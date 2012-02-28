@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import floppyforms as forms
-from Search.forms import SearchFieldForm, TwoDatesForm
+from sanza.Search.forms import SearchFieldForm, TwoDatesForm
 from django.utils.translation import ugettext as _
 from sanza.Crm import models
 from django.core.exceptions import ValidationError
@@ -222,6 +222,21 @@ class MainContactSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'main_contact': True if int(self._value) else False}
+
+
+class ContactRoleSearchForm(SearchFieldForm):
+    _name = 'contact_role'
+    _label = _(u'Contact role')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactRoleSearchForm, self).__init__(*args, **kwargs)
+        qs = models.EntityRole.objects.all().order_by('name') 
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'role': self._value}
+
 
 class ActionTypeSearchForm(SearchFieldForm):
     _name = 'action_type'
