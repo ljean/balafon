@@ -1,0 +1,15 @@
+{% extends "_section.html" %}
+{% load i18n %}
+
+{% block section_title %}
+  {{ emailing.newsletter.subject }}
+{% endblock %}
+  
+{% block section_data %}
+  <div>{{ emailing.get_info }}</div>
+{% endblock %}
+
+{% block section_action %}
+  {{ emailing.next_action }}
+  <a class="colorbox-form" href="{% url emailing_delete emailing.id %}">{% trans "Delete" %}</a>
+{% endblock %}

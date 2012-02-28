@@ -1,0 +1,4 @@
+{% load search_utils %}
+<input type="text" class="datepicker from" {% if value %}value="{{value|dt_from}}"{%endif %} {% if required %} required{% endif %}>
+<input type="text" class="datepicker to" {% if value %}value="{{value|dt_to}}"{%endif %} {% if required %} required{% endif %}>
+<input type="hidden" id="id_{{name}}" name="{{ name }}"{% if value %} value="{{ value }}"{% endif %}{% if required %} required{% endif %}>

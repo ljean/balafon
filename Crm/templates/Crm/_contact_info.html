@@ -1,0 +1,21 @@
+{% extends "_section.html" %}
+{% load i18n sanza_utils %}
+
+{% block section_title %}
+<div class="contact_info">
+  <span class="title">{{contact}}</span>&nbsp;-&nbsp;<a href="{% url crm_view_entity contact.entity.id %}">{{contact.get_role}}</a>
+</div>
+{% endblock %}
+  
+{% block section_data %}
+{{contact.get_full_address}} -
+{% if contact.get_email %}<a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a> -{% endif %}
+{{contact.get_phones|seq_to_dash}}
+<br /><br />
+<span class="notes">{{contact.notes}}</span>
+{% endblock %}
+
+
+{% block section_action %}
+    <a href="{% url crm_edit_contact contact.id %}">{% trans "Edit" %}</a>
+{% endblock %}

@@ -1,0 +1,48 @@
+<input type="hidden" name="{{ name }}"{% if value %} value="{{ value }}"{% endif %}>
+<input type="text" name="{{ name }}_visible" {% if required %} required{% endif %}{% for attr in attrs.items %} {{ attr.0 }}{% if attr.1 %}="{{ attr.1 }}"{% endif %}{% endfor %}>
+<script>
+{% if 'colorbox' in attrs.values %}
+$(document).bind('cbox_complete', function(){
+{% else %}
+$(function() {
+{% endif %}
+	var name_to_id = {};
+	{% if value %}
+	//get the current value
+    $.ajax({
+        url: "{% block get_value_url %}{% endblock %}",
+        success: function(data){
+            $('input[name={{name}}_visible]').val(data.name);
+        }
+    });
+	{% endif %}
+    //when someting is an entered, get the autocomplete list
+	$("input[name={{name}}_visible]").autocomplete({
+		source: function(request, add){
+			{% block extra_filter_value %}{% endblock %}
+			$.ajax({
+                url: "{% block get_list_url %}{% endblock %}?term="+request.term{% block extra_filter %}{% endblock %},
+                success : function(data) {
+                    var items = [];
+                    $.each(data, function(i, val){
+                        name_to_id[val.name] = val.id; //store in local dict
+                        items.push(val.name);
+                    });
+                    add(items);
+                }
+            });
+        },
+		//when the item is selected : get the value
+        select: function(event, ui) {
+            var id = name_to_id[ui.item.value]; //get id from local dict
+            if (!id) {
+                id = ui.item.value;
+            }
+            $("input[name={{name}}]").val(id);
+        }
+    });
+    $("input[name={{name}}_visible]").change(function() {
+        $("input[name={{name}}]").val($("input[name={{name}}_visible]").val());
+    });
+});
+</script>

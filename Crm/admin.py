@@ -1,0 +1,60 @@
+# -*- coding: utf-8 -*-
+from django.contrib import admin
+from django.core.urlresolvers import reverse
+from sanza.Crm import models
+
+admin.site.register(models.EntityType)
+admin.site.register(models.ActivitySector)
+admin.site.register(models.Relationship)
+admin.site.register(models.Zone)
+admin.site.register(models.EntityRole)
+admin.site.register(models.ActionType)
+admin.site.register(models.SameAs)
+admin.site.register(models.OpportunityType)
+
+class ZoneTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'type']
+admin.site.register(models.ZoneType, ZoneTypeAdmin)
+
+class OpportunityStatusAdmin(admin.ModelAdmin):
+    list_display = ['name', 'ordering']
+admin.site.register(models.OpportunityStatus, OpportunityStatusAdmin)
+
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ['lastname', 'firstname', 'entity']
+    search_fields = ['lastname']
+    raw_id_admin = ('entity',)
+admin.site.register(models.Contact, ContactAdmin)
+
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ['name', 'description']
+    search_fields = ['name']
+    filter_horizontal = ['entities']
+admin.site.register(models.Group, GroupAdmin)
+
+class GroupInline(admin.TabularInline):
+    model = models.Group
+
+class CityAdmin(admin.ModelAdmin):
+    list_display = ['__unicode__', 'parent']
+    search_fields = ['name']
+admin.site.register(models.City, CityAdmin)
+
+class EntityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'relationship', 'activity_sector')
+    search_fields = ['name']
+admin.site.register(models.Entity, EntityAdmin)
+
+class OpportunityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'entity', 'ended', 'display_on_board']
+    search_fields = ['name', 'entity']
+    raw_id_admin = ('entity',)
+admin.site.register(models.Opportunity, OpportunityAdmin)
+
+class ActionAdmin(admin.ModelAdmin):
+    list_display = ['subject', 'entity']
+    search_fields = ['subject', 'entity']
+    raw_id_admin = ('entity',)
+admin.site.register(models.Action, ActionAdmin)
+
+

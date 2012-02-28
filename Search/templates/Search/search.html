@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block document_title %}
+{% trans "Search for contacts" %}
+  {% if search %}
+  : {{search.name}}
+  {% endif %}
+{% endblock %}
+{% block document_content %}
+
+{% include "Search/_section_search_form.html" %}
+
+{% if entities or message %}    
+{% include "Search/_section_search_results.html" %}
+{% endif %}
+
+{% endblock %}

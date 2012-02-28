@@ -1,0 +1,9 @@
+{% extends "colorbox/popup_form_base.html" %}
+{% load i18n %}
+{% block title %}{{action.subject}}{% endblock %}
+{% block form_url %}{% url crm_do_action action.id %}{% endblock %}
+{% block popup_buttons %}
+<a href="" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" value="{% trans "Done" %}">
+<input type="submit" name="done_and_new" value="{% trans "Done & new" %}">
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "_section.html" %}
+{% load i18n thumbnail %}
+
+{% block section_title %}
+{% spaceless %}
+<div class="entity_logo">
+  <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{STATIC_URL}}img/no-logo.png{% endif %}"/>
+</div>
+<div class="entity_info">
+  <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;
+  <span class="entity_type label">{{entity.type}}</span>
+  <span class="entity_relationship label">{{entity.relationship}}</span>
+  {% if entity.activity_sector %}<span class="entity_sector label">{{entity.activity_sector}}</span>{% endif %}
+  {% if entity.relationship_date %}
+    <span class="label">{{entity.relationship_date}}</span>
+  {% endif %}
+  <br /><br />
+  <span class="entity_description">{{entity.description}}</span>
+  
+</div>
+{% endspaceless %}
+{% endblock %}
+  
+{% block section_data %}
+  <span class="entity_address addr-info">{{entity.get_display_address}}</span>
+  <span class="entity_phone addr-info">{{entity.phone}}</span>
+  <span class="entity_fax addr-info">{{entity.fax}}</span>
+  <br /><br />
+  <span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>
+  <span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>
+{% endblock %}
+
+{% block section_action %}
+    <a href="{% url crm_edit_entity entity.id %}">{% trans "Edit" %}</a>
+{% endblock %}

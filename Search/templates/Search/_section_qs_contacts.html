@@ -1,0 +1,26 @@
+{% extends "_section.html" %}
+{% load i18n %}
+
+{% block section_title %}{{ name.capitalize }}{% endblock %}
+  
+{% block section_data %}
+<table>
+  <tr><th>{% trans "Name" %}</th><th>{% trans "Role" %}</th><th>{% trans "Entity" %}</th>
+  <th>{% trans "Type" %}</th><th>{% trans "Relationship" %}</th>
+  <th>{% trans "Activity sector" %}</th><th>{% trans "City" %}</th>
+  {% for c in contacts %}
+  {% with c.entity as e %}
+  <tr class="{% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
+    <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
+    <td>{{c.role|default:'&nbsp;'}}</td>
+    <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
+    <td>{{e.type}}</td>
+    <td>{{e.relationship}}</td>
+    <td>{{e.activity_sector}}</td>
+    <td>{{e.city|default:"&nbsp;"}}</td>
+  </tr>
+  {% endwith %}
+  {% endfor %}
+</table>
+{% endblock %}
+

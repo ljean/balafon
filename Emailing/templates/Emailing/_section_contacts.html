@@ -1,0 +1,29 @@
+{% extends "_section.html" %}
+{% load i18n pagination_tags %}
+
+{% with emailing.get_contacts as contacts %}
+
+{% block section_title %}
+  {{ contacts.count }} {% trans "Contacts" %}
+{% endblock %}
+  
+{% block section_data %}
+
+<table>
+  <tr><th>{% trans "Contact" %}</th><th>{% trans "Entity" %}</th></tr>
+  {% autopaginate contacts 25 %}
+  {% for c in contacts %}
+  <tr>
+    <td>
+      <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.role|default:'' }}&nbsp;
+      {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+    </td>
+    <td><a href="{{c.entity.get_absolute_url}}">{{ c.entity }}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% paginate %}
+{% endblock %}
+
+{% endwith %}
+

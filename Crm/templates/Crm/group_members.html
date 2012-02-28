@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block document_title %}{% trans "Group" %}{% endblock %}
+{% block document_content %}
+{% include "Crm/_section_group_members.html" with group=group %}
+{% endblock %}

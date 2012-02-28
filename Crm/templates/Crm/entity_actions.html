@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n pagination_tags %}
+
+{% block document_content %}
+  
+{% autopaginate actions 25 %}  
+{% include "Crm/_section_actions.html" %}
+{% paginate %}
+
+{% endblock %}

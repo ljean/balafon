@@ -1,0 +1,52 @@
+{% extends "_section.html" %}
+{% load i18n pagination_tags %}
+
+{% block section_title %}
+  {% if all_opportunities and entity %}
+    {% trans "Opportunities with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+  {% else %}
+    {% trans "Opportunities" %}
+  {% endif %}
+{% endblock %}
+  
+{% block section_data %}
+{% if opportunities %}
+{% if all_opportunities %}{% autopaginate opportunities 25 %}{% endif %}
+<table id="entity_actions">
+  <tr>
+    <th>{% trans "Name" %}</th>
+    {% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
+    <th>{% trans "Status" %}</th>
+    {% if all_opportunities %}<th>{% trans "Closed" %}</th>{% endif %}
+    <th>{% trans "Amount" %}</th>
+    <th>{% trans "Probability" %}</th>
+  </tr>
+  {% for o in opportunities %}
+  <tr class="{% if o.ended%}old-opportunity{% endif %}">
+    <td><a href="{% url crm_view_opportunity o.id %}">{{o.name}}</a></td>
+    {% if not entity %}<td><a href="{% url crm_view_entity o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
+    <td>{{o.status}}</td>
+    {% if all_opportunities %}<td>{{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>{% endif %}
+    <td>{{o.amount}}</a></td>
+    <td>{{o.get_probability_display|capfirst}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% if all_opportunities %}{% paginate %}{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block section_action %}
+  {% if entity %}
+    <a href="{% url crm_add_opportunity_for_entity entity.id %}">{% trans "Add" %}</a>
+    {% if not all_opportunities %}
+      <a href="{% url crm_entity_opportunities entity.id %}">{% trans "All" %}</a>
+    {% endif %}
+  {% endif %}
+  {% if not entity %}
+     <a class="colorbox-form" href="{% url crm_add_opportunity %}">{% trans "Add" %}</a>
+     {% if not all_opportunities %}
+      <a href="{% url crm_all_opportunities %}">{% trans "All" %}</a>
+     {% endif %}
+  {% endif %}
+{% endblock %}

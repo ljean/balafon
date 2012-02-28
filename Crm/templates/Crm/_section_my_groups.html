@@ -1,0 +1,32 @@
+{% extends "_section.html" %}
+{% load i18n pagination_tags %}
+
+{% block section_title %}{% trans "My groups" %}{% endblock %}
+  
+{% block section_data %}
+  <table>
+  <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th><th>{% trans "Description" %}</th></tr>
+  {% autopaginate groups 25 %}
+  {% for g in groups %}
+    <tr>
+      <td><a href="{% url crm_get_group_members g.id %}">{{g.name}}</a></td>
+      <td>{{g.entities.count}}</td>
+      <td>{{g.description|default:"&nbsp;"}}</td>
+    </tr>
+  {% endfor %}
+  </table>
+  {% paginate %}
+{% endblock %}
+
+{% block section_action %}
+  {% if entity %}
+    <a href="{% url crm_add_entity_to_group entity.id %}">{% trans "Add" %}</a>
+  {% else %}
+    <a href="{% url crm_add_group %}">{% trans "Add" %}</a>
+    {% if ordering != 'name' %}
+    <a href="{% url crm_see_my_groups %}?ordering=name">{% trans "By name" %}</a>
+    {% else %}
+    <a href="{% url crm_see_my_groups %}?ordering=date">{% trans "By date" %}</a>
+    {% endif %}
+  {% endif %}
+{% endblock %}

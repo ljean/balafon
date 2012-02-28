@@ -1,0 +1,12 @@
+{% extends "Emailing/public/base_custom.html" %}
+{% load i18n %}
+{% block content %}
+      <h1>{% blocktrans %}
+      You have have subscribe to the {{my_company}} mailing-list.
+      {% endblocktrans %}</h1>
+      <p>
+      {% blocktrans %}
+      You can unregister by clicking <a href="{{unregister_url}}">here</a>.
+      {% endblocktrans %}
+      </p>
+{% endblock %}

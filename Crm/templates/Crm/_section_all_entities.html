@@ -1,0 +1,53 @@
+{% extends "_section.html" %}
+{% load i18n pagination_tags %}
+
+{% block section_title %}
+  {%if partial %}{% trans "Latest entities" %}{% else %}{% trans "All entities" %}{%endif%}
+{% endblock %}
+  
+{% block section_data %}
+{% autopaginate entities 25 %}
+<table class="entities-table">
+  <tr>
+    <th>{% trans "Name" %}</th>
+    <th>{% trans "Relationship" %}</th>
+    <th>{% trans "Type" %}</th>
+    <th>{% trans "City" %}</th>
+    <th>{% trans "Main contacts" %}</th>
+    <th>{% trans "Last action" %}</th>
+    <th>{% trans "Opportunities" %}</th>
+  </tr>
+  {% for e in entities %}
+  <tr>
+    <td><a href="{% url crm_view_entity e.id %}">{{e.name}}</a></td>
+    <td>{{e.relationship}}</td>
+    <td>{{e.type}}</td>
+    <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
+    <td>
+      {% if e.main_contacts %}
+      {% for c in e.main_contacts %}<a href="{% url crm_view_contact c.id%}">{{c.fullname}}</a><br/>{% endfor %}</td>
+      {% else %}
+        &nbsp;
+      {% endif %}
+    <td>
+      {% with e.last_action as action %}
+      {% if action %}
+        <a href="{% url crm_edit_action action.id %}">{{action.subject}}</a>
+      {% else %}
+        &nbsp;
+      {% endif %}
+      {% endwith %}
+    </td>
+    <td>{{e.current_opportunities|default:"&nbsp;"}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% paginate %}
+{% endblock %}
+
+{% block section_action %}
+  <a href="{% url crm_create_entity %}">{% trans "Add" %}</a>
+  {% if partial %}
+  <a href="{% url crm_view_entities_list %}">{% trans "All" %}</a>
+  {% endif %}
+{% endblock %}

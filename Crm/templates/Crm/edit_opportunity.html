@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block document_content %}
+  {% if opportunity %}
+  <h2>{% trans "Edit opportunity" %}</h2>
+  {% if opportunity.ended %}
+    {% trans "This opportunity has be closed on" %} {{opportunity.end_date}}
+  {% endif %}
+  {% else %}
+  <h2>{% trans "Create opportunity" %}</h2>
+  {% endif %}
+  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+    <div class="buttons">
+    <input type="submit" value="{% trans "Save"%}">
+    {% if opportunity %}
+    <a class="colorbox-form" href="{% url crm_delete_opportunity opportunity.id %}">{% trans "Delete" %}</a>
+    {% endif %}
+    <a href="{% url crm_view_entity entity.id %}">{% trans "Cancel" %}</a>
+    </div>
+    <ul>
+      <li><h3>{% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a></h3></li>
+      {{form.as_ul}}
+    </ul>
+  </form>
+  {% include "_calendar.html" with field="end_date" yearRange="c:c+2" %}
+  {% include "_calendar.html" with field="start_date" yearRange="c:c+2" %}
+{% endblock %}

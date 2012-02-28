@@ -1,0 +1,13 @@
+{% extends "Emailing/public/base_custom.html" %}
+{% load i18n %}
+{% block content %}
+      {% if unregister %}
+        <h1>{% blocktrans %}
+        You have been unregistered from the {{my_company}} mailing-list.
+        {% endblocktrans %}</h1>
+      {% else %}
+        <h1>{% blocktrans %}
+        You have cancelled the operation. You are still member of the {{my_company}} mailing-list.
+        {% endblocktrans %}</h1>
+      {% endif %}
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "_section.html" %}
+{% load i18n %}
+
+{% block section_title %}{% trans "Search criteria" %}{% endblock %}
+{% block section_data %}
+
+<div class="search-block-template" style="display: none">
+  <div class="search-block">
+    <div class="actions">
+      {{search_form.actions|safe}}
+    </div>
+    <div class="fields">
+    </div>
+  </div>
+</div>
+
+<form class="search-form" action="" method="post">{% csrf_token %}
+  {{search_form.as_html|safe}}
+  <div class="form">
+  </div>
+</form>
+
+<script>
+  $(function() {
+    var block_count = {{search_form.block_count|default:0}};
+    var field_count = 0;
+    
+    var add_block = function(no_remove) {
+      var gr = $(".form").append($(".search-block-template").html());
+      gr.find('.search-block:last').attr("rel", "gr"+block_count);
+      block_count += 1;
+      if (no_remove) {
+        gr.find('.remove-block').remove();
+      }
+    }
+    
+    $(".remove-field").live('click', function() {
+      $(this).parent().remove();
+      return false;
+    });
+    
+    $(".remove-block").live('click', function() {
+      $(this).parent().parent().remove();
+      return false;
+    });
+    
+    $(".clear-block").live('click', function() {
+      $(this).parent().parent().find('.fields').remove();
+      $(this).parent().parent().append('<div class="fields"></div>')
+      return false;
+    });
+    
+    $(".add-block").live('click', function() {
+      add_block();
+      return false;
+    });
+    
+    if (block_count===0) {
+      add_block(true);  
+    } else {
+      $(".form .actions").each(function() {
+        $(this).append($(".search-block-template").html());
+      });
+      $('.search-block[rel="gr0"]').find('.actions a.remove-block').remove();
+    }
+    
+  
+    $(".add-field").live('click', function() {
+      var field_type = $(this).parent().find("select[name='field_choice']").val();
+      if (field_type) {
+        $.ajax({
+          url: field_type+'?block='+$(this).parent().parent().attr('rel')+"&count="+field_count,
+          context: $(this).parent(),
+          success: function(data){
+            field_count += 1;
+            $(this).parent().find(".fields").append(data.form);
+          }
+        });
+      }
+      return false;
+    });
+    
+    $("#search-button").click(function() {
+      $("input[name=excluded]").val('');
+      $("form.search-form").submit();
+      return false;
+    })
+    
+    $("#save-button").click(function() {
+      if ($("input[name=name]").parent().is(":visible")) {
+        $("form.search-form").attr('action', $(this).attr('href'));
+        $("form.search-form").submit();
+        $("form.search-form").attr('action', '');  
+      } else {
+        $("input[name=name]").parent().show();
+      }
+      return false;
+    })
+    
+    $('.datepicker').live('click', function() {
+      $(this).datepicker({
+        dateFormat: 'dd/mm/yy',
+        dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
+        monthNames : {% trans "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']" %},
+        firstDay: 1,
+        changeYear: true,
+        showOn:'focus'
+      }).focus();
+    });
+    
+    $('.datepicker').live('change', function() {
+      if ($(this).hasClass('from')) {
+        var to = $(this).parent().find(".to");
+        var input = $(this).parent().find("input[type=hidden]");
+        input.val($(this).val()+' '+to.val());
+      } else if ($(this).hasClass('to')) {
+        var from = $(this).parent().find(".from");
+        var input = $(this).parent().find("input[type=hidden]");
+        input.val(from.val()+' '+$(this).val());  
+      }
+    });
+    
+    $("input[name=name]").parent().hide();
+  });
+</script>
+
+{% endblock %}
+
+{% block section_action %}
+<a href="" id="search-button">{% trans "Search" %}</a>
+<a href="{% url search_save search.id %}" id="save-button">{% trans "Save" %}</a>
+<a href="{% url search_list %}">{% trans "Open" %}</a>
+{% endblock %}

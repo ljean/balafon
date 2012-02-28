@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  <script type="text/javascript" src="{{STATIC_URL}}js/js18n.js"></script>
+  {{form.media}}
+{% endblock %}
+
+{% block document_content %}
+  <h2>{% if group %}
+    {% blocktrans %}Edit the '{{group}}' group{% endblocktrans %}
+  {% else %}
+    {% trans "Create group" %}
+  {% endif %}</h2>
+  <form method="POST" action="">{% csrf_token %}
+    <div class="buttons">
+    <input type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}">
+    {% if group %}
+      <a class="colorbox-form" href="{% url crm_delete_group group.id %}">{% trans "Delete" %}</a>
+      <a href="{% url crm_get_group_members group.id %}">{% trans "Cancel" %}</a>
+    {% else %}
+      <a href="{% url crm_see_my_groups %}">{% trans "Cancel" %}</a>
+    {% endif %}
+    </div>
+    <ul>
+      {{form.as_ul}}
+    </ul>
+  </form>
+{% endblock %}

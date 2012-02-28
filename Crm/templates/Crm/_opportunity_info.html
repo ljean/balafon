@@ -1,0 +1,33 @@
+{% extends "_section.html" %}
+{% load i18n sanza_utils %}
+
+{% block section_title %}
+<div class="opportunity_info">
+  <span class="title">{{opportunity.name}}</span>&nbsp;&nbsp;
+  {% if opportunity.type %}<span class="label">{{opportunity.type}}</span>{% endif %}
+  <span class="label">{{opportunity.status}}</span>
+  {% if opportunity.ended %}<span class="ended label">{% trans "Ended" %}</span>{% endif %}
+  <br /><br />
+  <div>
+  {% trans "Opportunity with" %} <a href="{% url crm_view_entity opportunity.entity.id %}">{{ opportunity.entity }}</a>
+  &nbsp;-&nbsp; 
+  {% if opportunity.start_date %}
+    {% trans "from" %} {{ opportunity.start_date }}
+    {% if opportunity.end_date %}{% trans "to" %} {{ opportunity.end_date }}{% endif %}
+  {% else %}
+    {% if opportunity.end_date %}{% trans "End date:" %} {{ opportunity.end_date }}{% endif %}
+  {% endif %}
+  </div>
+</div>
+{% endblock %}
+  
+{% block section_data %}
+<span class="">{% trans "Probability" %}: {{opportunity.get_probability_display}}</span>&nbsp;-&nbsp; 
+<span class="">{% trans "Amount" %}: {{opportunity.amount}}€</span>
+<span class="entity_description">{{opportunity.detail}}</span>
+{% endblock %}
+
+
+{% block section_action %}
+    <a href="{% url crm_edit_opportunity opportunity.id %}">{% trans "Edit" %}</a>
+{% endblock %}

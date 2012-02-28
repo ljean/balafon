@@ -1,0 +1,107 @@
+{% extends "_section.html" %}
+{% load i18n sanza_utils pagination_tags %}
+
+{% block section_title %}
+  {% if all_actions and entity %}
+    {% trans "Actions with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+  {% else %}
+    {% trans "Actions" %}
+  {% endif %}
+{% endblock %}
+  
+  
+{% block section_data %}
+{% if actions %}
+{% if all_actions %}{% autopaginate actions 25 %}{% endif %}
+<table id="entity_actions">
+  <tr>
+    <th>&nbsp;</th>
+    <th>{% trans "Subject" %}</th>
+    {% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
+    <th>{% trans "Date" %}</th>
+    {% if all_actions %}<th>{% trans "Done" %}</th>{% endif %}
+    <th>{% trans "Contact" %}</th>
+    <th>{% trans "Type" %}</th>
+    <th>{% trans "Priority" %}</th>
+    {% if multi_user %}<th>{% trans "In charge" %}</th>{% endif %}
+  </tr>
+  {% for a in actions %}
+  <tr class="{% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+    <td class="status-icon">
+      <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
+        href="{% url crm_do_action a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
+    </a></td>
+    <td><a href="{% url crm_edit_action a.id %}">{{a.subject}}</a></td>
+    {% if not entity %}<td><a href="{% url crm_view_entity a.entity.id %}">{{ a.entity }}</a></td>{% endif %}
+    
+    {% if all_actions %}
+      <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
+      <td>{{a.done_date|date:'j F Y'|default:'&nbsp;'}}</td>
+    {% else %}
+      {% if a.done_date %}
+        <td>{{ a.done_date|date:'j F Y'|default:'&nbsp;'}}</td>
+      {% else %}
+        <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
+      {% endif %}
+    {% endif %}
+    
+    <td><a {% if a.contact %} href="{% url crm_view_contact a.contact.id %} {% endif %}">
+      {{a.contact|default:'&nbsp;'}}
+    </a></td>
+    <td>{{a.type|default:'&nbsp;'}}</td>
+    <td>{{a.get_priority_display|capfirst}}</td>
+    {% if multi_user %}<td>{{ a.in_charge.first_name }}&nbsp;{{ a.in_charge.last_name }}</td>{% endif %}
+  </tr>
+  {% endfor %}
+</table>
+{% if all_actions %}{% paginate %}{% endif %}
+{% comment%}
+<script>
+  $(function() {
+    $("tr td.status-icon").live('click', function() {
+      if (!$(this).parent().hasClass('not-my-action')){
+        var action_id = $(this).attr('id').substr(2);
+        $.post('{% url crm_toogle_action %}', {id: action_id}, function(data) {
+          window.location.reload();
+        });
+      }
+      return false;
+    });
+  })
+</script>
+{% endcomment %}
+{% endif %}
+{% endblock %}
+
+{% block section_action %}
+  {% if entity %}
+    <a href="{% url crm_add_action_for_entity entity.id %}">{% trans "Add" %}</a>
+    {% if not all_actions %}
+    <a href="{% url crm_entity_actions entity.id %}">{% trans "All" %}</a>
+  {% endif %}
+  {% else %}
+    <a class="colorbox-form" href="{% url crm_add_action %}">{% trans "Add" %}</a>
+  {% endif %}
+  {% if multi_user %}
+    <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
+    <script>
+      $(function() {
+        $("#toggle_my_actions").click(function() {
+          if ($("#toggle_my_actions").hasClass('all')) {
+            $("#toggle_my_actions").removeClass('all');
+            $("#toggle_my_actions").addClass('mine');
+            $("tr.not-my-action").hide();
+            $("#toggle_my_actions").html('{% trans "See all actions" %}');
+          } else {
+            $("#toggle_my_actions").removeClass('mine');
+            $("#toggle_my_actions").addClass('all');
+            $("tr.not-my-action").show();
+            $("#toggle_my_actions").html('{% trans "See my actions" %}');
+          }
+          return false;
+        });
+        {% if default_my_actions %}$("#toggle_my_actions").click();{% endif %}
+      })
+    </script>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "coop_cms/newsletter.html" %}
+{% load i18n %}
+
+{% block email_only_header %}
+<div class="top-header email-only">
+    {% if contact and emailing %}
+    <div class="item">
+    {% trans "If you can't view this email, " %}
+    <a href="{{SITE_PREFIX}}{% url emailing_view_online emailing.id contact.uuid %}">
+        {% trans "read the online version" %}
+    </a>
+    </div>
+    <div class="top-header-item">
+        {% blocktrans %}
+        You receive this email because you subscribe to the mailing list of {{my_company}}.
+        You can unsubscribe by clicking 
+        {% endblocktrans %}
+        <a href="{{SITE_PREFIX}}{% url emailing_unregister emailing.id contact.uuid %}">{% trans "this link" %}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block email_only_footer %}
+    {% if contact and emailing %}
+<div class="bottom-footer email-only">
+    <div class="item">
+        {% blocktrans %}
+        You receive this email because you subscribe to the mailing list of {{my_company}}.
+        You can unsubscribe by clicking 
+        {% endblocktrans %}
+        <a href="{{SITE_PREFIX}}{% url emailing_unregister emailing.id contact.uuid %}">{% trans "this link" %}</a>
+    </div>
+    {% endif %}
+{% endblock %}
+

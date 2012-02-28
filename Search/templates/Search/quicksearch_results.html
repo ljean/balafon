@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block document_title %}{% trans "Quick search results for" %} '{{text}}'{% endblock %}
+{% block document_content %}
+
+{% if entities_by_name %}    
+{% include "Search/_section_qs_entities.html" with entities=entities_by_name name=entities_title %}
+{% endif %}
+
+{% if contacts_by_name %}    
+{% include "Search/_section_qs_contacts.html" with contacts=contacts_by_name name=contacts_title %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block document_content %}
+  {% if contact %}
+  <h2>{% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
+  {% else %}
+  <h2>{% trans "Create contact" %}</h2>
+  {% endif %}
+  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+    <div class="buttons">
+    <input type="submit" value="{% trans "Save"%}">
+    {% if contact %}
+    <a class="colorbox-form" href="{% url crm_delete_contact contact.id %}">{% trans "Delete" %}</a>
+    <a href="{% url crm_view_contact contact.id %}">{% trans "Cancel" %}</a>
+    <br /><br />
+    {% if mini %}
+      <a href="{% url crm_edit_contact_advanced contact.id %}">{% trans "Advanced form" %}</a>
+    {% else %}
+      <a href="{% url crm_edit_contact contact.id %}">{% trans "Simple form" %}</a>
+    {% endif %}
+    {% endif %}
+    </div>
+    <ul>
+      <li><h3>{% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a></h3></li>
+      {{contact_form.as_ul}}
+    </ul>
+  </form>
+  {% include "_calendar.html" with field="birth_date" yearRange="c-100:c" %}
+{% endblock %}

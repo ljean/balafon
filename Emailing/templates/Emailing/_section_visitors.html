@@ -1,0 +1,16 @@
+{% extends "_section.html" %}
+{% load i18n %}
+
+{% block section_title %}
+  {% trans "Links" %}
+{% endblock %}
+  
+{% block section_data %}
+<table class="entities-table">
+<tr><th>{% trans "url" %}</th><th>{% trans "visitors" %}</th></tr>
+{% for l in emailing.magiclink_set.all %}
+    <tr><td><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></td><td>{{ l.visitors.count }}</td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block extra_head %}
+{{block.super}}
+<script>
+  $(function() {
+      $("input[name='group_name']").autocomplete({
+          source: "{% url crm_get_group_suggest_list %}"//,
+      });
+  });
+  </script>
+{% endblock %}
+
+{% block document_content %}
+<h3>{% blocktrans %}Add {{entity.name}} to a group{% endblocktrans %}</h3>
+<form method="POST" action="">{% csrf_token %}
+  {% if form.errors %}
+  <ul class="errors">
+    {% for err in form.non_field_errors %}<li>{{err}}</li>{% endfor %}
+    {% for err in form.group_name.errors %}<li>{{err}}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  {{form.group_name}}
+  <input type="submit" value="{% trans "Add" %}">
+  <a href="{% url crm_view_entity entity.id %}">{% trans "Cancel" %}</a>
+</form>
+{% endblock %}

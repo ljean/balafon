@@ -1,0 +1,13 @@
+{% extends "Emailing/public/base_custom.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Unregister" %}{% endblock %}
+
+{% block content %}
+  {% blocktrans %}<h1>Are you sure to unregister from the {{my_company}} mailing-list?</h1>{% endblocktrans %}
+  <form method="post" action="">{% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" name="unregister" value="{% trans "Yes" %}">
+    <input type="submit" name="cancel" value="{% trans "No" %}">
+  </form>
+{% endblock %}

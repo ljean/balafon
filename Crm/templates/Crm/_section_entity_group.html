@@ -1,0 +1,27 @@
+{% extends "_section.html" %}
+{% load i18n %}
+
+{% block section_title %}{% trans "Groups" %}{% endblock %}
+  
+{% block section_data %}
+  {% for g in groups.all %}
+    <span class="entity_group label" title="{{g.description}}">
+      <a href="{% url crm_get_group_members g.id %}">{{g.name}}</a>
+      {% if entity %}<a class="colorbox-form" href="{% url crm_remove_entity_from_group g.id entity.id %}" title="{% trans "Remove from group" %}">x</a>{% endif %}
+    </span>
+    
+  {% endfor %}
+{% endblock %}
+
+{% block section_action %}
+  {% if entity %}
+    <a href="{% url crm_add_entity_to_group entity.id %}">{% trans "Add" %}</a>
+  {% else %}
+    <a href="{% url crm_add_group %}">{% trans "Add" %}</a>
+    {% if ordering != 'name' %}
+    <a href="{% url crm_see_my_groups %}?ordering=name">{% trans "By name" %}</a>
+    {% else %}
+    <a href="{% url crm_see_my_groups %}?ordering=date">{% trans "By date" %}</a>
+    {% endif %}
+  {% endif %}
+{% endblock %}

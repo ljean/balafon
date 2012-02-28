@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block document_content %}
+  {% if entity %}
+  <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
+  {% else %}
+  <h2>{% trans "Create entity" %}</h2>
+  {% endif %}
+  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+    <div class="buttons">
+    <input type="submit" value="{% trans "Save"%}">
+    {% if entity %}
+    <a class="colorbox-form" href="{% url crm_delete_entity entity.id%}">{% trans "Delete" %}</a>
+    <a href="{% url crm_view_entity entity.id%}">{% trans "Cancel" %}</a>
+    {% else %}
+    <a href="{% url crm_board_panel %}">{% trans "Cancel" %}</a>
+    {% endif %}
+    </div>
+    <ul>
+      {{form.as_ul}}
+    </ul>
+  </form>
+  {% include "_calendar.html" with field="relationship_date" %}
+{% endblock %}
