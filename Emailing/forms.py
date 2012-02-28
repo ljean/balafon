@@ -57,15 +57,14 @@ class SubscribeForm(forms.ModelForm):
         }
         
     entity = forms.CharField(required=False)
-    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), choices=[
-        (g.id, g.name) for g in Group.objects.filter(subscribe_form=True)
-    ])
+    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple())
     
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
-        #
-        #print self.fields['groups'].choices
-        #
+        
+        self.fields['groups'].choices = [
+            (g.id, g.name) for g in Group.objects.filter(subscribe_form=True)
+        ]
         
     def clean_entity(self):
         entity = self.cleaned_data['entity']

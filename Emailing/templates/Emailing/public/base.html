@@ -4,11 +4,15 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}{% endblock %}</title>
-  {% block style %}
+  {% block jquery_declaration %}
+  <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
+  {% endblock %}
+  {% block extra_head %}
   {% endblock %}
 </head>
 <body>
   <div id="main">
+    {% include "coop_cms/_messages.html" %}
     <div id="header">
       {% block header %}{% endblock %}
     </div>
