@@ -1,0 +1,8 @@
+{% extends "colorbox/popup_form_base.html" %}
+{% load i18n %}
+{% block title %}{{message}}{% endblock %}
+{% block form_url %}{{ action_url }}{% endblock %}
+{% block popup_buttons %}
+<a href="" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="confirm" value="{% trans "Confirm" %}">
+{% endblock %}

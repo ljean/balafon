@@ -1,0 +1,23 @@
+{% load i18n %}
+<script>
+    {% if colorbox %}
+    $(document).bind('cbox_complete', function(){
+    {% else %}
+    $(function() {
+    {% endif %}
+        $("input[name={{field}}]").datepicker({
+          dateFormat: 'dd/mm/yy',
+          dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
+          monthNames : {% spaceless%}
+            ['{% trans "January" %}', '{% trans "February" %}', '{% trans "March" %}', '{% trans "April" %}',
+            '{% trans "May" %}', '{% trans "June" %}', '{% trans "July" %}', '{% trans "August" %}',
+             '{% trans "September" %}', '{% trans "October" %}', '{% trans "November" %}', '{% trans "December" %}'],
+          {% endspaceless %}
+          firstDay: 1,
+          {% if yearRange %}
+          yearRange: "{{yearRange}}",
+          {% endif %}
+          changeYear: true
+        });
+    });
+</script>

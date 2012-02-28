@@ -1,0 +1,26 @@
+{% extends "Emailing/newsletter.html" %}
+{% load i18n coop_edition %}
+
+  {% block style %}
+  {{block.super}}
+  <style>
+    body {
+        background: #f55;
+        font-family: "Calibri";
+    }
+  </style>
+{% endblock %}
+
+{% block newsletter %}
+    {% cms_edit newsletter %}{% cms_nospace %}
+        <div class="header">
+        {% coop_piece_of_html "newsletter_header" %}
+        </div>
+        <div class="date">{% now "j F Y"%}</div>
+        <div id="content">{{ newsletter.content }}</div>
+
+        {% include "coop_cms/_newsletter_articles.html" %}
+
+    {% end_cms_nospace %}{% end_cms_edit %}
+{% endblock %}
+

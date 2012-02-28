@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% load i18n %}
+{% block main %}
+{% include "_header.html" %}
+<div style="background: #e0cbb8; width: 1050px">
+    <span style="float: right; color: #777; font-size: 9px">
+        {% trans "Photo by" %} <a target="_blank" href="http://fr.wikipedia.org/wiki/Fichier:Sanza.jpg">serged</a> - {% trans "Creative Commons license" %}
+    </span>
+    <img src="{{STATIC_URL}}img/login.png" style="margin-left: 200px;">
+</div>
+{% if form.errors %}
+    <p class="warning">{% trans "Login has failed" %}</p>
+{% else %}
+    <p />
+{% endif %}
+<form class="loginform" action="{% url django.contrib.auth.views.login %}" method="post">{% csrf_token %}
+    <ul>
+    {{form.as_ul}}
+    </ul>
+<input type="submit" value="{% trans "Login" %}" />
+</form>
+
+<p>
+{% trans "Forgotten Password" %} <a href="{% url django.contrib.auth.views.password_reset %}">{% trans "Click Here" %}</a>
+</p>
+{% endblock %}
+    

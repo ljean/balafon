@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% load i18n %}
+{% block main %}
+<h2>{{title}}</h2>
+<p>
+    {% trans "Login" %} <a href="{% url django.contrib.auth.views.login %}">{% trans "Click Here" %}</a>
+</p>
+{% endblock %}
+    
