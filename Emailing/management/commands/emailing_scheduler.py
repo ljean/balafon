@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.core.management.base import BaseCommand
-from Emailing.models import Emailing
-from Emailing.utils import send_newsletter
+from sanza.Emailing.models import Emailing
+from sanza.Emailing.utils import send_newsletter
 from datetime import datetime
 
 class Command(BaseCommand):

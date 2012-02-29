@@ -50,7 +50,7 @@ class ZoneType(NamedElement):
 
 
 class BaseZone(NamedElement):
-    parent = models.ForeignKey('Zone', blank=True, default='', null=True)
+    parent = models.ForeignKey('Zone', blank=True, default=None, null=True)
 
     def get_full_name(self):
         if self.parent:
@@ -94,7 +94,7 @@ class Entity(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
     type = models.ForeignKey(EntityType, verbose_name=_(u'type'))
-    activity_sector = models.ForeignKey(ActivitySector, blank=True, default=u'', null=True, verbose_name=_(u'activity sector'))
+    activity_sector = models.ForeignKey(ActivitySector, blank=True, default=None, null=True, verbose_name=_(u'activity sector'))
     relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'))
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
@@ -111,7 +111,7 @@ class Entity(TimeStampedModel):
     
     zip_code = models.CharField(_('zip code'), max_length=10, blank=True, default=u'')
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=u'', null=True)
+    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
     def __unicode__(self):
         return self.name
@@ -206,7 +206,7 @@ class Contact(TimeStampedModel):
     address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
     zip_code = models.CharField(_('zip code'), max_length=10, blank=True, default=u'')
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=u'', null=True)
+    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
     notes = models.CharField(_('notes'), max_length=500, blank=True, default="")
     
@@ -346,11 +346,11 @@ class Action(TimeStampedModel):
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_('detail'), blank=True, default='')
     priority = models.IntegerField(_('priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
-    opportunity = models.ForeignKey(Opportunity, blank=True, default='', null=True)
-    contact = models.ForeignKey(Contact, blank=True, default='', null=True)
+    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True)
+    contact = models.ForeignKey(Contact, blank=True, default=None, null=True)
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
-    in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default='',
+    in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
         limit_choices_to={'first_name__regex': '.+'})
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
 

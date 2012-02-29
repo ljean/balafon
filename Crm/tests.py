@@ -23,25 +23,18 @@ class OpportunityTest(BaseTestCase):
 
     def test_add_opportunity(self):
         
-        entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        entity2 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        other_entity = mommy.make_one(models.Entity, relationship_date='2012-01-30')
+        entity1 = mommy.make_one(models.Entity, name='ent1', relationship_date='2012-01-30')
+        entity2 = mommy.make_one(models.Entity, name='ent2', relationship_date='2012-01-30')
+        other_entity = mommy.make_one(models.Entity, name='ent3', relationship_date='2012-01-30')
         
         url = reverse("crm_add_opportunity")
         response = self.client.get(url)
-        
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, entity1.name)
-        self.assertContains(response, entity2.name)
-        self.assertNotContains(response, other_entity.name)
         
         response = self.client.post(url, data={'entity': entity2.id}, follow=True)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.redirect_chain))
-        
-        self.assertContains(response, entity2.name)
-        self.assertNotContains(response, entity1.name)
-        self.assertNotContains(response, other_entity.name)
+        next_url = reverse('crm_add_opportunity_for_entity', args=[entity2.id])
+        self.assertContains(response, next_url)
 
     def test_add_opportunity_for_entity(self):
         pass
@@ -49,37 +42,37 @@ class OpportunityTest(BaseTestCase):
 
     def test_view_opportunity(self):
         entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        opp1 = mommy.make_one(models.Opportunity, entity=entity1)
+        opp1 = mommy.make_one(models.Opportunity, name="OPP1", entity=entity1)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
-        self.assertEqual(200, response.content)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, opp1.name)
         
     def test_view_opportunity_actions(self):
-        entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        entity2 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        opp1 = mommy.make_one(models.Opportunity, entity=entity1)
-        act1 = mommy.make_one(models.Action, opportunity=opp1, entity=entity1)
-        act2 = mommy.make_one(models.Action, opportunity=opp1, entity=entity2)
-        act3 = mommy.make_one(models.Action, entity=entity1)
+        entity1 = mommy.make_one(models.Entity, name='ent1', relationship_date='2012-01-30')
+        entity2 = mommy.make_one(models.Entity, name='ent2', relationship_date='2012-01-30')
+        opp1 = mommy.make_one(models.Opportunity, name='OPP1', entity=entity1)
+        act1 = mommy.make_one(models.Action, subject='ABC', opportunity=opp1, entity=entity1)
+        act2 = mommy.make_one(models.Action, subject='DEF', opportunity=opp1, entity=entity2)
+        act3 = mommy.make_one(models.Action, subject='GHI', entity=entity1)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
-        self.assertEqual(200, response.content)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, opp1.name)
-        self.assertContains(response, act1.name)
-        self.assertContains(response, act2.name)
-        self.assertNotContains(response, act3.name)
+        self.assertContains(response, act1.subject)
+        self.assertContains(response, act2.subject)
+        self.assertNotContains(response, act3.subject)
     
     def test_view_opportunity_contacts(self):
         entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
         entity2 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
         opp1 = mommy.make_one(models.Opportunity, entity=entity1)
-        contact1 = mommy.make_one(models.Contact, entity=entity1)
-        contact2 = mommy.make_one(models.Contact, entity=entity2)
-        contact3 = mommy.make_one(models.Contact, entity=entity1)
+        contact1 = mommy.make_one(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make_one(models.Contact, lastname='DEF', entity=entity2)
+        contact3 = mommy.make_one(models.Contact, lastname='GHI', entity=entity1)
         act1 = mommy.make_one(models.Action, opportunity=opp1, entity=entity1, contact=contact1)
         act2 = mommy.make_one(models.Action, opportunity=opp1, entity=entity2, contact=contact2)
         act3 = mommy.make_one(models.Action, entity=entity1, contact=contact3)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
-        self.assertEqual(200, response.content)
+        self.assertEqual(200, response.status_code)
         self.assertContains(response, contact1.lastname)
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
@@ -109,7 +102,7 @@ class SameAsTest(BaseTestCase):
         entity2 = models.Entity.objects.create(name="Titi")
         contact1 = models.Contact.objects.create(entity=entity1, firstname="John", lastname="Lennon")
         contact2 = models.Contact.objects.create(entity=entity2, firstname="John", lastname="Lennon")
-        contact3 = models.Contact.objects.create(entity=entity3, firstname="Ringo", lastname="Star")
+        contact3 = models.Contact.objects.create(entity=entity2, firstname="Ringo", lastname="Star")
         
         url = reverse("crm_same_as", args=[contact1.id])
         response = self.client.get(url)
@@ -124,10 +117,12 @@ class SameAsTest(BaseTestCase):
         
         #refresh
         contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
         contact3 = models.Contact.objects.get(id=contact3.id)
         
         self.assertEqual(0, models.SameAs.objects.count())
         self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, None)
         
         
@@ -151,7 +146,7 @@ class OpportunityAutoCompleteTest(BaseTestCase):
         url = reverse('crm_get_opportunity_name', args=[555])
         url = url.replace('555', 'toto')
         response = self.client.get(url)
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(301, response.status_code)
         
     def test_get_opportunity_list(self):
         e1 = mommy.make_one(models.Entity, name='ABC')

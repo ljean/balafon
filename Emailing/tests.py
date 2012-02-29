@@ -366,8 +366,8 @@ class SendEmailingTest(BaseTestCase):
         
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
-    def test_send_newsletter(self):
-        super(NewsletterTest, self).test_send_newsletter('test/newsletter_contact.html')
+    def test_send_newsletter_template(self):
+        super(NewsletterTest, self).test_send_test_newsletter('test/newsletter_contact.html')
         
 class SubscribeTest(TestCase):
     
