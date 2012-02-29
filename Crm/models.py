@@ -91,7 +91,7 @@ def _get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 class Entity(TimeStampedModel):
-    name = models.CharField(_('name'), max_length=200)
+    name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
     type = models.ForeignKey(EntityType, verbose_name=_(u'type'))
     activity_sector = models.ForeignKey(ActivitySector, blank=True, default=u'', null=True, verbose_name=_(u'activity sector'))
@@ -182,7 +182,7 @@ class Contact(TimeStampedModel):
     
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
     title = models.CharField(_(u'title'), max_length=200, blank=True, default=u'')
-    lastname = models.CharField(_(u'last name'), max_length=200, blank=True, default=u'')
+    lastname = models.CharField(_(u'last name'), max_length=200, blank=True, default=u'', db_index=True)
     firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
     nickname = models.CharField(_(u'nickname'), max_length=200, blank=True, default=u'')
     
@@ -190,8 +190,8 @@ class Contact(TimeStampedModel):
     birth_date = models.DateField(_(u"birth date"), blank=True, default=None, null=True)
     job = models.CharField(_(u"job"), max_length=200, blank=True, default=u"")
     
-    main_contact = models.BooleanField(_("main contact"), default=True)
-    accept_newsletter = models.BooleanField(_("accept newsletter"), default=False)
+    main_contact = models.BooleanField(_("main contact"), default=True, db_index=True)
+    accept_newsletter = models.BooleanField(_("accept newsletter"), default=False, db_index=True)
     accept_3rdparty = models.BooleanField(_("accept third parties"), default=False)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
@@ -267,7 +267,7 @@ class Contact(TimeStampedModel):
         verbose_name_plural = _(u'contacts')
     
 class Group(TimeStampedModel):
-    name = models.CharField(_(u'name'), max_length=200, unique=True)
+    name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
     description = models.CharField(_(u'description'), max_length=200, blank=True, default="")
     entities = models.ManyToManyField(Entity, blank=True, null=True)
     subscribe_form = models.BooleanField(default=False)
@@ -311,10 +311,10 @@ class Opportunity(TimeStampedModel):
     probability = models.IntegerField(_('probability'), default=PROBABILITY_MEDIUM,
         choices=PROBABILITY_CHOICES)
     amount = models.PositiveIntegerField(_(u'amount'), default=0)
-    ended = models.BooleanField(_(u'closed'), default=False)
+    ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True)
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     
     def __unicode__(self):
         return u"{0.entity} - {0.name}".format(self)
@@ -342,17 +342,17 @@ class Action(TimeStampedModel):
 
     entity = models.ForeignKey(Entity)
     subject = models.CharField(_('subject'), max_length=200)
-    planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True)
+    planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_('detail'), blank=True, default='')
     priority = models.IntegerField(_('priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
     opportunity = models.ForeignKey(Opportunity, blank=True, default='', null=True)
     contact = models.ForeignKey(Contact, blank=True, default='', null=True)
-    done = models.BooleanField(_(u'done'), default=False)
-    done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None)
+    done = models.BooleanField(_(u'done'), default=False, db_index=True)
+    done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default='',
         limit_choices_to={'first_name__regex': '.+'})
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True)
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
 
     def __unicode__(self):
         return u'{0.subject} with {0.entity}'.format(self)
