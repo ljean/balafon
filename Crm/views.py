@@ -546,7 +546,7 @@ def view_entity_opportunities(request, entity_id):
 def view_all_opportunities(request):
     opportunities = models.Opportunity.objects.all().order_by('ended', '-end_date')
     all_opportunities = True
-    request.session["redirect_url"] = reverse('crm_view_all_opportunities', args=[entity_id])
+    request.session["redirect_url"] = reverse('crm_all_opportunities')
     return render_to_response(
         'Crm/all_opportunities.html',
         locals(),
