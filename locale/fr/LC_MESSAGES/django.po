@@ -1106,7 +1106,7 @@ msgstr "Newsletters"
 #: .\Emailing\templates\Emailing\_section_newsletters.html.py:12
 msgid ""
 "Emailing is disabled: You must buy credits in order to send new emailings"
-msgstr "L'amialing est désactivé: Vous devez acheter des crédits pour effectuer des envois"
+msgstr "L'emailing est désactivé: Vous devez acheter des crédits pour effectuer des envois"
 
 #: .\Emailing\templates\Emailing\_section_newsletters.html.py:14
 msgid "You have a credit of "
