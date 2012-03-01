@@ -346,6 +346,22 @@ a.selector-remove {
     color: #000;
 }
 
+.user-info {
+	font-weight: bold;
+    border: solid thin #aaa;
+    padding: 5px 5px 5px 5px;
+    background: #ddd;
+	margin-bottom: 10px;
+}
+
+.user-info.ok {
+    background: #af5;
+}
+
+.user-info.warning {
+    background: #fa5;
+}
+
 .action-warning {
 	background: #fc7;
 	width: 60%;

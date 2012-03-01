@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-02-29 09:28+0100\n"
+"POT-Creation-Date: 2012-03-01 11:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -704,7 +704,7 @@ msgstr "En charge"
 #: .\Crm\templates\Crm\_section_opportunities.html.py:47
 #: .\Crm\templates\Crm\add_entity_to_group.html.py:24
 #: .\Crm\templates\Crm\edit_group.html.py:18
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:43
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:52
 #: .\templates\base.html.py:44
 msgid "Add"
 msgstr "Ajouter"
@@ -839,7 +839,7 @@ msgstr "Ajouter %(entity.name)s à un groupe"
 #: .\Crm\templates\Crm\edit_entity.html.py:17
 #: .\Crm\templates\Crm\edit_group.html.py:21
 #: .\Crm\templates\Crm\edit_group.html.py:23
-#: .\Crm\templates\Crm\edit_opportunity.html.py:19 .\Emailing\models.py:65
+#: .\Crm\templates\Crm\edit_opportunity.html.py:19 .\Emailing\models.py:67
 #: .\Search\templates\Search\create_action_for_contacts.html.py:12
 #: .\Search\templates\Search\new_emailing.html.py:22
 #: .\templates\confirmation_dialog.html.py:6
@@ -945,7 +945,7 @@ msgid "Reason"
 msgstr "Raison"
 
 #: .\Emailing\forms.py:17
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:13
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:22
 msgid "Newsletter"
 msgstr "Newsletter"
 
@@ -973,89 +973,129 @@ msgstr "Commentaires"
 msgid "Invalid group"
 msgstr "Groupe invalide"
 
-#: .\Emailing\models.py:29
+#: .\Emailing\models.py:30
 msgid "Edition in progress"
 msgstr "Edition en cours"
 
-#: .\Emailing\models.py:30
+#: .\Emailing\models.py:31
 msgid "Sending is scheduled"
 msgstr "Envoi programmé"
 
-#: .\Emailing\models.py:31
+#: .\Emailing\models.py:32
 msgid "Sending in progress"
 msgstr "Envoi en cours"
 
-#: .\Emailing\models.py:32
+#: .\Emailing\models.py:33
 msgid "Sent"
 msgstr "Envoyé"
 
-#: .\Emailing\models.py:40
+#: .\Emailing\models.py:34
+msgid "Credit missing"
+msgstr "Crédit insuffisant"
+
+#: .\Emailing\models.py:42
 msgid "scheduling date"
 msgstr "date programmé de l'envoi"
 
-#: .\Emailing\models.py:41
+#: .\Emailing\models.py:43
 msgid "sending date"
 msgstr "date d'envoi"
 
-#: .\Emailing\models.py:47
+#: .\Emailing\models.py:49
 msgid "emailing"
 msgstr "emailing"
 
-#: .\Emailing\models.py:48
+#: .\Emailing\models.py:50
 msgid "emailings"
 msgstr "emailings"
 
-#: .\Emailing\models.py:53 .\Emailing\models.py:55
+#: .\Emailing\models.py:55 .\Emailing\models.py:57
 msgid "{0} on {1}"
 msgstr "{0} sur {1}"
 
-#: .\Emailing\models.py:62
+#: .\Emailing\models.py:64
 msgid "Send"
 msgstr "Envoyer"
 
-#: .\Emailing\utils.py:50
+#: .\Emailing\models.py:69
+msgid "Buy"
+msgstr "Acheter"
+
+#: .\Emailing\models.py:97
+msgid "Credit"
+msgstr "Crédit"
+
+#: .\Emailing\models.py:97
+msgid "Number of email used"
+msgstr "Nombre d'emails utilisé"
+
+#: .\Emailing\models.py:98
+msgid "Total"
+msgstr "Total"
+
+#: .\Emailing\models.py:98
+msgid "Number of amails bought"
+msgstr "Nombre d'emails achetés"
+
+#: .\Emailing\models.py:99
+msgid "Bought date"
+msgstr "Date d'achat"
+
+#: .\Emailing\models.py:100
+msgid "Finished date"
+msgstr "Date de fin"
+
+#: .\Emailing\models.py:103
+msgid "Date : {0} - Total: {1} - Credit : {2}"
+msgstr "Date : {0} - Total: {1} - Credit : {2}"
+
+#: .\Emailing\utils.py:53
 #: .\Emailing\templates\Emailing\view_emailing.html.py:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: .\Emailing\views.py:44
+#: .\Emailing\utils.py:73
+msgid "Credit missing for sending this emailing (available: {0} - required {1}"
+msgstr "Credit insuffisant pour l'envoi de cet emailing: disponible {0} - necessaire {1}"
+
+#: .\Emailing\views.py:46
 msgid "Are you sure to delete '{0.newsletter.subject}' {1}?"
 msgstr "Etes-vous sur de supprimer '{0.newsletter.subject}' {1}?"
 
-#: .\Emailing\views.py:91
+#: .\Emailing\views.py:93
 msgid "The sending has been scheduled"
 msgstr "L'envoi a été programmé"
 
-#: .\Emailing\views.py:93
+#: .\Emailing\views.py:95
 msgid "The sending can't be scheduled"
 msgstr "L'envoi ne paut pas être programmé"
 
-#: .\Emailing\views.py:99
+#: .\Emailing\views.py:101
 msgid "Is this newsletter ready to be sent?"
 msgstr "Est-ce que la newsletter est prête à être envoyée?"
 
-#: .\Emailing\views.py:115
+#: .\Emailing\views.py:117
 msgid "The sending has been cancelled"
 msgstr "L'envoi a été annulé"
 
-#: .\Emailing\views.py:117
+#: .\Emailing\views.py:119
 msgid "The sending can't be cancelled"
 msgstr "L'anvoi ne peut pas être annulé"
 
-#: .\Emailing\views.py:123
+#: .\Emailing\views.py:125
 msgid "Cancel the sending?"
 msgstr "Annuler l'envoi?"
 
-#: .\Emailing\views.py:136
+#: .\Emailing\views.py:138
 msgid "Link"
 msgstr "Lien"
 
-#: .\Emailing\views.py:165
+#: .\Emailing\views.py:167
 #: .\Emailing\templates\Emailing\public\unregister_confirm.html.py:4
 msgid "Unregister"
 msgstr "Se désinscrire"
 
-#: .\Emailing\views.py:167
+#: .\Emailing\views.py:169
 msgid "{0} has unregister"
 msgstr "{0} s'est désinscrit"
 
@@ -1063,15 +1103,28 @@ msgstr "{0} s'est désinscrit"
 msgid "Newsletters"
 msgstr "Newsletters"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:13
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:12
+msgid ""
+"Emailing is disabled: You must buy credits in order to send new emailings"
+msgstr "L'amialing est désactivé: Vous devez acheter des crédits pour effectuer des envois"
+
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:14
+msgid "You have a credit of "
+msgstr "Vous avez un crédit de "
+
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:14
+msgid "emails"
+msgstr "emails"
+
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:22
 msgid "Sending"
 msgstr "Envois"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:24
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:33
 msgid "recipients"
 msgstr "destinataires"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:38
+#: .\Emailing\templates\Emailing\_section_newsletters.html.py:47
 msgid "No newsletters"
 msgstr "Aucune newsletters"
 

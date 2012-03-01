@@ -22,9 +22,11 @@ from django.conf import settings
 def newsletter_list(request):
     newsletters = Newsletter.objects.all().order_by('-id')
     
+    credits = sum([c.credit for c in models.EmailingCounter.objects.filter(credit__gt=0)])
+    
     return render_to_response(
         'Emailing/newsletter_list.html',
-        {'newsletters': newsletters},
+        {'newsletters': newsletters, 'credits': credits},
         context_instance=RequestContext(request)
     )
 

@@ -24,12 +24,14 @@ class Emailing(TimeStampedModel):
     STATUS_SCHEDULED = 2
     STATUS_SENDING = 3
     STATUS_SENT = 4
+    STATUS_CREDIT_MISSING = 5
     
     STATUS_CHOICES = (
         (STATUS_EDITING, _(u'Edition in progress')),
         (STATUS_SCHEDULED, _(u'Sending is scheduled')),
         (STATUS_SENDING, _(u'Sending in progress')),
-        (STATUS_SENT, _(u'Sent')), 
+        (STATUS_SENT, _(u'Sent')),
+        (STATUS_CREDIT_MISSING, _(u'Credit missing')),
     )
     
     newsletter = models.ForeignKey(Newsletter) 
@@ -58,11 +60,13 @@ class Emailing(TimeStampedModel):
     def next_action(self):
         action = ""
         if self.status == Emailing.STATUS_EDITING:
-            action = '<a  class="colorbox-form action-button" href="{1}">{0}</a>'.format(
+            action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id]))
         if self.status == Emailing.STATUS_SCHEDULED:
-            action = '<a  class="colorbox-form action-button" href="{1}">{0}</a>'.format(
+            action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id]))
+        if self.status == Emailing.STATUS_CREDIT_MISSING:
+            action = '<a href="mailto:{1}">{0}</a>'.format(ugettext(u'Buy'), settings.ADMINS[0][1])
         return mark_safe(action)
     
     def get_contacts(self):
@@ -89,3 +93,11 @@ class MagicLink(models.Model):
         self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
         return super(MagicLink, self).save()        
         
+class EmailingCounter(models.Model):
+    credit = models.IntegerField(default=0, verbose_name=_(u"Credit"), help_text=_(u"Number of email used"))
+    total = models.IntegerField(default=0, verbose_name=_(u"Total"), help_text=_(u"Number of amails bought"))
+    bought_date = models.DateField(_(u"Bought date"), blank=True, default=None, null=True)
+    finished_date = models.DateField(_(u"Finished date"), blank=True, default=None, null=True)
+    
+    def __unicode__(self):
+        return _(u"Date : {0} - Total: {1} - Credit : {2}").format(self.bought_date, self.total, self.credit)

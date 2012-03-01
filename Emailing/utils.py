@@ -7,12 +7,15 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from sanza.Crm.models import Contact, Action, ActionType
 from datetime import date, timedelta, datetime
-from sanza.Emailing.models import MagicLink
+from sanza.Emailing.models import MagicLink, EmailingCounter, Emailing
 from django.core.mail import get_connection, EmailMultiAlternatives
 import re
 from coop_cms.models import Newsletter
 from coop_cms.utils import make_links_absolute
 from coop_cms.html2text import html2text
+from datetime import date
+
+class CreditMissing(Exception): pass
 
 def get_emailing_context(emailing, contact):
     data = dict(contact.__dict__)
@@ -55,8 +58,24 @@ def send_newsletter(emailing, max_nb):
     connection = get_connection()
     from_email = settings.COOP_CMS_FROM_EMAIL
     emails = []
-    contacts = list(emailing.send_to.all()[:max_nb])
     
+    nb_contacts = emailing.send_to.count()
+    try:
+        available = 0
+        counter = EmailingCounter.objects.all().order_by('-credit')[0]
+        if nb_contacts > counter.credit:
+            available = counter.credit
+            raise CreditMissing
+    except (IndexError, CreditMissing):
+        emailing.status = Emailing.STATUS_CREDIT_MISSING
+        emailing.save()
+        raise CreditMissing(
+            _(u'Credit missing for sending this emailing (available: {0} - required {1}').format(
+                available, nb_contacts
+            )
+        )
+        
+    contacts = list(emailing.send_to.all()[:max_nb])
     for contact in contacts:
         
         if contact.get_email:
@@ -82,5 +101,12 @@ def send_newsletter(emailing, max_nb):
     
     #print "emailing", emailing.send_to.all(), emailing.sent_to.all()
     emailing.save()
-    return connection.send_messages(emails)
+    nb_sent = connection.send_messages(emails)
+    
+    counter.credit = counter.credit - nb_sent
+    if counter.credit == 0:
+        counter.finshed_date = date.today()
+    counter.save()
+    
+    return nb_sent
     
