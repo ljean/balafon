@@ -1126,7 +1126,7 @@ msgstr "destinataires"
 
 #: .\Emailing\templates\Emailing\_section_newsletters.html.py:47
 msgid "No newsletters"
-msgstr "Aucune newsletters"
+msgstr "Aucune newsletter"
 
 #: .\Emailing\templates\Emailing\_section_visitors.html.py:5
 msgid "Links"
