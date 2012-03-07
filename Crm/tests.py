@@ -198,3 +198,41 @@ class DoActionTest(BaseTestCase):
         self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
         
+class GroupTest(BaseTestCase):
+    
+    def test_view_add_group(self):
+        entity = mommy.make_one(models.Entity)
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+    
+    def test_add_group_new(self):
+        entity = mommy.make_one(models.Entity)
+        data = {
+            'group_name': 'toto'
+        }
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.subscribe_form, False)
+        
+    def test_add_group_existing(self):
+        group = mommy.make_one(models.Group, name='toto')
+        entity = mommy.make_one(models.Entity)
+        data = {
+            'group_name': group.name
+        }
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [entity])
+        

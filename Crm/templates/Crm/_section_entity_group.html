@@ -15,7 +15,7 @@
 
 {% block section_action %}
   {% if entity %}
-    <a href="{% url crm_add_entity_to_group entity.id %}">{% trans "Add" %}</a>
+    <a class="colorbox-form" href="{% url crm_add_entity_to_group entity.id %}">{% trans "Add" %}</a>
   {% else %}
     <a href="{% url crm_add_group %}">{% trans "Add" %}</a>
     {% if ordering != 'name' %}

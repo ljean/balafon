@@ -43,6 +43,7 @@ def view_entities_list(request):
     )
 
 @login_required
+@popup_redirect
 def add_entity_to_group(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     
@@ -55,11 +56,11 @@ def add_entity_to_group(request, entity_id):
             group.entities.add(entity)
             group.save()
             next_url = reverse('crm_view_entity', args=[entity_id])
-            if is_new:
-                request.session["next_url"] = next_url
-                return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
-            else:
-                return HttpResponseRedirect(next_url)
+            #if is_new:
+            #    request.session["next_url"] = next_url
+            #    return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
+            #else:
+            return HttpResponseRedirect(next_url)
     else:
         form = forms.AddEntityToGroupForm(entity)
     

@@ -1,5 +1,6 @@
-{% extends "base.html" %}
+{% extends "colorbox/popup_form_base.html" %}
 {% load i18n %}
+
 {% block extra_head %}
 {{block.super}}
 <script>
@@ -11,17 +12,9 @@
   </script>
 {% endblock %}
 
-{% block document_content %}
-<h3>{% blocktrans %}Add {{entity.name}} to a group{% endblocktrans %}</h3>
-<form method="POST" action="">{% csrf_token %}
-  {% if form.errors %}
-  <ul class="errors">
-    {% for err in form.non_field_errors %}<li>{{err}}</li>{% endfor %}
-    {% for err in form.group_name.errors %}<li>{{err}}</li>{% endfor %}
-  </ul>
-  {% endif %}
-  {{form.group_name}}
-  <input type="submit" value="{% trans "Add" %}">
-  <a href="{% url crm_view_entity entity.id %}">{% trans "Cancel" %}</a>
-</form>
-{% endblock %}
+
+{% block title %}{% blocktrans %}Add {{entity.name}} to a group{% endblocktrans %}{% endblock %}
+
+{% block form_url %}{% url crm_add_entity_to_group entity.id %}{% endblock %}
+
+{% block form_ok %}{% trans "Ok" %}{% endblock %}
