@@ -148,7 +148,13 @@ class ContactForm(ModelFormWithCity):
         exclude=('uuid', 'same_as')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
+            'role': forms.SelectMultiple(attrs={
+                'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactForm, self).__init__(*args, **kwargs)
+        self.fields["role"].help_text = ""
 
 class MiniContactForm(forms.ModelForm):
     class Meta:
@@ -156,7 +162,14 @@ class MiniContactForm(forms.ModelForm):
         fields=('gender', 'firstname', 'lastname', 'title', 'role', 'phone', 'mobile', 'email', 'notes')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
+            'role': forms.SelectMultiple(attrs={
+                'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(MiniContactForm, self).__init__(*args, **kwargs)
+        self.fields["role"].help_text = ""
+
 
 class EntityTypeForm(forms.ModelForm):
     

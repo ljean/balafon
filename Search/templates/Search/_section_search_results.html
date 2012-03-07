@@ -1,5 +1,5 @@
 {% extends "_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}{% trans "Search results" %}{% endblock %}
   
@@ -16,7 +16,7 @@
         {% if contacts %}
           {% for c in contacts %}
             <div class="contact contact-sr">
-              <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.role|default:'' }}&nbsp;
+              <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
               {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
               <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
             </div>

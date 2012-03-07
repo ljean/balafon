@@ -178,7 +178,7 @@ class Contact(TimeStampedModel):
     GENDER_CHOICE = ((GENDER_MALE, _('Mr.')), (GENDER_FEMALE, _('Mrs.')))
     
     entity = models.ForeignKey(Entity)
-    role = models.ForeignKey(EntityRole, blank=True, null=True, default=None)
+    role = models.ManyToManyField(EntityRole, blank=True, null=True, default=None, verbose_name=_(u'Roles'))
     
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
     title = models.CharField(_(u'title'), max_length=200, blank=True, default=u'')
@@ -233,9 +233,12 @@ class Contact(TimeStampedModel):
 
     def get_email_address(self):
         return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
-
+        
     def get_phones(self):
         return [x for x in (self.phone, self.mobile) if x]
+    
+    def get_roles(self):
+        return [x.name for x in self.role.all()]
         
     def __unicode__(self):
         if self.gender:

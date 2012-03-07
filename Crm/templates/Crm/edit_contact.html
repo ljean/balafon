@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block extra_head %}
+  {{block.super}}
+  <link rel="stylesheet" href="{{STATIC_URL}}chosen/chosen.css" />
+  <style>
+    .chzn-container-multi .chzn-choices .search-choice .search-choice-close {
+      height: 8px;
+    }
+    .chzn-container-multi .chzn-choices .search-field input {
+      height: 27px;
+    }
+  </style>
+{% endblock %}
+
 {% block document_content %}
   {% if contact %}
   <h2>{% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
@@ -27,4 +40,6 @@
     </ul>
   </form>
   {% include "_calendar.html" with field="birth_date" yearRange="c-100:c" %}
+  <script src="{{STATIC_URL}}chosen/chosen.jquery.js" type="text/javascript"></script>
+  <script type="text/javascript"> $(".chzn-select").chosen();</script>
 {% endblock %}

@@ -7,13 +7,13 @@
 {% if contacts %}
 <table id="entity_contacts">
   <tr><th>{% trans "Name" %}</th>{% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
-  <th>{% trans "Role" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th></tr>
+  <th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th></tr>
   {% for c in contacts %}
   {% with c.has_left as has_left %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
     {% if not entity %}<td><a href="{% url crm_view_entity c.entity.id %}">{{ c.entity }}</a></td>{% endif %}
-    <td>{{c.role|default:'&nbsp;'}}</td>
+    <td>{{c.get_roles|seq_to_dash}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
   </tr>
