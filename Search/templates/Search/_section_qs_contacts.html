@@ -1,5 +1,5 @@
 {% extends "_section.html" %}
-{% load i18n %}
+{% load i18n sanza_utils %}
 
 {% block section_title %}{{ name.capitalize }}{% endblock %}
   
@@ -12,11 +12,11 @@
   {% with c.entity as e %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
     <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
-    <td>{{c.role|default:'&nbsp;'}}</td>
+    <td>{{c.role.all|seq_to_dash}}</td>
     <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
     <td>{{e.type}}</td>
     <td>{{e.relationship}}</td>
-    <td>{{e.activity_sector}}</td>
+    <td>{{e.activity_sector|default:"&nbsp;"}}</td>
     <td>{{e.city|default:"&nbsp;"}}</td>
   </tr>
   {% endwith %}

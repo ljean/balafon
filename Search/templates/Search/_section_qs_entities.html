@@ -13,7 +13,7 @@
     <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
     <td>{{e.type}}</td>
     <td>{{e.relationship}}</td>
-    <td>{{e.activity_sector}}</td>
+    <td>{{e.activity_sector|default:"&nbsp;"}}</td>
     <td>{{e.contact_set.all|seq_to_br|default:"&nbsp;"}}</td>
     <td>{{e.city|default:"&nbsp;"}}</td>
   </tr>
