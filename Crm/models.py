@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.conf import settings as project_settings
 from datetime import datetime, date
-import uuid
+import uuid, unicodedata
 from sanza.Crm import settings
 from django.contrib.sites.models import Site
 from sorl.thumbnail import default as sorl_thumbnail
@@ -75,6 +75,8 @@ class Zone(BaseZone):
         ordering = ['name']
 
 class City(BaseZone):
+    groups = models.ManyToManyField(Zone, blank=True, null=True,
+        verbose_name=_(u'group'), related_name='city_groups_set')
 
     class Meta:
         verbose_name = _(u'city')
@@ -261,7 +263,8 @@ class Contact(TimeStampedModel):
 
         super(Contact, self).save(*args, **kwargs)
         if not self.uuid:
-            name = '{0}-contact-{1}-{2}'.format(project_settings.SECRET_KEY, self.id, self.lastname)
+            ln = unicodedata.normalize('NFKD', self.lastname).encode("utf8",'ignore')
+            name = '{0}-contact-{1}-{2}'.format(project_settings.SECRET_KEY, self.id, ln)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(Contact, self).save()
 
