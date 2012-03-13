@@ -18,10 +18,10 @@ class Migration(SchemaMigration):
         db.add_column('Crm_contact', 'cedex', self.gf('django.db.models.fields.CharField')(default=u'', max_length=200, blank=True), keep_default=False)
 
         # Adding field 'Contact.city'
-        db.add_column('Crm_contact', 'city', self.gf('django.db.models.fields.related.ForeignKey')(default=u'', to=orm['Crm.City'], null=True, blank=True), keep_default=False)
+        db.add_column('Crm_contact', 'city', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['Crm.City'], null=True, blank=True), keep_default=False)
 
         # Adding field 'Contact.notes'
-        db.add_column('Crm_contact', 'notes', self.gf('django.db.models.fields.CharField')(default=None, max_length=500, blank=True), keep_default=False)
+        db.add_column('Crm_contact', 'notes', self.gf('django.db.models.fields.CharField')(default=u'', max_length=500, blank=True), keep_default=False)
 
 
     def backwards(self, orm):
