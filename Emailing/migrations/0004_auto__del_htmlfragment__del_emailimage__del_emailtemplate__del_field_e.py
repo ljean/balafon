@@ -30,7 +30,7 @@ class Migration(SchemaMigration):
         db.delete_column('Emailing_emailing', 'subject')
 
         # Adding field 'Emailing.newsletter'
-        db.add_column('Emailing_emailing', 'newsletter', self.gf('django.db.models.fields.related.ForeignKey')(default='', to=orm['coop_cms.Newsletter']), keep_default=False)
+        db.add_column('Emailing_emailing', 'newsletter', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['coop_cms.Newsletter']), keep_default=False)
 
         # Adding field 'Emailing.status'
         db.add_column('Emailing_emailing', 'status', self.gf('django.db.models.fields.IntegerField')(default=1), keep_default=False)
