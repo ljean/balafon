@@ -69,7 +69,7 @@ class Migration(SchemaMigration):
             'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'birth_date': ('django.db.models.fields.DateField', [], {'default': "u''", 'null': 'True', 'blank': 'True'}),
             'cedex': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': "u''", 'to': "orm['Crm.City']", 'null': 'True', 'blank': 'True'}),
+            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': "None", 'to': "orm['Crm.City']", 'null': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'default': "u''", 'max_length': '75', 'blank': 'True'}),
             'firstname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'gender': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
