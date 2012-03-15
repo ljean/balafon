@@ -12,7 +12,7 @@
   {% with c.entity as e %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
     <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
-    <td>{{c.role.all|seq_to_dash}}</td>
+    <td>{{c.get_roles|seq_to_dash}}</td>
     <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
     <td>{{e.type}}</td>
     <td>{{e.relationship}}</td>
