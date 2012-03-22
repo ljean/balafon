@@ -162,6 +162,10 @@ class GroupSearchForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(GroupSearchForm, self).__init__(*args, **kwargs)
         qs = models.Group.objects.all()
+        try:
+            qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+        except:
+            qs = qs.order_by('name')
         field = forms.ModelChoiceField(qs, label=self._label)
         self._add_field(field)
         
