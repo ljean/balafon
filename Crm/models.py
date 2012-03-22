@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 from django.core.urlresolvers import reverse
 from django.conf import settings as project_settings
 from datetime import datetime, date
@@ -246,9 +247,11 @@ class Contact(TimeStampedModel):
         if self.gender:
             #title = _('Mr. ') if self.gender==Contact.GENDER_MALE else _('Mrs. ')
             title = self.get_gender_display()
-            title += ' '
+            title += u' '
         else:
-            title = ''
+            title = u''
+        if not (self.firstname or self.lastname):
+            return u"< {0} >".format(__(u"Unknown"))
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
             
     @property
