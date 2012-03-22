@@ -545,8 +545,17 @@ def view_entity_opportunities(request, entity_id):
     )
 
 @login_required
-def view_all_opportunities(request):
-    opportunities = models.Opportunity.objects.all().order_by('ended', '-end_date')
+def view_all_opportunities(request, ordering=None):
+    opportunities = models.Opportunity.objects.all()
+    if ordering == 'name':
+        opportunities = opportunities.order_by('name')
+    elif ordering == 'entity':
+        opportunities = opportunities.order_by('entity__name')
+    elif ordering == 'date':
+        opportunities = opportunities.order_by('-end_date')
+    else:
+        opportunities = opportunities.order_by('ended', '-end_date')
+        
     all_opportunities = True
     request.session["redirect_url"] = reverse('crm_all_opportunities')
     return render_to_response(
@@ -651,7 +660,6 @@ def view_all_actions(request):
         locals(),
         context_instance=RequestContext(request)
     )
-
 
 @login_required
 @popup_redirect

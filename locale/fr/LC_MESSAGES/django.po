@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-22 17:00+0100\n"
-"PO-Revision-Date: 2012-03-22 17:01+0100\n"
+"POT-Creation-Date: 2012-03-22 17:12+0100\n"
+"PO-Revision-Date: 2012-03-22 17:13+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -692,7 +692,7 @@ msgstr "Etes-vous sur de supprimer le contact \"{0}\"?"
 msgid "Are you sure to delete the action \"{0}\"?"
 msgstr "Etes-vous sur de supprimer l'action \"{0}\"?"
 
-#: .\Crm\views.py:617
+#: .\Crm\views.py:626
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
@@ -808,7 +808,7 @@ msgstr "Dernière action"
 
 #: .\Crm\templates\Crm\_section_all_entities.html.py:51
 #: .\Crm\templates\Crm\_section_opportunities.html.py:43
-#: .\Crm\templates\Crm\_section_opportunities.html.py:49
+#: .\Crm\templates\Crm\_section_opportunities.html.py:54
 msgid "All"
 msgstr "Tous"
 
@@ -837,11 +837,13 @@ msgstr "Supprimer du groupe"
 
 #: .\Crm\templates\Crm\_section_entity_group.html.py:22
 #: .\Crm\templates\Crm\_section_my_groups.html.py:27
+#: .\Crm\templates\Crm\_section_opportunities.html.py:49
 msgid "By name"
 msgstr "Par nom"
 
 #: .\Crm\templates\Crm\_section_entity_group.html.py:24
 #: .\Crm\templates\Crm\_section_my_groups.html.py:29
+#: .\Crm\templates\Crm\_section_opportunities.html.py:51
 msgid "By date"
 msgstr "Par date"
 
@@ -873,6 +875,14 @@ msgstr "Etat"
 #: .\Crm\templates\Crm\_section_opportunities.html.py:20
 msgid "Closed"
 msgstr "Fermé"
+
+#: .\Crm\templates\Crm\_section_opportunities.html.py:50
+msgid "By entity"
+msgstr "Par entité"
+
+#: .\Crm\templates\Crm\_section_opportunities.html.py:52
+msgid "By status"
+msgstr "Par état"
 
 #: .\Crm\templates\Crm\_section_same_as.html.py:4
 #: .\Crm\templates\Crm\_section_same_as.html.py:31

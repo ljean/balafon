@@ -45,7 +45,12 @@
   {% endif %}
   {% if not entity %}
      <a class="colorbox-form" href="{% url crm_add_opportunity %}">{% trans "Add" %}</a>
-     {% if not all_opportunities %}
+     {% if all_opportunities %}
+       <a href="{% url crm_all_opportunities_by "name" %}">{% trans "By name" %}</a>
+       <a href="{% url crm_all_opportunities_by "entity" %}">{% trans "By entity" %}</a>
+       <a href="{% url crm_all_opportunities_by "date" %}">{% trans "By date" %}</a>
+       <a href="{% url crm_all_opportunities_by "status" %}">{% trans "By status" %}</a>
+      {% else %}
       <a href="{% url crm_all_opportunities %}">{% trans "All" %}</a>
      {% endif %}
   {% endif %}
