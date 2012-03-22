@@ -17,7 +17,7 @@
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
     <td><a href="{% url crm_view_entity c.entity.id %}">{{ c.entity }}</a></td>
-    <td>{{c.role|default:'&nbsp;'}}</td>
+    <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
   </tr>
