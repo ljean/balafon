@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-22 16:04+0100\n"
-"PO-Revision-Date: 2012-03-22 16:06+0100\n"
+"POT-Creation-Date: 2012-03-22 17:00+0100\n"
+"PO-Revision-Date: 2012-03-22 17:01+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -672,27 +672,27 @@ msgstr "Autorise les contacts identiques"
 msgid "Opportunity reminder"
 msgstr "Relance de dossier"
 
-#: .\Crm\views.py:103
+#: .\Crm\views.py:104
 msgid "Do you want to remove {0.name} from the {1.name} group?"
 msgstr "Voulez vous supprimer {0.name} du groupe {1.name}?"
 
-#: .\Crm\views.py:159
+#: .\Crm\views.py:160
 msgid "Are you sure to delete the group {0.name}?"
 msgstr "Etes-vous sur de supprimer le groupe {0.name}?"
 
-#: .\Crm\views.py:273
+#: .\Crm\views.py:274
 msgid "Are you sure to delete {0.name}?"
 msgstr "Etes-vous sur de supprimer {0.name}?"
 
-#: .\Crm\views.py:431
+#: .\Crm\views.py:432
 msgid "Are you sure to delete the contact \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le contact \"{0}\"?"
 
-#: .\Crm\views.py:507
+#: .\Crm\views.py:508
 msgid "Are you sure to delete the action \"{0}\"?"
 msgstr "Etes-vous sur de supprimer l'action \"{0}\"?"
 
-#: .\Crm\views.py:616
+#: .\Crm\views.py:617
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
@@ -777,20 +777,18 @@ msgid "Add"
 msgstr "Ajouter"
 
 #: .\Crm\templates\Crm\_section_actions.html.py:80
-#: .\Crm\templates\Crm\_section_all_entities.html.py:51
-#: .\Crm\templates\Crm\_section_opportunities.html.py:43
-#: .\Crm\templates\Crm\_section_opportunities.html.py:49
-msgid "All"
-msgstr "Tous"
+#: .\Crm\templates\Crm\_section_actions.html.py:85
+msgid "All actions"
+msgstr "Toutes"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:86
-#: .\Crm\templates\Crm\_section_actions.html.py:99
+#: .\Crm\templates\Crm\_section_actions.html.py:89
+#: .\Crm\templates\Crm\_section_actions.html.py:102
 msgid "See my actions"
-msgstr "Voir mes actions"
+msgstr "Mes actions"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:94
-msgid "See all actions"
-msgstr "Voir toutes les actions"
+#: .\Crm\templates\Crm\_section_actions.html.py:97
+msgid "See actions of all"
+msgstr "Actions de tous"
 
 #: .\Crm\templates\Crm\_section_all_entities.html.py:5
 msgid "Latest entities"
@@ -807,6 +805,12 @@ msgstr "Contacts principaux"
 #: .\Crm\templates\Crm\_section_all_entities.html.py:17
 msgid "Last action"
 msgstr "Dernière action"
+
+#: .\Crm\templates\Crm\_section_all_entities.html.py:51
+#: .\Crm\templates\Crm\_section_opportunities.html.py:43
+#: .\Crm\templates\Crm\_section_opportunities.html.py:49
+msgid "All"
+msgstr "Tous"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:10
 #: .\Crm\templates\Crm\_section_same_as.html.py:12
@@ -1652,6 +1656,9 @@ msgstr "Un email vous a été envoyé"
 #: .\templates\registration\password_reset_done.html.py:5
 msgid "It contains the procedure to reset the password."
 msgstr "Il contient la procédure de réinitialisation du mot de passe"
+
+#~ msgid "See all actions"
+#~ msgstr "Voir toutes les actions"
 
 #~ msgid "close"
 #~ msgstr "fermer"

@@ -42,4 +42,5 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^mailto-opportunity-contacts/(?P<opportunity_id>\d+)$', 'mailto_opportunity_contacts', name='crm_mailto_opportunity_contacts'),
     url(r'^entity-name/(?P<entity_id>.+)$', 'get_entity_name', name='crm_get_entity_name'),
     url(r'^entities/list$', 'get_entities', name='crm_get_entities'),
+    url(r'^all-actions$', 'view_all_actions', name='crm_all_actions'),
 )

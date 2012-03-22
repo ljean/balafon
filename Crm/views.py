@@ -13,6 +13,7 @@ from datetime import date, timedelta
 import json, re
 from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
+from django.conf import settings
 
 @login_required
 def view_entity(request, entity_id):
@@ -621,11 +622,12 @@ def delete_opportunity(request, opportunity_id):
 
 @login_required
 def view_board_panel(request):
-    last_week = date.today() - timedelta(7)
-    actions = models.Action.objects.filter(Q(display_on_board=True),
-        Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "-done_date", "priority")
-    opportunities = models.Opportunity.objects.filter(Q(display_on_board=True),
-        Q(ended=False) | Q(end_date__gte=last_week)).order_by("status__ordering", "ended")
+    days = getattr(settings, 'SANZA_DAYS_OF_ACTIONS_ON_PANEL', 30)
+    until_date = date.today() + timedelta(days)
+    actions = models.Action.objects.filter(Q(done=False),
+        Q(display_on_board=True), Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)).order_by(
+        "priority", "planned_date")
+    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("status__ordering")
     partial = True
     multi_user = True
     default_my_actions = True
@@ -635,6 +637,21 @@ def view_board_panel(request):
         locals(),
         context_instance=RequestContext(request)
     )
+
+@login_required
+def view_all_actions(request):
+    actions = models.Action.objects.all().order_by("planned_date")
+    partial = False
+    multi_user = True
+    default_my_actions = False
+    all_actions = True
+    request.session["redirect_url"] = reverse('crm_all_actions')
+    return render_to_response(
+        'Crm/all_actions.html',
+        locals(),
+        context_instance=RequestContext(request)
+    )
+
 
 @login_required
 @popup_redirect
