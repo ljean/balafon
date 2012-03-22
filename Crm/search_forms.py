@@ -172,6 +172,27 @@ class GroupSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__group__id': self._value}
 
+class NotInGroupSearchForm(SearchFieldForm):
+    _name = 'not_in_group'
+    _label = _(u'Not in group')
+    
+    def __init__(self, *args, **kwargs):
+        super(NotInGroupSearchForm, self).__init__(*args, **kwargs)
+        qs = models.Group.objects.all()
+        try:
+            qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+        except:
+            qs = qs.order_by('name')
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+    
+    def get_lookup(self):
+        pass
+        
+    def get_exclude_lookup(self):
+        return {'entity__group__id': self._value}
+
+
 class ContactAgeSearchForm(SearchFieldForm):
     _name = 'contact_age'
     _label = _(u'Contact age')

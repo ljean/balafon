@@ -12,6 +12,7 @@ SEARCH_FORMS = [
             search_forms.RelationshipDateForm,
             search_forms.SectorSearchForm,
             search_forms.GroupSearchForm,
+            search_forms.NotInGroupSearchForm,
         ),
     ),(
         _(u'Location'),
