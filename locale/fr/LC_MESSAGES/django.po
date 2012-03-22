@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-22 17:12+0100\n"
-"PO-Revision-Date: 2012-03-22 17:13+0100\n"
+"POT-Creation-Date: 2012-03-22 17:18+0100\n"
+"PO-Revision-Date: 2012-03-22 17:19+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #: .\config.py:7
 #: .\Crm\forms.py:268
-#: .\Crm\templates\Crm\_section_actions.html.py:20
+#: .\Crm\templates\Crm\_section_actions.html.py:24
 #: .\Crm\templates\Crm\_section_contacts.html.py:9
 #: .\Crm\templates\Crm\_section_opportunities.html.py:18
 #: .\Crm\templates\Crm\_section_same_as.html.py:10
@@ -44,7 +44,7 @@ msgid "Contacts"
 msgstr "Contacts"
 
 #: .\config.py:36
-#: .\Crm\templates\Crm\_section_actions.html.py:8
+#: .\Crm\templates\Crm\_section_actions.html.py:11
 msgid "Actions"
 msgstr "Actions"
 
@@ -145,7 +145,7 @@ msgstr "L'entité n'existe pas"
 
 #: .\Crm\forms.py:283
 #: .\Crm\search_forms.py:302
-#: .\Crm\templates\Crm\_section_actions.html.py:23
+#: .\Crm\templates\Crm\_section_actions.html.py:27
 #: .\Emailing\templates\Emailing\_section_contacts.html.py:13
 msgid "Contact"
 msgstr "Contacts"
@@ -567,7 +567,7 @@ msgid "Action by user"
 msgstr "Action par nom de contact"
 
 #: .\Crm\search_forms.py:121
-#: .\Crm\templates\Crm\_section_actions.html.py:24
+#: .\Crm\templates\Crm\_section_actions.html.py:28
 #: .\Crm\templates\Crm\_section_all_entities.html.py:14
 #: .\Search\templates\Search\_section_qs_contacts.html.py:9
 #: .\Search\templates\Search\_section_qs_entities.html.py:8
@@ -737,31 +737,36 @@ msgstr "Montant"
 msgid "Actions with"
 msgstr "Actions avec"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:19
+#: .\Crm\templates\Crm\_section_actions.html.py:9
+#, python-format
+msgid "Actions to do in the next %(days)s days"
+msgstr "Actions à faire dans les %(days)s prochains jours"
+
+#: .\Crm\templates\Crm\_section_actions.html.py:23
 #: .\Emailing\forms.py:18
 #: .\Emailing\forms.py:46
 msgid "Subject"
 msgstr "Sujet"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:21
+#: .\Crm\templates\Crm\_section_actions.html.py:25
 msgid "Date"
 msgstr "Date"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:22
+#: .\Crm\templates\Crm\_section_actions.html.py:26
 #: .\Crm\templates\Crm\do_action.html.py:7
 msgid "Done"
 msgstr "Fait"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:25
+#: .\Crm\templates\Crm\_section_actions.html.py:29
 msgid "Priority"
 msgstr "Priorité"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:26
+#: .\Crm\templates\Crm\_section_actions.html.py:30
 msgid "In charge"
 msgstr "En charge"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:78
-#: .\Crm\templates\Crm\_section_actions.html.py:83
+#: .\Crm\templates\Crm\_section_actions.html.py:82
+#: .\Crm\templates\Crm\_section_actions.html.py:87
 #: .\Crm\templates\Crm\_section_all_entities.html.py:49
 #: .\Crm\templates\Crm\_section_contacts.html.py:28
 #: .\Crm\templates\Crm\_section_entity_group.html.py:18
@@ -776,17 +781,17 @@ msgstr "En charge"
 msgid "Add"
 msgstr "Ajouter"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:80
-#: .\Crm\templates\Crm\_section_actions.html.py:85
+#: .\Crm\templates\Crm\_section_actions.html.py:84
+#: .\Crm\templates\Crm\_section_actions.html.py:89
 msgid "All actions"
 msgstr "Toutes"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:89
-#: .\Crm\templates\Crm\_section_actions.html.py:102
+#: .\Crm\templates\Crm\_section_actions.html.py:93
+#: .\Crm\templates\Crm\_section_actions.html.py:106
 msgid "See my actions"
 msgstr "Mes actions"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:97
+#: .\Crm\templates\Crm\_section_actions.html.py:101
 msgid "See actions of all"
 msgstr "Actions de tous"
 

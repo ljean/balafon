@@ -5,7 +5,11 @@
   {% if all_actions and entity %}
     {% trans "Actions with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
   {% else %}
-    {% trans "Actions" %}
+    {% if days %}
+      {% blocktrans %}Actions to do in the next {{days}} days{% endblocktrans %}
+    {% else %}
+      {% trans "Actions" %}
+    {% endif %}
   {% endif %}
 {% endblock %}
   
