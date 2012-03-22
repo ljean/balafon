@@ -205,6 +205,8 @@ def export_contacts_as_excel(request):
                     f = getattr(c, fn)
                     if callable(f):
                         f = f()
+                    if fn == 'role':
+                        f = u", ".join([r.name for r in f.all()])
                     if f:
                         ws.write(i+1, j, unicode(f), style)
 
