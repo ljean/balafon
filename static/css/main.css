@@ -463,6 +463,7 @@ form.search-form {
     font-weight: bold;
     margin-left: 2px;
     background: #fff;
+	display: inline-block;
 }
 
 .entity_type, .entity_relationship, .entity_sector  {
@@ -482,6 +483,10 @@ form.search-form {
     background: #eee;
     padding: 0 2px 0 2px;
     margin: 0 2px 0 2px;
+}
+
+.entity_group.label {
+	margin-bottom: 1px;
 }
 
 .main-contact {

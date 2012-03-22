@@ -284,7 +284,7 @@ class SameAsForm(forms.Form):
     
     def __init__(self, contact, *args, **kwargs):
         super(SameAsForm, self).__init__(*args, **kwargs)
-        self._same_as = [(c.id, "{0} - {1}".format(unicode(c), c.entity))
+        self._same_as = [(c.id, u"{0} - {1}".format(unicode(c), c.entity))
             for c in models.Contact.objects.filter(
                 lastname__iexact=contact.lastname, firstname__iexact=contact.firstname
             ).exclude(id=contact.id)

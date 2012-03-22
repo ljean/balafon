@@ -5,7 +5,11 @@
   {% if all_actions and entity %}
     {% trans "Actions with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
   {% else %}
-    {% trans "Actions" %}
+    {% if days %}
+      {% blocktrans %}Actions to do in the next {{days}} days{% endblocktrans %}
+    {% else %}
+      {% trans "Actions" %}
+    {% endif %}
   {% endif %}
 {% endblock %}
   
@@ -77,10 +81,13 @@
   {% if entity %}
     <a href="{% url crm_add_action_for_entity entity.id %}">{% trans "Add" %}</a>
     {% if not all_actions %}
-    <a href="{% url crm_entity_actions entity.id %}">{% trans "All" %}</a>
-  {% endif %}
+    <a href="{% url crm_entity_actions entity.id %}">{% trans "All actions" %}</a>
+    {% endif %}
   {% else %}
     <a class="colorbox-form" href="{% url crm_add_action %}">{% trans "Add" %}</a>
+    {% if not all_actions %}
+      <a href="{% url crm_all_actions %}">{% trans "All actions" %}</a>
+    {% endif %}
   {% endif %}
   {% if multi_user %}
     <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
@@ -91,7 +98,7 @@
             $("#toggle_my_actions").removeClass('all');
             $("#toggle_my_actions").addClass('mine');
             $("tr.not-my-action").hide();
-            $("#toggle_my_actions").html('{% trans "See all actions" %}');
+            $("#toggle_my_actions").html('{% trans "See actions of all" %}');
           } else {
             $("#toggle_my_actions").removeClass('mine');
             $("#toggle_my_actions").addClass('all');
