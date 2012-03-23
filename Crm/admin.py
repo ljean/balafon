@@ -57,4 +57,11 @@ class ActionAdmin(admin.ModelAdmin):
     raw_id_admin = ('entity',)
 admin.site.register(models.Action, ActionAdmin)
 
+class CustomFieldAdmin(admin.ModelAdmin):
+    list_display = ['name', 'model', 'label', 'widget', 'simple_form']
+    list_filter = ('model', 'simple_form', 'widget')
+admin.site.register(models.CustomField, CustomFieldAdmin)
 
+class EntityCustomFieldValueAdmin(admin.ModelAdmin):
+    search_fields = ['entity']
+admin.site.register(models.EntityCustomFieldValue, EntityCustomFieldValueAdmin)

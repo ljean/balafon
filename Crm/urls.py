@@ -44,4 +44,6 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^entity-name/(?P<entity_id>.+)$', 'get_entity_name', name='crm_get_entity_name'),
     url(r'^entities/list$', 'get_entities', name='crm_get_entities'),
     url(r'^all-actions$', 'view_all_actions', name='crm_all_actions'),
+    url(r'^edit-custom-fields/(?P<model_name>\w+)/(?P<instance_id>\d+)$', 'edit_custom_fields', name='crm_edit_custom_fields'),
+    
 )

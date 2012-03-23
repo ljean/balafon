@@ -311,4 +311,21 @@ class ActionDoneForm(forms.ModelForm):
         }
     
     
+class CustomFieldForm(forms.Form):
     
+    def __init__(self, instance, fields, *args, **kwargs):
+        super(CustomFieldForm, self).__init__(*args, **kwargs)
+        self._instance = instance
+        for f in fields:
+            self.fields[f.name] = forms.CharField(required=False, label=f.label)
+            if len(args)==0: #No Post
+                self.fields[f.name].initial = getattr(instance, 'custom_field_'+f.name, '')
+        
+    def save(self, *args, **kwargs):
+        for f in self.fields:
+            cf = models.CustomField.objects.get(name = f)
+            cfv, _new = models.EntityCustomFieldValue.objects.get_or_create(entity = self._instance, custom_field = cf)
+            cfv.value = self.cleaned_data[f]
+            cfv.save()
+            
+            

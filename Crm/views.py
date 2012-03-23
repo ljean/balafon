@@ -727,3 +727,31 @@ def add_action(request):
     except Exception, msg:
         print "##", msg
         raise
+
+@login_required
+def edit_custom_fields(request, model_name, instance_id):
+    try:
+        model_type, klass = {
+            'entity': (models.CustomField.MODEL_ENTITY, models.Entity),
+            'contact': (models.CustomField.MODEL_CONTACT, models.Contact),
+        }[model_name]
+    except KeyError:
+        raise Http404
+    
+    custom_fields = models.CustomField.objects.filter(model=model_type)
+    instance = get_object_or_404(klass, id=instance_id)
+    
+    if request.method == 'POST':
+        form = forms.CustomFieldForm(instance, custom_fields, request.POST)
+        if form.is_valid():
+            print 'VALID'
+            form.save()
+            return HttpResponseRedirect(instance.get_absolute_url())
+    else:
+        form = forms.CustomFieldForm(instance, custom_fields)
+    
+    return render_to_response(
+        'Crm/edit_custom_fields.html',
+        {'form': form, 'instance': instance},
+        context_instance=RequestContext(request)
+    )

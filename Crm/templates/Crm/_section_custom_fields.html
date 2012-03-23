@@ -1,0 +1,19 @@
+{% extends "_section.html" %}
+{% load i18n thumbnail sanza_utils %}
+
+{% block section_title %}{% trans "Custom fields" %}{% endblock %}
+  
+{% block section_data %}
+  <div class="custom-fields">
+  {% for f in custom_fields %}
+    <span class="custom-field">
+      <span class="custom-field-label">{{f.label}}:</span>
+      <span class="custom-field-value">{{instance|custom_field:f.name}}</span>
+    </span>
+  {% endfor %}
+  </div>
+{% endblock %}
+
+{% block section_action %}
+  <a href="{% url crm_edit_custom_fields model instance.id %}">{% trans "Edit" %}</a>
+{% endblock %}

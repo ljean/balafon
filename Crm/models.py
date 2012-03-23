@@ -151,6 +151,21 @@ class Entity(TimeStampedModel):
     def logo_thumbnail(self):
         return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128")
 
+    def get_custom_fields(self):
+        return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
+
+    def __getattribute__(self, attr):
+        prefix = "custom_field_"
+        prefix_length = len(prefix)
+        if attr[:prefix_length] == prefix:
+            field_name = attr[prefix_length:]
+            try:
+                custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field__name=field_name)
+                return custom_field_value.value
+            except EntityCustomFieldValue.DoesNotExist:
+                return u''
+        return object.__getattribute__(self, attr)
+
     class Meta:
         verbose_name = _(u'entity')
         verbose_name_plural = _(u'entities')
@@ -374,3 +389,56 @@ class Action(TimeStampedModel):
             self.done_date = None
         return super(Action, self).save(*args, **kwargs)
         
+class CustomField(models.Model):
+    
+    MODEL_ENTITY = 1
+    MODEL_CONTACT = 2
+    
+    MODEL_CHOICE = (
+        (MODEL_ENTITY, _(u'Entity')),
+        (MODEL_CONTACT, _(u'Contact')), 
+    )
+    
+    name = models.CharField(max_length=100, verbose_name=_(u'name'))
+    label = models.CharField(max_length=100, verbose_name=_(u'label'), blank=True, default='')
+    model = models.IntegerField(verbose_name=_(u'model'), choices=MODEL_CHOICE)
+    widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
+    simple_form = models.BooleanField(verbose_name=_(u'visible on simple form'), default=True)
+    
+    def __unicode__(self):
+        return _(u"{0}:{1}").format(self.get_model_display(), self.name)
+    
+    class Meta:
+        verbose_name = _(u'custom field')
+        verbose_name_plural = _(u'custom fields')
+
+
+class CustomFieldValue(models.Model):
+    custom_field = models.ForeignKey(CustomField, verbose_name = _(u'custom field'))
+    value = models.TextField(verbose_name=_(u'value'))
+    
+    class Meta:
+        verbose_name = _(u'custom field value')
+        verbose_name_plural = _(u'custom field values')
+        abstract = True
+        
+class EntityCustomFieldValue(CustomFieldValue):
+    entity = models.ForeignKey(Entity)
+    
+    class Meta:
+        verbose_name = _(u'entity custom field value')
+        verbose_name_plural = _(u'entity custom field values')
+
+    def __unicode__(self):
+        return u'{0} {1}'.format(self.entity, self.custom_field)
+    
+class ContactCustomFieldValue(CustomFieldValue):
+    contact = models.ForeignKey(Contact)
+    
+    class Meta:
+        verbose_name = _(u'contact custom field value')
+        verbose_name_plural = _(u'contact custom field values')
+
+    def __unicode__(self):
+        return u'{0} {1}'.format(self.contact, self.custom_field)
+    

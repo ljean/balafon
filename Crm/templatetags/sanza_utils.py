@@ -35,3 +35,7 @@ def cut_null_hour(value):
         pass
     return value
     
+@register.filter
+def custom_field(instance, field_name):
+    return getattr(instance, 'custom_field_'+field_name)
+    

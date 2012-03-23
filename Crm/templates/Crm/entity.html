@@ -5,9 +5,15 @@
   
 {% include "Crm/_section_entity_info.html" %}
 
+{% include "Crm/_section_contacts.html" %}
+
 {% include "Crm/_section_entity_group.html" with groups=entity.group_set %}
 
-{% include "Crm/_section_contacts.html" %}
+{% with entity.get_custom_fields as custom_fields %}
+{% if custom_fields %}
+    {% include "Crm/_section_custom_fields.html" with instance=entity  model="entity" %}
+{% endif %}
+{% endwith %}
 
 {% include "Crm/_section_actions.html" %}
   

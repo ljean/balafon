@@ -546,3 +546,20 @@ th {
 tr.not-my-action td, tr.not-my-action a {
     font-style: italic;
 }
+
+.custom-field {
+	padding: 2px 2px;
+	border: solid thin #aaa;
+	margin-right: 10px;
+	display: inline-block;
+}
+
+.custom-field-label {
+	background: #ccf;
+	padding: 1px 2px;
+	font-weight: bold;
+}
+
+.custom-field-value {
+	
+}
