@@ -30,6 +30,12 @@ class BaseTestCase(TestCase):
         self.client.login(username="toto", password="abc")
 
 class GroupSearchTest(BaseTestCase):
+    
+    def test_view_search(self):
+        url = reverse('search')
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
     def test_view_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")

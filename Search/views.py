@@ -50,6 +50,7 @@ def search(request, search_id=0, group_id=0):
     field_choice_form = forms.FieldChoiceForm()
     contains_refuse_newsletter = False
     data = None
+    contacts_count = 0
     
     if request.method == "POST":
         data = request.POST
@@ -65,6 +66,8 @@ def search(request, search_id=0, group_id=0):
                 message = _(u'Sorry, no results found')
     else:
         search = get_object_or_404(models.Search, id=search_id) if search_id else None
+        search_form = forms.SearchForm(instance=search)
+        
         
     return render_to_response(
         'Search/search.html',
