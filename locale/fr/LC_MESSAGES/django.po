@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-22 17:18+0100\n"
-"PO-Revision-Date: 2012-03-22 17:19+0100\n"
+"POT-Creation-Date: 2012-03-23 11:28+0100\n"
+"PO-Revision-Date: 2012-03-23 11:29+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +26,7 @@ msgstr ""
 #: .\Crm\templates\Crm\edit_opportunity.html.py:22
 #: .\Emailing\templates\Emailing\_section_contacts.html.py:13
 #: .\Search\templates\Search\_section_qs_contacts.html.py:8
-#: .\Search\templates\Search\_section_search_results.html.py:10
+#: .\Search\templates\Search\_section_search_results.html.py:12
 msgid "Entity"
 msgstr "Entité"
 
@@ -39,7 +39,7 @@ msgstr "Lieu"
 #: .\Emailing\templates\Emailing\_section_contacts.html.py:7
 #: .\Search\views.py:35
 #: .\Search\templates\Search\_section_qs_entities.html.py:9
-#: .\Search\templates\Search\_section_search_results.html.py:10
+#: .\Search\templates\Search\_section_search_results.html.py:12
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -405,6 +405,7 @@ msgid "contact"
 msgstr "contact"
 
 #: .\Crm\models.py:276
+#: .\Search\templates\Search\_section_search_results.html.py:5
 msgid "contacts"
 msgstr "contacts"
 
@@ -676,23 +677,23 @@ msgstr "Relance de dossier"
 msgid "Do you want to remove {0.name} from the {1.name} group?"
 msgstr "Voulez vous supprimer {0.name} du groupe {1.name}?"
 
-#: .\Crm\views.py:160
+#: .\Crm\views.py:161
 msgid "Are you sure to delete the group {0.name}?"
 msgstr "Etes-vous sur de supprimer le groupe {0.name}?"
 
-#: .\Crm\views.py:274
+#: .\Crm\views.py:275
 msgid "Are you sure to delete {0.name}?"
 msgstr "Etes-vous sur de supprimer {0.name}?"
 
-#: .\Crm\views.py:432
+#: .\Crm\views.py:433
 msgid "Are you sure to delete the contact \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le contact \"{0}\"?"
 
-#: .\Crm\views.py:508
+#: .\Crm\views.py:509
 msgid "Are you sure to delete the action \"{0}\"?"
 msgstr "Etes-vous sur de supprimer l'action \"{0}\"?"
 
-#: .\Crm\views.py:626
+#: .\Crm\views.py:627
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
@@ -700,6 +701,7 @@ msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 #: .\Crm\templates\Crm\_opportunity_info.html.py:32
 #: .\Crm\templates\Crm\_section_entity_info.html.py:34
 #: .\Crm\templates\Crm\_section_group_members.html.py:20
+#: .\Crm\templates\Crm\_section_my_groups.html.py:16
 msgid "Edit"
 msgstr "Editer"
 
@@ -771,8 +773,8 @@ msgstr "En charge"
 #: .\Crm\templates\Crm\_section_contacts.html.py:28
 #: .\Crm\templates\Crm\_section_entity_group.html.py:18
 #: .\Crm\templates\Crm\_section_entity_group.html.py:20
-#: .\Crm\templates\Crm\_section_my_groups.html.py:23
 #: .\Crm\templates\Crm\_section_my_groups.html.py:25
+#: .\Crm\templates\Crm\_section_my_groups.html.py:27
 #: .\Crm\templates\Crm\_section_opportunities.html.py:41
 #: .\Crm\templates\Crm\_section_opportunities.html.py:47
 #: .\Crm\templates\Crm\edit_group.html.py:18
@@ -828,7 +830,7 @@ msgid "Email"
 msgstr "Email"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:31
-#: .\Search\templates\Search\_section_search_results.html.py:105
+#: .\Search\templates\Search\_section_search_results.html.py:111
 msgid "Mail to"
 msgstr "Mail à"
 
@@ -841,13 +843,13 @@ msgid "Remove from group"
 msgstr "Supprimer du groupe"
 
 #: .\Crm\templates\Crm\_section_entity_group.html.py:22
-#: .\Crm\templates\Crm\_section_my_groups.html.py:27
+#: .\Crm\templates\Crm\_section_my_groups.html.py:29
 #: .\Crm\templates\Crm\_section_opportunities.html.py:49
 msgid "By name"
 msgstr "Par nom"
 
 #: .\Crm\templates\Crm\_section_entity_group.html.py:24
-#: .\Crm\templates\Crm\_section_my_groups.html.py:29
+#: .\Crm\templates\Crm\_section_my_groups.html.py:31
 #: .\Crm\templates\Crm\_section_opportunities.html.py:51
 msgid "By date"
 msgstr "Par date"
@@ -865,7 +867,7 @@ msgstr "Mes groupes"
 msgid "Number of members"
 msgstr "Nombre de membres"
 
-#: .\Crm\templates\Crm\_section_my_groups.html.py:8
+#: .\Crm\templates\Crm\_section_my_groups.html.py:9
 msgid "Description"
 msgstr "Description"
 
@@ -941,7 +943,7 @@ msgid "Edit action"
 msgstr "Editer l'action"
 
 #: .\Crm\templates\Crm\edit_action.html.py:8
-#: .\Search\templates\Search\_section_search_results.html.py:108
+#: .\Search\templates\Search\_section_search_results.html.py:114
 msgid "Create action"
 msgstr "Ajout d'une action"
 
@@ -1332,24 +1334,24 @@ msgstr "Sélectionnez un choix valide. Ce choix n'ext pas disponible."
 msgid "Enter a name and click save."
 msgstr "Entrez un nom et cliquez sur Enregistrer"
 
-#: .\Search\forms.py:264
+#: .\Search\forms.py:265
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: .\Search\forms.py:264
+#: .\Search\forms.py:265
 msgid "Add block"
 msgstr "Ajouter un bloc"
 
-#: .\Search\forms.py:264
+#: .\Search\forms.py:265
 msgid "Clear"
 msgstr "Effacer"
 
-#: .\Search\forms.py:264
-#: .\Search\forms.py:301
+#: .\Search\forms.py:265
+#: .\Search\forms.py:302
 msgid "Remove"
 msgstr "Supprimer"
 
-#: .\Search\forms.py:325
+#: .\Search\forms.py:326
 msgid "Two valid dates are required"
 msgstr "Deux dates valides sont requises"
 
@@ -1392,11 +1394,11 @@ msgstr "champs de recherche"
 msgid "Entities"
 msgstr "Entités"
 
-#: .\Search\views.py:58
+#: .\Search\views.py:65
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: .\Search\views.py:238
+#: .\Search\views.py:244
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crée"
 
@@ -1422,15 +1424,15 @@ msgstr "Recherche"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: .\Search\templates\Search\_section_search_results.html.py:4
+#: .\Search\templates\Search\_section_search_results.html.py:5
 msgid "Search results"
 msgstr "Résulats de la recherche"
 
-#: .\Search\templates\Search\_section_search_results.html.py:21
+#: .\Search\templates\Search\_section_search_results.html.py:23
 msgid "exclude"
 msgstr "exclure"
 
-#: .\Search\templates\Search\_section_search_results.html.py:59
+#: .\Search\templates\Search\_section_search_results.html.py:61
 msgid ""
 "The search results contains contacts who are refusing the newsletter.\\n"
 "\\n"
@@ -1440,11 +1442,15 @@ msgstr ""
 "\\n"
 "Continuer?"
 
-#: .\Search\templates\Search\_section_search_results.html.py:106
+#: .\Search\templates\Search\_section_search_results.html.py:107
+msgid "Edit group"
+msgstr "Editer le groupe"
+
+#: .\Search\templates\Search\_section_search_results.html.py:112
 msgid "Mailing"
 msgstr "Mailing"
 
-#: .\Search\templates\Search\_section_search_results.html.py:107
+#: .\Search\templates\Search\_section_search_results.html.py:113
 msgid "Excel"
 msgstr "Excel"
 

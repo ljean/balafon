@@ -1,7 +1,9 @@
 {% extends "_section.html" %}
 {% load i18n pagination_tags sanza_utils %}
 
-{% block section_title %}{% trans "Search results" %}{% endblock %}
+{% block section_title %}
+  {% trans "Search results" %} : {{contacts_count}} {% trans "contacts" %}
+{% endblock %}
   
 {% block section_data %}
 {% if entities %}
@@ -101,6 +103,10 @@
 {% endblock %}
 
 {% block section_action %}
+{% if group_id %}
+<a href="{% url crm_edit_group group_id %}">{% trans "Edit group" %}</a>
+{% endif %}
+
 {% if entities %}
 <a href="{% url search_mailto_contacts %}" id="mailto-button">{% trans "Mail to" %}</a>
 <a href="{% url search_emailing %}" id="emailing-button">{% trans "Mailing" %}</a>

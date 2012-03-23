@@ -120,12 +120,12 @@ def get_group_members(request, group_id):
 @login_required
 def edit_group(request, group_id):
     group = models.Group.objects.get(id=group_id)
-    
+    next_url = request.session.get('next_url', reverse('crm_see_my_groups'))
     if request.method == "POST":
         form = forms.EditGroupForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
-        next_url = request.session.pop('next_url', reverse('crm_get_group_members', args=[group.id]))
+        next_url = request.session.pop('next_url', reverse('crm_see_my_groups'))
         return HttpResponseRedirect(next_url)
     else:
         form = forms.EditGroupForm(instance=group)
@@ -134,6 +134,7 @@ def edit_group(request, group_id):
         'form': form,
         'group': group,
         'request': request,
+        'next_url': next_url,
     }
 
     return render_to_response(
@@ -649,7 +650,7 @@ def view_board_panel(request):
 
 @login_required
 def view_all_actions(request):
-    actions = models.Action.objects.all().order_by("planned_date")
+    actions = models.Action.objects.all().order_by("-planned_date")
     partial = False
     multi_user = True
     default_my_actions = False

@@ -29,68 +29,164 @@ class BaseTestCase(TestCase):
     def _login(self):
         self.client.login(username="toto", password="abc")
 
-class CreateEmailingTest(BaseTestCase):
-    def test_create_mailing(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
-        newsletter = mommy.make_one(Newsletter)
+class GroupSearchTest(BaseTestCase):
+    def test_view_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
         
-        url = reverse('search_emailing')
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
         
-        response = self.client.post(url, data={
-            'create_emailing': True, 
-            'newsletter': newsletter.id, 'contacts': ';'.join([unicode(c.id) for c in contacts])
-        })
+        group = mommy.make_one(models.Group, name=u"my group")
+        
+        group.entities.add(entity1)
+        group.save()
+        
+        url = reverse('search_group', args=[group.id])
+        
+        response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
-        self.assertEqual(Emailing.objects.count(), 1)
-        emailing = Emailing.objects.all()[0]
-        self.assertEqual(emailing.status, Emailing.STATUS_EDITING)
-        self.assertEqual(emailing.scheduling_dt, None)
-        self.assertEqual(emailing.sending_dt, None)
-        self.assertEqual(emailing.send_to.count(), 3)
-        self.assertEqual(emailing.sent_to.count(), 0)
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
         
-    def test_create_mailing_new_newsletter(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
         
-        url = reverse('search_emailing')
+    def test_search_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
         
-        response = self.client.post(url, data={
-            'create_emailing': True, 'subject': 'Hello',
-            'newsletter': 0, 'contacts': ';'.join([unicode(c.id) for c in contacts])
-        })
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        group = mommy.make_one(models.Group, name=u"my group")
+        group.entities.add(entity1)
+        group.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0#group#0": group.id}
+        
+        response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
-        self.assertEqual(Newsletter.objects.count(), 1)
-        self.assertEqual(Emailing.objects.count(), 1)
-        emailing = Emailing.objects.all()[0]
-        self.assertEqual(emailing.status, Emailing.STATUS_EDITING)
-        self.assertEqual(emailing.scheduling_dt, None)
-        self.assertEqual(emailing.sending_dt, None)
-        self.assertEqual(emailing.send_to.count(), 3)
-        self.assertEqual(emailing.sent_to.count(), 0)
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
         
-    def test_create_mailing_new_newsletter_no_subject(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
         
-        url = reverse('search_emailing')
+    def test_search_entity(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
         
-        response = self.client.post(url, data={
-            'create_emailing': True,
-            'newsletter': 0, 'contacts': ';'.join([unicode(c.id) for c in contacts])
-        })
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+                
+        url = reverse('search')
+        
+        data = {"gr0#entity_name#0": 'tiny'}
+        
+        response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(get_form_errors(response), 1)
-        self.assertEqual(Newsletter.objects.count(), 0)
-        self.assertEqual(Emailing.objects.count(), 0)
         
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
         
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_search_contact(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_name#0": 'ABC'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_contact_of_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        group = mommy.make_one(models.Group, name=u"my group")
+        group.entities.add(entity1)
+        group.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_name#0": 'ABC', 'gr0#group#1': group.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+        
+    def test_search_union_of_contacts(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_name#0": 'ABCD', 'gr1#contact_name#0': 'ABCA'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)

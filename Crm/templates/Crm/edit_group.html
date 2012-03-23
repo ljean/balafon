@@ -18,7 +18,7 @@
     <input type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}">
     {% if group %}
       <a class="colorbox-form" href="{% url crm_delete_group group.id %}">{% trans "Delete" %}</a>
-      <a href="{% url crm_get_group_members group.id %}">{% trans "Cancel" %}</a>
+      <a href="{{ next_url }}">{% trans "Cancel" %}</a>
     {% else %}
       <a href="{% url crm_see_my_groups %}">{% trans "Cancel" %}</a>
     {% endif %}

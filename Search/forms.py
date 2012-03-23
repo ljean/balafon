@@ -228,6 +228,7 @@ class SearchForm(forms.Form):
     def get_contacts_by_entity(self):
         self.contains_refuse_newsletter = False
         contacts = self._get_contacts()
+        contacts_count = len(contacts)
         entities = {}
         for contact in contacts:
             if not contact.accept_newsletter:
@@ -241,7 +242,7 @@ class SearchForm(forms.Form):
         for entity, contacts in entities.values():
             entity.search_contacts = contacts
             results.append(entity)
-        return results
+        return results, contacts_count
     
     def get_contacts(self):
         contacts = self._get_contacts()

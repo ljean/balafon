@@ -5,13 +5,15 @@
   
 {% block section_data %}
   <table>
-  <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th><th>{% trans "Description" %}</th></tr>
+  <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th>
+      <th>{% trans "Description" %}</th><th>&nbsp;</th></tr>
   {% autopaginate groups 50 %}
   {% for g in groups %}
     <tr>
-      <td><a href="{% url crm_get_group_members g.id %}">{{g.name}}</a></td>
+      <td><a href="{% url search_group g.id %}">{{g.name}}</a></td>
       <td>{{g.entities.count}}</td>
       <td>{{g.description|default:"&nbsp;"}}</td>
+      <td><a href="{% url crm_edit_group g.id %}">{% trans "Edit" %}</a></td>
     </tr>
   {% endfor %}
   </table>

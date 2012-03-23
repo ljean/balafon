@@ -41,32 +41,38 @@ def quick_search(request):
             )
     else:
         raise Http404
-    
+      
 @login_required
-def search(request, search_id=0):
+def search(request, search_id=0, group_id=0):
     message = ''
     entities = []
     search=None
     field_choice_form = forms.FieldChoiceForm()
     contains_refuse_newsletter = False
+    data = None
+    
     if request.method == "POST":
-        search_form = forms.SearchForm(request.POST)
+        data = request.POST
+    elif group_id:
+        data = {"gr0#group#0": group_id}
+            
+    if data:
+        search_form = forms.SearchForm(data)
         if search_form.is_valid():
-            entities = search_form.get_contacts_by_entity()
+            entities, contacts_count = search_form.get_contacts_by_entity()
             contains_refuse_newsletter = search_form.contains_refuse_newsletter
             if not entities:
                 message = _(u'Sorry, no results found')
     else:
         search = get_object_or_404(models.Search, id=search_id) if search_id else None
-        search_form = forms.SearchForm(instance=search)
         
     return render_to_response(
         'Search/search.html',
         {
             'request': request, 'entities': entities,
             'field_choice_form': field_choice_form, 'message': message,
-            'search_form': search_form, 'search': search,
-            'contains_refuse_newsletter': contains_refuse_newsletter,
+            'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
+            'contains_refuse_newsletter': contains_refuse_newsletter, 'group_id': group_id,
         },
         context_instance=RequestContext(request)
     )
