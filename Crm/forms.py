@@ -313,19 +313,49 @@ class ActionDoneForm(forms.ModelForm):
     
 class CustomFieldForm(forms.Form):
     
-    def __init__(self, instance, fields, *args, **kwargs):
+    def __init__(self, instance, *args, **kwargs):
         super(CustomFieldForm, self).__init__(*args, **kwargs)
         self._instance = instance
-        for f in fields:
+        model_type = self._get_model_type()
+        custom_fields = models.CustomField.objects.filter(model=model_type)
+        for f in custom_fields:
             self.fields[f.name] = forms.CharField(required=False, label=f.label)
+            if f.widget:
+                self.fields[f.name].widget.attrs = {'class': f.widget}
             if len(args)==0: #No Post
                 self.fields[f.name].initial = getattr(instance, 'custom_field_'+f.name, '')
-        
+                
     def save(self, *args, **kwargs):
         for f in self.fields:
-            cf = models.CustomField.objects.get(name = f)
-            cfv, _new = models.EntityCustomFieldValue.objects.get_or_create(entity = self._instance, custom_field = cf)
+            model_type = self._get_model_type()
+            cf = models.CustomField.objects.get(name = f, model=model_type)
+            cfv = self._create_custom_field_value(cf)
             cfv.value = self.cleaned_data[f]
             cfv.save()
+        return self._instance
+
+class EntityCustomFieldForm(CustomFieldForm):
+        
+    def _get_model_type(self):
+        return models.CustomField.MODEL_ENTITY
+    
+    @staticmethod
+    def model():
+        return models.Entity
+    
+    def _create_custom_field_value(self, cf):
+        cfv, _new = models.EntityCustomFieldValue.objects.get_or_create(entity = self._instance, custom_field = cf)
+        return cfv
             
-            
+class ContactCustomFieldForm(CustomFieldForm):
+    
+    def _get_model_type(self):
+        return models.CustomField.MODEL_CONTACT
+    
+    def _create_custom_field_value(self, cf):
+        cfv, _new = models.ContactCustomFieldValue.objects.get_or_create(contact = self._instance, custom_field = cf)
+        return cfv
+    
+    @staticmethod
+    def model():
+        return models.Contact

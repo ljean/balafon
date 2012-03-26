@@ -238,12 +238,25 @@ class Contact(TimeStampedModel):
             return u' '.join([f for f in fields if f])
         return self.entity.get_full_address()
     
+    def get_custom_fields(self):
+        return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
+
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
             field_name = attr[4:]
             if field_name in ('phone', 'email', 'address', 'zip_code', 'cedex', 'city'):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
+        else:
+            prefix = "custom_field_"
+            prefix_length = len(prefix)
+            if attr[:prefix_length] == prefix:
+                field_name = attr[prefix_length:]
+                try:
+                    custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field__name=field_name)
+                    return custom_field_value.value
+                except ContactCustomFieldValue.DoesNotExist:
+                    return u''
         return object.__getattribute__(self, attr)
     
     def get_absolute_url(self):
@@ -403,7 +416,7 @@ class CustomField(models.Model):
     label = models.CharField(max_length=100, verbose_name=_(u'label'), blank=True, default='')
     model = models.IntegerField(verbose_name=_(u'model'), choices=MODEL_CHOICE)
     widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
-    simple_form = models.BooleanField(verbose_name=_(u'visible on simple form'), default=True)
+    ordering = models.IntegerField(verbose_name=_(u'ordering'), default=10)
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.get_model_display(), self.name)
@@ -411,6 +424,7 @@ class CustomField(models.Model):
     class Meta:
         verbose_name = _(u'custom field')
         verbose_name_plural = _(u'custom fields')
+        ordering = ('ordering', )
 
 
 class CustomFieldValue(models.Model):

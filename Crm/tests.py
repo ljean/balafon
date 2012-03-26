@@ -80,10 +80,10 @@ class OpportunityTest(BaseTestCase):
 class SameAsTest(BaseTestCase):
 
     def test_add_same_as(self):
-        entity1 = models.Entity.objects.create(name="Toto")
-        entity2 = models.Entity.objects.create(name="Titi")
-        contact1 = models.Contact.objects.create(entity=entity1, firstname="John", lastname="Lennon")
-        contact2 = models.Contact.objects.create(entity=entity2, firstname="John", lastname="Lennon")
+        entity1 = mommy.make_one(models.Entity, name="Toto")
+        entity2 = mommy.make_one(models.Entity, name="Titi")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
         
         url = reverse("crm_same_as", args=[contact1.id])
         response = self.client.post(url, data={'contact': contact2.id})
@@ -98,11 +98,11 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, contact1.same_as)
         
     def test_add_same_as_list(self):
-        entity1 = models.Entity.objects.create(name="Toto")
-        entity2 = models.Entity.objects.create(name="Titi")
-        contact1 = models.Contact.objects.create(entity=entity1, firstname="John", lastname="Lennon")
-        contact2 = models.Contact.objects.create(entity=entity2, firstname="John", lastname="Lennon")
-        contact3 = models.Contact.objects.create(entity=entity2, firstname="Ringo", lastname="Star")
+        entity1 = mommy.make_one(models.Entity, name="Toto")
+        entity2 = mommy.make_one(models.Entity, name="Titi")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
+        contact3 = mommy.make_one(models.Contact, entity=entity2, firstname="Ringo", lastname="Star")
         
         url = reverse("crm_same_as", args=[contact1.id])
         response = self.client.get(url)
@@ -235,4 +235,77 @@ class GroupTest(BaseTestCase):
         group = models.Group.objects.all()[0]
         self.assertEqual(group.name, data['group_name'])
         self.assertEqual(list(group.entities.all()), [entity])
+        
+class CustomFieldTest(BaseTestCase):
+    
+    def test_entity_custom_field(self):
+        entity = mommy.make_one(models.Entity)
+        cfv = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        data = {'siret': '555444333222111'}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(entity.custom_field_siret, data['siret'])
+    
+    def test_entity_custom_two_fields(self):
+        entity = mommy.make_one(models.Entity)
+        cfv1 = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
+        cfv2 = models.CustomField.objects.create(name = 'naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY)
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        data = {'siret': '555444333222111', 'naf': '56789'}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(entity.custom_field_siret, data['siret'])
+        self.assertEqual(entity.custom_field_naf, data['naf'])
+    
+    def test_contact_custom_field(self):
+        contact = mommy.make_one(models.Contact)
+        cfv = models.CustomField.objects.create(name = 'insee', label = 'INSEE', model=models.CustomField.MODEL_CONTACT)
+        url = reverse('crm_edit_custom_fields', args=['contact', contact.id])
+        data = {'insee': '1234567890'}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(contact.custom_field_insee, data['insee'])
+        
+    def test_view_entity(self):
+        entity = mommy.make_one(models.Entity)
+        cf1 = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
+        cf2 = models.CustomField.objects.create(name = 'naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY)
+        
+        response = self.client.get(entity.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        
+        data = {'siret': '555444333222111', 'naf': '56789'}
+        cfv1 = models.EntityCustomFieldValue.objects.create(custom_field=cf1, entity=entity, value=data['siret'])
+        cfv2 = models.EntityCustomFieldValue.objects.create(custom_field=cf2, entity=entity, value=data['naf'])
+        
+        response = self.client.get(entity.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, data['siret'])
+        self.assertContains(response, data['naf'])
+        
+    def test_custom_field_ordering(self):
+        entity = mommy.make_one(models.Entity)
+        cfv1 = models.CustomField.objects.create(name = 'no_siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2)
+        cfv2 = models.CustomField.objects.create(name = 'code_naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY, ordering=1)
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        pos_siret = response.content.find('no_siret')
+        pos_naf = response.content.find('code_naf')
+        self.assertTrue(pos_naf < pos_siret)
+        
+        response = self.client.get(entity.get_absolute_url())
+        pos_siret = response.content.find('SIRET')
+        pos_naf = response.content.find('Code NAF')
+        self.assertTrue(pos_naf < pos_siret)
+        
+    def test_custom_field_widget(self):
+        entity = mommy.make_one(models.Entity)
+        cfv1 = models.CustomField.objects.create(name = 'date_b', label = 'Date', model=models.CustomField.MODEL_ENTITY, widget="datepicker")
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'class="datepicker"')
+        
         

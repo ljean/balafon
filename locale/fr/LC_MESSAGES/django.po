@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 16:11+0100\n"
-"PO-Revision-Date: 2012-03-23 16:15+0100\n"
+"POT-Creation-Date: 2012-03-26 10:59+0200\n"
+"PO-Revision-Date: 2012-03-26 11:13+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #: .\config.py:7
 #: .\Crm\forms.py:268
-#: .\Crm\models.py:398
+#: .\Crm\models.py:411
 #: .\Crm\templates\Crm\_section_actions.html.py:24
 #: .\Crm\templates\Crm\_section_contacts.html.py:9
 #: .\Crm\templates\Crm\_section_opportunities.html.py:18
@@ -118,7 +118,7 @@ msgid "Select roles"
 msgstr "Sélectionnez les rôles de ce contact"
 
 #: .\Crm\forms.py:195
-#: .\Crm\models.py:370
+#: .\Crm\models.py:383
 msgid "planned date"
 msgstr "date prévue"
 
@@ -145,12 +145,12 @@ msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
 #: .\Crm\forms.py:283
-#: .\Crm\models.py:399
+#: .\Crm\models.py:412
 #: .\Crm\search_forms.py:302
 #: .\Crm\templates\Crm\_section_actions.html.py:27
 #: .\Emailing\templates\Emailing\_section_contacts.html.py:13
 msgid "Contact"
-msgstr "Contacts"
+msgstr "Contact"
 
 #: .\Crm\forms.py:298
 msgid "Invalid contact"
@@ -227,7 +227,7 @@ msgid "zones"
 msgstr "zones"
 
 #: .\Crm\models.py:80
-#: .\Crm\models.py:304
+#: .\Crm\models.py:317
 msgid "group"
 msgstr "groupe"
 
@@ -242,16 +242,16 @@ msgid "cities"
 msgstr "villes"
 
 #: .\Crm\models.py:97
-#: .\Crm\models.py:294
-#: .\Crm\models.py:332
-#: .\Crm\models.py:402
+#: .\Crm\models.py:307
+#: .\Crm\models.py:345
+#: .\Crm\models.py:415
 #: .\Search\models.py:10
 #: .\Search\models.py:21
 msgid "name"
 msgstr "nom"
 
 #: .\Crm\models.py:98
-#: .\Crm\models.py:295
+#: .\Crm\models.py:308
 msgid "description"
 msgstr "description"
 
@@ -399,180 +399,180 @@ msgstr "notes"
 msgid "has left"
 msgstr "a quitté"
 
-#: .\Crm\models.py:270
+#: .\Crm\models.py:283
 msgid "{1}{0.firstname} {0.lastname}"
 msgstr "{1} {0.firstname} {0.lastname}"
 
-#: .\Crm\models.py:290
+#: .\Crm\models.py:303
 msgid "contact"
 msgstr "contact"
 
-#: .\Crm\models.py:291
+#: .\Crm\models.py:304
 #: .\Search\templates\Search\_section_search_results.html.py:5
 msgid "contacts"
 msgstr "contacts"
 
-#: .\Crm\models.py:297
+#: .\Crm\models.py:310
 msgid "Subscribe form"
 msgstr "Affiché sur le formulaire d'inscription"
 
-#: .\Crm\models.py:298
+#: .\Crm\models.py:311
 msgid "This group will be proposed on the public subscribe form"
 msgstr "Ce groupe sera proposé sur le formulaire d'inscription public"
 
-#: .\Crm\models.py:305
+#: .\Crm\models.py:318
 msgid "groups"
 msgstr "groupes"
 
-#: .\Crm\models.py:311
-#: .\Crm\models.py:312
+#: .\Crm\models.py:324
+#: .\Crm\models.py:325
 msgid "opportunity status"
 msgstr "Etats d'un dossier"
 
-#: .\Crm\models.py:317
+#: .\Crm\models.py:330
 msgid "opportunity type"
 msgstr "type de dossier"
 
-#: .\Crm\models.py:318
+#: .\Crm\models.py:331
 msgid "opportunity types"
 msgstr "types de dossier"
 
-#: .\Crm\models.py:326
-#: .\Crm\models.py:363
+#: .\Crm\models.py:339
+#: .\Crm\models.py:376
 msgid "low"
 msgstr "basse"
 
-#: .\Crm\models.py:327
-#: .\Crm\models.py:364
+#: .\Crm\models.py:340
+#: .\Crm\models.py:377
 msgid "medium"
 msgstr "moyenne"
 
-#: .\Crm\models.py:328
-#: .\Crm\models.py:365
+#: .\Crm\models.py:341
+#: .\Crm\models.py:378
 msgid "high"
 msgstr "haute"
 
-#: .\Crm\models.py:335
-#: .\Crm\models.py:372
+#: .\Crm\models.py:348
+#: .\Crm\models.py:385
 msgid "detail"
 msgstr "détail"
 
-#: .\Crm\models.py:336
+#: .\Crm\models.py:349
 msgid "probability"
 msgstr "probabilité"
 
-#: .\Crm\models.py:338
+#: .\Crm\models.py:351
 msgid "amount"
 msgstr "montant"
 
-#: .\Crm\models.py:339
+#: .\Crm\models.py:352
 msgid "closed"
 msgstr "fermé"
 
-#: .\Crm\models.py:340
+#: .\Crm\models.py:353
 msgid "starting date"
 msgstr "date de début"
 
-#: .\Crm\models.py:341
+#: .\Crm\models.py:354
 msgid "closing date"
 msgstr "date de fin"
 
-#: .\Crm\models.py:342
-#: .\Crm\models.py:380
+#: .\Crm\models.py:355
+#: .\Crm\models.py:393
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: .\Crm\models.py:348
+#: .\Crm\models.py:361
 msgid "opportunity"
 msgstr "dossier"
 
-#: .\Crm\models.py:349
+#: .\Crm\models.py:362
 msgid "opportunities"
 msgstr "dossiers"
 
-#: .\Crm\models.py:354
+#: .\Crm\models.py:367
 msgid "action type"
 msgstr "type d'action"
 
-#: .\Crm\models.py:355
+#: .\Crm\models.py:368
 msgid "action types"
 msgstr "types d'action"
 
-#: .\Crm\models.py:369
+#: .\Crm\models.py:382
 msgid "subject"
 msgstr "sujet"
 
-#: .\Crm\models.py:373
+#: .\Crm\models.py:386
 msgid "priority"
 msgstr "priorité"
 
-#: .\Crm\models.py:376
+#: .\Crm\models.py:389
 msgid "done"
 msgstr "réalisé"
 
-#: .\Crm\models.py:377
+#: .\Crm\models.py:390
 msgid "done date"
 msgstr "date de réalisation"
 
-#: .\Crm\models.py:378
+#: .\Crm\models.py:391
 msgid "in charge"
 msgstr "en charge"
 
-#: .\Crm\models.py:403
+#: .\Crm\models.py:416
 msgid "label"
 msgstr "libellé"
 
-#: .\Crm\models.py:404
+#: .\Crm\models.py:417
 msgid "model"
 msgstr "modèle"
 
-#: .\Crm\models.py:405
+#: .\Crm\models.py:418
 msgid "widget"
 msgstr "widget"
 
-#: .\Crm\models.py:406
+#: .\Crm\models.py:419
 msgid "visible on simple form"
 msgstr "Visible sur le formulaire simplifié"
 
-#: .\Crm\models.py:409
+#: .\Crm\models.py:422
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: .\Crm\models.py:412
-#: .\Crm\models.py:417
+#: .\Crm\models.py:425
+#: .\Crm\models.py:430
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: .\Crm\models.py:413
+#: .\Crm\models.py:426
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: .\Crm\models.py:418
+#: .\Crm\models.py:431
 #: .\Search\models.py:33
 msgid "value"
 msgstr "valeur"
 
-#: .\Crm\models.py:421
+#: .\Crm\models.py:434
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: .\Crm\models.py:422
+#: .\Crm\models.py:435
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: .\Crm\models.py:429
+#: .\Crm\models.py:442
 msgid "entity custom field value"
 msgstr "cal"
 
-#: .\Crm\models.py:430
+#: .\Crm\models.py:443
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: .\Crm\models.py:439
+#: .\Crm\models.py:452
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: .\Crm\models.py:440
+#: .\Crm\models.py:453
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
@@ -897,8 +897,8 @@ msgid "Mail to"
 msgstr "Mail à"
 
 #: .\Crm\templates\Crm\_section_custom_fields.html.py:4
-msgid "Custom fields"
-msgstr "Champs personnalisés"
+msgid "More information"
+msgstr "Plus d'information"
 
 #: .\Crm\templates\Crm\_section_entity_group.html.py:4
 msgid "Groups"
@@ -1746,6 +1746,9 @@ msgstr "Un email vous a été envoyé"
 #: .\templates\registration\password_reset_done.html.py:5
 msgid "It contains the procedure to reset the password."
 msgstr "Il contient la procédure de réinitialisation du mot de passe"
+
+#~ msgid "Custom fields"
+#~ msgstr "Champs personnalisés"
 
 #~ msgid "See all actions"
 #~ msgstr "Voir toutes les actions"

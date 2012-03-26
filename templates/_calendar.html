@@ -5,7 +5,11 @@
     {% else %}
     $(function() {
     {% endif %}
+        {% if field %}
         $("input[name={{field}}]").datepicker({
+        {% else %}
+        $(".datepicker").datepicker({
+        {% endif %}
           dateFormat: 'dd/mm/yy',
           dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
           monthNames : {% spaceless%}

@@ -58,8 +58,8 @@ class ActionAdmin(admin.ModelAdmin):
 admin.site.register(models.Action, ActionAdmin)
 
 class CustomFieldAdmin(admin.ModelAdmin):
-    list_display = ['name', 'model', 'label', 'widget', 'simple_form']
-    list_filter = ('model', 'simple_form', 'widget')
+    list_display = ['name', 'model', 'label', 'widget', 'ordering']
+    list_filter = ('model', 'widget')
 admin.site.register(models.CustomField, CustomFieldAdmin)
 
 class EntityCustomFieldValueAdmin(admin.ModelAdmin):

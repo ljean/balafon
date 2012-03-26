@@ -5,6 +5,12 @@
   
 {% include "Crm/_contact_info.html" %}
 
+{% with contact.get_custom_fields as custom_fields %}
+{% if custom_fields %}
+    {% include "Crm/_section_custom_fields.html" with instance=contact  model="contact" %}
+{% endif %}
+{% endwith %}
+
 {% include "Crm/_section_actions.html" %}
 
 {% include "Crm/_section_same_as.html" %}
