@@ -6,8 +6,9 @@
 {% block section_data %}
   {% for g in groups.all %}
     <span class="entity_group label" title="{{g.description}}">
-      <a href="{% url search_group g.id %}">{{g.name}}</a>
-      {% if entity %}<a class="colorbox-form" href="{% url crm_remove_entity_from_group g.id entity.id %}" title="{% trans "Remove from group" %}">x</a>{% endif %}
+      {% spaceless %}
+      <a href="{% url search_group g.id %}" class="group-name">{{g.name}}</a>{% if entity %}<a class="colorbox-form btn-close" href="{% url crm_remove_entity_from_group g.id entity.id %}" title="{% trans "Remove from group" %}"></a>{% endif %}
+      {% endspaceless %}
     </span>
     
   {% endfor %}
