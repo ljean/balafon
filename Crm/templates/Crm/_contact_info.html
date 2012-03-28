@@ -3,16 +3,16 @@
 
 {% block section_title %}
 <div class="contact_info">
-  <span class="title">{{contact}}</span>
-  &nbsp;-&nbsp;<a href="{% url crm_view_entity contact.entity.id %}">{{contact.entity}}</a>
-  {% with contact.get_roles as roles %}{% if roles %}&nbsp;-&nbsp;{{roles|seq_to_dash}}{% endif %}{% endwith %}
+  <div class="title">{{contact}}</div>
+  <span class="addr-info entity-info"><a href="{% url crm_view_entity contact.entity.id %}">{{contact.entity}}</a></span>
+  {% with contact.get_roles as roles %}{% if roles %}<span class="addr-info role-info">{{roles|seq_to_dash}}</span>{% endif %}{% endwith %}
 </div>
 {% endblock %}
   
 {% block section_data %}
-{{contact.get_full_address}}
-{% if contact.get_email %}&nbsp;-&nbsp;<a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>{% endif %}
-{% with contact.get_phones as phones %}{% if phones %}&nbsp;-&nbsp;{{phones|seq_to_dash}}{% endif %}{% endwith %}
+{% if contact.get_full_address %}<span class="addr-info">{{contact.get_full_address}}</span>{% endif %}
+{% if contact.get_email %}<span class="addr-info"><a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a></span>{% endif %}
+{% with contact.get_phones as phones %}{% if phones %}<span class="addr-info">{{phones|seq_to_dash}}</span>{% endif %}{% endwith %}
 <br /><br />
 <span class="notes">{{contact.notes}}</span>
 {% endblock %}

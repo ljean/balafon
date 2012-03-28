@@ -22,12 +22,12 @@
 {% endblock %}
   
 {% block section_data %}
-  <span class="entity_address addr-info">{{entity.get_display_address}}</span>
-  <span class="entity_phone addr-info">{{entity.phone}}</span>
-  <span class="entity_fax addr-info">{{entity.fax}}</span>
+  {% if entity.get_display_address %}<span class="entity_address addr-info">{{entity.get_display_address}}</span>{% endif %}
+  {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
+  {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
   <br /><br />
-  <span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>
-  <span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>
+  {% if entity.website %}<span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>{% endif %}
+  {% if entity.email %}<span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>{% endif %}
 {% endblock %}
 
 {% block section_action %}

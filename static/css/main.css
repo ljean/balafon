@@ -308,12 +308,11 @@ body a:hover{
 
 }
 
-/*
-a.action-button {
-	background: #ef9300;
-	
+.addr-info {
+	padding-right: 15px;
+	font-weight: bold;
 }
-*/
+
 .column.section-actions a:hover{
     /*background: #ccf;*/
 	color: #22a;
