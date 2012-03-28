@@ -226,7 +226,7 @@ class ActionForContactsForm(ActionForm):
     contacts = forms.CharField(widget=forms.HiddenInput())
     class Meta:
         model = models.Action
-        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'opportunity', 'detail',
+        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'detail',
             'priority', 'planned_date', 'contacts')
         
     def __init__(self, *args, **kwargs):
@@ -238,9 +238,30 @@ class ActionForContactsForm(ActionForm):
         super(ActionForContactsForm, self).__init__(None, *args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
-        self.fields['opportunity'].widget = OpportunityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'})
+        #self.fields['opportunity'].widget = OpportunityAutoComplete(
+        #    attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'})
         
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return models.Contact.objects.filter(id__in=ids)
+    
+class OpportunityForContactsForm(forms.ModelForm):
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    
+    class Meta:
+        model = models.Opportunity
+        exclude = ('entity',)
+        
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        super(OpportunityForContactsForm, self).__init__(*args, **kwargs)
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
         return models.Contact.objects.filter(id__in=ids)

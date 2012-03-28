@@ -2,7 +2,7 @@
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from sanza.Search.forms import QuickSearchForm
-from sanza.Crm.models import Entity, Contact, Group, Action
+from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Context, Template
 from sanza.Search import forms, models
@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
-from sanza.Crm.forms import ActionForContactsForm
+from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm
 from django.contrib import messages
 
 @login_required
@@ -259,6 +259,47 @@ def create_action_for_contacts(request):
                     form = ActionForContactsForm(initial={'contacts': contacts})
                     return render_to_response(
                         'Search/create_action_for_contacts.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+    except Exception, msg:
+        print msg
+        raise
+    raise Http404
+
+
+@login_required
+@popup_redirect
+def create_opportunity_for_contacts(request):
+    try:
+        search_form = forms.SearchForm(request.POST)
+        if request.method == "POST":
+            if "create_opportunities" in request.POST:
+                form = OpportunityForContactsForm(request.POST)
+                if form.is_valid():
+                    contacts = form.get_contacts()
+                    for contact in contacts:
+                        #create opportunity
+                        kwargs = dict(form.cleaned_data)
+                        for k in ('contacts', ): del kwargs[k]
+                        opportunity = Opportunity.objects.create(
+                            entity = contact.entity, **kwargs
+                        )
+                    messages.add_message(request, messages.SUCCESS, _(u"{0} opportunities have been created".format(len(contacts))))
+                    return HttpResponseRedirect(reverse('crm_board_panel'))
+                else:
+                    return render_to_response(
+                        'Search/create_action_for_contacts.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                search_form = forms.SearchForm(request.POST)
+                if search_form.is_valid():
+                    contacts = search_form.get_contacts()
+                    form = OpportunityForContactsForm(initial={'contacts': contacts})
+                    return render_to_response(
+                        'Search/create_opportunity_for_contacts.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )
