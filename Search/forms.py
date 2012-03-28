@@ -252,7 +252,7 @@ class SearchForm(forms.Form):
     def get_contacts_emails(self):
         contacts = self._get_contacts()
         ids = self.cleaned_data['excluded']
-        return [c.get_email for c in contacts if c.get_email and (c.id not in ids)]
+        return [u'"{1}" <{0}>'.format(c.get_email, c.fullname) for c in contacts if c.get_email and (c.id not in ids)]
     
     def actions(self):
         f = FieldChoiceForm()
