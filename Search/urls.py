@@ -14,5 +14,5 @@ urlpatterns = patterns('sanza.Search.views',
     url(r'^as-excel$', 'export_contacts_as_excel', name='search_export_contacts_as_excel'),
     url(r'^create-actions$', 'create_action_for_contacts', name='search_create_action_for_contacts'),
     url(r'^create-opportunities$', 'create_opportunity_for_contacts', name='search_create_opportunity_for_contacts'),
-    
+    url(r'^add-contacts-to-group$', 'add_contacts_to_group', name='search_add_contacts_to_group'),
 )

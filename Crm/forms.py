@@ -265,6 +265,39 @@ class OpportunityForContactsForm(forms.ModelForm):
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
         return models.Contact.objects.filter(id__in=ids)
+
+class GroupForContactsForm(forms.Form):
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    groups = forms.ModelMultipleChoiceField(queryset=models.Group.objects.all())
+    
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css',)
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
+        
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        super(GroupForContactsForm, self).__init__(*args, **kwargs)
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+    
+        self.fields['groups'].widget.attrs = {
+            'class': 'chzn-select',
+            'data-placeholder': _(u'Select groups'),
+            'style': "width:350px;"
+        }
+        self.fields['groups'].help_text = ''
+
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return models.Contact.objects.filter(id__in=ids)
     
 class OpportunityForm(forms.ModelForm):
     class Meta:

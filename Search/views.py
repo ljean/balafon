@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
-from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm
+from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
 from django.contrib import messages
 
 @login_required
@@ -278,18 +278,19 @@ def create_opportunity_for_contacts(request):
                 form = OpportunityForContactsForm(request.POST)
                 if form.is_valid():
                     contacts = form.get_contacts()
-                    for contact in contacts:
+                    entities = set([c.entity for c in contacts])
+                    for entity in entities:
                         #create opportunity
                         kwargs = dict(form.cleaned_data)
                         for k in ('contacts', ): del kwargs[k]
                         opportunity = Opportunity.objects.create(
-                            entity = contact.entity, **kwargs
+                            entity = entity, **kwargs
                         )
-                    messages.add_message(request, messages.SUCCESS, _(u"{0} opportunities have been created".format(len(contacts))))
+                    messages.add_message(request, messages.SUCCESS, _(u"{0} opportunities have been created".format(len(entities))))
                     return HttpResponseRedirect(reverse('crm_board_panel'))
                 else:
                     return render_to_response(
-                        'Search/create_action_for_contacts.html',
+                        'Search/create_opportunity_for_contacts.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )
@@ -300,6 +301,46 @@ def create_opportunity_for_contacts(request):
                     form = OpportunityForContactsForm(initial={'contacts': contacts})
                     return render_to_response(
                         'Search/create_opportunity_for_contacts.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+    except Exception, msg:
+        print msg
+        raise
+    raise Http404
+
+@login_required
+@popup_redirect
+def add_contacts_to_group(request):
+    try:
+        search_form = forms.SearchForm(request.POST)
+        if request.method == "POST":
+            if "add_to_group" in request.POST:
+                form = GroupForContactsForm(request.POST)
+                if form.is_valid():
+                    contacts = form.get_contacts()
+                    entities = set([c.entity for c in contacts])
+                    groups = form.cleaned_data['groups']
+                    for g in groups:
+                        for entity in entities:
+                        #create opportunity
+                            g.entities.add(entity)
+                        g.save()
+                    messages.add_message(request, messages.SUCCESS, _(u"{0} entities have been added to groups".format(len(entities))))
+                    return HttpResponseRedirect(reverse('crm_board_panel'))
+                else:
+                    return render_to_response(
+                        'Search/add_contacts_to_group.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                search_form = forms.SearchForm(request.POST)
+                if search_form.is_valid():
+                    contacts = search_form.get_contacts()
+                    form = GroupForContactsForm(initial={'contacts': contacts})
+                    return render_to_response(
+                        'Search/add_contacts_to_group.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )

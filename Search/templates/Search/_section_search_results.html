@@ -90,6 +90,12 @@
         return false;
       });
       
+      $("#add-to-group-button").click(function() {
+        $("form.search-form").colorboxSubmit({href: $(this).attr('href')});
+        $("form.search-form").attr('action', '');
+        return false;
+      });
+      
       $(".pagination a").live('click', function() {
         $("form.search-form").attr('action', $(this).attr('href'));
         $("form.search-form").submit();
@@ -120,6 +126,7 @@
 <a href="{% url search_export_contacts_as_excel %}" id="xl-button">{% trans "Excel" %}</a>
 <a href="{% url search_create_action_for_contacts %}" id="create-action-button" class="colorbox-form">{% trans "Create action" %}</a>
 <a href="{% url search_create_opportunity_for_contacts %}" id="create-opp-button" class="colorbox-form">{% trans "Create Opportunity" %}</a>
+<a href="{% url search_add_contacts_to_group %}" id="add-to-group-button" class="colorbox-form">{% trans "Add to groups" %}</a>
 
 {% endif %}
 {% endblock %}
