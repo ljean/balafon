@@ -291,8 +291,23 @@ body a:hover{
 	-moz-box-shadow   : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
 	box-shadow        : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
 	color: #333;
+}
+
+.column.section-actions a:hover{
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#f4f4f4', GradientType=0 ); 
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(20%, #eeeeee), color-stop(50%, #e8e8e8), color-stop(52%, #f0f0f0), color-stop(100%, #f4f4f4));
+	background-image: -webkit-linear-gradient(top, #eeeeee 20%, #e8e8e8 50%, #f0f0f0 52%, #f4f4f4 100%);
+	background-image: -moz-linear-gradient(top, #eeeeee 20%, #e8e8e8 50%, #f0f0f0 52%, #f4f4f4 100%);
+	background-image: -o-linear-gradient(top, #eeeeee 20%, #e8e8e8 50%, #f0f0f0 52%, #f4f4f4 100%);
+	background-image: -ms-linear-gradient(top, #eeeeee 20%, #e8e8e8 50%, #f0f0f0 52%, #f4f4f4 100%);
+	background-image: linear-gradient(top, #eeeeee 20%, #e8e8e8 50%, #f0f0f0 52%, #f4f4f4 100%); 
+	-webkit-box-shadow: 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
+	-moz-box-shadow   : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
+	box-shadow        : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
+	color: #333;
 
 }
+
 /*
 a.action-button {
 	background: #ef9300;

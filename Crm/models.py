@@ -116,6 +116,8 @@ class Entity(TimeStampedModel):
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
+    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
     def __unicode__(self):
         return self.name
 
@@ -231,6 +233,8 @@ class Contact(TimeStampedModel):
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
     
     has_left = models.BooleanField(_(u'has left'), default=False)
+    
+    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     def get_full_address(self):
         if self.city:
@@ -456,3 +460,23 @@ class ContactCustomFieldValue(CustomFieldValue):
     def __unicode__(self):
         return u'{0} {1}'.format(self.contact, self.custom_field)
     
+class ContactsImport(TimeStampedModel):
+    
+    def _get_import_dir(self, filename):
+        return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
+
+    import_file = models.FileField(_(u'import file'), upload_to=_get_import_dir)
+    name = models.CharField(max_length=100, verbose_name=_(u'name'), blank=True, default=u'')
+    imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
+    
+    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'))
+    relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'))
+    activity_sector = models.ForeignKey(ActivitySector, verbose_name=_(u'activity sector'), blank=True, default=None, null=True)
+    groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True)
+
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _(u'contact import')
+        verbose_name_plural = _(u'contact imports')

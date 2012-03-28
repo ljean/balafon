@@ -14,6 +14,7 @@ import json, re
 from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
 from django.conf import settings
+import os.path, re
 
 @login_required
 def view_entity(request, entity_id):
@@ -751,5 +752,157 @@ def edit_custom_fields(request, model_name, instance_id):
     return render_to_response(
         'Crm/edit_custom_fields.html',
         {'form': form, 'instance': instance},
+        context_instance=RequestContext(request)
+    )
+    
+@login_required
+def new_contacts_import(request):
+    if request.method == 'POST':
+        instance = models.ContactsImport(imported_by=request.user)
+        form = forms.ContactsImportForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            src = form.cleaned_data['import_file']
+            ipt = form.save()
+            if not ipt.name:
+                ipt.name = os.path.splitext(src.name)[0]
+                ipt.save()
+            return HttpResponseRedirect(reverse('crm_confirm_contacts_import', args=[ipt.id]))
+    else:
+        form = forms.ContactsImportForm()
+    
+    return render_to_response(
+        'Crm/new_contacts_import.html',
+        {'form': form},
+        context_instance=RequestContext(request)
+    )
+
+import csv, codecs
+def unicode_csv_reader(the_file, dialect=csv.excel, **kwargs):
+    csv_reader = csv.reader(the_file, dialect=dialect, **kwargs)
+    for row in csv_reader:
+        yield [codecs.decode(cell, 'iso-8859-15') for cell in row]
+
+def resolve_city(city_name, zip_code, default_department):
+    try:
+        return models.City.objects.get(name__iexact=city_name)
+    except models.City.DoesNotExist:
+        code = zip_code[:2] or default_department
+        parent = models.Zone.objects.get(code=default_department)
+        return models.City.objects.create(name=city_name, parent=parent)
+
+@login_required
+def confirm_contacts_import(request, import_id):
+    
+    contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
+    reader = unicode_csv_reader(contacts_import.import_file)
+    
+    fields = ('entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
+        'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
+        'entity.city', 'entity.cedex', 'entity.zip_code', 'address', 'address2',
+        'address3', 'city', 'cedex', 'zip_code', 'job', 'entity.website', 'notes', 'role',
+    )
+        
+    contacts = []
+    for k, row in enumerate(reader):
+        if k==0: continue #remove the header row
+        c = {}
+        for i, field in enumerate(fields):
+            c[field] = row[i]
+            if field == 'gender':
+                if c[field]:
+                    if c[field] in ('M', 'M.', 'Mr', 'Mr.'):
+                        c[field] = models.Contact.GENDER_MALE
+                    else:
+                        c[field] = models.Contact.GENDER_FEMALE
+            #Copy value of entity fields with _ rather than . for using it in template
+            if field.find('.')>0:
+                c[field.replace('.', '_')] = c[field]
+            if field.find('city')>=0 and c[field]:
+                field = field.replace('.', '_')
+                c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
+                
+        email = u''
+        if not c['entity']:
+            entity = u''
+            res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
+            if res:
+                name, entity, ext = res.groups(0)
+                email = u'{0}@{1}.{2}'.format(name, entity, ext)
+            if entity in ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte'):
+                if not (c['lastname'] or c['firstname']):
+                    try:
+                        c['lastname'], c['firstname'] = [x.capitalize() for x in name.split('.')]
+                    except ValueError:
+                        c['lastname'] = name.capitalize()
+                entity = name
+            if not c['entity']:
+                c['entity'] = entity
+            
+        c['entity_exists'] = (models.Entity.objects.filter(name__iexact=c['entity']).count()!=0)
+        c['role_exists'] = (models.EntityRole.objects.filter(name__iexact=c['role']).count()!=0)
+            
+        if email:
+            if models.Contact.objects.filter(email=email).count()==0:
+                contacts.append(c)
+        else:
+            contacts.append(c)
+    
+    if request.method == 'POST':
+        form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
+        
+        if form.is_valid():
+            #create entities
+            default_department = form.cleaned_data['default_department']
+            contacts_import = form.save()
+            
+            for c in contacts:
+                #Entity
+                if c['entity_exists']:
+                    entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
+                else:
+                    entity = models.Entity.objects.create(
+                        name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import,
+                        relationship=contacts_import.relationship, activity_sector=contacts_import.activity_sector)
+                
+                for g in contacts_import.groups.all():
+                    g.entities.add(entity)
+                    g.save()
+                    
+                #Contact
+                contact = models.Contact.objects.create(entity=entity, firstname=c['firstname'],
+                    lastname=c['lastname'], imported_by=contacts_import)
+                
+                for field_name in fields:
+                    if field_name in ('entity', 'city', 'entity.city', 'role'):
+                        continue
+                    obj = contact
+                    try:
+                        x, field = field_name.split('.')
+                        obj = getattr(obj, x)
+                    except ValueError:
+                        field = field_name
+                    if c[field_name] and field!='city':
+                        setattr(obj, field, c[field_name])
+
+                if c['city']:
+                    contact.city = resolve_city(c['city'], c['zip_code'], default_department)
+                if c['entity.city']:
+                    contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], default_department)
+                if c['role']:
+                    if c['role_exists']:
+                        contact.role.add(models.EntityRole.objects.filter(name__iexact=c['role'])[0])
+                    else:
+                        contact.role.add(models.EntityRole.objects.create(name=c['role']))
+                
+                contact.entity.save()
+                contact.save()
+            
+            return HttpResponseRedirect("/")
+    else:
+        form = forms.ContactsImportConfirmForm(instance=contacts_import)
+    
+    return render_to_response(
+        'Crm/confirm_contacts_import.html',
+        {'form': form, 'contacts': contacts},
         context_instance=RequestContext(request)
     )

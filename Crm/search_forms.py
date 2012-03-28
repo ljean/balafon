@@ -445,3 +445,16 @@ class OpportunityReminderForm(SearchFieldForm):
         return {'entity__opportunity__start_date__lte': d,
                 'entity__opportunity__end_date__gte': d, }
         
+
+class ContactsImportSearchForm(SearchFieldForm):
+    _name = 'contact_import'
+    _label = _(u'Import')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactsImportSearchForm, self).__init__(*args, **kwargs)
+        qs = models.ContactsImport.objects.order_by('name') 
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'imported_by': self._value}

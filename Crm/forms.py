@@ -359,3 +359,39 @@ class ContactCustomFieldForm(CustomFieldForm):
     @staticmethod
     def model():
         return models.Contact
+
+
+class ContactsImportForm(forms.ModelForm):
+    
+    class Meta:
+        model = models.ContactsImport
+        exclude = ('imported_by', )
+        
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css',)
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactsImportForm, self).__init__(*args, **kwargs)
+        
+        self.fields['groups'].widget.attrs = {
+            'class': 'chzn-select',
+            'data-placeholder': _(u'Select groups'),
+            'style': "width:600px;"
+        }
+        self.fields['groups'].help_text = ''
+
+class ContactsImportConfirmForm(ContactsImportForm):
+    default_department = forms.CharField(required=True)
+    
+    class Meta(ContactsImportForm.Meta):
+        exclude = ('imported_by', 'import_file')
+    
+    def clean_default_department(self):
+        if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
+            raise ValidationError(_(u'Please enter a valid code'))
+        return self.cleaned_data['default_department']

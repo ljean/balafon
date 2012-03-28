@@ -55,6 +55,11 @@ SEARCH_FORMS = [
             search_forms.OpportunityReminderForm,
         ),
     ),(
+        _(u'Admin'),
+        (
+            search_forms.ContactsImportSearchForm,
+        ),
+    ),(
         _(u'Options'),
         (
             search_forms.NoSameAsForm,
