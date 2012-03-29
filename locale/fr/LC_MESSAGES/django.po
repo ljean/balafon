@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-28 23:54+0200\n"
-"PO-Revision-Date: 2012-03-28 23:55+0100\n"
+"POT-Creation-Date: 2012-03-29 07:01+0200\n"
+"PO-Revision-Date: 2012-03-29 07:01+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: .\config.py:7
-#: .\Crm\forms.py:322
+#: .\Crm\forms.py:323
 #: .\Crm\models.py:415
 #: .\Crm\templates\Crm\_section_actions.html.py:24
 #: .\Crm\templates\Crm\_section_contacts.html.py:9
@@ -103,7 +103,7 @@ msgstr "Vous devez entrer un code postal valide pour créer une nouvelle ville"
 #: .\Crm\forms.py:142
 #: .\Crm\search_forms.py:27
 #: .\Crm\templates\Crm\_section_all_entities.html.py:15
-#: .\Search\templates\Search\_section_qs_contacts.html.py:10
+#: .\Search\templates\Search\_section_qs_contacts.html.py:11
 #: .\Search\templates\Search\_section_qs_entities.html.py:9
 msgid "City"
 msgstr "Ville"
@@ -132,29 +132,29 @@ msgstr "date prévue"
 msgid "planned time"
 msgstr "date plannifiée"
 
-#: .\Crm\forms.py:208
+#: .\Crm\forms.py:209
 msgid "Enter the name of an opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: .\Crm\forms.py:210
-#: .\Crm\forms.py:309
+#: .\Crm\forms.py:211
+#: .\Crm\forms.py:310
 msgid "enter details"
 msgstr "plus de détails"
 
-#: .\Crm\forms.py:293
-#: .\Crm\forms.py:437
+#: .\Crm\forms.py:294
+#: .\Crm\forms.py:438
 msgid "Select groups"
 msgstr "Sélectionnez les groupes"
 
-#: .\Crm\forms.py:327
+#: .\Crm\forms.py:328
 msgid "Enter the name of an entity"
 msgstr "Entrez le nom d'une entité"
 
-#: .\Crm\forms.py:334
+#: .\Crm\forms.py:335
 msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
-#: .\Crm\forms.py:337
+#: .\Crm\forms.py:338
 #: .\Crm\models.py:416
 #: .\Crm\search_forms.py:302
 #: .\Crm\templates\Crm\_section_actions.html.py:27
@@ -162,19 +162,19 @@ msgstr "L'entité n'existe pas"
 msgid "Contact"
 msgstr "Contact"
 
-#: .\Crm\forms.py:352
+#: .\Crm\forms.py:353
 msgid "Invalid contact"
 msgstr "Contact invalide"
 
-#: .\Crm\forms.py:355
+#: .\Crm\forms.py:356
 msgid "Contact does not exist"
 msgstr "Le contact n'existe pas"
 
-#: .\Crm\forms.py:364
+#: .\Crm\forms.py:365
 msgid "give details bout the action"
 msgstr "plus de détail à propos de cette action"
 
-#: .\Crm\forms.py:450
+#: .\Crm\forms.py:451
 msgid "Please enter a valid code"
 msgstr "Veuillez entrer un code valide"
 
@@ -666,21 +666,19 @@ msgstr "Action par nom de contact"
 #: .\Crm\search_forms.py:121
 #: .\Crm\templates\Crm\_section_actions.html.py:28
 #: .\Crm\templates\Crm\_section_all_entities.html.py:14
-#: .\Search\templates\Search\_section_qs_contacts.html.py:9
+#: .\Search\templates\Search\_section_qs_contacts.html.py:10
 #: .\Search\templates\Search\_section_qs_entities.html.py:8
 msgid "Type"
 msgstr "Type"
 
 #: .\Crm\search_forms.py:134
 #: .\Crm\templates\Crm\_section_all_entities.html.py:13
-#: .\Search\templates\Search\_section_qs_contacts.html.py:9
+#: .\Search\templates\Search\_section_qs_contacts.html.py:10
 #: .\Search\templates\Search\_section_qs_entities.html.py:8
 msgid "Relationship"
 msgstr "Relation"
 
 #: .\Crm\search_forms.py:147
-#: .\Search\templates\Search\_section_qs_contacts.html.py:10
-#: .\Search\templates\Search\_section_qs_entities.html.py:9
 msgid "Activity sector"
 msgstr "Secteur d'activité"
 
@@ -924,17 +922,19 @@ msgstr "Tous"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:10
 #: .\Crm\templates\Crm\_section_same_as.html.py:12
+#: .\Search\templates\Search\_section_qs_contacts.html.py:9
 msgid "Phone"
 msgstr "Téléphone"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:10
 #: .\Crm\templates\Crm\_section_same_as.html.py:13
 #: .\Crm\templates\Crm\confirm_contacts_import.html.py:40
+#: .\Search\templates\Search\_section_qs_contacts.html.py:9
 msgid "Email"
 msgstr "Email"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:31
-#: .\Search\templates\Search\_section_search_results.html.py:124
+#: .\Search\templates\Search\_section_search_results.html.py:112
 msgid "Mail to"
 msgstr "Mail à"
 
@@ -1086,7 +1086,7 @@ msgid "Edit action"
 msgstr "Editer l'action"
 
 #: .\Crm\templates\Crm\edit_action.html.py:8
-#: .\Search\templates\Search\_section_search_results.html.py:127
+#: .\Search\templates\Search\_section_search_results.html.py:116
 msgid "Create action"
 msgstr "Ajout d'une action"
 
@@ -1547,15 +1547,15 @@ msgstr "Entités"
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: .\Search\views.py:247
+#: .\Search\views.py:249
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crée"
 
-#: .\Search\views.py:289
+#: .\Search\views.py:291
 msgid "{0} opportunities have been created"
 msgstr "{0} dossiers ont été crée"
 
-#: .\Search\views.py:329
+#: .\Search\views.py:331
 msgid "{0} entities have been added to groups"
 msgstr "{0} entités ont été ajoutés aux groupes"
 
@@ -1599,23 +1599,27 @@ msgstr ""
 "\\n"
 "Continuer?"
 
-#: .\Search\templates\Search\_section_search_results.html.py:120
+#: .\Search\templates\Search\_section_search_results.html.py:108
 msgid "Edit group"
 msgstr "Editer le groupe"
 
-#: .\Search\templates\Search\_section_search_results.html.py:125
+#: .\Search\templates\Search\_section_search_results.html.py:113
+msgid "BCC Mail to"
+msgstr "Mail à CCI"
+
+#: .\Search\templates\Search\_section_search_results.html.py:114
 msgid "Mailing"
 msgstr "Mailing"
 
-#: .\Search\templates\Search\_section_search_results.html.py:126
+#: .\Search\templates\Search\_section_search_results.html.py:115
 msgid "Excel"
 msgstr "Excel"
 
-#: .\Search\templates\Search\_section_search_results.html.py:128
+#: .\Search\templates\Search\_section_search_results.html.py:117
 msgid "Create Opportunity"
 msgstr "Ajout d'un dossier"
 
-#: .\Search\templates\Search\_section_search_results.html.py:129
+#: .\Search\templates\Search\_section_search_results.html.py:118
 msgid "Add to groups"
 msgstr "Ajouter aux groupes"
 

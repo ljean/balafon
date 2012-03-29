@@ -112,7 +112,7 @@ def get_field(request, name):
         raise
     
 @login_required
-def mailto_contacts(request):
+def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
         search_form = forms.SearchForm(request.POST)
@@ -121,7 +121,9 @@ def mailto_contacts(request):
             if len(emails)>50:
                 return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
             else:
-                mailto = u'mailto:'+','.join(emails)
+                mailto = u'mailto:'
+                if int(bcc): mailto += '?bcc='
+                mailto += ','.join(emails)
                 return HttpResponseRedirect(mailto)
     raise Http404
 
