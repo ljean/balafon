@@ -31,8 +31,11 @@ def quick_search(request):
             
             contacts_by_name = Contact.objects.filter(lastname__icontains=text)
             
+            groups_by_name = Group.objects.filter(name__icontains=text)
+            
             entities_title = _(u'Entities')
             contacts_title = _(u'Contacts')
+            groups_title = _(u'Groups')
             
             return render_to_response(
                 'Search/quicksearch_results.html',

@@ -1,0 +1,18 @@
+{% extends "_section.html" %}
+{% load i18n sanza_utils %}
+
+{% block section_title %}{{ name.capitalize }}{% endblock %}
+  
+{% block section_data %}
+<table>
+  <tr><th>{% trans "Group" %}</th><th>{% trans "Description" %}</th><th>{% trans "Members" %}</th>
+  </tr>
+  {% for g in groups %}
+  <tr>
+    <td><a href="{% url search_group g.id %}">{{g.name}}</a></td>
+    <td>{{g.description|default:"&nbsp;"}}</td>
+    <td>{{g.entities.count}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

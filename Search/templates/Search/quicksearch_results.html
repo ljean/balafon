@@ -13,4 +13,8 @@
 {% include "Search/_section_qs_contacts.html" with contacts=contacts_by_name name=contacts_title %}
 {% endif %}
 
+{% if groups_by_name %}    
+{% include "Search/_section_qs_groups.html" with groups=groups_by_name name=groups_title %}
+{% endif %}
+
 {% endblock %}
