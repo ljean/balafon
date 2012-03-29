@@ -821,31 +821,33 @@ def confirm_contacts_import(request, import_id):
                 field = field.replace('.', '_')
                 c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
                 
-        email = u''
         if not c['entity']:
             entity = u''
             res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
             if res:
                 name, entity, ext = res.groups(0)
-                email = u'{0}@{1}.{2}'.format(name, entity, ext)
+                #email = u'{0}@{1}.{2}'.format(name, entity, ext)
             if entity in ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte'):
-                if not (c['lastname'] or c['firstname']):
-                    try:
-                        c['lastname'], c['firstname'] = [x.capitalize() for x in name.split('.')]
-                    except ValueError:
-                        c['lastname'] = name.capitalize()
                 entity = name
             if not c['entity']:
                 c['entity'] = entity
+        else:
+            name = c['entity']
+        if not (c['lastname'] or c['firstname']):
+            try:
+                c['firstname'], c['lastname'] = [x.capitalize() for x in name.split('.')]
+            except ValueError:
+                c['lastname'] = name.capitalize()
             
         c['entity_exists'] = (models.Entity.objects.filter(name__iexact=c['entity']).count()!=0)
         c['role_exists'] = (models.EntityRole.objects.filter(name__iexact=c['role']).count()!=0)
             
-        if email:
-            if models.Contact.objects.filter(email=email).count()==0:
+        if c['email']:
+            if models.Contact.objects.filter(email=c['email']).count()==0:
                 contacts.append(c)
         else:
             contacts.append(c)
+    total_contacts = k
     
     if request.method == 'POST':
         form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
@@ -903,6 +905,6 @@ def confirm_contacts_import(request, import_id):
     
     return render_to_response(
         'Crm/confirm_contacts_import.html',
-        {'form': form, 'contacts': contacts},
+        {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
         context_instance=RequestContext(request)
     )

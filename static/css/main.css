@@ -687,3 +687,19 @@ tr.not-my-action td, tr.not-my-action a {
 .custom-field-value {
 	
 }
+
+.help-message {
+	border: solid thin #aaa;
+	background: #eee;
+	padding: 10px 10px;
+	width: 600px;
+}
+
+.import-data {
+	margin-top: 20px;
+}
+
+.import-data th{
+	background: #eee;
+	border: solid thin #aaa;
+}

@@ -22,6 +22,14 @@
     <a href="{{cancel_url}}">{% trans "Cancel" %}</a>
     </div>
     <ul>
+      <div class="help-message">
+        {% blocktrans %}You can create contacts and entities by importing a csv file.
+        For example, the csv file can be created by exporting your address book in Thunderbird or Outlook.<br /><br />
+        Then you need to adapt the content of this file to match the import format.
+        Download this <a href="{{STATIC_URL}}template-import-contacts.csv">template file</a> to get the expected format.<br /><br />
+        Finally, update your file and define the settings for the import.
+        {% endblocktrans %}
+      </div>
       {{form.as_ul}}
     </ul>
   </form>

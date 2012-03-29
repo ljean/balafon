@@ -1,0 +1,5 @@
+"Entité","Civilité","Prénom","Nom de famille","Email","Tel entité","Tél. direct","Fax","Portable","Adresse entité","Adresse 2 entité","Adresse 3 entité","Ville Entité","Cedex Entité","Code postal Entité","Adresse Contact","Adresse 2 Contact","Adresse 3 Contact","Ville Contact","Cedex Contact","Code postal Contact","Profession","Site Web","Notes","Rôle"
+"Exemple 1","M","Jacques","Dupond","j.dupond@gmail.com","04.04.04.04","04.04.04.05","04.04.04.06","06.06.06.06.06","rue du pont",,,"Rozier en Donzy",,42810,,,,,,,,"http://www.exemple1.com",,"marketing"
+"Exemple 2","Mme","Odette","Dupuy","o.dupuy@example3.com",,,,,,,,"Lyon",,,,,,,,,,,,
+,,,,"jean.martin@example4.fr",,,,,,,,,,,,,,,,,,,,
+,,,,"mon.asso@gmail.com",,,,,,,,,,,,,,,,,,,,

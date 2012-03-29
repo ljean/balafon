@@ -435,16 +435,18 @@ class ContactsImportForm(forms.ModelForm):
         
         self.fields['groups'].widget.attrs = {
             'class': 'chzn-select',
-            'data-placeholder': _(u'Select groups'),
+            'data-placeholder': _(u'The created entities will be added to the selected groups'),
             'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
 
 class ContactsImportConfirmForm(ContactsImportForm):
-    default_department = forms.CharField(required=True)
+    default_department = forms.ChoiceField(required=True, label=_(u'Default department'),
+        choices=[(x.code, x.name) for x in models.Zone.objects.filter(type__type='department')],
+        help_text=_(u'The city in red will be created with this department as parent'))
     
     class Meta(ContactsImportForm.Meta):
-        exclude = ('imported_by', 'import_file')
+        exclude = ('imported_by', 'import_file', 'name')
     
     def clean_default_department(self):
         if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):

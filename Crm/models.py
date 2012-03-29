@@ -465,14 +465,20 @@ class ContactsImport(TimeStampedModel):
     def _get_import_dir(self, filename):
         return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
-    import_file = models.FileField(_(u'import file'), upload_to=_get_import_dir)
-    name = models.CharField(max_length=100, verbose_name=_(u'name'), blank=True, default=u'')
+    import_file = models.FileField(_(u'import file'), upload_to=_get_import_dir,
+        help_text=_(u'CSV file following the import contacts format.'))
+    name = models.CharField(max_length=100, verbose_name=_(u'name'), blank=True, default=u'',
+        help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     
-    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'))
-    relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'))
-    activity_sector = models.ForeignKey(ActivitySector, verbose_name=_(u'activity sector'), blank=True, default=None, null=True)
-    groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True)
+    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
+        help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
+    relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'),
+        help_text=_(u'All created entities will get this relationship. Ignored if the entity already exist.'))
+    activity_sector = models.ForeignKey(ActivitySector, verbose_name=_(u'activity sector'), blank=True, default=None, null=True,
+        help_text=_(u'Optional, All created entities will get this value. Ignored if the entity already exist.'))
+    groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
+        help_text=_(u'The created entities will be added to the selected groups.'))
 
     def __unicode__(self):
         return self.name

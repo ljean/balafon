@@ -18,8 +18,13 @@
     border: solid thin #aaa;
   }
   .exists {
-    color: red;
     background: #ccc;
+  }
+  .not-exists {
+    background: #f93;
+  }
+  .default-dep {
+    background: #f44;
   }
 </style>
 {% endblock %}
@@ -33,26 +38,75 @@
     </div>
     <ul>
       {{form.as_ul}}
-    </ul>
-    <table class="import-data">
-      <tr>
-        <td>{% trans "Entity" %}</td><td>{% trans "Gender" %}</td><td>{% trans "Lastname" %}</td>
-        <td>{% trans "Firstname" %}</td><td>{% trans "Email" %}</td><td>{% trans "Entity city" %}</td>
-        <td>{% trans "Contact city" %}</td><td>{% trans "Role" %}</td>
-      </tr>
-    {% for c in contacts %}
-      <tr>
-        <td{% if c.entity_exists %} class="exists"{% endif %}>{{c.entity}}</td>
-        <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
-        <td>{{c.lastname|default:"&nbsp;"}}</td>
-        <td>{{c.firstname|default:"&nbsp;"}}</td>
-        <td>{{c.email|default:"&nbsp;"}}</td>
-        <td{% if c.entity_city_exists %} class="exists"{% endif %}>{{c.entity_city|default:"&nbsp;"}}</td>
-        <td{% if c.city_exists %} class="exists"{% endif %}>{{c.city|default:"&nbsp;"}}</td>
-        <td{% if c.role_exists %} class="exists"{% endif %}>{{c.role|default:"&nbsp;"}}</td>
-      </tr>
-    {% endfor %}
-    </table>
+      
+      {% if not contacts %}
+      <div class="help-message" style="margin-top: 20px; background: #f83;">
+        {% blocktrans %}No new contacts to import ({{total_contacts }} in csv file){% endblocktrans %}
+      </div>
+      {% else %}
+      <div class="help-message" style="margin-top: 20px">
+        {% blocktrans %}It imports only contacts if their email doesn't already exists
+        ({{nb_contacts}} on {{total_contacts }} in csv file)<br/><br/>
+        <b>Caption:</b><br />
+        * Gray background : Already exists<br />
+        * Orange background : will be created<br />
+        * Red background : The city will be created with default department as parent<br />
+        {% endblocktrans %}
+      </div>
+      
+      <table class="import-data">
+        <tr>
+          <th>{% trans "Entity" %}</th><th>{% trans "Gender" %}</th><th>{% trans "Lastname" %}</th>
+          <th>{% trans "Firstname" %}</th><th>{% trans "Email" %}</th><th>{% trans "Entity city" %}</th>
+          <th>{% trans "Contact city" %}</th><th>{% trans "Role" %}</th>
+        </tr>
+      {% for c in contacts %}
+        <tr>
+          <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.entity}}</td>
+          
+          <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
+          <td>{{c.lastname|default:"&nbsp;"}}</td>
+          <td>{{c.firstname|default:"&nbsp;"}}</td>
+          <td>{{c.email|default:"&nbsp;"}}</td>
+          
+          {% if c.entity_city %}
+            {% if c.entity_city_exists %}
+              <td class="exists">{{c.entity_city}}</td>
+            {% else %}
+              {% if c.entity_zip_code %}
+                <td class="not-exists">{{c.entity_city}} ({{c.entity_zip_code|slice:":2"}})</td>
+              {% else %}
+                <td class="not-exists default-dep">{{c.entity_city}}</td>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.city %}
+            {% if c.city_exists %}
+              <td class="exists">{{c.city}}</td>
+            {% else %}
+              {% if c.zip_code %}
+                <td class="not-exists">{{c.city}} ({{c.zip_code|slice:":2"}})</td>
+              {% else %}
+                <td class="not-exists default-dep">{{c.city}}</td>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.role %}
+            <td class="{% if c.role_exists %}exists{% else %}not-exists{% endif %}">{{c.role|default:"&nbsp;"}}</td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+      </table>
+      {% endif %}
+      </ul>
   </form>
   <script type="text/javascript"> $(".chzn-select").chosen();</script>
 {% endblock %}
