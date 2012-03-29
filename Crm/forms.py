@@ -204,8 +204,9 @@ class ActionForm(forms.ModelForm):
         super(ActionForm, self).__init__(*args, **kwargs)
         if entity:
             self.fields['contact'].queryset = models.Contact.objects.filter(entity=entity)
-        self.fields['opportunity'].queryset = models.Opportunity.objects.filter(ended=False)
-        self.fields['opportunity'].widget = OpportunityAutoComplete(attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80'})
+        if 'opportunity' in self.fields:
+            self.fields['opportunity'].queryset = models.Opportunity.objects.filter(ended=False)
+            self.fields['opportunity'].widget = OpportunityAutoComplete(attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80'})
         
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
         self.fields['planned_date'].widget = forms.HiddenInput()
