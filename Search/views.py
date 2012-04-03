@@ -19,6 +19,7 @@ from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
 from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
 from django.contrib import messages
+from django.conf import settings
 
 @login_required
 def quick_search(request):
@@ -118,10 +119,11 @@ def get_field(request, name):
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
+        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 50)
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
-            if len(emails)>50:
+            if len(emails)>nb_limit:
                 return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
             else:
                 mailto = u'mailto:'
