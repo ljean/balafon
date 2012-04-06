@@ -821,6 +821,7 @@ def confirm_contacts_import(request, import_id):
                 field = field.replace('.', '_')
                 c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
                 
+        name = u"< {0} >".format(_(u"Unknown"))
         if not c['entity']:
             entity = u''
             res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
