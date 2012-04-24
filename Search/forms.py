@@ -242,6 +242,7 @@ class SearchForm(forms.Form):
         for entity, contacts in entities.values():
             entity.search_contacts = contacts
             results.append(entity)
+        results.sort(key=lambda x: x.name)
         return results, contacts_count
     
     def get_contacts(self):
