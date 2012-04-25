@@ -2,7 +2,12 @@
 {% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}
-  {% trans "Search results" %} : {{contacts_count}} {% trans "contacts" %}
+  {% trans "Search results" %} :
+  {% if entities %}
+  {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
+  -
+  {% if entities|length > 1 %}{{entities|length}} {% trans "entities" %}{% else %}{{entities|length}} {% trans "entity" %}{% endif %}
+  {% endif %}
 {% endblock %}
   
 {% block section_data %}
