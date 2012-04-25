@@ -843,11 +843,18 @@ def confirm_contacts_import(request, import_id):
         c['entity_exists'] = (models.Entity.objects.filter(name__iexact=c['entity']).count()!=0)
         c['role_exists'] = (models.EntityRole.objects.filter(name__iexact=c['role']).count()!=0)
             
-        if c['email']:
-            if models.Contact.objects.filter(email=c['email']).count()==0:
-                contacts.append(c)
-        else:
-            contacts.append(c)
+        if c['entity_exists']:
+            c['contact_exist'] = (models.Contact.objects.filter(
+                entity__name=c['entity'], firstname=c['firstname'], lastname=c['lastname']).count()!=0)
+        c['email_exists'] = (models.Contact.objects.filter(email=c['email']).count()!=0)
+            
+        contacts.append(c)
+        
+        #if c['email']: #Do not add contacts with a known email
+        #    if models.Contact.objects.filter(email=c['email']).count()==0:
+        #        contacts.append(c)
+        #else:
+        #    contacts.append(c)
     total_contacts = k
     
     if request.method == 'POST':
@@ -872,8 +879,9 @@ def confirm_contacts_import(request, import_id):
                     g.save()
                     
                 #Contact
-                contact = models.Contact.objects.create(entity=entity, firstname=c['firstname'],
-                    lastname=c['lastname'], imported_by=contacts_import)
+                contact, _is_new = models.Contact.objects.get_or_create(entity=entity, firstname=c['firstname'],
+                    lastname=c['lastname'])
+                contact.imported_by = contacts_import
                 
                 for field_name in fields:
                     if field_name in ('entity', 'city', 'entity.city', 'role'):
