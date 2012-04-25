@@ -202,12 +202,16 @@ class SearchForm(forms.Form):
         contacts = set([])
         post_processors = []
         for key in keys:
+            q_objs = []
             filter_lookup = {}
             exclude_lookup = {}
             for form in self._forms[key]:
                 lookup = form.get_lookup()
                 if lookup:
-                    filter_lookup.update(lookup)
+                    if type(lookup) is dict:
+                        filter_lookup.update(lookup)
+                    else:
+                        q_objs.append(lookup)
 
                 if hasattr(form, 'get_exclude_lookup'):
                     xcl_lkp = form.get_exclude_lookup()
@@ -217,7 +221,7 @@ class SearchForm(forms.Form):
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
 
-            contacts_set = Contact.objects.filter(**filter_lookup)
+            contacts_set = Contact.objects.filter(*q_objs, **filter_lookup)
             if exclude_lookup:
                 contacts_set = contacts_set.exclude(**exclude_lookup)
             contacts = contacts.union(set(contacts_set))

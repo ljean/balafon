@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from sanza.Crm.settings import get_default_country
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 class EntityNameSearchForm(SearchFieldForm):
     _name = 'entity_name'
@@ -261,6 +262,23 @@ class ContactRoleSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'role': self._value}
+
+class ContactHasEmail(SearchFieldForm):
+    _name = 'contact_has_email'
+    _label = _(u'Contact has email')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactHasEmail, self).__init__(*args, **kwargs)
+        choices = ((1, _('Yes')), (0, _('No')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        has_no_email = (Q(email='') & Q(entity__email=''))
+        if int(self._value):
+            return ~has_no_email
+        else:
+            return has_no_email
 
 
 class ActionTypeSearchForm(SearchFieldForm):

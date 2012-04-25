@@ -196,3 +196,87 @@ class GroupSearchTest(BaseTestCase):
         
         self.assertContains(response, entity3.name)
         self.assertContains(response, contact4.lastname)
+        
+    def test_search_has_email(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_has_email#0": 1}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_has_no_email(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_has_email#0": 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+
+    def test_search_has_email_and_name(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0#contact_has_email#0": 1, "gr0#entity_name#1": entity1.name}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
