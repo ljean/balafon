@@ -444,6 +444,9 @@ class ContactsImportForm(forms.ModelForm):
             'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
+        
+        if models.ActivitySector.objects.count() == 0:
+            self.fields['activity_sector'].widget = forms.HiddenInput()
 
 class ContactsImportConfirmForm(ContactsImportForm):
     default_department = forms.ChoiceField(required=True, label=_(u'Default department'),
