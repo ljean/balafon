@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from sorl.thumbnail import default as sorl_thumbnail
 from django_extensions.db.models import TimeStampedModel, AutoSlugField
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -117,6 +118,11 @@ class Entity(TimeStampedModel):
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        super(Entity, self).save(*args, **kwargs)
+        if self.contact_set.count() == 0:
+            Contact.objects.create(entity=self)
     
     def __unicode__(self):
         return self.name

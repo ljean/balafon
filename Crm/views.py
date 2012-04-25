@@ -247,6 +247,8 @@ def create_entity(request):
                     entity.save()
                 else:
                     entity.logo.save(logo.name, logo)
+            if entity.contact_set.count() > 0:
+                return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
         else:
             entity = None
@@ -332,7 +334,7 @@ def get_entities(request):
     return HttpResponse(json.dumps(entities), 'application/json')
 
 @login_required
-def edit_contact(request, contact_id, mini=True):
+def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     contact = get_object_or_404(models.Contact, id=contact_id)
     
     entity = contact.entity
@@ -353,7 +355,8 @@ def edit_contact(request, contact_id, mini=True):
                         contact.save()
                     else:
                         contact.photo.save(photo.name, photo)
-            
+            if go_to_entity:
+                return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         if mini:
