@@ -266,9 +266,10 @@ class SearchForm(forms.Form):
             {0}
             <a class="add-field" href="">{1}</a>
             <a class="add-block" href="">{2}</a>
+            <a class="duplicate-block" href="">{5}</a>
             <a class="clear-block" href="">{3}</a>
             <a class="remove-block" href="">{4}</a>""".format(
-                f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'))
+                f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate'))
     
     def as_html(self):
         keys = self._forms.keys()
