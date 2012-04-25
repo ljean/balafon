@@ -356,7 +356,8 @@ class Opportunity(TimeStampedModel):
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board'),
+        default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
     
     def __unicode__(self):
         return u"{0.entity} - {0.name}".format(self)
