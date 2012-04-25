@@ -131,7 +131,7 @@ msgstr "date prévue"
 
 #: .\Crm\forms.py:196
 msgid "planned time"
-msgstr "date plannifiée"
+msgstr "heure prévue"
 
 #: .\Crm\forms.py:209
 msgid "Enter the name of an opportunity"
