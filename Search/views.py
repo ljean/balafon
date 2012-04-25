@@ -199,7 +199,7 @@ def export_contacts_as_excel(request):
             #fields = ('get_gender', 'lastname', 'firstname', 'title', 'entity', 'role',
             #    'get_address', 'get_zipcode', 'get_cedex', 'get_city', 'get_mobile', 'get_phone', 'get_email')
             
-            fields = ('get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
+            fields = ('id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
                 'get_address', 'get_zip_code', 'get_cedex', 'get_city', 'mobile', 'get_phone', 'get_email')
             
             #header
