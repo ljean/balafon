@@ -7,7 +7,7 @@
   
 {% block section_data %}
 {% if entities %}
-  {% autopaginate entities 25 %}
+  {% autopaginate entities nb_entities_by_page %}
   <table>
     <tr><th>{% trans "Entity" %}</th><th>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}

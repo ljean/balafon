@@ -7,6 +7,12 @@ class CityAutoComplete(forms.HiddenInput):
     is_hidden = False
     template_name = 'forms/city_autocomplete.html'
 
+class CityNoCountryAutoComplete(forms.HiddenInput):
+    input_type = 'text'
+    is_hidden = False
+    template_name = 'forms/city_nocountry_autocomplete.html'
+
+
 class OpportunityAutoComplete(forms.HiddenInput):
     input_type = 'text'
     is_hidden = False

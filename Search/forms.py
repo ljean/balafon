@@ -121,13 +121,14 @@ class SearchForm(forms.Form):
             data = {}
             for gr in instance.searchgroup_set.all():
                 for f in gr.searchfield_set.all():
-                    key = '#'.join((gr.name, f.field, str(len(data))))
+                    key = '-_-'.join((gr.name, f.field, str(len(data))))
                     data[key] = f.value
         if data:
             for key, value in data.items():
                 try:
                     #extract search fields
-                    gr, field, id = key.split('#')
+                    gr, field, id = key.split('-_-')
+                    int(id) #will raise an except for city visible field --> ignore this field
                     if not self._forms.has_key(gr):
                         self._forms[gr] = []
                     form_class = get_field_form(field)
@@ -292,7 +293,7 @@ class SearchFieldForm(forms.Form):
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         
     def _get_field_name(self):
-        return self._block+'#'+self._name+'#'+self._count
+        return self._block+'-_-'+self._name+'-_-'+self._count
         
     def _add_field(self, field):
         field.required = True

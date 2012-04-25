@@ -59,7 +59,7 @@ def search(request, search_id=0, group_id=0):
     if request.method == "POST":
         data = request.POST
     elif group_id:
-        data = {"gr0#group#0": group_id}
+        data = {"gr0-_-group-_-0": group_id}
             
     if data:
         search_form = forms.SearchForm(data)
@@ -76,7 +76,7 @@ def search(request, search_id=0, group_id=0):
     return render_to_response(
         'Search/search.html',
         {
-            'request': request, 'entities': entities,
+            'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
             'field_choice_form': field_choice_form, 'message': message,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group_id': group_id,

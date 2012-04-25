@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from sanza.Crm.settings import get_default_country
 from django.contrib.auth.models import User
 from django.db.models import Q
+from sanza.Crm.widgets import CityNoCountryAutoComplete
 
 class EntityNameSearchForm(SearchFieldForm):
     _name = 'entity_name'
@@ -30,7 +31,9 @@ class CitySearchForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(CitySearchForm, self).__init__(*args, **kwargs)
         qs = models.City.objects.order_by('name') 
-        field = forms.ModelChoiceField(qs, label=self._label)
+        field = forms.ModelChoiceField(qs, label=self._label,
+            widget = CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        )
         self._add_field(field)
         
     def get_lookup(self):

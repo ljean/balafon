@@ -75,7 +75,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#group#0": group.id}
+        data = {"gr0-_-group-_-0": group.id}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -97,7 +97,7 @@ class GroupSearchTest(BaseTestCase):
                 
         url = reverse('search')
         
-        data = {"gr0#entity_name#0": 'tiny'}
+        data = {"gr0-_-entity_name-_-0": 'tiny'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -122,7 +122,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABC'}
+        data = {"gr0-_-contact_name-_-0": 'ABC'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -154,7 +154,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABC', 'gr0#group#1': group.id}
+        data = {"gr0-_-contact_name-_-0": 'ABC', 'gr0-_-group-_-1': group.id}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -182,7 +182,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABCD', 'gr1#contact_name#0': 'ABCA'}
+        data = {"gr0-_-contact_name-_-0": 'ABCD', 'gr1-_-contact_name-_-0': 'ABCA'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -210,7 +210,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_has_email#0": 1}
+        data = {"gr0-_-contact_has_email-_-0": 1}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -238,7 +238,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_has_email#0": 0}
+        data = {"gr0-_-contact_has_email-_-0": 0}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -266,7 +266,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_has_email#0": 1, "gr0#entity_name#1": entity1.name}
+        data = {"gr0-_-contact_has_email-_-0": 1, "gr0-_-entity_name-_-1": entity1.name}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
