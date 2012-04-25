@@ -283,6 +283,22 @@ class ContactHasEmail(SearchFieldForm):
         else:
             return has_no_email
 
+class UnknownContact(SearchFieldForm):
+    _name = 'unknown_contact'
+    _label = _(u'Unknown contacts')
+    
+    def __init__(self, *args, **kwargs):
+        super(UnknownContact, self).__init__(*args, **kwargs)
+        choices = ((1, _('Yes')), (0, _('No')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        unknown_contact = (Q(firstname='') & Q(lastname=''))
+        if int(self._value):
+            return unknown_contact
+        else:
+            return ~unknown_contact
 
 class ActionTypeSearchForm(SearchFieldForm):
     _name = 'action_type'

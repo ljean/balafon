@@ -59,6 +59,7 @@ SEARCH_FORMS = [
         [
             search_forms.ContactsImportSearchForm,
             search_forms.ContactHasEmail,
+            search_forms.UnknownContact,
         ],
     ),(
         _(u'Options'),
