@@ -134,6 +134,11 @@ class EntityForm(ModelFormWithCity):
         widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
     
+    def __init__(self, *args, **kwargs):
+        super(EntityForm, self).__init__(*args, **kwargs)
+        if models.ActivitySector.objects.count() == 0:
+            self.fields['activity_sector'].widget = forms.HiddenInput()
+    
     class Meta:
         model = models.Entity
 
