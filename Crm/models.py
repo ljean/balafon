@@ -151,7 +151,7 @@ class Entity(TimeStampedModel):
         return self.opportunity_set.filter(ended=False).count()
 
     def logo_thumbnail(self):
-        return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128")
+        return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center')
 
     def get_custom_fields(self):
         return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
@@ -236,6 +236,9 @@ class Contact(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    def photo_thumbnail(self):
+        return sorl_thumbnail.backend.get_thumbnail(self.photo.file, "128x128", crop='center')
+
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]

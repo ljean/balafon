@@ -3,7 +3,17 @@
 
 {% block section_title %}
 <div class="contact_info">
-  <div class="title">{{contact}}</div>
+  <div class="entity_logo">
+  {% if contact.photo %}
+    <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
+  {% else %}
+    {% if entity.logo %}
+    <img src="{{MEDIA_URL}}{{entity.logo_thumbnail}}"/>
+    {% else %}
+    <img src="{{STATIC_URL}}img/no-logo.png"/>
+  {% endif %}{% endif %}
+  </div>
+  <div class="title">{{contact}}</div><br/>
   <span class="addr-info entity-info"><a href="{% url crm_view_entity contact.entity.id %}">{{contact.entity}}</a></span>
   {% with contact.get_roles as roles %}{% if roles %}<span class="addr-info role-info">{{roles|seq_to_dash}}</span>{% endif %}{% endwith %}
 </div>

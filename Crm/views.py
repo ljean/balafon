@@ -341,10 +341,19 @@ def edit_contact(request, contact_id, mini=True):
         if mini:
             contact_form = forms.MiniContactForm(request.POST, instance=contact)
         else:
-            contact_form = forms.ContactForm(request.POST, instance=contact)
+            contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         
         if contact_form.is_valid():
-            contact_form.save()
+            contact = contact_form.save()
+            if not mini:
+                photo = contact_form.cleaned_data['photo']
+                if photo != None:
+                    if type(photo)==bool:
+                        contact.photo = None
+                        contact.save()
+                    else:
+                        contact.photo.save(photo.name, photo)
+            
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         if mini:
