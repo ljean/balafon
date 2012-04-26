@@ -23,8 +23,10 @@ def view_entity(request, entity_id):
     contacts = models.Contact.objects.filter(entity=entity).order_by("-main_contact")
     actions = models.Action.objects.filter(Q(entity=entity),
         Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "priority")
-    opportunities = models.Opportunity.objects.filter(Q(entity=entity),
-        Q(ended=False) | Q(end_date__gte=last_week)).order_by("status__ordering", "ended")
+    opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("status__ordering", "ended")
+    show_all_button = opportunities.count() > 10
+    if show_all_button:
+        opportunities = opportunities[:10]
     multi_user = True
     entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])

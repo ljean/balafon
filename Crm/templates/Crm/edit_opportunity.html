@@ -23,6 +23,6 @@
       {{form.as_ul}}
     </ul>
   </form>
-  {% include "_calendar.html" with field="end_date" yearRange="c:c+2" %}
-  {% include "_calendar.html" with field="start_date" yearRange="c:c+2" %}
+  {% include "_calendar.html" with field="end_date" yearRange="c-1:c+2" %}
+  {% include "_calendar.html" with field="start_date" yearRange="c-1:c+2" %}
 {% endblock %}
