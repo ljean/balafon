@@ -84,7 +84,8 @@ def send_newsletter(emailing, max_nb):
             html_text = t.render(context)
         
             text = html2text(html_text)
-            email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()])
+            headers = {'Reply-To': settings.COOP_CMS_REPLY_TO}
+            email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()], headers=headers)
             email.attach_alternative(html_text, "text/html")
             emails.append(email)
             

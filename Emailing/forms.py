@@ -7,7 +7,7 @@ from django.conf import settings
 from coop_cms.models import Newsletter
 from django.core.exceptions import ValidationError
 from coop_cms.settings import get_newsletter_templates
-from sanza.Crm.models import Group, Contact, Entity
+from sanza.Crm.models import Group, Contact, Entity, EntityType, Relationship
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -69,10 +69,18 @@ class SubscribeForm(forms.ModelForm):
     def clean_entity(self):
         entity = self.cleaned_data['entity']
         if entity:
-            entity, _is_new = Entity.objects.get_or_create(name=entity)
+            try:
+                return Entity.objects.get(name=entity)
+            except Entity.DoesNotExist:
+                pass
         else:
-            entity = Entity.objects.create(name=self.cleaned_data['lastname'])
-        return entity
+            data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
+            entity = u' '.join([x for x in data if x])
+
+        entity_type, _is_new = EntityType.objects.get_or_create(name=_(u'Unknown'))
+        relationship, _is_new = Relationship.objects.get_or_create(name=_(u'Newsletter'))
+
+        return Entity.objects.create(name=entity, type=entity_type, relationship=relationship)
     
     def clean_groups(self):
         try:
@@ -85,6 +93,8 @@ class SubscribeForm(forms.ModelForm):
         contact = super(SubscribeForm, self).save(commit=False)
         contact.entity = self.cleaned_data['entity']
         contact.save()
+        #delete unknown contacts for the current entity
+        contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
         
         groups = self.cleaned_data['groups']
         for g in groups:
