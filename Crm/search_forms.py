@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import floppyforms as forms
-from sanza.Search.forms import SearchFieldForm, TwoDatesForm
+from sanza.Search.forms import SearchFieldForm, TwoDatesForm, YesNoSearchFieldForm
 from django.utils.translation import ugettext as _
 from sanza.Crm import models
 from django.core.exceptions import ValidationError
@@ -72,18 +72,12 @@ class CountrySearchForm(ZoneSearchForm):
         else:
             return {'entity__city__parent__id': self._value}
             
-class ActionInProgressForm(SearchFieldForm):
+class ActionInProgressForm(YesNoSearchFieldForm):
     _name = 'action'
     _label = _(u'Action in progress')
-    
-    def __init__(self, *args, **kwargs):
-        super(ActionInProgressForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
         
     def get_lookup(self):
-        if int(self._value):
+        if self.is_yes():
             return {'entity__action__done': False}
     
     def get_exclude_lookup(self):
@@ -213,44 +207,26 @@ class ContactAgeSearchForm(SearchFieldForm):
         return {'birth_date__gte': dt_from, 'birth_date__lte': dt_to}
 
 
-class ContactNewsletterSearchForm(SearchFieldForm):
+class ContactNewsletterSearchForm(YesNoSearchFieldForm):
     _name = 'accept_newsletter'
     _label = _(u'Accept newsletter')
-    
-    def __init__(self, *args, **kwargs):
-        super(ContactNewsletterSearchForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
+            
     def get_lookup(self):
-        return {'accept_newsletter': True if int(self._value) else False}
+        return {'accept_newsletter': self.is_yes()}
         
-class Contact3rdPartySearchForm(SearchFieldForm):
+class Contact3rdPartySearchForm(YesNoSearchFieldForm):
     _name = 'accept_3rdparty'
     _label = _(u'Accept third parties')
-    
-    def __init__(self, *args, **kwargs):
-        super(Contact3rdPartySearchForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
+            
     def get_lookup(self):
-        return {'accept_3rdparty': True if int(self._value) else False}
+        return {'accept_3rdparty': self.is_yes()}
 
-class MainContactSearchForm(SearchFieldForm):
+class MainContactSearchForm(YesNoSearchFieldForm):
     _name = 'main_contact'
     _label = _(u'Main contact')
-    
-    def __init__(self, *args, **kwargs):
-        super(MainContactSearchForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
+            
     def get_lookup(self):
-        return {'main_contact': True if int(self._value) else False}
+        return {'main_contact': self.is_yes()}
 
 
 class ContactRoleSearchForm(SearchFieldForm):
@@ -266,36 +242,24 @@ class ContactRoleSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'role': self._value}
 
-class ContactHasEmail(SearchFieldForm):
+class ContactHasEmail(YesNoSearchFieldForm):
     _name = 'contact_has_email'
     _label = _(u'Contact has email')
-    
-    def __init__(self, *args, **kwargs):
-        super(ContactHasEmail, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
+            
     def get_lookup(self):
         has_no_email = (Q(email='') & Q(entity__email=''))
-        if int(self._value):
+        if self.is_yes():
             return ~has_no_email
         else:
             return has_no_email
 
-class UnknownContact(SearchFieldForm):
+class UnknownContact(YesNoSearchFieldForm):
     _name = 'unknown_contact'
     _label = _(u'Unknown contacts')
-    
-    def __init__(self, *args, **kwargs):
-        super(UnknownContact, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
         
     def get_lookup(self):
         unknown_contact = (Q(firstname='') & Q(lastname=''))
-        if int(self._value):
+        if self.is_yes():
             return unknown_contact
         else:
             return ~unknown_contact
@@ -374,6 +338,22 @@ class OpportunityNameSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__opportunity__name__icontains': self._value}
 
+class NoOpportunityWithNameSearchForm(SearchFieldForm):
+    _name = 'no_opportunity_with_name'
+    _label = _(u'No opportunity with name')
+    
+    def __init__(self, *args, **kwargs):
+        super(NoOpportunityWithNameSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'enter a part of the name of the searched opportunity')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        pass
+    
+    def get_exclude_lookup(self):
+        return {'entity__opportunity__name__icontains': self._value}
+
 class OpportunityByEndDate(TwoDatesForm):
     _name = 'opportunity_by_end_date'
     _label = _(u'Opportunity by end date')
@@ -392,6 +372,34 @@ class OpportunityByStartDate(TwoDatesForm):
         return {'entity__opportunity__start_date__gte': dt1,
                 'entity__opportunity__start_date__lte': dt2, }
 
+class OpportunityBetween(TwoDatesForm):
+    _name = 'opportunity_between'
+    _label = _(u'Opportunity between')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        q_obj1 = Q(entity__opportunity__end_date__gte=dt1) & Q(entity__opportunity__start_date__lte=dt2) \
+            & Q(entity__opportunity__end_date__isnull=False) & Q(entity__opportunity__start_date__isnull=False)
+        
+        q_obj2 = Q(entity__opportunity__end_date__isnull=True) & Q(entity__opportunity__start_date__lte=dt2) \
+            & Q(entity__opportunity__start_date__gte=dt1)
+        
+        q_obj3 = Q(entity__opportunity__end_date__isnull=True) & Q(entity__opportunity__ended=False) \
+            & Q(entity__opportunity__start_date__lte=dt1)
+        
+        q_obj4 = Q(entity__opportunity__start_date__isnull=True) & Q(entity__opportunity__end_date__gte=dt1) \
+            & Q(entity__opportunity__end_date__lte=dt2)
+        
+        return q_obj1 | q_obj2 | q_obj3 | q_obj4
+    
+class NoOpportunityBetween(OpportunityBetween):
+    _name = 'no_opportunity_between'
+    _label = _(u'No opportunity between')
+    
+    def get_lookup(self):
+        q_obj = super(NoOpportunityBetween, self).get_lookup()
+        return ~q_obj
+        
 class OpportunityTypeSearchForm(SearchFieldForm):
     _name = 'opportunity_type'
     _label = _(u'Opportunity type')
@@ -405,33 +413,37 @@ class OpportunityTypeSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__opportunity__type': self._value}
 
-class OpportunityInProgressForm(SearchFieldForm):
+class NoOpportunityOfTypeSearchForm(SearchFieldForm):
+    _name = 'no_opportunity_of_type'
+    _label = _(u'No opportunity of type')
+    
+    def __init__(self, *args, **kwargs):
+        super(NoOpportunityOfTypeSearchForm, self).__init__(*args, **kwargs)
+        qs = models.OpportunityType.objects.all()
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+    
+    def get_lookup(self):
+        pass
+        
+    def get_exclude_lookup(self):
+        return {'entity__opportunity__type': self._value}
+
+class OpportunityInProgressForm(YesNoSearchFieldForm):
     _name = 'opportunity_in_progress'
     _label = _(u'Opportunity in progress')
     
-    def __init__(self, *args, **kwargs):
-        super(OpportunityInProgressForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
     def get_lookup(self):
-        if int(self._value):
+        if self.is_yes():
             return {'entity__opportunity__ended': False}
     
     def get_exclude_lookup(self):
         return {'entity__opportunity__ended': False}
 
-class NoSameAsForm(SearchFieldForm):
+class NoSameAsForm(YesNoSearchFieldForm):
     _name = 'no_same_as'
     _label = _(u'Allow same-as')
     
-    def __init__(self, *args, **kwargs):
-        super(NoSameAsForm, self).__init__(*args, **kwargs)
-        choices = ((0, _('No')), (1, _('Yes')))
-        field = forms.ChoiceField(choices=choices, label=self._label)
-        self._add_field(field)
-        
     def get_lookup(self):
         pass
     
@@ -439,7 +451,7 @@ class NoSameAsForm(SearchFieldForm):
         pass
     
     def post_process(self, contacts):
-        if int(self._value):
+        if self.is_yes():
             return contacts
         else:
             same_as = {}

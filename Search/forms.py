@@ -204,6 +204,7 @@ class SearchForm(forms.Form):
         post_processors = []
         for key in keys:
             q_objs = []
+            exclude_q_objs = []
             filter_lookup = {}
             exclude_lookup = {}
             for form in self._forms[key]:
@@ -217,14 +218,17 @@ class SearchForm(forms.Form):
                 if hasattr(form, 'get_exclude_lookup'):
                     xcl_lkp = form.get_exclude_lookup()
                     if xcl_lkp:
-                        exclude_lookup.update(xcl_lkp)
+                        if type(lookup) is dict:
+                            exclude_lookup.update(xcl_lkp)
+                        else:
+                            exclude_q_objs.append(xcl_lkp)
                 
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
 
             contacts_set = Contact.objects.filter(*q_objs, **filter_lookup)
-            if exclude_lookup:
-                contacts_set = contacts_set.exclude(**exclude_lookup)
+            if exclude_lookup or exclude_q_objs:
+                contacts_set = contacts_set.exclude(*exclude_q_objs, **exclude_lookup)
             contacts = contacts.union(set(contacts_set))
             for pp in post_processors:
                 contacts = pp(contacts)
@@ -339,4 +343,12 @@ class TwoDatesForm(SearchFieldForm):
         d1.reverse(), d2.reverse()
         return date(*d1), date(*d2)
 
-        
+class YesNoSearchFieldForm(SearchFieldForm):
+    def __init__(self, *args, **kwargs):
+        super(YesNoSearchFieldForm, self).__init__(*args, **kwargs)
+        choices = ((1, _('Yes')), (0, _('No')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+    
+    def is_yes(self):
+        return True if int(self._value) else False
