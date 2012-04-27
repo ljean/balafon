@@ -141,6 +141,7 @@ class EntityForm(ModelFormWithCity):
     
     class Meta:
         model = models.Entity
+        exclude = ('imported_by',)
 
 class ContactForm(ModelFormWithCity):
     city = forms.CharField(
