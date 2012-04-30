@@ -106,10 +106,11 @@ def send_newsletter(emailing, max_nb):
     emailing.save()
     nb_sent = connection.send_messages(emails)
     
-    counter.credit = counter.credit - nb_sent
-    if counter.credit == 0:
-        counter.finshed_date = date.today()
-    counter.save()
+    if nb_sent:
+        counter.credit = counter.credit - nb_sent
+        if counter.credit == 0:
+            counter.finshed_date = date.today()
+        counter.save()
     
     return nb_sent
     
