@@ -14,12 +14,13 @@ from datetime import datetime
 from sanza.Emailing.models import Emailing
 import xlwt
 from django.contrib.auth.decorators import login_required
-from colorbox.decorators import popup_redirect
+from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
 from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
 from django.contrib import messages
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def quick_search(request):
@@ -348,6 +349,55 @@ def add_contacts_to_group(request):
                     form = GroupForContactsForm(initial={'contacts': contacts})
                     return render_to_response(
                         'Search/add_contacts_to_group.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+    except Exception, msg:
+        print msg
+        raise
+    raise Http404
+
+@login_required
+@popup_close
+def contacts_admin(request):
+    
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
+    try:
+        search_form = forms.SearchForm(request.POST)
+        if request.method == "POST":
+            if "contacts_admin" in request.POST:
+                form = forms.ContactsAdminForm(request.POST)
+                if form.is_valid():
+                    nb_contacts = 0
+                    contacts = form.get_contacts()
+                    subscribe = form.cleaned_data['subscribe_newsletter']
+                    for c in contacts:
+                        if c.accept_newsletter != subscribe:
+                            c.accept_newsletter = subscribe
+                            c.save()
+                            nb_contacts += 1
+                    if subscribe:
+                        messages.add_message(request, messages.SUCCESS,
+                            _(u"{0} contacts have subscribe to the newsletter".format(nb_contacts)))
+                    else:
+                        messages.add_message(request, messages.SUCCESS,
+                            _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts)))
+                    return None #popup_close will return js code to close the popup
+                else:
+                    return render_to_response(
+                        'Search/contacts_admin_form.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                search_form = forms.SearchForm(request.POST)
+                if search_form.is_valid():
+                    contacts = search_form.get_contacts()
+                    form = forms.ContactsAdminForm(initial={'contacts': contacts})
+                    return render_to_response(
+                        'Search/contacts_admin_form.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )

@@ -352,3 +352,34 @@ class YesNoSearchFieldForm(SearchFieldForm):
     
     def is_yes(self):
         return True if int(self._value) else False
+
+class SearchActionBaseForm:
+    def _pre_init(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        return initial_contacts
+        
+    def _post_init(self, initial_contacts):
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=ids)
+
+
+class SearchActionForm(forms.Form, SearchActionBaseForm):
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    
+    def __init__(self, *args, **kwargs):
+        initial_contacts = self._pre_init(*args, **kwargs)
+        super(SearchActionForm, self).__init__(*args, **kwargs)
+        self._post_init(initial_contacts)
+
+class ContactsAdminForm(SearchActionForm):
+    subscribe_newsletter = forms.BooleanField(required=False)
+    
+
