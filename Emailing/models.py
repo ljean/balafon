@@ -89,9 +89,10 @@ class MagicLink(models.Model):
     
     def save(self, *args, **kwargs):
         super(MagicLink, self).save(*args, **kwargs)
-        name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
-        self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
-        return super(MagicLink, self).save()        
+        if not self.uuid:
+            name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
+            self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
+            return super(MagicLink, self).save()        
         
 class EmailingCounter(models.Model):
     credit = models.IntegerField(default=0, verbose_name=_(u"Credit"), help_text=_(u"Number of email used"))

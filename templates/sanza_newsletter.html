@@ -38,7 +38,7 @@
 <body {% block body_args%}style="background: #eee;"{% endblock %}>
     {% if by_email %}
     {% block email_only_header %}
-    <div style="font-size: 10px; text-align: center; width: 100%;">
+    <div style="font-size: 11px; text-align: center; width: 100%;">
         <div class="item">
             {% trans "If you can't view this email, " %}
             <a href="{{SITE_PREFIX}}{% url coop_cms_view_newsletter newsletter.id %}">
