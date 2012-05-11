@@ -6,10 +6,14 @@
 {% block section_data %}
   <div class="custom-fields">
   {% for f in custom_fields %}
+    {% with instance|custom_field:f.name as cfv %}
+    {% if cfv %}
     <span class="custom-field">
       <span class="custom-field-label">{{f.label}}:</span>
-      <span class="custom-field-value">{{instance|custom_field:f.name}}</span>
+        <span class="custom-field-value">{{instance|custom_field:f.name}}</span>
     </span>
+    {% endif %}
+    {% endwith %}
   {% endfor %}
   </div>
 {% endblock %}

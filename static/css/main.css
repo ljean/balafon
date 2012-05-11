@@ -660,10 +660,12 @@ tr.not-my-action td, tr.not-my-action a {
 }
 
 .custom-field {
-	padding: 2px 2px;
+	padding: 2px 4px;
+	padding-left: 0;
 	border: solid thin #aaa;
 	margin-right: 10px;
-	display: inline-block;
+	margin-bottom: 2px;
+	display: inline-block;{% endif %}
 }
 
 .custom-field-label {
@@ -675,10 +677,9 @@ tr.not-my-action td, tr.not-my-action a {
 	background-image: -o-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
 	background-image: -ms-linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%);
 	background-image: linear-gradient(top, #f4f4f4 20%, #f0f0f0 50%, #e8e8e8 52%, #eeeeee 100%); 
-	-webkit-box-shadow: 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
-	-moz-box-shadow   : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
-	box-shadow        : 0 0 2px #ffffff inset, 0 1px 0 rgba(0,0,0,0.05);
+
 	color: #333;
+	border-right: solid thin #ddd;
 
 	padding: 1px 2px;
 	font-weight: bold;

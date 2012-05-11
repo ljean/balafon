@@ -58,7 +58,7 @@
         <tr>
           <th>{% trans "Entity" %}</th><th>{% trans "Gender" %}</th><th>{% trans "Lastname" %}</th>
           <th>{% trans "Firstname" %}</th><th>{% trans "Email" %}</th><th>{% trans "Entity city" %}</th>
-          <th>{% trans "Contact city" %}</th><th>{% trans "Role" %}</th>
+          <th>{% trans "Contact city" %}</th><th>{% trans "Groups" %}</th><th>{% trans "Roles" %}</th>
         </tr>
       {% for c in contacts %}
         <tr>
@@ -96,12 +96,33 @@
           {% else %}
             <td>&nbsp;</td>
           {% endif %}
-          
-          {% if c.role %}
-            <td class="{% if c.role_exists %}exists{% else %}not-exists{% endif %}">{{c.role|default:"&nbsp;"}}</td>
+
+          {% if c.entity_groups %}
+            <td>
+              {% for g in c.entity_groups %}
+              <span class="{% if g.exists %}exists{% else %}not-exists{% endif %}">
+                {{g.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
           {% else %}
             <td>&nbsp;</td>
           {% endif %}
+          
+          {% if c.roles %}
+            <td>
+              {% for r in c.roles %}
+              <span class="{% if r.exists %}exists{% else %}not-exists{% endif %}">
+                {{r.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
         </tr>
       {% endfor %}
       </table>

@@ -421,6 +421,7 @@ class CustomField(models.Model):
     model = models.IntegerField(verbose_name=_(u'model'), choices=MODEL_CHOICE)
     widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
     ordering = models.IntegerField(verbose_name=_(u'ordering'), default=10)
+    import_order = models.IntegerField(verbose_name=_(u'ordering'), default=0)
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.get_model_display(), self.name)
