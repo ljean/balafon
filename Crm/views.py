@@ -812,7 +812,10 @@ def confirm_contacts_import(request, import_id):
         if k==0: continue #remove the header row
         c = {}
         for i, field in enumerate(fields):
-            c[field] = row[i]
+            try:
+                c[field] = row[i]
+            except IndexError:
+                c[field] = ''
             if field == 'gender':
                 if c[field]:
                     if c[field] in ('M', 'M.', 'Mr', 'Mr.'):
