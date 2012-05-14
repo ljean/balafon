@@ -218,7 +218,7 @@ class SearchForm(forms.Form):
                 if hasattr(form, 'get_exclude_lookup'):
                     xcl_lkp = form.get_exclude_lookup()
                     if xcl_lkp:
-                        if type(lookup) is dict:
+                        if type(xcl_lkp) is dict:
                             exclude_lookup.update(xcl_lkp)
                         else:
                             exclude_q_objs.append(xcl_lkp)
@@ -226,9 +226,13 @@ class SearchForm(forms.Form):
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
 
-            contacts_set = Contact.objects.filter(*q_objs, **filter_lookup)
-            if exclude_lookup or exclude_q_objs:
-                contacts_set = contacts_set.exclude(*exclude_q_objs, **exclude_lookup)
+            contacts_set = Contact.objects.filter(**filter_lookup)
+            for q_obj in q_objs:
+                contacts_set = contacts_set.filter(q_obj)
+            if exclude_lookup:
+                contacts_set = contacts_set.exclude(**exclude_lookup)
+            for q_obj in exclude_q_objs:
+                contacts_set = contacts_set.exclude(q_obj)
             contacts = contacts.union(set(contacts_set))
             for pp in post_processors:
                 contacts = pp(contacts)

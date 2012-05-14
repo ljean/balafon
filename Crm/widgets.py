@@ -22,3 +22,8 @@ class EntityAutoComplete(forms.HiddenInput):
     input_type = 'text'
     is_hidden = False
     template_name = 'forms/entity_autocomplete.html'
+
+class GroupAutoComplete(forms.HiddenInput):
+    input_type = 'text'
+    is_hidden = False
+    template_name = 'forms/group_autocomplete.html'

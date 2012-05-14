@@ -300,10 +300,10 @@ def get_cities(request):
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
     if country_id == 0 or country_id == default_country.id:
         cities = [{'id': x.id, 'name': x.name}
-            for x in models.City.objects.filter(name__istartswith=term).exclude(parent__code='')]
+            for x in models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]]
     else:
         cities = [{'id': x.id, 'name': x.name}
-            for x in models.City.objects.filter(name__istartswith=term, parent__id=country_id)]
+            for x in models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]]
     return HttpResponse(json.dumps(cities), 'application/json')
 
 @login_required
@@ -983,3 +983,18 @@ def confirm_contacts_import(request, import_id):
         {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
         context_instance=RequestContext(request)
     )
+
+@login_required
+def get_group_name(request, gr_id):
+    try:
+        gr = models.Group.objects.get(id=gr_id)
+        return HttpResponse(json.dumps({'name': gr.name}), 'application/json')
+    except models.Group.DoesNotExist:
+        return HttpResponse(json.dumps({'name': gr_id}), 'application/json')
+
+@login_required
+def get_groups(request):
+    term = request.GET.get('term')
+    groups = [{'id': x.id, 'name': x.name}
+        for x in models.Group.objects.filter(name__icontains=term)[:10]]
+    return HttpResponse(json.dumps(groups), 'application/json')

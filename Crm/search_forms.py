@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from sanza.Crm.settings import get_default_country
 from django.contrib.auth.models import User
 from django.db.models import Q
-from sanza.Crm.widgets import CityNoCountryAutoComplete
+from sanza.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
 
 class EntityNameSearchForm(SearchFieldForm):
     _name = 'entity_name'
@@ -138,11 +138,12 @@ class GroupSearchForm(SearchFieldForm):
             qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
         except:
             qs = qs.order_by('name')
-        field = forms.ModelChoiceField(qs, label=self._label)
+        field = forms.ModelChoiceField(qs, label=self._label,
+            widget = GroupAutoComplete(attrs={'placeholder': _(u'Enter part of the group name'), 'size': '80'}))
         self._add_field(field)
         
     def get_lookup(self):
-        return {'entity__group__id': self._value}
+        return Q(entity__group__id=self._value)
 
 class NotInGroupSearchForm(SearchFieldForm):
     _name = 'not_in_group'
@@ -155,7 +156,8 @@ class NotInGroupSearchForm(SearchFieldForm):
             qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
         except:
             qs = qs.order_by('name')
-        field = forms.ModelChoiceField(qs, label=self._label)
+        field = forms.ModelChoiceField(qs, label=self._label,
+            widget = GroupAutoComplete(attrs={'placeholder': _(u'Enter part of the group name'), 'size': '80'}))
         self._add_field(field)
     
     def get_lookup(self):
