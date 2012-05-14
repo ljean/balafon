@@ -1,0 +1,30 @@
+[
+ {
+  "pk": 4, 
+  "model": "Crm.entitytype", 
+  "fields": {
+   "name": "Association"
+  }
+ }, 
+ {
+  "pk": 3, 
+  "model": "Crm.entitytype", 
+  "fields": {
+   "name": "Particulier"
+  }
+ }, 
+ {
+  "pk": 2, 
+  "model": "Crm.entitytype", 
+  "fields": {
+   "name": "Organisme public"
+  }
+ }, 
+ {
+  "pk": 1, 
+  "model": "Crm.entitytype", 
+  "fields": {
+   "name": "Entreprise"
+  }
+ }
+]
