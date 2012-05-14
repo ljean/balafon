@@ -862,10 +862,12 @@ def confirm_contacts_import(request, import_id):
         
         groups = [x for x in c['groups'].strip().split(";") if x]
         c['groups_exists'] = []
+        c['groups'] = []
         for g in groups:
             c['groups_exists'].append(
                 (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
             )
+            c['groups'].append(g)
             groups_dict[g] = True
         c['entity_groups'] = [{'name': g, 'exists': e} for (g, e) in zip(groups, c['groups_exists'])]
         
