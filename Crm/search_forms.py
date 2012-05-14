@@ -116,7 +116,7 @@ class ActionByUser(SearchFieldForm):
 
 class TypeSearchForm(SearchFieldForm):
     _name = 'type'
-    _label = _(u'Type')
+    _label = _(u'Entity type')
     
     def __init__(self, *args, **kwargs):
         super(TypeSearchForm, self).__init__(*args, **kwargs)
@@ -274,7 +274,7 @@ class RelationshipDateForm(TwoDatesForm):
         
 class ContactNameSearchForm(SearchFieldForm):
     _name = 'contact_name'
-    _label = _(u'Contact')
+    _label = _(u'Contact name')
     
     def __init__(self, *args, **kwargs):
         super(ContactNameSearchForm, self).__init__(*args, **kwargs)
