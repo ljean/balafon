@@ -26,7 +26,7 @@
   <tr class="{% if o.ended%}old-opportunity{% endif %}">
     <td><a href="{% url crm_view_opportunity o.id %}">{{o.name}}</a></td>
     {% if not entity %}<td><a href="{% url crm_view_entity o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
-    <td>{{o.type}}</td>
+    <td>{{o.type|default:"&nbsp;"}}</td>
     <td>{{o.status}}</td>
    <td>{{ o.start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>
     <td>{{o.amount}}</td>
