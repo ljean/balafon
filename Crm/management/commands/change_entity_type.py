@@ -29,7 +29,7 @@ class Command(BaseCommand):
         
         for e in qs:
             e.type = entity_type
-            e.type.save()
+            e.save()
         
         if verbose:
             print qs.count(), "entities updated"
