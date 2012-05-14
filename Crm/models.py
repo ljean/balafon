@@ -12,6 +12,7 @@ from django.contrib.sites.models import Site
 from sorl.thumbnail import default as sorl_thumbnail
 from django_extensions.db.models import TimeStampedModel, AutoSlugField
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -118,6 +119,11 @@ class Entity(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    def save(self, *args, **kwargs):
+        super(Entity, self).save(*args, **kwargs)
+        if self.contact_set.count() == 0:
+            Contact.objects.create(entity=self)
+    
     def __unicode__(self):
         return self.name
 
@@ -151,7 +157,7 @@ class Entity(TimeStampedModel):
         return self.opportunity_set.filter(ended=False).count()
 
     def logo_thumbnail(self):
-        return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128")
+        return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center')
 
     def get_custom_fields(self):
         return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
@@ -236,6 +242,9 @@ class Contact(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    def photo_thumbnail(self):
+        return sorl_thumbnail.backend.get_thumbnail(self.photo.file, "128x128", crop='center')
+
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
@@ -356,7 +365,8 @@ class Opportunity(TimeStampedModel):
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board'),
+        default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
     
     def __unicode__(self):
         return u"{0.entity} - {0.name}".format(self)

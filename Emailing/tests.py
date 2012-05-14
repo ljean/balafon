@@ -196,7 +196,13 @@ class EmailingManagement(BaseTestCase):
     
 
 class SendEmailingTest(BaseTestCase):
-
+    
+    def setUp(self):
+        super(SendEmailingTest, self).setUp()
+        settings.COOP_CMS_FROM_EMAIL = 'toto@toto.fr'
+        settings.COOP_CMS_REPLY_TO = 'titi@toto.fr'
+        
+        
     def test_send_newsletter(self):
         entity = mommy.make_one(models.Entity, name="my corp")
         
@@ -243,9 +249,11 @@ class SendEmailingTest(BaseTestCase):
         
         for email, contact in zip(outbox, contacts):
             self.assertEqual(email.to, [contact.get_email_address()])
+            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
             self.assertEqual(email.subject, newsletter_data['subject'])
             self.assertTrue(email.body.find(entity.name)>=0)
             #print email.body
+            self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
             self.assertTrue(email.body.find(contact.fullname)>=0)
             self.assertTrue(email.alternatives[0][1], "text/html")
             self.assertTrue(email.alternatives[0][0].find(contact.fullname)>=0)
@@ -590,7 +598,12 @@ class SubscribeTest(TestCase):
         response = self.client.post(url, data=data, follow=False)
         
         self.assertEqual(200, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 1)
+        
+        self.assertEqual(models.Entity.objects.all()[0].name, 'Toto')
+        self.assertEqual(list(models.Entity.objects.all()[0].group_set.all()),  [])
+        
     
     def test_view_subscribe_done(self):
         contact = mommy.make_one(models.Contact)

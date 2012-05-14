@@ -12,6 +12,7 @@ from django.core import management
 from django.core import mail
 from django.conf import settings
 from BeautifulSoup import BeautifulSoup
+from datetime import date
 
 def get_form_errors(response):
     soup = BeautifulSoup(response.content)
@@ -75,7 +76,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#group#0": group.id}
+        data = {"gr0-_-group-_-0": group.id}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -97,7 +98,7 @@ class GroupSearchTest(BaseTestCase):
                 
         url = reverse('search')
         
-        data = {"gr0#entity_name#0": 'tiny'}
+        data = {"gr0-_-entity_name-_-0": 'tiny'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -122,7 +123,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABC'}
+        data = {"gr0-_-contact_name-_-0": 'ABC'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -154,7 +155,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABC', 'gr0#group#1': group.id}
+        data = {"gr0-_-contact_name-_-0": 'ABC', 'gr0-_-group-_-1': group.id}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -182,7 +183,7 @@ class GroupSearchTest(BaseTestCase):
         
         url = reverse('search')
         
-        data = {"gr0#contact_name#0": 'ABCD', 'gr1#contact_name#0': 'ABCA'}
+        data = {"gr0-_-contact_name-_-0": 'ABCD', 'gr1-_-contact_name-_-0': 'ABCA'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -196,3 +197,191 @@ class GroupSearchTest(BaseTestCase):
         
         self.assertContains(response, entity3.name)
         self.assertContains(response, contact4.lastname)
+        
+    def test_search_has_email(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_has_email-_-0": 1}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_has_no_email(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_has_email-_-0": 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+
+    def test_search_has_email_and_name(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        
+        entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_has_email-_-0": 1, "gr0-_-entity_name-_-1": entity1.name}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+        
+    def _create_opportunities_for_between_date(self):
+        entity1 = mommy.make_one(models.Entity, name=u"Barthez")
+        entity2 = mommy.make_one(models.Entity, name=u"Amoros")
+        entity3 = mommy.make_one(models.Entity, name=u"Lizarazu")
+        entity4 = mommy.make_one(models.Entity, name=u"Bossis")
+        entity5 = mommy.make_one(models.Entity, name=u"Blanc")
+        entity6 = mommy.make_one(models.Entity, name=u"Fernandez")
+        entity7 = mommy.make_one(models.Entity, name=u"Cantona")
+        entity8 = mommy.make_one(models.Entity, name=u"Tigana")
+        entity9 = mommy.make_one(models.Entity, name=u"Papin")
+        entity10 = mommy.make_one(models.Entity, name=u"Platini")
+        entity11 = mommy.make_one(models.Entity, name=u"Zidane")
+        entity12 = mommy.make_one(models.Entity, name=u"Deschamps")
+        entity13 = mommy.make_one(models.Entity, name=u"Giresse")
+        entity14 = mommy.make_one(models.Entity, name=u"Rocheteau")
+        entity15 = mommy.make_one(models.Entity, name=u"Thuram")
+        
+        opp1 = mommy.make_one(models.Opportunity, entity=entity1,
+            start_date=date(2011, 1, 1), end_date=date(2011, 12, 31))
+        opp2 = mommy.make_one(models.Opportunity, entity=entity2,
+            start_date=date(2011, 4, 10), end_date=date(2011, 4, 15))
+        opp3 = mommy.make_one(models.Opportunity, entity=entity3,
+            start_date=date(2011, 1, 1), end_date=date(2011, 4, 10))
+        opp4 = mommy.make_one(models.Opportunity, entity=entity4,
+            start_date=date(2011, 4, 15), end_date=date(2011, 12, 31))
+        opp5 = mommy.make_one(models.Opportunity, entity=entity5,
+            start_date=date(2011, 1, 1), end_date=date(2011, 2, 1))
+        opp6 = mommy.make_one(models.Opportunity, entity=entity6,
+            start_date=date(2011, 7, 1), end_date=date(2011, 8, 1))
+        opp7 = mommy.make_one(models.Opportunity, entity=entity7,
+            start_date=date(2011, 1, 1), ended=False)
+        opp8 = mommy.make_one(models.Opportunity, entity=entity8,
+            start_date=date(2011, 7, 1))
+        opp9 = mommy.make_one(models.Opportunity, entity=entity9)
+        opp10 = mommy.make_one(models.Opportunity, entity=entity10,
+            end_date=date(2011, 12, 31))
+        opp11 = mommy.make_one(models.Opportunity, entity=entity11,
+            end_date=date(2011, 4, 15))
+        opp12 = mommy.make_one(models.Opportunity, entity=entity12,
+            end_date=date(2011, 4, 15), ended=True)
+        opp13 = mommy.make_one(models.Opportunity, entity=entity13,
+            end_date=date(2011, 4, 15), ended=False)
+        opp14 = mommy.make_one(models.Opportunity, entity=entity14,
+            start_date=date(2011, 1, 1), ended=True)
+        
+        class MyVars: pass
+        vars = MyVars()
+        for k, v in locals().items():
+            setattr(vars, k, v)
+        return vars
+
+        
+    def test_search_opportunity_between(self):
+        vars = self._create_opportunities_for_between_date()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-opportunity_between-_-0": "01/04/2011 01/05/2011"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, vars.entity1.name)
+        self.assertContains(response, vars.entity2.name)
+        self.assertContains(response, vars.entity3.name)
+        self.assertContains(response, vars.entity4.name)
+        self.assertContains(response, vars.entity7.name)
+        self.assertContains(response, vars.entity11.name)
+        self.assertContains(response, vars.entity12.name)
+        
+        self.assertNotContains(response, vars.entity5.name)
+        self.assertNotContains(response, vars.entity6.name)
+        self.assertNotContains(response, vars.entity8.name)
+        self.assertNotContains(response, vars.entity9.name)
+        self.assertNotContains(response, vars.entity10.name)
+        self.assertNotContains(response, vars.entity14.name)
+        self.assertNotContains(response, vars.entity15.name)
+        
+    def test_search_opportunity_not_between(self):
+        vars = self._create_opportunities_for_between_date()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-no_opportunity_between-_-0": "01/04/2011 01/05/2011"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, vars.entity1.name)
+        self.assertNotContains(response, vars.entity2.name)
+        self.assertNotContains(response, vars.entity3.name)
+        self.assertNotContains(response, vars.entity4.name)
+        self.assertNotContains(response, vars.entity7.name)
+        self.assertNotContains(response, vars.entity11.name)
+        self.assertNotContains(response, vars.entity12.name)
+        self.assertNotContains(response, vars.entity9.name)
+        self.assertNotContains(response, vars.entity15.name)
+        
+        self.assertContains(response, vars.entity5.name)
+        self.assertContains(response, vars.entity6.name)
+        self.assertContains(response, vars.entity8.name)
+        self.assertContains(response, vars.entity10.name)
+        self.assertContains(response, vars.entity14.name)

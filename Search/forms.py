@@ -121,13 +121,14 @@ class SearchForm(forms.Form):
             data = {}
             for gr in instance.searchgroup_set.all():
                 for f in gr.searchfield_set.all():
-                    key = '#'.join((gr.name, f.field, str(len(data))))
+                    key = '-_-'.join((gr.name, f.field, str(len(data))))
                     data[key] = f.value
         if data:
             for key, value in data.items():
                 try:
                     #extract search fields
-                    gr, field, id = key.split('#')
+                    gr, field, id = key.split('-_-')
+                    int(id) #will raise an except for city visible field --> ignore this field
                     if not self._forms.has_key(gr):
                         self._forms[gr] = []
                     form_class = get_field_form(field)
@@ -202,24 +203,32 @@ class SearchForm(forms.Form):
         contacts = set([])
         post_processors = []
         for key in keys:
+            q_objs = []
+            exclude_q_objs = []
             filter_lookup = {}
             exclude_lookup = {}
             for form in self._forms[key]:
                 lookup = form.get_lookup()
                 if lookup:
-                    filter_lookup.update(lookup)
+                    if type(lookup) is dict:
+                        filter_lookup.update(lookup)
+                    else:
+                        q_objs.append(lookup)
 
                 if hasattr(form, 'get_exclude_lookup'):
                     xcl_lkp = form.get_exclude_lookup()
                     if xcl_lkp:
-                        exclude_lookup.update(xcl_lkp)
+                        if type(lookup) is dict:
+                            exclude_lookup.update(xcl_lkp)
+                        else:
+                            exclude_q_objs.append(xcl_lkp)
                 
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
 
-            contacts_set = Contact.objects.filter(**filter_lookup)
-            if exclude_lookup:
-                contacts_set = contacts_set.exclude(**exclude_lookup)
+            contacts_set = Contact.objects.filter(*q_objs, **filter_lookup)
+            if exclude_lookup or exclude_q_objs:
+                contacts_set = contacts_set.exclude(*exclude_q_objs, **exclude_lookup)
             contacts = contacts.union(set(contacts_set))
             for pp in post_processors:
                 contacts = pp(contacts)
@@ -242,6 +251,7 @@ class SearchForm(forms.Form):
         for entity, contacts in entities.values():
             entity.search_contacts = contacts
             results.append(entity)
+        results.sort(key=lambda x: x.name)
         return results, contacts_count
     
     def get_contacts(self):
@@ -260,9 +270,10 @@ class SearchForm(forms.Form):
             {0}
             <a class="add-field" href="">{1}</a>
             <a class="add-block" href="">{2}</a>
+            <a class="duplicate-block" href="">{5}</a>
             <a class="clear-block" href="">{3}</a>
             <a class="remove-block" href="">{4}</a>""".format(
-                f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'))
+                f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate'))
     
     def as_html(self):
         keys = self._forms.keys()
@@ -287,7 +298,7 @@ class SearchFieldForm(forms.Form):
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         
     def _get_field_name(self):
-        return self._block+'#'+self._name+'#'+self._count
+        return self._block+'-_-'+self._name+'-_-'+self._count
         
     def _add_field(self, field):
         field.required = True
@@ -332,4 +343,43 @@ class TwoDatesForm(SearchFieldForm):
         d1.reverse(), d2.reverse()
         return date(*d1), date(*d2)
 
+class YesNoSearchFieldForm(SearchFieldForm):
+    def __init__(self, *args, **kwargs):
+        super(YesNoSearchFieldForm, self).__init__(*args, **kwargs)
+        choices = ((1, _('Yes')), (0, _('No')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+    
+    def is_yes(self):
+        return True if int(self._value) else False
+
+class SearchActionBaseForm:
+    def _pre_init(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        return initial_contacts
         
+    def _post_init(self, initial_contacts):
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=ids)
+
+
+class SearchActionForm(forms.Form, SearchActionBaseForm):
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    
+    def __init__(self, *args, **kwargs):
+        initial_contacts = self._pre_init(*args, **kwargs)
+        super(SearchActionForm, self).__init__(*args, **kwargs)
+        self._post_init(initial_contacts)
+
+class ContactsAdminForm(SearchActionForm):
+    subscribe_newsletter = forms.BooleanField(required=False)
+    
+

@@ -329,6 +329,7 @@ form ul li{
 form ul li label {
     display: block;
     margin-top: 10px;
+	padding: 1px 0;
 }
 
 form ul li input {
@@ -347,14 +348,22 @@ form.loginform ul li{
 
 ul.errors, ul.errorlist {
 	padding: 0 0 0 0;
+	display: inline-block;
+	float: left;
+}
+
+.search-block ul.errors, .search-block ul.errorlist {
+	margin: 3px 2px;
 }
 
 ul.errors li, ul.errorlist li, form.loginform ul.errorlist li {
     list-style: none;
-    color: #ccf;
-    background: #007;
-    padding: 2px 2px 2px 2px;
+    color: white;
+	font-weight: bold;
+    background: red;
+    padding: 1px 4px;
 	max-width: 600px;
+	display: inline-block;
 }
 
 form.loginform input[type=submit]{

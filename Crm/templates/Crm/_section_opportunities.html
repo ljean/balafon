@@ -16,8 +16,9 @@
   <tr>
     <th>{% trans "Name" %}</th>
     {% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
+    <th>{% trans "Type" %}</th>
     <th>{% trans "Status" %}</th>
-    {% if all_opportunities %}<th>{% trans "Closed" %}</th>{% endif %}
+    <th>{% trans "Dates" %}</th>
     <th>{% trans "Amount" %}</th>
     <th>{% trans "Probability" %}</th>
   </tr>
@@ -25,9 +26,10 @@
   <tr class="{% if o.ended%}old-opportunity{% endif %}">
     <td><a href="{% url crm_view_opportunity o.id %}">{{o.name}}</a></td>
     {% if not entity %}<td><a href="{% url crm_view_entity o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
+    <td>{{o.type}}</td>
     <td>{{o.status}}</td>
-    {% if all_opportunities %}<td>{{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>{% endif %}
-    <td>{{o.amount}}</a></td>
+   <td>{{ o.start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>
+    <td>{{o.amount}}</td>
     <td>{{o.get_probability_display|capfirst}}</td>
   </tr>
   {% endfor %}
@@ -39,7 +41,7 @@
 {% block section_action %}
   {% if entity %}
     <a href="{% url crm_add_opportunity_for_entity entity.id %}">{% trans "Add" %}</a>
-    {% if not all_opportunities %}
+    {% if not all_opportunities and show_all_button %}
       <a href="{% url crm_entity_opportunities entity.id %}">{% trans "All" %}</a>
     {% endif %}
   {% endif %}

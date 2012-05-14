@@ -23,6 +23,9 @@
   .not-exists {
     background: #f93;
   }
+  .email-exists {
+    background: #39f;
+  }
   .default-dep {
     background: #f44;
   }
@@ -51,6 +54,7 @@
         * Gray background : Already exists<br />
         * Orange background : will be created<br />
         * Red background : The city will be created with default department as parent<br />
+        * Blue background : The email is already known in the database<br />
         {% endblocktrans %}
       </div>
       
@@ -65,9 +69,9 @@
           <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.entity}}</td>
           
           <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
-          <td>{{c.lastname|default:"&nbsp;"}}</td>
-          <td>{{c.firstname|default:"&nbsp;"}}</td>
-          <td>{{c.email|default:"&nbsp;"}}</td>
+          <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.lastname|default:"&nbsp;"}}</td>
+          <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.firstname|default:"&nbsp;"}}</td>
+          <td class="{% if c.email_exists %}email-exists{% endif %}">{{c.email|default:"&nbsp;"}}</td>
           
           {% if c.entity_city %}
             {% if c.entity_city_exists %}

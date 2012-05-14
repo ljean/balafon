@@ -2,12 +2,17 @@
 {% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}
-  {% trans "Search results" %} : {{contacts_count}} {% trans "contacts" %}
+  {% trans "Search results" %} :
+  {% if entities %}
+  {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
+  -
+  {% if entities|length > 1 %}{{entities|length}} {% trans "entities" %}{% else %}{{entities|length}} {% trans "entity" %}{% endif %}
+  {% endif %}
 {% endblock %}
   
 {% block section_data %}
 {% if entities %}
-  {% autopaginate entities 25 %}
+  {% autopaginate entities nb_entities_by_page %}
   <table>
     <tr><th>{% trans "Entity" %}</th><th>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
@@ -116,6 +121,6 @@
 <a href="{% url search_create_action_for_contacts %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a>
 <a href="{% url search_create_opportunity_for_contacts %}" class="action-button" class="colorbox-form">{% trans "Create Opportunity" %}</a>
 <a href="{% url search_add_contacts_to_group %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a>
-
+{% if user.is_superuser %}<a href="{% url search_contacts_admin %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a>{% endif %}
 {% endif %}
 {% endblock %}

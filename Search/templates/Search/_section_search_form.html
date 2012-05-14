@@ -27,11 +27,13 @@
     
     var add_block = function(no_remove) {
       var gr = $(".form").append($(".search-block-template").html());
-      gr.find('.search-block:last').attr("rel", "gr"+block_count);
+      var new_name = "gr"+block_count;
+      gr.find('.search-block:last').attr("rel", new_name);
       block_count += 1;
       if (no_remove) {
         gr.find('.remove-block').remove();
       }
+      return new_name;
     }
     
     $(".remove-field").live('click', function() {
@@ -52,6 +54,16 @@
     
     $(".add-block").live('click', function() {
       add_block();
+      return false;
+    });
+    
+    $(".duplicate-block").live('click', function() {
+      var new_rel = add_block();
+      var rel = $(this).parent().parent().attr('rel');
+      var fields = $(this).parent().parent().find('.fields').html();
+      var reg=new RegExp("("+rel+"-_-)", "g");
+      fields = fields.replace(reg, new_rel+'-_-');
+      $('.search-block[rel="'+new_rel+'"] .fields').html(fields);
       return false;
     });
     

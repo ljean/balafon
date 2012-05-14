@@ -14,6 +14,7 @@ from coop_cms.models import Newsletter
 from coop_cms.utils import make_links_absolute
 from coop_cms.html2text import html2text
 from datetime import date
+from coop_cms.utils import make_links_absolute
 
 class CreditMissing(Exception): pass
 
@@ -82,9 +83,11 @@ def send_newsletter(emailing, max_nb):
             context = Context(get_emailing_context(emailing, contact))
             t = get_template(emailing.newsletter.get_template_name())
             html_text = t.render(context)
+            html_text = make_links_absolute(html_text)
         
             text = html2text(html_text)
-            email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()])
+            headers = {'Reply-To': settings.COOP_CMS_REPLY_TO}
+            email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()], headers=headers)
             email.attach_alternative(html_text, "text/html")
             emails.append(email)
             
@@ -103,10 +106,11 @@ def send_newsletter(emailing, max_nb):
     emailing.save()
     nb_sent = connection.send_messages(emails)
     
-    counter.credit = counter.credit - nb_sent
-    if counter.credit == 0:
-        counter.finshed_date = date.today()
-    counter.save()
+    if nb_sent:
+        counter.credit = counter.credit - nb_sent
+        if counter.credit == 0:
+            counter.finshed_date = date.today()
+        counter.save()
     
     return nb_sent
     

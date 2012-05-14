@@ -14,11 +14,13 @@ from datetime import datetime
 from sanza.Emailing.models import Emailing
 import xlwt
 from django.contrib.auth.decorators import login_required
-from colorbox.decorators import popup_redirect
+from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
 from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
 from django.contrib import messages
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def quick_search(request):
@@ -58,7 +60,7 @@ def search(request, search_id=0, group_id=0):
     if request.method == "POST":
         data = request.POST
     elif group_id:
-        data = {"gr0#group#0": group_id}
+        data = {"gr0-_-group-_-0": group_id}
             
     if data:
         search_form = forms.SearchForm(data)
@@ -75,7 +77,7 @@ def search(request, search_id=0, group_id=0):
     return render_to_response(
         'Search/search.html',
         {
-            'request': request, 'entities': entities,
+            'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
             'field_choice_form': field_choice_form, 'message': message,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group_id': group_id,
@@ -118,10 +120,11 @@ def get_field(request, name):
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
+        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 50)
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
-            if len(emails)>50:
+            if len(emails)>nb_limit:
                 return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
             else:
                 mailto = u'mailto:'
@@ -197,7 +200,7 @@ def export_contacts_as_excel(request):
             #fields = ('get_gender', 'lastname', 'firstname', 'title', 'entity', 'role',
             #    'get_address', 'get_zipcode', 'get_cedex', 'get_city', 'get_mobile', 'get_phone', 'get_email')
             
-            fields = ('get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
+            fields = ('id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
                 'get_address', 'get_zip_code', 'get_cedex', 'get_city', 'mobile', 'get_phone', 'get_email')
             
             #header
@@ -346,6 +349,55 @@ def add_contacts_to_group(request):
                     form = GroupForContactsForm(initial={'contacts': contacts})
                     return render_to_response(
                         'Search/add_contacts_to_group.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+    except Exception, msg:
+        print msg
+        raise
+    raise Http404
+
+@login_required
+@popup_close
+def contacts_admin(request):
+    
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
+    try:
+        search_form = forms.SearchForm(request.POST)
+        if request.method == "POST":
+            if "contacts_admin" in request.POST:
+                form = forms.ContactsAdminForm(request.POST)
+                if form.is_valid():
+                    nb_contacts = 0
+                    contacts = form.get_contacts()
+                    subscribe = form.cleaned_data['subscribe_newsletter']
+                    for c in contacts:
+                        if c.accept_newsletter != subscribe:
+                            c.accept_newsletter = subscribe
+                            c.save()
+                            nb_contacts += 1
+                    if subscribe:
+                        messages.add_message(request, messages.SUCCESS,
+                            _(u"{0} contacts have subscribe to the newsletter".format(nb_contacts)))
+                    else:
+                        messages.add_message(request, messages.SUCCESS,
+                            _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts)))
+                    return None #popup_close will return js code to close the popup
+                else:
+                    return render_to_response(
+                        'Search/contacts_admin_form.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                search_form = forms.SearchForm(request.POST)
+                if search_form.is_valid():
+                    contacts = search_form.get_contacts()
+                    form = forms.ContactsAdminForm(initial={'contacts': contacts})
+                    return render_to_response(
+                        'Search/contacts_admin_form.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )

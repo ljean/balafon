@@ -24,8 +24,10 @@ def view_entity(request, entity_id):
     contacts = models.Contact.objects.filter(entity=entity).order_by("-main_contact")
     actions = models.Action.objects.filter(Q(entity=entity),
         Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "priority")
-    opportunities = models.Opportunity.objects.filter(Q(entity=entity),
-        Q(ended=False) | Q(end_date__gte=last_week)).order_by("status__ordering", "ended")
+    opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("status__ordering", "ended")
+    show_all_button = opportunities.count() > 10
+    if show_all_button:
+        opportunities = opportunities[:10]
     multi_user = True
     entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])
@@ -248,6 +250,8 @@ def create_entity(request):
                     entity.save()
                 else:
                     entity.logo.save(logo.name, logo)
+            if entity.contact_set.count() > 0:
+                return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
         else:
             entity = None
@@ -333,7 +337,7 @@ def get_entities(request):
     return HttpResponse(json.dumps(entities), 'application/json')
 
 @login_required
-def edit_contact(request, contact_id, mini=True):
+def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     contact = get_object_or_404(models.Contact, id=contact_id)
     
     entity = contact.entity
@@ -342,10 +346,20 @@ def edit_contact(request, contact_id, mini=True):
         if mini:
             contact_form = forms.MiniContactForm(request.POST, instance=contact)
         else:
-            contact_form = forms.ContactForm(request.POST, instance=contact)
+            contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         
         if contact_form.is_valid():
-            contact_form.save()
+            contact = contact_form.save()
+            if not mini:
+                photo = contact_form.cleaned_data['photo']
+                if photo != None:
+                    if type(photo)==bool:
+                        contact.photo = None
+                        contact.save()
+                    else:
+                        contact.photo.save(photo.name, photo)
+            if go_to_entity:
+                return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         if mini:
@@ -829,6 +843,7 @@ def confirm_contacts_import(request, import_id):
                 field = field.replace('.', '_')
                 c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
                 
+        name = u"< {0} >".format(_(u"Unknown"))
         if not c['entity']:
             entity = u''
             res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
@@ -911,8 +926,9 @@ def confirm_contacts_import(request, import_id):
                     g.save()
                     
                 #Contact
-                contact = models.Contact.objects.create(entity=entity, firstname=c['firstname'],
-                    lastname=c['lastname'], imported_by=contacts_import)
+                contact, _is_new = models.Contact.objects.get_or_create(entity=entity, firstname=c['firstname'],
+                    lastname=c['lastname'])
+                contact.imported_by = contacts_import
                 
                 for field_name in fields:
                     if field_name in ('entity', 'city', 'entity.city', 'role', 'groups'):
