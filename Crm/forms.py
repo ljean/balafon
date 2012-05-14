@@ -136,8 +136,6 @@ class EntityForm(ModelFormWithCity):
     
     def __init__(self, *args, **kwargs):
         super(EntityForm, self).__init__(*args, **kwargs)
-        if models.ActivitySector.objects.count() == 0:
-            self.fields['activity_sector'].widget = forms.HiddenInput()
     
     class Meta:
         model = models.Entity
@@ -182,20 +180,10 @@ class EntityTypeForm(forms.ModelForm):
     class Meta:
         model = models.EntityType
 
-class RelationshipForm(forms.ModelForm):
-    
-    class Meta:
-        model = models.Relationship
-
 class EntityRoleForm(forms.ModelForm):
     
     class Meta:
         model = models.EntityRole
-
-class ActivitySectorForm(forms.ModelForm):
-    
-    class Meta:
-        model = models.ActivitySector
 
 class ActionForm(forms.ModelForm):
     date = forms.DateField(label=_(u"planned date"), required=False)
@@ -446,9 +434,6 @@ class ContactsImportForm(forms.ModelForm):
         }
         self.fields['groups'].help_text = ''
         
-        if models.ActivitySector.objects.count() == 0:
-            self.fields['activity_sector'].widget = forms.HiddenInput()
-
 class ContactsImportConfirmForm(ContactsImportForm):
     default_department = forms.ChoiceField(required=True, label=_(u'Default department'),
         choices=[(x.code, x.name) for x in models.Zone.objects.filter(type__type='department')],

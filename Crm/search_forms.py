@@ -127,32 +127,6 @@ class TypeSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__type__id': self._value}
 
-class RelationshipSearchForm(SearchFieldForm):
-    _name = 'relationship'
-    _label = _(u'Relationship')
-    
-    def __init__(self, *args, **kwargs):
-        super(RelationshipSearchForm, self).__init__(*args, **kwargs)
-        qs = models.Relationship.objects.all()
-        field = forms.ModelChoiceField(qs, label=self._label)
-        self._add_field(field)
-        
-    def get_lookup(self):
-        return {'entity__relationship__id': self._value}
-
-class SectorSearchForm(SearchFieldForm):
-    _name = 'sector'
-    _label = _(u'Activity sector')
-    
-    def __init__(self, *args, **kwargs):
-        super(SectorSearchForm, self).__init__(*args, **kwargs)
-        qs = models.ActivitySector.objects.all()
-        field = forms.ModelChoiceField(qs, label=self._label)
-        self._add_field(field)
-        
-    def get_lookup(self):
-        return {'entity__activity_sector__id': self._value}
-
 class GroupSearchForm(SearchFieldForm):
     _name = 'group'
     _label = _(u'Group')

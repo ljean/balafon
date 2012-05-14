@@ -6,9 +6,7 @@
 {% block section_data %}
 <table>
   <tr><th>{% trans "Name" %}</th><th>{% trans "Entity" %}</th><th>{% trans "Role" %}</th>
-  <th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
-  <th>{% trans "Type" %}</th><th>{% trans "Relationship" %}</th>
-  <th>{% trans "City" %}</th>
+  <th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th><th>{% trans "City" %}</th>
   {% for c in contacts %}
   {% with c.entity as e %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
@@ -17,9 +15,6 @@
     <td>{{c.get_roles|seq_to_dash}}</td>
     <td>{{c.get_phones|seq_to_dash}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
-    
-    <td>{{e.type}}</td>
-    <td>{{e.relationship}}</td>
     <td>{{e.city|default:"&nbsp;"}}</td>
   </tr>
   {% endwith %}

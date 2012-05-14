@@ -7,7 +7,7 @@ from django.conf import settings
 from coop_cms.models import Newsletter
 from django.core.exceptions import ValidationError
 from coop_cms.settings import get_newsletter_templates
-from sanza.Crm.models import Group, Contact, Entity, EntityType, Relationship
+from sanza.Crm.models import Group, Contact, Entity, EntityType
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -77,10 +77,11 @@ class SubscribeForm(forms.ModelForm):
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
             entity = u' '.join([x for x in data if x])
 
-        entity_type, _is_new = EntityType.objects.get_or_create(name=_(u'Unknown'))
-        relationship, _is_new = Relationship.objects.get_or_create(name=_(u'Newsletter'))
-
-        return Entity.objects.create(name=entity, type=entity_type, relationship=relationship)
+        entity_type, _is_new = EntityType.objects.get_or_create(
+            name=getattr(settings, 'SANZA_DEFAULT_ENTITY_TYPE', _(u'Unknown'))
+        )
+        
+        return Entity.objects.create(name=entity, type=entity_type)
     
     def clean_groups(self):
         try:

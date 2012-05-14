@@ -8,8 +8,6 @@ SEARCH_FORMS = [
         [
             search_forms.EntityNameSearchForm,
             search_forms.TypeSearchForm,
-            search_forms.RelationshipSearchForm,
-            search_forms.SectorSearchForm,
             search_forms.RelationshipDateForm,
             search_forms.GroupSearchForm,
             search_forms.NotInGroupSearchForm,
@@ -72,11 +70,3 @@ SEARCH_FORMS = [
         ],
     ),
 ]
-
-def disable_activity_sector_form():
-    for (label, forms) in SEARCH_FORMS:
-        if label == _(u'Entity'):
-            from sanza.Crm.models import ActivitySector
-            if ActivitySector.objects.count() == 0:        
-                forms.remove(search_forms.SectorSearchForm)
-disable_activity_sector_form()

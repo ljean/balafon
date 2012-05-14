@@ -4,8 +4,6 @@ from django.core.urlresolvers import reverse
 from sanza.Crm import models
 
 admin.site.register(models.EntityType)
-admin.site.register(models.ActivitySector)
-admin.site.register(models.Relationship)
 admin.site.register(models.Zone)
 admin.site.register(models.EntityRole)
 admin.site.register(models.ActionType)
@@ -41,7 +39,7 @@ class CityAdmin(admin.ModelAdmin):
 admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'relationship', 'activity_sector')
+    list_display = ('name', 'type')
     search_fields = ['name']
 admin.site.register(models.Entity, EntityAdmin)
 

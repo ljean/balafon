@@ -915,8 +915,7 @@ def confirm_contacts_import(request, import_id):
                     entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
                 else:
                     entity = models.Entity.objects.create(
-                        name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import,
-                        relationship=contacts_import.relationship, activity_sector=contacts_import.activity_sector)
+                        name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import)
                 
                 is_first_for_entity = entity_dict.has_key(entity.name)
                 entity_dict[entity.name] = True

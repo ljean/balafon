@@ -31,18 +31,6 @@ class EntityType(NamedElement):
         verbose_name_plural = _(u'entity types')
 
 
-class ActivitySector(NamedElement):
-
-    class Meta:
-        verbose_name = _(u'activity sector')
-        verbose_name_plural = _(u'activity sectors')
-
-class Relationship(NamedElement):
-
-    class Meta:
-        verbose_name = _(u'relationship')
-        verbose_name_plural = _(u'relationships')
-
 class ZoneType(NamedElement):
     type = models.CharField(_('type'), max_length=200)
     
@@ -98,8 +86,6 @@ class Entity(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
     type = models.ForeignKey(EntityType, verbose_name=_(u'type'))
-    activity_sector = models.ForeignKey(ActivitySector, blank=True, default=None, null=True, verbose_name=_(u'activity sector'))
-    relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'))
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_entity_logo_dir)
@@ -484,10 +470,6 @@ class ContactsImport(TimeStampedModel):
     
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
-    relationship = models.ForeignKey(Relationship, verbose_name=_(u'relationship'),
-        help_text=_(u'All created entities will get this relationship. Ignored if the entity already exist.'))
-    activity_sector = models.ForeignKey(ActivitySector, verbose_name=_(u'activity sector'), blank=True, default=None, null=True,
-        help_text=_(u'Optional, All created entities will get this value. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
         help_text=_(u'The created entities will be added to the selected groups.'))
 
