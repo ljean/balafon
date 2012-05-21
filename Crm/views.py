@@ -796,34 +796,8 @@ def new_contacts_import(request):
         {'form': form},
         context_instance=RequestContext(request)
     )
-
-@login_required
-def confirm_contacts_import(request, import_id):
     
-    contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
-    reader = unicode_csv_reader(contacts_import.import_file)
-    
-    fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
-        'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
-        'entity.city', 'entity.cedex', 'entity.zip_code', 'address', 'address2',
-        'address3', 'city', 'cedex', 'zip_code', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
-    ]
-    
-    #custom fields
-    custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
-    for i in xrange(custom_fields_count):
-        fields.append('cf_{0}'.format(i+1))
-        
-    custom_fields = []
-    for idx in xrange(1, custom_fields_count+1):
-        try:
-            cf = models.CustomField.objects.get(import_order=idx)
-            custom_fields.append(cf)
-        except models.CustomField.DoesNotExist:
-            custom_fields.append(None)
-    
-    cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
-        
+def read_contacts(reader, fields):
     contacts = []
     entity_dict = {}
     role_dict = {}
@@ -891,97 +865,125 @@ def confirm_contacts_import(request, import_id):
             c['groups'].append(g)
             groups_dict[g] = True
         c['entity_groups'] = [{'name': g, 'exists': e} for (g, e) in zip(groups, c['groups_exists'])]
-        
-        #if c['email']:
-        #    if models.Contact.objects.filter(email=c['email']).count()==0:
-        #        contacts.append(c)
-        #    else:
-        #        print '## DO NOT ADD', c['entity'], c['lastname']
-        #else:
-        #    contacts.append(c)
         contacts.append(c)
     total_contacts = k
+    return contacts, total_contacts
     
+
+@login_required
+def confirm_contacts_import(request, import_id):
+    
+    fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
+        'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
+        'entity.city', 'entity.cedex', 'entity.zip_code', 'address', 'address2',
+        'address3', 'city', 'cedex', 'zip_code', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
+    ]
+    
+    #custom fields
+    custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
+    for i in xrange(custom_fields_count):
+        fields.append('cf_{0}'.format(i+1))
+        
+    custom_fields = []
+    for idx in xrange(1, custom_fields_count+1):
+        try:
+            cf = models.CustomField.objects.get(import_order=idx)
+            custom_fields.append(cf)
+        except models.CustomField.DoesNotExist:
+            custom_fields.append(None)
+    
+    cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
+    
+    contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
     if request.method == 'POST':
         form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
         
         if form.is_valid():
-            #create entities
+            reader = unicode_csv_reader(contacts_import.import_file, form.cleaned_data['encoding'])
+            contacts, total_contacts = read_contacts(reader, fields)
             default_department = form.cleaned_data['default_department']
             contacts_import = form.save()
-            entity_dict = {}
-            for c in contacts:
-                #Entity
-                if settings.DEBUG:
-                    try:
-                        print c['entity'], c['lastname']
-                    except UnicodeError:
-                        print '##!'
-                if c['entity_exists']:
-                    entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
-                else:
-                    entity = models.Entity.objects.create(
-                        name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import)
-                
-                is_first_for_entity = entity_dict.has_key(entity.name)
-                entity_dict[entity.name] = True
-                
-                for g in contacts_import.groups.all():
-                    g.entities.add(entity)
-                    g.save()
-                    
-                #Contact
-                contact, _is_new = models.Contact.objects.get_or_create(entity=entity, firstname=c['firstname'],
-                    lastname=c['lastname'])
-                contact.imported_by = contacts_import
-                
-                for field_name in fields:
-                    if field_name in ('entity', 'city', 'entity.city', 'role', 'groups'):
-                        continue
-                    obj = contact
-                    try:
-                        x, field = field_name.split('.')
-                        obj = getattr(obj, x)
-                    except ValueError:
-                        field = field_name
-                    if c[field_name] and field!='city':
-                        setattr(obj, field, c[field_name])
 
-                if c['city']:
-                    contact.city = resolve_city(c['city'], c['zip_code'], default_department)
-                if c['entity.city']:
-                    contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], default_department)
-                if c['role']:
-                    for role_exists, role in zip(c['role_exists'], c['role']):
-                        if role_exists:
-                            contact.role.add(models.EntityRole.objects.filter(name__iexact=role)[0])
-                        else:
-                            contact.role.add(models.EntityRole.objects.create(name=role))
-                if c['groups']:
-                    for group_exists, group in zip(c['groups_exists'], c['groups']):
-                        if group_exists:
-                            group = models.Group.objects.filter(name__iexact=group)[0]
-                        else:
-                            group, _x = models.Group.objects.get_or_create(name=group)
-                        group.entities.add(contact.entity)
-                        group.save()
-                
-                contact.entity.save()
-                contact.save()
-                
-                for name, cf in zip(cf_names, custom_fields):
-                    value = c[name]
-                    if cf and value:
-                        if cf.model == models.CustomField.MODEL_ENTITY and is_first_for_entity:
-                            cfv, _x = models.EntityCustomFieldValue.objects.get_or_create(custom_field=cf, entity=contact.entity)
-                            cfv.value = value
-                            cfv.save()
-                        if cf.model == models.CustomField.MODEL_CONTACT:
-                            cfv, _x = models.ContactCustomFieldValue.objects.get_or_create(custom_field=cf, contact=contact)
-                            cfv.value = value 
-                            cfv.save()
-            return HttpResponseRedirect("/")
+            if 'create_contacts' in request.POST:
+                #create entities
+                entity_dict = {}
+                for c in contacts:
+                    #Entity
+                    if settings.DEBUG:
+                        try:
+                            print c['entity'], c['lastname']
+                        except UnicodeError:
+                            print '##!'
+                    if c['entity_exists']:
+                        entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
+                    else:
+                        entity = models.Entity.objects.create(
+                            name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import)
+                    
+                    is_first_for_entity = entity_dict.has_key(entity.name)
+                    entity_dict[entity.name] = True
+                    
+                    for g in contacts_import.groups.all():
+                        g.entities.add(entity)
+                        g.save()
+                        
+                    #Contact
+                    contact, _is_new = models.Contact.objects.get_or_create(entity=entity, firstname=c['firstname'],
+                        lastname=c['lastname'])
+                    contact.imported_by = contacts_import
+                    
+                    for field_name in fields:
+                        if field_name in ('entity', 'city', 'entity.city', 'role', 'groups'):
+                            continue
+                        obj = contact
+                        try:
+                            x, field = field_name.split('.')
+                            obj = getattr(obj, x)
+                        except ValueError:
+                            field = field_name
+                        if c[field_name] and field!='city':
+                            setattr(obj, field, c[field_name])
+    
+                    if c['city']:
+                        contact.city = resolve_city(c['city'], c['zip_code'], default_department)
+                    if c['entity.city']:
+                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], default_department)
+                    if c['role']:
+                        for role_exists, role in zip(c['role_exists'], c['role']):
+                            if role_exists:
+                                contact.role.add(models.EntityRole.objects.filter(name__iexact=role)[0])
+                            else:
+                                contact.role.add(models.EntityRole.objects.create(name=role))
+                    if c['groups']:
+                        for group_exists, group in zip(c['groups_exists'], c['groups']):
+                            if group_exists:
+                                group = models.Group.objects.filter(name__iexact=group)[0]
+                            else:
+                                group, _x = models.Group.objects.get_or_create(name=group)
+                            group.entities.add(contact.entity)
+                            group.save()
+                    
+                    contact.entity.save()
+                    contact.save()
+                    contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
+                    
+                    for name, cf in zip(cf_names, custom_fields):
+                        value = c[name]
+                        if cf and value:
+                            if cf.model == models.CustomField.MODEL_ENTITY and is_first_for_entity:
+                                cfv, _x = models.EntityCustomFieldValue.objects.get_or_create(custom_field=cf, entity=contact.entity)
+                                cfv.value = value
+                                cfv.save()
+                            if cf.model == models.CustomField.MODEL_CONTACT:
+                                cfv, _x = models.ContactCustomFieldValue.objects.get_or_create(custom_field=cf, contact=contact)
+                                cfv.value = value 
+                                cfv.save()
+                return HttpResponseRedirect("/")
+            else:
+                form = forms.ContactsImportConfirmForm(instance=contacts_import)
     else:
+        reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
+        contacts, total_contacts = read_contacts(reader, fields)
         form = forms.ContactsImportConfirmForm(instance=contacts_import)
     
     return render_to_response(

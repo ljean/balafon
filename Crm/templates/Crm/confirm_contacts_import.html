@@ -36,7 +36,8 @@
   <h2>{% trans "Confirm contacts import" %}</h2>
   <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
     <div class="buttons">
-    <input type="submit" value="{% trans "Confirm"%}">
+    <input type="submit" value="{% trans "Preview"%}">
+    <input type="submit" name="create_contacts" value="{% trans "Import"%}">
     <a href="{{cancel_url}}">{% trans "Cancel" %}</a>
     </div>
     <ul>

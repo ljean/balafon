@@ -421,11 +421,17 @@ class CustomField(models.Model):
     label = models.CharField(max_length=100, verbose_name=_(u'label'), blank=True, default='')
     model = models.IntegerField(verbose_name=_(u'model'), choices=MODEL_CHOICE)
     widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
-    ordering = models.IntegerField(verbose_name=_(u'ordering'), default=10)
-    import_order = models.IntegerField(verbose_name=_(u'ordering'), default=0)
+    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    import_order = models.IntegerField(verbose_name=_(u'import ordering'), default=0)
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.get_model_display(), self.name)
+    
+    def model_name(self):
+        if self.model == self.MODEL_ENTITY:
+            return 'entity'
+        else:
+            return 'contact'
     
     class Meta:
         verbose_name = _(u'custom field')
@@ -464,6 +470,11 @@ class ContactCustomFieldValue(CustomFieldValue):
     
 class ContactsImport(TimeStampedModel):
     
+    ENCODINGS = (
+        ('iso-8859-15', 'iso-8859-15'),
+        ('cp1252', 'cp1252')
+    )
+    
     def _get_import_dir(self, filename):
         return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
@@ -472,7 +483,7 @@ class ContactsImport(TimeStampedModel):
     name = models.CharField(max_length=100, verbose_name=_(u'name'), blank=True, default=u'',
         help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
-    
+    encoding = models.CharField(max_length=50, default='iso-8859-15', choices=ENCODINGS)
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,

@@ -68,10 +68,11 @@ def get_users(self):
 #            self.writerow(row)
 #            
 import csv, codecs
-def unicode_csv_reader(the_file, dialect=csv.excel, **kwargs):
+def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
     csv_reader = csv.reader(the_file, dialect=dialect, **kwargs)
     for row in csv_reader:
-        yield [codecs.decode(cell, 'iso-8859-15') for cell in row]
+        #yield [codecs.decode(cell, 'iso-8859-15') for cell in row] #'cp1252'
+        yield [codecs.decode(cell, encoding) for cell in row]
 
 def resolve_city(city_name, zip_code, default_department):
     code = zip_code[:2] or default_department
