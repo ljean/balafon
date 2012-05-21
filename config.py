@@ -27,7 +27,7 @@ SEARCH_FORMS = [
             search_forms.ContactRoleSearchForm,
             search_forms.ContactNewsletterSearchForm,
             search_forms.Contact3rdPartySearchForm,
-            search_forms.MainContactSearchForm,
+            search_forms.SecondarySearchForm,
             search_forms.ContactAgeSearchForm,
         ],
     ),(

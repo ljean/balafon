@@ -56,6 +56,7 @@ def search(request, search_id=0, group_id=0):
     contains_refuse_newsletter = False
     data = None
     contacts_count = 0
+    has_empty_entities = False
     
     if request.method == "POST":
         data = request.POST
@@ -65,7 +66,7 @@ def search(request, search_id=0, group_id=0):
     if data:
         search_form = forms.SearchForm(data)
         if search_form.is_valid():
-            entities, contacts_count = search_form.get_contacts_by_entity()
+            entities, contacts_count, has_empty_entities = search_form.get_contacts_by_entity()
             contains_refuse_newsletter = search_form.contains_refuse_newsletter
             if not entities:
                 message = _(u'Sorry, no results found')
@@ -78,7 +79,7 @@ def search(request, search_id=0, group_id=0):
         'Search/search.html',
         {
             'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
-            'field_choice_form': field_choice_form, 'message': message,
+            'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group_id': group_id,
         },
@@ -124,13 +125,16 @@ def mailto_contacts(request, bcc):
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
-            if len(emails)>nb_limit:
-                return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+            if emails:
+                if len(emails)>nb_limit:
+                    return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+                else:
+                    mailto = u'mailto:'
+                    if int(bcc): mailto += '?bcc='
+                    mailto += ','.join(emails)
+                    return HttpResponseRedirect(mailto)
             else:
-                mailto = u'mailto:'
-                if int(bcc): mailto += '?bcc='
-                mailto += ','.join(emails)
-                return HttpResponseRedirect(mailto)
+                return HttpResponse(_(u'Mailto: Error, no emails defined'), mimetype='text/plain')
     raise Http404
 
 @login_required
@@ -264,12 +268,22 @@ def create_action_for_contacts(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    form = ActionForContactsForm(initial={'contacts': contacts})
-                    return render_to_response(
-                        'Search/create_action_for_contacts.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
-                    )
+                    if contacts:
+                        form = ActionForContactsForm(initial={'contacts': contacts})
+                        return render_to_response(
+                            'Search/create_action_for_contacts.html',
+                            {'form': form},
+                            context_instance=RequestContext(request)
+                        )
+                    else:
+                        return render_to_response(
+                            'message_dialog.html',
+                            {
+                                'title': _('Create action for contacts'),
+                                'message': _(u'The search results contains no contacts')
+                            },
+                            context_instance=RequestContext(request)
+                        )
     except Exception, msg:
         print msg
         raise
@@ -306,12 +320,22 @@ def create_opportunity_for_contacts(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    form = OpportunityForContactsForm(initial={'contacts': contacts})
-                    return render_to_response(
-                        'Search/create_opportunity_for_contacts.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
-                    )
+                    if contacts:
+                        form = OpportunityForContactsForm(initial={'contacts': contacts})
+                        return render_to_response(
+                            'Search/create_opportunity_for_contacts.html',
+                            {'form': form},
+                            context_instance=RequestContext(request)
+                        )
+                    else:
+                        return render_to_response(
+                            'message_dialog.html',
+                            {
+                                'title': _('Create opportunity for contacts'),
+                                'message': _(u'The search results contains no contacts')
+                            },
+                            context_instance=RequestContext(request)
+                        )
     except Exception, msg:
         print msg
         raise
@@ -346,12 +370,22 @@ def add_contacts_to_group(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    form = GroupForContactsForm(initial={'contacts': contacts})
-                    return render_to_response(
-                        'Search/add_contacts_to_group.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
-                    )
+                    if contacts:
+                        form = GroupForContactsForm(initial={'contacts': contacts})
+                        return render_to_response(
+                            'Search/add_contacts_to_group.html',
+                            {'form': form},
+                            context_instance=RequestContext(request)
+                        )
+                    else:
+                        return render_to_response(
+                            'message_dialog.html',
+                            {
+                                'title': _('Add contacts to group'),
+                                'message': _(u'The search results contains no contacts')
+                            },
+                            context_instance=RequestContext(request)
+                        )
     except Exception, msg:
         print msg
         raise
@@ -395,12 +429,22 @@ def contacts_admin(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    form = forms.ContactsAdminForm(initial={'contacts': contacts})
-                    return render_to_response(
-                        'Search/contacts_admin_form.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
-                    )
+                    if contacts:
+                        form = forms.ContactsAdminForm(initial={'contacts': contacts})
+                        return render_to_response(
+                            'Search/contacts_admin_form.html',
+                            {'form': form},
+                            context_instance=RequestContext(request)
+                        )
+                    else:
+                        return render_to_response(
+                            'message_dialog.html',
+                            {
+                                'title': _('Contacts admin'),
+                                'message': _(u'The search results contains no contacts')
+                            },
+                            context_instance=RequestContext(request)
+                        )
     except Exception, msg:
         print msg
         raise

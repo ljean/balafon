@@ -197,13 +197,22 @@ class Contact3rdPartySearchForm(YesNoSearchFieldForm):
     def get_lookup(self):
         return {'accept_3rdparty': self.is_yes()}
 
-class MainContactSearchForm(YesNoSearchFieldForm):
-    _name = 'main_contact'
-    _label = _(u'Main contact')
-            
+class SecondarySearchForm(SearchFieldForm):
+    _name = 'secondary_contact'
+    _label = _(u'Secondary contact')
+    
+    def __init__(self, *args, **kwargs):
+        super(SecondarySearchForm, self).__init__(*args, **kwargs)
+        choices = ((1, _('Include')), (0, _('Only')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+        
     def get_lookup(self):
-        return {'main_contact': self.is_yes()}
-
+        value = int(self._value)
+        if value == 1:
+            return {} #the lookup 'main_contact' will be removed by the search form
+        elif value == 0:
+            return {'main_contact': False}
 
 class ContactRoleSearchForm(SearchFieldForm):
     _name = 'contact_role'

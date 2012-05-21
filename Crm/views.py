@@ -19,15 +19,21 @@ from sanza.Crm.utils import unicode_csv_reader, resolve_city
     
 @login_required
 def view_entity(request, entity_id):
+    
+    all_contacts = request.GET.get('all', 0)
+    
     last_week = date.today() - timedelta(7)
     entity = get_object_or_404(models.Entity, id=entity_id)
-    contacts = models.Contact.objects.filter(entity=entity).order_by("-main_contact")
+    contacts = entity.contact_set.all().order_by("-main_contact", "lastname", "firstname")
+    if not all_contacts:
+        contacts = contacts.filter(has_left=False)
     actions = models.Action.objects.filter(Q(entity=entity),
         Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "priority")
     opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("status__ordering", "ended")
     show_all_button = opportunities.count() > 10
     if show_all_button:
         opportunities = opportunities[:10]
+    show_all_contacts = not all_contacts and (entity.contact_set.filter(has_left=True).count()>0)
     multi_user = True
     entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])

@@ -12,27 +12,36 @@
   
 {% block section_data %}
 {% if entities %}
+  {% if has_empty_entities %}
+    <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
+  {% endif %}
   {% autopaginate entities nb_entities_by_page %}
   <table>
     <tr><th>{% trans "Entity" %}</th><th>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
-    <tr>
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
       <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
-      <td>
-        {% with e.search_contacts as contacts %}
-        {% if contacts %}
-          {% for c in contacts %}
-            <div class="contact contact-sr">
-              <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
-              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-              <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
-            </div>
-          {% endfor %}
-        {% else %}
-          &nbsp;
-        {% endif %}
-        {% endwith %}
-      </td>
+      {% if e.is_empty %}
+        <td class="empty-entity">
+          {% trans "No contacts !!" %}
+        </td>
+      {% else %}
+        <td>
+          {% with e.search_contacts as contacts %}
+          {% if contacts %}
+            {% for c in contacts %}
+              <div class="contact contact-sr">
+                <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
+                {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+                <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
+              </div>
+            {% endfor %}
+          {% else %}
+            &nbsp;
+          {% endif %}
+          {% endwith %}
+        </td>
+      {% endif %}
     </tr>
   {% endfor %}
   </table>

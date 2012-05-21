@@ -1,0 +1,39 @@
+{% load i18n %}
+<html>
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript">
+    $(function() {
+      $(document).bind('cbox_complete', function(){
+        $("a.cancel_button").click(function() {
+          $.colorbox.close();
+          return false;
+        });
+
+        var s = "{{ title }}";
+        while(true) {
+          var so = s;
+          s = so.replace("&#39;", "'");
+          if (s===so) break;
+        }
+        
+        $("#cboxTitle").text(s);
+      });
+    });
+  </script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="main">
+    <div class="popup_content popup_form">
+      {% block content %}{{message}}{% endblock %}
+    </div>
+    <div class="popup_buttons">
+        {% block popup_buttons %}
+        <a href="" class="cancel_button">{% trans "Ok" %}</a>
+        {% endblock %}
+    </div>
+    
+  </div>
+</body>
+</html>

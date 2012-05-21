@@ -397,6 +397,14 @@ a.selector-remove {
     color: #000;
 }
 
+.warning-text {
+	color: red;
+	padding: 1px 3px;
+	margin-left: 10px;
+	border: solid thin red;
+	background: #fcc;
+}
+
 .user-info {
 	font-weight: bold;
     border: solid thin #aaa;
@@ -614,8 +622,9 @@ form.search-form {
     font-weight: bold;
 }
 
-.old-contact {
-    text-decoration: line-through;
+.old-contact, .old-contact a {
+    color: #888;
+	font-style: italic;
 }
 
 .old-action, .old-opportunity, .old-action a, .old-opportunity a {
@@ -712,4 +721,13 @@ tr.not-my-action td, tr.not-my-action a {
 .import-data th{
 	background: #eee;
 	border: solid thin #aaa;
+}
+
+.even {
+	background: #ffe8e8;
+}
+
+.empty-entity {
+	color: #f50;
+	font-weight: bold;
 }

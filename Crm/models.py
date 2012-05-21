@@ -107,8 +107,13 @@ class Entity(TimeStampedModel):
     
     def save(self, *args, **kwargs):
         super(Entity, self).save(*args, **kwargs)
-        if self.contact_set.count() == 0:
-            Contact.objects.create(entity=self)
+        if self.contact_set.filter(has_left=False).count() == 0:
+            Contact.objects.create(entity=self, main_contact=True, has_left=False)
+        elif self.contact_set.filter(main_contact=True, has_left=False).count() == 0:
+            #Always at least 1 main contact per entity
+            c = self.contact_set.all()[0]
+            c.main_contact = True
+            c.save()
     
     def __unicode__(self):
         return self.name

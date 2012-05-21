@@ -15,6 +15,7 @@ from sanza.Crm.models import Contact
 from django.conf import settings
 SEARCH_FORMS = None
 from django.utils import importlib
+from itertools import chain
 
 def load_from_name(constant_full_name):
     x = constant_full_name.split('.')
@@ -205,7 +206,10 @@ class SearchForm(forms.Form):
         for key in keys:
             q_objs = []
             exclude_q_objs = []
-            filter_lookup = {}
+            if 'secondary_contact' in [f._name for f in self._forms[key]]:
+                filter_lookup = {}
+            else:
+                filter_lookup = {'main_contact': True}
             exclude_lookup = {}
             for form in self._forms[key]:
                 lookup = form.get_lookup()
@@ -238,38 +242,56 @@ class SearchForm(forms.Form):
                 contacts = pp(contacts)
         return list(contacts)
     
+    def _get_filter_func(self):
+        #form_names = [f._name for f in chain.from_iterable(self._forms.values())]
+        #if 'main_contact' in form_names:
+        #    return lambda c: (not c.has_left)
+        #return lambda c: (not c.has_left) and c.main_contact
+        return lambda c: (not c.has_left)
+
     def get_contacts_by_entity(self):
         self.contains_refuse_newsletter = False
         contacts = self._get_contacts()
-        contacts_count = len(contacts)
+        contacts_count = 0
         entities = {}
+        filter_func = self._get_filter_func()
+        empty_entities = {}
         for contact in contacts:
-            if not contact.accept_newsletter:
-                self.contains_refuse_newsletter = True
+            pass_filter = filter_func(contact)
             entity = contact.entity
             if not entities.has_key(entity.id):
                 entities[entity.id] = (entity, [])
-            entities[entity.id][1].append(contact)
-            entities[entity.id][1].sort(key=lambda c: c.lastname.lower())
+                empty_entities[entity.id] = entity
+            if pass_filter:
+                if not contact.accept_newsletter:
+                    self.contains_refuse_newsletter = True
+                entities[entity.id][1].append(contact)
+                entities[entity.id][1].sort(key=lambda c: c.lastname.lower())
+                empty_entities.pop(entity.id, None)
+                contacts_count += 1
+            
         results = []
         for entity, contacts in entities.values():
             entity.search_contacts = contacts
+            if entity.id in empty_entities:
+                setattr(entity, 'is_empty', True)
             results.append(entity)
         results.sort(key=lambda x: x.name)
-        return results, contacts_count
+        return results, contacts_count, (len(empty_entities)>0)
     
     def get_contacts(self):
+        filter_func = self._get_filter_func()
         contacts = self._get_contacts()
         ids = self.cleaned_data['excluded']
-        return [c for c in contacts if (c.id not in ids)]
+        return [c for c in contacts if (c.id not in ids and filter_func(c))]
         
     def get_contacts_emails(self):
+        filter_func = self._get_filter_func()
         contacts = self._get_contacts()
         excluded_ids = self.cleaned_data['excluded']
-        
         emails = []
         for c in contacts:
-            if c.get_email and (c.id not in excluded_ids):
+            if c.get_email and (c.id not in excluded_ids) and filter_func(c):
                 if c.firstname or c.lastname:
                     emails.append(u'"{1}" <{0}>'.format(c.get_email, c.fullname))    
                 else:
