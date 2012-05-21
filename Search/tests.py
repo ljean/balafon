@@ -479,3 +479,85 @@ class GroupSearchTest(BaseTestCase):
         self.assertContains(response, vars.entity8.name)
         self.assertContains(response, vars.entity10.name)
         self.assertContains(response, vars.entity14.name)
+        
+class MainContactAndHasLeftSearchTest(BaseTestCase):
+    
+    def _make_contact(self, main_contact, has_left):
+        entity = mommy.make_one(models.Entity, name=u"TinyTinyCorp")
+        contact = entity.contact_set.all()[0]
+        contact.lastname = 'TiniMax'
+        contact.firstname = 'Boss'
+        contact.main_contact = main_contact
+        contact.has_left = has_left
+        contact.save()
+        return entity, contact
+    
+    def _make_another_contact(self, entity, main_contact, has_left):
+        contact = mommy.make_one(models.Contact, entity=entity)
+        contact.lastname = 'TinyMin'
+        contact.firstname = 'Other'
+        contact.main_contact = main_contact
+        contact.has_left = has_left
+        contact.save()
+        return contact
+    
+    def test_main_contact(self):
+        e, c = self._make_contact(True, False)
+        
+        url = reverse('search')
+        data = {"gr0-_-entity_name-_-0": e.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertContains(response, c.lastname)
+        
+    def test_main_contact_has_left(self):
+        e, c = self._make_contact(True, True)
+        
+        url = reverse('search')
+        data = {"gr0-_-entity_name-_-0": e.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertNotContains(response, c.lastname)
+        
+    def test_only_one_main_contact(self):
+        e, c = self._make_contact(False, False)
+        
+        url = reverse('search')
+        data = {"gr0-_-entity_name-_-0": e.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertNotContains(response, c.lastname)
+        
+        e.save()
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertContains(response, c.lastname)
+        
+        self.assertEqual(1, models.Contact.objects.count())
+        c = models.Contact.objects.all()[0]
+        self.assertEqual(c.main_contact, True)
+        
+        
+    def test_two_main_contacts(self):
+        e, c = self._make_contact(False, False)
+        c2 = self._make_another_contact(e, True, False)
+        
+        url = reverse('search')
+        data = {"gr0-_-entity_name-_-0": e.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertNotContains(response, c.lastname)
+        self.assertContains(response, c2.lastname)
+        
+        
