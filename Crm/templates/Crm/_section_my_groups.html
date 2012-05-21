@@ -9,7 +9,7 @@
       <th>{% trans "Description" %}</th><th>&nbsp;</th></tr>
   {% autopaginate groups 50 %}
   {% for g in groups %}
-    <tr>
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
       <td><a href="{% url search_group g.id %}">{{g.name}}</a></td>
       <td>{{g.entities.count}}</td>
       <td>{{g.description|default:"&nbsp;"}}</td>

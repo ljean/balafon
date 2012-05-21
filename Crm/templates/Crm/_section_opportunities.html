@@ -23,7 +23,7 @@
     <th>{% trans "Probability" %}</th>
   </tr>
   {% for o in opportunities %}
-  <tr class="{% if o.ended%}old-opportunity{% endif %}">
+  <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="{% url crm_view_opportunity o.id %}">{{o.name}}</a></td>
     {% if not entity %}<td><a href="{% url crm_view_entity o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
     <td>{{o.type|default:"&nbsp;"}}</td>

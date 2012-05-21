@@ -30,7 +30,7 @@
     {% if multi_user %}<th>{% trans "In charge" %}</th>{% endif %}
   </tr>
   {% for a in actions %}
-  <tr class="{% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
     <td class="status-icon">
       <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
         href="{% url crm_do_action a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
