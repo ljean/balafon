@@ -163,7 +163,7 @@ class ContactForm(ModelFormWithCity):
 class MiniContactForm(forms.ModelForm):
     class Meta:
         model = models.Contact
-        fields=('gender', 'firstname', 'lastname', 'title', 'role', 'phone', 'mobile', 'email', 'notes')
+        fields=('gender', 'firstname', 'lastname', 'title', 'role', 'phone', 'mobile', 'email', 'has_left', 'main_contact', 'notes')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
@@ -433,6 +433,7 @@ class ContactsImportForm(forms.ModelForm):
             'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
+        
         
 class ContactsImportConfirmForm(ContactsImportForm):
     default_department = forms.ChoiceField(required=True, label=_(u'Default department'),

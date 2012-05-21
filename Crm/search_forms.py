@@ -229,6 +229,17 @@ class ContactHasEmail(YesNoSearchFieldForm):
         else:
             return has_no_email
 
+class ContactHasPersonalEmail(YesNoSearchFieldForm):
+    _name = 'contact_has_personal_email'
+    _label = _(u'Contact has pesonal email')
+            
+    def get_lookup(self):
+        has_no_email = Q(email='')
+        if self.is_yes():
+            return ~has_no_email
+        else:
+            return has_no_email
+
 class UnknownContact(YesNoSearchFieldForm):
     _name = 'unknown_contact'
     _label = _(u'Unknown contacts')
