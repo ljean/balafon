@@ -187,7 +187,7 @@ class Contact(TimeStampedModel):
     
     GENDER_MALE = 1
     GENDER_FEMALE = 2
-    GENDER_CHOICE = ((GENDER_MALE, _('Mr.')), (GENDER_FEMALE, _('Mrs.')))
+    GENDER_CHOICE = ((GENDER_MALE, _('Mr')), (GENDER_FEMALE, _('Mrs')))
     
     entity = models.ForeignKey(Entity)
     role = models.ManyToManyField(EntityRole, blank=True, null=True, default=None, verbose_name=_(u'Roles'))
@@ -268,11 +268,11 @@ class Contact(TimeStampedModel):
         return [x for x in (self.phone, self.mobile) if x]
     
     def get_roles(self):
-        return [x.name for x in self.role.all()]
+        has_left = [__(u'Has left')] if self.has_left else []
+        return has_left + [x.name for x in self.role.all()]
         
     def __unicode__(self):
         if self.gender:
-            #title = _('Mr. ') if self.gender==Contact.GENDER_MALE else _('Mrs. ')
             title = self.get_gender_display()
             title += u' '
         else:
