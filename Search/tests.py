@@ -39,11 +39,11 @@ class GroupSearchTest(BaseTestCase):
         
     def test_view_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         group = mommy.make_one(models.Group, name=u"my group")
         
@@ -64,11 +64,11 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         group = mommy.make_one(models.Group, name=u"my group")
         group.entities.add(entity1)
@@ -90,11 +90,11 @@ class GroupSearchTest(BaseTestCase):
     
     def test_search_two_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         group1 = mommy.make_one(models.Group, name=u"my group")
         group1.entities.add(entity1)
@@ -122,11 +122,11 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_two_group_not_in(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         group1 = mommy.make_one(models.Group, name=u"my group")
         group1.entities.add(entity1)
@@ -152,11 +152,11 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_two_group_in_and_not_in(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         group1 = mommy.make_one(models.Group, name=u"my group")
         group1.entities.add(entity1)
@@ -184,11 +184,11 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_entity(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
                 
         url = reverse('search')
         
@@ -206,14 +206,14 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_contact(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         url = reverse('search')
         
@@ -234,14 +234,14 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_contact_of_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         group = mommy.make_one(models.Group, name=u"my group")
         group.entities.add(entity1)
@@ -266,14 +266,14 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_union_of_contacts(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         url = reverse('search')
         
@@ -294,14 +294,14 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_has_email(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         url = reverse('search')
         
@@ -322,14 +322,14 @@ class GroupSearchTest(BaseTestCase):
         
     def test_search_has_no_email(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         url = reverse('search')
         
@@ -350,14 +350,14 @@ class GroupSearchTest(BaseTestCase):
 
     def test_search_has_email_and_name(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
-        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
         
         entity2 = mommy.make_one(models.Entity, name=u"Other corp")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
         entity3 = mommy.make_one(models.Entity, name=u"The big Org", email="toto2@toto.fr")
-        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC")
+        contact4 = mommy.make_one(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
         
         url = reverse('search')
         
