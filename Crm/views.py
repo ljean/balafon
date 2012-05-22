@@ -129,7 +129,7 @@ def get_group_members(request, group_id):
     
 @login_required
 def edit_group(request, group_id):
-    group = models.Group.objects.get(id=group_id)
+    group = get_object_or_404(models.Group, id=group_id)
     next_url = request.session.get('next_url', reverse('crm_see_my_groups'))
     if request.method == "POST":
         form = forms.EditGroupForm(request.POST, instance=group)
@@ -156,7 +156,7 @@ def edit_group(request, group_id):
 @login_required
 @popup_redirect
 def delete_group(request, group_id):
-    group = models.Group.objects.get(id=group_id)
+    group = get_object_or_404(models.Group, id=group_id)
     
     if request.method == 'POST':
         if 'confirm' in request.POST:
