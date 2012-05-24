@@ -875,9 +875,11 @@ def confirm_contacts_import(request, import_id):
     
     fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
         'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
-        'entity.city', 'entity.cedex', 'entity.zip_code', 'address', 'address2',
-        'address3', 'city', 'cedex', 'zip_code', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
+        'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
+        'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
     ]
+    
+    #TODO / COUNTRY
     
     #custom fields
     custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
@@ -933,7 +935,7 @@ def confirm_contacts_import(request, import_id):
                     contact.imported_by = contacts_import
                     
                     for field_name in fields:
-                        if field_name in ('entity', 'city', 'entity.city', 'role', 'groups'):
+                        if field_name in ('entity', 'city', 'entity.city', 'role', 'groups', 'country', 'entity.country'):
                             continue
                         obj = contact
                         try:
@@ -945,9 +947,9 @@ def confirm_contacts_import(request, import_id):
                             setattr(obj, field, c[field_name])
     
                     if c['city']:
-                        contact.city = resolve_city(c['city'], c['zip_code'], default_department)
+                        contact.city = resolve_city(c['city'], c['zip_code'], c['country'], default_department)
                     if c['entity.city']:
-                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], default_department)
+                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], c['country'], default_department)
                     if c['role']:
                         for role_exists, role in zip(c['role_exists'], c['role']):
                             if role_exists:

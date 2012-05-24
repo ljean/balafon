@@ -66,7 +66,8 @@ def get_users(self):
 #    def writerows(self, rows):
 #        for row in rows:
 #            self.writerow(row)
-#            
+#
+from sanza.Crm.settings import get_default_country
 import csv, codecs
 def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
     csv_reader = csv.reader(the_file, dialect=dialect, **kwargs)
@@ -74,12 +75,18 @@ def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
         #yield [codecs.decode(cell, 'iso-8859-15') for cell in row] #'cp1252'
         yield [codecs.decode(cell, encoding) for cell in row]
 
-def resolve_city(city_name, zip_code, default_department):
-    code = zip_code[:2] or default_department
-    try:
-        parent = models.Zone.objects.get(code=code)
-    except models.Zone.DoesNotExist, msg:
-        parent = None
+def resolve_city(city_name, zip_code, country, default_department):
+    default_country = get_default_country()
+    foreign_city = bool(country) and (country!=default_country)
+    if foreign_city:
+        zone_type = models.ZoneType.objects.get(type='country')
+        parent, _is_new = models.Zone.objects.get_or_create(name=country, type=zone_type)
+    else:
+        code = zip_code[:2] or default_department
+        try:
+            parent = models.Zone.objects.get(code=code)
+        except models.Zone.DoesNotExist, msg:
+            parent = None
     try:
         return models.City.objects.get(name__iexact=city_name, parent=parent)
     except models.City.DoesNotExist:
