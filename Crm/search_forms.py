@@ -51,14 +51,14 @@ class DepartmentSearchForm(ZoneSearchForm):
     _label = _(u'Department')
         
     def get_lookup(self):
-        return {'entity__city__parent__id': self._value}
+        return Q(entity__city__parent__id=self._value) | Q(city__parent__id=self._value)
         
 class RegionSearchForm(ZoneSearchForm):
     _name = 'region'
     _label = _(u'Region')
         
     def get_lookup(self):
-        return {'entity__city__parent__parent__id': self._value}
+        return Q(entity__city__parent__parent__id=self._value) | Q(city__parent__parent__id=self._value)
         
 class CountrySearchForm(ZoneSearchForm):
     _name = 'country'
@@ -68,9 +68,9 @@ class CountrySearchForm(ZoneSearchForm):
         default_country_name = get_default_country()
         default_country = models.Zone.objects.get(name=default_country_name, type__type=self._name)
         if int(self._value) == default_country.id:
-            return {'entity__city__parent__type__type': 'department'}
+            return Q(entity__city__parent__type__type='department') | Q(city__parent__type__type='department')
         else:
-            return {'entity__city__parent__id': self._value}
+            return Q(entity__city__parent__id=self._value) | Q(city__parent__id=self._value)
             
 class ActionInProgressForm(YesNoSearchFieldForm):
     _name = 'action'
