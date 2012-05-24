@@ -13,7 +13,7 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
     {% if not entity %}<td><a href="{% url crm_view_entity c.entity.id %}">{{ c.entity }}</a></td>{% endif %}
-    <td>{{c.get_roles|seq_to_dash}}</td>
+    <td>{{c.get_roles|seq_to_dash|default:"&nbsp;"}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
   </tr>
