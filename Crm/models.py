@@ -273,7 +273,7 @@ class Contact(TimeStampedModel):
         return [x for x in (self.phone, self.mobile) if x]
     
     def get_roles(self):
-        has_left = [__(u'Has left')] if self.has_left else []
+        has_left = [__(u'has left')] if self.has_left else []
         return has_left + [x.name for x in self.role.all()]
         
     def __unicode__(self):
