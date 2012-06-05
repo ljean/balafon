@@ -822,7 +822,10 @@ def read_contacts(reader, fields):
             if field.find('city')>=0 and c[field]:
                 field = field.replace('.', '_')
                 c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
-                
+        
+        if not any(c.values()):
+            continue
+        
         name = u"< {0} >".format(_(u"Unknown"))
         if not c['entity']:
             entity = u''
@@ -830,7 +833,9 @@ def read_contacts(reader, fields):
             if res:
                 name, entity, ext = res.groups(0)
                 #email = u'{0}@{1}.{2}'.format(name, entity, ext)
-            if entity in ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte'):
+            email_providers = ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
+                'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
+            if entity in email_providers:
                 entity = name
             if not c['entity']:
                 c['entity'] = entity
@@ -879,10 +884,10 @@ def confirm_contacts_import(request, import_id):
         'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
     ]
     
-    #TODO / COUNTRY
-    
     #custom fields
     custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
+    if not custom_fields_count:
+        custom_fields_count = 0
     for i in xrange(custom_fields_count):
         fields.append('cf_{0}'.format(i+1))
         
@@ -983,6 +988,9 @@ def confirm_contacts_import(request, import_id):
                 return HttpResponseRedirect("/")
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
+        else:
+            reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
+            contacts, total_contacts = read_contacts(reader, fields)
     else:
         reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
         contacts, total_contacts = read_contacts(reader, fields)
