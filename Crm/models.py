@@ -248,7 +248,7 @@ class Contact(TimeStampedModel):
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
             field_name = attr[4:]
-            if field_name in ('phone', 'email', 'address', 'zip_code', 'cedex', 'city'):
+            if field_name in ('phone', 'email', 'address', 'address2', 'address3', 'zip_code', 'cedex', 'city'):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
         else:
