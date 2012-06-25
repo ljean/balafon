@@ -436,14 +436,18 @@ class ContactsImportForm(forms.ModelForm):
         
         
 class ContactsImportConfirmForm(ContactsImportForm):
-    default_department = forms.ChoiceField(required=True, label=_(u'Default department'),
-        choices=[(x.code, x.name) for x in models.Zone.objects.filter(type__type='department')],
+    default_department = forms.ChoiceField(required=False, label=_(u'Default department'),
+        choices=([('', '')]+[(x.code, x.name) for x in models.Zone.objects.filter(type__type='department')]),
         help_text=_(u'The city in red will be created with this department as parent'))
     
     class Meta(ContactsImportForm.Meta):
         exclude = ('imported_by', 'import_file', 'name')
     
     def clean_default_department(self):
-        if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
-            raise ValidationError(_(u'Please enter a valid code'))
-        return self.cleaned_data['default_department']
+        code = self.cleaned_data['default_department']
+        if code:
+            if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
+                raise ValidationError(_(u'Please enter a valid code'))
+            return self.cleaned_data['default_department']
+        else:
+            return None

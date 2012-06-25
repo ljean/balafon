@@ -157,10 +157,11 @@ class Entity(TimeStampedModel):
         if attr[:prefix_length] == prefix:
             field_name = attr[prefix_length:]
             try:
-                custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field__name=field_name)
+                custom_field = CustomField.objects.get(model=CustomField.MODEL_ENTITY, name=field_name)
+                custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field=custom_field)
                 return custom_field_value.value
             except EntityCustomFieldValue.DoesNotExist:
-                return u''
+                return u'' #If no value defined: return empty string
         return object.__getattribute__(self, attr)
 
     class Meta:
@@ -249,16 +250,31 @@ class Contact(TimeStampedModel):
             if field_name in ('phone', 'email', 'address', 'address2', 'address3', 'zip_code', 'cedex', 'city'):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
+            else:
+                prefix = "custom_field_"
+                prefix_length = len(prefix)
+                if field_name[:prefix_length] == prefix:
+                    value = getattr(self, field_name)
+                    if not value: #if no value for the custom field
+                        try:
+                            #Try to get a value for a custom field with same name on entity
+                            value = getattr(self.entity, field_name)
+                        except CustomField.DoesNotExist:
+                            #No custom field with same name on entity: returns empty string
+                            pass
+                    return value
         else:
             prefix = "custom_field_"
             prefix_length = len(prefix)
             if attr[:prefix_length] == prefix:
                 field_name = attr[prefix_length:]
                 try:
-                    custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field__name=field_name)
+                    custom_field = CustomField.objects.get(model=CustomField.MODEL_CONTACT, name=field_name)
+                    custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
                 except ContactCustomFieldValue.DoesNotExist:
-                    return u''
+                    return u'' #If no value defined: return empty string
+
         return object.__getattribute__(self, attr)
     
     def get_absolute_url(self):
@@ -421,6 +437,7 @@ class CustomField(models.Model):
     widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
     import_order = models.IntegerField(verbose_name=_(u'import ordering'), default=0)
+    export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.get_model_display(), self.name)

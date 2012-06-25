@@ -2,7 +2,7 @@
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from sanza.Search.forms import QuickSearchForm
-from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity, City
+from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity, City, CustomField
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Context, Template
 from sanza.Search import forms, models
@@ -218,13 +218,19 @@ def export_contacts_as_excel(request):
             #fields = ('get_gender', 'lastname', 'firstname', 'title', 'entity', 'role',
             #    'get_address', 'get_zipcode', 'get_cedex', 'get_city', 'get_mobile', 'get_phone', 'get_email')
             
-            fields = ('id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
-                'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city', 'mobile', 'get_phone', 'get_email')
+            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
+                'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city', 'mobile', 'get_phone', 'get_email']
             
             #header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
             #create a map of verbose name for each field
             field_dict = dict([(f.name, _(f.verbose_name).capitalize()) for f in Contact._meta.fields])
+            
+            #Add custom fields
+            for cf in CustomField.objects.filter(model=CustomField.MODEL_CONTACT).filter(export_order__gt=0).order_by('export_order'):
+                fields.append('get_custom_field_'+cf.name)
+                field_dict['custom_field_'+cf.name] = cf.label
+            
             for i, f in enumerate(fields):
                 if f[:4] == 'get_':
                     f = f[4:]
