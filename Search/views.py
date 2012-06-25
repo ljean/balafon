@@ -30,9 +30,9 @@ def quick_search(request):
         if form.is_valid():
             text = form.cleaned_data["text"]
             
-            entities_by_name = Entity.objects.filter(name__icontains=text)
+            entities_by_name = Entity.objects.filter(name__icontains=text).order_by('name')
             
-            contacts_by_name = Contact.objects.filter(lastname__icontains=text)
+            contacts_by_name = Contact.objects.filter(lastname__icontains=text).order_by('lastname', 'firstname')
             
             groups_by_name = Group.objects.filter(name__icontains=text)
             
@@ -210,6 +210,7 @@ def export_contacts_as_excel(request):
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             contacts = search_form.get_contacts()
+            contacts.sort(key=lambda x: u"{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
             
             #create the excel document
             wb = xlwt.Workbook()

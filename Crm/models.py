@@ -134,7 +134,7 @@ class Entity(TimeStampedModel):
         return self.get_full_address()
     
     def main_contacts(self):
-        return [c for c in self.contact_set.filter(main_contact=True)]
+        return [c for c in self.contact_set.filter(main_contact=True).order_by("lastname", "firstname")]
     
     def last_action(self):
         try:
