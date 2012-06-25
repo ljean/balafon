@@ -2,7 +2,7 @@
 
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from sanza.Search.forms import QuickSearchForm
-from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity
+from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity, City
 from django.shortcuts import render_to_response
 from django.template import RequestContext, Context, Template
 from sanza.Search import forms, models
@@ -21,6 +21,7 @@ from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, G
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 
 @login_required
 def quick_search(request):
@@ -35,9 +36,22 @@ def quick_search(request):
             
             groups_by_name = Group.objects.filter(name__icontains=text)
             
+            cities_by_name = []
+            for city in City.objects.filter(name__icontains=text):
+                contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
+                if contacts_and_entities:
+                    setattr(city, 'contacts_and_entities', contacts_and_entities)
+                    cities_by_name.append(city)
+            
+            
+            contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
+            contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
+            
             entities_title = _(u'Entities')
             contacts_title = _(u'Contacts')
             groups_title = _(u'Groups')
+            cities_title = _(u'Contacts and entities by city')
+            phones_title = _(u'Contacts and entities by phone number')
             
             return render_to_response(
                 'Search/quicksearch_results.html',

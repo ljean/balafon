@@ -1,0 +1,21 @@
+{% extends "_section.html" %}
+{% load i18n sanza_utils %}
+
+{% block section_title %}{{ name.capitalize }}{% endblock %}
+  
+{% block section_data %}
+<table>
+  <tr><th>{% trans "City" %}</th><th>{% trans "Contacts and entities" %}</th>
+  </tr>
+  {% for city in cities %}
+  <tr>
+    <td>{{city.name}}</td>
+    <td>
+      {% for x in city.contacts_and_entities %}
+        <a href="{{ x.get_absolute_url }}">{{x}}</a><br \>
+      {% endfor %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
