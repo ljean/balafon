@@ -214,10 +214,7 @@ def export_contacts_as_excel(request):
             #create the excel document
             wb = xlwt.Workbook()
             ws = wb.add_sheet('sanza')
-            
-            #fields = ('get_gender', 'lastname', 'firstname', 'title', 'entity', 'role',
-            #    'get_address', 'get_zipcode', 'get_cedex', 'get_city', 'get_mobile', 'get_phone', 'get_email')
-            
+
             fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city', 'mobile', 'get_phone', 'get_email']
             
