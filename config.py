@@ -7,6 +7,7 @@ SEARCH_FORMS = [
         _(u'Entity'),
         [
             search_forms.EntityNameSearchForm,
+            search_forms.EntityNameStartsWithSearchForm,
             search_forms.TypeSearchForm,
             search_forms.RelationshipDateForm,
             search_forms.GroupSearchForm,

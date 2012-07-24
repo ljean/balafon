@@ -24,6 +24,20 @@ class EntityNameSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__name__icontains': self._value}
 
+class EntityNameStartsWithSearchForm(SearchFieldForm):
+    _name = 'entity_name_sw'
+    _label = _(u'Entity name starts with')
+    
+    def __init__(self, *args, **kwargs):
+        super(EntityNameStartsWithSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter the beginning of the name of the searched entities')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'entity__name__istartswith': self._value}
+
+
 class CitySearchForm(SearchFieldForm):
     _name = 'city'
     _label = _(u'City')
