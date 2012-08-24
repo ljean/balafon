@@ -75,7 +75,7 @@ def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
         #yield [codecs.decode(cell, 'iso-8859-15') for cell in row] #'cp1252'
         yield [codecs.decode(cell, encoding) for cell in row]
 
-def resolve_city(city_name, zip_code, country, default_department):
+def resolve_city(city_name, zip_code, country='', default_department=''):
     default_country = get_default_country()
     foreign_city = bool(country) and (country!=default_country)
     if foreign_city:

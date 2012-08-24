@@ -384,12 +384,21 @@ def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     actions = contact.action_set.all()
     same_as = None
+    
+    opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
+    
     if contact.same_as:
         same_as = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
     
     return render_to_response(
         'Crm/view_contact.html',
-        {'contact': contact, 'actions': actions, 'same_as': same_as, 'entity': contact.entity},
+        {
+            'contact': contact,
+            'actions': actions,
+            'opportunities': opportunities,
+            'same_as': same_as,
+            'entity': contact.entity
+        },
         context_instance=RequestContext(request)
     )
 
