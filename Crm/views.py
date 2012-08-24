@@ -846,6 +846,8 @@ def read_contacts(reader, fields):
                 'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
             if entity in email_providers:
                 entity = name
+            else:
+                entity = u'{0} {1}'.format(c['lastname'], c['firstname']).upper()
             if not c['entity']:
                 c['entity'] = entity
         else:
