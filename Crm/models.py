@@ -366,7 +366,7 @@ class Opportunity(TimeStampedModel):
     detail = models.TextField(_('detail'), blank=True, default='')
     probability = models.IntegerField(_('probability'), default=PROBABILITY_MEDIUM,
         choices=PROBABILITY_CHOICES)
-    amount = models.PositiveIntegerField(_(u'amount'), default=0)
+    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
