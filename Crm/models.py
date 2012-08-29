@@ -503,6 +503,7 @@ class ContactsImport(TimeStampedModel):
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
         help_text=_(u'The created entities will be added to the selected groups.'))
+    entity_name_from_email = models.BooleanField(verbose_name=_(u'generate entity name from email address'), default=True)
 
     def __unicode__(self):
         return self.name
