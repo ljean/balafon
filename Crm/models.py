@@ -440,13 +440,13 @@ class CustomField(models.Model):
     export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
     
     def __unicode__(self):
-        return _(u"{0}:{1}").format(self.get_model_display(), self.name)
+        return _(u"{0}:{1}").format(self.model_name(), self.name)
     
     def model_name(self):
         if self.model == self.MODEL_ENTITY:
-            return 'entity'
+            return u'entity'
         else:
-            return 'contact'
+            return u'contact'
     
     class Meta:
         verbose_name = _(u'custom field')

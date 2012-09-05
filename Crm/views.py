@@ -14,7 +14,7 @@ import json, re
 from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
 from django.conf import settings
-import os.path, re
+import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
     
 @login_required
@@ -887,10 +887,7 @@ def read_contacts(reader, fields, extract_from_email):
     total_contacts = k
     return contacts, total_contacts
     
-
-@login_required
-def confirm_contacts_import(request, import_id):
-    
+def get_imports_fields():
     fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
         'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
@@ -911,6 +908,24 @@ def confirm_contacts_import(request, import_id):
             custom_fields.append(cf)
         except models.CustomField.DoesNotExist:
             custom_fields.append(None)
+    
+    return fields, custom_fields
+    
+@login_required
+def contacts_import_template(request):
+    fields, custom_fields = get_imports_fields()
+    
+    cols = fields[:len(fields)-len(custom_fields)] + custom_fields
+    
+    template_file = u";".join([u'"{0}"'.format(unicode(col)) for col in cols])+u"\n"
+    
+    return HttpResponse(template_file, mimetype="text/csv", )
+
+
+@login_required
+def confirm_contacts_import(request, import_id):
+    
+    fields, custom_fields = get_imports_fields()
     
     cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
     
