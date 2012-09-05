@@ -490,6 +490,11 @@ class ContactsImport(TimeStampedModel):
         ('cp1252', 'cp1252')
     )
     
+    SEPARATORS = (
+        (',', _(u'Coma')),
+        (';', _(u'Semi-colon'))
+    )
+    
     def _get_import_dir(self, filename):
         return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
@@ -499,6 +504,7 @@ class ContactsImport(TimeStampedModel):
         help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     encoding = models.CharField(max_length=50, default='iso-8859-15', choices=ENCODINGS)
+    separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,

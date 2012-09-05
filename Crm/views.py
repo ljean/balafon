@@ -927,6 +927,7 @@ def confirm_contacts_import(request, import_id):
     
     fields, custom_fields = get_imports_fields()
     
+    custom_fields_count = len(custom_fields)
     cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
     
     contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
@@ -934,7 +935,8 @@ def confirm_contacts_import(request, import_id):
         form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
         
         if form.is_valid():
-            reader = unicode_csv_reader(contacts_import.import_file, form.cleaned_data['encoding'])
+            
+            reader = unicode_csv_reader(contacts_import.import_file, form.cleaned_data['encoding'], delimiter=form.cleaned_data['separator'])
             contacts, total_contacts = read_contacts(reader, fields, form.cleaned_data['entity_name_from_email'])
             default_department = form.cleaned_data['default_department']
             contacts_import = form.save()
@@ -1017,10 +1019,13 @@ def confirm_contacts_import(request, import_id):
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
         else:
-            reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
+            
+            print '#######', contacts_import.separator, type(contacts_import.separator)
+            
+            reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator)
             contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
     else:
-        reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
+        reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator)
         contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
         form = forms.ContactsImportConfirmForm(instance=contacts_import)
     

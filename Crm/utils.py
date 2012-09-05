@@ -70,6 +70,8 @@ def get_users(self):
 from sanza.Crm.settings import get_default_country
 import csv, codecs
 def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
+    if kwargs.has_key('delimiter'):
+        kwargs['delimiter'] = str(kwargs['delimiter'])
     csv_reader = csv.reader(the_file, dialect=dialect, **kwargs)
     for row in csv_reader:
         #yield [codecs.decode(cell, 'iso-8859-15') for cell in row] #'cp1252'

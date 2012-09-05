@@ -434,6 +434,11 @@ class ContactsImportForm(forms.ModelForm):
         }
         self.fields['groups'].help_text = ''
         
+    def clean_separator(self):
+        if len(self.cleaned_data["separator"]) != 1:
+            raise ValidationError(_(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
+        return self.cleaned_data["separator"]
+        
         
 class ContactsImportConfirmForm(ContactsImportForm):
     default_department = forms.ChoiceField(required=False, label=_(u'Default department'),
