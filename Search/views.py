@@ -213,7 +213,7 @@ def export_contacts_as_excel(request):
             field_dict = dict([(f.name, _(f.verbose_name).capitalize()) for f in Contact._meta.fields])
             
             #Add custom fields
-            for cf in CustomField.objects.filter(model=CustomField.MODEL_CONTACT).filter(export_order__gt=0).order_by('export_order'):
+            for cf in CustomField.objects.filter(export_order__gt=0).order_by('export_order'):
                 fields.append('get_custom_field_'+cf.name)
                 field_dict['custom_field_'+cf.name] = cf.label
             
