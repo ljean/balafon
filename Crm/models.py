@@ -126,17 +126,15 @@ class Entity(TimeStampedModel):
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
             return u' '.join([f for f in fields if f])
         return u''
-    
+
+    def get_phones(self):
+        return [self.phone]
+        
     def get_display_address(self):
         return self.get_full_address()
-        #if self.city:
-        #    parent = self.city.parent
-        #    name, code = parent.name, parent.code
-        #    addr += u'({0}{2}{1})'.format(name, code, u' ' if len(code) else u'')
-        #return addr
     
     def main_contacts(self):
-        return [c for c in self.contact_set.filter(main_contact=True)]
+        return [c for c in self.contact_set.filter(main_contact=True).order_by("lastname", "firstname")]
     
     def last_action(self):
         try:
@@ -249,7 +247,7 @@ class Contact(TimeStampedModel):
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
             field_name = attr[4:]
-            if field_name in ('phone', 'email', 'address', 'zip_code', 'cedex', 'city'):
+            if field_name in ('phone', 'email', 'address', 'address2', 'address3', 'zip_code', 'cedex', 'city'):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
             else:

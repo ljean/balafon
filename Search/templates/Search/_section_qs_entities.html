@@ -10,7 +10,7 @@
   {% for e in entities %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
-    <td>{{e.contact_set.all|seq_to_br|default:"&nbsp;"}}</td>
+    <td>{{e.main_contacts|seq_to_br|default:"&nbsp;"}}</td>
     <td>{{e.city|default:"&nbsp;"}}</td>
   </tr>
   {% endfor %}
