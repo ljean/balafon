@@ -272,7 +272,7 @@ class Contact(TimeStampedModel):
                     custom_field = CustomField.objects.get(model=CustomField.MODEL_CONTACT, name=field_name)
                     custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
-                except ContactCustomFieldValue.DoesNotExist:
+                except (CustomField.DoesNotExist, ContactCustomFieldValue.DoesNotExist):
                     return u'' #If no value defined: return empty string
 
         return object.__getattribute__(self, attr)
