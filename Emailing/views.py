@@ -41,7 +41,7 @@ def delete_emailing(request, emailing_id):
         return HttpResponseRedirect(reverse('emailing_newsletter_list'))
 
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u"Are you sure to delete '{0.newsletter.subject}' {1}?").format(
                 emailing, emailing.get_status_display()),
@@ -96,7 +96,7 @@ def confirm_send_mail(request, emailing_id):
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Is this newsletter ready to be sent?'),
             'action_url': reverse("emailing_confirm_send_mail", args=[emailing_id]),
@@ -120,7 +120,7 @@ def cancel_send_mail(request, emailing_id):
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Cancel the sending?'),
             'action_url': reverse("emailing_cancel_send_mail", args=[emailing_id]),

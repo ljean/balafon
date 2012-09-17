@@ -295,7 +295,7 @@ def create_action_for_contacts(request):
                         )
                     else:
                         return render_to_response(
-                            'message_dialog.html',
+                            'sanza/message_dialog.html',
                             {
                                 'title': _('Create action for contacts'),
                                 'message': _(u'The search results contains no contacts')
@@ -347,7 +347,7 @@ def create_opportunity_for_contacts(request):
                         )
                     else:
                         return render_to_response(
-                            'message_dialog.html',
+                            'sanza/message_dialog.html',
                             {
                                 'title': _('Create opportunity for contacts'),
                                 'message': _(u'The search results contains no contacts')
@@ -397,7 +397,7 @@ def add_contacts_to_group(request):
                         )
                     else:
                         return render_to_response(
-                            'message_dialog.html',
+                            'sanza/message_dialog.html',
                             {
                                 'title': _('Add contacts to group'),
                                 'message': _(u'The search results contains no contacts')
@@ -456,7 +456,7 @@ def contacts_admin(request):
                         )
                     else:
                         return render_to_response(
-                            'message_dialog.html',
+                            'sanza/message_dialog.html',
                             {
                                 'title': _('Contacts admin'),
                                 'message': _(u'The search results contains no contacts')

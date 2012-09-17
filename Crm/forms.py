@@ -45,9 +45,14 @@ class EditGroupForm(forms.ModelForm):
         }
     
     class Media:
-        css = {
-            'all': (settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',)
-        }
+        try:
+            css = {
+                'all': (settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',)
+            }
+        except AttributeError:
+            css = {
+                'all': (settings.STATIC_URL+'admin/css/widgets.css',)
+            }
         
     def clean_name(self):
         name = self.cleaned_data['name']
