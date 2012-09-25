@@ -12,7 +12,7 @@ from sanza.Crm.forms import ModelFormWithCity
 from datetime import datetime
 from django.template import Context
 from django.template.loader import get_template
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -149,8 +149,12 @@ class SubscribeForm(ModelFormWithCity):
             t = get_template('Emailing/subscribe_notification_email.txt')
             content = t.render(Context(data))
             
-            from_email = contact.email or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
-            send_mail(_(u'New contact'), content, contact.email, [notification_email], fail_silently=True)
+            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
+            
+            email = EmailMessage(
+                _(u'New contact'), content, from_email,
+                [notification_email], headers = {'Reply-To': 'contact.email'})
+            email.send()
             
         return contact
     
