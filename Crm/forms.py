@@ -78,6 +78,8 @@ class ModelFormWithCity(forms.ModelForm):
         
         if len(args):
             self.country_id = int(args[0]["country"])
+            
+        self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         
         self.fields['country'].choices = [(0, '')]+[(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
         try:

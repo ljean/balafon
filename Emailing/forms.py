@@ -7,7 +7,12 @@ from django.conf import settings
 from coop_cms.models import Newsletter
 from django.core.exceptions import ValidationError
 from coop_cms.settings import get_newsletter_templates
-from sanza.Crm.models import Group, Contact, Entity, EntityType
+from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
+from sanza.Crm.forms import ModelFormWithCity
+from datetime import datetime
+from django.template import Context
+from django.template.loader import get_template
+from django.core.mail import send_mail
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -48,22 +53,33 @@ class NewNewsletterForm(forms.Form):
     template = forms.ChoiceField(label=_(u"Template"), choices = get_newsletter_templates(None, None))
                         
 
-class SubscribeForm(forms.ModelForm):
+class SubscribeForm(ModelFormWithCity):
     class Meta:
         model = Contact
-        fields=('gender', 'firstname', 'lastname', 'phone', 'mobile', 'email', 'accept_newsletter', 'notes')
+        fields=('gender', 'firstname', 'lastname',
+            'phone', 'mobile', 'email', 'city', 'accept_newsletter', 'notes', 'address',
+            'address2', 'address3', 'zip_code',)
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'72'}),
+            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
+            'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
+            'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
+            'email': forms.TextInput(attrs={'placeholder': _(u'Email')}),
         }
         
     entity = forms.CharField(required=False)
-    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple())
+    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='')
+    action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='')
     
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
         
         self.fields['groups'].choices = [
             (g.id, g.name) for g in Group.objects.filter(subscribe_form=True)
+        ]
+        
+        self.fields['action_types'].choices = [
+            (at.id, at.name) for at in ActionType.objects.filter(subscribe_form=True)
         ]
         
     def clean_entity(self):
@@ -89,6 +105,13 @@ class SubscribeForm(forms.ModelForm):
         except Group.DoesNotExist:
             raise ValidationError(_(u"Invalid group"))
         return groups
+    
+    def clean_action_types(self):
+        try:
+            action_types = [ActionType.objects.get(id=at_id) for at_id in self.cleaned_data['action_types']]
+        except ActionType.DoesNotExist:
+            raise ValidationError(_(u"Invalid action type"))
+        return action_types
         
     def save(self):
         contact = super(SubscribeForm, self).save(commit=False)
@@ -102,6 +125,33 @@ class SubscribeForm(forms.ModelForm):
             contact.entity.group_set.add(g)
         contact.entity.save()
         
+        action_types = self.cleaned_data['action_types']
+        actions = []
+        for at in action_types:
+            action = Action.objects.create(
+                subject = _(u"Contact"),
+                type = at,
+                planned_date = datetime.now(),
+                entity = contact.entity,
+                contact = contact,
+            )
+            actions.append(action)
+            
+        #send an email
+        notification_email = getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', '')
+        if notification_email:
+            data = {
+                'contact': contact,
+                'groups': contact.entity.group_set.all(),
+                'actions': actions,
+                'site': settings.COOP_CMS_SITE_PREFIX,
+            }
+            t = get_template('Emailing/subscribe_notification_email.txt')
+            content = t.render(Context(data))
+            
+            from_email = contact.email or getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+            send_mail(_(u'New contact'), content, contact.email, [notification_email], fail_silently=True)
+            
         return contact
     
     

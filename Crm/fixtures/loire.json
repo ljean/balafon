@@ -1,5 +1,13 @@
 [
  {
+  "pk": 4, 
+  "model": "Crm.zonetype", 
+  "fields": {
+   "type": "canton", 
+   "name": "Canton"
+  }
+ }, 
+ {
   "pk": 201, 
   "model": "Crm.zone", 
   "fields": {

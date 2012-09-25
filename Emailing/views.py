@@ -17,6 +17,7 @@ from coop_cms.models import Newsletter
 from sanza.Emailing.utils import get_emailing_context
 from django.template.loader import get_template
 from django.conf import settings
+from django.utils.importlib import import_module
 
 @login_required
 def newsletter_list(request):
@@ -203,13 +204,21 @@ def view_emailing_online(request, emailing_id, contact_uuid):
         
 
 def subscribe_newsletter(request):
+    try:
+        form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
+        module_name, class_name = form_name.rsplit('.', 1)
+        module = import_module(module_name)
+        SubscribeForm = getattr(module, class_name)
+    except AttributeError:
+        SubscribeForm = forms.SubscribeForm
+    
     if request.method == "POST":
-        form = forms.SubscribeForm(request.POST)
+        form = SubscribeForm(request.POST, request.FILES)
         if form.is_valid():
             contact = form.save()
             return HttpResponseRedirect(reverse('emailing_subscribe_done', args=[contact.uuid]))
     else:
-        form = forms.SubscribeForm()
+        form = SubscribeForm()
         
     context_dict = {
         'form': form,

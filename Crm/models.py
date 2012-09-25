@@ -381,6 +381,9 @@ class Opportunity(TimeStampedModel):
         verbose_name_plural = _(u'opportunities')
 
 class ActionType(NamedElement):
+    
+    subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This action type will be proposed on the public subscribe form'))
 
     class Meta:
         verbose_name = _(u'action type')
