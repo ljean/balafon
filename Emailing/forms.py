@@ -153,7 +153,7 @@ class SubscribeForm(ModelFormWithCity):
             
             email = EmailMessage(
                 _(u'New contact'), content, from_email,
-                [notification_email], headers = {'Reply-To': 'contact.email'})
+                [notification_email], headers = {'Reply-To': contact.email})
             email.send()
             
         return contact
