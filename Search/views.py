@@ -141,7 +141,9 @@ def mailto_contacts(request, bcc):
             emails = search_form.get_contacts_emails()
             if emails:
                 if len(emails)>nb_limit:
-                    return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+                    #conf49 : La poste required only ' ' as separator
+                    #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+                    return HttpResponse(', '.join(emails), mimetype='text/plain')
                 else:
                     mailto = u'mailto:'
                     if int(bcc): mailto += '?bcc='
