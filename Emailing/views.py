@@ -215,7 +215,7 @@ def subscribe_newsletter(request):
     if request.method == "POST":
         form = SubscribeForm(request.POST, request.FILES)
         if form.is_valid():
-            contact = form.save()
+            contact = form.save(request)
             return HttpResponseRedirect(reverse('emailing_subscribe_done', args=[contact.uuid]))
     else:
         form = SubscribeForm()

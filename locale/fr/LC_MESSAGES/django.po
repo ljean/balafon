@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-25 22:01+0200\n"
+"POT-Creation-Date: 2012-10-03 10:09+0200\n"
 "PO-Revision-Date: 2012-05-25 09:36+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: .\config.py:7 .\Crm\forms.py:324 .\Crm\models.py:433
+#: .\config.py:7 .\Crm\forms.py:327 .\Crm\models.py:433
 #: .\Crm\templates\Crm\_section_actions.html.py:24
 #: .\Crm\templates\Crm\_section_contacts.html.py:9
 #: .\Crm\templates\Crm\_section_opportunities.html.py:18
@@ -89,91 +89,92 @@ msgstr "entités"
 msgid "Country"
 msgstr "Pays"
 
-#: .\Crm\forms.py:82 .\Crm\forms.py:141 .\Crm\forms.py:154
-#: .\Crm\search_forms.py:35
+#: .\Crm\forms.py:82 .\Crm\forms.py:144 .\Crm\forms.py:157
+#: .\Crm\search_forms.py:35 .\Emailing\forms.py:60
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
-#: .\Crm\forms.py:128
+#: .\Crm\forms.py:131
 msgid "You must enter a valid zip code for selecting a new city"
-msgstr "Vous devez entrer un code postal valide pour créer une nouvelle ville"
+msgstr ""
+"Veuillez entrer un code postal valide ou au minimum le numéro de département"
 
-#: .\Crm\forms.py:140 .\Crm\forms.py:153 .\Crm\search_forms.py:29
-#: .\Crm\templates\Crm\_section_all_entities.html.py:13
+#: .\Crm\forms.py:143 .\Crm\forms.py:156 .\Crm\search_forms.py:29
+#: .\Crm\templates\Crm\_section_all_entities.html.py:13 .\Emailing\forms.py:59
 #: .\Search\templates\Search\_section_qs_cities.html.py:8
 #: .\Search\templates\Search\_section_qs_contacts.html.py:9
 #: .\Search\templates\Search\_section_qs_entities.html.py:8
 msgid "City"
 msgstr "Ville"
 
-#: .\Crm\forms.py:161 .\Crm\forms.py:175
+#: .\Crm\forms.py:164 .\Crm\forms.py:178
 msgid "enter notes about the contact"
 msgstr "Ajouter une note sur ce contact"
 
-#: .\Crm\forms.py:163 .\Crm\forms.py:177
+#: .\Crm\forms.py:166 .\Crm\forms.py:180
 msgid "Select roles"
 msgstr "Sélectionnez les rôles de ce contact"
 
-#: .\Crm\forms.py:196 .\Crm\models.py:405
+#: .\Crm\forms.py:199 .\Crm\models.py:405
 msgid "planned date"
 msgstr "date prévue"
 
-#: .\Crm\forms.py:197
+#: .\Crm\forms.py:200
 msgid "planned time"
 msgstr "heure prévue"
 
-#: .\Crm\forms.py:210
+#: .\Crm\forms.py:213
 msgid "Enter the name of an opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: .\Crm\forms.py:212 .\Crm\forms.py:311
+#: .\Crm\forms.py:215 .\Crm\forms.py:314
 msgid "enter details"
 msgstr "plus de détails"
 
-#: .\Crm\forms.py:295
+#: .\Crm\forms.py:298
 msgid "Select groups"
 msgstr "Sélectionnez les groupes"
 
-#: .\Crm\forms.py:329
+#: .\Crm\forms.py:332
 msgid "Enter the name of an entity"
 msgstr "Entrez le nom d'une entité"
 
-#: .\Crm\forms.py:336
+#: .\Crm\forms.py:339
 msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
-#: .\Crm\forms.py:339 .\Crm\models.py:434
-#: .\Crm\templates\Crm\_section_actions.html.py:27 .\Emailing\forms.py:132
+#: .\Crm\forms.py:342 .\Crm\models.py:434
+#: .\Crm\templates\Crm\_section_actions.html.py:27 .\Emailing\forms.py:144
 #: .\Emailing\templates\Emailing\_section_contacts.html.py:13
 #: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:3
 msgid "Contact"
 msgstr "Contact"
 
-#: .\Crm\forms.py:354
+#: .\Crm\forms.py:357
 msgid "Invalid contact"
 msgstr "Contact invalide"
 
-#: .\Crm\forms.py:357
+#: .\Crm\forms.py:360
 msgid "Contact does not exist"
 msgstr "Le contact n'existe pas"
 
-#: .\Crm\forms.py:366
+#: .\Crm\forms.py:369
 msgid "give details bout the action"
 msgstr "plus de détail à propos de cette action"
 
-#: .\Crm\forms.py:439
+#: .\Crm\forms.py:442
 msgid "The created entities will be added to the selected groups"
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés"
 
-#: .\Crm\forms.py:446
+#: .\Crm\forms.py:449
 msgid "Default department"
 msgstr "Département par défaut"
 
-#: .\Crm\forms.py:448
+#: .\Crm\forms.py:451
 msgid "The city in red will be created with this department as parent"
 msgstr "Les villes en rouge seront crées avec ce département comme parent"
 
-#: .\Crm\forms.py:457
+#: .\Crm\forms.py:460
 msgid "Please enter a valid code"
 msgstr "Veuillez entrer un code valide"
 
@@ -277,7 +278,7 @@ msgstr "adresse 2"
 msgid "address 3"
 msgstr "adresse 3"
 
-#: .\Crm\models.py:102 .\Crm\models.py:223
+#: .\Crm\models.py:102 .\Crm\models.py:223 .\Emailing\forms.py:74
 msgid "zip code"
 msgstr "code postal"
 
@@ -794,7 +795,7 @@ msgstr "Etes-vous sur de supprimer l'action \"{0}\"?"
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
-#: .\Crm\views.py:829 .\Emailing\forms.py:97
+#: .\Crm\views.py:829 .\Emailing\forms.py:105
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -850,8 +851,8 @@ msgstr "Actions avec"
 msgid "Actions to do in the next %(days)s days"
 msgstr "Actions à faire dans les %(days)s prochains jours"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:23 .\Emailing\forms.py:23
-#: .\Emailing\forms.py:51
+#: .\Crm\templates\Crm\_section_actions.html.py:23 .\Emailing\forms.py:24
+#: .\Emailing\forms.py:52
 msgid "Subject"
 msgstr "Sujet"
 
@@ -931,7 +932,7 @@ msgid "All"
 msgstr "Tous"
 
 #: .\Crm\templates\Crm\_section_contacts.html.py:10
-#: .\Crm\templates\Crm\_section_same_as.html.py:12 .\Emailing\forms.py:66
+#: .\Crm\templates\Crm\_section_same_as.html.py:12 .\Emailing\forms.py:72
 #: .\Search\templates\Search\_section_qs_contacts.html.py:9
 msgid "Phone"
 msgstr "Téléphone"
@@ -939,7 +940,7 @@ msgstr "Téléphone"
 #: .\Crm\templates\Crm\_section_contacts.html.py:10
 #: .\Crm\templates\Crm\_section_same_as.html.py:13
 #: .\Crm\templates\Crm\confirm_contacts_import.html.py:65
-#: .\Emailing\forms.py:67
+#: .\Emailing\forms.py:73
 #: .\Search\templates\Search\_section_qs_contacts.html.py:9
 msgid "Email"
 msgstr "Email"
@@ -1114,12 +1115,12 @@ msgid "Gender"
 msgstr "civilité"
 
 #: .\Crm\templates\Crm\confirm_contacts_import.html.py:64
-#: .\Emailing\forms.py:64
+#: .\Emailing\forms.py:70
 msgid "Lastname"
 msgstr "Nom"
 
 #: .\Crm\templates\Crm\confirm_contacts_import.html.py:65
-#: .\Emailing\forms.py:65
+#: .\Emailing\forms.py:71
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -1258,47 +1259,55 @@ msgstr "Sélectionner un contact"
 msgid "Back to newsletters"
 msgstr "Retour aux newsletters"
 
-#: .\Emailing\forms.py:18
+#: .\Emailing\forms.py:19
 msgid "Reason"
 msgstr "Raison"
 
-#: .\Emailing\forms.py:22
+#: .\Emailing\forms.py:23
 #: .\Emailing\templates\Emailing\_section_newsletters.html.py:22
 msgid "Newsletter"
 msgstr "Newsletter"
 
-#: .\Emailing\forms.py:24 .\Emailing\forms.py:52
+#: .\Emailing\forms.py:25 .\Emailing\forms.py:53
 msgid "Subject of the newsletter"
 msgstr "Sujet de la newsletter"
 
-#: .\Emailing\forms.py:40
+#: .\Emailing\forms.py:41
 msgid "-- New --"
 msgstr "-- Nouveau --"
 
-#: .\Emailing\forms.py:47
+#: .\Emailing\forms.py:48
 msgid "Please enter a subject for the newsletter"
 msgstr "Veuillez entrer le sujet de la newsletter"
 
-#: .\Emailing\forms.py:53
+#: .\Emailing\forms.py:54
 msgid "Template"
 msgstr "Modèle"
 
-#: .\Emailing\forms.py:63
+#: .\Emailing\forms.py:69
 #: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:21
 msgid "Comments"
 msgstr "Commentaires"
 
-#: .\Emailing\forms.py:106
+#: .\Emailing\forms.py:114
 msgid "Invalid group"
 msgstr "Groupe invalide"
 
-#: .\Emailing\forms.py:113
+#: .\Emailing\forms.py:121
 msgid "Invalid action type"
 msgstr "Type d'action invalide"
 
-#: .\Emailing\forms.py:155
+#: .\Emailing\forms.py:167
 msgid "New contact"
 msgstr "Nouveau contact"
+
+#: .\Emailing\forms.py:173
+msgid "The message have been sent"
+msgstr "Votre meassage a bien été envoyé"
+
+#: .\Emailing\forms.py:177
+msgid "The message couldn't be send."
+msgstr "Votre message n'a pas pu être envoyé"
 
 #: .\Emailing\models.py:30
 msgid "Edition in progress"
@@ -1590,7 +1599,7 @@ msgstr "Recherche rapide"
 
 #: .\Search\forms.py:84
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Sélectionnez un choix valide. Ce choix n'ext pas disponible."
+msgstr "Sélectionnez un choix valide. Ce choix n'est pas disponible."
 
 #: .\Search\forms.py:110
 msgid "Enter a name and click save."

@@ -13,6 +13,8 @@ from datetime import datetime
 from django.template import Context
 from django.template.loader import get_template
 from django.core.mail import send_mail, EmailMessage
+from sanza.Crm.widgets import CityAutoComplete
+from django.contrib import messages
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -54,17 +56,24 @@ class NewNewsletterForm(forms.Form):
                         
 
 class SubscribeForm(ModelFormWithCity):
+    city = forms.CharField(
+        required = False, label=_(u'City'),   
+        widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+    )
+    
     class Meta:
         model = Contact
         fields=('gender', 'firstname', 'lastname',
-            'phone', 'mobile', 'email', 'city', 'accept_newsletter', 'notes', 'address',
-            'address2', 'address3', 'zip_code',)
+            'phone', 'mobile', 'email', 'accept_newsletter', 'notes', 'address',
+            'address2', 'address3', 'zip_code')
         widgets = {
-            'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'72'}),
+            'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
             'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
             'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
             'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
             'email': forms.TextInput(attrs={'placeholder': _(u'Email')}),
+            'zip_code': forms.TextInput(attrs={'placeholder': _(u'zip code')}),
+            #'country': forms.HiddenInput(),
         }
         
     entity = forms.CharField(required=False)
@@ -113,12 +122,16 @@ class SubscribeForm(ModelFormWithCity):
             raise ValidationError(_(u"Invalid action type"))
         return action_types
         
-    def save(self):
+    def save(self, request=None):
         contact = super(SubscribeForm, self).save(commit=False)
         contact.entity = self.cleaned_data['entity']
+        contact.city = self.cleaned_data['city']
         contact.save()
         #delete unknown contacts for the current entity
         contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
+        
+        #force also the city on the entity
+        contact.entity.city = contact.city
         
         groups = self.cleaned_data['groups']
         for g in groups:
@@ -154,8 +167,16 @@ class SubscribeForm(ModelFormWithCity):
             email = EmailMessage(
                 _(u'New contact'), content, from_email,
                 [notification_email], headers = {'Reply-To': contact.email})
-            email.send()
-            
+            try:
+                email.send()
+                if request:
+                    messages.add_message(request, messages.SUCCESS,
+                        _(u"The message have been sent"))
+            except Exception, msg:
+                if request:
+                    messages.add_message(request, messages.ERROR,
+                        _(u"The message couldn't be send."))
+                
         return contact
     
-    
+        
