@@ -299,7 +299,8 @@ def get_city_name(request, city):
     except ValueError:
         return HttpResponse(json.dumps({'name': city}), 'application/json')
 
-@login_required
+#subscribe form : no login required
+#@login_required
 def get_cities(request):
     term = request.GET.get('term')
     country_id = int(request.GET.get('country', 0))
