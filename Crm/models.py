@@ -48,8 +48,8 @@ class BaseZone(NamedElement):
         return self.name
 
     def __unicode__(self):
-        if self.parent and self.parent.code:
-            return u"{0} ({1})".format(self.name, self.parent.code)
+        #if self.parent and self.parent.code:
+        #    return u"{0} ({1})".format(self.name, self.parent.code)
         return self.name    
     
     class Meta:
