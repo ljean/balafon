@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "sanza/base.html" %}
 {% load i18n %}
 
 {% block document_content %}
@@ -21,5 +21,5 @@
       {{form.as_ul}}
     </ul>
   </form>
-  {% include "_calendar.html" with field="relationship_date" %}
+  {% include "sanza/_calendar.html" with field="relationship_date" %}
 {% endblock %}

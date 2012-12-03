@@ -56,7 +56,8 @@ class ActionAdmin(admin.ModelAdmin):
 admin.site.register(models.Action, ActionAdmin)
 
 class CustomFieldAdmin(admin.ModelAdmin):
-    list_display = ['name', 'model', 'label', 'widget', 'ordering', 'import_order']
+    list_display = ['name', 'model', 'label', 'widget', 'ordering', 'import_order', 'export_order']
+    list_editable = ['ordering', 'import_order', 'export_order']
     list_filter = ('model', 'widget')
 admin.site.register(models.CustomField, CustomFieldAdmin)
 

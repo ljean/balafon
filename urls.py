@@ -8,7 +8,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'sanza.Crm.views.view_board_panel', name="homepage"),
+    url(r'^crm/$', 'sanza.Crm.views.view_board_panel', name="homepage"),
     (r'^crm/', include('sanza.Crm.urls')),
     (r'^search/', include('sanza.Search.urls')),
     (r'^emailing/', include('sanza.Emailing.urls')),

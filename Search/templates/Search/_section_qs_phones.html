@@ -1,0 +1,16 @@
+{% extends "sanza/_section.html" %}
+{% load i18n sanza_utils %}
+
+{% block section_title %}{{ name.capitalize }}{% endblock %}
+  
+{% block section_data %}
+<table>
+  {% for c in contacts_and_entities %}
+  <tr>
+    <td>
+      <a href="{{ c.get_absolute_url }}">{{c}}</a> : {{ c.get_phones|seq_to_dash }}<br \>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

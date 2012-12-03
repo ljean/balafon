@@ -109,7 +109,7 @@ def remove_entity_from_group(request, group_id, entity_id):
         return HttpResponseRedirect(reverse('crm_view_entity', args=[entity_id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Do you want to remove {0.name} from the {1.name} group?').format(entity, group),
             'action_url': reverse("crm_remove_entity_from_group", args=[group_id, entity_id]),
@@ -166,7 +166,7 @@ def delete_group(request, group_id):
             return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Are you sure to delete the group {0.name}?').format(group),
             'action_url': reverse("crm_delete_group", args=[group_id]),
@@ -282,7 +282,7 @@ def delete_entity(request, entity_id):
             return HttpResponseRedirect(reverse('crm_edit_entity', args=[entity.id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Are you sure to delete {0.name}?').format(entity),
             'action_url': reverse("crm_delete_entity", args=[entity_id]),
@@ -299,7 +299,8 @@ def get_city_name(request, city):
     except ValueError:
         return HttpResponse(json.dumps({'name': city}), 'application/json')
 
-@login_required
+#subscribe form : no login required
+#@login_required
 def get_cities(request):
     term = request.GET.get('term')
     country_id = int(request.GET.get('country', 0))
@@ -450,7 +451,7 @@ def delete_contact(request, contact_id):
             return HttpResponseRedirect(reverse('crm_edit_contact', args=[contact.id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Are you sure to delete the contact "{0}"?').format(contact),
             'action_url': reverse("crm_delete_contact", args=[contact_id]),
@@ -526,7 +527,7 @@ def delete_action(request, action_id):
             return HttpResponseRedirect(reverse('crm_edit_action', args=[action.id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Are you sure to delete the action "{0}"?').format(action),
             'action_url': reverse("crm_delete_action", args=[action_id]),
@@ -644,7 +645,7 @@ def delete_opportunity(request, opportunity_id):
             return HttpResponseRedirect(reverse('crm_edit_opportunity', args=[opportunity.id]))
     
     return render_to_response(
-        'confirmation_dialog.html',
+        'sanza/confirmation_dialog.html',
         {
             'message': _(u'Are you sure to delete the opportunity "{0}"?').format(opportunity),
             'action_url': reverse("crm_delete_opportunity", args=[opportunity_id]),

@@ -51,7 +51,7 @@ class CitySearchForm(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return {'entity__city__id': self._value}
+        return Q(entity__city__id=self._value) | Q(city__id=self._value)
         
 class ZoneSearchForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):

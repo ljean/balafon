@@ -4,7 +4,8 @@
 {% block title %}{% trans "Subscribe" %}{% endblock %}
 
 {% block content %}
-  {% blocktrans %}<h1>Subscribe to the {{my_company}} mailing-list?</h1>{% endblocktrans %}
+  {{ block.super }}
+    
   <form method="post" action="">{% csrf_token %}
     {{form.as_p}}
     <input type="submit" value="{% trans "Ok" %}">

@@ -126,17 +126,15 @@ class Entity(TimeStampedModel):
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
             return u' '.join([f for f in fields if f])
         return u''
-    
+
+    def get_phones(self):
+        return [self.phone]
+        
     def get_display_address(self):
         return self.get_full_address()
-        #if self.city:
-        #    parent = self.city.parent
-        #    name, code = parent.name, parent.code
-        #    addr += u'({0}{2}{1})'.format(name, code, u' ' if len(code) else u'')
-        #return addr
     
     def main_contacts(self):
-        return [c for c in self.contact_set.filter(main_contact=True)]
+        return [c for c in self.contact_set.filter(main_contact=True).order_by("lastname", "firstname")]
     
     def last_action(self):
         try:
@@ -159,10 +157,11 @@ class Entity(TimeStampedModel):
         if attr[:prefix_length] == prefix:
             field_name = attr[prefix_length:]
             try:
-                custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field__name=field_name)
+                custom_field = CustomField.objects.get(model=CustomField.MODEL_ENTITY, name=field_name)
+                custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field=custom_field)
                 return custom_field_value.value
             except EntityCustomFieldValue.DoesNotExist:
-                return u''
+                return u'' #If no value defined: return empty string
         return object.__getattribute__(self, attr)
 
     class Meta:
@@ -248,19 +247,34 @@ class Contact(TimeStampedModel):
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
             field_name = attr[4:]
-            if field_name in ('phone', 'email', 'address', 'zip_code', 'cedex', 'city'):
+            if field_name in ('phone', 'email', 'address', 'address2', 'address3', 'zip_code', 'cedex', 'city'):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
+            else:
+                prefix = "custom_field_"
+                prefix_length = len(prefix)
+                if field_name[:prefix_length] == prefix:
+                    value = getattr(self, field_name)
+                    if not value: #if no value for the custom field
+                        try:
+                            #Try to get a value for a custom field with same name on entity
+                            value = getattr(self.entity, field_name)
+                        except CustomField.DoesNotExist:
+                            #No custom field with same name on entity: returns empty string
+                            pass
+                    return value
         else:
             prefix = "custom_field_"
             prefix_length = len(prefix)
             if attr[:prefix_length] == prefix:
                 field_name = attr[prefix_length:]
                 try:
-                    custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field__name=field_name)
+                    custom_field = CustomField.objects.get(model=CustomField.MODEL_CONTACT, name=field_name)
+                    custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
-                except ContactCustomFieldValue.DoesNotExist:
-                    return u''
+                except (CustomField.DoesNotExist, ContactCustomFieldValue.DoesNotExist):
+                    return u'' #If no value defined: return empty string
+
         return object.__getattribute__(self, attr)
     
     def get_absolute_url(self):
@@ -367,6 +381,9 @@ class Opportunity(TimeStampedModel):
         verbose_name_plural = _(u'opportunities')
 
 class ActionType(NamedElement):
+    
+    subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This action type will be proposed on the public subscribe form'))
 
     class Meta:
         verbose_name = _(u'action type')
@@ -423,6 +440,7 @@ class CustomField(models.Model):
     widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
     import_order = models.IntegerField(verbose_name=_(u'import ordering'), default=0)
+    export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.get_model_display(), self.name)

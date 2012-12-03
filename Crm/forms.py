@@ -45,9 +45,14 @@ class EditGroupForm(forms.ModelForm):
         }
     
     class Media:
-        css = {
-            'all': (settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',)
-        }
+        try:
+            css = {
+                'all': (settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',)
+            }
+        except AttributeError:
+            css = {
+                'all': (settings.STATIC_URL+'admin/css/widgets.css',)
+            }
         
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -73,6 +78,8 @@ class ModelFormWithCity(forms.ModelForm):
         
         if len(args):
             self.country_id = int(args[0]["country"])
+            
+        self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         
         self.fields['country'].choices = [(0, '')]+[(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
         try:
@@ -111,7 +118,10 @@ class ModelFormWithCity(forms.ModelForm):
                     pass
 
                 zip_code = self.cleaned_data['zip_code']
-                country_id = self.cleaned_data.get('country') or self.country_id
+                try:
+                    country_id = int(self.cleaned_data.get('country')) or self.country_id
+                except ValueError:
+                    country_id = 0
                 country = self._get_country(country_id)
                 default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
                 if country != default_country:

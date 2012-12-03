@@ -325,4 +325,39 @@ class CustomFieldTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'class="datepicker"')
         
+    def test_contact_get_custom_field(self):
+        contact = mommy.make_one(models.Contact)
+        
+        cf_c = models.CustomField.objects.create(
+            name = 'id_poste', label = 'Id Poste', model=models.CustomField.MODEL_CONTACT)
+        
+        cf_e = models.CustomField.objects.create(
+            name = 'id_poste', label = 'Id Poste', model=models.CustomField.MODEL_ENTITY)
+        
+        contact1 = mommy.make_one(models.Contact)
+        models.EntityCustomFieldValue.objects.create(custom_field=cf_e, entity=contact1.entity, value='111')
+        
+        contact2 = mommy.make_one(models.Contact)
+        models.ContactCustomFieldValue.objects.create(custom_field=cf_c, contact=contact2, value='222')
+        
+        contact3 = mommy.make_one(models.Contact)
+        models.ContactCustomFieldValue.objects.create(custom_field=cf_c, contact=contact3, value='333')
+        models.EntityCustomFieldValue.objects.create(custom_field=cf_e, entity=contact3.entity, value='444')
+        
+        contact4 = mommy.make_one(models.Contact)
+        
+        self.assertEqual(contact1.get_custom_field_id_poste, '111')
+        self.assertEqual(contact2.get_custom_field_id_poste, '222')
+        self.assertEqual(contact3.get_custom_field_id_poste, '333')
+        self.assertEqual(contact4.get_custom_field_id_poste, '')
+        
+        
+    def test_contact_missing_custom_field(self):
+        contact = mommy.make_one(models.Contact)
+        
+        contact_custom_field_toto = lambda: contact.custom_field_toto
+        self.assertRaises(models.CustomField.DoesNotExist, contact_custom_field_toto)
+        
+        entity_custom_field_toto = lambda: contact.entity.custom_field_toto
+        self.assertRaises(models.CustomField.DoesNotExist, entity_custom_field_toto)
         

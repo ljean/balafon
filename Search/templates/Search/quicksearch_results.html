@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "sanza/base.html" %}
 {% load i18n %}
 
 
@@ -15,6 +15,14 @@
 
 {% if groups_by_name %}    
 {% include "Search/_section_qs_groups.html" with groups=groups_by_name name=groups_title %}
+{% endif %}
+
+{% if cities_by_name %}    
+{% include "Search/_section_qs_cities.html" with cities=cities_by_name name=cities_title %}
+{% endif %}
+
+{% if contacts_by_phone %}    
+{% include "Search/_section_qs_phones.html" with contacts_and_entities=contacts_by_phone name=phone_title %}
 {% endif %}
 
 {% endblock %}
