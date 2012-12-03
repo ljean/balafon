@@ -89,7 +89,7 @@ def confirm_send_mail(request, emailing_id):
         if 'confirm' in request.POST:
             if emailing.status == models.Emailing.STATUS_EDITING:
                 emailing.status = models.Emailing.STATUS_SCHEDULED
-                emailing.scheduling_dt = datetime.now() + timedelta(hours=1)
+                emailing.scheduling_dt = datetime.now() + timedelta(minutes=5)
                 emailing.save()
                 messages.add_message(request, messages.SUCCESS, _(u"The sending has been scheduled"))
             else:
