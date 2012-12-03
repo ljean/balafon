@@ -13,4 +13,5 @@ def jhouston(request):
         return {'jhouston': 
             mark_safe('<script src="{0}jhouston/js/jhouston.js" type="text/javascript"></script>\n'.format(settings.STATIC_URL))
         }
+    return {}
     
