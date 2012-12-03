@@ -48,6 +48,7 @@ class BaseZone(NamedElement):
         return self.name
 
     def __unicode__(self):
+        #Conf49 : No department code in the excel export
         #if self.parent and self.parent.code:
         #    return u"{0} ({1})".format(self.name, self.parent.code)
         return self.name    
@@ -366,7 +367,7 @@ class Opportunity(TimeStampedModel):
     detail = models.TextField(_('detail'), blank=True, default='')
     probability = models.IntegerField(_('probability'), default=PROBABILITY_MEDIUM,
         choices=PROBABILITY_CHOICES)
-    amount = models.PositiveIntegerField(_(u'amount'), default=0)
+    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
@@ -443,13 +444,13 @@ class CustomField(models.Model):
     export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
     
     def __unicode__(self):
-        return _(u"{0}:{1}").format(self.get_model_display(), self.name)
+        return _(u"{0}:{1}").format(self.model_name(), self.name)
     
     def model_name(self):
         if self.model == self.MODEL_ENTITY:
-            return 'entity'
+            return u'entity'
         else:
-            return 'contact'
+            return u'contact'
     
     class Meta:
         verbose_name = _(u'custom field')
@@ -493,6 +494,11 @@ class ContactsImport(TimeStampedModel):
         ('cp1252', 'cp1252')
     )
     
+    SEPARATORS = (
+        (',', _(u'Coma')),
+        (';', _(u'Semi-colon'))
+    )
+    
     def _get_import_dir(self, filename):
         return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
@@ -502,10 +508,12 @@ class ContactsImport(TimeStampedModel):
         help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     encoding = models.CharField(max_length=50, default='iso-8859-15', choices=ENCODINGS)
+    separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
         help_text=_(u'The created entities will be added to the selected groups.'))
+    entity_name_from_email = models.BooleanField(verbose_name=_(u'generate entity name from email address'), default=True)
 
     def __unicode__(self):
         return self.name

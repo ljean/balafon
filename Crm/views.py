@@ -14,7 +14,7 @@ import json, re
 from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
 from django.conf import settings
-import os.path, re
+import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
     
 @login_required
@@ -29,7 +29,7 @@ def view_entity(request, entity_id):
         contacts = contacts.filter(has_left=False)
     actions = models.Action.objects.filter(Q(entity=entity),
         Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "priority")
-    opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("status__ordering", "ended")
+    opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("type__name", "status__ordering", "start_date", "end_date", "ended")
     show_all_button = opportunities.count() > 10
     if show_all_button:
         opportunities = opportunities[:10]
@@ -385,12 +385,23 @@ def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     actions = contact.action_set.all()
     same_as = None
+    
+    opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
+    opportunities.sort(key=lambda x: u"{0}{1}{2}{3}{4}".format(x.type.id, x.status.ordering, x.start_date, x.end_date, x.ended))
+    opportunities.reverse()
+    
     if contact.same_as:
         same_as = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
     
     return render_to_response(
         'Crm/view_contact.html',
-        {'contact': contact, 'actions': actions, 'same_as': same_as, 'entity': contact.entity},
+        {
+            'contact': contact,
+            'actions': actions,
+            'opportunities': opportunities,
+            'same_as': same_as,
+            'entity': contact.entity
+        },
         context_instance=RequestContext(request)
     )
 
@@ -660,7 +671,7 @@ def view_board_panel(request):
     actions = models.Action.objects.filter(Q(done=False),
         Q(display_on_board=True), Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)).order_by(
         "priority", "planned_date")
-    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("status__ordering")
+    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("type__name", "status__ordering")
     partial = True
     multi_user = True
     default_my_actions = True
@@ -798,7 +809,7 @@ def new_contacts_import(request):
         context_instance=RequestContext(request)
     )
     
-def read_contacts(reader, fields):
+def read_contacts(reader, fields, extract_from_email):
     contacts = []
     entity_dict = {}
     role_dict = {}
@@ -830,16 +841,18 @@ def read_contacts(reader, fields):
         name = u"< {0} >".format(_(u"Unknown"))
         if not c['entity']:
             entity = u''
-            res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
-            if res:
-                name, entity, ext = res.groups(0)
-                #email = u'{0}@{1}.{2}'.format(name, entity, ext)
-            email_providers = ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
-                'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
-            if entity in email_providers:
-                entity = name
-            if not c['entity']:
-                c['entity'] = entity
+            if extract_from_email:
+                res = re.match('(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', c['email'])
+                if res:
+                    name, entity, ext = res.groups(0)
+                    #email = u'{0}@{1}.{2}'.format(name, entity, ext)
+                email_providers = ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
+                    'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
+                if entity in email_providers:
+                    entity = name
+            if not entity:
+                entity = u'{0} {1}'.format(c['lastname'], c['firstname']).upper()
+            c['entity'] = entity
         else:
             name = c['entity']
         if not (c['lastname'] or c['firstname']):
@@ -875,10 +888,7 @@ def read_contacts(reader, fields):
     total_contacts = k
     return contacts, total_contacts
     
-
-@login_required
-def confirm_contacts_import(request, import_id):
-    
+def get_imports_fields():
     fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
         'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
@@ -900,6 +910,25 @@ def confirm_contacts_import(request, import_id):
         except models.CustomField.DoesNotExist:
             custom_fields.append(None)
     
+    return fields, custom_fields
+    
+@login_required
+def contacts_import_template(request):
+    fields, custom_fields = get_imports_fields()
+    
+    cols = fields[:len(fields)-len(custom_fields)] + custom_fields
+    
+    template_file = u";".join([u'"{0}"'.format(unicode(col)) for col in cols])+u"\n"
+    
+    return HttpResponse(template_file, mimetype="text/csv", )
+
+
+@login_required
+def confirm_contacts_import(request, import_id):
+    
+    fields, custom_fields = get_imports_fields()
+    
+    custom_fields_count = len(custom_fields)
     cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
     
     contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
@@ -907,8 +936,9 @@ def confirm_contacts_import(request, import_id):
         form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
         
         if form.is_valid():
-            reader = unicode_csv_reader(contacts_import.import_file, form.cleaned_data['encoding'])
-            contacts, total_contacts = read_contacts(reader, fields)
+            
+            reader = unicode_csv_reader(contacts_import.import_file, form.cleaned_data['encoding'], delimiter=form.cleaned_data['separator'])
+            contacts, total_contacts = read_contacts(reader, fields, form.cleaned_data['entity_name_from_email'])
             default_department = form.cleaned_data['default_department']
             contacts_import = form.save()
 
@@ -990,11 +1020,14 @@ def confirm_contacts_import(request, import_id):
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
         else:
-            reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
-            contacts, total_contacts = read_contacts(reader, fields)
+            
+            print '#######', contacts_import.separator, type(contacts_import.separator)
+            
+            reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator)
+            contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
     else:
-        reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding)
-        contacts, total_contacts = read_contacts(reader, fields)
+        reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator)
+        contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
         form = forms.ContactsImportConfirmForm(instance=contacts_import)
     
     return render_to_response(

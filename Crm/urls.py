@@ -48,6 +48,7 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^edit-custom-fields/(?P<model_name>\w+)/(?P<instance_id>\d+)$', 'edit_custom_fields', name='crm_edit_custom_fields'),
     url(r'^contacts-import/new$', 'new_contacts_import', name='crm_new_contacts_import'),
     url(r'^contacts-import/(?P<import_id>\d+)$', 'confirm_contacts_import', name='crm_confirm_contacts_import'),
+    url(r'^contacts-import/template.csv$', 'contacts_import_template', name='crm_contacts_import_template'),
     url(r'^group-name/(?P<gr_id>.+)$', 'get_group_name', name='crm_get_group_name'),
     url(r'^groups/list$', 'get_groups', name='crm_get_groups'),
 )
