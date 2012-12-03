@@ -77,8 +77,8 @@ class SubscribeForm(ModelFormWithCity):
         }
         
     entity = forms.CharField(required=False)
-    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='')
-    action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='')
+    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
+    action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)

@@ -77,7 +77,11 @@ class ModelFormWithCity(forms.ModelForm):
         super(ModelFormWithCity, self).__init__(*args, **kwargs)
         
         if len(args):
-            self.country_id = int(args[0]["country"])
+            try:
+                self.country_id = int(args[0]["country"])
+            except KeyError:
+                cn = get_default_country()
+                self.country_id = models.Zone.objects.get(name=cn, parent__isnull=True).id
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         

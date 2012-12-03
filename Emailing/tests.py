@@ -527,6 +527,8 @@ class SubscribeTest(TestCase):
         self.group1 = mommy.make_one(models.Group, name="ABC", subscribe_form=True)
         self.group2 = mommy.make_one(models.Group, name="DEF", subscribe_form=True)
         self.group3 = mommy.make_one(models.Group, name="GHI", subscribe_form=False)
+        
+        default_country = mommy.make_one(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
     
     def test_view_subscribe_newsletter(self):
         url = reverse("emailing_subscribe_newsletter")
@@ -547,7 +549,6 @@ class SubscribeTest(TestCase):
         }
         
         response = self.client.post(url, data=data, follow=False)
-        
         self.assertEqual(302, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 1)
         
@@ -571,7 +572,6 @@ class SubscribeTest(TestCase):
         }
         
         response = self.client.post(url, data=data, follow=False)
-        #print response.content
         self.assertEqual(302, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 1)
         
