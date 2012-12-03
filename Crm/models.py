@@ -292,13 +292,18 @@ class Contact(TimeStampedModel):
         return has_left + [x.name for x in self.role.all()]
         
     def __unicode__(self):
-        if self.gender:
+        if not (self.firstname or self.lastname):
+            return u"< {0} >".format(__(u"Unknown"))
+        
+        if self.gender and self.lastname:
             title = self.get_gender_display()
             title += u' '
         else:
             title = u''
-        if not (self.firstname or self.lastname):
-            return u"< {0} >".format(__(u"Unknown"))
+        
+        if (not self.firstname) or (not self.lastname):
+            return _(u"{1}{0.firstname}{0.lastname}").format(self, title)
+        
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
             
     @property
