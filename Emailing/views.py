@@ -14,7 +14,7 @@ from sanza.Emailing import models, forms
 from django.contrib import messages
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
-from sanza.Emailing.utils import get_emailing_context
+from sanza.Emailing.utils import get_emailing_context, get_credit
 from django.template.loader import get_template
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -89,7 +89,7 @@ def confirm_send_mail(request, emailing_id):
         if 'confirm' in request.POST:
             if emailing.status == models.Emailing.STATUS_EDITING:
                 emailing.status = models.Emailing.STATUS_SCHEDULED
-                emailing.scheduling_dt = datetime.now() + timedelta(minutes=5)
+                emailing.scheduling_dt = datetime.now() + timedelta(minutes=1)
                 emailing.save()
                 messages.add_message(request, messages.SUCCESS, _(u"The sending has been scheduled"))
             else:
@@ -111,7 +111,7 @@ def cancel_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     if request.method == "POST":
         if 'confirm' in request.POST:
-            if emailing.status == models.Emailing.STATUS_SCHEDULED:
+            if emailing.status in (models.Emailing.STATUS_SCHEDULED, models.Emailing.STATUS_CREDIT_MISSING):
                 emailing.status = models.Emailing.STATUS_EDITING
                 emailing.scheduling_dt = None
                 emailing.save()

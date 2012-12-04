@@ -62,11 +62,11 @@ class Emailing(TimeStampedModel):
         if self.status == Emailing.STATUS_EDITING:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id]))
-        if self.status == Emailing.STATUS_SCHEDULED:
+        if self.status == Emailing.STATUS_SCHEDULED or self.status == Emailing.STATUS_CREDIT_MISSING:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id]))
-        if self.status == Emailing.STATUS_CREDIT_MISSING:
-            action = '<a href="mailto:{1}">{0}</a>'.format(ugettext(u'Buy'), settings.ADMINS[0][1])
+        #if self.status == Emailing.STATUS_CREDIT_MISSING:
+            #action = '<a href="mailto:{1}">{0}</a>'.format(ugettext(u'Buy'), settings.ADMINS[0][1])
         return mark_safe(action)
     
     def get_contacts(self):

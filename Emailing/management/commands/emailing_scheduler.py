@@ -27,7 +27,8 @@ class Command(BaseCommand):
             except CreditMissing, msg:
                 if verbose:
                     print "ERRROR: ", msg
-                continue #next emailing
+                nb_sent = 0
+                continue
             
             if verbose:
                 print nb_sent, "emails sent for emailing", emailing.id

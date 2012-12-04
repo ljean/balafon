@@ -357,7 +357,8 @@ class SendEmailingTest(BaseTestCase):
         
     def test_send_newsletter_credit_missing(self):
         entity = mommy.make_one(models.Entity, name="my corp")
-        names = ['alpha', 'beta', 'gamma']
+        names = ['alpha', 'beta', 'gamma', 'delta', 'eta',
+            'one', 'two', 'three', 'four', 'five', 'un', 'deux']
         contacts = [mommy.make_one(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
@@ -374,10 +375,10 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(c)
         emailing.save()
         
-        for x in range(10):
-            management.call_command('add_emailing_counter', 1, verbosity=0, interactive=False)
+        #for x in range(10):
+        management.call_command('add_emailing_counter', 10, verbosity=0, interactive=False)
         
-        management.call_command('emailing_scheduler', 2, verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', 11, verbosity=0, interactive=False)
         
         emailing = Emailing.objects.get(id=emailing.id)
         
@@ -404,6 +405,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(c)
         emailing.save()
         
+        #Only 1 credit and try to send 3 emails -> credit missing
         management.call_command('add_emailing_counter', 1, verbosity=0, interactive=False)
         
         management.call_command('emailing_scheduler', 2, verbosity=0, interactive=False)
@@ -412,7 +414,20 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(emailing.status, Emailing.STATUS_CREDIT_MISSING)
         self.assertEqual(len(mail.outbox), 0)
         
-        management.call_command('add_emailing_counter', 10, verbosity=0, interactive=False)
+        #Add 1 more credit and try to send 3 emails --> still 1 missing
+        management.call_command('add_emailing_counter', 1, verbosity=0, interactive=False)
+        
+        emailing.status = Emailing.STATUS_SCHEDULED
+        emailing.save()
+        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        
+        emailing = Emailing.objects.get(id=emailing.id)
+        self.assertEqual(emailing.status, Emailing.STATUS_CREDIT_MISSING)
+        self.assertEqual(len(mail.outbox), 0)
+        
+        #Add 1 more -> 3 credits for emaisl to send -> Ok
+        management.call_command('add_emailing_counter', 1, verbosity=0, interactive=False)
+        
         emailing.status = Emailing.STATUS_SCHEDULED
         emailing.save()
         management.call_command('emailing_scheduler', verbosity=0, interactive=False)
@@ -458,7 +473,64 @@ class SendEmailingTest(BaseTestCase):
         
         self.assertEqual(len(mail.outbox), 1)
         
-            
+        emailing.status = Emailing.STATUS_SCHEDULED
+        emailing.save()
+        
+        management.call_command('add_emailing_counter', 3, verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', 10, verbosity=0, interactive=False)
+        
+        emailing = Emailing.objects.get(id=emailing.id)
+        self.assertEqual(emailing.status, Emailing.STATUS_SENT)
+        
+        emailing2 = Emailing.objects.get(id=emailing2.id)
+        self.assertEqual(emailing2.status, Emailing.STATUS_SENT)
+        
+        self.assertEqual(len(mail.outbox), 4)
+        
+    
+    def test_send_newsletter_credit_missing_reset_before_resend(self):
+        entity = mommy.make_one(models.Entity, name="my corp")
+        names = ['alpha', 'beta', 'gamma']
+        contacts = [mommy.make_one(models.Contact, entity=entity,
+            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        
+        emailing = mommy.make_one(Emailing,
+            newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt = datetime.now(), sending_dt = None)
+        for c in contacts:
+            emailing.send_to.add(c)
+        emailing.save()
+        
+        #Credit missing
+        management.call_command('add_emailing_counter', 1, verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', 2, verbosity=0, interactive=False)
+        
+        emailing = Emailing.objects.get(id=emailing.id)
+        self.assertEqual(emailing.status, Emailing.STATUS_CREDIT_MISSING)
+        self.assertEqual(len(mail.outbox), 0)
+        
+        #Add credit
+        management.call_command('add_emailing_counter', 3, verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', 10, verbosity=0, interactive=False)
+        
+        emailing = Emailing.objects.get(id=emailing.id)
+        self.assertEqual(emailing.status, Emailing.STATUS_CREDIT_MISSING)
+        self.assertEqual(len(mail.outbox), 0)
+        
+        #Reset the credit_missing status
+        emailing.status = Emailing.STATUS_SCHEDULED
+        emailing.save()
+        management.call_command('emailing_scheduler', 10, verbosity=0, interactive=False)
+        
+        self.assertEqual(len(mail.outbox), 3)
+        
+                
     def test_view_magic_link(self):
         entity = mommy.make_one(models.Entity, name="my corp")
         contact = mommy.make_one(models.Contact, entity=entity,

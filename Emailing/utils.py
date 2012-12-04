@@ -15,6 +15,7 @@ from coop_cms.utils import make_links_absolute
 from coop_cms.html2text import html2text
 from datetime import date
 from coop_cms.utils import make_links_absolute
+from django.utils import translation
 
 class CreditMissing(Exception): pass
 
@@ -48,6 +49,8 @@ def get_emailing_context(emailing, contact):
         'unregister_url': unregister_url, 'contact': contact, 'emailing': emailing,
     }
     
+def get_credit():
+    return sum([c.credit for c in EmailingCounter.objects.all()])
     
 def send_newsletter(emailing, max_nb):
     #Create automatically an action type for logging one action by contact
@@ -61,18 +64,13 @@ def send_newsletter(emailing, max_nb):
     emails = []
     
     nb_contacts = emailing.send_to.count()
-    try:
-        available = 0
-        counter = EmailingCounter.objects.all().order_by('-credit')[0]
-        if nb_contacts > counter.credit:
-            available = counter.credit
-            raise CreditMissing
-    except (IndexError, CreditMissing):
+    credit_available = get_credit()
+    if nb_contacts > credit_available:
         emailing.status = Emailing.STATUS_CREDIT_MISSING
         emailing.save()
         raise CreditMissing(
             _(u'Credit missing for sending this emailing (available: {0} - required {1}').format(
-                available, nb_contacts
+                credit_available, nb_contacts
             )
         )
         
@@ -82,6 +80,8 @@ def send_newsletter(emailing, max_nb):
         if contact.get_email:
             context = Context(get_emailing_context(emailing, contact))
             t = get_template(emailing.newsletter.get_template_name())
+            lang = settings.LANGUAGE_CODE[:2]
+            translation.activate(lang)
             html_text = t.render(context)
             html_text = make_links_absolute(html_text)
         
@@ -107,10 +107,21 @@ def send_newsletter(emailing, max_nb):
     nb_sent = connection.send_messages(emails)
     
     if nb_sent:
-        counter.credit = counter.credit - nb_sent
-        if counter.credit == 0:
-            counter.finshed_date = date.today()
-        counter.save()
+        taken_credit = nb_sent
+        for counter in EmailingCounter.objects.all().order_by('-credit'):
+            if counter.credit > taken_credit:
+                counter.credit -= taken_credit
+                taken_credit = 0 
+            else:
+                counter.credit = 0
+                taken_credit -= counter.credit 
+            if counter.credit == 0:
+                counter.finshed_date = date.today()
+            counter.save()
+            if taken_credit == 0:
+                break
+        return nb_sent
+    else:
+        return 0
     
-    return nb_sent
     
