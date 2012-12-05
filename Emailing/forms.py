@@ -15,6 +15,8 @@ from django.template.loader import get_template
 from django.core.mail import send_mail, EmailMessage
 from sanza.Crm.widgets import CityAutoComplete
 from django.contrib import messages
+import urllib2, re
+from bs4 import BeautifulSoup
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -53,7 +55,32 @@ class NewNewsletterForm(forms.Form):
     subject = forms.CharField(label=_(u"Subject"), 
         widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
     template = forms.ChoiceField(label=_(u"Template"), choices = get_newsletter_templates(None, None))
-                        
+    content = forms.CharField(label=_(u'Source URL'), max_length=128, required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super(NewNewsletterForm, self).__init__(*args, **kwargs)
+        
+        self.allow_url_sources = getattr(settings, 'SANZA_NEWSLETTER_SOURCES', ())
+        if not self.allow_url_sources:
+            self.fields['content'].widget = forms.HiddenInput()
+    
+    def clean_content(self):
+        url = self.cleaned_data['content']
+        if url:
+            #Check in config if the url match with something allowed
+            newsletter_sources = getattr(settings, 'SANZA_NEWSLETTER_SOURCES', ())
+            for (regex, selector) in newsletter_sources:
+                if re.match(regex, url):
+                    try:
+                        #if so get the content
+                        html = urllib2.urlopen(url).read()
+                        #and extract the selector content as initial content for the newsletter
+                        soup = BeautifulSoup(html)
+                        return u''.join([unicode(tag) for tag in soup.select(selector)])
+                    except Exception, msg:
+                        raise ValidationError(msg)
+            raise ValidationError(_(u"The url is not allowed"))
+        return u''
 
 class SubscribeForm(ModelFormWithCity):
     city = forms.CharField(
