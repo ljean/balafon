@@ -274,6 +274,12 @@ class Contact(TimeStampedModel):
                     return custom_field_value.value
                 except ContactCustomFieldValue.DoesNotExist:
                     return u'' #If no value defined: return empty string
+            else:
+                entity_prefix = "entity_"
+                full_prefix = entity_prefix + prefix
+                if attr[:len(full_prefix)] == full_prefix: # if the attr is entity_custom_field_<something>
+                    #return self.entity.custom_field_<something>
+                    return getattr(self.entity, attr[len(entity_prefix):])
 
         return object.__getattribute__(self, attr)
     
