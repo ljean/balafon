@@ -9,9 +9,12 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'ActionType.subscribe_form'
-        db.add_column('Crm_actiontype', 'subscribe_form',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
+        try:
+            db.add_column('Crm_actiontype', 'subscribe_form',
+                          self.gf('django.db.models.fields.BooleanField')(default=False),
+                          keep_default=False)
+        except:
+            print "Crm_actiontype:subscribe_form already exists?"
 
 
     def backwards(self, orm):

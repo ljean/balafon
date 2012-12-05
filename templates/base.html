@@ -1,29 +1,31 @@
-{% extends "sanza/base.html" %}{% load i18n %}
-
-{% block header %}{% endblock %}
-
-{% block main %}
-
-<div style="background: #e0cbb8; width: 1050px">
-    <span style="float: right; color: #777; font-size: 9px">
-        {% trans "Photo by" %} <a target="_blank" href="http://fr.wikipedia.org/wiki/Fichier:Sanza.jpg">serged</a> - {% trans "Creative Commons license" %}
-    </span>
-    <img src="{{STATIC_URL}}img/login.png" style="margin-left: 200px;">
+{% load i18n static coop_navigation coop_bar_tags %}<!DOCYTPE HTML>
+<head>
+    <title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
+    {% block jquery_declaration %}
+    <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
+    {% endblock %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/coop_cms.css" type="text/css" />
+    {% coop_bar_headers %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div id="container">
+<div class="header">
+    <h1><a href="/" title="{% trans "Homepage" %}">coop_cms</a></h1>
 </div>
-{% if form.errors %}
-    <p class="warning">{% trans "Login has failed" %}</p>
-{% else %}
-    <p />
-{% endif %}
-<form class="loginform" action="{% url django.contrib.auth.views.login %}" method="post">{% csrf_token %}
-    <ul>
-    {{form.as_ul}}
-    </ul>
-<input type="submit" value="{% trans "Login" %}" />
-</form>
-
-<p>
-{% trans "Forgotten Password" %} <a href="{% url django.contrib.auth.views.password_reset %}">{% trans "Click Here" %}</a>
-</p>
-{% endblock %}
-    
+<div id="main">
+  {% include "coop_cms/_messages.html "%}
+  {% block navigation %}
+  <ul id="nav">
+    {% navigation_as_nested_ul li_template="coop_cms/dropdown_li.html" ul_template="coop_cms/dropdown_ul.html" li_args="coop_cms/dropdown_li_class.html" %}
+  </ul>
+  {% endblock %}
+  <div class="document">
+      {% block document %}
+      {% endblock %}
+  </div>
+</div>
+</div>
+{% coop_bar %}
+</body>
+</html>

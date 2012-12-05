@@ -10,7 +10,7 @@
     <h2>{% trans "Sorry! we can not process your request. The server encountered an error." %}</h2>
     <p>
     {% trans "We've been informed and we will make our best to fix the problem as soon as possible" %}</br></br>
-    {% trans "Please retry in a short while or go back to the" %} <a href="/">{% trans "homepage" %}</a>. 
+    {% trans "Please retry in a short while or go back to the" %} <a href="{% url sanza_homepage %}">{% trans "homepage" %}</a>. 
     </p>
     
 {% endblock %}    
