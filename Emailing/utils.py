@@ -19,6 +19,15 @@ from django.utils import translation
 
 class CreditMissing(Exception): pass
 
+def format_context(text, data):
+    # { and } need to be escaped for the format function
+    text = text.replace('{', '{{').replace('}', '}}')
+    
+    # #!- and -!# are turned into { and }
+    text = text.replace('#!-', '{').replace('-!#', '}')
+    
+    return text.format(**data)
+
 def get_emailing_context(emailing, contact):
     data = dict(contact.__dict__)
     data['fullname'] = contact.fullname
@@ -27,8 +36,8 @@ def get_emailing_context(emailing, contact):
     newsletter = Newsletter()
     newsletter.__dict__ = dict(emailing.newsletter.__dict__)
     
-    newsletter.subject = newsletter.subject.format(**data)
-    html_content = newsletter.content.format(**data)
+    newsletter.subject = format_context(newsletter.subject, data)
+    html_content = format_context(newsletter.content, data)
     
     #magic links
     links = re.findall('href="(?P<url>.+?)"', html_content)
