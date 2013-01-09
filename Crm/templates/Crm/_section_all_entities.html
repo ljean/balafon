@@ -17,7 +17,9 @@
   </tr>
   {% for e in entities %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="{% url crm_view_entity e.id %}">{{e.name}}</a></td>
+    <td>
+      <a href="{% url crm_view_entity e.id %}">{{e.name}}</a>
+    </td>
     <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
     <td>
       {% if e.main_contacts %}
@@ -42,7 +44,6 @@
 {% endblock %}
 
 {% block section_action %}
-  <a href="{% url crm_create_entity %}">{% trans "Add" %}</a>
   {% if partial %}
   <a href="{% url crm_view_entities_list %}">{% trans "All" %}</a>
   {% endif %}

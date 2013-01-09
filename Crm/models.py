@@ -25,10 +25,20 @@ class NamedElement(models.Model):
     
 
 class EntityType(NamedElement):
-
+    GENDER_MALE = 1
+    GENDER_FEMALE = 2
+    GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
+    #required for translation into some languages (french for example)
+    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
+    order = models.IntegerField(_(u'order'), default=0)
+    
+    def is_male(self):
+        return (self.gender == EntityType.GENDER_MALE)
+    
     class Meta:
         verbose_name = _(u'entity type')
         verbose_name_plural = _(u'entity types')
+        ordering = ['order']
 
 
 class ZoneType(NamedElement):
@@ -86,7 +96,7 @@ def _get_entity_logo_dir(instance, filename):
 class Entity(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
-    type = models.ForeignKey(EntityType, verbose_name=_(u'type'))
+    type = models.ForeignKey(EntityType, verbose_name=_(u'type'), blank=True, null=True, default=None)
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_entity_logo_dir)
@@ -105,6 +115,8 @@ class Entity(TimeStampedModel):
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    is_single_contact = models.BooleanField(_("is single contact"), default=False)
     
     def save(self, *args, **kwargs):
         super(Entity, self).save(*args, **kwargs)

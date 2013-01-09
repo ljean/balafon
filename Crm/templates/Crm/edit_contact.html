@@ -35,7 +35,13 @@
     {% endif %}
     </div>
     <ul>
-      <li><h3>{% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a></h3></li>
+      <li><h3>
+      {% if contact.entity %}
+        {% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+      {% else %}
+        {% trans "Single contact" %}</a>
+      {% endif %}
+      </h3></li>
       {{contact_form.as_ul}}
     </ul>
   </form>

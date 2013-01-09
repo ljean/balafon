@@ -103,6 +103,11 @@ h1 img {
 	left: auto;
 }
 
+#nav li.separator {
+	border-top: solid 2px #aaa;
+	width: 100%;
+}
+
 
 /* @end */
 

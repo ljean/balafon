@@ -243,9 +243,11 @@ def edit_entity(request, entity_id):
     )
 
 @login_required
-def create_entity(request):
+def create_entity(request, entity_type_id):
+    entity_type = get_object_or_404(models.EntityType, id=entity_type_id)
+    entity = models.Entity(type=entity_type)
+    
     if request.method == "POST":
-        entity = models.Entity()
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
@@ -259,14 +261,16 @@ def create_entity(request):
             if entity.contact_set.count() > 0:
                 return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
-        else:
-            entity = None
     else:
-        form = forms.EntityForm()
-
+        form = forms.EntityForm(instance=entity)
+        
     return render_to_response(
         'Crm/edit_entity.html',
-        locals(),
+        {
+            'entity': entity,
+            'form': form,
+            'create_entity': True,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -277,7 +281,7 @@ def delete_entity(request, entity_id):
     if request.method == 'POST':
         if 'confirm' in request.POST:
             entity.delete()
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(reverse('sanza_homepage'))
         else:
             return HttpResponseRedirect(reverse('crm_edit_entity', args=[entity.id]))
     
@@ -445,6 +449,41 @@ def add_contact(request, entity_id):
     return render_to_response(
         'Crm/edit_contact.html',
         locals(),
+        context_instance=RequestContext(request)
+    )
+
+@login_required
+def add_single_contact(request):
+    if request.method == 'POST':
+        contact = models.Contact()
+        contact_form = forms.MiniContactForm(request.POST, instance=contact)
+        if contact_form.is_valid():
+            
+            entity = models.Entity(
+                name = contact.fullname,
+                is_single_contact = True
+            )
+            entity.save()
+            #This create a default contact
+            default_contact = entity.contact_set.all()[0]
+            
+            contact = contact_form.save(commit=False)
+            contact.entity = entity
+            contact.save()
+            
+            default_contact.delete()
+            
+            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
+    else:
+        contact = None
+        contact_form = forms.MiniContactForm()
+        
+    return render_to_response(
+        'Crm/edit_contact.html',
+        {
+            'contact': contact,
+            'contact_form': contact_form,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -1016,7 +1055,7 @@ def confirm_contacts_import(request, import_id):
                                 cfv, _x = models.ContactCustomFieldValue.objects.get_or_create(custom_field=cf, contact=contact)
                                 cfv.value = value 
                                 cfv.save()
-                return HttpResponseRedirect("/")
+                return HttpResponseRedirect(reverse("sanza_homepage"))
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
         else:

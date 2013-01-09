@@ -2,15 +2,21 @@
 {% load i18n %}
 
 {% block document_content %}
-  {% if entity %}
+  {% if entity.id %}
   <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
   {% else %}
-  <h2>{% trans "Create entity" %}</h2>
+  <h2>
+    {% if entity.type.is_male %}
+      {% trans "NewMale" %} {{entity.type}}
+    {% else %}
+      {% trans "NewFemale" %} {{entity.type}}
+    {% endif %}
+  </h2>
   {% endif %}
   <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
     <div class="buttons">
     <input type="submit" value="{% trans "Save"%}">
-    {% if entity %}
+    {% if entity.id %}
     <a class="colorbox-form" href="{% url crm_delete_entity entity.id%}">{% trans "Delete" %}</a>
     <a href="{% url crm_view_entity entity.id%}">{% trans "Cancel" %}</a>
     {% else %}
