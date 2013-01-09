@@ -63,23 +63,32 @@ def view_emailing(request, emailing_id):
 @login_required
 @popup_redirect
 def new_newsletter(request):
-    if request.method == 'POST':
-        form = forms.NewNewsletterForm(request.POST)
-        if form.is_valid():
-            subject = form.cleaned_data["subject"]
-            template = form.cleaned_data["template"]
-            newsletter = Newsletter.objects.create(subject=subject, template=template)
-            
-        return HttpResponseRedirect(reverse('coop_cms_edit_newsletter', args=[newsletter.id]))
-    else:
-        form = forms.NewNewsletterForm()
-
-    return render_to_response(
-        'Emailing/new_newsletter.html',
-        {'form': form},
-        context_instance=RequestContext(request)
-    )
-
+    try:
+        if request.method == 'POST':
+            form = forms.NewNewsletterForm(request.POST)
+            if form.is_valid():
+                subject = form.cleaned_data["subject"]
+                template = form.cleaned_data["template"]
+                
+                content = form.cleaned_data["content"]
+                if not content:
+                    content = _(u"Enter the text of your newsletter here")
+                
+                newsletter = Newsletter.objects.create(
+                    subject=subject, template=template, content=content
+                )
+                return HttpResponseRedirect(reverse('coop_cms_edit_newsletter', args=[newsletter.id]))
+        else:
+            form = forms.NewNewsletterForm()
+    
+        return render_to_response(
+            'Emailing/new_newsletter.html',
+            {'form': form},
+            context_instance=RequestContext(request)
+        )
+    except Exception, msg:
+        print "#ERR", msg
+        raise
 
 @login_required
 @popup_redirect
