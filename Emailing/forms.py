@@ -17,6 +17,7 @@ from sanza.Crm.widgets import CityAutoComplete
 from django.contrib import messages
 import urllib2, re
 from bs4 import BeautifulSoup
+from django.utils.importlib import import_module
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -69,17 +70,26 @@ class NewNewsletterForm(forms.Form):
         if url:
             #Check in config if the url match with something allowed
             newsletter_sources = getattr(settings, 'SANZA_NEWSLETTER_SOURCES', ())
-            for (regex, selector) in newsletter_sources:
+            for (regex, selector, post_processor) in newsletter_sources:
+                print "#", regex, url, re.match(regex, url)
                 if re.match(regex, url):
                     try:
                         #if so get the content
                         html = urllib2.urlopen(url).read()
                         #and extract the selector content as initial content for the newsletter
                         soup = BeautifulSoup(html)
-                        return u''.join([unicode(tag) for tag in soup.select(selector)])
+                        content = u''.join([unicode(tag) for tag in soup.select(selector)])
+                        if post_processor:
+                            #import the post_processor function
+                            module_name, processor_name = post_processor.rsplit('.', 1)
+                            module = import_module(module_name)
+                            post_processor_func = getattr(module, processor_name)
+                            #call the post_processor and update the content
+                            content = post_processor_func(content)
+                        return content
                     except Exception, msg:
                         raise ValidationError(msg)
-            raise ValidationError(_(u"The url is not allowed"))
+                raise ValidationError(_(u"The url is not allowed"))
         return u''
 
 class SubscribeForm(ModelFormWithCity):
