@@ -247,10 +247,16 @@ class Contact(TimeStampedModel):
 
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
+            address_fields = ('address', 'address2', 'address3', 'zip_code', 'cedex', 'city')
             field_name = attr[4:]
-            if field_name in ('phone', 'email', 'address', 'address2', 'address3', 'zip_code', 'cedex', 'city'):
+            if field_name in ('phone', 'email',):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
+            elif field_name in address_fields:
+                is_contact_address_defined = any([getattr(self, f) for f in address_fields])
+                if is_contact_address_defined:
+                    return getattr(self, field_name)
+                return getattr(self.entity, field_name)
             else:
                 prefix = "custom_field_"
                 prefix_length = len(prefix)
