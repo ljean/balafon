@@ -1,0 +1,86 @@
+{% extends "sanza/base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{ block.super }}
+<script>
+  $(function() {
+    var error_index = -1;
+    $("form fieldset").each(function(idx, elt) {
+      $(elt).addClass('item'+idx);
+      var err_cls = "";
+      if ($(elt).find('.errorlist').length>0) {
+        if (error_index==-1) {
+          error_index = idx;
+        }
+        var err_cls = "error";  
+      }
+      $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').text()+'</span>');
+      
+    });
+    $(".tabbar .tab").live('click', function() {
+      var item = $(this).attr('rel');
+      $(this).siblings().removeClass("selected");
+      $(this).addClass("selected");
+      $("fieldset").hide();
+      $("fieldset."+item).show();
+    })
+    if (error_index>0) {
+      $(".tabbar .tab[rel=item"+error_index+"]").click();  
+    } else {
+      $(".tabbar .tab:first").click();  
+    }
+    
+    
+  });
+</script>  
+{% endblock %}
+
+{% block document_content %}
+  
+  {% block doc_header %}
+  {% endblock %}
+
+  {% if form.errors   %}
+  <div class="error-msg">{% trans "The form is not valid." %}</div>
+  {% endif %}
+      
+  <div class="tabbar"></div>
+  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+  
+    <div class="buttons">
+    {% block form_buttons %}
+    {% endblock %}
+    </div>
+
+    <div class="">
+      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+        {% for fieldset in form.fieldsets %}
+          <fieldset class="{{ fieldset.classes }}">
+          {% if fieldset.legend %}
+            <legend>{{ fieldset.legend }}</legend>
+          {% endif %}
+          {% if fieldset.description %}
+            <p class="description">{{ fieldset.description }}</p>
+          {% endif %}
+          <ul>
+          {% for field in fieldset %}
+            {% if field.is_hidden %}
+              {{ field }}
+            {% else %}
+              <li{{ field.row_attrs }}>
+                {{ field.errors }}
+                {{ field.label_tag }}
+                {{ field }}
+              </li>
+            {% endif %}
+          {% endfor %}
+          </ul>
+          </fieldset>
+        {% endfor %}
+    </div>
+  </form>
+  
+  {% block doc_footer %}
+  {% endblock %}
+{% endblock %}

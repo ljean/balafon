@@ -354,33 +354,31 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     entity = contact.entity
     
     if request.method == 'POST':
-        if mini:
-            contact_form = forms.MiniContactForm(request.POST, instance=contact)
-        else:
-            contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
+        form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         
-        if contact_form.is_valid():
-            contact = contact_form.save()
-            if not mini:
-                photo = contact_form.cleaned_data['photo']
-                if photo != None:
-                    if type(photo)==bool:
-                        contact.photo = None
-                        contact.save()
-                    else:
-                        contact.photo.save(photo.name, photo)
+        if form.is_valid():
+            contact = form.save()
+            #if not mini:
+            #    photo = contact_form.cleaned_data['photo']
+            #    if photo != None:
+            #        if type(photo)==bool:
+            #            contact.photo = None
+            #            contact.save()
+            #        else:
+            #            contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
-        if mini:
-            contact_form = forms.MiniContactForm(instance=contact)
-        else:
-            contact_form = forms.ContactForm(instance=contact)
+        form = forms.ContactForm(instance=contact)
         
     return render_to_response(
         'Crm/edit_contact.html',
-        locals(),
+        {
+            'form': form,
+            'contact': contact,
+            'entity': entity,
+        },
         context_instance=RequestContext(request)
     )
 
