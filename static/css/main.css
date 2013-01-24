@@ -1,5 +1,5 @@
 body {
-    font-family: 'Calibri';
+    font-family: 'Arial';
     font-size: small;
     background-color: #ebeffd;
 	color: #222;
@@ -740,4 +740,42 @@ tr.not-my-action td, tr.not-my-action a {
 	text-align: center;
 	margin-bottom: 5px;
 	color: #888;
+}
+
+.tabbar {
+	border-bottom: solid 1px #ccc;
+}
+
+.tabbar .tab {
+	padding: 5px 10px;
+	border: solid 1px #aaa;
+	border-bottom: none;
+	background: #eee;
+	cursor: pointer;
+	border-radius: 5px 5px 0 0;
+	display: inline-block;
+	min-width: 50px;
+}
+
+.tabbar .tab.selected {
+	font-weight: bold;
+	background: #ccc;
+}
+
+.tabbar .tab.error {
+	background: #e20;
+}
+
+.tabbar .tab.error.selected {
+	background: #d00;
+}
+
+.error-msg {
+	width: 95%;
+	background: #d00;
+	color: white;
+	font-size: 1.1em;
+	padding: 5px 5px;
+	margin: 5px;
+	font-weight: bold;
 }
