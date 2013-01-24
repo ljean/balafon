@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete
 from sanza.Crm.settings import get_default_country
-from datetime import datetime
+from datetime import datetime, date
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(
@@ -70,7 +70,10 @@ class EditGroupForm(forms.ModelForm):
             widget=FilteredSelectMultiple(_(u"entities"), False)
         )
         
-class ModelFormWithCity(forms.ModelForm):
+from form_utils.forms import BetterModelForm
+
+#class ModelFormWithCity(forms.ModelForm):
+class ModelFormWithCity(BetterModelForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
     def __init__(self, *args, **kwargs):
@@ -150,10 +153,22 @@ class EntityForm(ModelFormWithCity):
     
     def __init__(self, *args, **kwargs):
         super(EntityForm, self).__init__(*args, **kwargs)
+        
+        #self.field_groups = {
+        #    _(u'Name'): ['name', 'description', 'relationship_date'],
+        #    _(u'Phone / Web'): ['website', 'email', 'phone', 'fax'],
+        #    _(u'Address'): ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+        #}
     
     class Meta:
         model = models.Entity
-        exclude = ('imported_by', 'is_single_contact',)
+        exclude = ('imported_by', 'is_single_contact', 'logo', 'type')
+        fieldsets = [
+            ('name', {'fields': ['name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
+            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Phone / Web')}),
+            ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+        ]
+    
 
 class ContactForm(ModelFormWithCity):
     city = forms.CharField(

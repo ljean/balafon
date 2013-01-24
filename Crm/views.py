@@ -262,7 +262,7 @@ def create_entity(request, entity_type_id):
                 return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
-        form = forms.EntityForm(instance=entity)
+        form = forms.EntityForm(instance=entity, initial={'relationship_date': date.today()})
         
     return render_to_response(
         'Crm/edit_entity.html',
