@@ -358,17 +358,18 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
         
         if form.is_valid():
             contact = form.save()
-            #if not mini:
-            #    photo = contact_form.cleaned_data['photo']
-            #    if photo != None:
-            #        if type(photo)==bool:
-            #            contact.photo = None
-            #            contact.save()
-            #        else:
-            #            contact.photo.save(photo.name, photo)
+            photo = form.cleaned_data['photo']
+            if photo != None:
+                if type(photo)==bool:
+                    contact.photo = None
+                    contact.save()
+                else:
+                    contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+        else:
+            print form.errors
     else:
         form = forms.ContactForm(instance=contact)
         

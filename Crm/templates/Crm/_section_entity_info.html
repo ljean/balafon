@@ -4,7 +4,7 @@
 {% block section_title %}
 {% spaceless %}
 <div class="entity_logo">
-  <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{STATIC_URL}}img/no-logo.png{% endif %}"/>
+  <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{entity.default_logo}}{% endif %}"/>
 </div>
 <div class="entity_info">
   <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;

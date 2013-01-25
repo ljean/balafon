@@ -25,12 +25,18 @@ class NamedElement(models.Model):
     
 
 class EntityType(NamedElement):
+    
+    def _get_logo_dir(self, filename):
+        return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
+    
     GENDER_MALE = 1
     GENDER_FEMALE = 2
     GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
+    
     #required for translation into some languages (french for example)
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
     order = models.IntegerField(_(u'order'), default=0)
+    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
     
     def is_male(self):
         return (self.gender == EntityType.GENDER_MALE)
@@ -130,6 +136,18 @@ class Entity(TimeStampedModel):
     
     def __unicode__(self):
         return self.name
+    
+    def default_logo(self):
+        if self.type and self.type.logo:
+            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "128x128", crop='center')
+            return file.url
+        
+        if self.is_single_contact:
+            logo = "img/single-contact.png"
+        else:
+            logo = "img/small-company.png"
+        
+        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
 
     def get_absolute_url(self):
         return reverse('crm_view_entity', args=[self.id])
@@ -244,6 +262,13 @@ class Contact(TimeStampedModel):
     has_left = models.BooleanField(_(u'has left'), default=False)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    def default_logo(self):
+        if self.gender == Contact.GENDER_FEMALE:
+            logo = "img/woman.png"
+        else:
+            logo = "img/man.png"
+        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def photo_thumbnail(self):
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, "128x128", crop='center')

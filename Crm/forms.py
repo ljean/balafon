@@ -162,11 +162,12 @@ class EntityForm(ModelFormWithCity):
     
     class Meta:
         model = models.Entity
-        exclude = ('imported_by', 'is_single_contact', 'logo', 'type')
+        exclude = ('imported_by', 'is_single_contact')
         fieldsets = [
-            ('name', {'fields': ['name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
+            ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
             ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Phone / Web')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+            ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
     
 
@@ -178,7 +179,7 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
@@ -191,6 +192,7 @@ class ContactForm(ModelFormWithCity):
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
             ('relationship', {'fields': ['main_contact', 'accept_newsletter', 'accept_3rdparty', 'has_left'], 'legend': _(u'Relationship')}),
             ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
+            ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
     def __init__(self, *args, **kwargs):

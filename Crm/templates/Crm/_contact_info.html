@@ -7,11 +7,8 @@
   {% if contact.photo %}
     <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
   {% else %}
-    {% if entity.logo %}
-    <img src="{{MEDIA_URL}}{{entity.logo_thumbnail}}"/>
-    {% else %}
-    <img src="{{STATIC_URL}}img/no-logo.png"/>
-  {% endif %}{% endif %}
+    <img src="{{contact.default_logo}}"/>
+  {% endif %}
   </div>
   <div> <span class="title">{{contact}}</span>
   {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
