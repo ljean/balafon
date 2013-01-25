@@ -466,7 +466,7 @@ def add_contact(request, entity_id):
 def add_single_contact(request):
     if request.method == 'POST':
         contact = models.Contact()
-        contact_form = forms.MiniContactForm(request.POST, instance=contact)
+        contact_form = forms.ContactForm(request.POST, instance=contact)
         if contact_form.is_valid():
             
             entity = models.Entity(
@@ -486,13 +486,13 @@ def add_single_contact(request):
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
         contact = None
-        contact_form = forms.MiniContactForm()
+        contact_form = forms.ContactForm()
         
     return render_to_response(
         'Crm/edit_contact.html',
         {
             'contact': contact,
-            'contact_form': contact_form,
+            'form': contact_form,
         },
         context_instance=RequestContext(request)
     )
