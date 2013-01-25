@@ -11,6 +11,9 @@
   {% if entity.relationship_date %}
     <span class="label">{{entity.relationship_date}}</span>
   {% endif %}
+  {% if entity.type %}
+    <span class="label">{{entity.type}}</span>
+  {% endif %}
   <br /><br />
   <span class="entity_description">{{entity.description}}</span>
   
@@ -20,13 +23,14 @@
   
 {% block section_data %}
   {% if entity.get_display_address %}<span class="entity_address addr-info">{{entity.get_display_address}}</span>{% endif %}
-  {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
-  {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
   <br /><br />
   {% if entity.website %}<span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>{% endif %}
   {% if entity.email %}<span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>{% endif %}
+  {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
+  {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
 {% endblock %}
 
 {% block section_action %}
     <a href="{% url crm_edit_entity entity.id %}">{% trans "Edit" %}</a>
+    <a class="colorbox-form" href="{% url crm_delete_entity entity.id%}">{% trans "Delete" %}</a>
 {% endblock %}

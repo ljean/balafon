@@ -137,6 +137,12 @@ class Entity(TimeStampedModel):
     def __unicode__(self):
         return self.name
     
+    def get_safe_logo(self):
+        if self.logo:
+            return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center').url
+        else:
+            return self.default_logo()
+    
     def default_logo(self):
         if self.type and self.type.logo:
             file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "128x128", crop='center')

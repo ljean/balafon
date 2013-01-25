@@ -438,16 +438,27 @@ def add_contact(request, entity_id):
     
     if request.method == 'POST':
         contact = models.Contact(entity=entity)
-        contact_form = forms.MiniContactForm(request.POST, instance=contact)
+        contact_form = forms.ContactForm(request.POST, instance=contact)
         if contact_form.is_valid():
-            contact_form.save()
+            contact = contact_form.save()
+            photo = contact_form.cleaned_data['photo']
+            if photo != None:
+                if type(photo)==bool:
+                    contact.photo = None
+                    contact.save()
+                else:
+                    contact.photo.save(photo.name, photo)
+                    
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
-        contact_form = forms.MiniContactForm()
+        contact_form = forms.ContactForm()
         
     return render_to_response(
         'Crm/edit_contact.html',
-        locals(),
+        {
+            "entity": entity,
+            "form": contact_form,
+        },
         context_instance=RequestContext(request)
     )
 

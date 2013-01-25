@@ -30,8 +30,9 @@ body h1 a:hover {
 }
 
 h1 .title {
-    text-decoration: underline;
-    font-size: 35px;
+	/*font-family: serif;*/
+    /*text-decoration: underline;*/
+    font-size: 32px;
     font-weight: bold;
     font-style: italic;
 }
@@ -273,7 +274,7 @@ body a:hover{
     /*background: #ccf;*/
 }
 
-.column.section-actions a{
+.column.section-actions a, .buttons a, .buttons input{
     display: block;
     text-decoration: none;
     padding: 4px 4px 4px 4px;
@@ -522,11 +523,15 @@ form.search-form {
 }
 
 
-.entity_logo {
+.entity_logo, .contact_logo {
     float: left;
     height: 128px;
     width: 128px;
     padding: 5px 5px 5px 5px;
+}
+
+.entity_info, .contact_info {
+	padding: 5px 5px 5px 5px;
 }
 
 .entity_title {
@@ -778,4 +783,26 @@ tr.not-my-action td, tr.not-my-action a {
 	padding: 5px 5px;
 	margin: 5px;
 	font-weight: bold;
+}
+
+.contact-entity-info {
+	float: right;
+	border: solid thin #ccc;
+	padding: 5px;
+}
+
+.contact-entity-info img{
+	width: 64px;
+	vertical-align: middle;
+}
+
+.contact-entity-info .text{
+	padding-left: 5px;
+}
+
+.notes {
+	border: solid thin #ccc;
+	padding: 5px;
+	width: 99%;
+	clear: both;
 }

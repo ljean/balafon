@@ -12,7 +12,7 @@ from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
 
 class AddEntityToGroupForm(forms.Form):
-    group_name = forms.CharField(
+    group_name = forms.CharField(label=_(u"Group name"),
         widget=forms.TextInput(attrs={'placeholder': _(u'name of a group')})
     )
     
