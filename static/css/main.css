@@ -789,15 +789,22 @@ tr.not-my-action td, tr.not-my-action a {
 	float: right;
 	border: solid thin #ccc;
 	padding: 5px;
+	max-width: 200px;
+	display: block;
 }
 
 .contact-entity-info img{
 	width: 64px;
 	vertical-align: middle;
+	display: inline-block;
 }
 
 .contact-entity-info .text{
 	padding-left: 5px;
+	font-size: 12px;
+	display: inline-block;
+	max-width: 128px;
+	vertical-align: middle;
 }
 
 .notes {
