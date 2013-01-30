@@ -131,6 +131,9 @@ def get_field(request, name):
         print 'Search.views.get_field ERROR', msg
         raise
     
+class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
+    allowed_schemes = ['http', 'https', 'ftp', 'mailto']
+
 @login_required
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
@@ -148,7 +151,7 @@ def mailto_contacts(request, bcc):
                     mailto = u'mailto:'
                     if int(bcc): mailto += '?bcc='
                     mailto += ','.join(emails)
-                    return HttpResponseRedirect(mailto)
+                    return HttpResponseRedirectMailtoAllowed(mailto)
             else:
                 return HttpResponse(_(u'Mailto: Error, no emails defined'), mimetype='text/plain')
     raise Http404

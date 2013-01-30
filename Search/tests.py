@@ -13,6 +13,7 @@ from django.core import mail
 from django.conf import settings
 from BeautifulSoup import BeautifulSoup
 from datetime import date
+from django.utils.translation import ugettext as _
 
 def get_form_errors(response):
     soup = BeautifulSoup(response.content)
@@ -560,4 +561,97 @@ class MainContactAndHasLeftSearchTest(BaseTestCase):
         self.assertNotContains(response, c.lastname)
         self.assertContains(response, c2.lastname)
         
+class MailtoContactsTest(BaseTestCase):
+    
+    def setUp(self):
+        super(MailtoContactsTest, self).setUp()
+        settings.SANZA_MAILTO_LIMIT = 50
+        
+        
+    def _create_contact(self, email=''):
+        entity = mommy.make_one(models.Entity)
+        contact = entity.contact_set.all()[0]
+        contact.lastname = 'TiniMax'
+        contact.firstname = 'Boss'
+        contact.email = email
+        contact.main_contact = True
+        contact.has_left = False
+        contact.save()
+        return entity, contact
+        
+    def test_mailto_no_email(self):
+        entity, contact = self._create_contact()
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-entity_name-_-0": entity.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, _(u'Mailto: Error, no emails defined'))
+        
+    def test_mailto_one_email(self):
+        email = 'toto@mailinator.com'
+        entity, contact = self._create_contact(email)
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-entity_name-_-0": entity.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(response['Location'].find('mailto:')==0)
+        self.assertTrue(response['Location'].find(email)>0)
+        self.assertTrue(response['Location'].find(contact.lastname)>0)
+        self.assertTrue(response['Location'].find(contact.firstname)>0)
+        
+    def test_mailto_one_email_bcc(self):
+        email = 'toto@mailinator.com'
+        entity, contact = self._create_contact(email)
+        url = reverse('search_mailto_contacts', args=[1])
+        data = {"gr0-_-entity_name-_-0": entity.name}
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(response['Location'].find('mailto:')==0)
+        self.assertTrue(response['Location'].find(email)>0)
+        self.assertTrue(response['Location'].find(contact.lastname)>0)
+        self.assertTrue(response['Location'].find(contact.firstname)>0)
+        
+    def test_mailto_several_emails(self):
+        group = mommy.make_one(models.Group)
+        contacts = []
+        for i in xrange(50):
+            email = 'toto{0}@mailinator.com'.format(i)
+            entity, contact = self._create_contact(email)
+            contacts.append(contact)
+            group.entities.add(entity)
+        group.save()
+        
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-group-_-0": group.id}
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(response['Location'].find('mailto:')==0)
+        for contact in contacts:
+            self.assertTrue(response['Location'].find(contact.email)>0)
+            self.assertTrue(response['Location'].find(contact.lastname)>0)
+            self.assertTrue(response['Location'].find(contact.firstname)>0)
+        
+    def test_mailto_several_emails_more_than_limit(self):
+        group = mommy.make_one(models.Group)
+        contacts = []
+        for i in xrange(51):
+            email = 'toto{0}@mailinator.com'.format(i)
+            entity, contact = self._create_contact(email)
+            contacts.append(contact)
+            group.entities.add(entity)
+        group.save()
+        
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-group-_-0": group.id}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        for contact in contacts:
+            self.assertTrue(response.content.find(contact.email)>0)
+            self.assertTrue(response.content.find(contact.lastname)>0)
+            self.assertTrue(response.content.find(contact.firstname)>0)
+            
+    def test_get_mailto(self):
+        url = reverse('search_mailto_contacts', args=[0])
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
         
