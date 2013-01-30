@@ -71,13 +71,18 @@ def new_newsletter(request):
                 template = form.cleaned_data["template"]
                 
                 content = form.cleaned_data["content"]
+                go_to_edit = False
                 if not content:
                     content = _(u"Enter the text of your newsletter here")
+                    go_to_edit = True
                 
                 newsletter = Newsletter.objects.create(
                     subject=subject, template=template, content=content
                 )
-                return HttpResponseRedirect(reverse('coop_cms_edit_newsletter', args=[newsletter.id]))
+                if go_to_edit:
+                    return HttpResponseRedirect(reverse('coop_cms_edit_newsletter', args=[newsletter.id]))
+                else:
+                    return HttpResponseRedirect(reverse('coop_cms_view_newsletter', args=[newsletter.id]))
         else:
             form = forms.NewNewsletterForm()
     

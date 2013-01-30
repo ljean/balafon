@@ -397,4 +397,100 @@ class ImportTemplateTest(BaseTestCase):
         for j, f in enumerate([cf1, cf4, cf3, cf6]):
             self.assertEqual(cols[j0+j], unicode(f))
         
+class AddressOverloadTest(BaseTestCase):
+
+    def test_address_of_contact(self):
+        
+        city1 = mommy.make_one(models.City, name='city1')
+        city2 = mommy.make_one(models.City, name='city2')
+        
+        entity_address = {
+            'address': u'rue Jules Rimet',
+            'address2': u'lot du stade',
+            'address2': u'cité St-Laurent',
+            'cedex': u'Cedex 2',
+            'zip_code': u'12345',
+            'city': city1,
+        }
+        
+        contact_address = {
+            'address': u'',
+            'address2': u'',
+            'address2': u'',
+            'cedex': u'',
+            'zip_code': u'',
+            'city': None,
+        }
+        
+        entity = mommy.make_one(models.Entity, **entity_address)
+        contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+        
+        for (att, val) in entity_address.items():
+            self.assertEqual(getattr(entity, att), val)
+            
+    def test_address_overloaded(self):
+        
+        city1 = mommy.make_one(models.City, name='city1')
+        city2 = mommy.make_one(models.City, name='city2')
+        
+        entity_address = {
+            'address': u'rue Jules Rimet',
+            'address2': u'lot du stade',
+            'address2': u'cité St-Laurent',
+            'cedex': u'Cedex 2',
+            'zip_code': '12345',
+            'city': city1,
+        }
+        
+        contact_address = {
+            'address': u'rue des tilleuls',
+            'address2': u'lot des arbres',
+            'address2': u'verrerie',
+            'cedex': u'Cedex 3',
+            'zip_code': '12346',
+            'city': city2,
+        }
+        
+        entity = mommy.make_one(models.Entity, **entity_address)
+        contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+        
+        for (att, val) in contact_address.items():
+            self.assertEqual(getattr(contact, att), val)
+            
+    def test_address_overloaded_missing_fields(self):
+        
+        city1 = mommy.make_one(models.City, name='city1')
+        city2 = mommy.make_one(models.City, name='city2')
+        
+        entity_address = {
+            'address': u'rue Jules Rimet',
+            'address2': u'lot du stade',
+            'address2': u'cité St-Laurent',
+            'cedex': u'Cedex 2',
+            'zip_code': '12345',
+            'city': city1,
+        }
+        
+        base_contact_address = {
+            'address': u'rue des tilleuls',
+            'address2': u'lot des arbres',
+            'address2': u'verrerie',
+            'cedex': u'Cedex 3',
+            'zip_code': '12346',
+            'city': city2,
+        }
+        
+        for (key, value) in base_contact_address.items():
+            #create a dict with same keys but blank values
+            contact_address = dict([(k, u'') for k in base_contact_address.keys()])
+            contact_address[key] = value
+            if key != 'city':
+                contact_address['city'] = None
+        
+        
+            entity = mommy.make_one(models.Entity, **entity_address)
+            contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+        
+            for (att, val) in contact_address.items():
+                self.assertEqual(getattr(contact, att), val)
     

@@ -121,13 +121,13 @@ class ModelFormWithCity(BetterModelForm):
                 try:
                     id = int(city)
                     return models.City.objects.get(id=id)
-                except ValueError:
+                except (ValueError, TypeError):
                     pass
 
                 zip_code = self.cleaned_data['zip_code']
                 try:
                     country_id = int(self.cleaned_data.get('country')) or self.country_id
-                except ValueError:
+                except (ValueError, TypeError):
                     country_id = 0
                 country = self._get_country(country_id)
                 default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
