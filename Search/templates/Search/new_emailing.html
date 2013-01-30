@@ -1,5 +1,5 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 {% block extra_head %}
 <script>
 $(document).bind('cbox_complete', function(){
@@ -17,7 +17,7 @@ $(document).bind('cbox_complete', function(){
 </script>
 {% endblock %}
 {% block title %}{% trans "New emailing" %}{% endblock %}
-{% block form_url %}{% url search_emailing %}{% endblock %}
+{% block form_url %}{% url "search_emailing" %}{% endblock %}
 {% block popup_buttons %}
 <a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="create_emailing" value="{% trans "Create" %}">

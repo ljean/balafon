@@ -1,5 +1,5 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 {% block extra_head %}
   <link type="text/css" href="{{ STATIC_URL }}css/redmond/jquery-ui-1.8.16.custom.css" rel="Stylesheet" />	
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
@@ -8,7 +8,7 @@
   </script>
 {% endblock %}
 {% block title %}{% blocktrans %}Create opportunity for {{nb_contacts}} contacts{% endblocktrans %}{% endblock %}
-{% block form_url %}{% url search_create_opportunity_for_contacts %}{% endblock %}
+{% block form_url %}{% url "search_create_opportunity_for_contacts" %}{% endblock %}
 {% block popup_buttons %}
 <a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="create_opportunities" value="{% trans "Create" %}">

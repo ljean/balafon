@@ -1,3 +1,4 @@
 {% extends "forms/autocomplete_input.html" %}
-{% block get_value_url %}{% url crm_get_group_name value %}{% endblock %}
-{% block get_list_url %}{% url crm_get_groups %}{% endblock %}
+{% load url from future %}
+{% block get_value_url %}{% url "crm_get_group_name" value %}{% endblock %}
+{% block get_list_url %}{% url "crm_get_groups" %}{% endblock %}

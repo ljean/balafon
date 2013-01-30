@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block section_title %}
   {{ emailing.newsletter.subject }}
@@ -11,6 +11,6 @@
 
 {% block section_action %}
   {{ emailing.next_action }}
-  <a class="colorbox-form" href="{% url emailing_delete emailing.id %}">{% trans "Delete" %}</a>
-  <a href="{% url emailing_newsletter_list %}">{% trans "Back" %}</a>
+  <a class="colorbox-form" href="{% url "emailing_delete" emailing.id %}">{% trans "Delete" %}</a>
+  <a href="{% url "emailing_newsletter_list" %}">{% trans "Back" %}</a>
 {% endblock %}

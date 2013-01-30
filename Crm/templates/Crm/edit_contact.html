@@ -1,5 +1,5 @@
 {% extends "sanza/base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block extra_head %}
   {{block.super}}
@@ -24,18 +24,18 @@
     <div class="buttons">
     <input type="submit" value="{% trans "Save"%}">
     {% if contact %}
-    <a class="colorbox-form" href="{% url crm_delete_contact contact.id %}">{% trans "Delete" %}</a>
-    <a href="{% url crm_view_contact contact.id %}">{% trans "Cancel" %}</a>
+    <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id %}">{% trans "Delete" %}</a>
+    <a href="{% url "crm_view_contact" contact.id %}">{% trans "Cancel" %}</a>
     <br /><br />
     {% if mini %}
-      <a href="{% url crm_edit_contact_advanced contact.id %}">{% trans "Advanced form" %}</a>
+      <a href="{% url "crm_edit_contact_advanced" contact.id %}">{% trans "Advanced form" %}</a>
     {% else %}
-      <a href="{% url crm_edit_contact contact.id %}">{% trans "Simple form" %}</a>
+      <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Simple form" %}</a>
     {% endif %}
     {% endif %}
     </div>
     <ul>
-      <li><h3>{% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a></h3></li>
+      <li><h3>{% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a></h3></li>
       {{contact_form.as_ul}}
     </ul>
   </form>

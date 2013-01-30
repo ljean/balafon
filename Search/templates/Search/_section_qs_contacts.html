@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}{{ name.capitalize }}{% endblock %}
   
@@ -10,8 +10,8 @@
   {% for c in contacts %}
   {% with c.entity as e %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
-    <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
-    <td><a href="{% url crm_view_entity e.id %}">{{e}}</a></td>
+    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
     <td>{{c.get_roles|seq_to_dash}}</td>
     <td>{{c.get_phones|seq_to_dash}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>

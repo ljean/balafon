@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags %}{% load url from future %}
 
 {% block section_title %}
   {%if partial %}{% trans "Latest entities" %}{% else %}{% trans "All entities" %}{%endif%}
@@ -17,18 +17,18 @@
   </tr>
   {% for e in entities %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="{% url crm_view_entity e.id %}">{{e.name}}</a></td>
+    <td><a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></td>
     <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
     <td>
       {% if e.main_contacts %}
-      {% for c in e.main_contacts %}<a href="{% url crm_view_contact c.id%}">{{c.fullname}}</a><br/>{% endfor %}</td>
+      {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}</td>
       {% else %}
         &nbsp;
       {% endif %}
     <td>
       {% with e.last_action as action %}
       {% if action %}
-        <a href="{% url crm_edit_action action.id %}">{{action.subject}}</a>
+        <a href="{% url "crm_edit_action" action.id %}">{{action.subject}}</a>
       {% else %}
         &nbsp;
       {% endif %}
@@ -42,8 +42,8 @@
 {% endblock %}
 
 {% block section_action %}
-  <a href="{% url crm_create_entity %}">{% trans "Add" %}</a>
+  <a href="{% url "crm_create_entity" %}">{% trans "Add" %}</a>
   {% if partial %}
-  <a href="{% url crm_view_entities_list %}">{% trans "All" %}</a>
+  <a href="{% url "crm_view_entities_list" %}">{% trans "All" %}</a>
   {% endif %}
 {% endblock %}

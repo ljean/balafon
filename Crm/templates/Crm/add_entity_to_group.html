@@ -1,12 +1,12 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block extra_head %}
 {{block.super}}
 <script>
   $(function() {
       $("input[name='group_name']").autocomplete({
-          source: "{% url crm_get_group_suggest_list %}"//,
+          source: "{% url "crm_get_group_suggest_list" %}"//,
       });
   });
   </script>
@@ -15,6 +15,6 @@
 
 {% block title %}{% blocktrans %}Add {{entity.name}} to a group{% endblocktrans %}{% endblock %}
 
-{% block form_url %}{% url crm_add_entity_to_group entity.id %}{% endblock %}
+{% block form_url %}{% url "crm_add_entity_to_group" entity.id %}{% endblock %}
 
 {% block form_ok %}{% trans "Ok" %}{% endblock %}

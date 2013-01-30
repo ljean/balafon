@@ -1,5 +1,5 @@
 {% extends "sanza/base.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags %}{% load url from future %}
 
 
 {% block document_title %}
@@ -9,7 +9,7 @@
 <ul>
 {% autopaginate searches 25 %}
 {% for search in searches %}
-  <li><a href="{% url search search.id %}">{{search.name}}</a></li>  
+  <li><a href="{% url "search" search.id %}">{{search.name}}</a></li>  
 {% endfor %}
 </ul>
 {% paginate %}

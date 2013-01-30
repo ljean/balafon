@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n pagination_tags sanza_utils %}
+{% load i18n pagination_tags sanza_utils %}{% load url from future %}
 
 {% with emailing.get_contacts as contacts %}
 
@@ -17,7 +17,7 @@
     <td>
       <a href="{{c.get_absolute_url}}">{{c}}</a>
       &nbsp;&nbsp;&nbsp;
-      <a href="{% url crm_view_entity c.entity.id %}">{{c.entity.name}}</a>{{ c.get_roles|seq_to_dash|default:'' }}
+      <a href="{% url "crm_view_entity" c.entity.id %}">{{c.entity.name}}</a>{{ c.get_roles|seq_to_dash|default:'' }}
       &nbsp;&nbsp;&nbsp;
       {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
     </td>

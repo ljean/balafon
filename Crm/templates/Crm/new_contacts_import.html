@@ -1,5 +1,5 @@
 {% extends "sanza/base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block extra_head %}
   {{block.super}}
@@ -23,7 +23,7 @@
     </div>
     <ul>
       <div class="help-message">
-        {% url crm_contacts_import_template as template_url %}
+        {% url "crm_contacts_import_template" as template_url %}
         {% blocktrans %}You can create contacts and entities by importing a csv file.
         For example, the csv file can be created by exporting your address book in Thunderbird or Outlook.<br /><br />
         Then you need to adapt the content of this file to match the import format.

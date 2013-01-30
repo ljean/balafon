@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags %}{% load url from future %}
 
 {% block section_title %}{% trans "My groups" %}{% endblock %}
   
@@ -10,10 +10,10 @@
   {% autopaginate groups 50 %}
   {% for g in groups %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      <td><a href="{% url search_group g.id %}">{{g.name}}</a></td>
+      <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
       <td>{{g.entities.count}}</td>
       <td>{{g.description|default:"&nbsp;"}}</td>
-      <td><a href="{% url crm_edit_group g.id %}">{% trans "Edit" %}</a></td>
+      <td><a href="{% url "crm_edit_group" g.id %}">{% trans "Edit" %}</a></td>
     </tr>
   {% endfor %}
   </table>
@@ -22,13 +22,13 @@
 
 {% block section_action %}
   {% if entity %}
-    <a href="{% url crm_add_entity_to_group entity.id %}">{% trans "Add" %}</a>
+    <a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a>
   {% else %}
-    <a href="{% url crm_add_group %}">{% trans "Add" %}</a>
+    <a href="{% url "crm_add_group" %}">{% trans "Add" %}</a>
     {% if ordering != 'name' %}
-    <a href="{% url crm_see_my_groups %}?ordering=name">{% trans "By name" %}</a>
+    <a href="{% url "crm_see_my_groups" %}?ordering=name">{% trans "By name" %}</a>
     {% else %}
-    <a href="{% url crm_see_my_groups %}?ordering=date">{% trans "By date" %}</a>
+    <a href="{% url "crm_see_my_groups" %}?ordering=date">{% trans "By date" %}</a>
     {% endif %}
   {% endif %}
 {% endblock %}

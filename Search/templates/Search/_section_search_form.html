@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block section_title %}{% trans "Search criteria" %}{% endblock %}
 {% block section_data %}
@@ -140,6 +140,6 @@
 
 {% block section_action %}
 <a href="" id="search-button">{% trans "Search" %}</a>
-<a href="{% url search_save search.id %}" id="save-button">{% trans "Save" %}</a>
-<a href="{% url search_list %}">{% trans "Open" %}</a>
+<a href="{% url "search_save" search.id %}" id="save-button">{% trans "Save" %}</a>
+<a href="{% url "search_list" %}">{% trans "Open" %}</a>
 {% endblock %}

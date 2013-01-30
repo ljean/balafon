@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n thumbnail sanza_utils %}
+{% load i18n thumbnail sanza_utils %}{% load url from future %}
 
 {% block section_title %}{% trans "More information" %}{% endblock %}
   
@@ -19,5 +19,5 @@
 {% endblock %}
 
 {% block section_action %}
-  <a href="{% url crm_edit_custom_fields model instance.id %}">{% trans "Edit" %}</a>
+  <a href="{% url "crm_edit_custom_fields" model instance.id %}">{% trans "Edit" %}</a>
 {% endblock %}

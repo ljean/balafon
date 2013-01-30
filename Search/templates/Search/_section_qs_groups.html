@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}{{ name.capitalize }}{% endblock %}
   
@@ -9,7 +9,7 @@
   </tr>
   {% for g in groups %}
   <tr>
-    <td><a href="{% url search_group g.id %}">{{g.name}}</a></td>
+    <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
     <td>{{g.description|default:"&nbsp;"}}</td>
     <td>{{g.entities.count}}</td>
   </tr>

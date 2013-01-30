@@ -1,4 +1,4 @@
-{% load i18n coop_edition coop_bar_tags %}
+{% load i18n coop_edition coop_bar_tags %}{% load url from future %}
 {% if_cms_edition %}
 <!DOCYTPE HTML>
 <html>
@@ -41,7 +41,7 @@
     <div style="font-size: 11px; text-align: center; width: 100%;">
         <div class="item">
             {% trans "If you can't view this email, " %}
-            <a href="{{SITE_PREFIX}}{% url coop_cms_view_newsletter newsletter.id %}">
+            <a href="{{SITE_PREFIX}}{% url "coop_cms_view_newsletter" newsletter.id %}">
                 {% trans "read the online version" %}
             </a>
         </div>

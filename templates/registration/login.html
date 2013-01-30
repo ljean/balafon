@@ -1,4 +1,4 @@
-{% extends "sanza/base.html" %}{% load i18n %}
+{% extends "sanza/base.html" %}{% load i18n %}{% load url from future %}
 
 {% block main %}
 
@@ -13,7 +13,7 @@
 {% else %}
     <p />
 {% endif %}
-<form class="loginform" action="{% url django.contrib.auth.views.login %}" method="post">{% csrf_token %}
+<form class="loginform" action="{% url "django.contrib.auth.views.login" %}" method="post">{% csrf_token %}
     <ul>
     {{form.as_ul}}
     </ul>
@@ -21,7 +21,7 @@
 </form>
 
 <p>
-{% trans "Forgotten Password" %} <a href="{% url django.contrib.auth.views.password_reset %}">{% trans "Click Here" %}</a>
+{% trans "Forgotten Password" %} <a href="{% url "django.contrib.auth.views.password_reset" %}">{% trans "Click Here" %}</a>
 </p>
 {% endblock %}
     

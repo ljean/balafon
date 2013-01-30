@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n thumbnail %}
+{% load i18n thumbnail %}{% load url from future %}
 
 {% block section_title %}
 {% spaceless %}
@@ -28,5 +28,5 @@
 {% endblock %}
 
 {% block section_action %}
-    <a href="{% url crm_edit_entity entity.id %}">{% trans "Edit" %}</a>
+    <a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a>
 {% endblock %}

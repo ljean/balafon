@@ -1,5 +1,5 @@
 {% extends "sanza/base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 {% block document_content %}
   {% if entity %}
@@ -11,10 +11,10 @@
     <div class="buttons">
     <input type="submit" value="{% trans "Save"%}">
     {% if entity %}
-    <a class="colorbox-form" href="{% url crm_delete_entity entity.id%}">{% trans "Delete" %}</a>
-    <a href="{% url crm_view_entity entity.id%}">{% trans "Cancel" %}</a>
+    <a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%} ">{% trans "Delete" %}</a>
+    <a href="{% url "crm_view_entity" entity.id%}">{% trans "Cancel" %}</a>
     {% else %}
-    <a href="{% url crm_board_panel %}">{% trans "Cancel" %}</a>
+    <a href="{% url "crm_board_panel" %}">{% trans "Cancel" %}</a>
     {% endif %}
     </div>
     <ul>

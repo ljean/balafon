@@ -1,7 +1,7 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 {% block title %}{% blocktrans %}Contacts Admin{% endblocktrans %}{% endblock %}
-{% block form_url %}{% url search_contacts_admin %}{% endblock %}
+{% block form_url %}{% url "search_contacts_admin" %}{% endblock %}
 {% block popup_buttons %}
 <a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="contacts_admin" value="{% trans "Ok" %}">

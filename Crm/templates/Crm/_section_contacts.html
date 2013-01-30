@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}{% trans "Contacts" %}{% endblock %}
   
@@ -11,8 +11,8 @@
   {% for c in contacts %}
   {% with c.has_left as has_left %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
-    <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
-    {% if not entity %}<td><a href="{% url crm_view_entity c.entity.id %}">{{ c.entity }}</a></td>{% endif %}
+    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    {% if not entity %}<td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>{% endif %}
     <td>{{c.get_roles|seq_to_dash|default:"&nbsp;"}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
@@ -25,12 +25,12 @@
 
 {% block section_action %}
   {% if entity %}
-    <a href="{% url crm_add_contact entity.id %}">{% trans "Add" %}</a>
+    <a href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a>
   {% endif %}
   {% if entity and show_all_contacts %}
-    <a href="{% url crm_view_entity entity.id %}?all=1">{% trans "View old contacts" %}</a>
+    <a href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a>
   {% endif %}
   {% if mailto and opportunity %}
-    <a href="{% url crm_mailto_opportunity_contacts opportunity.id %}" target="_blank">{% trans "Mail to" %}</a>
+    <a href="{% url "crm_mailto_opportunity_contacts" opportunity.id %}" target="_blank">{% trans "Mail to" %}</a>
   {% endif %}
 {% endblock %}

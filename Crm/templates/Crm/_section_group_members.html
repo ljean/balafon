@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags %}{% load url from future %}
 
 {% block section_title %}
   {{group.name}} {%if group.description%}: {{group.description}}{% endif %}
@@ -10,12 +10,12 @@
   {% autopaginate entities 25 %}
   <ul>
   {% for e in entities %}
-    <li><a href="{% url crm_view_entity e.id %}">{{e.name}}</a></li>
+    <li><a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></li>
   {% endfor %}
   </ul>
   {% paginate %}
 {% endblock %}
 
 {% block section_action %}
-    <a href="{% url crm_edit_group group.id %}">{% trans "Edit" %}</a>
+    <a href="{% url "crm_edit_group" group.id %}">{% trans "Edit" %}</a>
 {% endblock %}

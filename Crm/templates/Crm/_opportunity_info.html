@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}
 <div class="opportunity_info">
@@ -9,7 +9,7 @@
   {% if opportunity.ended %}<span class="ended label">{% trans "Ended" %}</span>{% endif %}
   <br /><br />
   <div>
-  {% trans "Opportunity with" %} <a href="{% url crm_view_entity opportunity.entity.id %}">{{ opportunity.entity }}</a>
+  {% trans "Opportunity with" %} <a href="{% url "crm_view_entity" opportunity.entity.id %}">{{ opportunity.entity }}</a>
   &nbsp;-&nbsp; 
   {% if opportunity.start_date %}
     {% trans "from" %} {{ opportunity.start_date }}
@@ -29,5 +29,5 @@
 
 
 {% block section_action %}
-    <a href="{% url crm_edit_opportunity opportunity.id %}">{% trans "Edit" %}</a>
+    <a href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a>
 {% endblock %}

@@ -1,5 +1,5 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}{% trans "Same As" %}{% endblock %}
   
@@ -15,8 +15,8 @@
   {% for c in same_as %}
   {% with c.has_left as has_left %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
-    <td><a href="{% url crm_view_contact c.id %}">{{c}}</a></td>
-    <td><a href="{% url crm_view_entity c.entity.id %}">{{ c.entity }}</a></td>
+    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
     <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
@@ -28,5 +28,5 @@
 {% endblock %}
 
 {% block section_action %}
-  <a class="colorbox-form" href="{% url crm_same_as contact.id %}">{% trans "Same As" %}</a>
+  <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
 {% endblock %}

@@ -1,9 +1,9 @@
 {% extends "sanza/_section.html" %}
-{% load i18n sanza_utils pagination_tags %}
+{% load i18n sanza_utils pagination_tags %}{% load url from future %}
 
 {% block section_title %}
   {% if all_actions and entity %}
-    {% trans "Actions with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+    {% trans "Actions with" %} <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
   {% else %}
     {% if days %}
       {% blocktrans %}Actions to do in the next {{days}} days{% endblocktrans %}
@@ -33,10 +33,10 @@
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
     <td class="status-icon">
       <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
-        href="{% url crm_do_action a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
+        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
     </a></td>
-    <td><a href="{% url crm_edit_action a.id %}">{{a.subject}}</a></td>
-    {% if not entity %}<td><a href="{% url crm_view_entity a.entity.id %}">{{ a.entity }}</a></td>{% endif %}
+    <td><a href="{% url "crm_edit_action" a.id %}">{{a.subject}}</a></td>
+    {% if not entity %}<td><a href="{% url "crm_view_entity" a.entity.id %}">{{ a.entity }}</a></td>{% endif %}
     
     {% if all_actions %}
       <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
@@ -49,7 +49,7 @@
       {% endif %}
     {% endif %}
     
-    <td><a {% if a.contact %} href="{% url crm_view_contact a.contact.id %} {% endif %}">
+    <td><a {% if a.contact %} href="{% url "crm_view_contact" a.contact.id %} {% endif %}">
       {{a.contact|default:'&nbsp;'}}
     </a></td>
     <td>{{a.type|default:'&nbsp;'}}</td>
@@ -65,7 +65,7 @@
     $("tr td.status-icon").live('click', function() {
       if (!$(this).parent().hasClass('not-my-action')){
         var action_id = $(this).attr('id').substr(2);
-        $.post('{% url crm_toogle_action %}', {id: action_id}, function(data) {
+        $.post('{% url "crm_toogle_action" %}', {id: action_id}, function(data) {
           window.location.reload();
         });
       }
@@ -79,14 +79,14 @@
 
 {% block section_action %}
   {% if entity %}
-    <a href="{% url crm_add_action_for_entity entity.id %}">{% trans "Add" %}</a>
+    <a href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a>
     {% if not all_actions %}
-    <a href="{% url crm_entity_actions entity.id %}">{% trans "All actions" %}</a>
+    <a href="{% url "crm_entity_actions" entity.id %}">{% trans "All actions" %}</a>
     {% endif %}
   {% else %}
-    <a class="colorbox-form" href="{% url crm_add_action %}">{% trans "Add" %}</a>
+    <a class="colorbox-form" href="{% url "crm_add_action" %}">{% trans "Add" %}</a>
     {% if not all_actions %}
-      <a href="{% url crm_all_actions %}">{% trans "All actions" %}</a>
+      <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
     {% endif %}
   {% endif %}
   {% if multi_user %}

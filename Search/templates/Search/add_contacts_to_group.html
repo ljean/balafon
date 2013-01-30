@@ -1,5 +1,5 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 {% block extra_head %}
   {{block.super}}
   <style>
@@ -17,7 +17,7 @@
   </script>
 {% endblock %}
 {% block title %}{% blocktrans %}Add  to group{% endblocktrans %}{% endblock %}
-{% block form_url %}{% url search_add_contacts_to_group %}{% endblock %}
+{% block form_url %}{% url "search_add_contacts_to_group" %}{% endblock %}
 {% block popup_buttons %}
 <a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="add_to_group" value="{% trans "Add" %}">

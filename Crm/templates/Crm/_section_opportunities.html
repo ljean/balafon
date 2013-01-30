@@ -1,9 +1,9 @@
 {% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags %}{% load url from future %}
 
 {% block section_title %}
   {% if all_opportunities and entity %}
-    {% trans "Opportunities with" %} <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+    {% trans "Opportunities with" %} <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
   {% else %}
     {% trans "Opportunities" %}
   {% endif %}
@@ -24,8 +24,8 @@
   </tr>
   {% for o in opportunities %}
   <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="{% url crm_view_opportunity o.id %}">{{o.name}}</a></td>
-    {% if not entity %}<td><a href="{% url crm_view_entity o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
+    <td><a href="{% url "crm_view_opportunity" o.id %}">{{o.name}}</a></td>
+    {% if not entity %}<td><a href="{% url "crm_view_entity" o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
     <td>{{o.type|default:"&nbsp;"}}</td>
     <td>{{o.status}}</td>
    <td>{{ o.start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>
@@ -40,20 +40,20 @@
 
 {% block section_action %}
   {% if entity %}
-    <a href="{% url crm_add_opportunity_for_entity entity.id %}">{% trans "Add" %}</a>
+    <a href="{% url "crm_add_opportunity_for_entity" entity.id %}">{% trans "Add" %}</a>
     {% if not all_opportunities and show_all_button %}
-      <a href="{% url crm_entity_opportunities entity.id %}">{% trans "All" %}</a>
+      <a href="{% url "crm_entity_opportunities" entity.id %}">{% trans "All" %}</a>
     {% endif %}
   {% endif %}
   {% if not entity %}
-     <a class="colorbox-form" href="{% url crm_add_opportunity %}">{% trans "Add" %}</a>
+     <a class="colorbox-form" href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a>
      {% if all_opportunities %}
-       <a href="{% url crm_all_opportunities_by "name" %}">{% trans "By name" %}</a>
-       <a href="{% url crm_all_opportunities_by "entity" %}">{% trans "By entity" %}</a>
-       <a href="{% url crm_all_opportunities_by "date" %}">{% trans "By date" %}</a>
-       <a href="{% url crm_all_opportunities_by "status" %}">{% trans "By status" %}</a>
+       <a href="{% url "crm_all_opportunities_by" "name" %}">{% trans "By name" %}</a>
+       <a href="{% url "crm_all_opportunities_by" "entity" %}">{% trans "By entity" %}</a>
+       <a href="{% url "crm_all_opportunities_by" "date" %}">{% trans "By date" %}</a>
+       <a href="{% url "crm_all_opportunities_by" "status" %}">{% trans "By status" %}</a>
       {% else %}
-      <a href="{% url crm_all_opportunities %}">{% trans "All" %}</a>
+      <a href="{% url "crm_all_opportunities" %}">{% trans "All" %}</a>
      {% endif %}
   {% endif %}
 {% endblock %}

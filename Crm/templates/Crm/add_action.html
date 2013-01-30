@@ -1,5 +1,5 @@
 {% extends "colorbox/popup_form_base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 {% block title %}{% trans "Select an entity" %}{% endblock %}
-{% block form_url %}{% url crm_add_action %}{% endblock %}
+{% block form_url %}{% url "crm_add_action" %}{% endblock %}
 {% block form_ok %}{% trans "Ok" %}{% endblock %}
