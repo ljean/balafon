@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime
 from sanza.Emailing.models import Emailing
 import xlwt
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
@@ -22,8 +22,9 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from sanza.permissions import can_access
 
-@login_required
+@user_passes_test(can_access)
 def quick_search(request):
     if request.method == "POST":
         form = QuickSearchForm(request.POST)
@@ -61,7 +62,7 @@ def quick_search(request):
     else:
         raise Http404
       
-@login_required
+@user_passes_test(can_access)
 def search(request, search_id=0, group_id=0):
     message = ''
     entities = []
@@ -100,7 +101,7 @@ def search(request, search_id=0, group_id=0):
         context_instance=RequestContext(request)
     )
     
-@login_required
+@user_passes_test(can_access)
 def save_search(request, search_id=0):
     if search_id:
         search = get_object_or_404(models.Search, id=search_id)
@@ -114,7 +115,7 @@ def save_search(request, search_id=0):
             return HttpResponseRedirect(reverse('search', args=[search.id]))    
     return HttpResponseRedirect(reverse('search'))
     
-@login_required
+@user_passes_test(can_access)
 def get_field(request, name):
     block = request.GET.get('block')
     count = request.GET.get('count')
@@ -134,7 +135,7 @@ def get_field(request, name):
 class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
     allowed_schemes = ['http', 'https', 'ftp', 'mailto']
 
-@login_required
+@user_passes_test(can_access)
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
@@ -156,7 +157,7 @@ def mailto_contacts(request, bcc):
                 return HttpResponse(_(u'Mailto: Error, no emails defined'), mimetype='text/plain')
     raise Http404
 
-@login_required
+@user_passes_test(can_access)
 def view_search_list(request):
     searches = models.Search.objects.all()#.order_by("-created")
     return render_to_response(
@@ -165,7 +166,7 @@ def view_search_list(request):
         context_instance=RequestContext(request)
     )
     
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def create_emailing(request):
     try:
@@ -208,7 +209,7 @@ def create_emailing(request):
         raise
     raise Http404
     
-@login_required
+@user_passes_test(can_access)
 def export_contacts_as_excel(request):
     search_form = forms.SearchForm(request.POST)
     if request.method == "POST":
@@ -265,7 +266,7 @@ def export_contacts_as_excel(request):
         return response
     raise Http404
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def create_action_for_contacts(request):
     try:
@@ -318,7 +319,7 @@ def create_action_for_contacts(request):
     raise Http404
 
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def create_opportunity_for_contacts(request):
     try:
@@ -369,7 +370,7 @@ def create_opportunity_for_contacts(request):
         raise
     raise Http404
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def add_contacts_to_group(request):
     try:
@@ -419,7 +420,7 @@ def add_contacts_to_group(request):
         raise
     raise Http404
 
-@login_required
+@user_passes_test(can_access)
 @popup_close
 def contacts_admin(request):
     

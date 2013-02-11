@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Max
 from sanza.Crm import models, forms
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import date, timedelta
 import json, re
 from colorbox.decorators import popup_redirect
@@ -16,8 +16,9 @@ from sanza.Crm.settings import get_default_country
 from django.conf import settings
 import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
+from sanza.permissions import can_access
     
-@login_required
+@user_passes_test(can_access)
 def view_entity(request, entity_id):
     
     all_contacts = request.GET.get('all', 0)
@@ -43,7 +44,7 @@ def view_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_entities_list(request):
     entities = models.Entity.objects.all().order_by('name')
     
@@ -53,7 +54,7 @@ def view_entities_list(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def add_entity_to_group(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -87,7 +88,7 @@ def add_entity_to_group(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def get_group_suggest_list(request):
     try:
         suggestions = []
@@ -98,7 +99,7 @@ def get_group_suggest_list(request):
     except Exception, msg:
         print '###', msg
         
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def remove_entity_from_group(request, group_id, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -117,7 +118,7 @@ def remove_entity_from_group(request, group_id, entity_id):
         context_instance=RequestContext(request)
     )
     
-@login_required
+@user_passes_test(can_access)
 def get_group_members(request, group_id):
     group = get_object_or_404(models.Group, id=group_id)
     group.save() #update last access
@@ -127,7 +128,7 @@ def get_group_members(request, group_id):
         context_instance=RequestContext(request)
     )
     
-@login_required
+@user_passes_test(can_access)
 def edit_group(request, group_id):
     group = get_object_or_404(models.Group, id=group_id)
     next_url = request.session.get('next_url', reverse('crm_see_my_groups'))
@@ -153,7 +154,7 @@ def edit_group(request, group_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_group(request, group_id):
     group = get_object_or_404(models.Group, id=group_id)
@@ -175,7 +176,7 @@ def delete_group(request, group_id):
     )
 
 
-@login_required
+@user_passes_test(can_access)
 def add_group(request):
     
     if request.method == "POST":
@@ -194,7 +195,7 @@ def add_group(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def see_my_groups(request):
     
     ordering = request.GET.get('ordering', 'name')
@@ -217,7 +218,7 @@ def see_my_groups(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def edit_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     entity.save() #update last access
@@ -242,7 +243,7 @@ def edit_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def create_entity(request):
     if request.method == "POST":
         entity = models.Entity()
@@ -270,7 +271,7 @@ def create_entity(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -290,7 +291,7 @@ def delete_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def get_city_name(request, city):
     try:
         city_id = int(city)
@@ -300,7 +301,7 @@ def get_city_name(request, city):
         return HttpResponse(json.dumps({'name': city}), 'application/json')
 
 #subscribe form : no login required
-#@login_required
+#@user_passes_test(can_access)
 def get_cities(request):
     term = request.GET.get('term')
     country_id = int(request.GET.get('country', 0))
@@ -313,7 +314,7 @@ def get_cities(request):
             for x in models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]]
     return HttpResponse(json.dumps(cities), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def get_opportunity_name(request, opp_id):
     try:
         opp = models.Opportunity.objects.get(id=opp_id)
@@ -321,14 +322,14 @@ def get_opportunity_name(request, opp_id):
     except models.Opportunity.DoesNotExist:
         return HttpResponse(json.dumps({'name': opp_id}), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def get_opportunities(request):
     term = request.GET.get('term')
     opps = [{'id': x.id, 'name': u'{0} -  {1}'.format(x.name, x.entity.name)}
         for x in models.Opportunity.objects.filter(Q(name__istartswith=term) | Q(entity__name__istartswith=term))]
     return HttpResponse(json.dumps(opps), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def get_entity_name(request, entity_id):
     try:
         entity = models.Entity.objects.get(id=entity_id)
@@ -336,14 +337,14 @@ def get_entity_name(request, entity_id):
     except models.Entity.DoesNotExist:
         return HttpResponse(json.dumps({'name': entity_id}), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def get_entities(request):
     term = request.GET.get('term')
     entities = [{'id': x.id, 'name': x.name}
         for x in models.Entity.objects.filter(name__istartswith=term)]
     return HttpResponse(json.dumps(entities), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     contact = get_object_or_404(models.Contact, id=contact_id)
     
@@ -380,7 +381,7 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     actions = contact.action_set.all()
@@ -405,7 +406,7 @@ def view_contact(request, contact_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def same_as(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
@@ -429,7 +430,7 @@ def same_as(request, contact_id):
     )
 
 
-@login_required
+@user_passes_test(can_access)
 def add_contact(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     
@@ -448,7 +449,7 @@ def add_contact(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
@@ -470,7 +471,7 @@ def delete_contact(request, contact_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def add_action_for_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     
@@ -491,7 +492,7 @@ def add_action_for_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_entity_actions(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     actions = models.Action.objects.filter(entity=entity).order_by('done', '-done_date')
@@ -503,7 +504,7 @@ def view_entity_actions(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def edit_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
     entity = get_object_or_404(models.Entity, id=action.entity.id)
@@ -523,7 +524,7 @@ def edit_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
@@ -546,7 +547,7 @@ def delete_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def add_opportunity_for_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     
@@ -567,7 +568,7 @@ def add_opportunity_for_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_entity_opportunities(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     opportunities = models.Opportunity.objects.filter(entity=entity)
@@ -579,7 +580,7 @@ def view_entity_opportunities(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_all_opportunities(request, ordering=None):
     opportunities = models.Opportunity.objects.all()
     if ordering == 'name':
@@ -599,7 +600,7 @@ def view_all_opportunities(request, ordering=None):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def edit_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
     entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
@@ -618,7 +619,7 @@ def edit_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
     actions = opportunity.action_set.all()
@@ -629,7 +630,7 @@ def view_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def mailto_opportunity_contacts(request, opportunity_id):
     """Open the mail client in order to send email to contacts"""
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
@@ -641,7 +642,7 @@ def mailto_opportunity_contacts(request, opportunity_id):
         mailto = u'mailto:'+','.join(emails)
         return HttpResponseRedirect(mailto)
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
@@ -664,7 +665,7 @@ def delete_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_board_panel(request):
     days = getattr(settings, 'SANZA_DAYS_OF_ACTIONS_ON_PANEL', 30)
     until_date = date.today() + timedelta(days)
@@ -682,7 +683,7 @@ def view_board_panel(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_all_actions(request):
     actions = models.Action.objects.all().order_by("-planned_date")
     partial = False
@@ -696,7 +697,7 @@ def view_all_actions(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def do_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
@@ -736,7 +737,7 @@ def select_entity_and_redirect(request, view_name, template_name):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def add_opportunity(request):
     try:
@@ -749,7 +750,7 @@ def add_opportunity(request):
         print "##", msg
         raise
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def add_action(request):
     try:
@@ -762,7 +763,7 @@ def add_action(request):
         print "##", msg
         raise
 
-@login_required
+@user_passes_test(can_access)
 def edit_custom_fields(request, model_name, instance_id):
     try:
         form_class = {
@@ -788,7 +789,7 @@ def edit_custom_fields(request, model_name, instance_id):
         context_instance=RequestContext(request)
     )
     
-@login_required
+@user_passes_test(can_access)
 def new_contacts_import(request):
     if request.method == 'POST':
         instance = models.ContactsImport(imported_by=request.user)
@@ -912,7 +913,7 @@ def get_imports_fields():
     
     return fields, custom_fields
     
-@login_required
+@user_passes_test(can_access)
 def contacts_import_template(request):
     fields, custom_fields = get_imports_fields()
     
@@ -923,7 +924,7 @@ def contacts_import_template(request):
     return HttpResponse(template_file, mimetype="text/csv", )
 
 
-@login_required
+@user_passes_test(can_access)
 def confirm_contacts_import(request, import_id):
     
     fields, custom_fields = get_imports_fields()
@@ -1036,7 +1037,7 @@ def confirm_contacts_import(request, import_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def get_group_name(request, gr_id):
     try:
         gr = models.Group.objects.get(id=gr_id)
@@ -1044,7 +1045,7 @@ def get_group_name(request, gr_id):
     except models.Group.DoesNotExist:
         return HttpResponse(json.dumps({'name': gr_id}), 'application/json')
 
-@login_required
+@user_passes_test(can_access)
 def get_groups(request):
     term = request.GET.get('term')
     groups = [{'id': x.id, 'name': x.name}

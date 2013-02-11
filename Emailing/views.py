@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from sanza.Crm.models import Contact, Action, ActionType
 from datetime import date, timedelta, datetime
 from sanza.Emailing import models, forms
@@ -18,8 +18,9 @@ from sanza.Emailing.utils import get_emailing_context, get_credit
 from django.template.loader import get_template
 from django.conf import settings
 from django.utils.importlib import import_module
+from sanza.permissions import can_access
 
-@login_required
+@user_passes_test(can_access)
 def newsletter_list(request):
     newsletters = Newsletter.objects.all().order_by('-id')
     
@@ -31,7 +32,7 @@ def newsletter_list(request):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def delete_emailing(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -51,7 +52,7 @@ def delete_emailing(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 def view_emailing(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     return render_to_response(
@@ -60,7 +61,7 @@ def view_emailing(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def new_newsletter(request):
     try:
@@ -95,7 +96,7 @@ def new_newsletter(request):
         print "#ERR", msg
         raise
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def confirm_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -119,7 +120,7 @@ def confirm_send_mail(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
-@login_required
+@user_passes_test(can_access)
 @popup_redirect
 def cancel_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
