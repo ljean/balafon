@@ -23,7 +23,7 @@
 
   <h3>
   {% if contact.entity.id %}
-    {% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+    {% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
   {% else %}
     {% trans "Single contact" %}
   {% endif %}
@@ -33,15 +33,11 @@
 {% block form_buttons %}
     <input type="submit" value="{% trans "Save"%}">
     {% if contact %}
-    <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id %}">{% trans "Delete" %}</a>
     <a href="{% url "crm_view_contact" contact.id %}">{% trans "Cancel" %}</a>
-      <a href="{% url "crm_edit_contact_advanced" contact.id %}">{% trans "Advanced form" %}</a>
-      <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Simple form" %}</a>
     {% endif %}
 {% endblock %}
 
 {% block doc_footer %}
-      <li><h3>{% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a></h3></li>
   {% include "sanza/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
   <script src="{{STATIC_URL}}chosen/chosen.jquery.js" type="text/javascript"></script>
   <script type="text/javascript"> $(".chzn-select").chosen();</script>

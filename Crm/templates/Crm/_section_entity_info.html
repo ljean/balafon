@@ -32,5 +32,5 @@
 
 {% block section_action %}
     <a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a>
-    <a class="colorbox-form" href="{% url crm_delete_entity entity.id%}">{% trans "Delete" %}</a>
+    <a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a>
 {% endblock %}

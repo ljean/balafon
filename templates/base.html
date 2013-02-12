@@ -1,4 +1,4 @@
-{% load i18n static coop_navigation coop_bar_tags %}<!DOCYTPE HTML>
+{% load i18n static coop_navigation coop_bar_tags %}{% load url from future %}<!DOCYTPE HTML>
 <head>
     <title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
     {% block jquery_declaration %}

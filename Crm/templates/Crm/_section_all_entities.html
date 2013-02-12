@@ -42,7 +42,6 @@
 {% endblock %}
 
 {% block section_action %}
-  <a href="{% url "crm_create_entity" %}">{% trans "Add" %}</a>
   {% if partial %}
   <a href="{% url "crm_view_entities_list" %}">{% trans "All" %}</a>
   {% endif %}

@@ -13,14 +13,13 @@
 <div class="contact_info">
   <div>
     <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
-    <a href="{% url crm_view_entity contact.entity.id %}" class="contact-entity-info">
+    <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
       <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
     </a>
      {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
   </div>
   <br/>
   <div>
-  <span class="addr-info entity-info"><a href="{% url "crm_view_entity" contact.entity.id %}">{{contact.entity}}</a></span>
   {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
   {% with contact.get_roles as roles %}
     {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}
@@ -42,5 +41,4 @@
 
 {% block section_action %}
     <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a>
-    <a class="colorbox-form" href="{% url crm_delete_contact contact.id %}">{% trans "Delete" %}</a>
 {% endblock %}
