@@ -295,7 +295,7 @@ def delete_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-@user_passes_test(can_access)
+#@user_passes_test(can_access)
 def get_city_name(request, city):
     try:
         city_id = int(city)
@@ -439,7 +439,7 @@ def add_contact(request, entity_id):
     
     if request.method == 'POST':
         contact = models.Contact(entity=entity)
-        contact_form = forms.ContactForm(request.POST, instance=contact)
+        contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         if contact_form.is_valid():
             contact = contact_form.save()
             photo = contact_form.cleaned_data['photo']
@@ -467,7 +467,7 @@ def add_contact(request, entity_id):
 def add_single_contact(request):
     if request.method == 'POST':
         contact = models.Contact()
-        contact_form = forms.ContactForm(request.POST, instance=contact)
+        contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         if contact_form.is_valid():
             
             entity = models.Entity(
