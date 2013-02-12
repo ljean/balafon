@@ -35,29 +35,19 @@
     {% include "sanza/_header.html" %}
     {% endblock %}
     {% block navigation %}
-    <nav id="nav">
-      <ul>
+    {% include "sanza/_navigation.html" %}
         <li><a href="{% url "crm_board_panel" %}">{% trans "Board panel" %}</a></li>
-        <li>
           <a href="{% url "crm_view_entities_list" %}">{% trans "Entities" %}</a>
           <ul><li><a href="{% url "crm_create_entity" %}">{% trans "Add" %}</a></li></ul>
-        </li>
         <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
         <li><a href="{% url "crm_see_my_groups" %}">{% trans "My groups" %}</a></li>
         <li><a href="{% url "emailing_newsletter_list" %}">{% trans "My mailings" %}</a></li>
-        <li>
-          <a>{% trans "Account" %}</a>
-          <ul>
             <li><a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a></li>
             <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
             {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
             {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">{% trans "Contacts import" %}</a></li>{% endif %}
             {%if user.is_staff %}<li><a href="{% url "export_database_json" %}">{% trans "Export database" %}</a></li>{% endif %}
-          </ul>
-        </li>
         <li><form method="POST" action="{% url "quick_search" %}">{% csrf_token %}{{quick_search_form.text}}</form></li>
-      </ul>
-    </nav>
     {% endblock %}
     {% block document %}
     <div id="document">

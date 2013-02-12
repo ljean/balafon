@@ -25,10 +25,26 @@ class NamedElement(models.Model):
     
 
 class EntityType(NamedElement):
-
+    
+    def _get_logo_dir(self, filename):
+        return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
+    
+    GENDER_MALE = 1
+    GENDER_FEMALE = 2
+    GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
+    
+    #required for translation into some languages (french for example)
+    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
+    order = models.IntegerField(_(u'order'), default=0)
+    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
+    
+    def is_male(self):
+        return (self.gender == EntityType.GENDER_MALE)
+    
     class Meta:
         verbose_name = _(u'entity type')
         verbose_name_plural = _(u'entity types')
+        ordering = ['order']
 
 
 class ZoneType(NamedElement):
@@ -86,7 +102,7 @@ def _get_entity_logo_dir(instance, filename):
 class Entity(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
-    type = models.ForeignKey(EntityType, verbose_name=_(u'type'))
+    type = models.ForeignKey(EntityType, verbose_name=_(u'type'), blank=True, null=True, default=None)
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_entity_logo_dir)
@@ -106,6 +122,8 @@ class Entity(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    is_single_contact = models.BooleanField(_("is single contact"), default=False)
+    
     def save(self, *args, **kwargs):
         super(Entity, self).save(*args, **kwargs)
         if self.contact_set.filter(has_left=False).count() == 0:
@@ -118,6 +136,24 @@ class Entity(TimeStampedModel):
     
     def __unicode__(self):
         return self.name
+    
+    def get_safe_logo(self):
+        if self.logo:
+            return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center').url
+        else:
+            return self.default_logo()
+    
+    def default_logo(self):
+        if self.type and self.type.logo:
+            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "128x128", crop='center')
+            return file.url
+        
+        if self.is_single_contact:
+            logo = "img/single-contact.png"
+        else:
+            logo = "img/small-company.png"
+        
+        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
 
     def get_absolute_url(self):
         return reverse('crm_view_entity', args=[self.id])
@@ -232,6 +268,13 @@ class Contact(TimeStampedModel):
     has_left = models.BooleanField(_(u'has left'), default=False)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    def default_logo(self):
+        if self.gender == Contact.GENDER_FEMALE:
+            logo = "img/woman.png"
+        else:
+            logo = "img/man.png"
+        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def photo_thumbnail(self):
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, "128x128", crop='center')

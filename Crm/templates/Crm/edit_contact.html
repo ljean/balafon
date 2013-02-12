@@ -1,4 +1,4 @@
-{% extends "sanza/base.html" %}
+{% extends "sanza/tab_form.html" %}
 {% load i18n %}{% load url from future %}
 
 {% block extra_head %}
@@ -14,31 +14,34 @@
   </style>
 {% endblock %}
 
-{% block document_content %}
+{% block doc_header %}
   {% if contact %}
   <h2>{% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
   {% else %}
   <h2>{% trans "Create contact" %}</h2>
   {% endif %}
-  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
-    <div class="buttons">
+
+  <h3>
+  {% if contact.entity.id %}
+    {% trans "Entity" %}: <a href="{% url crm_view_entity entity.id %}">{{entity.name}}</a>
+  {% else %}
+    {% trans "Single contact" %}
+  {% endif %}
+  </h3>
+{% endblock %}
+
+{% block form_buttons %}
     <input type="submit" value="{% trans "Save"%}">
     {% if contact %}
     <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id %}">{% trans "Delete" %}</a>
     <a href="{% url "crm_view_contact" contact.id %}">{% trans "Cancel" %}</a>
-    <br /><br />
-    {% if mini %}
       <a href="{% url "crm_edit_contact_advanced" contact.id %}">{% trans "Advanced form" %}</a>
-    {% else %}
       <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Simple form" %}</a>
     {% endif %}
-    {% endif %}
-    </div>
-    <ul>
+{% endblock %}
+
+{% block doc_footer %}
       <li><h3>{% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a></h3></li>
-      {{contact_form.as_ul}}
-    </ul>
-  </form>
   {% include "sanza/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
   <script src="{{STATIC_URL}}chosen/chosen.jquery.js" type="text/javascript"></script>
   <script type="text/javascript"> $(".chzn-select").chosen();</script>

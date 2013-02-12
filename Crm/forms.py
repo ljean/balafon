@@ -9,10 +9,10 @@ from django.contrib.auth.models import User
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete
 from sanza.Crm.settings import get_default_country
-from datetime import datetime
+from datetime import datetime, date
 
 class AddEntityToGroupForm(forms.Form):
-    group_name = forms.CharField(
+    group_name = forms.CharField(label=_(u"Group name"),
         widget=forms.TextInput(attrs={'placeholder': _(u'name of a group')})
     )
     
@@ -70,7 +70,10 @@ class EditGroupForm(forms.ModelForm):
             widget=FilteredSelectMultiple(_(u"entities"), False)
         )
         
-class ModelFormWithCity(forms.ModelForm):
+from form_utils.forms import BetterModelForm
+
+#class ModelFormWithCity(forms.ModelForm):
+class ModelFormWithCity(BetterModelForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
     def __init__(self, *args, **kwargs):
@@ -150,10 +153,23 @@ class EntityForm(ModelFormWithCity):
     
     def __init__(self, *args, **kwargs):
         super(EntityForm, self).__init__(*args, **kwargs)
+        
+        #self.field_groups = {
+        #    _(u'Name'): ['name', 'description', 'relationship_date'],
+        #    _(u'Phone / Web'): ['website', 'email', 'phone', 'fax'],
+        #    _(u'Address'): ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+        #}
     
     class Meta:
         model = models.Entity
-        exclude = ('imported_by',)
+        exclude = ('imported_by', 'is_single_contact')
+        fieldsets = [
+            ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
+            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Phone / Web')}),
+            ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+            ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
+        ]
+    
 
 class ContactForm(ModelFormWithCity):
     city = forms.CharField(
@@ -163,30 +179,39 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
                 'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
         }
-    
+        fieldsets = [
+            ('name', {'fields': ['gender', 'lastname', 'firstname', 'nickname', 'birth_date'], 'legend': _(u'Name')}),
+            ('job', {'fields': ['title', 'role', 'job'], 'legend': _(u'Job')}),
+            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
+            ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+            ('relationship', {'fields': ['main_contact', 'accept_newsletter', 'accept_3rdparty', 'has_left'], 'legend': _(u'Relationship')}),
+            ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
+            ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
+        ]
+        
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
         self.fields["role"].help_text = ""
 
-class MiniContactForm(forms.ModelForm):
-    class Meta:
-        model = models.Contact
-        fields=('gender', 'firstname', 'lastname', 'title', 'role', 'phone', 'mobile', 'email', 'has_left', 'main_contact', 'notes')
-        widgets = {
-            'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
-            'role': forms.SelectMultiple(attrs={
-                'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(MiniContactForm, self).__init__(*args, **kwargs)
-        self.fields["role"].help_text = ""
+#class MiniContactForm(forms.ModelForm):
+#    class Meta:
+#        model = models.Contact
+#        fields=('gender', 'firstname', 'lastname', 'title', 'role', 'phone', 'mobile', 'email', 'has_left', 'main_contact', 'notes')
+#        widgets = {
+#            'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
+#            'role': forms.SelectMultiple(attrs={
+#                'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
+#        }
+#
+#    def __init__(self, *args, **kwargs):
+#        super(MiniContactForm, self).__init__(*args, **kwargs)
+#        self.fields["role"].help_text = ""
 
 
 class EntityTypeForm(forms.ModelForm):

@@ -244,9 +244,11 @@ def edit_entity(request, entity_id):
     )
 
 @user_passes_test(can_access)
-def create_entity(request):
+def create_entity(request, entity_type_id):
+    entity_type = get_object_or_404(models.EntityType, id=entity_type_id)
+    entity = models.Entity(type=entity_type)
+    
     if request.method == "POST":
-        entity = models.Entity()
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
@@ -260,14 +262,16 @@ def create_entity(request):
             if entity.contact_set.count() > 0:
                 return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
-        else:
-            entity = None
     else:
-        form = forms.EntityForm()
-
+        form = forms.EntityForm(instance=entity, initial={'relationship_date': date.today()})
+        
     return render_to_response(
         'Crm/edit_entity.html',
-        locals(),
+        {
+            'entity': entity,
+            'form': form,
+            'create_entity': True,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -278,7 +282,7 @@ def delete_entity(request, entity_id):
     if request.method == 'POST':
         if 'confirm' in request.POST:
             entity.delete()
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(reverse('sanza_homepage'))
         else:
             return HttpResponseRedirect(reverse('crm_edit_entity', args=[entity.id]))
     
@@ -351,33 +355,32 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     entity = contact.entity
     
     if request.method == 'POST':
-        if mini:
-            contact_form = forms.MiniContactForm(request.POST, instance=contact)
-        else:
-            contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
+        form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         
-        if contact_form.is_valid():
-            contact = contact_form.save()
-            if not mini:
-                photo = contact_form.cleaned_data['photo']
-                if photo != None:
-                    if type(photo)==bool:
-                        contact.photo = None
-                        contact.save()
-                    else:
-                        contact.photo.save(photo.name, photo)
+        if form.is_valid():
+            contact = form.save()
+            photo = form.cleaned_data['photo']
+            if photo != None:
+                if type(photo)==bool:
+                    contact.photo = None
+                    contact.save()
+                else:
+                    contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
-    else:
-        if mini:
-            contact_form = forms.MiniContactForm(instance=contact)
         else:
-            contact_form = forms.ContactForm(instance=contact)
+            print form.errors
+    else:
+        form = forms.ContactForm(instance=contact)
         
     return render_to_response(
         'Crm/edit_contact.html',
-        locals(),
+        {
+            'form': form,
+            'contact': contact,
+            'entity': entity,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -436,16 +439,62 @@ def add_contact(request, entity_id):
     
     if request.method == 'POST':
         contact = models.Contact(entity=entity)
-        contact_form = forms.MiniContactForm(request.POST, instance=contact)
+        contact_form = forms.ContactForm(request.POST, instance=contact)
         if contact_form.is_valid():
-            contact_form.save()
+            contact = contact_form.save()
+            photo = contact_form.cleaned_data['photo']
+            if photo != None:
+                if type(photo)==bool:
+                    contact.photo = None
+                    contact.save()
+                else:
+                    contact.photo.save(photo.name, photo)
+                    
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
-        contact_form = forms.MiniContactForm()
+        contact_form = forms.ContactForm()
         
     return render_to_response(
         'Crm/edit_contact.html',
-        locals(),
+        {
+            "entity": entity,
+            "form": contact_form,
+        },
+        context_instance=RequestContext(request)
+    )
+
+@login_required
+def add_single_contact(request):
+    if request.method == 'POST':
+        contact = models.Contact()
+        contact_form = forms.ContactForm(request.POST, instance=contact)
+        if contact_form.is_valid():
+            
+            entity = models.Entity(
+                name = contact.fullname,
+                is_single_contact = True
+            )
+            entity.save()
+            #This create a default contact
+            default_contact = entity.contact_set.all()[0]
+            
+            contact = contact_form.save(commit=False)
+            contact.entity = entity
+            contact.save()
+            
+            default_contact.delete()
+            
+            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
+    else:
+        contact = None
+        contact_form = forms.ContactForm()
+        
+    return render_to_response(
+        'Crm/edit_contact.html',
+        {
+            'contact': contact,
+            'form': contact_form,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -1017,7 +1066,7 @@ def confirm_contacts_import(request, import_id):
                                 cfv, _x = models.ContactCustomFieldValue.objects.get_or_create(custom_field=cf, contact=contact)
                                 cfv.value = value 
                                 cfv.save()
-                return HttpResponseRedirect("/")
+                return HttpResponseRedirect(reverse("sanza_homepage"))
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
         else:

@@ -1,25 +1,30 @@
-{% extends "sanza/base.html" %}
+{% extends "sanza/tab_form.html" %}
 {% load i18n %}{% load url from future %}
 
-{% block document_content %}
-  {% if entity %}
+{% block doc_header %}
+  {% if entity.id %}
   <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
   {% else %}
-  <h2>{% trans "Create entity" %}</h2>
+  <h2>
+    {% if entity.type.is_male %}
+      {% trans "NewMale" %} {{entity.type}}
+    {% else %}
+      {% trans "NewFemale" %} {{entity.type}}
+    {% endif %}
+  </h2>
   {% endif %}
-  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
-    <div class="buttons">
-    <input type="submit" value="{% trans "Save"%}">
-    {% if entity %}
+{% endblock %}
+
+{% block form_buttons %}
+  <input type="submit" value="{% trans "Save"%}">
+  {% if entity.id %}
     <a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%} ">{% trans "Delete" %}</a>
     <a href="{% url "crm_view_entity" entity.id%}">{% trans "Cancel" %}</a>
-    {% else %}
+  {% else %}
     <a href="{% url "crm_board_panel" %}">{% trans "Cancel" %}</a>
-    {% endif %}
-    </div>
-    <ul>
-      {{form.as_ul}}
-    </ul>
-  </form>
+  {% endif %}
+{% endblock %}
+
+{% block doc_footer %}
   {% include "sanza/_calendar.html" with field="relationship_date" %}
 {% endblock %}

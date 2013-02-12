@@ -3,12 +3,16 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from sanza.Crm import models
 
-admin.site.register(models.EntityType)
 admin.site.register(models.Zone)
 admin.site.register(models.EntityRole)
 admin.site.register(models.ActionType)
 admin.site.register(models.SameAs)
 admin.site.register(models.OpportunityType)
+
+class EntityTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'gender', 'order']
+    list_editable = ['name', 'gender', 'order']
+admin.site.register(models.EntityType, EntityTypeAdmin)
 
 class ZoneTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'type']

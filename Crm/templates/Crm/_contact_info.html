@@ -2,35 +2,45 @@
 {% load i18n sanza_utils %}{% load url from future %}
 
 {% block section_title %}
+<div class="contact_logo">
+{% if contact.photo %}
+  <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
+{% else %}
+  <img src="{{contact.default_logo}}"/>
+{% endif %}
+</div>
+  
 <div class="contact_info">
-  <div class="entity_logo">
-  {% if contact.photo %}
-    <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
-  {% else %}
-    {% if entity.logo %}
-    <img src="{{MEDIA_URL}}{{entity.logo_thumbnail}}"/>
-    {% else %}
-    <img src="{{STATIC_URL}}img/no-logo.png"/>
-  {% endif %}{% endif %}
-  </div>
-  <div> <span class="title">{{contact}}</span>
-  {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
+  <div>
+    <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
+    <a href="{% url crm_view_entity contact.entity.id %}" class="contact-entity-info">
+      <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
+    </a>
+     {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
   </div>
   <br/>
+  <div>
   <span class="addr-info entity-info"><a href="{% url "crm_view_entity" contact.entity.id %}">{{contact.entity}}</a></span>
-  {% with contact.get_roles as roles %}{% if roles %}<span class="addr-info role-info">{{roles|seq_to_dash}}</span>{% endif %}{% endwith %}
+  {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
+  {% with contact.get_roles as roles %}
+    {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}
+  {% endwith %}
+  </div>
 </div>
 {% endblock %}
   
 {% block section_data %}
-{% if contact.get_full_address %}<span class="addr-info">{{contact.get_full_address}}</span>{% endif %}
+{% if contact.get_full_address %}<span class="addr-info">{{contact.get_full_address}}</span>{% endif %}<br /><br />
 {% if contact.get_email %}<span class="addr-info"><a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a></span>{% endif %}
 {% with contact.get_phones as phones %}{% if phones %}<span class="addr-info">{{phones|seq_to_dash}}</span>{% endif %}{% endwith %}
 <br /><br />
-<span class="notes">{{contact.notes}}</span>
+{% if contact.notes %}
+<div class="notes">{{contact.notes|linebreaksbr}}</div>
+{% endif %}
 {% endblock %}
 
 
 {% block section_action %}
     <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a>
+    <a class="colorbox-form" href="{% url crm_delete_contact contact.id %}">{% trans "Delete" %}</a>
 {% endblock %}
