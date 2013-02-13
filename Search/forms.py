@@ -216,6 +216,8 @@ class SearchForm(forms.Form):
                 if lookup:
                     if type(lookup) is dict:
                         filter_lookup.update(lookup)
+                    elif type(lookup) is list:
+                        q_objs.extend(lookup)
                     else:
                         q_objs.append(lookup)
 
@@ -224,6 +226,8 @@ class SearchForm(forms.Form):
                     if xcl_lkp:
                         if type(xcl_lkp) is dict:
                             exclude_lookup.update(xcl_lkp)
+                        elif type(xcl_lkp) is list:
+                            exclude_q_objs.extend(xcl_lkp)
                         else:
                             exclude_q_objs.append(xcl_lkp)
                 
@@ -235,6 +239,11 @@ class SearchForm(forms.Form):
                 contacts_set = contacts_set.filter(q_obj)
             if exclude_lookup:
                 contacts_set = contacts_set.exclude(**exclude_lookup)
+            print "******************************"
+            from django.db.models import Q
+            for c in contacts_set.filter(~Q(group__id=110)):
+                print c.group_set.all()
+            print "******************************"
             for q_obj in exclude_q_objs:
                 contacts_set = contacts_set.exclude(q_obj)
             contacts = contacts.union(set(contacts_set))
