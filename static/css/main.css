@@ -561,7 +561,7 @@ form.search-form {
     background: #ccc;
 }
 
-.entity_group.label {
+.entity_group.label, .contact_group.label {
   -webkit-border-radius: 3px;
   -moz-border-radius   : 3px;
   border-radius        : 3px;
@@ -587,22 +587,21 @@ form.search-form {
   position: relative;
   cursor: default;
 }
-.entity_group.label-focus {
+
+.entity_group_on_contact.label a{
+	color: #444;
+}
+
+.entity_group.label-focus, contact_group.label-focus {
   background: #d4d4d4;
 }
-/*
-.entity_group.label {
-	margin-bottom: 1px;
-	background: #eee;
-	padding: 1px 2px;
-}
-*/
-.entity_group a.group-name {
+
+.entity_group a.group-name, .contact_group a.group-name {
 	display: inline-block;
 	padding-bottom: 1px;
 }
 
-.entity_group .btn-close {
+.entity_group .btn-close, .contact_group .btn-close {
   margin-top: 1px;
   display: inline-block;
   border: solid thin #bbb;
@@ -612,10 +611,10 @@ form.search-form {
   background: url(../chosen/chosen-sprite.png) right top no-repeat;
 }
 
-.entity_group .btn-close:hover {
+.entity_group .btn-close:hover, .contact_group .btn-close:hover {
   background-position: right -11px;
 }
-.entity_group .btn-close {
+.entity_group .btn-close, .contact_group .btn-close:hover {
   background-position: right top;
 }
 

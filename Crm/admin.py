@@ -27,7 +27,7 @@ admin.site.register(models.Contact, ContactAdmin)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ['name', 'description']
     search_fields = ['name']
-    filter_horizontal = ['entities']
+    filter_horizontal = ['entities', 'contacts']
 admin.site.register(models.Group, GroupAdmin)
 
 class GroupInline(admin.TabularInline):

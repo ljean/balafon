@@ -25,6 +25,21 @@ class AddEntityToGroupForm(forms.Form):
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
             raise ValidationError(_(u"The entity already belong to group {0}").format(name))
         return name
+    
+class AddContactToGroupForm(forms.Form):
+    group_name = forms.CharField(
+        widget=forms.TextInput(attrs={'placeholder': _(u'name of a group')})
+    )
+    
+    def __init__(self, contact, *args, **kwargs):
+        self.contact = contact
+        super(AddContactToGroupForm, self).__init__(*args, **kwargs)
+    
+    def clean_group_name(self):
+        name = self.cleaned_data['group_name']
+        if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
+            raise ValidationError(_(u"The contact already belong to group {0}").format(name))
+        return name
 
 class EditGroupForm(forms.ModelForm):
     class Meta:
