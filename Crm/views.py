@@ -173,15 +173,15 @@ def remove_contact_from_group(request, group_id, contact_id):
         print "#ERR", msg
         raise
     
-@login_required
-def get_group_members(request, group_id):
-    group = get_object_or_404(models.Group, id=group_id)
-    group.save() #update last access
-    return render_to_response(
-        'Crm/group_members.html',
-        {'group': group, 'entities': group.entities.all().order_by('name')},
-        context_instance=RequestContext(request)
-    )
+#@login_required
+#def get_group_members(request, group_id):
+#    group = get_object_or_404(models.Group, id=group_id)
+#    group.save() #update last access
+#    return render_to_response(
+#        'Crm/group_members.html',
+#        {'group': group, 'entities': group.entities.all().order_by('name')},
+#        context_instance=RequestContext(request)
+#    )
     
 @login_required
 def edit_group(request, group_id):
