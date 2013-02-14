@@ -380,14 +380,21 @@ def add_contacts_to_group(request):
                 form = GroupForContactsForm(request.POST)
                 if form.is_valid():
                     contacts = form.get_contacts()
-                    entities = set([c.entity for c in contacts])
                     groups = form.cleaned_data['groups']
-                    for g in groups:
-                        for entity in entities:
-                        #create opportunity
-                            g.entities.add(entity)
-                        g.save()
-                    messages.add_message(request, messages.SUCCESS, _(u"{0} entities have been added to groups".format(len(entities))))
+                    
+                    if form.cleaned_data["on_contact"]:
+                        for g in groups:
+                            for c in contacts:
+                                g.contacts.add(c)
+                            g.save()
+                        messages.add_message(request, messages.SUCCESS, _(u"{0} contacts have been added to groups".format(len(contacts))))
+                    else:
+                        entities = set([c.entity for c in contacts])
+                        for g in groups:
+                            for entity in entities:
+                                g.entities.add(entity)
+                            g.save()
+                        messages.add_message(request, messages.SUCCESS, _(u"{0} entities have been added to groups".format(len(entities))))
                     return HttpResponseRedirect(reverse('crm_board_panel'))
                 else:
                     return render_to_response(

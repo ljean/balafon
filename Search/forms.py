@@ -216,6 +216,8 @@ class SearchForm(forms.Form):
                 if lookup:
                     if type(lookup) is dict:
                         filter_lookup.update(lookup)
+                    elif type(lookup) is list:
+                        q_objs.extend(lookup)
                     else:
                         q_objs.append(lookup)
 
@@ -224,6 +226,8 @@ class SearchForm(forms.Form):
                     if xcl_lkp:
                         if type(xcl_lkp) is dict:
                             exclude_lookup.update(xcl_lkp)
+                        elif type(xcl_lkp) is list:
+                            exclude_q_objs.extend(xcl_lkp)
                         else:
                             exclude_q_objs.append(xcl_lkp)
                 

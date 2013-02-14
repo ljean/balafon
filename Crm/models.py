@@ -386,6 +386,7 @@ class Group(TimeStampedModel):
     name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
     description = models.CharField(_(u'description'), max_length=200, blank=True, default="")
     entities = models.ManyToManyField(Entity, blank=True, null=True)
+    contacts = models.ManyToManyField(Contact, blank=True, null=True)
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This group will be proposed on the public subscribe form'))
 

@@ -89,6 +89,39 @@ def add_entity_to_group(request, entity_id):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
+def add_contact_to_group(request, contact_id):
+    try:
+        contact = get_object_or_404(models.Contact, id=contact_id)
+        
+        if request.method == "POST":
+            form = forms.AddContactToGroupForm(contact, request.POST)
+            if form.is_valid():
+                name = form.cleaned_data["group_name"]
+                group, is_new = models.Group.objects.get_or_create(name=name)
+                group.contacts.add(contact)
+                group.save()
+                next_url = reverse('crm_view_contact', args=[contact_id])
+                return HttpResponseRedirect(next_url)
+        else:
+            form = forms.AddContactToGroupForm(contact)
+        
+        context_dict = {
+            'contact': contact,
+            'form': form,
+            #'request': request,
+        }
+    
+        return render_to_response(
+            'Crm/add_contact_to_group.html',
+            context_dict,
+            context_instance=RequestContext(request)
+        )
+    except Exception, msg:
+        print "#ERR", msg
+        raise
+
+@login_required
 def get_group_suggest_list(request):
     try:
         suggestions = []
@@ -117,16 +150,39 @@ def remove_entity_from_group(request, group_id, entity_id):
         },
         context_instance=RequestContext(request)
     )
-    
+
 @user_passes_test(can_access)
-def get_group_members(request, group_id):
-    group = get_object_or_404(models.Group, id=group_id)
-    group.save() #update last access
-    return render_to_response(
-        'Crm/group_members.html',
-        {'group': group, 'entities': group.entities.all().order_by('name')},
-        context_instance=RequestContext(request)
-    )
+@popup_redirect
+def remove_contact_from_group(request, group_id, contact_id):
+    try:
+        contact = get_object_or_404(models.Contact, id=contact_id)
+        group = get_object_or_404(models.Group, id=group_id)
+        if request.method == 'POST':
+            if 'confirm' in request.POST:
+                group.contacts.remove(contact)
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact_id]))
+        
+        return render_to_response(
+            'sanza/confirmation_dialog.html',
+            {
+                'message': _(u'Do you want to remove {0.fullname} from the {1.name} group?').format(contact, group),
+                'action_url': reverse("crm_remove_contact_from_group", args=[group_id, contact_id]),
+            },
+            context_instance=RequestContext(request)
+        )
+    except Exception, msg:
+        print "#ERR", msg
+        raise
+    
+#@login_required
+#def get_group_members(request, group_id):
+#    group = get_object_or_404(models.Group, id=group_id)
+#    group.save() #update last access
+#    return render_to_response(
+#        'Crm/group_members.html',
+#        {'group': group, 'entities': group.entities.all().order_by('name')},
+#        context_instance=RequestContext(request)
+#    )
     
 @user_passes_test(can_access)
 def edit_group(request, group_id):

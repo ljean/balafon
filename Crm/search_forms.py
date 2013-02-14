@@ -157,7 +157,7 @@ class GroupSearchForm(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return Q(entity__group__id=self._value)
+        return Q(entity__group__id=self._value) | Q(group__id=self._value)
 
 class NotInGroupSearchForm(SearchFieldForm):
     _name = 'not_in_group'
@@ -175,11 +175,7 @@ class NotInGroupSearchForm(SearchFieldForm):
         self._add_field(field)
     
     def get_lookup(self):
-        pass
-        
-    def get_exclude_lookup(self):
-        return {'entity__group__id': self._value}
-
+        return [~Q(entity__group__id=self._value), ~Q(group__id=self._value)]
 
 class ContactAgeSearchForm(SearchFieldForm):
     _name = 'contact_age'

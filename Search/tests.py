@@ -88,6 +88,32 @@ class GroupSearchTest(BaseTestCase):
         
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
+        
+    def test_search_contact_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group = mommy.make_one(models.Group, name=u"my group")
+        group.contacts.add(contact1)
+        group.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
     
     def test_search_two_group(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
@@ -120,6 +146,67 @@ class GroupSearchTest(BaseTestCase):
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
         
+    def test_search_two_group_with_contacts(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make_one(models.Group, name=u"my group")
+        group1.contacts.add(contact1)
+        group1.save()
+        
+        group2 = mommy.make_one(models.Group, name=u"oups")
+        group2.contacts.add(contact1)
+        group2.contacts.add(contact2)
+        group2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-group-_-1": group2.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_search_two_group_mix_entity_contacts(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make_one(models.Group, name=u"my group")
+        group1.contacts.add(contact1)
+        group1.save()
+        
+        group2 = mommy.make_one(models.Group, name=u"oups")
+        group2.contacts.add(contact1)
+        group2.entities.add(entity2)
+        group2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-group-_-1": group2.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
         
     def test_search_two_group_not_in(self):
         entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
@@ -178,6 +265,68 @@ class GroupSearchTest(BaseTestCase):
         self.assertNotContains(response, entity1.name)
         self.assertNotContains(response, contact1.lastname)
         self.assertNotContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+    def test_search_contacts_two_group_in_and_not_in(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make_one(models.Group, name=u"my group")
+        group1.contacts.add(contact1)
+        group1.contacts.add(contact2)
+        group1.save()
+        
+        group2 = mommy.make_one(models.Group, name=u"oups")
+        group2.contacts.add(contact1)
+        group2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-not_in_group-_-1": group2.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+    def test_search_contacts_entities_two_group_in_and_not_in(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make_one(models.Group, name=u"my group")
+        group1.entities.add(entity1)
+        group1.entities.add(entity2)
+        group1.save()
+        
+        group2 = mommy.make_one(models.Group, name=u"oups")
+        group2.contacts.add(contact1)
+        group2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-not_in_group-_-1": group2.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
         
         self.assertContains(response, entity2.name)
         self.assertContains(response, contact2.lastname)
@@ -654,4 +803,77 @@ class MailtoContactsTest(BaseTestCase):
         url = reverse('search_mailto_contacts', args=[0])
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
+        
+
+class AddToGroupActionTest(BaseTestCase):
+    
+    def test_add_contact_to_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group = mommy.make_one(models.Group, name="GROUP1")
+        group.entities.add(entity1)
+        group.entities.add(entity2)
+        group.save()
+        
+        group2 = mommy.make_one(models.Group, name="GROUP2")
+        self.assertEqual(group2.entities.count(), 0)
+        self.assertEqual(group2.contacts.count(), 0)
+        
+        contacts = [contact1, contact2, contact3]
+        url = reverse('search_add_contacts_to_group')
+        data = {
+            "gr0-_-group-_-0": group.id, 'add_to_group': 'add_to_group',
+            'groups': [group2.id], 'on_contact': True, 'contacts': ";".join([str(c.id) for c in contacts]) }
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(reverse('crm_board_panel')))
+        
+        group2 = models.Group.objects.get(id=group2.id)
+        
+        for c in contacts:
+            self.assertTrue(c in group2.contacts.all())
+        for e in [entity1, entity2]:
+            self.assertFalse(e in group2.entities.all())
+            
+    def test_add_entity_to_group(self):
+        entity1 = mommy.make_one(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make_one(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make_one(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make_one(models.Entity, name=u"Other corp")
+        contact2 = mommy.make_one(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group = mommy.make_one(models.Group, name="GROUP1")
+        group.entities.add(entity1)
+        group.entities.add(entity2)
+        group.save()
+        
+        group2 = mommy.make_one(models.Group, name="GROUP2")
+        self.assertEqual(group2.entities.count(), 0)
+        self.assertEqual(group2.contacts.count(), 0)
+        
+        contacts = [contact1, contact2, contact3]
+        url = reverse('search_add_contacts_to_group')
+        data = {
+            "gr0-_-group-_-0": group.id, 'add_to_group': 'add_to_group',
+            'groups': [group2.id], 'on_contact': False, 'contacts': ";".join([str(c.id) for c in contacts]) }
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(reverse('crm_board_panel')))
+        
+        group2 = models.Group.objects.get(id=group2.id)
+        
+        for c in contacts:
+            self.assertFalse(c in group2.contacts.all())
+        for e in [entity1, entity2]:
+            self.assertTrue(e in group2.entities.all())
         

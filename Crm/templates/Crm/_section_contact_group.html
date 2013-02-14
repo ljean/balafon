@@ -1,0 +1,28 @@
+{% extends "sanza/_section.html" %}
+{% load i18n %}{% load url from future %}
+
+{% block section_title %}{% trans "Groups" %}{% endblock %}
+  
+{% block section_data %}
+  {% for g in contact.entity.group_set.all %}
+    <span class="entity_group entity_group_on_contact label" title="{{g.description}}">
+      {% spaceless %}
+      <a href="{% url "search_group" g.id %}" class="group-name">{{g.name}}</a>
+      {% endspaceless %}
+    </span>
+  {% endfor %}
+  {% for g in contact.group_set.all %}
+    <span class="contact_group label" title="{{g.description}}">
+      {% spaceless %}
+      <a href="{% url "search_group" g.id %}" class="group-name">{{g.name}}</a>
+      <a class="colorbox-form btn-close" href="{% url "crm_remove_contact_from_group" g.id contact.id %}" title="{% trans "Remove from group" %}"></a>
+      {% endspaceless %}
+    </span>
+  {% endfor %}
+{% endblock %}
+
+{% block section_action %}
+  {% if contact %}
+    <a class="colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">{% trans "Add" %}</a>
+  {% endif %}
+{% endblock %}
