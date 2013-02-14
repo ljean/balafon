@@ -205,6 +205,12 @@ class GroupTest(BaseTestCase):
         url = reverse('crm_add_entity_to_group', args=[entity.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+        
+    def test_view_add_contact_group(self):
+        contact = mommy.make_one(models.Contact)
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
     
     def test_add_group_new(self):
         entity = mommy.make_one(models.Entity)
@@ -214,11 +220,28 @@ class GroupTest(BaseTestCase):
         url = reverse('crm_add_entity_to_group', args=[entity.id])
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[entity.id]))
         
         self.assertEqual(1, models.Group.objects.count())
         group = models.Group.objects.all()[0]
         self.assertEqual(group.name, data['group_name'])
         self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.subscribe_form, False)
+        
+    def test_add_contact_group_new(self):
+        contact = mommy.make_one(models.Contact)
+        data = {
+            'group_name': 'toto'
+        }
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.contacts.all()), [contact])
         self.assertEqual(group.subscribe_form, False)
         
     def test_add_group_existing(self):
@@ -230,11 +253,256 @@ class GroupTest(BaseTestCase):
         url = reverse('crm_add_entity_to_group', args=[entity.id])
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[entity.id]))
         
         self.assertEqual(1, models.Group.objects.count())
         group = models.Group.objects.all()[0]
         self.assertEqual(group.name, data['group_name'])
         self.assertEqual(list(group.entities.all()), [entity])
+        
+    def test_add_already_in_group(self):
+        group = mommy.make_one(models.Group, name='toto')
+        entity = mommy.make_one(models.Entity)
+        data = {
+            'group_name': group.name
+        }
+        group.entities.add(entity)
+        group.save()
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, reverse('crm_view_entity', args=[entity.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [entity])
+        
+    def test_add_entity_contact_already_in_group(self):
+        group = mommy.make_one(models.Group, name='toto')
+        contact = mommy.make_one(models.Contact)
+        data = {
+            'group_name': group.name
+        }
+        group.contacts.add(contact)
+        group.save()
+        url = reverse('crm_add_entity_to_group', args=[contact.entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[contact.entity.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [contact.entity])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        
+    def test_add_contact_entity_already_in_group(self):
+        group = mommy.make_one(models.Group, name='toto')
+        contact = mommy.make_one(models.Contact)
+        data = {
+            'group_name': group.name
+        }
+        group.entities.add(contact.entity)
+        group.save()
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [contact.entity])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        
+    def test_add_contact_group_existing(self):
+        group = mommy.make_one(models.Group, name='toto')
+        contact = mommy.make_one(models.Contact)
+        data = {
+            'group_name': group.name
+        }
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        
+    def test_add_contact_already_in_group(self):
+        group = mommy.make_one(models.Group, name='toto')
+        contact = mommy.make_one(models.Contact)
+        group.contacts.add(contact)
+        group.save()
+        data = {
+            'group_name': group.name
+        }
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        
+    def test_view_contact(self):
+        
+        contact = mommy.make_one(models.Contact)
+        
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr2 = mommy.make_one(models.Group, name="GROUP2")
+        gr3 = mommy.make_one(models.Group, name="GROUP3")
+        
+        gr1.contacts.add(contact)
+        gr2.entities.add(contact.entity)
+        
+        url = reverse('crm_view_contact', args=[contact.id])
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertContains(response, gr1.name)
+        self.assertContains(response, gr2.name)
+        self.assertNotContains(response, gr3.name)
+        
+    def test_view_entity(self):
+        
+        contact = mommy.make_one(models.Contact)
+        
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr2 = mommy.make_one(models.Group, name="GROUP2")
+        gr3 = mommy.make_one(models.Group, name="GROUP3")
+        
+        gr1.contacts.add(contact)
+        gr2.entities.add(contact.entity)
+        
+        url = reverse('crm_view_entity', args=[contact.entity.id])
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertNotContains(response, gr1.name)
+        self.assertContains(response, gr2.name)
+        self.assertNotContains(response, gr3.name)
+        
+    def test_remove_contact_form_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr1.contacts.add(contact)
+        self.assertEqual(1, gr1.contacts.count())
+        
+        url = reverse('crm_remove_contact_from_group', args=[gr1.id, contact.id])
+        
+        data = {'confirm': "1"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(0, gr1.contacts.count())
+        
+    def test_remove_contact_not_in_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        self.assertEqual(0, gr1.contacts.count())
+        
+        url = reverse('crm_remove_contact_from_group', args=[gr1.id, contact.id])
+        
+        data = {'confirm': "1"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(0, gr1.contacts.count())
+        
+    def test_cancel_remove_contact_form_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr1.contacts.add(contact)
+        self.assertEqual(1, gr1.contacts.count())
+        
+        url = reverse('crm_remove_contact_from_group', args=[gr1.id, contact.id])
+        
+        data = {}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(1, gr1.contacts.count())
+        
+    def test_remove_entity_form_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr1.entities.add(contact.entity)
+        self.assertEqual(1, gr1.entities.count())
+        
+        url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
+        
+        data = {'confirm': "1"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[contact.entity.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(0, gr1.entities.count())
+    
+    def test_remove_entity_not_in_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        self.assertEqual(0, gr1.entities.count())
+        
+        url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
+        
+        data = {'confirm': "1"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[contact.entity.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(0, gr1.entities.count())
+    
+        
+    def test_cancel_remove_entity_form_group(self):
+        
+        contact = mommy.make_one(models.Contact)
+        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        gr1.entities.add(contact.entity)
+        self.assertEqual(1, gr1.entities.count())
+        
+        url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
+        
+        data = {}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[contact.entity.id]))
+        
+        gr1 = models.Group.objects.get(id=gr1.id)
+        self.assertEqual(1, gr1.entities.count())
+        
         
 class CustomFieldTest(BaseTestCase):
     
@@ -493,4 +761,5 @@ class AddressOverloadTest(BaseTestCase):
         
             for (att, val) in contact_address.items():
                 self.assertEqual(getattr(contact, att), val)
+    
     
