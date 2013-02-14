@@ -299,6 +299,8 @@ class OpportunityForContactsForm(forms.ModelForm):
 class GroupForContactsForm(forms.Form):
     contacts = forms.CharField(widget=forms.HiddenInput())
     groups = forms.ModelMultipleChoiceField(queryset=models.Group.objects.all())
+    on_contact = forms.BooleanField(_(u"Group on contact"),
+        help_text=_(u"Define if the group is added on the contact itself or on his entity"))
     
     class Media:
         css = {

@@ -239,11 +239,6 @@ class SearchForm(forms.Form):
                 contacts_set = contacts_set.filter(q_obj)
             if exclude_lookup:
                 contacts_set = contacts_set.exclude(**exclude_lookup)
-            print "******************************"
-            from django.db.models import Q
-            for c in contacts_set.filter(~Q(group__id=110)):
-                print c.group_set.all()
-            print "******************************"
             for q_obj in exclude_q_objs:
                 contacts_set = contacts_set.exclude(q_obj)
             contacts = contacts.union(set(contacts_set))
