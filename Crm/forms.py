@@ -10,6 +10,7 @@ from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete
 from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
+from form_utils.forms import BetterModelForm
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
@@ -87,7 +88,6 @@ class EditGroupForm(forms.ModelForm):
         )
         
         self.fields['contacts'] = forms.ModelMultipleChoiceField(
-from form_utils.forms import BetterModelForm
             queryset=models.Entity.objects.all(),
             widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
