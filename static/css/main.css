@@ -1,5 +1,5 @@
 body {
-    font-family: 'Arial';
+    font-family: 'Tahoma';
     font-size: small;
     background-color: #ebeffd;
 	color: #222;
@@ -596,6 +596,10 @@ form.search-form {
   margin: 3px 0 3px 5px;
   position: relative;
   cursor: default;
+}
+
+.contact_group.label {
+	background: #ffe8e8
 }
 
 .entity_group_on_contact.label a{

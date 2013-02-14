@@ -334,7 +334,7 @@ class Contact(TimeStampedModel):
         return object.__getattribute__(self, attr)
     
     def get_absolute_url(self):
-        return reverse('crm_edit_contact', args=[self.id])
+        return reverse('crm_view_contact', args=[self.id])
 
     def get_email_address(self):
         return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
