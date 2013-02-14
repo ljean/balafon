@@ -44,6 +44,7 @@ class AddContactToGroupForm(forms.Form):
 class EditGroupForm(forms.ModelForm):
     class Meta:
         model = models.Group
+        fields = ('name', 'description', 'subscribe_form', 'entities', 'contacts')
         widgets = {
             'description': forms.TextInput(
                 attrs={
@@ -83,6 +84,11 @@ class EditGroupForm(forms.ModelForm):
         self.fields['entities'] = forms.ModelMultipleChoiceField(
             queryset=models.Entity.objects.all(),
             widget=FilteredSelectMultiple(_(u"entities"), False)
+        )
+        
+        self.fields['contacts'] = forms.ModelMultipleChoiceField(
+            queryset=models.Entity.objects.all(),
+            widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
         
 class ModelFormWithCity(forms.ModelForm):
