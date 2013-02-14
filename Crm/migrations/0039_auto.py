@@ -3,7 +3,7 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-
+from django.db.utils import DatabaseError
 
 class Migration(SchemaMigration):
 
@@ -16,11 +16,9 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('Crm_group_contacts', ['group_id', 'contact_id'])
 
-
     def backwards(self, orm):
         # Removing M2M table for field contacts on 'Group'
         db.delete_table('Crm_group_contacts')
-
 
     models = {
         'Crm.action': {
@@ -132,12 +130,13 @@ class Migration(SchemaMigration):
             'fax': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'imported_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['Crm.ContactsImport']", 'null': 'True', 'blank': 'True'}),
+            'is_single_contact': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'logo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'relationship_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Crm.EntityType']"}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['Crm.EntityType']", 'null': 'True', 'blank': 'True'}),
             'website': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'zip_code': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '20', 'blank': 'True'})
         },
@@ -154,9 +153,12 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         'Crm.entitytype': {
-            'Meta': {'object_name': 'EntityType'},
+            'Meta': {'ordering': "['order']", 'object_name': 'EntityType'},
+            'gender': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+            'logo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'Crm.group': {
             'Meta': {'object_name': 'Group'},
