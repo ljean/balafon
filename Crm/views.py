@@ -17,6 +17,7 @@ from django.conf import settings
 import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
 from sanza.permissions import can_access
+
     
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -1126,8 +1127,6 @@ def confirm_contacts_import(request, import_id):
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
         else:
-            
-            print '#######', contacts_import.separator, type(contacts_import.separator)
             
             reader = unicode_csv_reader(contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator)
             contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
