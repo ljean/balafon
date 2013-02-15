@@ -4,7 +4,6 @@
   <link type="text/css" href="{{ STATIC_URL }}css/redmond/jquery-ui-1.8.16.custom.css" rel="Stylesheet" />	
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
   {% include "sanza/_calendar.html" with field="date" yearRange="c:c+2" colorbox="yes" %}
-  </script>
 {% endblock %}
 {% block title %}{% blocktrans %}Create actions for {{nb_contacts}} contacts{% endblocktrans %}{% endblock %}
 {% block form_url %}{% url "search_create_action_for_contacts" %}{% endblock %}
