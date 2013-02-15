@@ -81,7 +81,7 @@ class GroupedChoiceField(ChoiceField):
         for group_label, group in self.choices:
             valid_values += [str(k) for k, v in group]
         if value not in valid_values:
-            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(_(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class FieldChoiceForm(forms.Form):
@@ -420,4 +420,21 @@ class SearchActionForm(forms.Form, SearchActionBaseForm):
 class ContactsAdminForm(SearchActionForm):
     subscribe_newsletter = forms.BooleanField(required=False)
     
-
+class PdfTemplateForm(SearchActionForm):
+    
+    def __init__(self, *args, **kwargs):
+        super(PdfTemplateForm, self).__init__(*args, **kwargs)
+        
+        if getattr(settings, 'SANZA_PDF_TEMPLATES', None):
+            choices = settings.SANZA_PDF_TEMPLATES
+        else:
+            choices = (
+                ('pdf/small_labels.html', _(u'small labels')),
+                ('pdf/address_strip.html', _(u'address strip')),
+            )
+        
+        self.fields['template'] = ChoiceField(
+            choices=choices, required=True, label=_(u'template'),
+            help_text=_(u'Select the type of document to generate')
+        )
+        

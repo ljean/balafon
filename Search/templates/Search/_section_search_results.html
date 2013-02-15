@@ -115,6 +115,7 @@
 {% else %}
   {{ message }}
 {% endif %}
+
 {% endblock %}
 
 {% block section_action %}
@@ -130,6 +131,8 @@
 <a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a>
 <a href="{% url "search_create_opportunity_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create Opportunity" %}</a>
 <a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a>
+<a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a>
+
 {% if user.is_superuser %}<a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a>{% endif %}
 {% endif %}
 {% endblock %}

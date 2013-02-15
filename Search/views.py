@@ -18,11 +18,15 @@ from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
 from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
+from sanza.Search.forms import PdfTemplateForm
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from sanza.permissions import can_access
+import logging
+logger = logging.getLogger("sanza")
+from wkhtmltopdf.views import PDFTemplateView
 
 @user_passes_test(can_access)
 def quick_search(request):
@@ -129,7 +133,7 @@ def get_field(request, name):
     except KeyError:
         raise Http404
     except Exception, msg:
-        print 'Search.views.get_field ERROR', msg
+        logger.exception("get_field")
         raise
     
 class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
@@ -205,7 +209,7 @@ def create_emailing(request):
                         context_instance=RequestContext(request)
                     )
     except Exception, msg:
-        print "ERROR", msg
+        logger.exception("create_emailing")
         raise
     raise Http404
     
@@ -314,7 +318,7 @@ def create_action_for_contacts(request):
                             context_instance=RequestContext(request)
                         )
     except Exception, msg:
-        print msg
+        logger.exception("create_action_for_contacts")
         raise
     raise Http404
 
@@ -366,7 +370,7 @@ def create_opportunity_for_contacts(request):
                             context_instance=RequestContext(request)
                         )
     except Exception, msg:
-        print msg
+        logger.exception("create_opportunity_for_contacts")
         raise
     raise Http404
 
@@ -423,7 +427,7 @@ def add_contacts_to_group(request):
                             context_instance=RequestContext(request)
                         )
     except Exception, msg:
-        print msg
+        logger.exception("add_contacts_to_group")
         raise
     raise Http404
 
@@ -482,6 +486,50 @@ def contacts_admin(request):
                             context_instance=RequestContext(request)
                         )
     except Exception, msg:
-        print msg
+        logger.exception("contacts_admin")
+        raise
+    raise Http404
+
+@user_passes_test(can_access)
+@popup_redirect
+def export_to_pdf(request):
+    try:
+        if request.method == "POST":
+            if "export_to_pdf" in request.POST:
+                #called by the colorbox
+                form = PdfTemplateForm(request.POST)
+                if form.is_valid():
+                    template_name = form.cleaned_data['template']
+                    contacts = form.get_contacts()
+                    
+                    context = {
+                        "contacts": contacts,
+                    }
+                    
+                    pdf_view = PDFTemplateView(filename='sanza.pdf', template_name=template_name, request=request)
+                    return pdf_view.render_to_response(context)
+
+                    return render_to_pdf('template', context)
+                    
+                    #TODO close
+                    #return HttpResponseRedirect(newsletter.get_edit_url())
+                else:
+                    return render_to_response(
+                        'Search/export_to_pdf.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                search_form = forms.SearchForm(request.POST)
+                if search_form.is_valid():
+                    contacts = search_form.get_contacts()
+                    form = PdfTemplateForm(initial={'contacts': contacts})
+                    return render_to_response(
+                        'Search/export_to_pdf.html',
+                        {'form': form},
+                        context_instance=RequestContext(request)
+                    )
+    except Exception, msg:
+        logger.exception("export_to_pdf")
         raise
     raise Http404

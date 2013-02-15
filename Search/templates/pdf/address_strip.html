@@ -1,0 +1,10 @@
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <table>
+    {% for c in contacts %}
+        <tr><td>{{ c.fullname }}</td><td>{{ c.get_full_address }}</td></tr>
+    {% endfor %}
+    </table>
+{% endblock %}
