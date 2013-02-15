@@ -1,10 +1,43 @@
+{% extends "pdf/base.html" %}
+{% load i18n%}
 {% block extra_head %}
+<style>
+    table.contacts {
+        width: 100%;
+    }
+    td.contact {
+        width: 49.5%;
+        height: 35cm;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .warning {
+        color: red;
+        font-size: 1.2em;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-    <table>
+    <table class="contacts">
     {% for c in contacts %}
-        <tr><td>{{ c.fullname }}</td><td>{{ c.get_full_address }}</td></tr>
+        {% if forloop.counter0 == 0 or forloop.counter0|divisibleby:2 %}
+            <tr>
+        {% endif %}
+            <td class="contact">
+                <div class="name">{{ c.fullname }}</div>
+                {% if c.get_full_address %}
+                    <div class="address">{{ c.address1 }}</div>
+                    {% if c.address2 %}<div class="address">{{ c.address2 }}</div>{% endif %}
+                    {% if c.address3 %}<div class="address">{{ c.address3 }}</div>{% endif %}
+                    <div class="city">{{ c.zip_code }} {{ c.city }} {{ c.cedex }}</div>
+                {% else %}
+                    <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
+                {% endif %}
+            </td>
+        {% if forloop.counter|divisibleby:2 %}
+            </tr>
+        {% endif %}
     {% endfor %}
     </table>
 {% endblock %}
