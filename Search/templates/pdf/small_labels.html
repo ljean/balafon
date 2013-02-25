@@ -2,14 +2,19 @@
 {% load i18n%}
 {% block extra_head %}
 <style>
+    body {
+        font-family: "Calibri";
+        font-size: 11px;
+    }
     table.contacts {
         width: 100%;
+        margin-top: 8px;
+        margin-bottom: 8px;
     }
     td.contact {
         width: 24%;
-        height: 200px;
+        height: 148px;
         text-align: center;
-        border: solid thin #888;
         vertical-align: middle;
     }
     .warning {
@@ -28,10 +33,10 @@
             <td class="contact">
                 <div class="name">{{ c.fullname }}</div>
                 {% if c.get_full_address %}
-                    <div class="address">{{ c.address1 }}</div>
-                    {% if c.address2 %}<div class="address">{{ c.address2 }}</div>{% endif %}
-                    {% if c.address3 %}<div class="address">{{ c.address3 }}</div>{% endif %}
-                    <div class="city">{{ c.zip_code }} {{ c.city }} {{ c.cedex }}</div>
+                    <div class="address">{{ c.get_address }}</div>
+                    {% if c.address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
+                    {% if c.address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
+                    <div class="city">{{ c.get_zip_code }} {{ c.get_city }} {{ c.get_cedex }}</div>
                 {% else %}
                     <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
                 {% endif %}
