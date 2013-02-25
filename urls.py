@@ -29,10 +29,15 @@ if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
         url(r'^$', 'sanza.Crm.views.view_board_panel'),
     )
 
-if settings.DEBUG or ('test' in sys.argv):
-    urlpatterns += patterns('django.contrib.staticfiles.views',
-        url(r'^static/(?P<path>.*)$', 'serve'),
-    )
+if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
+    if settings.DEBUG:
+        urlpatterns += patterns('django.contrib.staticfiles.views',
+            url(r'^static/(?P<path>.*)$', 'serve'),
+        )
+    else:
+        urlpatterns += patterns('',
+            (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+        )
     urlpatterns += patterns('',
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes':True}),
     )
