@@ -223,19 +223,28 @@ class EntityRoleForm(forms.ModelForm):
     class Meta:
         model = models.EntityRole
 
-class ActionForm(forms.ModelForm):
-    date = forms.DateField(label=_(u"planned date"), required=False)
+class ActionForm(BetterModelForm):
+    date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
     
     class Meta:
         model = models.Action
-        fields = ('subject', 'date', 'time', 'type', 'in_charge', 'contact', 'opportunity', 'detail',
-            'priority', 'done', 'display_on_board', 'planned_date')
+        fields = ('type', 'subject', 'date', 'time', 'in_charge', 'contact', 'opportunity', 'detail',
+            'priority', 'amount', 'done', 'display_on_board', 'planned_date', 'archived')
+        fieldsets = [
+            ('name', {'fields': ['type', 'subject', 'date', 'time', 'contact', 'done', 'planned_date'], 'legend': _(u'Summary')}),
+            ('web', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'detail'], 'legend': _(u'Details')}),
+            ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
+        ]
 
-    def __init__(self, entity, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        entity = kwargs.pop('entity', None)
         super(ActionForm, self).__init__(*args, **kwargs)
-        if entity:
+        if entity and not entity.is_single_contact:
             self.fields['contact'].queryset = models.Contact.objects.filter(entity=entity)
+        else:
+            self.fields['contact'].widget = forms.HiddenInput()
+            
         if 'opportunity' in self.fields:
             self.fields['opportunity'].queryset = models.Opportunity.objects.filter(ended=False)
             self.fields['opportunity'].widget = OpportunityAutoComplete(attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80'})

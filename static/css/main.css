@@ -645,7 +645,7 @@ form.search-form {
 	color: #888;
 }
 
-td.status-icon {
+td.status-icon, td.priority-icon, td.note-icon, td.bookmark-icon {
 	padding-right: 0;
 	margin-right: 0;
 	width: 16px;
@@ -667,6 +667,38 @@ tr td.status-icon a, td.status-icon a:hover{
 tr td.status-icon a:hover{
 	background: url('../img/todo.png') no-repeat;
 	cursor: pointer;
+}
+
+tr td.priority-icon.prio1 {
+	background: url('../img/prio-low.png') no-repeat;
+}
+
+tr td.priority-icon.prio3 {
+	background: url('../img/prio-high.png') no-repeat;
+}
+
+td.bookmark-icon {
+	background: url('../img/unstar.png') no-repeat;
+}
+
+td.bookmark-icon:hover {
+	background: url('../img/star-half.png') no-repeat;
+}
+
+td.bookmark-icon.bookmarked {
+	background: url('../img/star.png') no-repeat;
+}
+
+/*
+tr td.note-icon {
+	cursor: pointer;
+	background: url('../img/pencil.png') no-repeat;
+	
+}
+*/
+
+tr td.note-icon.has-note {
+	background: url('../img/notebook.png') no-repeat;
 }
 
 tr.old-action td.status-icon a, tr.old-action td.status-icon a:hover{
@@ -815,4 +847,14 @@ tr.not-my-action td, tr.not-my-action a {
 	padding: 5px;
 	width: 99%;
 	clear: both;
+}
+
+.action-note {
+	position: absolute;
+	z-index: 500;
+	padding: 20px;
+	background: #444;
+	color: #fff;
+	opacity: 0.8;
+	font-style: normal;
 }

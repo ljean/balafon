@@ -70,3 +70,4 @@ class EntityCustomFieldValueAdmin(admin.ModelAdmin):
 admin.site.register(models.EntityCustomFieldValue, EntityCustomFieldValueAdmin)
 
 admin.site.register(models.ContactsImport)
+admin.site.register(models.ActionSet)

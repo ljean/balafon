@@ -1,0 +1,57 @@
+{% load i18n sanza_utils pagination_tags %}{% load url from future %}
+
+<script>
+  $(function() {
+    $("td.note-icon.has-note").live('click', function() {
+      $(this).find(".action-note").toggle();
+    });
+
+
+    $("td.bookmark-icon").live('click', function() {
+      var url = $(this).attr('rel');
+      var elt = $(this);
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {'confirm': true},
+        dataType: "json",
+        success: function(data) {
+          if (data.bookmarked) {
+            elt.addClass('bookmarked');
+          } else {
+            elt.removeClass('bookmarked');
+          }
+        }
+      })
+    });
+
+
+/*    
+    $("bookmark-icon").live('click', function() {
+      $.ajax({
+        url: $(this).attr('href'),
+        success: function(html) {
+          $(this).find('').append.(html);
+        }
+      })
+    
+    
+      $.post({
+        url: $(this).attr('href'),
+        data: $(this).find('form').serialize(),
+        success: function(html) {
+          $(this).html(html);
+        }
+      })
+    });
+*/
+
+
+  });
+
+  
+</script>
+
+{% for set_title, actions in actions_by_set %}
+  {% include "Crm/_section_actions_of_set.html" %}
+{% endfor %}

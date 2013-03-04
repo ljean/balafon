@@ -439,10 +439,17 @@ class Opportunity(TimeStampedModel):
         verbose_name = _(u'opportunity')
         verbose_name_plural = _(u'opportunities')
 
+class ActionSet(NamedElement):
+    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    class Meta:
+        verbose_name = _(u'action set')
+        verbose_name_plural = _(u'action sets')
+
 class ActionType(NamedElement):
     
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This action type will be proposed on the public subscribe form'))
+    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True)
 
     class Meta:
         verbose_name = _(u'action type')
@@ -454,12 +461,12 @@ class Action(TimeStampedModel):
     PRIORITY_MEDIUM = 2
     PRIORITY_HIGH = 3
     PRIORITY_CHOICES = (
-        (PRIORITY_LOW, _(u'low')),
-        (PRIORITY_MEDIUM, _(u'medium')),
-        (PRIORITY_HIGH, _(u'high')),
+        (PRIORITY_LOW, _(u'low priority')),
+        (PRIORITY_MEDIUM, _(u'medium priority')),
+        (PRIORITY_HIGH, _(u'high priority')),
     )
 
-    entity = models.ForeignKey(Entity)
+    entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
     subject = models.CharField(_('subject'), max_length=200)
     planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
@@ -472,6 +479,9 @@ class Action(TimeStampedModel):
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
         limit_choices_to={'first_name__regex': '.+'})
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
+    archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
+    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    
 
     def __unicode__(self):
         return u'{0.subject} with {0.entity}'.format(self)

@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import User
 from sanza.Crm import models
+from django.utils.translation import ugettext as _
 
 def get_users(self):
     return User.objects.exclude(firstame="", lastname="")
@@ -94,3 +95,19 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
     except models.City.DoesNotExist:
         return models.City.objects.create(name=city_name, parent=parent)
         
+def get_actions_by_set(actions):
+    actions_dict = {}
+    for a in actions:
+        key = a.type.set if a.type else None
+        try:
+            actions_dict[key].append(a)
+        except KeyError:
+            actions_dict[key] = [a]
+    
+    actions_by_set = []    
+    for a_set in models.ActionSet.objects.all().order_by('ordering'):
+        acts = actions_dict.get(a_set, None)
+        if acts:
+            actions_by_set.append((a_set.name, acts))
+    actions_by_set += [(_(u"Other kinds of actions"), actions_dict[None])]
+    return actions_by_set

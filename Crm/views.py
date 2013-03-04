@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q, Max
 from sanza.Crm import models, forms
+from .utils import get_actions_by_set
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import date, timedelta
 import json, re
@@ -17,7 +18,8 @@ from django.conf import settings
 import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
 from sanza.permissions import can_access
-
+import logging
+logger = logging.getLogger("sanza_crm")
     
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -29,9 +31,12 @@ def view_entity(request, entity_id):
     contacts = entity.contact_set.all().order_by("-main_contact", "lastname", "firstname")
     if not all_contacts:
         contacts = contacts.filter(has_left=False)
-    actions = models.Action.objects.filter(Q(entity=entity),
-        Q(done=False) | Q(done_date__gte=last_week)).order_by("done", "planned_date", "priority")
+    actions = models.Action.objects.filter(Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity),
+        Q(archived=False)).order_by("planned_date", "priority")
     opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("type__name", "status__ordering", "start_date", "end_date", "ended")
+    
+    actions_by_set = get_actions_by_set(actions)    
+    
     show_all_button = opportunities.count() > 10
     if show_all_button:
         opportunities = opportunities[:10]
@@ -39,9 +44,22 @@ def view_entity(request, entity_id):
     multi_user = True
     entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])
+    
+    context = {
+        'all_contacts': all_contacts,
+        'last_week': last_week,
+        "entity": entity,
+        'contacts': contacts,
+        'actions_by_set': actions_by_set,
+        'opportunities': opportunities,
+        'show_all_button': show_all_button,
+        'show_all_contacts': show_all_contacts,
+        'multi_user': multi_user,
+    }
+    
     return render_to_response(
         'Crm/entity.html',
-        locals(),
+        context,
         context_instance=RequestContext(request)
     )
 
@@ -444,8 +462,10 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
 @user_passes_test(can_access)
 def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
-    actions = contact.action_set.all()
     same_as = None
+    
+    actions = contact.action_set.filter(archived=False)
+    actions_by_set = get_actions_by_set(actions)    
     
     opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
     opportunities.sort(key=lambda x: u"{0}{1}{2}{3}{4}".format(x.type.id, x.status.ordering, x.start_date, x.end_date, x.ended))
@@ -458,7 +478,8 @@ def view_contact(request, contact_id):
         'Crm/view_contact.html',
         {
             'contact': contact,
-            'actions': actions,
+            #'actions': actions,
+            'actions_by_set': actions_by_set,
             'opportunities': opportunities,
             'same_as': same_as,
             'entity': contact.entity
@@ -583,18 +604,48 @@ def add_action_for_entity(request, entity_id):
     
     if request.method == 'POST':
         action = models.Action(entity=entity)
-        form = forms.ActionForm(entity, request.POST, instance=action)
+        form = forms.ActionForm(entity, request.POST, instance=action, entity=entity)
         if form.is_valid():
             form.save()
             next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
             return HttpResponseRedirect(next_url)
         action = None
     else:
-        form = forms.ActionForm(entity)
+        form = forms.ActionForm(entity=entity)
+    
+    context = {
+        'form': form,
+        'entity': entity,
+    }
     
     return render_to_response(
         'Crm/edit_action.html',
-        locals(),
+        context,
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+def add_action_for_contact(request, contact_id):
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    action = models.Action(contact=contact)
+    if request.method == 'POST':
+        form = forms.ActionForm(request.POST, instance=action)
+        if form.is_valid():
+            form.save()
+            next_url = request.session.get('redirect_url') or reverse('crm_view_contact', args=[contact.id])    
+            return HttpResponseRedirect(next_url)
+        action = None
+    else:
+        form = forms.ActionForm(instance=action)
+    
+    context = {
+        'form': form,
+        'contact': contact,
+    }
+    
+    return render_to_response(
+        'Crm/edit_action.html',
+        context,
         context_instance=RequestContext(request)
     )
 
@@ -613,20 +664,34 @@ def view_entity_actions(request, entity_id):
 @user_passes_test(can_access)
 def edit_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
-    entity = get_object_or_404(models.Entity, id=action.entity.id)
+    entity = get_object_or_404(models.Entity, id=action.entity.id) if action.entity else None
+    contact = get_object_or_404(models.Contact, id=action.contact.id) if action.contact else None
     
     if request.method == 'POST':
-        form = forms.ActionForm(entity, request.POST, instance=action)
+        form = forms.ActionForm(request.POST, instance=action)
         if form.is_valid():
             form.save()
-            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
+            next_url = request.session.get('redirect_url')
+            if not next_url:
+                if entity:
+                    next_url = reverse('crm_view_entity', args=[entity.id])
+                else:
+                    next_url = reverse('crm_view_contact', args=[contact.id])
             return HttpResponseRedirect(next_url)
     else:
         form = forms.ActionForm(entity, instance=action)
     
+    
+    context = {
+        'form': form,
+        'action': action,
+        'entity': entity,
+        'contact': contact,
+    }
+    
     return render_to_response(
         'Crm/edit_action.html',
-        locals(),
+        context,
         context_instance=RequestContext(request)
     )
 
@@ -634,13 +699,20 @@ def edit_action(request, action_id):
 @popup_redirect
 def delete_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
-    entity = get_object_or_404(models.Entity, id=action.entity.id)
     
     if request.method == 'POST':
         if 'confirm' in request.POST:
+            next_url = request.session.get('redirect_url')
+            
+            if not next_url and action.entity:
+                next_url = reverse('crm_view_entity', args=[action.entity.id])    
+            
+            if not next_url and action.contact:
+                next_url = reverse('crm_view_contact', args=[action.contact.id])
+            
             action.delete()
-            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
-            return HttpResponseRedirect(next_url)
+            
+            return HttpResponseRedirect(next_url or '/')
         else:
             return HttpResponseRedirect(reverse('crm_edit_action', args=[action.id]))
     
@@ -1155,3 +1227,17 @@ def get_groups(request):
     groups = [{'id': x.id, 'name': x.name}
         for x in models.Group.objects.filter(name__icontains=term)[:10]]
     return HttpResponse(json.dumps(groups), 'application/json')
+
+
+@user_passes_test(can_access)
+def toggle_action_bookmarked(request, action_id):
+    try:
+        if request.is_ajax() and request.method == "POST":
+            action = get_object_or_404(models.Action, id=action_id)
+            action.display_on_board = not action.display_on_board
+            action.save()
+            data = {'bookmarked': action.display_on_board}
+            return HttpResponse(json.dumps(data), 'application/json')
+        raise Http404
+    except:
+        logger.exception("---")

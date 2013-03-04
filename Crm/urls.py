@@ -29,6 +29,7 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^cities/list$', 'get_cities', name='crm_get_cities'),
     url(r'^board$', 'view_board_panel', name='crm_board_panel'),
     url(r'^add-action-for-entity/(?P<entity_id>\d+)$', 'add_action_for_entity', name='crm_add_action_for_entity'),
+    url(r'^add-action-for-contact/(?P<contact_id>\d+)$', 'add_action_for_contact', name='crm_add_action_for_contact'),
     url(r'^edit-action/(?P<action_id>\d+)$', 'edit_action', name='crm_edit_action'),
     url(r'^do-action/(?P<action_id>\d+)$', 'do_action', name='crm_do_action'),
     url(r'^delete-action/(?P<action_id>\d+)$', 'delete_action', name='crm_delete_action'),
@@ -54,4 +55,7 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^contacts-import/template.csv$', 'contacts_import_template', name='crm_contacts_import_template'),
     url(r'^group-name/(?P<gr_id>\d+)$', 'get_group_name', name='crm_get_group_name'),
     url(r'^groups/list$', 'get_groups', name='crm_get_groups'),
+    
+    url(r'^toggle-action-bookmark/(?P<action_id>\d+)$', 'toggle_action_bookmarked', name='crm_toggle_action_bookmarked'),
+    
 )
