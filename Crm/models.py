@@ -270,10 +270,7 @@ class Contact(TimeStampedModel):
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     def default_logo(self):
-        if self.gender == Contact.GENDER_FEMALE:
-            logo = "img/woman.png"
-        else:
-            logo = "img/man.png"
+        logo = "img/contact.png"
         return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def photo_thumbnail(self):
