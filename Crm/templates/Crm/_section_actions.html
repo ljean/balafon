@@ -3,65 +3,27 @@
 
 {% block section_title %}
   {% if all_actions and entity %}
-    {% trans "Actions with" %} <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
+    {{title}} - <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
   {% else %}
-    {% if days %}
-      {% blocktrans %}Actions to do in the next {{days}} days{% endblocktrans %}
+    {% if all_actions and contact %}
+      {{title}} - <a href="{% url "crm_view_contact" contact.id %}">{{contact.fullname}}</a>
     {% else %}
       {% trans "Actions" %}
-    {% endif %}
-  {% endif %}
+      <span class="day-selector">
+        {% for d in days_choice %}
+        <a href="{% url "crm_board_panel" %}?days={{d}}" class="{% if days == d %}selected{% endif %}">{% blocktrans %}Next {{d}} days{% endblocktrans %}</a>
+        {% endfor %}
+      </span>
+  {% endif %}{% endif %}
 {% endblock %}
   
   
 {% block section_data %}
+{% include "Crm/_actions_table_script.html" %}
+  
 {% if actions %}
 {% if all_actions %}{% autopaginate actions 25 %}{% endif %}
-<table id="entity_actions">
-  <tr>
-    <th>&nbsp;</th>
-    <th>{% trans "Subject" %}</th>
-    {% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
-    <th>{% trans "Date" %}</th>
-    {% if all_actions %}<th>{% trans "Done" %}</th>{% endif %}
-    <th>{% trans "Contact" %}</th>
-    <th>{% trans "Type" %}</th>
-    <th>{% trans "Priority" %}</th>
-    {% if multi_user %}<th>{% trans "In charge" %}</th>{% endif %}
-  </tr>
-  {% for a in actions %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
-    <td class="status-icon">
-      <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
-        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
-    </a></td>
-    <td><a href="{% url "crm_edit_action" a.id %}">{{a.subject}}</a></td>
-    {% if a.entity %}
-      <td><a href="{% url "crm_view_entity" a.entity.id %}">{{ a.entity }}</a></td>
-    {% else %}
-      <td>&nbsp;</td>
-    {% endif %}
-    
-    {% if all_actions %}
-      <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
-      <td>{{a.done_date|date:'j F Y'|default:'&nbsp;'}}</td>
-    {% else %}
-      {% if a.done_date %}
-        <td>{{ a.done_date|date:'j F Y'|default:'&nbsp;'}}</td>
-      {% else %}
-        <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
-      {% endif %}
-    {% endif %}
-    
-    <td><a {% if a.contact %} href="{% url "crm_view_contact" a.contact.id %} {% endif %}">
-      {{a.contact|default:'&nbsp;'}}
-    </a></td>
-    <td>{{a.type|default:'&nbsp;'}}</td>
-    <td>{{a.get_priority_display|capfirst}}</td>
-    {% if multi_user %}<td>{{ a.in_charge.first_name }}&nbsp;{{ a.in_charge.last_name }}</td>{% endif %}
-  </tr>
-  {% endfor %}
-</table>
+{% include "Crm/_actions_table.html" %}
 {% if all_actions %}{% paginate %}{% endif %}
 {% comment%}
 <script>
@@ -101,24 +63,5 @@
   {% endif %}{% endif %}
   {% if multi_user %}
     <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
-    <script>
-      $(function() {
-        $("#toggle_my_actions").click(function() {
-          if ($("#toggle_my_actions").hasClass('all')) {
-            $("#toggle_my_actions").removeClass('all');
-            $("#toggle_my_actions").addClass('mine');
-            $("tr.not-my-action").hide();
-            $("#toggle_my_actions").html('{% trans "See actions of all" %}');
-          } else {
-            $("#toggle_my_actions").removeClass('mine');
-            $("#toggle_my_actions").addClass('all');
-            $("tr.not-my-action").show();
-            $("#toggle_my_actions").html('{% trans "See my actions" %}');
-          }
-          return false;
-        });
-        {% if default_my_actions %}$("#toggle_my_actions").click();{% endif %}
-      })
-    </script>
   {% endif %}
 {% endblock %}

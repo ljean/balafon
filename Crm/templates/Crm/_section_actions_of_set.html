@@ -6,72 +6,20 @@
 {% endblock %}
   
 {% block section_data %}
-<table id="entity_actions">
-  <tr>
-    <th>&nbsp;</th>
-    <th>&nbsp;</th>
-    <th>{% trans "Date" %}</th>
-    <th>{% trans "Type" %}</th>
-    <th>{% trans "Subject" %}</th>
-    {% if not contact %}<th>{% trans "Contact" %}</th>{% endif %}
-    {% if SANZA_MULTI_USER %}<th>{% trans "In charge" %}</th>{% endif %}
-    <th>{% trans "Amount" %}</th>
-    <th></th>
-    <th>&nbsp;</th>
-  </tr>
-  
-  {% for a in actions %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
-    
-    <td class="status-icon">
-      <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
-        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
-    </a></td>
-    
-    <td class="priority-icon prio{{a.priority}}" title="{{ a.get_priority_display}}">
-      &nbsp;
-    </td>
-    
-    {% if a.done_date %}
-      <td>{{ a.done_date|date:'j F Y'|default:'&nbsp;'}}</td>
-    {% else %}
-      <td>{{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}</td>
-    {% endif %}
-    
-    <td>{{a.type}}</td>
-    <td>{{a.subject}}</td>
-    
-    {% if not contact %}<td><a href="{% url "crm_view_contact" a.contact.id %}">{{ a.contact }}</a></td>{% endif %}
-    {% if SANZA_MULTI_USER %}<td>{{ a.in_charge|default:"&nbsp;" }}</td>{% endif %}
-    
-    
-    <td>{{a.amount|default:'&nbsp;'}}</td>
-    <td class="note-icon{% if a.detail %} has-note{% endif %}">
-      {% if a.detail %}
-        <div class="action-note" style="display: none">
-          {{ a.detail|linebreaksbr }}
-        </div>
-      {% endif %}
-    </td>
-    <td title="{% trans "Show on board" %}" class="bookmark-icon{% if a.display_on_board %} bookmarked{% endif %}" rel="{% url "crm_toggle_action_bookmarked" a.id %}"></td>
-    
-    <td><a href="{% url "crm_edit_action" a.id %}">{% trans "Edit" %}</a></td>
-  </tr>
-  {% endfor %}
-</table>
+{% include "Crm/_actions_table.html" %}
 {% endblock %}
 
 {% block section_action %}
   {% if contact %}
     <a href="{% url "crm_add_action_for_contact" contact.id %}">{% trans "Add" %}</a>
     {% if not all_actions %}
-      <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
+      <a href="{% url "crm_contact_actions" contact.id set_id %}">{% trans "All actions" %}</a>
     {% endif %}
   {% else %}
     {% if entity %}
       <a href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a>
       {% if not all_actions %}
-      <a href="{% url "crm_entity_actions" entity.id %}">{% trans "All actions" %}</a>
+      <a href="{% url "crm_entity_actions" entity.id set_id %}">{% trans "All actions" %}</a>
       {% endif %}
     {% else %} 
       <a class="colorbox-form" href="{% url "crm_add_action" %}">{% trans "Add" %}</a>
@@ -79,26 +27,4 @@
         <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
       {% endif %}
   {% endif %}{% endif %}
-  {% if multi_user %}
-    <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
-    <script>
-      $(function() {
-        $("#toggle_my_actions").click(function() {
-          if ($("#toggle_my_actions").hasClass('all')) {
-            $("#toggle_my_actions").removeClass('all');
-            $("#toggle_my_actions").addClass('mine');
-            $("tr.not-my-action").hide();
-            $("#toggle_my_actions").html('{% trans "See actions of all" %}');
-          } else {
-            $("#toggle_my_actions").removeClass('mine');
-            $("#toggle_my_actions").addClass('all');
-            $("tr.not-my-action").show();
-            $("#toggle_my_actions").html('{% trans "See my actions" %}');
-          }
-          return false;
-        });
-        {% if default_my_actions %}$("#toggle_my_actions").click();{% endif %}
-      })
-    </script>
-  {% endif %}
 {% endblock %}

@@ -468,7 +468,7 @@ def view_contact(request, contact_id):
     actions_by_set = get_actions_by_set(actions)    
     
     opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
-    opportunities.sort(key=lambda x: u"{0}{1}{2}{3}{4}".format(x.type.id, x.status.ordering, x.start_date, x.end_date, x.ended))
+    opportunities.sort(key=lambda x: x.status.ordering)
     opportunities.reverse()
     
     if contact.same_as:
@@ -604,7 +604,7 @@ def add_action_for_entity(request, entity_id):
     
     if request.method == 'POST':
         action = models.Action(entity=entity)
-        form = forms.ActionForm(entity, request.POST, instance=action, entity=entity)
+        form = forms.ActionForm(request.POST, instance=action, entity=entity)
         if form.is_valid():
             form.save()
             next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
@@ -650,11 +650,44 @@ def add_action_for_contact(request, contact_id):
     )
 
 @user_passes_test(can_access)
-def view_entity_actions(request, entity_id):
+def view_entity_actions(request, entity_id, set_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
-    actions = models.Action.objects.filter(entity=entity).order_by('done', '-done_date')
+    
+    filters = []
+    if int(set_id):
+        action_set = get_object_or_404(models.ActionSet, id=set_id)
+        filters.append(Q(type__set=action_set))
+        title = action_set.name
+    else:
+        filters.append(Q(type__set=None))
+        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _u("Actions")
+    
+    actions = models.Action.objects.filter(
+        Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity), *filters).order_by("planned_date", "priority")
     all_actions = True
-    request.session["redirect_url"] = reverse('crm_entity_actions', args=[entity_id])
+    request.session["redirect_url"] = reverse('crm_entity_actions', args=[entity_id, set_id])
+    return render_to_response(
+        'Crm/entity_actions.html',
+        locals(),
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+def view_contact_actions(request, contact_id, set_id):
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    
+    filters = []
+    if int(set_id):
+        action_set = get_object_or_404(models.ActionSet, id=set_id)
+        filters.append(Q(type__set=action_set))
+        title = action_set.name
+    else:
+        filters.append(Q(type__set=None))
+        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _u("Actions")
+    
+    actions = contact.action_set.filter(*filters).order_by("planned_date", "priority")
+    all_actions = True
+    request.session["redirect_url"] = reverse('crm_contact_actions', args=[contact_id, set_id])
     return render_to_response(
         'Crm/entity_actions.html',
         locals(),
@@ -679,7 +712,7 @@ def edit_action(request, action_id):
                     next_url = reverse('crm_view_contact', args=[contact.id])
             return HttpResponseRedirect(next_url)
     else:
-        form = forms.ActionForm(entity, instance=action)
+        form = forms.ActionForm(instance=action, entity=entity)
     
     
     context = {
@@ -761,14 +794,17 @@ def view_entity_opportunities(request, entity_id):
 @user_passes_test(can_access)
 def view_all_opportunities(request, ordering=None):
     opportunities = models.Opportunity.objects.all()
+    if not ordering:
+        ordering = 'name'
     if ordering == 'name':
         opportunities = opportunities.order_by('name')
-    elif ordering == 'entity':
-        opportunities = opportunities.order_by('entity__name')
+    elif ordering == 'status':
+        opportunities = opportunities.order_by('status__ordering', 'status')
+    elif ordering == 'type':
+        opportunities = opportunities.order_by('type')
     elif ordering == 'date':
-        opportunities = opportunities.order_by('-end_date')
-    else:
-        opportunities = opportunities.order_by('ended', '-end_date')
+        opportunities = list(opportunities)
+        opportunities.sort(key=lambda o: o.get_start_date())
         
     all_opportunities = True
     request.session["redirect_url"] = reverse('crm_all_opportunities')
@@ -800,11 +836,13 @@ def edit_opportunity(request, opportunity_id):
 @user_passes_test(can_access)
 def view_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-    actions = opportunity.action_set.all()
+    actions = opportunity.action_set.filter(archived=False)
+    actions_by_set = get_actions_by_set(actions)
+    
     contacts = set([a.contact for a in actions if a.contact])
     return render_to_response(
         'Crm/view_opportunity.html',
-        {'opportunity': opportunity, 'actions': actions, 'contacts': contacts, 'mailto': True},
+        {'opportunity': opportunity, 'actions_by_set': actions_by_set, 'contacts': contacts, 'mailto': True},
         context_instance=RequestContext(request)
     )
 
@@ -846,14 +884,26 @@ def delete_opportunity(request, opportunity_id):
 @user_passes_test(can_access)
 def view_board_panel(request):
     days = getattr(settings, 'SANZA_DAYS_OF_ACTIONS_ON_PANEL', 30)
+    
+    try:
+        days = int(request.GET.get('days', days))
+    except ValueError:
+        logger.exception("view_board_panel --> 404")
+        raise Http404
+    
     until_date = date.today() + timedelta(days)
-    actions = models.Action.objects.filter(Q(done=False),
-        Q(display_on_board=True), Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)).order_by(
-        "priority", "planned_date")
-    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("type__name", "status__ordering")
+    dt_filter = [Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)]
+    
+    actions = models.Action.objects.filter(archived=False, display_on_board=True, *dt_filter).order_by(
+        "planned_date", "priority")
+    
+    opportunities = models.Opportunity.objects.filter(display_on_board=True).order_by("status__ordering")
     partial = True
-    multi_user = True
+    
     default_my_actions = True
+    days_choice = list(set((days, 7, 14, 30)))
+    days_choice.sort()
+    
     request.session["redirect_url"] = reverse('crm_board_panel')
     return render_to_response(
         'Crm/board_panel.html',
@@ -868,6 +918,7 @@ def view_all_actions(request):
     multi_user = True
     default_my_actions = False
     all_actions = True
+    view_name = "crm_all_actions"
     request.session["redirect_url"] = reverse('crm_all_actions')
     return render_to_response(
         'Crm/all_actions.html',
@@ -898,6 +949,7 @@ def do_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
+@user_passes_test(can_access)
 def select_entity_and_redirect(request, view_name, template_name):
     if request.method == 'POST':
         form = forms.SelectEntityForm(request.POST)
@@ -1229,15 +1281,22 @@ def get_groups(request):
     return HttpResponse(json.dumps(groups), 'application/json')
 
 
-@user_passes_test(can_access)
-def toggle_action_bookmarked(request, action_id):
+def _toggle_object_bookmark(request, object_model, object_id):
     try:
         if request.is_ajax() and request.method == "POST":
-            action = get_object_or_404(models.Action, id=action_id)
-            action.display_on_board = not action.display_on_board
-            action.save()
-            data = {'bookmarked': action.display_on_board}
+            object = get_object_or_404(object_model, id=object_id)
+            object.display_on_board = not object.display_on_board
+            object.save()
+            data = {'bookmarked': object.display_on_board}
             return HttpResponse(json.dumps(data), 'application/json')
         raise Http404
     except:
-        logger.exception("---")
+        logger.exception("_toggle_object_bookmarked")
+
+@user_passes_test(can_access)
+def toggle_action_bookmark(request, action_id):
+    return _toggle_object_bookmark(request, models.Action, action_id)
+    
+@user_passes_test(can_access)
+def toggle_opportunity_bookmark(request, opportunity_id):
+    return _toggle_object_bookmark(request, models.Opportunity, opportunity_id)

@@ -13,9 +13,13 @@
 <div class="contact_info">
   <div>
     <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
+    
+    {% if not contact.entity.is_single_contact %}
     <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
       <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
     </a>
+    {% endif %}
+    
      {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
   </div>
   <br/>

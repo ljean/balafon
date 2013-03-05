@@ -33,7 +33,8 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^edit-action/(?P<action_id>\d+)$', 'edit_action', name='crm_edit_action'),
     url(r'^do-action/(?P<action_id>\d+)$', 'do_action', name='crm_do_action'),
     url(r'^delete-action/(?P<action_id>\d+)$', 'delete_action', name='crm_delete_action'),
-    url(r'^actions/(?P<entity_id>\d+)$', 'view_entity_actions', name='crm_entity_actions'),
+    url(r'^entity-actions/(?P<entity_id>\d+)/(?P<set_id>\d+)/$', 'view_entity_actions', name='crm_entity_actions'),
+    url(r'^contact-actions/(?P<contact_id>\d+)/(?P<set_id>\d+)/$', 'view_contact_actions', name='crm_contact_actions'),
     url(r'^add-opportunity/(?P<entity_id>\d+)$', 'add_opportunity_for_entity', name='crm_add_opportunity_for_entity'),
     url(r'^edit-opportunity/(?P<opportunity_id>\d+)$', 'edit_opportunity', name='crm_edit_opportunity'),
     url(r'^view-opportunity/(?P<opportunity_id>\d+)$', 'view_opportunity', name='crm_view_opportunity'),
@@ -56,6 +57,6 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^group-name/(?P<gr_id>\d+)$', 'get_group_name', name='crm_get_group_name'),
     url(r'^groups/list$', 'get_groups', name='crm_get_groups'),
     
-    url(r'^toggle-action-bookmark/(?P<action_id>\d+)$', 'toggle_action_bookmarked', name='crm_toggle_action_bookmarked'),
-    
+    url(r'^toggle-action-bookmark/(?P<action_id>\d+)$', 'toggle_action_bookmark', name='crm_toggle_action_bookmark'),
+    url(r'^toggle-opportunity-bookmark/(?P<opportunity_id>\d+)$', 'toggle_opportunity_bookmark', name='crm_toggle_opportunity_bookmark'),
 )

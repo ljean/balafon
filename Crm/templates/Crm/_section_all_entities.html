@@ -9,32 +9,51 @@
 {% autopaginate entities 25 %}
 <table class="entities-table">
   <tr>
-    <th>{% trans "Name" %}</th>
+    <th colspan="2">{% trans "Contacts" %}</th>
     <th>{% trans "City" %}</th>
-    <th>{% trans "Main contacts" %}</th>
     <th>{% trans "Last action" %}</th>
-    <th>{% trans "Opportunities" %}</th>
+    <th>{% trans "Next action" %}</th>
   </tr>
   {% for e in entities %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    
+    {% if e.is_single_contact %}
+      {% with e.single_contact as c %}
+      <td colspan="2"><a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a></td>
+      {% endwith %}
+    {% else %}
     <td><a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></td>
-    <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
+
     <td>
       {% if e.main_contacts %}
-      {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}</td>
+      {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}
       {% else %}
         &nbsp;
       {% endif %}
+    </td>
+    {% endif %}
+
+    <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
+    
     <td>
       {% with e.last_action as action %}
       {% if action %}
-        <a href="{% url "crm_edit_action" action.id %}">{{action.subject}}</a>
+        {{action.done_date|date:"d F Y"}}: {{action.subject}}
       {% else %}
         &nbsp;
       {% endif %}
       {% endwith %}
     </td>
-    <td>{{e.current_opportunities|default:"&nbsp;"}}</td>
+    
+    <td>
+      {% with e.next_action as action %}
+      {% if action %}
+        {{action.planned_date|date:"d F Y"}}: {{action.subject}}
+      {% else %}
+        &nbsp;
+      {% endif %}
+      {% endwith %}
+    </td>
   </tr>
   {% endfor %}
 </table>

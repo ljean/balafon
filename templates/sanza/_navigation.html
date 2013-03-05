@@ -5,7 +5,8 @@
       <li>
         <a>{% trans "View" %}</a>
         <ul>
-          <li><a href="{% url crm_view_entities_list %}">{% trans "Contacts" %}</a>
+          <li><a href="{% url crm_view_entities_list %}">{% trans "Contacts" %}</a></li>
+          <li><a href="{% url crm_all_opportunities %}">{% trans "Opportunities" %}</a></li>
           <li><a href="{% url crm_see_my_groups %}">{% trans "Groups" %}</a></li>
           <li><a href="{% url emailing_newsletter_list %}">{% trans "Mailings" %}</a></li>
         </ul>

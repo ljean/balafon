@@ -2,10 +2,14 @@
 {% load i18n pagination_tags %}{% load url from future %}
 
 {% block section_title %}
-  {% if all_opportunities and entity %}
-    {% trans "Opportunities with" %} <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
-  {% else %}
-    {% trans "Opportunities" %}
+  {% trans "Opportunities" %}
+  {% if all_opportunities %}
+  <span class="day-selector">
+    <a href="{% url "crm_all_opportunities_by" "name" %}" class="{% if ordering == "name" %}selected{% endif %}">{% trans "By name" %}</a>
+    <a href="{% url "crm_all_opportunities_by" "date" %}" class="{% if ordering == "date" %}selected{% endif %}">{% trans "By date" %}</a>
+    <a href="{% url "crm_all_opportunities_by" "type" %}" class="{% if ordering == "type" %}selected{% endif %}">{% trans "By type" %}</a>
+    <a href="{% url "crm_all_opportunities_by" "status" %}" class="{% if ordering == "status" %}selected{% endif %}">{% trans "By status" %}</a>
+  </span>
   {% endif %}
 {% endblock %}
   
@@ -15,22 +19,33 @@
 <table id="entity_actions">
   <tr>
     <th>{% trans "Name" %}</th>
-    {% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
     <th>{% trans "Type" %}</th>
     <th>{% trans "Status" %}</th>
-    <th>{% trans "Dates" %}</th>
-    <th>{% trans "Amount" %}</th>
-    <th>{% trans "Probability" %}</th>
+    <th>{% trans "Actions" %}</th>
+    <th>{% trans "Date" %}</th>
+    <th></th>
+    <th></th>
+    <th></th>
   </tr>
   {% for o in opportunities %}
   <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="{% url "crm_view_opportunity" o.id %}">{{o.name}}</a></td>
-    {% if not entity %}<td><a href="{% url "crm_view_entity" o.entity.id %}">{{ o.entity }}</a></td>{% endif %}
+    <td>{{o.name}}</td>
     <td>{{o.type|default:"&nbsp;"}}</td>
     <td>{{o.status}}</td>
-   <td>{{ o.start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.end_date|date:'j F Y'|default:'&nbsp;'}}</td>
-    <td>{{o.amount}}</td>
-    <td>{{o.get_probability_display|capfirst}}</td>
+    <td>{{o.action_set.count}}</td>
+    <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
+   
+    <td class="note-icon{% if o.detail %} has-note{% endif %}">
+      {% if o.detail %}
+        <div class="action-note" style="display: none">
+          {{ o.detail|linebreaksbr }}
+        </div>
+      {% endif %}
+    </td>
+   
+    <td title="{% trans "Show on board" %}" class="bookmark-icon{% if o.display_on_board %} bookmarked{% endif %}" rel="{% url "crm_toggle_opportunity_bookmark" o.id %}"></td>
+   
+   <td class="ico-col" title="{% trans "View" %}"><a href="{% url "crm_view_opportunity" o.id %}"><img src="{{STATIC_URL}}img/info-ico.png"></a></td>
   </tr>
   {% endfor %}
 </table>
@@ -47,13 +62,5 @@
   {% endif %}
   {% if not entity %}
      <a class="colorbox-form" href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a>
-     {% if all_opportunities %}
-       <a href="{% url "crm_all_opportunities_by" "name" %}">{% trans "By name" %}</a>
-       <a href="{% url "crm_all_opportunities_by" "entity" %}">{% trans "By entity" %}</a>
-       <a href="{% url "crm_all_opportunities_by" "date" %}">{% trans "By date" %}</a>
-       <a href="{% url "crm_all_opportunities_by" "status" %}">{% trans "By status" %}</a>
-      {% else %}
-      <a href="{% url "crm_all_opportunities" %}">{% trans "All" %}</a>
-     {% endif %}
   {% endif %}
 {% endblock %}

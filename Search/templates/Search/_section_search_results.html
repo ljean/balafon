@@ -3,11 +3,7 @@
 
 {% block section_title %}
   {% trans "Search results" %} :
-  {% if entities %}
   {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
-  -
-  {% if entities|length > 1 %}{{entities|length}} {% trans "entities" %}{% else %}{{entities|length}} {% trans "entity" %}{% endif %}
-  {% endif %}
 {% endblock %}
   
 {% block section_data %}
@@ -17,31 +13,36 @@
   {% endif %}
   {% autopaginate entities nb_entities_by_page %}
   <table>
-    <tr><th>{% trans "Entity" %}</th><th>{% trans "Contacts" %}</th></tr>
+    <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
-      {% if e.is_empty %}
-        <td class="empty-entity">
-          {% trans "No contacts !!" %}
-        </td>
+      {% if not e.single_contact %}
+        <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
+        {% if e.is_empty %}
+          <td class="empty-entity">
+            {% trans "No contacts !!" %}
+          </td>
+        {% else %}
+          <td>
+        {% endif %}
       {% else %}
-        <td>
-          {% with e.search_contacts as contacts %}
-          {% if contacts %}
-            {% for c in contacts %}
-              <div class="contact contact-sr">
-                <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
-                {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-                <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
-              </div>
-            {% endfor %}
-          {% else %}
-            &nbsp;
-          {% endif %}
-          {% endwith %}
-        </td>
+        <td colspan=2>
       {% endif %}
+        
+      {% with e.search_contacts as contacts %}
+      {% if contacts %}
+        {% for c in contacts %}
+          <div class="contact contact-sr">
+            <a href="{{c.get_absolute_url}}">{{c}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
+            {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+            <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        &nbsp;
+      {% endif %}
+      {% endwith %}
+      </td>
     </tr>
   {% endfor %}
   </table>

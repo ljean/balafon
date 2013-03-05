@@ -35,28 +35,36 @@ def quick_search(request):
         if form.is_valid():
             text = form.cleaned_data["text"]
             
-            entities_by_name = Entity.objects.filter(name__icontains=text).order_by('name')
+            entities_by_name = list(Entity.objects.filter(is_single_contact=False, name__icontains=text))
+            contacts_by_name = list(Contact.objects.filter(lastname__icontains=text, has_left=False))
             
-            contacts_by_name = Contact.objects.filter(lastname__icontains=text).order_by('lastname', 'firstname')
+            for e in entities_by_name:
+                setattr(e, 'is_entity', True)
+                for c in e.contact_set.all():
+                    try:
+                        contacts_by_name.remove(c)
+                    except ValueError:
+                        pass
+            contacts = entities_by_name + contacts_by_name
+            contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
             
             groups_by_name = Group.objects.filter(name__icontains=text)
             
-            cities_by_name = []
-            for city in City.objects.filter(name__icontains=text):
-                contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
-                if contacts_and_entities:
-                    setattr(city, 'contacts_and_entities', contacts_and_entities)
-                    cities_by_name.append(city)
-            
-            
+            #cities_by_name = []
+            #for city in City.objects.filter(name__icontains=text):
+            #    contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
+            #    if contacts_and_entities:
+            #        setattr(city, 'contacts_and_entities', contacts_and_entities)
+            #        cities_by_name.append(city)
+            #
             contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
             contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
             
-            entities_title = _(u'Entities')
+            #entities_title = _(u'Entities')
             contacts_title = _(u'Contacts')
             groups_title = _(u'Groups')
-            cities_title = _(u'Contacts and entities by city')
-            phones_title = _(u'Contacts and entities by phone number')
+            #cities_title = _(u'Contacts and entities by city')
+            phones_title = _(u'Contacts by phone number')
             
             return render_to_response(
                 'Search/quicksearch_results.html',

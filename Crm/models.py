@@ -175,9 +175,20 @@ class Entity(TimeStampedModel):
     
     def last_action(self):
         try:
-            return self.action_set.all().order_by("-created")[0]
+            return Action.objects.filter(contact__entity=self, done_date__isnull=False).order_by("-done_date")[0]
         except IndexError:
-            return ''
+            return None
+        
+    def next_action(self):
+        try:
+            return Action.objects.filter(contact__entity=self, planned_date__isnull=False, done_date__isnull=True).order_by("-planned_date")[0]
+        except IndexError:
+            return None
+        
+    def single_contact(self):
+        if self.is_single_contact:
+            return self.contact_set.all()[0]
+        return None
         
     def current_opportunities(self):
         return self.opportunity_set.filter(ended=False).count()
@@ -418,19 +429,41 @@ class Opportunity(TimeStampedModel):
         (PROBABILITY_HIGH, _(u'high')),
     )
     
+    #TO BE REMOVED--
     entity = models.ForeignKey(Entity)
+    #---------------
     name = models.CharField(_('name'), max_length=200)
     status = models.ForeignKey(OpportunityStatus)
     type = models.ForeignKey(OpportunityType, blank=True, null=True, default=None)
     detail = models.TextField(_('detail'), blank=True, default='')
+    #TO BE REMOVED---
     probability = models.IntegerField(_('probability'), default=PROBABILITY_MEDIUM,
         choices=PROBABILITY_CHOICES)
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    #----------------
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
+    #TO BE REMOVED---
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
+    #----------------
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'),
         default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
+    
+    def get_start_date(self):
+        try:
+            return self.action_set.filter(planned_date__isnull=False).order_by("planned_date")[0].planned_date
+        except:
+            return None
+        
+    def get_end_date(self):
+        try:
+            return self.action_set.filter(planned_date__isnull=False).order_by("-planned_date")[0].planned_date
+        except:
+            return None
+    
+    def default_logo(self):
+        logo = "img/folder.png"
+        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def __unicode__(self):
         return u"{0.entity} - {0.name}".format(self)

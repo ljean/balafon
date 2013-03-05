@@ -5,19 +5,47 @@
   
 {% block section_data %}
 <table>
-  <tr><th>{% trans "Name" %}</th><th>{% trans "Entity" %}</th><th>{% trans "Role" %}</th>
-  <th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th><th>{% trans "City" %}</th>
-  {% for c in contacts %}
-  {% with c.entity as e %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if c.has_left %}old-contact{% endif %}">
-    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
-    <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
-    <td>{{c.get_roles|seq_to_dash}}</td>
-    <td>{{c.get_phones|seq_to_dash}}</td>
-    <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
-    <td>{{e.city|default:"&nbsp;"}}</td>
+  <tr>
+    <th colspan="2">{% trans "Contacts" %}</th><th>{% trans "Role" %}</th>
+    <th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th><th>{% trans "City" %}</th>
   </tr>
-  {% endwith %}
+  
+  {% for x in contacts %}
+  
+  {% if x.is_entity %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+      <td rowspan={{x.main_contacts|length}}>{{x}}</td>
+      {% for c in x.main_contacts %}
+        {% if not forloop.first %}
+          <tr>
+        {%endif %}
+        <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+        <td>{{c.get_roles|seq_to_dash}}</td>
+        <td>{{c.get_phones|seq_to_dash}}</td>
+        <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
+        <td>{{c.get_city|default:"&nbsp;"}}</td>
+        {% if not forloop.last %}
+          </tr>
+        {%endif %}
+      {% endfor %}
+    </tr>
+  {% else %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    {% with x.entity as e %}
+      {% if e.is_single_contact %}
+        <td colspan=2><a href="{% url "crm_view_contact" x.id %}">{{c}}</a></td>
+      {% else %}
+        <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
+        <td><a href="{% url "crm_view_contact" x.id %}">{{c}}</a></td>
+      {% endif %}
+      <td>{{x.get_roles|seq_to_dash}}</td>
+      <td>{{x.get_phones|seq_to_dash}}</td>
+      <td><a href="mailto:{{x.get_email}}">{{x.get_email}}</a></td>
+      <td>{{x.get_city|default:"&nbsp;"}}</td>
+    {% endwith %}
+  {% endif %}
+  
+  </tr>
   {% endfor %}
 </table>
 {% endblock %}

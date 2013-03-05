@@ -642,7 +642,8 @@ form.search-form {
 }
 
 .old-action, .old-opportunity, .old-action a, .old-opportunity a {
-	color: #888;
+	/*color: #888;*/
+	background: #777;
 }
 
 td.status-icon, td.priority-icon, td.note-icon, td.bookmark-icon {
@@ -651,7 +652,7 @@ td.status-icon, td.priority-icon, td.note-icon, td.bookmark-icon {
 	width: 16px;
 }
 
-td.status-icon a {
+td.status-icon a, .ico-col{
 	width: 16px;
 	display: block;
 	text-decoration: none;
@@ -669,6 +670,10 @@ tr td.status-icon a:hover{
 	cursor: pointer;
 }
 
+tr td.priority-icon {
+	width: 16px;
+}
+
 tr td.priority-icon.prio1 {
 	background: url('../img/prio-low.png') no-repeat;
 }
@@ -679,6 +684,8 @@ tr td.priority-icon.prio3 {
 
 td.bookmark-icon {
 	background: url('../img/unstar.png') no-repeat;
+	cursor: pointer;
+	width: 16px;
 }
 
 td.bookmark-icon:hover {
@@ -699,9 +706,10 @@ tr td.note-icon {
 
 tr td.note-icon.has-note {
 	background: url('../img/notebook.png') no-repeat;
+	cursor: pointer;
 }
 
-tr.old-action td.status-icon a, tr.old-action td.status-icon a:hover{
+tr.done-action td.status-icon a, tr.done-action td.status-icon a:hover{
 	background: url('../img/done.png') no-repeat;
 	cursor: default;
 }
@@ -767,6 +775,10 @@ tr.not-my-action td, tr.not-my-action a {
 
 .even {
 	background: #ffe8e8;
+}
+
+.even.old-action {
+	background: #977;
 }
 
 .empty-entity {
@@ -857,4 +869,18 @@ tr.not-my-action td, tr.not-my-action a {
 	color: #fff;
 	opacity: 0.8;
 	font-style: normal;
+}
+
+.day-selector a{
+	padding: 2px 5px;
+	border: solid 1px #aaa;
+	border-radius: 2px 10px 2px 10px;
+	background: #eee;
+	text-decoration: none;
+	margin: 0 10px;
+}
+
+.day-selector a.selected {
+	background: #444;
+	color: #fff;
 }

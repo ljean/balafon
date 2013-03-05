@@ -1,0 +1,76 @@
+{% load i18n sanza_utils %}{% load url from future %}
+<table id="entity_actions">
+  <tr>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Type" %}</th>
+    <th>{% trans "Subject" %}</th>
+    {% if not contact %}<th>{% trans "Contact" %}</th>{% endif %}
+    {% if SANZA_MULTI_USER %}<th>{% trans "In charge" %}</th>{% endif %}
+    <th>{% trans "Amount" %}</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+  </tr>
+  
+  {% for a in actions %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done-action{% endif %}{% if a.archived %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+    
+    {% if a.in_charge == user or a.in_charge == None %}
+    <td class="status-icon" title="{% if a.done %}{% trans "done" %}{% else %}{% trans "to do" %}{% endif %}">
+      <a {% if not a.done %}
+        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}>&nbsp;
+    </a></td>
+    {% else %}
+      <td class="status-icon"></td>
+    {%endif%}
+    
+    <td class="priority-icon prio{{a.priority}}" title="{{ a.get_priority_display}}">
+      &nbsp;
+    </td>
+    
+    <td>
+      {{a.planned_date|date:'j F Y H:i'|cut_null_hour|default:'&nbsp;'}}
+      {% if a.done_date %}
+        {% if a.planned_date %}&nbsp;-&nbsp;{% endif %}
+        {% trans "done on" %} {{ a.done_date|date:'j F Y'|default:'&nbsp;'}}
+      {% endif %}  
+    </td>
+    
+    <td>{{a.type|default:"&nbsp;"}}</td>
+    <td>{{a.subject}}</td>
+    
+    {% if not contact %}
+      {% if a.contact %}
+        <td>
+          <a href="{% url "crm_view_contact" a.contact.id %}">{{ a.contact }}</a>
+          {% if not a.contact.entity.is_single_contact %}
+            (<a href="{% url "crm_view_entity" a.contact.entity.id %}">{{ a.contact.entity }}</a>)
+          {% endif %}
+        </td>
+      {% else %}
+        {% if a.entity %}
+          <td><a href="{% url "crm_view_entity" a.entity.id %}">{{ a.entity }}</a></td>
+        {% else %}
+          <td>&nbsp;</td>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+    {% if SANZA_MULTI_USER %}<td>{{ a.in_charge|default:"&nbsp;" }}</td>{% endif %}
+    
+    
+    <td>{{a.amount|default:'&nbsp;'}}</td>
+    <td class="note-icon{% if a.detail %} has-note{% endif %}">
+      {% if a.detail %}
+        <div class="action-note" style="display: none">
+          {{ a.detail|linebreaksbr }}
+        </div>
+      {% endif %}
+    </td>
+    <td title="{% trans "Show on board" %}" class="bookmark-icon{% if a.display_on_board %} bookmarked{% endif %}" rel="{% url "crm_toggle_action_bookmark" a.id %}"></td>
+    
+    <td class="ico-col" title="{% trans "Edit" %}"><a href="{% url "crm_edit_action" a.id %}"><img src="{{STATIC_URL}}img/gear.png"></a></td>
+  </tr>
+  {% endfor %}
+</table>
