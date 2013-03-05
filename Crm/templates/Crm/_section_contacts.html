@@ -6,13 +6,23 @@
 {% block section_data %}
 {% if contacts %}
 <table id="entity_contacts">
-  <tr><th>{% trans "Name" %}</th>{% if not entity %}<th>{% trans "Entity" %}</th>{% endif %}
-  <th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th></tr>
+  <tr>
+    <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
+    <th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
+  </tr>
   {% for c in contacts %}
   {% with c.has_left as has_left %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
-    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
-    {% if not entity %}<td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>{% endif %}
+    {% if entity %}
+      <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    {% else %}
+      {% if c.entity.is_single_contact %}
+        <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+      {% else %}
+        <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
+        <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+      {% endif %}
+    {% endif %}
     <td>{{c.get_roles|seq_to_dash|default:"&nbsp;"}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>

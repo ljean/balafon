@@ -295,6 +295,11 @@ class Contact(TimeStampedModel):
     
     def get_custom_fields(self):
         return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
+        
+    def get_name_and_entity(self):
+        if self.entity.is_single_contact:
+            return self.fullname
+        return u"{0} ({1})".format(self.fullname, self.entity.name)
 
     def __getattribute__(self, attr):
         if attr[:4] == "get_":
@@ -430,7 +435,7 @@ class Opportunity(TimeStampedModel):
     )
     
     #TO BE REMOVED--
-    entity = models.ForeignKey(Entity)
+    entity = models.ForeignKey(Entity, blank=True, null=True, default=None)
     #---------------
     name = models.CharField(_('name'), max_length=200)
     status = models.ForeignKey(OpportunityStatus)
@@ -466,7 +471,7 @@ class Opportunity(TimeStampedModel):
         return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def __unicode__(self):
-        return u"{0.entity} - {0.name}".format(self)
+        return u"{0.name}".format(self)
 
     class Meta:
         verbose_name = _(u'opportunity')

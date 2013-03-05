@@ -1,0 +1,4 @@
+{% extends "forms/autocomplete_input.html" %}
+{% load url from future %}
+{% block get_value_url %}{% url "crm_get_contact_name" value %}{% endblock %}
+{% block get_list_url %}{% url "crm_get_contacts" %}{% endblock %}

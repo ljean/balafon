@@ -17,12 +17,14 @@
     {% endif %}
   {% else %}
     {% if entity %}
-      <a href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a>
+      <a class="colorbox-form" href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a>
       {% if not all_actions %}
       <a href="{% url "crm_entity_actions" entity.id set_id %}">{% trans "All actions" %}</a>
       {% endif %}
-    {% else %} 
-      <a class="colorbox-form" href="{% url "crm_add_action" %}">{% trans "Add" %}</a>
+    {% else %}
+      <a class="colorbox-form" href="{% url "crm_add_action" %}?x=0{% if opportunity %}&opp_id={{opportunity.id}}{% endif %}">
+        {% trans "Add" %}
+      </a>
       {% if not all_actions %}
         <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
       {% endif %}

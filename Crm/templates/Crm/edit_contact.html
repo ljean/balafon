@@ -22,7 +22,7 @@
   {% endif %}
 
   <h3>
-  {% if contact.entity.id %}
+  {% if entity.id %}
     {% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
   {% else %}
     {% trans "Single contact" %}

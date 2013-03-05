@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<form class="search-form" action="" method="post">{% csrf_token %}
+<form class="search-form" action="{% url "search" %}" method="post">{% csrf_token %}
   {{search_form.as_html|safe}}
   <div class="form">
   </div>

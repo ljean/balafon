@@ -1,13 +1,20 @@
 {% extends "sanza/base.html" %}
-{% load i18n %}
+{% load i18n %}{% load url from future %}
 
 
 {% block document_title %}
-{% trans "Search for contacts" %}
-  {% if search %}
-  : {{search.name}}
-  {% endif %}
+{% if group %}
+    {% trans "Contacts of group" %} <a href="{% url "crm_edit_group" group.id %}">{{group.name}}</a>
+{% else %}
+    {% if opportunity %}
+    {% trans "Contacts in oppportunity" %} <a href="{% url "crm_view_opportunity" opportunity.id %}">{{opportunity.name}}</a>
+    {% else %}
+        {% trans "Search for contacts" %} {% if search %}: {{search.name}}{% endif %}
+    {% endif %}
+{% endif %}
 {% endblock %}
+
+
 {% block document_content %}
 
 {% include "Search/_section_search_form.html" %}

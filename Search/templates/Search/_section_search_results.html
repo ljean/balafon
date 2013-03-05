@@ -120,10 +120,7 @@
 {% endblock %}
 
 {% block section_action %}
-{% if group_id %}
-<a href="{% url "crm_edit_group" group_id %}">{% trans "Edit group" %}</a>
-{% endif %}
-
+  
 {% if entities %}
 <a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a>
 <a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a>

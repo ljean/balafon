@@ -18,9 +18,8 @@ from django.conf import settings
 import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
 from sanza.permissions import can_access
-import logging
-logger = logging.getLogger("sanza_crm")
-    
+from sanza.utils import logger, log_error
+ 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
     
@@ -33,7 +32,10 @@ def view_entity(request, entity_id):
         contacts = contacts.filter(has_left=False)
     actions = models.Action.objects.filter(Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity),
         Q(archived=False)).order_by("planned_date", "priority")
-    opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("type__name", "status__ordering", "start_date", "end_date", "ended")
+    
+    #opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("type__name", "status__ordering", "start_date", "end_date", "ended")
+    opportunities = models.Opportunity.objects.filter(
+        Q(action__contact__entity=entity)).distinct().order_by("status__ordering")
     
     actions_by_set = get_actions_by_set(actions)    
     
@@ -405,7 +407,7 @@ def get_opportunity_name(request, opp_id):
 def get_opportunities(request):
     term = request.GET.get('term')
     opps = [{'id': x.id, 'name': u'{0} -  {1}'.format(x.name, x.entity.name)}
-        for x in models.Opportunity.objects.filter(Q(name__istartswith=term) | Q(entity__name__istartswith=term))]
+        for x in models.Opportunity.objects.filter(Q(ended=False), Q(name__istartswith=term) | Q(entity__name__istartswith=term))]
     return HttpResponse(json.dumps(opps), 'application/json')
 
 @user_passes_test(can_access)
@@ -422,6 +424,24 @@ def get_entities(request):
     entities = [{'id': x.id, 'name': x.name}
         for x in models.Entity.objects.filter(name__istartswith=term)]
     return HttpResponse(json.dumps(entities), 'application/json')
+
+@user_passes_test(can_access)
+def get_contact_name(request, contact_id):
+    try:
+        contact = models.Contact.objects.get(id=contact_id)
+        return HttpResponse(json.dumps({'name': contact.get_name_and_entity()}), 'application/json')
+    except models.Contact.DoesNotExist:
+        return HttpResponse(json.dumps({'name': contact_id}), 'application/json')
+
+@user_passes_test(can_access)
+@log_error
+def get_contacts(request):
+    term = request.GET.get('term')
+    contacts = [{'id': x.id, 'name': x.get_name_and_entity()}
+        for x in models.Contact.objects.filter(
+            Q(lastname__istartswith=term) | Q(entity__name__istartswith=term, entity__is_single_contact=False)
+        )]
+    return HttpResponse(json.dumps(contacts), 'application/json')
 
 @user_passes_test(can_access)
 def edit_contact(request, contact_id, mini=True, go_to_entity=False):
@@ -514,9 +534,9 @@ def same_as(request, contact_id):
 @user_passes_test(can_access)
 def add_contact(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
+    contact = models.Contact(entity=entity)
     
     if request.method == 'POST':
-        contact = models.Contact(entity=entity)
         contact_form = forms.ContactForm(request.POST, request.FILES, instance=contact)
         if contact_form.is_valid():
             contact = contact_form.save()
@@ -530,7 +550,7 @@ def add_contact(request, entity_id):
                     
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
-        contact_form = forms.ContactForm()
+        contact_form = forms.ContactForm(instance=contact)
         
     return render_to_response(
         'Crm/edit_contact.html',
@@ -601,28 +621,35 @@ def delete_contact(request, contact_id):
 @user_passes_test(can_access)
 def add_action_for_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
-    
-    if request.method == 'POST':
-        action = models.Action(entity=entity)
-        form = forms.ActionForm(request.POST, instance=action, entity=entity)
-        if form.is_valid():
-            form.save()
-            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
-            return HttpResponseRedirect(next_url)
-        action = None
-    else:
-        form = forms.ActionForm(entity=entity)
-    
-    context = {
-        'form': form,
-        'entity': entity,
-    }
-    
-    return render_to_response(
-        'Crm/edit_action.html',
-        context,
-        context_instance=RequestContext(request)
+    return select_contact_and_redirect(
+        request,
+        'crm_add_action_for_contact',
+        'Crm/add_action.html',
+        choices=entity.contact_set.filter(has_left=False)
     )
+    #entity = get_object_or_404(models.Entity, id=entity_id)
+    #
+    #if request.method == 'POST':
+    #    action = models.Action(entity=entity)
+    #    form = forms.ActionForm(request.POST, instance=action, entity=entity)
+    #    if form.is_valid():
+    #        form.save()
+    #        next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
+    #        return HttpResponseRedirect(next_url)
+    #    action = None
+    #else:
+    #    form = forms.ActionForm(entity=entity)
+    #
+    #context = {
+    #    'form': form,
+    #    'entity': entity,
+    #}
+    #
+    #return render_to_response(
+    #    'Crm/edit_action.html',
+    #    context,
+    #    context_instance=RequestContext(request)
+    #)
 
 @user_passes_test(can_access)
 def add_action_for_contact(request, contact_id):
@@ -636,7 +663,16 @@ def add_action_for_contact(request, contact_id):
             return HttpResponseRedirect(next_url)
         action = None
     else:
-        form = forms.ActionForm(instance=action)
+        opportunity_id = request.GET.get('opp_id', 0)
+        print "#################", opportunity_id
+        initial = {}
+        if opportunity_id:
+            try:
+                initial['opportunity'] = models.Opportunity.objects.get(id=opportunity_id)
+            except models.Opportunity.DoesNotExist:
+                pass
+        print '*************************', initial
+        form = forms.ActionForm(instance=action, initial=initial)
     
     context = {
         'form': form,
@@ -758,26 +794,26 @@ def delete_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
-@user_passes_test(can_access)
-def add_opportunity_for_entity(request, entity_id):
-    entity = get_object_or_404(models.Entity, id=entity_id)
-    
-    if request.method == 'POST':
-        opportunity = models.Opportunity(entity=entity)
-        form = forms.OpportunityForm(request.POST, instance=opportunity)
-        if form.is_valid():
-            form.save()
-            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
-            return HttpResponseRedirect(next_url)
-        opportunity = None
-    else:
-        form = forms.OpportunityForm()
-    
-    return render_to_response(
-        'Crm/edit_opportunity.html',
-        locals(),
-        context_instance=RequestContext(request)
-    )
+#@user_passes_test(can_access)
+#def add_opportunity_for_entity(request, entity_id):
+#    entity = get_object_or_404(models.Entity, id=entity_id)
+#    
+#    if request.method == 'POST':
+#        opportunity = models.Opportunity(entity=entity)
+#        form = forms.OpportunityForm(request.POST, instance=opportunity)
+#        if form.is_valid():
+#            form.save()
+#            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
+#            return HttpResponseRedirect(next_url)
+#        opportunity = None
+#    else:
+#        form = forms.OpportunityForm()
+#    
+#    return render_to_response(
+#        'Crm/edit_opportunity.html',
+#        locals(),
+#        context_instance=RequestContext(request)
+#    )
 
 @user_passes_test(can_access)
 def view_entity_opportunities(request, entity_id):
@@ -795,7 +831,7 @@ def view_entity_opportunities(request, entity_id):
 def view_all_opportunities(request, ordering=None):
     opportunities = models.Opportunity.objects.all()
     if not ordering:
-        ordering = 'name'
+        ordering = 'date'
     if ordering == 'name':
         opportunities = opportunities.order_by('name')
     elif ordering == 'status':
@@ -805,6 +841,7 @@ def view_all_opportunities(request, ordering=None):
     elif ordering == 'date':
         opportunities = list(opportunities)
         opportunities.sort(key=lambda o: o.get_start_date())
+        opportunities.reverse()
         
     all_opportunities = True
     request.session["redirect_url"] = reverse('crm_all_opportunities')
@@ -817,13 +854,12 @@ def view_all_opportunities(request, ordering=None):
 @user_passes_test(can_access)
 def edit_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-    entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
     
     if request.method == 'POST':
         form = forms.OpportunityForm(request.POST, instance=opportunity)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
+            opportunity= form.save()
+            return HttpResponseRedirect(reverse('crm_view_opportunity', args=[opportunity.id]))
     else:
         form = forms.OpportunityForm(instance=opportunity)
     
@@ -839,10 +875,19 @@ def view_opportunity(request, opportunity_id):
     actions = opportunity.action_set.filter(archived=False)
     actions_by_set = get_actions_by_set(actions)
     
-    contacts = set([a.contact for a in actions if a.contact])
+    #contacts = list(set([a.contact for a in actions if a.contact]))
+    #contacts.sort(key=lambda x: x.lastname.lower())
+    #
+    context = {
+        'opportunity': opportunity,
+        'actions_by_set': actions_by_set,
+        #'contacts': contacts,
+        #'mailto': True
+    }
+        
     return render_to_response(
         'Crm/view_opportunity.html',
-        {'opportunity': opportunity, 'actions_by_set': actions_by_set, 'contacts': contacts, 'mailto': True},
+        context,
         context_instance=RequestContext(request)
     )
 
@@ -862,12 +907,12 @@ def mailto_opportunity_contacts(request, opportunity_id):
 @popup_redirect
 def delete_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-    entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
+    #entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
     
     if request.method == 'POST':
         if 'confirm' in request.POST:
             opportunity.delete()
-            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
+            next_url = reverse('crm_board_panel')    
             return HttpResponseRedirect(next_url)
         else:
             return HttpResponseRedirect(reverse('crm_edit_opportunity', args=[opportunity.id]))
@@ -897,7 +942,7 @@ def view_board_panel(request):
     actions = models.Action.objects.filter(archived=False, display_on_board=True, *dt_filter).order_by(
         "planned_date", "priority")
     
-    opportunities = models.Opportunity.objects.filter(display_on_board=True).order_by("status__ordering")
+    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("status__ordering")
     partial = True
     
     default_my_actions = True
@@ -968,30 +1013,68 @@ def select_entity_and_redirect(request, view_name, template_name):
     )
 
 @user_passes_test(can_access)
-@popup_redirect
+def select_contact_and_redirect(request, view_name, template_name, choices=None):
+    opportunity_id = request.GET.get('opp_id', 0)
+    url_args = "?opp_id={0}".format(opportunity_id) if opportunity_id else ""
+
+    if request.method == 'POST':
+        form = forms.SelectContactForm(request.POST)
+        if form.is_valid():
+            contact = form.cleaned_data["contact"]
+            args = [contact.id]
+            url = reverse(view_name, args=args)+url_args
+            return HttpResponseRedirect(url)
+    else:
+        form = forms.SelectContactForm(choices=choices)
+    
+    post_url = reverse("crm_add_action")+url_args 
+    
+    return render_to_response(
+        template_name,
+        {'form': form, 'post_url': post_url},
+        context_instance=RequestContext(request)
+    )
+
+
+#@user_passes_test(can_access)
+#@popup_redirect
+#def add_opportunity(request):
+#    return select_entity_and_redirect(
+#        request,
+#        'crm_add_opportunity_for_entity',
+#        'Crm/add_opportunity.html'
+#    )
+
+@user_passes_test(can_access)
 def add_opportunity(request):
-    try:
-        return select_entity_and_redirect(
-            request,
-            'crm_add_opportunity_for_entity',
-            'Crm/add_opportunity.html'
-        )
-    except Exception, msg:
-        print "##", msg
-        raise
+    next_url = request.session.get('redirect_url')
+    if request.method == 'POST':
+        opportunity = models.Opportunity()
+        form = forms.OpportunityForm(request.POST, instance=opportunity)
+        if form.is_valid():
+            opportunity = form.save()
+            next_url = next_url or reverse('crm_view_opportunity', args=[opportunity.id])    
+            return HttpResponseRedirect(next_url)
+        opportunity = None
+    else:
+        form = forms.OpportunityForm()
+    
+    next_url = next_url or reverse('crm_board_panel')    
+    return render_to_response(
+        'Crm/edit_opportunity.html',
+        locals(),
+        context_instance=RequestContext(request)
+    )
+
 
 @user_passes_test(can_access)
 @popup_redirect
 def add_action(request):
-    try:
-        return select_entity_and_redirect(
-            request,
-            'crm_add_action_for_entity',
-            'Crm/add_action.html',
-        )
-    except Exception, msg:
-        print "##", msg
-        raise
+    return select_contact_and_redirect(
+        request,
+        'crm_add_action_for_contact',
+        'Crm/add_action.html',
+    )
 
 @user_passes_test(can_access)
 def edit_custom_fields(request, model_name, instance_id):

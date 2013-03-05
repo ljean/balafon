@@ -20,4 +20,5 @@
 
 {% block section_action %}
     <a href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a>
+    <a href="{% url "search_opportunity" opportunity.id %}">{% trans "View contacts" %}</a>
 {% endblock %}

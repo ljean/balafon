@@ -7,7 +7,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.conf import settings
 from django.contrib.auth.models import User
 from sanza.Crm import models
-from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete
+from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
 from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
 from form_utils.forms import BetterModelForm
@@ -88,7 +88,7 @@ class EditGroupForm(forms.ModelForm):
         )
         
         self.fields['contacts'] = forms.ModelMultipleChoiceField(
-            queryset=models.Entity.objects.all(),
+            queryset=models.Contact.objects.all(),
             widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
 
@@ -343,10 +343,15 @@ class GroupForContactsForm(forms.Form):
         ids = self.cleaned_data["contacts"].split(";")
         return models.Contact.objects.filter(id__in=ids)
     
-class OpportunityForm(forms.ModelForm):
+class OpportunityForm(BetterModelForm):
     class Meta:
         model = models.Opportunity
-        fields=('name', 'status', 'type', 'start_date', 'end_date', 'ended', 'display_on_board', 'probability', 'amount', 'detail')
+        fields=('name', 'status', 'type', 'ended', 'display_on_board', 'detail')
+        
+        fieldsets = [
+                ('name', {'fields': ['name', 'type', 'status', 'detail'], 'legend': _(u'Summary')}),
+                ('address', {'fields': ['display_on_board', 'ended'], 'legend': _(u'Display')}),
+            ]
 
     def __init__(self, *args, **kwargs):
         super(OpportunityForm, self).__init__(*args, **kwargs)
@@ -376,6 +381,27 @@ class SelectEntityForm(forms.Form):
             return models.Entity.objects.get(id=entity_id)
         except (ValueError, models.Entity.DoesNotExist):
             raise ValidationError(_(u"The entity does'nt exist"))
+
+class SelectContactForm(forms.Form):
+    
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop('choices', None)
+        super(SelectContactForm, self).__init__(*args, **kwargs)
+        if choices:
+            widget = forms.Select(choices=[(x.id, x.fullname) for x in choices])
+            self.fields["contact"] = forms.IntegerField(label=_(u"Contact"), widget=widget)
+        else:
+            widget = ContactAutoComplete(
+                attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'})
+            self.fields["contact"] = forms.CharField(label=_(u"Contact"), widget=widget)
+    
+    def clean_contact(self):
+        try:
+            contact_id = int(self.cleaned_data["contact"])
+            return models.Contact.objects.get(id=contact_id)
+        except (ValueError, models.Contact.DoesNotExist):
+            raise ValidationError(_(u"The contact does'nt exist"))
+
     
 class SameAsForm(forms.Form):
     contact = forms.IntegerField(label=_(u"Contact"))

@@ -75,7 +75,7 @@ def quick_search(request):
         raise Http404
       
 @user_passes_test(can_access)
-def search(request, search_id=0, group_id=0):
+def search(request, search_id=0, group_id=0, opportunity_id=0):
     message = ''
     entities = []
     search=None
@@ -84,11 +84,16 @@ def search(request, search_id=0, group_id=0):
     data = None
     contacts_count = 0
     has_empty_entities = False
+    group = opportunity = None
     
     if request.method == "POST":
         data = request.POST
     elif group_id:
+        group = get_object_or_404(Group, id=group_id)
         data = {"gr0-_-group-_-0": group_id}
+    elif opportunity_id:
+        opportunity = get_object_or_404(Opportunity, id=opportunity_id)
+        data = {"gr0-_-opportunity-_-0": opportunity_id}
             
     if data:
         search_form = forms.SearchForm(data)
@@ -101,14 +106,13 @@ def search(request, search_id=0, group_id=0):
         search = get_object_or_404(models.Search, id=search_id) if search_id else None
         search_form = forms.SearchForm(instance=search)
         
-        
     return render_to_response(
         'Search/search.html',
         {
             'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
             'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
-            'contains_refuse_newsletter': contains_refuse_newsletter, 'group_id': group_id,
+            'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
         },
         context_instance=RequestContext(request)
     )
