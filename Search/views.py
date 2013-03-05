@@ -17,15 +17,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
 from sanza.Emailing.forms import NewEmailingForm
-from sanza.Crm.forms import ActionForContactsForm, OpportunityForContactsForm, GroupForContactsForm
-from sanza.Search.forms import PdfTemplateForm
+from sanza.Search.forms import PdfTemplateForm, ActionForContactsForm, GroupForContactsForm
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from sanza.permissions import can_access
-import logging
-logger = logging.getLogger("sanza")
+from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
 
 @user_passes_test(can_access)
@@ -285,105 +283,49 @@ def export_contacts_as_excel(request):
 @user_passes_test(can_access)
 @popup_redirect
 def create_action_for_contacts(request):
-    try:
-        search_form = forms.SearchForm(request.POST)
-        if request.method == "POST":
-            if "create_actions" in request.POST:
-                form = ActionForContactsForm(request.POST)
-                if form.is_valid():
-                    contacts = form.get_contacts()
-                    for contact in contacts:
-                        #create actions
-                        kwargs = dict(form.cleaned_data)
-                        for k in ('date', 'time', 'contacts'): del kwargs[k]
-                        action = Action.objects.create(
-                            entity = contact.entity,
-                            contact = contact,
-                            **kwargs
-                        )
-                    messages.add_message(request, messages.SUCCESS, _(u"{0} actions have been created".format(len(contacts))))
-                    return HttpResponseRedirect(reverse('crm_board_panel'))
-                else:
+    search_form = forms.SearchForm(request.POST)
+    if request.method == "POST":
+        if "create_actions" in request.POST:
+            form = ActionForContactsForm(request.POST)
+            if form.is_valid():
+                contacts = form.get_contacts()
+                for contact in contacts:
+                    #create actions
+                    kwargs = dict(form.cleaned_data)
+                    for k in ('date', 'time', 'contacts'): del kwargs[k]
+                    action = Action.objects.create(
+                        entity = contact.entity,
+                        contact = contact,
+                        **kwargs
+                    )
+                messages.add_message(request, messages.SUCCESS, _(u"{0} actions have been created".format(len(contacts))))
+                return HttpResponseRedirect(reverse('crm_board_panel'))
+            else:
+                return render_to_response(
+                    'Search/create_action_for_contacts.html',
+                    {'form': form},
+                    context_instance=RequestContext(request)
+                )
+        else:
+            search_form = forms.SearchForm(request.POST)
+            if search_form.is_valid():
+                contacts = search_form.get_contacts()
+                if contacts:
+                    form = ActionForContactsForm(initial={'contacts': contacts})
                     return render_to_response(
                         'Search/create_action_for_contacts.html',
                         {'form': form},
                         context_instance=RequestContext(request)
                     )
-            else:
-                search_form = forms.SearchForm(request.POST)
-                if search_form.is_valid():
-                    contacts = search_form.get_contacts()
-                    if contacts:
-                        form = ActionForContactsForm(initial={'contacts': contacts})
-                        return render_to_response(
-                            'Search/create_action_for_contacts.html',
-                            {'form': form},
-                            context_instance=RequestContext(request)
-                        )
-                    else:
-                        return render_to_response(
-                            'sanza/message_dialog.html',
-                            {
-                                'title': _('Create action for contacts'),
-                                'message': _(u'The search results contains no contacts')
-                            },
-                            context_instance=RequestContext(request)
-                        )
-    except Exception, msg:
-        logger.exception("create_action_for_contacts")
-        raise
-    raise Http404
-
-
-@user_passes_test(can_access)
-@popup_redirect
-def create_opportunity_for_contacts(request):
-    try:
-        search_form = forms.SearchForm(request.POST)
-        if request.method == "POST":
-            if "create_opportunities" in request.POST:
-                form = OpportunityForContactsForm(request.POST)
-                if form.is_valid():
-                    contacts = form.get_contacts()
-                    entities = set([c.entity for c in contacts])
-                    for entity in entities:
-                        #create opportunity
-                        kwargs = dict(form.cleaned_data)
-                        for k in ('contacts', ): del kwargs[k]
-                        opportunity = Opportunity.objects.create(
-                            entity = entity, **kwargs
-                        )
-                    messages.add_message(request, messages.SUCCESS, _(u"{0} opportunities have been created".format(len(entities))))
-                    return HttpResponseRedirect(reverse('crm_board_panel'))
                 else:
                     return render_to_response(
-                        'Search/create_opportunity_for_contacts.html',
-                        {'form': form},
+                        'sanza/message_dialog.html',
+                        {
+                            'title': _('Create action for contacts'),
+                            'message': _(u'The search results contains no contacts')
+                        },
                         context_instance=RequestContext(request)
                     )
-            else:
-                search_form = forms.SearchForm(request.POST)
-                if search_form.is_valid():
-                    contacts = search_form.get_contacts()
-                    if contacts:
-                        form = OpportunityForContactsForm(initial={'contacts': contacts})
-                        return render_to_response(
-                            'Search/create_opportunity_for_contacts.html',
-                            {'form': form},
-                            context_instance=RequestContext(request)
-                        )
-                    else:
-                        return render_to_response(
-                            'sanza/message_dialog.html',
-                            {
-                                'title': _('Create opportunity for contacts'),
-                                'message': _(u'The search results contains no contacts')
-                            },
-                            context_instance=RequestContext(request)
-                        )
-    except Exception, msg:
-        logger.exception("create_opportunity_for_contacts")
-        raise
     raise Http404
 
 @user_passes_test(can_access)

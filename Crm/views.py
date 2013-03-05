@@ -396,6 +396,7 @@ def get_cities(request):
     return HttpResponse(json.dumps(cities), 'application/json')
 
 @user_passes_test(can_access)
+@log_error
 def get_opportunity_name(request, opp_id):
     try:
         opp = models.Opportunity.objects.get(id=opp_id)
@@ -404,10 +405,11 @@ def get_opportunity_name(request, opp_id):
         return HttpResponse(json.dumps({'name': opp_id}), 'application/json')
 
 @user_passes_test(can_access)
+@log_error
 def get_opportunities(request):
     term = request.GET.get('term')
-    opps = [{'id': x.id, 'name': u'{0} -  {1}'.format(x.name, x.entity.name)}
-        for x in models.Opportunity.objects.filter(Q(ended=False), Q(name__istartswith=term) | Q(entity__name__istartswith=term))]
+    opps = [{'id': x.id, 'name': u'{0}'.format(x.name)}
+        for x in models.Opportunity.objects.filter(ended=False, name__istartswith=term)]
     return HttpResponse(json.dumps(opps), 'application/json')
 
 @user_passes_test(can_access)

@@ -725,7 +725,7 @@ tr.done-action td.status-icon a, tr.done-action td.status-icon a:hover{
 }
 
 tr.not-my-action td.status-icon a, tr.not-my-action td.status-icon a:hover{
-	background: none;
+	/*background: none;*/
 	cursor: default;
 }
 

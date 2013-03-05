@@ -11,11 +11,13 @@ from sanza.Search import models
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
 from sanza.Search.widgets import DatespanInput
-from sanza.Crm.models import Contact
+from sanza.Crm.models import Contact, Action, Group
+from sanza.Crm.widgets import OpportunityAutoComplete
 from django.conf import settings
 SEARCH_FORMS = None
 from django.utils import importlib
 from itertools import chain
+from datetime import datetime
 
 def load_from_name(constant_full_name):
     x = constant_full_name.split('.')
@@ -438,3 +440,70 @@ class PdfTemplateForm(SearchActionForm):
             help_text=_(u'Select the type of document to generate')
         )
         
+class ActionForContactsForm(forms.ModelForm):
+    date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
+    time = forms.TimeField(label=_(u"planned time"), required=False)
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    
+    class Meta:
+        model = Action
+        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'detail', 'display_on_board',
+            'priority', 'planned_date', 'contacts', 'opportunity')
+        
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        super(ActionForContactsForm, self).__init__(*args, **kwargs)
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+        self.fields['opportunity'].widget = OpportunityAutoComplete(
+            attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'})
+        
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=ids)
+        
+    def clean_planned_date(self):
+        d = self.cleaned_data["date"]
+        t = self.cleaned_data.get("time", None)
+        if d:
+            return datetime.combine(d, t or datetime.min.time())
+        return None
+
+class GroupForContactsForm(forms.Form):
+    contacts = forms.CharField(widget=forms.HiddenInput())
+    groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
+    on_contact = forms.BooleanField(label=_(u"Group on contact"), required=False, initial=True,
+        help_text=_(u"Define if the group is added on the contact itself or on his entity"))
+    
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css',)
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
+        
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial')
+        initial_contacts = ''
+        if initial and initial.has_key('contacts'):
+            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial.pop('contacts')
+        super(GroupForContactsForm, self).__init__(*args, **kwargs)
+        if initial_contacts:
+            self.fields['contacts'].initial = initial_contacts
+    
+        self.fields['groups'].widget.attrs = {
+            'class': 'chzn-select',
+            'data-placeholder': _(u'Select groups'),
+            'style': "width:350px;"
+        }
+        self.fields['groups'].help_text = ''
+
+    def get_contacts(self):
+        ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=ids)

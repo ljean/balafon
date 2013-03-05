@@ -17,14 +17,10 @@
   {% for a in actions %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done-action{% endif %}{% if a.archived %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
     
-    {% if a.in_charge == user or a.in_charge == None %}
     <td class="status-icon" title="{% if a.done %}{% trans "done" %}{% else %}{% trans "to do" %}{% endif %}">
-      <a {% if not a.done %}
-        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}>&nbsp;
+      <a {% if not a.done %}{% if a.in_charge == user or a.in_charge == None %}
+        href="{% url "crm_do_action" a.id %}" class="colorbox-form"{%endif%}{%endif%}>&nbsp;
     </a></td>
-    {% else %}
-      <td class="status-icon"></td>
-    {%endif%}
     
     <td class="priority-icon prio{{a.priority}}" title="{{ a.get_priority_display}}">
       &nbsp;
