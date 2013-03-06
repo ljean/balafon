@@ -458,15 +458,12 @@ def export_to_pdf(request):
                     
                     context = {
                         "contacts": contacts,
+                        "search_dict": json.loads(form.cleaned_data['search_dict']),
                     }
                     
                     pdf_view = PDFTemplateView(filename='sanza.pdf', template_name=template_name, request=request)
                     return pdf_view.render_to_response(context)
 
-                    return render_to_pdf('template', context)
-                    
-                    #TODO close
-                    #return HttpResponseRedirect(newsletter.get_edit_url())
                 else:
                     return render_to_response(
                         'Search/export_to_pdf.html',
@@ -477,7 +474,9 @@ def export_to_pdf(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    form = PdfTemplateForm(initial={'contacts': contacts})
+                    
+                    search_dict = json.dumps(search_form.serialize())
+                    form = PdfTemplateForm(initial={'contacts': contacts, 'search_dict': search_dict})
                     return render_to_response(
                         'Search/export_to_pdf.html',
                         {'form': form},

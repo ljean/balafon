@@ -14,6 +14,7 @@ from sanza.Search.widgets import DatespanInput
 from sanza.Crm.models import Contact, Action, Group
 from sanza.Crm.widgets import OpportunityAutoComplete
 from django.conf import settings
+from .utils import get_date_bounds
 SEARCH_FORMS = None
 from django.utils import importlib
 from itertools import chain
@@ -145,6 +146,15 @@ class SearchForm(forms.Form):
     def block_count(self):
         return len(self._forms)
     
+    def serialize(self):
+        data = {}
+        for group, forms in self._forms.items():
+            for form in forms:
+                if group in data:
+                    data[group] += [form.serialize()]
+                else:
+                    data[group] = [form.serialize()]
+        return data
     
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -347,6 +357,9 @@ class SearchFieldForm(forms.Form):
     def clean(self):
         return {self._get_field_name(): self._value}
         
+    def serialize(self):
+        return {self._name: self._value}
+        
     def as_it_is(self):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
@@ -378,10 +391,7 @@ class TwoDatesForm(SearchFieldForm):
         return self._value
     
     def _get_dates(self):
-        d1, d2 = self._value.split(' ')
-        d1, d2 = [int(x) for x in d1.split('/')], [int(x) for x in d2.split('/')]
-        d1.reverse(), d2.reverse()
-        return date(*d1), date(*d2)
+        return get_date_bounds(self._value)
 
 class YesNoSearchFieldForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
@@ -423,6 +433,7 @@ class ContactsAdminForm(SearchActionForm):
     subscribe_newsletter = forms.BooleanField(required=False)
     
 class PdfTemplateForm(SearchActionForm):
+    search_dict = forms.CharField(widget=forms.HiddenInput())
     
     def __init__(self, *args, **kwargs):
         super(PdfTemplateForm, self).__init__(*args, **kwargs)
@@ -433,6 +444,7 @@ class PdfTemplateForm(SearchActionForm):
             choices = (
                 ('pdf/small_labels.html', _(u'small labels')),
                 ('pdf/address_strip.html', _(u'address strip')),
+                ('pdf/list_of_actions.html', _(u'list of actions')),
             )
         
         self.fields['template'] = ChoiceField(
