@@ -109,6 +109,6 @@ def get_actions_by_set(actions):
         acts = actions_dict.get(a_set, None)
         if acts:
             actions_by_set.append((a_set.id, a_set.name, acts))
-    title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _u("Actions")
+    title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _(u"Actions")
     actions_by_set += [(0, title, actions_dict.get(None, []))]
     return actions_by_set
