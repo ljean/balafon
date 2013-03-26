@@ -17,7 +17,7 @@ def load_commands(coop_bar):
         [back_to_newsletters, cms_cfg.edit_newsletter, cms_cfg.cancel_edit_newsletter, cms_cfg.save_newsletter,
             cms_cfg.change_newsletter_template, cms_cfg.test_newsletter],
         [cms_cfg.cms_edit, cms_cfg.cms_view, cms_cfg.cms_save, cms_cfg.cms_cancel],
-        [cms_cfg.cms_new_article, cms_cfg.cms_article_settings, cms_cfg.cms_set_homepage],
+        [cms_cfg.cms_new_article, cms_cfg.cms_new_link, cms_cfg.cms_article_settings, cms_cfg.cms_set_homepage],
         [cms_cfg.cms_publish],
         [cms_cfg.cms_media_library, cms_cfg.cms_upload_image, cms_cfg.cms_upload_doc],
         [cms_cfg.log_out]
