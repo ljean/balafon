@@ -33,10 +33,10 @@
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     {% with x.entity as e %}
       {% if e.is_single_contact %}
-        <td colspan=2><a href="{% url "crm_view_contact" x.id %}">{{c}}</a></td>
+        <td colspan=2><a href="{% url "crm_view_contact" x.id %}">{{x}}</a></td>
       {% else %}
         <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
-        <td><a href="{% url "crm_view_contact" x.id %}">{{c}}</a></td>
+        <td><a href="{% url "crm_view_contact" x.id %}">{{x}}</a></td>
       {% endif %}
       <td>{{x.get_roles|seq_to_dash}}</td>
       <td>{{x.get_phones|seq_to_dash}}</td>

@@ -40,6 +40,7 @@ def quick_search(request):
                 setattr(e, 'is_entity', True)
                 for c in e.contact_set.all():
                     try:
+                        # avoid duplicates
                         contacts_by_name.remove(c)
                     except ValueError:
                         pass
