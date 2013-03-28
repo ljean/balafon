@@ -180,6 +180,7 @@ class EntityForm(ModelFormWithCity):
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
             ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Phone / Web')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+            ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
     

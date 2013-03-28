@@ -61,13 +61,26 @@
       
       <table class="import-data">
         <tr>
-          <th>{% trans "Entity" %}</th><th>{% trans "Gender" %}</th><th>{% trans "Lastname" %}</th>
-          <th>{% trans "Firstname" %}</th><th>{% trans "Email" %}</th><th>{% trans "Entity city" %}</th>
-          <th>{% trans "Contact city" %}</th><th>{% trans "Groups" %}</th><th>{% trans "Roles" %}</th>
+          <th>{% trans "Entity" %}</th><th>{% trans "Entity type" %}</th>
+          <th>{% trans "Gender" %}</th><th>{% trans "Lastname" %}</th>
+          <th>{% trans "Firstname" %}</th><th>{% trans "Email" %}</th>
+          <th>{% trans "Entity city" %}</th><th>{% trans "Contact city" %}</th>
+          <th>{% trans "Entity groups" %}</th><th>{% trans "Contact groups" %}</th>
+          <th>{% trans "Roles" %}</th>
         </tr>
       {% for c in contacts %}
         <tr>
+          {% if c.entity %}
           <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.entity}}</td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.entity_type %}
+          <td class="{% if c.entity_type_exists %}exists{% else %}not-exists{% endif %}">{{c.entity_type}}</td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
           
           <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
           <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.lastname|default:"&nbsp;"}}</td>
@@ -105,6 +118,19 @@
           {% if c.entity_groups %}
             <td>
               {% for g in c.entity_groups %}
+              <span class="{% if g.exists %}exists{% else %}not-exists{% endif %}">
+                {{g.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.contact_groups %}
+            <td>
+              {% for g in c.contact_groups %}
               <span class="{% if g.exists %}exists{% else %}not-exists{% endif %}">
                 {{g.name}}
               </span>

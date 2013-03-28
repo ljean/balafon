@@ -120,6 +120,8 @@ class Entity(TimeStampedModel):
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
+    notes = models.TextField(_('notes'), blank=True, default="")
+    
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     is_single_contact = models.BooleanField(_("is single contact"), default=False)
@@ -272,7 +274,7 @@ class Contact(TimeStampedModel):
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
-    notes = models.CharField(_('notes'), max_length=500, blank=True, default="")
+    notes = models.TextField(_('notes'), blank=True, default="")
     
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
     
@@ -601,8 +603,8 @@ class ContactsImport(TimeStampedModel):
     )
     
     SEPARATORS = (
+        (';', _(u'Semi-colon')),
         (',', _(u'Coma')),
-        (';', _(u'Semi-colon'))
     )
     
     def _get_import_dir(self, filename):
@@ -614,7 +616,7 @@ class ContactsImport(TimeStampedModel):
         help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     encoding = models.CharField(max_length=50, default='iso-8859-15', choices=ENCODINGS)
-    separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
+    separator = models.CharField(max_length=5, default=';', choices=SEPARATORS)
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,

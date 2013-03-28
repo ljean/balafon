@@ -1150,6 +1150,8 @@ def read_contacts(reader, fields, extract_from_email):
             if field.find('city')>=0 and c[field]:
                 field = field.replace('.', '_')
                 c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
+            if field.find("accept_")==0:
+                c[field] = True if c[field] else False
         
         if not any(c.values()):
             continue
@@ -1164,22 +1166,28 @@ def read_contacts(reader, fields, extract_from_email):
                     #email = u'{0}@{1}.{2}'.format(name, entity, ext)
                 email_providers = ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
                     'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
-                if entity in email_providers:
-                    entity = name
-            if not entity:
-                entity = u'{0} {1}'.format(c['lastname'], c['firstname']).upper()
+                #if entity in email_providers:
+                #    entity = name
+            #if not entity:
+            #    entity = u'{0} {1}'.format(c['lastname'], c['firstname']).upper()
             c['entity'] = entity
-        else:
-            name = c['entity']
+        #else:
+        #    name = c['entity']
         if not (c['lastname'] or c['firstname']):
             try:
                 c['firstname'], c['lastname'] = [x.capitalize() for x in name.split('.')]
             except ValueError:
                 c['lastname'] = name.capitalize()
         
-        c['entity_exists'] = (models.Entity.objects.filter(name__iexact=c['entity']).count()!=0) or \
-            (c['entity'] in entity_dict)
-        entity_dict[c['entity']] = True
+        if c['entity']:
+            c['entity_exists'] = (models.Entity.objects.filter(name__iexact=c['entity']).count()!=0) or \
+                (c['entity'] in entity_dict)
+            entity_dict[c['entity']] = True
+        else:
+            c['entity_exists'] = False
+            
+        if c['entity_type']:
+            c['entity_type_exists'] = (models.EntityType.objects.filter(name=c['entity_type']).count()!=0)
         
         c['role'] = c['role'].split(";")
         c['role_exists'] = []
@@ -1190,25 +1198,41 @@ def read_contacts(reader, fields, extract_from_email):
             role_dict[r.lower()] = True
         c['roles'] = [{'name': r, 'exists': e} for (r, e) in zip(c['role'], c['role_exists'])]
         
-        groups = [x for x in c['groups'].strip().split(";") if x]
-        c['groups_exists'] = []
-        c['groups'] = []
-        for g in groups:
-            c['groups_exists'].append(
-                (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
-            )
-            c['groups'].append(g)
+        entity_groups = [x for x in c['entity.groups'].strip().split(";") if x]
+        c['entity_groups'] = []
+        for g in entity_groups:
+            exists = (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
             groups_dict[g] = True
-        c['entity_groups'] = [{'name': g, 'exists': e} for (g, e) in zip(groups, c['groups_exists'])]
+            c['entity_groups'].append({'name': g, 'exists': exists})
+            
+        contact_groups = [x for x in c['groups'].strip().split(";") if x]
+        c['contact_groups'] = []
+        for g in contact_groups:
+            exists = (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
+            groups_dict[g] = True
+            c['contact_groups'].append({'name': g, 'exists': exists})
+        
         contacts.append(c)
     total_contacts = k
     return contacts, total_contacts
     
 def get_imports_fields():
-    fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
-        'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
-        'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
-        'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
+    #fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
+    #    'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
+    #    'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
+    #    'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website',
+    #    'notes', 'role', 'entity.email', 'groups', 'entity.notes', 'entity.description',
+    #]
+    fields = [
+        'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job',
+        'notes', 'role', 
+        'accept_newsletter', 'accept_3rdparty',
+        'entity', 'entity.type', 'entity.description', 'entity.website', 'entity.email',
+        'entity.phone', 'entity.fax', 'entity.notes', 
+        'entity.address', 'entity.address2', 'entity.address3',
+        'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
+        'address', 'address2', 'address3', 'city', 'cedex', 'zip_code', 'country',
+        'entity.groups', 'groups',
     ]
     
     #custom fields
@@ -1257,6 +1281,11 @@ def confirm_contacts_import(request, import_id):
             contacts, total_contacts = read_contacts(reader, fields, form.cleaned_data['entity_name_from_email'])
             default_department = form.cleaned_data['default_department']
             contacts_import = form.save()
+            
+            complex_fields = (
+                'entity', 'city', 'entity.city', 'role', 'entity.groups',
+                'contacts.groups', 'country', 'entity.country', 'entity.type',
+            )
 
             if 'create_contacts' in request.POST:
                 #create entities
@@ -1268,14 +1297,29 @@ def confirm_contacts_import(request, import_id):
                             print c['entity'], c['lastname']
                         except UnicodeError:
                             print '##!'
+                            
+                    entity_type = None
+                    if not c['entity.type']:
+                        entity_type = contacts_import.entity_type
+                    else:
+                        entity_type, _x =  models.Entity.objects.get_or_create(name=c['entity.type'])
+                            
                     if c['entity_exists']:
                         entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
                     else:
-                        entity = models.Entity.objects.create(
-                            name=c['entity'], type=contacts_import.entity_type, imported_by=contacts_import)
+                        if c['entity']:
+                            entity = models.Entity.objects.create(
+                                name=c['entity'], type=entity_type, imported_by=contacts_import)
+                        else:
+                            fullname = u"{0} {1}".format(c['firstname'], c['lastname'])
+                            entity = models.Entity.objects.create(
+                                name=fullname, is_single_contact=True, imported_by=contacts_import)
                     
-                    is_first_for_entity = entity_dict.has_key(entity.name)
-                    entity_dict[entity.name] = True
+                    if entity.is_single_contact:
+                        is_first_for_entity = True
+                    else:
+                        is_first_for_entity = entity_dict.has_key(entity.name)
+                        entity_dict[entity.name] = True
                     
                     for g in contacts_import.groups.all():
                         g.entities.add(entity)
@@ -1287,7 +1331,7 @@ def confirm_contacts_import(request, import_id):
                     contact.imported_by = contacts_import
                     
                     for field_name in fields:
-                        if field_name in ('entity', 'city', 'entity.city', 'role', 'groups', 'country', 'entity.country'):
+                        if field_name in complex_fields:
                             continue
                         obj = contact
                         try:
@@ -1308,13 +1352,18 @@ def confirm_contacts_import(request, import_id):
                                 contact.role.add(models.EntityRole.objects.filter(name__iexact=role)[0])
                             else:
                                 contact.role.add(models.EntityRole.objects.create(name=role))
-                    if c['groups']:
-                        for group_exists, group in zip(c['groups_exists'], c['groups']):
+                    
+                    for (is_entity, key) in ((True, 'entity_groups'), (False, 'contact_groups')):
+                        for group_data in c[key]:
+                            group, group_exists = group_data['name'], group_data['exists']
                             if group_exists:
                                 group = models.Group.objects.filter(name__iexact=group)[0]
                             else:
                                 group, _x = models.Group.objects.get_or_create(name=group)
-                            group.entities.add(contact.entity)
+                            if is_entity:
+                                group.entities.add(contact.entity)
+                            else:
+                                group.contacts.add(contact)
                             group.save()
                     
                     contact.entity.save()
