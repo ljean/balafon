@@ -1196,7 +1196,7 @@ def read_contacts(reader, fields, extract_from_email):
         if c['entity_type']:
             c['entity_type_exists'] = (models.EntityType.objects.filter(name=c['entity_type']).count()!=0)
         
-        c['role'] = c['role'].split(";")
+        c['role'] = [x.strip() for x in c['role'].split(";") if x.strip()]
         c['role_exists'] = []
         for r in c['role']:
             c['role_exists'].append(
