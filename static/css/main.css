@@ -719,6 +719,14 @@ tr td.note-icon.has-note {
 	cursor: pointer;
 }
 
+.note-icon {
+	position: relative;
+}
+
+.action-note {
+	position: absolute;
+}
+
 tr.done-action td.status-icon a, tr.done-action td.status-icon a:hover{
 	background: url('../img/done.png') no-repeat;
 	cursor: default;

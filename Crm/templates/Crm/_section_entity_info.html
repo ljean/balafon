@@ -14,9 +14,16 @@
   {% if entity.type %}
     <span class="label">{{entity.type}}</span>
   {% endif %}
+  {% if entity.notes %}
+    <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
+      <img src="{{STATIC_URL}}img/notebook.png">
+      <div class="action-note" style="display: none;">
+        {{entity.notes|linebreaksbr}}
+      </div>
+   </a>
+  {% endif %}
   <br /><br />
   <span class="entity_description">{{entity.description}}</span>
-  
 </div>
 {% endspaceless %}
 {% endblock %}

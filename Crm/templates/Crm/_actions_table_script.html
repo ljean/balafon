@@ -18,12 +18,6 @@
     });
     {% if default_my_actions %}$("#toggle_my_actions").click();{% endif %}
     {% endif %}
-    
-    $("td.note-icon.has-note").live('click', function() {
-      $(this).find(".action-note").toggle();
-    });
-
-
 
     $("td.bookmark-icon").live('click', function() {
       var url = $(this).attr('rel');

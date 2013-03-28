@@ -18,10 +18,18 @@
   <script type="text/javascript">
     $(function () {
       $("a.colorbox-form").colorboxify();
+      $(".note-icon.has-note").live('click', function() {
+        var pos = $(this).position();
+        $(this).find(".action-note").toggle().css({
+          left: 0,
+          top: $(this).height()
+        });
+        return false;
+      });
     });
   </script>
   {% endblock %}
-  <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css" type="text/css" />
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css?v=1.1" type="text/css" />
   {% block extra_head %}{% endblock %}
 </head>
 <body>

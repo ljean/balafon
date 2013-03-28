@@ -57,7 +57,7 @@
     
     
     <td>{{a.amount|default:'&nbsp;'}}</td>
-    <td class="note-icon{% if a.detail %} has-note{% endif %}">
+    <td class="note-icon{% if a.detail %} has-note{% endif %}" title="{% trans "Show note" %}">
       {% if a.detail %}
         <div class="action-note" style="display: none">
           {{ a.detail|linebreaksbr }}
