@@ -69,5 +69,9 @@ class EntityCustomFieldValueAdmin(admin.ModelAdmin):
     search_fields = ['entity']
 admin.site.register(models.EntityCustomFieldValue, EntityCustomFieldValueAdmin)
 
+class ContactCustomFieldValueAdmin(admin.ModelAdmin):
+    search_fields = ['contact']
+admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin)
+
 admin.site.register(models.ContactsImport)
 admin.site.register(models.ActionSet)
