@@ -1186,6 +1186,13 @@ def read_contacts(reader, fields, extract_from_email):
         else:
             c['entity_exists'] = False
             
+        if c['entity']:
+            contact_qs = models.Contact.objects.filter(entity__name=c['entity'])
+        else:
+            contact_qs = models.Contact.objects.filter(entity__is_single_contact=True)
+        c['contact_exists'] = (contact_qs.filter(
+            lastname=c['lastname'], firstname=c['firstname']).count()!=0)
+            
         if c['entity_type']:
             c['entity_type_exists'] = (models.EntityType.objects.filter(name=c['entity_type']).count()!=0)
         
@@ -1311,9 +1318,12 @@ def confirm_contacts_import(request, import_id):
                             entity = models.Entity.objects.create(
                                 name=c['entity'], type=entity_type, imported_by=contacts_import)
                         else:
-                            fullname = u"{0} {1}".format(c['firstname'], c['lastname'])
-                            entity = models.Entity.objects.create(
-                                name=fullname, is_single_contact=True, imported_by=contacts_import)
+                            entity, _x = models.Entity.objects.get_or_create(
+                                contact__lastname=c['lastname'], contact__firstname=c['firstname'],
+                                is_single_contact=True)
+                            entity.name = u"{0} {1}".format(c['firstname'], c['lastname'])
+                            entity.imported_by = contacts_import
+                            entity.save()
                     
                     if entity.is_single_contact:
                         is_first_for_entity = True
@@ -1326,8 +1336,8 @@ def confirm_contacts_import(request, import_id):
                         g.save()
                         
                     #Contact
-                    contact, _is_new = models.Contact.objects.get_or_create(entity=entity, firstname=c['firstname'],
-                        lastname=c['lastname'])
+                    contact, _is_new = models.Contact.objects.get_or_create(
+                        entity=entity, firstname=c['firstname'], lastname=c['lastname'])
                     contact.imported_by = contacts_import
                     
                     for field_name in fields:
@@ -1361,7 +1371,10 @@ def confirm_contacts_import(request, import_id):
                             else:
                                 group, _x = models.Group.objects.get_or_create(name=group)
                             if is_entity:
-                                group.entities.add(contact.entity)
+                                if contact.entity.is_single_contact:
+                                    group.contacts.add(contact)
+                                else:
+                                    group.entities.add(contact.entity)
                             else:
                                 group.contacts.add(contact)
                             group.save()

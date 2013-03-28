@@ -83,8 +83,8 @@
           {% endif %}
           
           <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
-          <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.lastname|default:"&nbsp;"}}</td>
-          <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.firstname|default:"&nbsp;"}}</td>
+          <td class="{% if c.contact_exists %}exists{% else %}not-exists{% endif %}">{{c.lastname|default:"&nbsp;"}}</td>
+          <td class="{% if c.contact_exists %}exists{% else %}not-exists{% endif %}">{{c.firstname|default:"&nbsp;"}}</td>
           <td class="{% if c.email_exists %}email-exists{% endif %}">{{c.email|default:"&nbsp;"}}</td>
           
           {% if c.entity_city %}
