@@ -1,13 +1,16 @@
-{% extends "base.html" %}
+{% extends "registration/base.html" %}
 {% load i18n %}
 
-{% block document %}
-<h1>{% trans "Edit your profile" %}</h1>
-<form action="" method="POST">{% csrf_token %}
+{% block registration_content %}
+<h2>{% trans "Edit your profile" %}</h2>
+<form action="" method="POST" class="registration-form">{% csrf_token %}
     <table>
         {{ form.as_table }}
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="{% trans "Update"  %}"/></td>
+        </tr>
     </table>
-    <input type="submit" value="{% trans "Update"  %}"/>
 </form>
  
 {% endblock %}

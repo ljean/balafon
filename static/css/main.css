@@ -353,13 +353,13 @@ form ul li input {
     width: 600px;
 }
 
-form.loginform {
+form.registration-form {
 	padding-left: 150px;
 	padding-bottom: 25px;
 	-moz-border-radius: 10px 10px 10px 10px;
 }
 
-form.loginform ul li{
+form.registration-form ul li{
 	padding: 15px 0 10px 0;
 }
 
@@ -373,7 +373,7 @@ ul.errors, ul.errorlist {
 	margin: 3px 2px;
 }
 
-ul.errors li, ul.errorlist li, form.loginform ul.errorlist li {
+ul.errors li, ul.errorlist li, form.registration-form ul.errorlist li {
     list-style: none;
     color: white;
 	font-weight: bold;
@@ -383,7 +383,7 @@ ul.errors li, ul.errorlist li, form.loginform ul.errorlist li {
 	display: inline-block;
 }
 
-form.loginform input[type=submit]{
+form.registration-form input[type=submit]{
 	margin-left: 550px;
 }
 
@@ -887,6 +887,7 @@ tr.not-my-action td, tr.not-my-action a {
 	color: #fff;
 	opacity: 0.8;
 	font-style: normal;
+	width: 150px;
 }
 
 .day-selector a{

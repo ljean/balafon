@@ -1,0 +1,12 @@
+{% extends "sanza/base.html" %}{% load i18n %}{% load url from future %}
+
+{% block main %}
+<div style="background: #e0cbb8; width: 1050px">
+    <span style="float: right; color: #777; font-size: 9px">
+        {% trans "Photo by" %} <a target="_blank" href="http://fr.wikipedia.org/wiki/Fichier:Sanza.jpg">serged</a> - {% trans "Creative Commons license" %}
+    </span>
+    <img src="{{STATIC_URL}}img/login.png" style="margin-left: 200px;">
+</div>
+{% block registration_content %}
+{% endblock %}
+{% endblock %}

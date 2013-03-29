@@ -1,5 +1,5 @@
-{% extends "base.html" %}{% load i18n %}{% load url from future %}
-{% block main %}
+{% extends "registration/base.html" %}{% load i18n %}{% load url from future %}
+{% block maincol_content %}
 <h2>{{title}}</h2>
 <p>
     {% trans "Login" %} <a href="{% url "django.contrib.auth.views.login" %}">{% trans "Click Here" %}</a>

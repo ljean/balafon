@@ -37,6 +37,8 @@ class EntityType(NamedElement):
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
     order = models.IntegerField(_(u'order'), default=0)
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
+    subscribe_form = models.BooleanField(default=True, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This type will be proposed on the public subscribe form'))
     
     def is_male(self):
         return (self.gender == EntityType.GENDER_MALE)

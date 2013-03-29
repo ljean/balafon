@@ -5,6 +5,7 @@ from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.models import Contact
 from django.utils.translation import ugettext_lazy as _
+from registration.forms import RegistrationForm
 
 class ProfileForm(ModelFormWithCity):
     
@@ -31,5 +32,6 @@ class ProfileForm(ModelFormWithCity):
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
-    
-    
+
+class AcceptNewsletterRegistrationForm(RegistrationForm):
+    accept_newsletter = forms.BooleanField(label=_(u'Accept newsletter'))

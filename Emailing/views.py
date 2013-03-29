@@ -216,6 +216,34 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     context = Context(get_emailing_context(emailing, contact))
     t = get_template(emailing.newsletter.get_template_name())
     return HttpResponse(t.render(context))
+
+
+#def contact_form(request):
+#    try:
+#        form_name = getattr(settings, 'SANZA_CONTACT_FORM')
+#        module_name, class_name = form_name.rsplit('.', 1)
+#        module = import_module(module_name)
+#        ContactForm = getattr(module, class_name)
+#    except AttributeError:
+#        ContactForm = forms.ContactForm
+#    
+#    if request.method == "POST":
+#        form = ContactForm(request.POST, request.FILES)
+#        if form.is_valid():
+#            contact = form.save(request)
+#            return HttpResponseRedirect(reverse('concat_form_done', args=[contact.uuid]))
+#    else:
+#        form = SubscribeForm()
+#        
+#    context_dict = {
+#        'form': form,
+#    }
+#        
+#    return render_to_response(
+#        'Emailing/public/subscribe.html',
+#        context_dict,
+#        context_instance=RequestContext(request)
+#    )
         
 
 def subscribe_newsletter(request):

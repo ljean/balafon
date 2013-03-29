@@ -1,0 +1,5 @@
+{% extends "registration/base.html" %}{% load i18n %}{% load url from future %}
+{% block registration_content %}
+<h2>{% trans "Your account is now active!" %}</h2>
+<p>{% trans "Now, you can"%} <a href="{% url "django.contrib.auth.views.login" %}">{% trans "login!" %}</a></p>
+{% endblock %}

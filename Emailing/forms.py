@@ -97,14 +97,20 @@ class SubscribeForm(ModelFormWithCity):
         required = False, label=_(u'City'),   
         widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
+    entity_type = forms.ChoiceField(required=True, widget=forms.Select())
+    entity = forms.CharField(required=False,
+        widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')}))
+    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
+    action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
+    message = forms.CharField(required=True, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     
     class Meta:
         model = Contact
         fields=('gender', 'firstname', 'lastname',
-            'phone', 'mobile', 'email', 'accept_newsletter', 'notes', 'address',
+            'phone', 'mobile', 'email', 'accept_newsletter', 'accept_3rdparty', 'address',
             'address2', 'address3', 'zip_code')
         widgets = {
-            'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
+            #'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
             'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
             'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
             'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
@@ -113,12 +119,13 @@ class SubscribeForm(ModelFormWithCity):
             #'country': forms.HiddenInput(),
         }
         
-    entity = forms.CharField(required=False)
-    groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
-    action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
+        
+        self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
+            (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
+        ]
         
         self.fields['groups'].choices = [
             (g.id, g.name) for g in Group.objects.filter(subscribe_form=True)
@@ -127,23 +134,34 @@ class SubscribeForm(ModelFormWithCity):
         self.fields['action_types'].choices = [
             (at.id, at.name) for at in ActionType.objects.filter(subscribe_form=True)
         ]
+    
+    def clean_entity_type(self):
+        try:
+            entity_type = int(self.cleaned_data['entity_type'])
+            if entity_type:
+                return EntityType.objects.get(id=entity_type)
+            return None
+        except (ValueError, EntityType.DoesNotExist):
+            raise ValidationError(_(u"Invalid entity type"))
         
     def clean_entity(self):
+        entity_type = self.cleaned_data['entity_type']
         entity = self.cleaned_data['entity']
-        if entity:
-            try:
-                return Entity.objects.get(name=entity)
-            except Entity.DoesNotExist:
-                pass
+        if entity_type:
+            if entity:
+                return Entity.objects.create(name=entity, type=entity_type)
+            else:
+                raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
             entity = u' '.join([x for x in data if x])
-
-        entity_type, _is_new = EntityType.objects.get_or_create(
-            name=getattr(settings, 'SANZA_DEFAULT_ENTITY_TYPE', _(u'Unknown'))
-        )
-        
-        return Entity.objects.create(name=entity, type=entity_type)
+            return Entity.objects.create(name=entity, type=None, is_single_contact=True)
+    
+    def clean_message(self):
+        message = self.cleaned_data["message"]
+        if len(message) > 10000:
+            raise ValidationError(_(u"Your message is too long"))
+        return message
     
     def clean_groups(self):
         try:
@@ -175,6 +193,37 @@ class SubscribeForm(ModelFormWithCity):
             contact.entity.group_set.add(g)
         contact.entity.save()
         
+        message = self.cleaned_data["message"]
+        accept_newsletter = self.cleaned_data["accept_newsletter"]
+        accept_3rdparty = self.cleaned_data["accept_3rdparty"]
+        
+        if message:
+            at, _x = ActionType.objects.get_or_create(name=_(u"Message"))
+            action = Action.objects.create(
+                subject = _(u"Message from web site"),
+                type = at,
+                planned_date = datetime.now(),
+                contact = contact,
+                detail = message,
+                display_on_board = True
+            )
+            
+        subscriptions = []
+        if accept_newsletter:
+            subscriptions += [_(u'newsletter')]
+        if accept_3rdparty:
+            subscriptions += [_(u'3rd parties')]
+        
+        if subscriptions:
+            at, _x = ActionType.objects.get_or_create(name=_(u"Subscription"))
+            action = Action.objects.create(
+                subject = _(u"Subscribe to {0}").format(u", ".join(subscriptions)),
+                type = at,
+                planned_date = datetime.now(),
+                contact = contact,
+                display_on_board = False
+            )
+        
         action_types = self.cleaned_data['action_types']
         actions = []
         for at in action_types:
@@ -182,8 +231,8 @@ class SubscribeForm(ModelFormWithCity):
                 subject = _(u"Contact"),
                 type = at,
                 planned_date = datetime.now(),
-                entity = contact.entity,
                 contact = contact,
+                display_on_board = True
             )
             actions.append(action)
             
