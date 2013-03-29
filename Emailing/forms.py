@@ -111,10 +111,10 @@ class SubscribeForm(ModelFormWithCity):
             'address2', 'address3', 'zip_code')
         widgets = {
             #'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
-            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
+            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname'), 'required': 'required'}),
             'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
             'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
-            'email': forms.TextInput(attrs={'placeholder': _(u'Email')}),
+            'email': forms.TextInput(attrs={'placeholder': _(u'Email'), 'required': 'required'}),
             'zip_code': forms.TextInput(attrs={'placeholder': _(u'zip code')}),
             #'country': forms.HiddenInput(),
         }
@@ -122,6 +122,9 @@ class SubscribeForm(ModelFormWithCity):
     
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
+        
+        self.fields['email'].required = True
+        #self.fields['lastname'].required = True
         
         self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
             (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)

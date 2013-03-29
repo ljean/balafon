@@ -5,7 +5,8 @@ from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.models import Contact
 from django.utils.translation import ugettext_lazy as _
-from registration.forms import RegistrationForm
+#from registration.forms import RegistrationForm
+from django.contrib.auth.models import User
 
 class ProfileForm(ModelFormWithCity):
     
@@ -33,5 +34,32 @@ class ProfileForm(ModelFormWithCity):
         ]
         
 
-class AcceptNewsletterRegistrationForm(RegistrationForm):
-    accept_newsletter = forms.BooleanField(label=_(u'Accept newsletter'))
+class Email(forms.EmailField): 
+    def clean(self, value):
+        super(Email, self).clean(value)
+        if User.objects.filter(email=value).count() > 0:
+            raise forms.ValidationError(
+                _(u"This email is already registered. Use the 'forgot password' link on the login page")
+            )
+        return value
+        
+class UserRegistrationForm(forms.Form):
+    email = Email(required=True, label=_(u"Email"), widget=forms.TextInput())
+    password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
+    password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
+    accept_termofuse = forms.BooleanField(label=_(u'Accept term of use'))
+    accept_newsletter = forms.BooleanField(label=_(u'Accept newsletter'), required=False)
+    accept_3rdparty = forms.BooleanField(label=_(u'Accept 3rd party'), required=False)
+    
+    def __init__(self, *args, **kwargs):
+        super(UserRegistrationForm, self).__init__(*args, **kwargs)
+        
+        for (name, field) in self.fields.items():
+            field.widget.attrs['placeholder'] = field.label
+            if not (name.find('accept')==0):
+                field.widget.attrs['required'] = "required"
+        
+    def clean(self, *args, **kwargs):
+        if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+            raise forms.ValidationError(_(u'Passwords are not the same'))
+        return super(UserRegistrationForm, self).clean(*args, **kwargs)
