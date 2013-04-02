@@ -366,7 +366,10 @@ class Contact(TimeStampedModel):
         
     def __unicode__(self):
         if not (self.firstname or self.lastname):
-            return u"< {0} >".format(__(u"Unknown"))
+            if self.email:
+                return self.email
+            else:
+                return u"< {0} >".format(__(u"Unknown"))
         
         if self.gender and self.lastname:
             title = self.get_gender_display()

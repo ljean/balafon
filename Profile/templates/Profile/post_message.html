@@ -1,0 +1,12 @@
+{% extends "registration/base.html" %}
+{% load i18n %}
+
+{% block registration_content %}
+<form action="" method="POST" class="registration-form">{% csrf_token %}
+    <div>
+    {% include "_field.html" with field=form.message %}
+    </div>
+    <input type="submit" value="{% trans "Post"  %}"/>
+</form>
+ 
+{% endblock %}

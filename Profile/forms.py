@@ -22,7 +22,7 @@ class ProfileForm(ModelFormWithCity):
             'gender', 'lastname', 'firstname', 'birth_date', 'email', 'phone', 'mobile',
             'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'accept_newsletter', 'accept_3rdparty',
-            'photo'
+            #'photo'
         )
         
         fieldsets = [
@@ -30,7 +30,7 @@ class ProfileForm(ModelFormWithCity):
             ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
             ('relationship', {'fields': ['accept_newsletter', 'accept_3rdparty'], 'legend': _(u'Relationship')}),
-            ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
+            #('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
 
@@ -63,3 +63,14 @@ class UserRegistrationForm(forms.Form):
         if self.cleaned_data['password1'] != self.cleaned_data['password2']:
             raise forms.ValidationError(_(u'Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
+        
+class MessageForm(forms.Form):
+    message = forms.CharField(required=True, widget=forms.Textarea(attrs={
+        'placeholder': _(u"Your message"),
+    }))
+    
+    def clean_message(self):
+        message = self.cleaned_data['message']
+        if len(message)>10000:
+            raise forms.ValidationError(_(u'Message is too long'))
+        return message

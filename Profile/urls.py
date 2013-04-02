@@ -8,6 +8,7 @@ from registration.views import register
 
 urlpatterns = patterns('sanza.Profile.views',
     url(r'edit/$', 'edit_profile', name='profile_edit'),
+    url(r'post-message/$', 'post_message', name='profile_post_message'),
 )
 
 urlpatterns += patterns('',

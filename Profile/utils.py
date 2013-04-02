@@ -42,11 +42,13 @@ def create_profile_contact(user):
                 display_on_board = True
             )
             
-    contact.lastname = user.last_name
-    contact.firstname = user.first_name
+    
+    contact.lastname = contact.lastname or user.last_name
+    contact.firstname = contact.firstname or user.first_name
     contact.email = user.email
     contact.accept_newsletter = profile.accept_newsletter
     contact.accept_3rdparty = profile.accept_3rdparty
+    contact.email_verified = True
     contact.save()
     
     profile.contact = contact
