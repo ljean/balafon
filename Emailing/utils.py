@@ -16,6 +16,8 @@ from coop_cms.html2text import html2text
 from datetime import date
 from coop_cms.utils import make_links_absolute
 from django.utils import translation
+from django.contrib.sites.models import Site
+from django.core.mail import EmailMessage
 
 class CreditMissing(Exception): pass
 
@@ -133,4 +135,22 @@ def send_newsletter(emailing, max_nb):
     else:
         return 0
     
-    
+def send_verification_email(contact):
+    if contact.email:
+        data = {
+            'contact': contact,
+            'verification_url': reverse('emailing_email_verification', args=[contact.uuid]),
+            'site': Site.objects.get_current(),
+            'my_company': settings.SANZA_MY_COMPANY,
+        }
+        t = get_template('Emailing/subscribe_verification_email.txt')
+        content = t.render(Context(data))
+        
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
+        
+        email = EmailMessage(
+            _(u'Verification of your email address'), content, from_email,
+            [contact.email])
+        email.send()
+        return True
+    return False

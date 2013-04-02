@@ -97,12 +97,12 @@ class SubscribeForm(ModelFormWithCity):
         required = False, label=_(u'City'),   
         widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
-    entity_type = forms.ChoiceField(required=True, widget=forms.Select())
+    entity_type = forms.ChoiceField(required=False, widget=forms.Select())
     entity = forms.CharField(required=False,
         widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')}))
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
-    message = forms.CharField(required=True, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
+    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     
     class Meta:
         model = Contact

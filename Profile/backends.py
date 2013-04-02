@@ -9,7 +9,6 @@ from django.contrib.auth.backends import ModelBackend
 class AcceptNewsletterRegistrationBackend(DefaultBackend):
     
     def register(self, request, **kwargs):
-        print kwargs
         kwargs["username"] = kwargs["email"] 
         user = super(AcceptNewsletterRegistrationBackend, self).register(request, **kwargs)
         

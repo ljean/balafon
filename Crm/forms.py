@@ -204,7 +204,7 @@ class ContactForm(ModelFormWithCity):
             ('job', {'fields': ['title', 'role', 'job'], 'legend': _(u'Job')}),
             ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('relationship', {'fields': ['main_contact', 'accept_newsletter', 'accept_3rdparty', 'has_left'], 'legend': _(u'Relationship')}),
+            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'has_left'], 'legend': _(u'Relationship')}),
             ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
@@ -212,6 +212,8 @@ class ContactForm(ModelFormWithCity):
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
         self.fields["role"].help_text = ""
+        
+        self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
 
 
 class EntityTypeForm(forms.ModelForm):

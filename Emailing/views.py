@@ -19,6 +19,8 @@ from django.template.loader import get_template
 from django.conf import settings
 from django.utils.importlib import import_module
 from sanza.permissions import can_access
+from utils import send_verification_email
+from sanza.utils import logger, log_error
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -217,35 +219,6 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     t = get_template(emailing.newsletter.get_template_name())
     return HttpResponse(t.render(context))
 
-
-#def contact_form(request):
-#    try:
-#        form_name = getattr(settings, 'SANZA_CONTACT_FORM')
-#        module_name, class_name = form_name.rsplit('.', 1)
-#        module = import_module(module_name)
-#        ContactForm = getattr(module, class_name)
-#    except AttributeError:
-#        ContactForm = forms.ContactForm
-#    
-#    if request.method == "POST":
-#        form = ContactForm(request.POST, request.FILES)
-#        if form.is_valid():
-#            contact = form.save(request)
-#            return HttpResponseRedirect(reverse('concat_form_done', args=[contact.uuid]))
-#    else:
-#        form = SubscribeForm()
-#        
-#    context_dict = {
-#        'form': form,
-#    }
-#        
-#    return render_to_response(
-#        'Emailing/public/subscribe.html',
-#        context_dict,
-#        context_instance=RequestContext(request)
-#    )
-        
-
 def subscribe_newsletter(request):
     try:
         form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
@@ -259,7 +232,21 @@ def subscribe_newsletter(request):
         form = SubscribeForm(request.POST, request.FILES)
         if form.is_valid():
             contact = form.save(request)
-            return HttpResponseRedirect(reverse('emailing_subscribe_done', args=[contact.uuid]))
+            try:
+                send_verification_email(contact)
+                return HttpResponseRedirect(reverse('emailing_subscribe_done', args=[contact.uuid]))
+            except:
+                logger.exception('send_verification_email')
+                
+                #create action
+                detail = _(u"An error occured while verifying the email address of this contact.")
+                fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
+                action = Action.objects.create(
+                    subject=_(u"Need to verify the email address"), planned_date=datetime.now(),
+                    type = fix_action, detail=detail, contact=contact, display_on_board=True,
+                )
+                
+                return HttpResponseRedirect(reverse('emailing_subscribe_error', args=[contact.uuid]))
     else:
         form = SubscribeForm()
         
@@ -276,9 +263,32 @@ def subscribe_newsletter(request):
 def subscribe_done(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     my_company = settings.SANZA_MY_COMPANY
-    unregister_url = reverse('emailing_unregister', args=[0, contact.uuid])
+    
     return render_to_response(
         'Emailing/public/subscribe_done.html',
+        locals(),
+        context_instance=RequestContext(request)
+    )
+    
+def subscribe_error(request, contact_uuid):
+    contact = get_object_or_404(Contact, uuid=contact_uuid)
+    my_company = settings.SANZA_MY_COMPANY
+    
+    return render_to_response(
+        'Emailing/public/subscribe_error.html',
+        locals(),
+        context_instance=RequestContext(request)
+    )
+
+def email_verification(request, contact_uuid):
+    contact = get_object_or_404(Contact, uuid=contact_uuid)
+    my_company = settings.SANZA_MY_COMPANY
+    
+    contact.email_verified = True
+    contact.save()
+    
+    return render_to_response(
+        'Emailing/public/verification_done.html',
         locals(),
         context_instance=RequestContext(request)
     )

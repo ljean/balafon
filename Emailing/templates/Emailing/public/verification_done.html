@@ -1,0 +1,10 @@
+{% extends "Emailing/public/base_custom.html" %}
+{% load i18n %}{% load url from future %}
+{% block content %}
+    <h1>{% trans "Your email has been verified." %}</h1>
+    <p>
+    {% blocktrans %}
+    Thanks for subscribing to the {{my_company}} mailing-list.
+    {% endblocktrans %}
+    </p>
+{% endblock %}

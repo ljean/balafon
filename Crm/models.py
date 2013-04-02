@@ -261,6 +261,7 @@ class Contact(TimeStampedModel):
     main_contact = models.BooleanField(_("main contact"), default=True, db_index=True)
     accept_newsletter = models.BooleanField(_("accept newsletter"), default=False, db_index=True)
     accept_3rdparty = models.BooleanField(_("accept third parties"), default=False)
+    email_verified = models.BooleanField(_("email verified"), default=False)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
     mobile = models.CharField(_('mobile'), max_length=200, blank=True, default= u'')
@@ -390,8 +391,8 @@ class Contact(TimeStampedModel):
 
         super(Contact, self).save(*args, **kwargs)
         if not self.uuid:
-            ln = unicodedata.normalize('NFKD', unicode(self.lastname)).encode("utf8",'ignore')
-            name = '{0}-contact-{1}-{2}'.format(project_settings.SECRET_KEY, self.id, ln)
+            ln = unicodedata.normalize('NFKD', unicode(self.fullname)).encode("utf8",'ignore')
+            name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ln, self.email)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(Contact, self).save()
 

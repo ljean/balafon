@@ -1,0 +1,13 @@
+{% load i18n sanza_utils %}{% load url from future %}
+
+{% blocktrans %}
+Hello,
+
+You have requested to subscribe to the newsletter of {{site}}. We need to confirm your email address.
+
+Please confirm it by visiting the following url: {{verification_url}}
+
+The {{site}} team!
+
+PS: If you did subscribe to the newsletter, please just ignore this email.
+{% endblocktrans %}
