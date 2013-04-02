@@ -671,14 +671,12 @@ def add_action_for_contact(request, contact_id):
         action = None
     else:
         opportunity_id = request.GET.get('opp_id', 0)
-        print "#################", opportunity_id
         initial = {}
         if opportunity_id:
             try:
                 initial['opportunity'] = models.Opportunity.objects.get(id=opportunity_id)
             except models.Opportunity.DoesNotExist:
                 pass
-        print '*************************', initial
         form = forms.ActionForm(instance=action, initial=initial)
     
     context = {
