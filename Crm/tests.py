@@ -10,7 +10,7 @@ from sanza.Crm import models
 class BaseTestCase(TestCase):
 
     def setUp(self):
-        self.user = User.objects.create(username="toto")
+        self.user = User.objects.create(username="toto", is_staff=True)
         self.user.set_password("abc")
         self.user.save()
         self._login()
@@ -763,3 +763,45 @@ class AddressOverloadTest(BaseTestCase):
                 self.assertEqual(getattr(contact, att), val)
     
     
+class SingleContactTest(BaseTestCase):
+    
+    def test_view_delete_contact(self):
+        entity = mommy.make_one(models.Entity, is_single_contact=True)
+        contact = entity.contact_set.all()[0]
+        url = reverse('crm_delete_contact', args=[contact.id])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Contact.objects.filter(id=contact.id).count(), 1)
+        
+    def test_delete_single_contact(self):
+        entity = mommy.make_one(models.Entity, is_single_contact=True)
+        contact = entity.contact_set.all()[0]
+        url = reverse('crm_delete_contact', args=[contact.id])
+        data = {'confirm': True}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Entity.objects.filter(id=entity.id).count(), 0)
+        self.assertEqual(models.Contact.objects.filter(id=contact.id).count(), 0)
+        
+    def test_delete_entity_contact(self):
+        entity = mommy.make_one(models.Entity, is_single_contact=False)
+        contact = entity.contact_set.all()[0]
+        url = reverse('crm_delete_contact', args=[contact.id])
+        data = {'confirm': True}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Entity.objects.filter(id=entity.id).count(), 1)
+        entity.save() #force default contact creation
+        self.assertEqual(entity.contact_set.count(), 1)
+        
+    def test_delete_several_entity_contact(self):
+        entity = mommy.make_one(models.Entity, is_single_contact=False)
+        contact = entity.contact_set.all()[0]
+        contact2 = mommy.make_one(models.Contact, entity=entity)
+        self.assertEqual(entity.contact_set.count(), 2)
+        url = reverse('crm_delete_contact', args=[contact.id])
+        data = {'confirm': True}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Entity.objects.filter(id=entity.id).count(), 1)
+        self.assertEqual(entity.contact_set.count(), 1)

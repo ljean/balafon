@@ -601,13 +601,18 @@ def add_single_contact(request):
 @user_passes_test(can_access)
 @popup_redirect
 def delete_contact(request, contact_id):
+    
     contact = get_object_or_404(models.Contact, id=contact_id)
     entity = contact.entity
     
     if request.method == 'POST':
         if 'confirm' in request.POST:
-            contact.delete()
-            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
+            if contact.entity.is_single_contact:
+                contact.entity.delete()
+                return HttpResponseRedirect(reverse('crm_board_panel'))
+            else:
+                contact.delete()
+                return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
         else:
             return HttpResponseRedirect(reverse('crm_edit_contact', args=[contact.id]))
     

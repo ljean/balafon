@@ -49,4 +49,5 @@
 
 {% block section_action %}
     <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a>
+    <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a>
 {% endblock %}
