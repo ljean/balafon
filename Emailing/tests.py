@@ -611,13 +611,32 @@ class SubscribeTest(TestCase):
         self.assertContains(response, self.group2.name)
         self.assertNotContains(response, self.group3.name)
         
-    def test_subscribe_newsletter_no_entity(self):
+    def test_subscribe_newsletter_no_email(self):
         url = reverse("emailing_subscribe_newsletter")
         
         data = {
             'lastname': 'Dupond',
             'firstname': 'Pierre',
             'groups': str(self.group1.id),
+        }
+        
+        self.assertEqual(models.Contact.objects.count(), 0)
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+        self.assertEqual(len(mail.outbox), 0)
+        
+        
+    def test_subscribe_newsletter_no_entity(self):
+        url = reverse("emailing_subscribe_newsletter")
+        
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'groups': str(self.group1.id),
+            'email': 'pdupond@apidev.fr',
         }
         
         response = self.client.post(url, data=data, follow=False)
@@ -633,18 +652,28 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [self.group1])
         
+        self.assertEqual(len(mail.outbox), 1) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        self.assertTrue(unicode(mail.outbox[0].message()).find(url)>0) #email verification
+        
+        
     def test_subscribe_newsletter_entity(self):
         url = reverse("emailing_subscribe_newsletter")
         
+        entity_type = mommy.make_one(models.EntityType, name='Pro', subscribe_form=True)
+        
         data = {
+            'entity_type': entity_type.id,
             'entity': 'Toto',
             'lastname': 'Dupond',
             'firstname': 'Pierre',
+            'email': 'pdupond@apidev.fr',
             'groups': [self.group1.id, self.group2.id],
         }
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
+        
         self.assertEqual(models.Contact.objects.count(), 1)
         
         contact = models.Contact.objects.all()[0]
@@ -657,24 +686,27 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [self.group1, self.group2])
         
+        self.assertEqual(len(mail.outbox), 1) #email verification
+        
     def test_subscribe_newsletter_private_group(self):
         url = reverse("emailing_subscribe_newsletter")
         
+        entity_type = mommy.make_one(models.EntityType, name='Pro', subscribe_form=True)
         data = {
+            'entity_type': entity_type.id,
             'entity': 'Toto',
             'lastname': 'Dupond',
             'firstname': 'Pierre',
+            'email': 'pdupond@apidev.fr',
             'groups': [self.group1.id, self.group3.id],
         }
         
         response = self.client.post(url, data=data, follow=False)
-        
         self.assertEqual(200, response.status_code)
-        self.assertEqual(models.Entity.objects.count(), 1)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        self.assertEqual(models.Contact.objects.count(), 0)
         
-        self.assertEqual(models.Entity.objects.all()[0].name, 'Toto')
-        self.assertEqual(list(models.Entity.objects.all()[0].group_set.all()),  [])
+        self.assertEqual(len(mail.outbox), 0) #email verification
         
     
     def test_view_subscribe_done(self):
@@ -685,3 +717,80 @@ class SubscribeTest(TestCase):
         #unregister_url = reverse('emailing_unregister', args=[0, contact.uuid])
         #self.assertContains(response, unregister_url)
         
+    def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
+        url = reverse("emailing_subscribe_newsletter")
+        
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'email': 'pdupond@apidev.fr',
+            'accept_newsletter': accept_newsletter,
+            'accept_3rdparty': accept_3rdparty,
+        }
+        
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+        
+        contact = models.Contact.objects.all()[0]
+        
+        self.assertNotEqual(contact.uuid, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid]))>=0)
+        
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.accept_newsletter, data['accept_newsletter'])
+        self.assertEqual(contact.accept_3rdparty, data['accept_3rdparty'])
+        self.assertEqual(contact.email_verified, False)
+        
+        self.assertEqual(len(mail.outbox), 1) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        self.assertTrue(unicode(mail.outbox[0].message()).find(url)>0) #email verification
+        
+    def test_refuse_newsletter(self):
+        self.test_accept_newsletter(accept_newsletter=False, accept_3rdparty=False)
+            
+    def test_refuse_newsletter_accept_3rdparty(self):
+        self.test_accept_newsletter(accept_newsletter=False, accept_3rdparty=True)
+            
+    def test_accept_newsletter_refuse_3rdparty(self):
+        self.test_accept_newsletter(accept_newsletter=True, accept_3rdparty=False)
+        
+    def test_verify_email(self):
+        self.client.logout()
+        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+            accept_newsletter=True, accept_3rdparty=True, email_verified=False)
+        
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, True)
+        self.assertEqual(contact.accept_newsletter, True)
+        self.assertEqual(contact.accept_3rdparty, True)
+        
+    def test_verify_email_no_newsletter(self):
+        self.client.logout()
+        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+            accept_newsletter=False, accept_3rdparty=False, email_verified=False)
+        
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, True)
+        self.assertEqual(contact.accept_newsletter, False)
+        self.assertEqual(contact.accept_3rdparty, False)
+        
+    def test_verify_email_strange_uuid(self):
+        self.client.logout()
+        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+            accept_newsletter=False, accept_3rdparty=False, email_verified=False)
+        
+        url = reverse('emailing_email_verification', args=['abcd'])
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, False)
+    

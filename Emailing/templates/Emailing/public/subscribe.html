@@ -3,7 +3,7 @@
 
 {% block title %}{% trans "Subscribe" %}{% endblock %}
 
-{% block content %}
+{% block custom_content %}
   {{ block.super }}
     
   <form method="post" action="">{% csrf_token %}

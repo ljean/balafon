@@ -147,18 +147,27 @@ class SubscribeForm(ModelFormWithCity):
         except (ValueError, EntityType.DoesNotExist):
             raise ValidationError(_(u"Invalid entity type"))
         
-    def clean_entity(self):
-        entity_type = self.cleaned_data['entity_type']
+    def get_entity(self):
+        entity_type = self.cleaned_data.get('entity_type', None)
         entity = self.cleaned_data['entity']
         if entity_type:
             if entity:
                 return Entity.objects.create(name=entity, type=entity_type)
-            else:
+        else:
+            return Entity.objects.create(name=entity, type=None, is_single_contact=True)
+            
+    def clean_entity(self):
+        entity_type = self.cleaned_data.get('entity_type', None)
+        entity = self.cleaned_data['entity']
+        if entity_type:
+            if not entity:
                 raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
             entity = u' '.join([x for x in data if x])
-            return Entity.objects.create(name=entity, type=None, is_single_contact=True)
+            
+        return entity
+            
     
     def clean_message(self):
         message = self.cleaned_data["message"]
@@ -182,7 +191,7 @@ class SubscribeForm(ModelFormWithCity):
         
     def save(self, request=None):
         contact = super(SubscribeForm, self).save(commit=False)
-        contact.entity = self.cleaned_data['entity']
+        contact.entity = self.get_entity()
         contact.city = self.cleaned_data['city']
         contact.save()
         #delete unknown contacts for the current entity
