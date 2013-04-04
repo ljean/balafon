@@ -2,7 +2,7 @@
 
 from sanza.Crm.models import Contact, Entity, Action, ActionType
 from django.utils.translation import ugettext as _
-from models import ContactProfile
+from models import ContactProfile, CategoryPermission
 from datetime import datetime
 
 def create_profile_contact(user):
@@ -54,3 +54,35 @@ def create_profile_contact(user):
     profile.contact = contact
     profile.save()
     return profile
+
+def check_category_permission(article, permission, user):
+    #check that the object has a category
+    
+    try:
+        cat_perm = CategoryPermission.objects.get(category=article.category)
+    except:
+        #If no category permission exists : anyone is allowed
+        return True
+    
+    #Get the contact corresponding to the logged user
+    try:
+        contact = user.contactprofile.contact
+    except:
+        #If anonymous user or no contact exists for this profile
+        #users are not allowed to check the category
+        return False
+    
+    if permission == 'can_view_article':
+        groups = cat_perm.can_view_groups
+    elif permission == 'can_edit_article':
+        groups = cat_perm.can_edit_groups
+    else:
+        #This perm is not managed : allow it
+        return True
+    
+    for group in groups.all():
+        if group.contacts.filter(id=contact.id).count() or group.entities.filter(id=contact.entity.id).count():
+            #user is member of an allowed group
+            return True
+    #user is not member of a group : do not allow
+    return False

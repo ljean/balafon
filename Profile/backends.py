@@ -2,9 +2,11 @@
 
 from registration.backends.default import DefaultBackend
 from forms import UserRegistrationForm
-from utils import create_profile_contact
+from utils import create_profile_contact, check_category_permission
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
+from models import CategoryPermission
+
 
 class AcceptNewsletterRegistrationBackend(DefaultBackend):
     
@@ -49,3 +51,16 @@ class EmailModelBackend(ModelBackend):
                 if u.check_password(password):
                     return u
             return None
+        
+class ArticleCategoryPermissionBackend(object):
+    supports_object_permissions = True
+    supports_anonymous_user = True
+    supports_inactive_user = True
+
+    def authenticate(self, username, password):
+        return None
+
+    def has_perm(self, user_obj, perm, obj=None):
+        if obj:
+            return check_category_permission(obj, perm, user_obj)
+        return False
