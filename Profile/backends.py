@@ -57,7 +57,7 @@ class ArticleCategoryPermissionBackend(object):
     supports_anonymous_user = True
     supports_inactive_user = True
 
-    def authenticate(self, username, password):
+    def authenticate(self, username=None, password=None):
         return None
 
     def has_perm(self, user_obj, perm, obj=None):
