@@ -1,17 +1,1 @@
-{% extends "registration/base.html" %}{% load i18n %}{% load url from future %}
-{% block registration_content %}
-    <h2>{{title}}</h2>
-    <p>
-        {% trans "You've been logged out" %}
-    </p>
-    <script>
-        $(function() {
-            setTimeout(function() {
-                window.location = "/";
-            }, 4000);
-        })
-    </script>
-{% endblock %}
-    
-
-    
+{% extends "registration/logged_out.html" %}
