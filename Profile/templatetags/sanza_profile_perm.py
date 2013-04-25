@@ -26,11 +26,14 @@ class IfCanDoArticle(template.Node):
         for node in self.nodelist_false:
             yield node
 
-    def _check_perm(self, user, current_lang):
+    def _check_perm(self, user, force_lang=None, current_lang=None):
         Article = get_article_class()
         slug = slugify(self.title)
         try:
-            article = get_article(slug, current_lang=current_lang)
+            if force_lang:
+                article = get_article(slug, force_lang=force_lang)
+            else:
+                article = get_article(slug, current_lang=current_lang)
         except Article.DoesNotExist:
             article = Article.objects.create(slug=slug, title=self.title)
         return user.has_perm(self.perm, article)
@@ -44,9 +47,7 @@ class IfCanDoArticle(template.Node):
         except template.VariableDoesNotExist:
             self.title = self.title.strip("'").strip('"')
         
-        lang = self.lang or request.LANGUAGE_CODE
-        
-        if self._check_perm(request.user, lang):
+        if self._check_perm(request.user, force_lang=self.lang, current_lang=request.LANGUAGE_CODE):
             return self.nodelist_true.render(context)
         else:
             return self.nodelist_false.render(context)
