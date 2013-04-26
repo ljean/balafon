@@ -26,7 +26,8 @@ def edit_profile(request):
         form = ProfileForm(request.POST, request.FILES, instance=profile.contact)
         if form.is_valid():
             contact = form.save()
-            return HttpResponseRedirect(reverse('profile_edit'))
+            messages.add_message(request, messages.SUCCESS, _(u"Your profile has been updated."))
+            return HttpResponseRedirect(reverse('homepage'))
     else:
         form = ProfileForm(instance=profile.contact)
         

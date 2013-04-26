@@ -17,9 +17,9 @@ class ProfileForm(ModelFormWithCity):
     
     class Media:
         css = {
-             'all': ('css/base/jquery-ui-1.10.2.css',),
+             'all': ('css/base/jquery-ui-1.9.2.css',),
         }
-        js = ('js/jquery-ui-1.10.2.js',)
+        js = ('js/jquery-ui-1.9.2.js',)
     
     class Meta:
         model = Contact

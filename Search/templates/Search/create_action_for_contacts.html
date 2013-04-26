@@ -1,8 +1,8 @@
 {% extends "colorbox/popup_form_base.html" %}
 {% load i18n %}{% load url from future %}
 {% block extra_head %}
-  <link type="text/css" href="{{ STATIC_URL }}css/base/jquery-ui-1.10.2.css" rel="Stylesheet" />	
-  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.10.2.js"></script>
+  <link type="text/css" href="{{ STATIC_URL }}css/base/jquery-ui-1.9.2.css" rel="Stylesheet" />	
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.9.2.js"></script>
   {% include "sanza/_calendar.html" with field="date" yearRange="c:c+2" colorbox="yes" %}
 {% endblock %}
 {% block title %}{% blocktrans %}Create actions for {{nb_contacts}} contacts{% endblocktrans %}{% endblock %}
