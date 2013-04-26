@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from sanza.Crm.models import Action, ActionType
 from datetime import datetime
+from django.core.mail import send_mail, EmailMessage
 
 @login_required 
 def edit_profile(request):
@@ -52,7 +53,7 @@ def post_message(request):
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
                 
                 email = EmailMessage(
-                    _(u'New message'), message, from_email,
+                    _(u"Message from web site"), message, from_email,
                     [notification_email], headers = {'Reply-To': profile.contact.email})
                 try:
                     email.send()
