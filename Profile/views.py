@@ -13,7 +13,6 @@ from sanza.Crm.models import Action, ActionType
 from datetime import datetime
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import get_template
-from utils import create_profile_contact
 from models import ContactProfile
 
 @login_required 
@@ -21,7 +20,7 @@ def edit_profile(request):
     try:
         profile = request.user.get_profile()
     except ContactProfile.DoesNotExist:
-        profile = create_profile_contact(request.user)
+        raise Http404
     
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile.contact)

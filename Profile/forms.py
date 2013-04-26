@@ -15,6 +15,12 @@ class ProfileForm(ModelFormWithCity):
         widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
     
+    class Media:
+        css = {
+             'all': ('css/base/jquery-ui-1.10.2.css',),
+        }
+        js = ('js/jquery-ui-1.10.2.js',)
+    
     class Meta:
         model = Contact
         exclude=('uuid', 'same_as', 'imported_by', 'entity')

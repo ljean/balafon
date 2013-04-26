@@ -1,6 +1,13 @@
 {% extends "registration/base.html" %}
 {% load i18n %}
 
+{% block extra_head %}
+{{block.super}}
+<!--- -->
+{{form.media}}
+<!--- -->
+{% endblock %}
+
 {% block registration_content %}
 <h2>{% trans "Edit your profile" %}</h2>
 <form action="" method="POST" class="registration-form">{% csrf_token %}
