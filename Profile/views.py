@@ -12,6 +12,7 @@ from django.contrib import messages
 from sanza.Crm.models import Action, ActionType
 from datetime import datetime
 from django.core.mail import send_mail, EmailMessage
+from django.template.loader import get_template
 
 @login_required 
 def edit_profile(request):
@@ -52,8 +53,16 @@ def post_message(request):
             if notification_email:
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
                 
+                data = {
+                    'contact': profile.contact,
+                    'message': message,
+                    'site': settings.COOP_CMS_SITE_PREFIX,
+                }
+                t = get_template('Emailing/subscribe_notification_email.txt')
+                content = t.render(Context(data))
+                
                 email = EmailMessage(
-                    _(u"Message from web site"), message, from_email,
+                    _(u"Message from web site"), content, from_email,
                     [notification_email], headers = {'Reply-To': profile.contact.email})
                 try:
                     email.send()
@@ -70,7 +79,7 @@ def post_message(request):
                 type = message_action, detail=message, contact=profile.contact, display_on_board=True
             )
         
-            return HttpResponseRedirect(reverse('profile_post_message'))
+            return HttpResponseRedirect(reverse('homepage'))
     else:
         form = MessageForm()
         

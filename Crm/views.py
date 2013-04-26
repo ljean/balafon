@@ -786,7 +786,7 @@ def delete_action(request, action_id):
             
             action.delete()
             
-            return HttpResponseRedirect(next_url or '/')
+            return HttpResponseRedirect(next_url or reverse('sanza_homepage'))
         else:
             return HttpResponseRedirect(reverse('crm_edit_action', args=[action.id]))
     
