@@ -255,6 +255,7 @@ class SubscribeForm(ModelFormWithCity):
                 'contact': contact,
                 'groups': contact.entity.group_set.all(),
                 'actions': actions,
+                'message': message,
                 'site': settings.COOP_CMS_SITE_PREFIX,
             }
             t = get_template('Emailing/subscribe_notification_email.txt')
@@ -263,7 +264,7 @@ class SubscribeForm(ModelFormWithCity):
             from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
             
             email = EmailMessage(
-                _(u'New contact'), content, from_email,
+                _(u"Message from web site"), content, from_email,
                 [notification_email], headers = {'Reply-To': contact.email})
             try:
                 email.send()
