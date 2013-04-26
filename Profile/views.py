@@ -14,6 +14,7 @@ from datetime import datetime
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import get_template
 from utils import create_profile_contact
+from models import ContactProfile
 
 @login_required 
 def edit_profile(request):
