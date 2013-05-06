@@ -249,7 +249,7 @@ class SubscribeForm(ModelFormWithCity):
             actions.append(action)
             
         #send an email
-        notification_email = getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', '')
+        notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
         if notification_email:
             data = {
                 'contact': contact,

@@ -7,6 +7,9 @@ from django.views.generic.simple import redirect_to
 from django.contrib import admin
 admin.autodiscover()
 
+if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
+    raise Exception("Invalid setting : SANZA_NOTIFY_SUBSCRIPTIONS has been replaced by SANZA_NOTIFICATION_EMAIL")
+
 urlpatterns = patterns('',
     url(r'^crm/$', 'sanza.Crm.views.view_board_panel', name="sanza_homepage"),
     (r'^crm/', include('sanza.Crm.urls')),

@@ -4,6 +4,12 @@ from sanza.Crm.models import Contact, Entity, Action, ActionType
 from django.utils.translation import ugettext as _
 from models import ContactProfile, CategoryPermission
 from datetime import datetime
+from sanza.utils import logger
+from django.conf import settings
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+from django.template import Context
+
 
 def create_profile_contact(user):
     profile = user.contactprofile
@@ -86,3 +92,24 @@ def check_category_permission(article, permission, user):
             return True
     #user is not member of a group : do not allow
     return False
+
+def notify_registration(profile):
+    #send message by email
+    notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
+    if notification_email:
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
+        
+        data = {
+            'contact': profile.contact,
+            'site': settings.COOP_CMS_SITE_PREFIX,
+        }
+        t = get_template('Profile/registration_notification_email.txt')
+        content = t.render(Context(data))
+        
+        email = EmailMessage(
+            _(u"New registration"), content, from_email,
+            [notification_email], headers = {'Reply-To': profile.contact.email})
+        try:
+            email.send()
+        except Exception:
+            logger.exception("notify_registration")

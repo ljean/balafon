@@ -54,7 +54,7 @@ def post_message(request):
             message = form.cleaned_data['message']
             
             #send message by email
-            notification_email = getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', '')
+            notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
             if notification_email:
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
                 

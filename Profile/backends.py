@@ -2,7 +2,7 @@
 
 from registration.backends.default import DefaultBackend
 from forms import UserRegistrationForm
-from utils import create_profile_contact, check_category_permission
+from utils import create_profile_contact, check_category_permission, notify_registration
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 from models import CategoryPermission
@@ -30,6 +30,7 @@ class AcceptNewsletterRegistrationBackend(DefaultBackend):
         #The account has been activated: We can create the corresponding contact in Sanza
         if activated:
             create_profile_contact(activated)
+            notify_registration(activated)
         
         return activated
 

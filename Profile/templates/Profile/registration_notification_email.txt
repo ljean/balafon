@@ -1,0 +1,9 @@
+{% load i18n sanza_utils %}
+
+{% trans "A new user has registred to" %} {{site}}
+
+{% trans "About this user" %}
+-----------------
+{{contact.fullname}}
+{{contact.email}}
+
