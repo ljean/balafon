@@ -1,0 +1,20 @@
+  sanza: Contacts management
+  ~~~~~
+  License for use and distribution
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  sanza CRM Copyright
+  (C)2013 - Apidev - http://www.apidev.fr/ - ljean@apidev.fr
+ 
+  This is distributed under CeCILL V1.1
+
+  Apidev www.apidev.fr, hereby disclaims all copyright interest in the application 'sanza' written by Luc JEAN.
+
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  Apidev
+  Luc JEAN
+  296 rue Saint Pierre
+  42810 Rozier en Donzy
+  France
+
