@@ -1,0 +1,3 @@
+recursive-include sanza *.html *.json *.js *.css *.png *.jpg *.gif *.po *.mo
+recursive-include sanza *.
+include README.rst
