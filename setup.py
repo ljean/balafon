@@ -28,6 +28,13 @@ setup(
     zip_safe = False,
     install_requires = [
         #'coop-cms',
+        'django-chosen',
+        'beautifulsoup4',
+        'BeautifulSoup',
+        'django-wkhtmltopdf',
+        'django-form-utils',
+        'xlwt',
+        'xlrd',
     ],
     long_description = open('README.rst').read(),
     url = 'https://bitbucket.org/ljean/apidev-sanza',

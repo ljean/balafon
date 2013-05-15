@@ -1,7 +1,7 @@
 BeautifulSoup
 beautifulsoup4
 South
-django-chosen==0.1
+django-chosen
 django-extensions
 django-floppyforms
 django-pagination
@@ -9,3 +9,7 @@ model-mommy
 pil==1.1.7
 sorl-thumbnail
 django-form-utils
+django-wkhtmltopdf
+django-form-utils
+xlwt
+xlrd
