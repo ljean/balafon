@@ -1,1 +1,2 @@
 glob:*.pyc
+glob:sanza.egg-info/*
