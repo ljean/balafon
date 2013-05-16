@@ -33,7 +33,7 @@ setup(
         'BeautifulSoup',
         'django-wkhtmltopdf',
         'django-form-utils',
-        'xlwt',
+        'xlwt==0.7.4',
         'xlrd',
     ],
     long_description = open('README.rst').read(),

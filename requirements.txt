@@ -11,5 +11,5 @@ sorl-thumbnail
 django-form-utils
 django-wkhtmltopdf
 django-form-utils
-xlwt
+xlwt==0.7.4
 xlrd
