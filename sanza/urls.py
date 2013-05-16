@@ -3,6 +3,10 @@ from django.conf.urls.defaults import *
 from django.conf import settings
 import sys
 
+if 'localeurl' in settings.INSTALLED_APPS:
+    from localeurl.models import patch_reverse
+    patch_reverse()
+
 from django.contrib import admin
 admin.autodiscover()
 
