@@ -587,7 +587,7 @@ form.search-form {
     height: 128px;
     width: 128px;
     margin: 5px 5px 5px 5px;
-	background: #ccc;
+	border: solid thin #ccc;
 }
 
 .entity_logo img, .contact_logo img {
