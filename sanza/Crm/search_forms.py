@@ -92,10 +92,10 @@ class ActionInProgressForm(YesNoSearchFieldForm):
         
     def get_lookup(self):
         if self.is_yes():
-            return {'entity__action__done': False}
+            return {'action__done': False}
     
     def get_exclude_lookup(self):
-        return {'entity__action__done': False}
+        return {'action__done': False}
             
 class ActionByDoneDate(TwoDatesForm):
     _name = 'action_by_done_date'
@@ -103,7 +103,7 @@ class ActionByDoneDate(TwoDatesForm):
         
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
-        return {'entity__action__done_date__gte': dt1, 'entity__action__done_date__lte': dt2, }
+        return {'action__done_date__gte': dt1, 'action__done_date__lte': dt2, }
 
 
 class ActionByPlannedDate(TwoDatesForm):
@@ -112,8 +112,8 @@ class ActionByPlannedDate(TwoDatesForm):
     
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
-        return {'entity__action__planned_date__gte': dt1,
-                'entity__action__planned_date__lte': dt2, }
+        return {'action__planned_date__gte': dt1,
+                'action__planned_date__lte': dt2, }
 
 class ActionByUser(SearchFieldForm):
     _name = 'action_by_user'
@@ -126,7 +126,7 @@ class ActionByUser(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return {'entity__action__in_charge': self._value}
+        return {'action__in_charge': self._value}
 
 class TypeSearchForm(SearchFieldForm):
     _name = 'type'
@@ -281,7 +281,7 @@ class ActionTypeSearchForm(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return {'entity__action__type': self._value}
+        return {'action__type': self._value}
 
 class ActionNameSearchForm(SearchFieldForm):
     _name = 'action_name'
@@ -294,7 +294,7 @@ class ActionNameSearchForm(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return {'entity__action__subject__icontains': self._value}
+        return {'action__subject__icontains': self._value}
 
 class RelationshipDateForm(TwoDatesForm):
     _name = 'relationship_date'
