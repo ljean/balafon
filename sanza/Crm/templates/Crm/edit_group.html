@@ -26,7 +26,7 @@
   {% endif %}</h2>
   <form method="POST" action="">{% csrf_token %}
     <div class="buttons">
-    <input type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}">
+    <input type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
     {% if group %}
       <a class="colorbox-form" href="{% url "crm_delete_group" group.id %}">{% trans "Delete" %}</a>
       <a href="{{ next_url }}">{% trans "Cancel" %}</a>

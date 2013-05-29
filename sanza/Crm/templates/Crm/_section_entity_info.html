@@ -1,40 +1,41 @@
 {% extends "sanza/_section.html" %}
 {% load i18n thumbnail %}{% load url from future %}
 
-{% block section_title %}
-{% spaceless %}
-<div class="entity_logo">
-  <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{entity.default_logo}}{% endif %}"/>
-</div>
-<div class="entity_info">
-  <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;
-  {% if entity.relationship_date %}
-    <span class="label">{{entity.relationship_date}}</span>
-  {% endif %}
-  {% if entity.type %}
-    <span class="label">{{entity.type}}</span>
-  {% endif %}
-  {% if entity.notes %}
-    <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
-      <img src="{{STATIC_URL}}img/notebook.png">
-      <div class="action-note" style="display: none;">
-        {{entity.notes|linebreaksbr}}
-      </div>
-   </a>
-  {% endif %}
-  <br /><br />
-  <span class="entity_description">{{entity.description}}</span>
-</div>
-{% endspaceless %}
-{% endblock %}
-  
-{% block section_data %}
+{% block column_section_data %}
+<div class="column-section-data-title">
+  {% spaceless %}
+  <div class="entity_logo">
+    <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{entity.default_logo}}{% endif %}"/>
+  </div>
+  <div class="entity_info">
+    <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;
+    {% if entity.relationship_date %}
+      <span class="label">{{entity.relationship_date}}</span>
+    {% endif %}
+    {% if entity.type %}
+      <span class="label">{{entity.type}}</span>
+    {% endif %}
+    {% if entity.notes %}
+      <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
+        <img src="{{STATIC_URL}}img/notebook.png">
+        <div class="action-note" style="display: none;">
+          {{entity.notes|linebreaksbr}}
+        </div>
+     </a>
+    {% endif %}
+    <br /><br />
+    <span class="entity_description">{{entity.description}}</span>
+  </div>
+  {% endspaceless %}
+</div>  
+
   {% if entity.get_display_address %}<span class="entity_address addr-info">{{entity.get_display_address}}</span>{% endif %}
   <br /><br />
   {% if entity.website %}<span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>{% endif %}
   {% if entity.email %}<span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>{% endif %}
   {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
   {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
+
 {% endblock %}
 
 {% block section_action %}

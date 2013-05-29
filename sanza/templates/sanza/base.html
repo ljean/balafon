@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>{% trans "sanza CRM" %}</title>
-  <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.jpg">
+  <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.png">
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
 
   {% block jquery_declaration %}
   {{jhouston}}
@@ -39,9 +40,6 @@
   <div id="main">
   {% block main %}
     {% include "coop_cms/_messages.html "%}
-    {% block header %}
-    {% include "sanza/_header.html" %}
-    {% endblock %}
     {% block navigation %}
     {% include "sanza/_navigation.html" %}
     {% endblock %}

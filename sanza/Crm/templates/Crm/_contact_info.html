@@ -1,46 +1,46 @@
 {% extends "sanza/_section.html" %}
 {% load i18n sanza_utils %}{% load url from future %}
 
-{% block section_title %}
-<div class="contact_logo">
-{% if contact.photo %}
-  <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
-{% else %}
-  <img src="{{contact.default_logo}}"/>
-{% endif %}
-</div>
-  
-<div class="contact_info">
-  <div>
-    <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
-    
-    {% if not contact.entity.is_single_contact %}
-    <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
-      <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
-    </a>
-    {% endif %}
-    
-     {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
-  </div>
-  <br/>
-  <div>
-  {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
-  {% with contact.get_roles as roles %}
-    {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}
-  {% endwith %}
-  {% if contact.notes %}
-    <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
-      <img src="{{STATIC_URL}}img/notebook.png">
-      <div class="action-note" style="display: none;">
-        {{contact.notes|linebreaksbr}}
-      </div>
-   </a>
+{% block column_section_data %}
+<div class="column-section-data-title">
+  <div class="contact_logo">
+  {% if contact.photo %}
+    <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
+  {% else %}
+    <img src="{{contact.default_logo}}"/>
   {% endif %}
   </div>
-</div>
-{% endblock %}
-  
-{% block section_data %}
+    
+  <div class="contact_info">
+    <div>
+      <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
+      
+      {% if not contact.entity.is_single_contact %}
+      <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
+        <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
+      </a>
+      {% endif %}
+      
+       {% if contact.has_left %}<span class="warning-text">{% trans "This contact has left." %}</span>{% endif %}
+    </div>
+    <br/>
+    <div>
+    {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
+    {% with contact.get_roles as roles %}
+      {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}
+    {% endwith %}
+    {% if contact.notes %}
+      <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
+        <img src="{{STATIC_URL}}img/notebook.png">
+        <div class="action-note" style="display: none;">
+          {{contact.notes|linebreaksbr}}
+        </div>
+     </a>
+    {% endif %}
+    </div>
+  </div>
+</div>  
+
 {% if contact.get_full_address %}<span class="addr-info">{{contact.get_full_address}}</span>{% endif %}<br /><br />
 {% if contact.get_email %}<span class="addr-info"><a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a></span>{% endif %}
 {% with contact.get_phones as phones %}{% if phones %}<span class="addr-info">{{phones|seq_to_dash}}</span>{% endif %}{% endwith %}

@@ -1,8 +1,10 @@
 {% load i18n %}
 <div class="section">
   <div class="column section-data">
+    {% block column_section_data %}
     <h3>{% block section_title %}{% endblock %}</h3>
     {% block section_data %}{% endblock %}
+    {% endblock %}
   </div>
   <div class="column section-actions">
     <h3>&nbsp;</h3>

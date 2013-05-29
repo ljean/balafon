@@ -155,7 +155,7 @@ class Entity(TimeStampedModel):
         if self.is_single_contact:
             logo = "img/single-contact.png"
         else:
-            logo = "img/small-company.png"
+            logo = "img/entity.png"
         
         return u"{0}{1}".format(project_settings.STATIC_URL, logo)
 
@@ -286,7 +286,10 @@ class Contact(TimeStampedModel):
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     def default_logo(self):
-        logo = "img/contact.png"
+        if self.entity.is_single_contact:
+            logo = "img/single-contact.png"
+        else:
+            logo = "img/contact.png"
         return u"{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def photo_thumbnail(self):

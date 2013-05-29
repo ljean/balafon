@@ -14,7 +14,7 @@
 
   {% block form_buttons %}
     <div class="buttons">
-    <input type="submit" value="{% trans "Save"%}">
+    <input type="submit" value="{% trans "Save"%}" />
     {% if opportunity %}
     <a class="colorbox-form" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a>
     <a href="{% url "crm_view_opportunity" opportunity.id %}">{% trans "Cancel" %}</a>

@@ -1,19 +1,18 @@
 {% extends "sanza/_section.html" %}
 {% load i18n sanza_utils %}{% load url from future %}
 
-{% block section_title %}
-<div class="opportunity_info">
-  <div class="entity_logo">
-    <img src="{% if opportunity.logo %}{{MEDIA_URL}}{{opportunity.logo_thumbnail}}{% else %}{{opportunity.default_logo}}{% endif %}"/>
-  </div>
-
-  <span class="title">{{opportunity.name}}</span>&nbsp;&nbsp;
-  {% if opportunity.type %}<span class="label">{{opportunity.type}}</span>{% endif %}
-  <span class="label">{{opportunity.status}}</span>
-</div>
-{% endblock %}
+{% block column_section_data %}
+<div class="column-section-data-title">
+  <div class="opportunity_info">
+    <div class="entity_logo">
+      <img src="{% if opportunity.logo %}{{MEDIA_URL}}{{opportunity.logo_thumbnail}}{% else %}{{opportunity.default_logo}}{% endif %}"/>
+    </div>
   
-{% block section_data %}
+    <span class="title">{{opportunity.name}}</span>&nbsp;&nbsp;
+    {% if opportunity.type %}<span class="label">{{opportunity.type}}</span>{% endif %}
+    <span class="label">{{opportunity.status}}</span>
+  </div>
+</div>
 <div class="entity_description">{{opportunity.detail|linebreaksbr}}</div>
 {% endblock %}
 
