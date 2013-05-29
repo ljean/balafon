@@ -16,7 +16,7 @@ if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
 urlpatterns = patterns('',
     url(r'^crm/$', 'sanza.Crm.views.view_board_panel', name="sanza_homepage"),
     (r'^crm/', include('sanza.Crm.urls')),
-    (r'^search/', include('sanza.Search.urls')),
+    (r'^crm-search/', include('sanza.Search.urls')),
     (r'^emailing/', include('sanza.Emailing.urls')),
     #url(r'^accounts/profile/$', 'sanza.Crm.views.view_board_panel'),
     (r'^accounts/', include('django.contrib.auth.urls')),
