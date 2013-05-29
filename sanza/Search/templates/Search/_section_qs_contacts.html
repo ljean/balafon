@@ -14,7 +14,9 @@
   
   {% if x.is_entity %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      <td rowspan={{x.main_contacts|length}}>{{x}}</td>
+      <td rowspan={{x.main_contacts|length}}>
+        <a href="{% url "crm_view_entity" x.id %}">{{x}}</a>
+      </td>
       {% for c in x.main_contacts %}
         {% if not forloop.first %}
           <tr>
