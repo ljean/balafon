@@ -383,9 +383,12 @@ form ul li input {
 }
 
 form.registration-form {
-	padding-left: 150px;
-	padding-bottom: 25px;
-	-moz-border-radius: 10px 10px 10px 10px;
+	padding: 25px 150px;
+	border: solid 3px #ccc;
+}
+
+.registration-other-actions {
+	margin-top: 50px;
 }
 
 form.registration-form ul li{
@@ -413,7 +416,7 @@ ul.errors li, ul.errorlist li, form.registration-form ul.errorlist li {
 }
 
 form.registration-form input[type=submit]{
-	margin-left: 550px;
+	/*margin-left: 550px;*/
 }
 
 /*
@@ -966,4 +969,11 @@ tr.not-my-action td, tr.not-my-action a {
 .day-selector a.selected {
 	background: #444;
 	color: #fff;
+}
+
+.login-header {
+}
+
+.login-header img{
+	width: 150px;
 }
