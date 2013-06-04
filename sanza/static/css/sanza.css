@@ -2,7 +2,7 @@ body {
     /*font-family: 'Calibri';*/
 	font-family: "Source Sans Pro", sans-serif;
     font-size: small;
-    background-color: #99f;
+    background-color: #004;
 	color: #000;
 	padding: 0;
 	margin: 0;
@@ -50,11 +50,28 @@ header, nav {
 	vertical-align: middle;
 }
 
-h1 img {
-	vertical-align: middle;
+.nav_header h1, .nav_header h1 a {
+	padding: 0;
+	margin: 0;
+}
+
+.nav_header h1 img {
+	vertical-align: top;
     height: 40px;
+	background: #fff;
 	/*float: left;
 	margin-right: 10px;*/
+}
+
+.nav_header h1:hover img {
+	background: #ccc;
+}
+
+.nav_header {
+	margin: 5px auto;
+    width: 1100px;
+	font-size: 1.1em;
+	background: #eee;
 }
 
 #nav, #nav ul {
@@ -62,6 +79,7 @@ h1 img {
 	margin: 0;
 	list-style: none;
 	position: relative;
+	vertical-align: top;
 }
 
 #nav a {
@@ -93,15 +111,6 @@ h1 img {
 	margin: -1em 0 0 11em;
 }
 
-
-#nav, #nav ul {
-	padding: 0;
-	margin: 0;
-	list-style: none; 
-	line-height: 1;
-}
-
-
 #nav li:hover ul ul, #nav li.sfhover ul ul {
 	left: -999em;
 }
@@ -123,14 +132,15 @@ h1 img {
 
 
 #nav {
-	height: 30px;
-	width: 880px;
+	/*height: 30px;*/
+	/*width: 880px;*/
 	border-right-style: none;
 	border-left-style: none;
     z-index: 1;
 	/*border-bottom: solid 2px #ef9300;*/
 	/*border-top: solid 2px #efddaa;*/
 	/*background: #eeeee7;*/
+	height: 1px;
 }
 
 #nav li ul {
@@ -138,7 +148,8 @@ h1 img {
 }
 
 #nav ul > li{
-	padding: 0 10px;
+	padding: 5px 20px;
+	height: 100%;
 }
 	
 #nav li a{
@@ -178,16 +189,10 @@ h1 img {
 	font-size: 1em;
 }
 
-
-#nav li ul li:hover{
-	/*background-color: #7e5245;*/
-}
-
 #nav li:hover a {
     color: #fff;
 	background-color: #333;
 }
-
 
 #nav li:hover > a {
 	background-color: #888;
@@ -199,10 +204,14 @@ h1 img {
 	padding: 1px 1px 1px 1px;
     z-index: 1;
 	border: none;
+	width: 150%;
+	height: 100%;
+	
 }
 
 #nav form input{
     margin: 0 1px 0 1px;
+	width: 100%;
 }
 
 .section {
