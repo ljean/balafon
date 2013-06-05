@@ -6,7 +6,7 @@ from utils import create_profile_contact, check_category_permission, notify_regi
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 from models import CategoryPermission
-
+from coop_cms.perms_backends import ArticlePermissionBackend
 
 class AcceptNewsletterRegistrationBackend(DefaultBackend):
     
@@ -29,8 +29,8 @@ class AcceptNewsletterRegistrationBackend(DefaultBackend):
         
         #The account has been activated: We can create the corresponding contact in Sanza
         if activated:
-            create_profile_contact(activated)
-            notify_registration(activated)
+            profile = create_profile_contact(activated)
+            notify_registration(profile)
         
         return activated
 
@@ -53,15 +53,10 @@ class EmailModelBackend(ModelBackend):
                     return u
             return None
         
-class ArticleCategoryPermissionBackend(object):
-    supports_object_permissions = True
-    supports_anonymous_user = True
-    supports_inactive_user = True
-
-    def authenticate(self, username=None, password=None):
-        return None
-
+class ArticleCategoryPermissionBackend(ArticlePermissionBackend):
+    
     def has_perm(self, user_obj, perm, obj=None):
         if obj:
-            return check_category_permission(obj, perm, user_obj)
+            if check_category_permission(obj, perm, user_obj):
+                return super(ArticleCategoryPermissionBackend, self).has_perm(user_obj, perm, obj)
         return False
