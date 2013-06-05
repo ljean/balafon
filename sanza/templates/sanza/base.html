@@ -37,7 +37,9 @@
   <noscript>
     <div class="noscript">{% trans "This application requires javascript to be enabled" %}</div>
   </noscript>
+  {% block header_bar %}
   {% include "sanza/_navigation.html" %}
+  {% endblock %}
   <div id="main">
   {% block main %}
     {% include "coop_cms/_messages.html "%}
