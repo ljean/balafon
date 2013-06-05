@@ -11,7 +11,6 @@ from sanza.Emailing.models import MagicLink, EmailingCounter, Emailing
 from django.core.mail import get_connection, EmailMultiAlternatives
 import re
 from coop_cms.models import Newsletter
-from coop_cms.utils import make_links_absolute
 from coop_cms.html2text import html2text
 from datetime import date
 from coop_cms.utils import make_links_absolute
