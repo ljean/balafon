@@ -10,17 +10,18 @@
 {% endblock %}
 
 {% block newsletter %}
-    {% cms_edit newsletter %}{% spaceless %}
+    <a href="/this-link-without-prefix-in-template">This should be automatically prefixed</a>
+    {% cms_edit newsletter %}{% autoescape off %}{% spaceless %}
         <div class="header">
         {% coop_piece_of_html "newsletter_header" %}
         </div>
         
         <div class="hello">{{contact.entity}}</div>
         <div class="date">{% now "j F Y"%}</div>
-
+        
         <div id="content">{{newsletter.content}}</div>
         
         {% include "coop_cms/_newsletter_articles.html" %}
 
-    {% endspaceless %}{% end_cms_edit %}
+    {% endspaceless %}{% endautoescape %}{% end_cms_edit %}
 {% endblock %}

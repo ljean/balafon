@@ -18,14 +18,16 @@ class BaseTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username="toto")
         self.user.set_password("abc")
+        self.user.is_staff = True
         self.user.save()
         self._login()
 
     def _login(self):
-        self.client.login(username="toto", password="abc")
+        return self.client.login(username="toto", password="abc")
 
 
-class EmailingManagement(BaseTestCase):
+class EmailingManagementTestCase(BaseTestCase):
+    
     def test_view_newsletters_list(self):
         entity = mommy.make_one(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
@@ -591,6 +593,10 @@ class SendEmailingTest(BaseTestCase):
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
     def test_send_newsletter_template(self):
+        def extra_checker(e):
+            site = Site.objects.get(id=settings.SITE_ID)
+            url = "http://"+site.domain+"/this-link-without-prefix-in-template"
+            self.assertTrue(e.alternatives[0][0].find(url)>=0)
         super(NewsletterTest, self).test_send_test_newsletter('test/newsletter_contact.html')
         
 class SubscribeTest(TestCase):
@@ -652,9 +658,15 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [self.group1])
         
-        self.assertEqual(len(mail.outbox), 1) #email verification
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        self.assertTrue(unicode(mail.outbox[0].message()).find(url)>0) #email verification
+        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
         
         
     def test_subscribe_newsletter_entity(self):
@@ -686,7 +698,15 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [self.group1, self.group2])
         
-        self.assertEqual(len(mail.outbox), 1) #email verification
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
         
     def test_subscribe_newsletter_private_group(self):
         url = reverse("emailing_subscribe_newsletter")
@@ -744,9 +764,15 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.accept_3rdparty, data['accept_3rdparty'])
         self.assertEqual(contact.email_verified, False)
         
-        self.assertEqual(len(mail.outbox), 1) #email verification
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        self.assertTrue(unicode(mail.outbox[0].message()).find(url)>0) #email verification
+        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
         
     def test_refuse_newsletter(self):
         self.test_accept_newsletter(accept_newsletter=False, accept_3rdparty=False)

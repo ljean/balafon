@@ -6,7 +6,7 @@
     {% if contact and emailing %}
     <div class="item">
     {% trans "If you can't view this email, " %}
-    <a href="{{SITE_PREFIX}}{% url "emailing_view_online" emailing.id contact.uuid %}">
+    <a style="color: #fff;" href="{% url "emailing_view_online" emailing.id contact.uuid %}">
         {% trans "read the online version" %}
     </a>
     </div>
@@ -15,7 +15,7 @@
         You receive this email because you subscribe to the mailing list of {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
-        <a href="{{SITE_PREFIX}}{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
+        <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
     </div>
     {% endif %}
 </div>
@@ -29,7 +29,7 @@
         You receive this email because you subscribe to the mailing list of {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
-        <a href="{{SITE_PREFIX}}{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
+        <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
     </div>
     {% endif %}
 {% endblock %}

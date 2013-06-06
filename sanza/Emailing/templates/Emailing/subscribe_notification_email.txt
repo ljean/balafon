@@ -1,4 +1,4 @@
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils %}{% load url from future %}
 
 {% trans "Contact" %}
 -----------------
@@ -23,4 +23,4 @@
 {{contact.notes}}
 {% endif %}
 
-{% trans "More info at" %} {{site}}{% url crm_view_entity contact.entity.id  %}
+{% trans "More info at" %} {{site}}{% url "crm_view_entity" contact.entity.id  %}

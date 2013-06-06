@@ -66,9 +66,9 @@ def send_newsletter(emailing, max_nb):
     #Create automatically an action type for logging one action by contact
     emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
 
-    #Clean the urls 
-    emailing.newsletter.content = make_links_absolute(emailing.newsletter.content)
-
+    #Clean the urls
+    emailing.newsletter.content = make_links_absolute(emailing.newsletter.content, emailing.newsletter)
+    
     connection = get_connection()
     from_email = settings.COOP_CMS_FROM_EMAIL
     emails = []
@@ -93,8 +93,8 @@ def send_newsletter(emailing, max_nb):
             lang = settings.LANGUAGE_CODE[:2]
             translation.activate(lang)
             html_text = t.render(context)
-            html_text = make_links_absolute(html_text)
-        
+            html_text = make_links_absolute(html_text, emailing.newsletter)
+            
             text = html2text(html_text)
             headers = {'Reply-To': settings.COOP_CMS_REPLY_TO}
             email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()], headers=headers)
