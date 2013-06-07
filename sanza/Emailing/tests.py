@@ -29,28 +29,28 @@ class BaseTestCase(TestCase):
 class EmailingManagementTestCase(BaseTestCase):
     
     def test_view_newsletters_list(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        newsletter1 = mommy.make_one(Newsletter, subject='newsletter1')
-        newsletter2 = mommy.make_one(Newsletter, subject='newsletter2')
+        newsletter1 = mommy.make(Newsletter, subject='newsletter1')
+        newsletter2 = mommy.make(Newsletter, subject='newsletter2')
         
-        emailing1 = mommy.make_one(Emailing,
+        emailing1 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
             emailing1.send_to.add(c)
         emailing1.save()
         
-        emailing2 = mommy.make_one(Emailing,
+        emailing2 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENDING,
             scheduling_dt = datetime.now(), sending_dt = None)
         emailing2.send_to.add(contacts[0])
         emailing2.save()
         
-        emailing3 = mommy.make_one(Emailing,
+        emailing3 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENT,
             scheduling_dt = datetime.now(), sending_dt = datetime.now())
         emailing3.send_to.add(contacts[-1])
@@ -67,12 +67,12 @@ class EmailingManagementTestCase(BaseTestCase):
         self.assertContains(response, emailing3.get_info())
 
     def test_emailing_next_action(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             status=Emailing.STATUS_EDITING,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -96,19 +96,19 @@ class EmailingManagementTestCase(BaseTestCase):
         self.assertEqual(emailing.next_action(), "")
         
     def test_view_magic_link(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             status=Emailing.STATUS_SENT,
             scheduling_dt = datetime.now(), sending_dt = datetime.now())
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
         
-        emailing2 = mommy.make_one(Emailing)
+        emailing2 = mommy.make(Emailing)
         
         google = "http://www.google.fr"
         google_link = MagicLink.objects.create(emailing=emailing, url=google)
@@ -134,12 +134,12 @@ class EmailingManagementTestCase(BaseTestCase):
         self.assertNotContains(response, titi)
         
     def test_confirm_sending(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        emailing = mommy.make_one(Emailing, status=Emailing.STATUS_EDITING)
+        emailing = mommy.make(Emailing, status=Emailing.STATUS_EDITING)
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -166,12 +166,12 @@ class EmailingManagementTestCase(BaseTestCase):
         
         
     def test_cancel_sending(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        emailing = mommy.make_one(Emailing, status=Emailing.STATUS_SCHEDULED, scheduling_dt=datetime.now())
+        emailing = mommy.make(Emailing, status=Emailing.STATUS_SCHEDULED, scheduling_dt=datetime.now())
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -206,10 +206,10 @@ class SendEmailingTest(BaseTestCase):
         
         
     def test_send_newsletter(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
         newsletter_data = {
@@ -217,11 +217,11 @@ class SendEmailingTest(BaseTestCase):
             'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
         management.call_command('add_emailing_counter', 5, verbosity=0, interactive=False)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -275,18 +275,18 @@ class SendEmailingTest(BaseTestCase):
             
             
     def test_send_newsletter_limit(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -331,18 +331,18 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(counter.total - len(contacts), counter.credit)
         
     def test_send_newsletter_no_credit(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -358,19 +358,19 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         
     def test_send_newsletter_credit_missing(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma', 'delta', 'eta',
             'one', 'two', 'three', 'four', 'five', 'un', 'deux']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -389,18 +389,18 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(len(mail.outbox), 0)
         
     def test_send_newsletter_credit_missing_new_credit(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -439,25 +439,25 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(len(mail.outbox), 3)
         
     def test_send_newsletter_credit_missing_new_emailing(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
         
-        emailing2 = mommy.make_one(Emailing,
+        emailing2 = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         emailing2.send_to.add(contacts[0])
@@ -491,18 +491,18 @@ class SendEmailingTest(BaseTestCase):
         
     
     def test_send_newsletter_credit_missing_reset_before_resend(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
+        entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make_one(models.Contact, entity=entity,
+        contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello {fullname}!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
         
-        emailing = mommy.make_one(Emailing,
+        emailing = mommy.make(Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
             scheduling_dt = datetime.now(), sending_dt = None)
         for c in contacts:
@@ -534,10 +534,10 @@ class SendEmailingTest(BaseTestCase):
         
                 
     def test_view_magic_link(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        contact = mommy.make_one(models.Contact, entity=entity,
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(models.Contact, entity=entity,
             email='toto@toto.fr', lastname='Toto')
-        emailing = mommy.make_one(Emailing)
+        emailing = mommy.make(Emailing)
         emailing.sent_to.add(contact)
         emailing.save()
         
@@ -550,10 +550,10 @@ class SendEmailingTest(BaseTestCase):
         
         
     def test_unregister_mailinglist(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        contact = mommy.make_one(models.Contact, entity=entity,
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(models.Contact, entity=entity,
             email='toto@toto.fr', lastname='Toto', accept_newsletter=True)
-        emailing = mommy.make_one(Emailing)
+        emailing = mommy.make(Emailing)
         emailing.sent_to.add(contact)
         emailing.save()
         
@@ -568,16 +568,16 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(contact.accept_newsletter, False)
     
     def test_view_online(self):
-        entity = mommy.make_one(models.Entity, name="my corp")
-        contact = mommy.make_one(models.Contact, entity=entity,
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(models.Contact, entity=entity,
             email='toto@toto.fr', lastname='Azerty', firstname='Albert')
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
             'template': 'test/newsletter_contact.html'
         }
-        newsletter = mommy.make_one(Newsletter, **newsletter_data)
-        emailing = mommy.make_one(Emailing, newsletter=newsletter)
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
         emailing.sent_to.add(contact)
         emailing.save()
         
@@ -602,11 +602,11 @@ class NewsletterTest(coop_cms_tests.NewsletterTest):
 class SubscribeTest(TestCase):
     
     def setUp(self):
-        self.group1 = mommy.make_one(models.Group, name="ABC", subscribe_form=True)
-        self.group2 = mommy.make_one(models.Group, name="DEF", subscribe_form=True)
-        self.group3 = mommy.make_one(models.Group, name="GHI", subscribe_form=False)
+        self.group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
+        self.group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
+        self.group3 = mommy.make(models.Group, name="GHI", subscribe_form=False)
         
-        default_country = mommy.make_one(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
+        default_country = mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
     
     def test_view_subscribe_newsletter(self):
         url = reverse("emailing_subscribe_newsletter")
@@ -672,7 +672,7 @@ class SubscribeTest(TestCase):
     def test_subscribe_newsletter_entity(self):
         url = reverse("emailing_subscribe_newsletter")
         
-        entity_type = mommy.make_one(models.EntityType, name='Pro', subscribe_form=True)
+        entity_type = mommy.make(models.EntityType, name='Pro', subscribe_form=True)
         
         data = {
             'entity_type': entity_type.id,
@@ -711,7 +711,7 @@ class SubscribeTest(TestCase):
     def test_subscribe_newsletter_private_group(self):
         url = reverse("emailing_subscribe_newsletter")
         
-        entity_type = mommy.make_one(models.EntityType, name='Pro', subscribe_form=True)
+        entity_type = mommy.make(models.EntityType, name='Pro', subscribe_form=True)
         data = {
             'entity_type': entity_type.id,
             'entity': 'Toto',
@@ -730,7 +730,7 @@ class SubscribeTest(TestCase):
         
     
     def test_view_subscribe_done(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         url = reverse('emailing_subscribe_done', args=[contact.uuid])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
@@ -785,7 +785,7 @@ class SubscribeTest(TestCase):
         
     def test_verify_email(self):
         self.client.logout()
-        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+        contact = mommy.make(models.Contact, email='toto@apidev.fr',
             accept_newsletter=True, accept_3rdparty=True, email_verified=False)
         
         url = reverse('emailing_email_verification', args=[contact.uuid])
@@ -798,7 +798,7 @@ class SubscribeTest(TestCase):
         
     def test_verify_email_no_newsletter(self):
         self.client.logout()
-        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+        contact = mommy.make(models.Contact, email='toto@apidev.fr',
             accept_newsletter=False, accept_3rdparty=False, email_verified=False)
         
         url = reverse('emailing_email_verification', args=[contact.uuid])
@@ -811,7 +811,7 @@ class SubscribeTest(TestCase):
         
     def test_verify_email_strange_uuid(self):
         self.client.logout()
-        contact = mommy.make_one(models.Contact, email='toto@apidev.fr',
+        contact = mommy.make(models.Contact, email='toto@apidev.fr',
             accept_newsletter=False, accept_3rdparty=False, email_verified=False)
         
         url = reverse('emailing_email_verification', args=['abcd'])
