@@ -31,11 +31,6 @@ class OpportunityTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
-        response = self.client.post(url, data={'entity': entity2.id}, follow=True)
-        self.assertEqual(200, response.status_code)
-        next_url = reverse('crm_add_opportunity_for_entity', args=[entity2.id])
-        self.assertContains(response, next_url)
-
     def test_add_opportunity_for_entity(self):
         pass
         #self.assertEqual(response.status_code, 200)
@@ -189,11 +184,31 @@ class DoActionTest(BaseTestCase):
         self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
         
-    def test_do_action_and_new(self):
-        action = mommy.make_one(models.Action, done=False)
+    def test_do_action_entity_and_new(self):
+        entity = mommy.make_one(models.Entity)
+        action = mommy.make_one(models.Action, done=False, entity=entity)
         response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_add_action_for_entity", args=[action.entity.id]))
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.detail, "tested")
+        self.assertEqual(action.done, True)
+        
+    def test_do_action_contact_and_new(self):
+        contact = mommy.make_one(models.Contact)
+        action = mommy.make_one(models.Action, done=False, contact=contact)
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse("crm_add_action_for_contact", args=[action.contact.id]))
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.detail, "tested")
+        self.assertEqual(action.done, True)
+        
+    def test_do_action_contact_and_new(self):
+        action = mommy.make_one(models.Action, done=False)
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse("crm_board_panel"))
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
@@ -625,9 +640,11 @@ class CustomFieldTest(BaseTestCase):
         
         contact_custom_field_toto = lambda: contact.custom_field_toto
         self.assertRaises(models.CustomField.DoesNotExist, contact_custom_field_toto)
+        #self.assertEqual("", contact.custom_field_toto)
         
         entity_custom_field_toto = lambda: contact.entity.custom_field_toto
         self.assertRaises(models.CustomField.DoesNotExist, entity_custom_field_toto)
+        #self.assertEqual("", contact.entity.custom_field_toto)
         
 
 class ImportTemplateTest(BaseTestCase):
@@ -653,10 +670,12 @@ class ImportTemplateTest(BaseTestCase):
         line = response.content[:pos]
         cols = [x.strip('"') for x in line.split(";")]
         
-        fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
-            'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
+        fields = ['gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job', 'notes',
+            'role', 'accept_newsletter', 'accept_3rdparty', 'entity', 'entity.type',
+            'entity.description', 'entity.website', 'entity.email', 'entity.phone',
+            'entity.fax', 'entity.notes', 'entity.address', 'entity.address2', 'entity.address3',
             'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
-            'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website', 'notes', 'role', 'entity.email', 'groups',
+            'address3', 'city', 'cedex', 'zip_code', 'country', 'entity.groups', 'groups',
         ]
         import codecs
         for i, f in enumerate(fields):

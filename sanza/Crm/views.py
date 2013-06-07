@@ -986,11 +986,15 @@ def do_action(request, action_id):
             action.done = True
             action = form.save()
             
+            next_url = ""
             if 'done_and_new' in request.POST:
-                return HttpResponseRedirect(reverse('crm_add_action_for_entity', args=[action.entity.id]))
-            else:
+                if action.contact:
+                    next_url = reverse('crm_add_action_for_contact', args=[action.contact.id])
+                elif action.entity:
+                    next_url = reverse('crm_add_action_for_entity', args=[action.entity.id])
+            if not next_url:
                 next_url = request.session.get('redirect_url') or reverse('crm_board_panel')    
-                return HttpResponseRedirect(next_url)
+            return HttpResponseRedirect(next_url)
     else:
         form = forms.ActionDoneForm(instance=action)
     return render_to_response(

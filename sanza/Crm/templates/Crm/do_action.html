@@ -5,5 +5,7 @@
 {% block popup_buttons %}
 <a href="" class="cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" value="{% trans "Done" %}">
+{% if action.contact or action.entity %}
 <input type="submit" name="done_and_new" value="{% trans "Done & new" %}">
+{% endif %}
 {% endblock %}
