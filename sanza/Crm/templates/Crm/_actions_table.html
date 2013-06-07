@@ -8,6 +8,7 @@
     <th>{% trans "Subject" %}</th>
     {% if not contact %}<th>{% trans "Contact" %}</th>{% endif %}
     {% if SANZA_MULTI_USER %}<th>{% trans "In charge" %}</th>{% endif %}
+    <th>{% trans "Number" %}</th>
     <th>{% trans "Amount" %}</th>
     <th>&nbsp;</th>
     <th>&nbsp;</th>
@@ -56,6 +57,7 @@
     {% if SANZA_MULTI_USER %}<td>{{ a.in_charge|default:"&nbsp;" }}</td>{% endif %}
     
     
+    <td>{{a.number|default:'&nbsp;'}}</td>
     <td>{{a.amount|default:'&nbsp;'}}</td>
     <td class="note-icon{% if a.detail %} has-note{% endif %}" title="{% trans "Show note" %}">
       {% if a.detail %}

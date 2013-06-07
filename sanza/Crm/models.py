@@ -499,6 +499,8 @@ class ActionType(NamedElement):
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This action type will be proposed on the public subscribe form'))
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True)
+    last_number = models.IntegerField(_(u'number'), default=0)
+    number_auto_generated = models.BooleanField(_(u'number'), default=False)
 
     class Meta:
         verbose_name = _(u'action type')
@@ -516,7 +518,7 @@ class Action(TimeStampedModel):
     )
 
     entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
-    subject = models.CharField(_('subject'), max_length=200)
+    subject = models.CharField(_('subject'), max_length=200, blank=True, default=True)
     planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_('detail'), blank=True, default='')
@@ -530,7 +532,7 @@ class Action(TimeStampedModel):
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
-    
+    number = models.IntegerField(_(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.'))
 
     def __unicode__(self):
         return u'{0.subject} with {0.entity}'.format(self)
@@ -540,6 +542,12 @@ class Action(TimeStampedModel):
             self.done_date = datetime.now()
         elif self.done_date and not self.done:
             self.done_date = None
+            
+        #generate number automatically based on action type
+        if self.type and self.type.number_auto_generated:
+            self.number = self.type.last_number = self.type.last_number + 1
+            self.type.save()
+            
         return super(Action, self).save(*args, **kwargs)
         
 class CustomField(models.Model):

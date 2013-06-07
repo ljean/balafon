@@ -805,3 +805,42 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Entity.objects.filter(id=entity.id).count(), 1)
         self.assertEqual(entity.contact_set.count(), 1)
+
+class ActionAutoGenerateNumberTestCase(TestCase):
+    
+    def test_create_action_with_auto_generated_number(self):
+        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 1)
+        
+    def test_create_action_several_auto_generated_number(self):
+        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 1)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 2)
+        no_gen_type = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=False)
+        a = models.Action.objects.create(type=no_gen_type, subject="a")
+        self.assertEqual(a.number, 0)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 3)
+        
+    def test_create_action_several_auto_generated_types(self):
+        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 1)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 2)
+        no_gen_type = mommy.make_one(models.ActionType, last_number=27, number_auto_generated=True)
+        a = models.Action.objects.create(type=no_gen_type, subject="a")
+        self.assertEqual(a.number, 28)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 3)
+        
+    def test_create_action_no_number_generation(self):
+        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=False)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 0)
+        
+        
+        

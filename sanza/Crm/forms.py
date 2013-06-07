@@ -234,10 +234,10 @@ class ActionForm(BetterModelForm):
     class Meta:
         model = models.Action
         fields = ('type', 'subject', 'date', 'time', 'in_charge', 'contact', 'opportunity', 'detail',
-            'priority', 'amount', 'done', 'display_on_board', 'planned_date', 'archived')
+            'priority', 'amount', 'number', 'done', 'display_on_board', 'planned_date', 'archived')
         fieldsets = [
             ('name', {'fields': ['type', 'subject', 'date', 'time', 'contact', 'done', 'planned_date'], 'legend': _(u'Summary')}),
-            ('web', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'detail'], 'legend': _(u'Details')}),
+            ('details', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
             ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
         ]
 
