@@ -12,7 +12,7 @@ from django.core import management
 from django.core import mail
 from django.conf import settings
 from BeautifulSoup import BeautifulSoup
-from bs4 import BeautifulSoup4
+from bs4 import BeautifulSoup as BeautifulSoup4
 from datetime import date
 from django.utils.translation import ugettext as _
 
@@ -811,7 +811,7 @@ class MailtoContactsTest(BaseTestCase):
             
     def test_mailto_several_emails_more_than_limit_clicks_mode(self):
         group = mommy.make(models.Group)
-        settings.SANZA_MAILTO_LIMIT_AS_TEXT = True
+        settings.SANZA_MAILTO_LIMIT_AS_TEXT = False
         contacts = []
         for i in xrange(settings.SANZA_MAILTO_LIMIT * 2):
             email = 'toto{0}@mailinator.com'.format(i)
@@ -824,13 +824,11 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-group-_-0": group.id}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
-        divs = soup.find_all('div', class='email-group')
-        self.assertEqual(2, len(divs))    
+        self.assertEqual(2, response.content.count('class="email-group"'))    
     
     def test_mailto_several_emails_more_than_limit_clicks_mode_not_exact(self):
         group = mommy.make(models.Group)
-        settings.SANZA_MAILTO_LIMIT_AS_TEXT = True
+        settings.SANZA_MAILTO_LIMIT_AS_TEXT = False
         contacts = []
         for i in xrange(settings.SANZA_MAILTO_LIMIT + 1):
             email = 'toto{0}@mailinator.com'.format(i)
@@ -843,9 +841,7 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-group-_-0": group.id}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
-        divs = soup.find_all('div', class='email-group')
-        self.assertEqual(2, len(divs))    
+        self.assertEqual(2, response.content.count('class="email-group"'))    
             
     def test_get_mailto(self):
         url = reverse('search_mailto_contacts', args=[0])
@@ -924,4 +920,97 @@ class AddToGroupActionTest(BaseTestCase):
             self.assertFalse(c in group2.contacts.all())
         for e in [entity1, entity2]:
             self.assertTrue(e in group2.entities.all())
+        
+class SameAsTest(BaseTestCase):
+    
+    def test_search_same_as_not_allowed1(self):
+        
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.save()
+        
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.save()
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(contact1.entity)
+        group.entities.add(contact2.entity)
+        group.save()
+        
+        contact1.same_as = models.SameAs.objects.create(main_contact=contact1)
+        contact1.save()
+        contact2.same_as = contact1.same_as
+        contact2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_as-_-1": '0'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.entity.name)
+        self.assertNotContains(response, contact2.entity.name)
+        
+    def test_search_same_as_not_allowed2(self):
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.save()
+        
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.save()
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(contact1.entity)
+        group.entities.add(contact2.entity)
+        group.save()
+        
+        contact1.same_as = models.SameAs.objects.create(main_contact=contact2)
+        contact1.save()
+        contact2.same_as = contact1.same_as
+        contact2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_as-_-1": '0'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        #print response
+        self.assertNotContains(response, contact1.entity.name)
+        self.assertContains(response, contact2.entity.name)
+        
+    def test_search_same_as_allowed(self):
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.save()
+        
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.save()
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(contact1.entity)
+        group.entities.add(contact2.entity)
+        group.save()
+        
+        contact1.same_as = models.SameAs.objects.create(main_contact=contact1)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_as-_-1": '1'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.entity.name)
+        self.assertContains(response, contact2.entity.name)
         

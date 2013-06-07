@@ -29,4 +29,14 @@
 
 {% block section_action %}
   <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
+  
+  {% if contact.same_as %}
+    {% if contact == contact.same_as.main_contact %}
+      <a class="is-main-contact">{% trans "Is Main" %}</a>
+    {% else %}
+      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id %}">{% trans "Make main" %}</a>
+    {% endif %}
+  {% endif %}
+  
+  
 {% endblock %}

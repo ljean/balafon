@@ -585,7 +585,7 @@ class NoSameAsForm(YesNoSearchFieldForm):
                 if c.same_as:
                     if not same_as.has_key(c.same_as.id):
                         same_as[c.same_as.id] = c.same_as
-                        filtered_contacts.append(c)
+                        filtered_contacts.append(c.same_as.main_contact if c.same_as else c)
                 else:
                     filtered_contacts.append(c)
             return filtered_contacts

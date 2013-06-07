@@ -231,6 +231,8 @@ def _get_contact_photo_dir(instance, filename):
 
 class SameAs(models.Model):
     
+    main_contact = models.ForeignKey("Contact", blank=True, null=True, default=None)
+    
     def __unicode__(self):
         return _(u"Same As: {0}").format(self.id)
     

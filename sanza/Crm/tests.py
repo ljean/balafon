@@ -121,6 +121,53 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, None)
         
+    def test_make_main_view(self):
+        entity1 = mommy.make(models.Entity, name="Toto")
+        entity2 = mommy.make(models.Entity, name="Titi")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.post(url, data={'contact': contact2.id})
+        self.assertEqual(200, response.status_code)
+        
+        url = reverse("crm_make_main_contact", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, models.SameAs.objects.all()[0])
+        self.assertEqual(contact2.same_as, contact1.same_as)
+        self.assertEqual(contact1.same_as.main_contact, None)
+    
+    def test_make_main_post(self):
+        entity1 = mommy.make(models.Entity, name="Toto")
+        entity2 = mommy.make(models.Entity, name="Titi")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.post(url, data={'contact': contact2.id})
+        self.assertEqual(200, response.status_code)
+        
+        url = reverse("crm_make_main_contact", args=[contact1.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, models.SameAs.objects.all()[0])
+        self.assertEqual(contact2.same_as, contact1.same_as)
+        self.assertEqual(contact1.same_as.main_contact, contact1)
+        
         
 class OpportunityAutoCompleteTest(BaseTestCase):
     def test_get_add_action(self):

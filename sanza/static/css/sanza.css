@@ -373,6 +373,11 @@ body a:hover{
 	/*color: #22a;*/
 }
 
+.column.section-actions a.is-main-contact{
+	background: #fff;
+	border: solid 2px #228;
+}
+
 form {
     border: 1px solid #ccc;
 }
