@@ -160,9 +160,26 @@ def mailto_contacts(request, bcc):
             emails = search_form.get_contacts_emails()
             if emails:
                 if len(emails)>nb_limit:
-                    #conf49 : La poste required only ' ' as separator
-                    #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
-                    return HttpResponse(', '.join(emails), mimetype='text/plain')
+                    if getattr(settings, 'SANZA_MAILTO_LIMIT_AS_TEXT', False):
+                        #conf49 : La poste required only ' ' as separator
+                        #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+                        return HttpResponse(', '.join(emails), mimetype='text/plain')
+                    else:
+                        index_from, email_groups = 0, []
+                        nb_emails = len(emails)
+                        while True:
+                            index_to = index_from + nb_limit
+                            if index_to < nb_emails:
+                                email_groups.append(emails[index_from:index_to])
+                            else:
+                                email_groups.append(emails[index_from:])
+                                break
+                            index_from = index_to
+                        return render_to_response(
+                            'Search/mailto_groups.html',
+                            {'bcc': int(bcc), 'email_groups': email_groups, 'nb_limt': nb_limit},
+                            context_instance=RequestContext(request)
+                        )
                 else:
                     mailto = u'mailto:'
                     if int(bcc): mailto += '?bcc='

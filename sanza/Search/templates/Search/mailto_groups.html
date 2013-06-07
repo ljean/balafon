@@ -1,0 +1,56 @@
+{% extends "sanza/base.html" %}
+{% load i18n %}{% load url from future %}
+
+{% block extra_head %}
+{{block.super}}
+<style>
+  .email-group {
+    margin: 15px 0;
+    padding: 5px 0;
+    background: #ddf;
+  }
+  
+  .email-group:hover {
+    background: #ccf;
+  }
+  
+  .email-group.checked, .email-group.checked:hover {
+    background: #77f;
+  }
+  
+  .email-group a {
+    text-decoration: none;
+  }
+  
+  
+  
+</style>
+<script>
+  $(function() {
+    $("a.check-on-click").click(function() {
+      $(this).parent().addClass("checked");
+      return true; //propagate event
+    })
+  })
+</script>
+{% endblock %}
+
+{% block document_title %}
+{% trans "Mailto" %} {% if bcc %}{% trans "BCC" %}{% endif %}
+{% endblock %}
+{% block document_content %}
+<div>
+  {% blocktrans %}
+  If the number of email address exceeds {{nb_limit}}, there is a risk that your mail is considered as spam.
+  You may be blocked.<br />
+  Sanza recommends to send your message in several emails. Click on the links below for sending to each groups.
+  {% endblocktrans %}
+</div>
+{% for emails in email_groups %}
+  <div class="email-group">
+    <a class="check-on-click" href="mailto:{%if bcc %}?bcc={%endif%}{{emails|join:","}}">
+      {{emails|join:" "}}
+    </a>
+  </div>  
+{% endfor %}
+{% endblock %}

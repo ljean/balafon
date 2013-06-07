@@ -12,6 +12,7 @@ from django.core import management
 from django.core import mail
 from django.conf import settings
 from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup4
 from datetime import date
 from django.utils.translation import ugettext as _
 
@@ -788,10 +789,11 @@ class MailtoContactsTest(BaseTestCase):
             self.assertTrue(response['Location'].find(contact.lastname)>0)
             self.assertTrue(response['Location'].find(contact.firstname)>0)
         
-    def test_mailto_several_emails_more_than_limit(self):
+    def test_mailto_several_emails_more_than_limit_text_mode(self):
         group = mommy.make(models.Group)
+        settings.SANZA_MAILTO_LIMIT_AS_TEXT = True
         contacts = []
-        for i in xrange(51):
+        for i in xrange(settings.SANZA_MAILTO_LIMIT + 1):
             email = 'toto{0}@mailinator.com'.format(i)
             entity, contact = self._create_contact(email)
             contacts.append(contact)
@@ -806,6 +808,44 @@ class MailtoContactsTest(BaseTestCase):
             self.assertTrue(response.content.find(contact.email)>0)
             self.assertTrue(response.content.find(contact.lastname)>0)
             self.assertTrue(response.content.find(contact.firstname)>0)
+            
+    def test_mailto_several_emails_more_than_limit_clicks_mode(self):
+        group = mommy.make(models.Group)
+        settings.SANZA_MAILTO_LIMIT_AS_TEXT = True
+        contacts = []
+        for i in xrange(settings.SANZA_MAILTO_LIMIT * 2):
+            email = 'toto{0}@mailinator.com'.format(i)
+            entity, contact = self._create_contact(email)
+            contacts.append(contact)
+            group.entities.add(entity)
+        group.save()
+        
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-group-_-0": group.id}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+        divs = soup.find_all('div', class='email-group')
+        self.assertEqual(2, len(divs))    
+    
+    def test_mailto_several_emails_more_than_limit_clicks_mode_not_exact(self):
+        group = mommy.make(models.Group)
+        settings.SANZA_MAILTO_LIMIT_AS_TEXT = True
+        contacts = []
+        for i in xrange(settings.SANZA_MAILTO_LIMIT + 1):
+            email = 'toto{0}@mailinator.com'.format(i)
+            entity, contact = self._create_contact(email)
+            contacts.append(contact)
+            group.entities.add(entity)
+        group.save()
+        
+        url = reverse('search_mailto_contacts', args=[0])
+        data = {"gr0-_-group-_-0": group.id}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+        divs = soup.find_all('div', class='email-group')
+        self.assertEqual(2, len(divs))    
             
     def test_get_mailto(self):
         url = reverse('search_mailto_contacts', args=[0])
