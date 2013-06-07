@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns('sanza.Emailing.views',
     url(r'^newsletters$', 'newsletter_list', name='emailing_newsletter_list'),
