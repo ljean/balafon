@@ -147,7 +147,7 @@ def get_group_suggest_list(request):
     try:
         suggestions = []
         term = request.GET["term"]#the 1st chars entered in the autocomplete
-        for group in models.Group.objects.filter(name__istartswith=term):
+        for group in models.Group.objects.filter(name__icontains=term):
             suggestions.append(group.name)
         return HttpResponse(json.dumps(suggestions), mimetype='application/json')
     except Exception, msg:
@@ -409,7 +409,7 @@ def get_opportunity_name(request, opp_id):
 def get_opportunities(request):
     term = request.GET.get('term')
     opps = [{'id': x.id, 'name': u'{0}'.format(x.name)}
-        for x in models.Opportunity.objects.filter(ended=False, name__istartswith=term)]
+        for x in models.Opportunity.objects.filter(ended=False, name__icontains=term)]
     return HttpResponse(json.dumps(opps), 'application/json')
 
 @user_passes_test(can_access)
@@ -424,7 +424,7 @@ def get_entity_name(request, entity_id):
 def get_entities(request):
     term = request.GET.get('term')
     entities = [{'id': x.id, 'name': x.name}
-        for x in models.Entity.objects.filter(name__istartswith=term)]
+        for x in models.Entity.objects.filter(name__icontains=term)]
     return HttpResponse(json.dumps(entities), 'application/json')
 
 @user_passes_test(can_access)
@@ -441,7 +441,7 @@ def get_contacts(request):
     term = request.GET.get('term')
     contacts = [{'id': x.id, 'name': x.get_name_and_entity()}
         for x in models.Contact.objects.filter(
-            Q(lastname__istartswith=term) | Q(entity__name__istartswith=term, entity__is_single_contact=False)
+            Q(lastname__icontains=term) | Q(entity__name__icontains=term, entity__is_single_contact=False)
         )]
     return HttpResponse(json.dumps(contacts), 'application/json')
 

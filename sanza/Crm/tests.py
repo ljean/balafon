@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 import json
 from model_mommy import mommy
 from sanza.Crm import models
+from django.conf import settings
 
 class BaseTestCase(TestCase):
 
@@ -23,9 +24,9 @@ class OpportunityTest(BaseTestCase):
 
     def test_add_opportunity(self):
         
-        entity1 = mommy.make_one(models.Entity, name='ent1', relationship_date='2012-01-30')
-        entity2 = mommy.make_one(models.Entity, name='ent2', relationship_date='2012-01-30')
-        other_entity = mommy.make_one(models.Entity, name='ent3', relationship_date='2012-01-30')
+        entity1 = mommy.make(models.Entity, name='ent1', relationship_date='2012-01-30')
+        entity2 = mommy.make(models.Entity, name='ent2', relationship_date='2012-01-30')
+        other_entity = mommy.make(models.Entity, name='ent3', relationship_date='2012-01-30')
         
         url = reverse("crm_add_opportunity")
         response = self.client.get(url)
@@ -36,19 +37,19 @@ class OpportunityTest(BaseTestCase):
         #self.assertEqual(response.status_code, 200)
 
     def test_view_opportunity(self):
-        entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        opp1 = mommy.make_one(models.Opportunity, name="OPP1", entity=entity1)
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity, name="OPP1", entity=entity1)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, opp1.name)
         
     def test_view_opportunity_actions(self):
-        entity1 = mommy.make_one(models.Entity, name='ent1', relationship_date='2012-01-30')
-        entity2 = mommy.make_one(models.Entity, name='ent2', relationship_date='2012-01-30')
-        opp1 = mommy.make_one(models.Opportunity, name='OPP1', entity=entity1)
-        act1 = mommy.make_one(models.Action, subject='ABC', opportunity=opp1, entity=entity1)
-        act2 = mommy.make_one(models.Action, subject='DEF', opportunity=opp1, entity=entity2)
-        act3 = mommy.make_one(models.Action, subject='GHI', entity=entity1)
+        entity1 = mommy.make(models.Entity, name='ent1', relationship_date='2012-01-30')
+        entity2 = mommy.make(models.Entity, name='ent2', relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity, name='OPP1', entity=entity1)
+        act1 = mommy.make(models.Action, subject='ABC', opportunity=opp1, entity=entity1)
+        act2 = mommy.make(models.Action, subject='DEF', opportunity=opp1, entity=entity2)
+        act3 = mommy.make(models.Action, subject='GHI', entity=entity1)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, opp1.name)
@@ -57,15 +58,15 @@ class OpportunityTest(BaseTestCase):
         self.assertNotContains(response, act3.subject)
     
     def test_view_opportunity_contacts(self):
-        entity1 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        entity2 = mommy.make_one(models.Entity, relationship_date='2012-01-30')
-        opp1 = mommy.make_one(models.Opportunity, entity=entity1)
-        contact1 = mommy.make_one(models.Contact, lastname='ABC', entity=entity1)
-        contact2 = mommy.make_one(models.Contact, lastname='DEF', entity=entity2)
-        contact3 = mommy.make_one(models.Contact, lastname='GHI', entity=entity1)
-        act1 = mommy.make_one(models.Action, opportunity=opp1, entity=entity1, contact=contact1)
-        act2 = mommy.make_one(models.Action, opportunity=opp1, entity=entity2, contact=contact2)
-        act3 = mommy.make_one(models.Action, entity=entity1, contact=contact3)
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        entity2 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity, entity=entity1)
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity2)
+        contact3 = mommy.make(models.Contact, lastname='GHI', entity=entity1)
+        act1 = mommy.make(models.Action, opportunity=opp1, entity=entity1, contact=contact1)
+        act2 = mommy.make(models.Action, opportunity=opp1, entity=entity2, contact=contact2)
+        act3 = mommy.make(models.Action, entity=entity1, contact=contact3)
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, contact1.lastname)
@@ -75,10 +76,10 @@ class OpportunityTest(BaseTestCase):
 class SameAsTest(BaseTestCase):
 
     def test_add_same_as(self):
-        entity1 = mommy.make_one(models.Entity, name="Toto")
-        entity2 = mommy.make_one(models.Entity, name="Titi")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
+        entity1 = mommy.make(models.Entity, name="Toto")
+        entity2 = mommy.make(models.Entity, name="Titi")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
         
         url = reverse("crm_same_as", args=[contact1.id])
         response = self.client.post(url, data={'contact': contact2.id})
@@ -93,11 +94,11 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, contact1.same_as)
         
     def test_add_same_as_list(self):
-        entity1 = mommy.make_one(models.Entity, name="Toto")
-        entity2 = mommy.make_one(models.Entity, name="Titi")
-        contact1 = mommy.make_one(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
-        contact2 = mommy.make_one(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
-        contact3 = mommy.make_one(models.Contact, entity=entity2, firstname="Ringo", lastname="Star")
+        entity1 = mommy.make(models.Entity, name="Toto")
+        entity2 = mommy.make(models.Entity, name="Titi")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, entity=entity2, firstname="Ringo", lastname="Star")
         
         url = reverse("crm_same_as", args=[contact1.id])
         response = self.client.get(url)
@@ -127,13 +128,13 @@ class OpportunityAutoCompleteTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         
     def test_get_opportunity_name(self):
-        opp = mommy.make_one(models.Opportunity, name="abcd")
+        opp = mommy.make(models.Opportunity, name="abcd")
         response = self.client.get(reverse('crm_get_opportunity_name', args=[opp.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, opp.name)
         
     def test_get_opportunity_name_unknown(self):
-        opp = mommy.make_one(models.Opportunity, name="abcd")
+        opp = mommy.make(models.Opportunity, name="abcd")
         response = self.client.get(reverse('crm_get_opportunity_name', args=[55]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, '55')
@@ -144,34 +145,30 @@ class OpportunityAutoCompleteTest(BaseTestCase):
         self.assertEqual(301, response.status_code)
         
     def test_get_opportunity_list(self):
-        e1 = mommy.make_one(models.Entity, name='ABC')
-        e2 = mommy.make_one(models.Entity, name='XYZ')
-        opp1 = mommy.make_one(models.Opportunity, name="def", entity=e1)
-        opp2 = mommy.make_one(models.Opportunity, name="Uvw", entity=e2)
+        opp1 = mommy.make(models.Opportunity, name="defz")
+        opp2 = mommy.make(models.Opportunity, name="Uvwz")
         
-        response = self.client.get(reverse('crm_get_opportunities')+'?term=a')
+        response = self.client.get(reverse('crm_get_opportunities')+'?term=d')
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, e1.name)
         self.assertContains(response, opp1.name)
-        self.assertNotContains(response, e2.name)
         self.assertNotContains(response, opp2.name)
         
         response = self.client.get(reverse('crm_get_opportunities')+'?term=U')
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, e2.name)
         self.assertContains(response, opp2.name)
-        self.assertNotContains(response, e1.name)
         self.assertNotContains(response, opp1.name)
         
         response = self.client.get(reverse('crm_get_opportunities')+'?term=k')
-        self.assertNotContains(response, e1.name)
         self.assertNotContains(response, opp1.name)
-        self.assertNotContains(response, e2.name)
         self.assertNotContains(response, opp2.name)
+        
+        response = self.client.get(reverse('crm_get_opportunities')+'?term=z')
+        self.assertContains(response, opp1.name)
+        self.assertContains(response, opp2.name)
         
 class DoActionTest(BaseTestCase):
     def test_do_action(self):
-        action = mommy.make_one(models.Action, done=False)
+        action = mommy.make(models.Action, done=False)
         response = self.client.get(reverse('crm_do_action', args=[action.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, action.detail)
@@ -185,8 +182,8 @@ class DoActionTest(BaseTestCase):
         self.assertEqual(action.done, True)
         
     def test_do_action_entity_and_new(self):
-        entity = mommy.make_one(models.Entity)
-        action = mommy.make_one(models.Action, done=False, entity=entity)
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, done=False, entity=entity)
         response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_add_action_for_entity", args=[action.entity.id]))
@@ -195,8 +192,8 @@ class DoActionTest(BaseTestCase):
         self.assertEqual(action.done, True)
         
     def test_do_action_contact_and_new(self):
-        contact = mommy.make_one(models.Contact)
-        action = mommy.make_one(models.Action, done=False, contact=contact)
+        contact = mommy.make(models.Contact)
+        action = mommy.make(models.Action, done=False, contact=contact)
         response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_add_action_for_contact", args=[action.contact.id]))
@@ -205,7 +202,7 @@ class DoActionTest(BaseTestCase):
         self.assertEqual(action.done, True)
         
     def test_do_action_contact_and_new(self):
-        action = mommy.make_one(models.Action, done=False)
+        action = mommy.make(models.Action, done=False)
         response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_board_panel"))
@@ -216,19 +213,19 @@ class DoActionTest(BaseTestCase):
 class GroupTest(BaseTestCase):
     
     def test_view_add_group(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         url = reverse('crm_add_entity_to_group', args=[entity.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
     def test_view_add_contact_group(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         url = reverse('crm_add_contact_to_group', args=[contact.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
     
     def test_add_group_new(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         data = {
             'group_name': 'toto'
         }
@@ -244,7 +241,7 @@ class GroupTest(BaseTestCase):
         self.assertEqual(group.subscribe_form, False)
         
     def test_add_contact_group_new(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         data = {
             'group_name': 'toto'
         }
@@ -260,8 +257,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(group.subscribe_form, False)
         
     def test_add_group_existing(self):
-        group = mommy.make_one(models.Group, name='toto')
-        entity = mommy.make_one(models.Entity)
+        group = mommy.make(models.Group, name='toto')
+        entity = mommy.make(models.Entity)
         data = {
             'group_name': group.name
         }
@@ -276,8 +273,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(list(group.entities.all()), [entity])
         
     def test_add_already_in_group(self):
-        group = mommy.make_one(models.Group, name='toto')
-        entity = mommy.make_one(models.Entity)
+        group = mommy.make(models.Group, name='toto')
+        entity = mommy.make(models.Entity)
         data = {
             'group_name': group.name
         }
@@ -294,8 +291,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(list(group.entities.all()), [entity])
         
     def test_add_entity_contact_already_in_group(self):
-        group = mommy.make_one(models.Group, name='toto')
-        contact = mommy.make_one(models.Contact)
+        group = mommy.make(models.Group, name='toto')
+        contact = mommy.make(models.Contact)
         data = {
             'group_name': group.name
         }
@@ -313,8 +310,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(list(group.contacts.all()), [contact])
         
     def test_add_contact_entity_already_in_group(self):
-        group = mommy.make_one(models.Group, name='toto')
-        contact = mommy.make_one(models.Contact)
+        group = mommy.make(models.Group, name='toto')
+        contact = mommy.make(models.Contact)
         data = {
             'group_name': group.name
         }
@@ -332,8 +329,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(list(group.contacts.all()), [contact])
         
     def test_add_contact_group_existing(self):
-        group = mommy.make_one(models.Group, name='toto')
-        contact = mommy.make_one(models.Contact)
+        group = mommy.make(models.Group, name='toto')
+        contact = mommy.make(models.Contact)
         data = {
             'group_name': group.name
         }
@@ -348,8 +345,8 @@ class GroupTest(BaseTestCase):
         self.assertEqual(list(group.contacts.all()), [contact])
         
     def test_add_contact_already_in_group(self):
-        group = mommy.make_one(models.Group, name='toto')
-        contact = mommy.make_one(models.Contact)
+        group = mommy.make(models.Group, name='toto')
+        contact = mommy.make(models.Contact)
         group.contacts.add(contact)
         group.save()
         data = {
@@ -367,11 +364,11 @@ class GroupTest(BaseTestCase):
         
     def test_view_contact(self):
         
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
-        gr2 = mommy.make_one(models.Group, name="GROUP2")
-        gr3 = mommy.make_one(models.Group, name="GROUP3")
+        gr1 = mommy.make(models.Group, name="GROUP1")
+        gr2 = mommy.make(models.Group, name="GROUP2")
+        gr3 = mommy.make(models.Group, name="GROUP3")
         
         gr1.contacts.add(contact)
         gr2.entities.add(contact.entity)
@@ -387,11 +384,11 @@ class GroupTest(BaseTestCase):
         
     def test_view_entity(self):
         
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
-        gr2 = mommy.make_one(models.Group, name="GROUP2")
-        gr3 = mommy.make_one(models.Group, name="GROUP3")
+        gr1 = mommy.make(models.Group, name="GROUP1")
+        gr2 = mommy.make(models.Group, name="GROUP2")
+        gr3 = mommy.make(models.Group, name="GROUP3")
         
         gr1.contacts.add(contact)
         gr2.entities.add(contact.entity)
@@ -407,8 +404,8 @@ class GroupTest(BaseTestCase):
         
     def test_remove_contact_form_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         gr1.contacts.add(contact)
         self.assertEqual(1, gr1.contacts.count())
         
@@ -426,8 +423,8 @@ class GroupTest(BaseTestCase):
         
     def test_remove_contact_not_in_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         self.assertEqual(0, gr1.contacts.count())
         
         url = reverse('crm_remove_contact_from_group', args=[gr1.id, contact.id])
@@ -444,8 +441,8 @@ class GroupTest(BaseTestCase):
         
     def test_cancel_remove_contact_form_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         gr1.contacts.add(contact)
         self.assertEqual(1, gr1.contacts.count())
         
@@ -463,8 +460,8 @@ class GroupTest(BaseTestCase):
         
     def test_remove_entity_form_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         gr1.entities.add(contact.entity)
         self.assertEqual(1, gr1.entities.count())
         
@@ -482,8 +479,8 @@ class GroupTest(BaseTestCase):
     
     def test_remove_entity_not_in_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         self.assertEqual(0, gr1.entities.count())
         
         url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
@@ -501,8 +498,8 @@ class GroupTest(BaseTestCase):
         
     def test_cancel_remove_entity_form_group(self):
         
-        contact = mommy.make_one(models.Contact)
-        gr1 = mommy.make_one(models.Group, name="GROUP1")
+        contact = mommy.make(models.Contact)
+        gr1 = mommy.make(models.Group, name="GROUP1")
         gr1.entities.add(contact.entity)
         self.assertEqual(1, gr1.entities.count())
         
@@ -522,7 +519,7 @@ class GroupTest(BaseTestCase):
 class CustomFieldTest(BaseTestCase):
     
     def test_entity_custom_field(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cfv = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
         data = {'siret': '555444333222111'}
@@ -531,7 +528,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertEqual(entity.custom_field_siret, data['siret'])
     
     def test_entity_custom_two_fields(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cfv1 = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
         cfv2 = models.CustomField.objects.create(name = 'naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY)
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
@@ -542,7 +539,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertEqual(entity.custom_field_naf, data['naf'])
     
     def test_contact_custom_field(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         cfv = models.CustomField.objects.create(name = 'insee', label = 'INSEE', model=models.CustomField.MODEL_CONTACT)
         url = reverse('crm_edit_custom_fields', args=['contact', contact.id])
         data = {'insee': '1234567890'}
@@ -551,7 +548,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertEqual(contact.custom_field_insee, data['insee'])
         
     def test_view_entity(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cf1 = models.CustomField.objects.create(name = 'siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY)
         cf2 = models.CustomField.objects.create(name = 'naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY)
         
@@ -568,7 +565,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertContains(response, data['naf'])
         
     def test_custom_field_ordering(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cf1 = models.CustomField.objects.create(name = 'no_siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2)
         cf2 = models.CustomField.objects.create(name = 'code_naf', label = 'Code NAF', model=models.CustomField.MODEL_ENTITY, ordering=1)
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
@@ -587,7 +584,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertTrue(pos_naf < pos_siret)
         
     def test_custom_field_visibility(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cf1 = models.CustomField.objects.create(name = 'no_siret', label = 'SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2)
         
         response = self.client.get(entity.get_absolute_url())
@@ -601,7 +598,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertContains(response, '1234567890')
         
     def test_custom_field_widget(self):
-        entity = mommy.make_one(models.Entity)
+        entity = mommy.make(models.Entity)
         cfv1 = models.CustomField.objects.create(name = 'date_b', label = 'Date', model=models.CustomField.MODEL_ENTITY, widget="datepicker")
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
         response = self.client.get(url)
@@ -609,7 +606,7 @@ class CustomFieldTest(BaseTestCase):
         self.assertContains(response, 'class="datepicker"')
         
     def test_contact_get_custom_field(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         
         cf_c = models.CustomField.objects.create(
             name = 'id_poste', label = 'Id Poste', model=models.CustomField.MODEL_CONTACT)
@@ -617,17 +614,17 @@ class CustomFieldTest(BaseTestCase):
         cf_e = models.CustomField.objects.create(
             name = 'id_poste', label = 'Id Poste', model=models.CustomField.MODEL_ENTITY)
         
-        contact1 = mommy.make_one(models.Contact)
+        contact1 = mommy.make(models.Contact)
         models.EntityCustomFieldValue.objects.create(custom_field=cf_e, entity=contact1.entity, value='111')
         
-        contact2 = mommy.make_one(models.Contact)
+        contact2 = mommy.make(models.Contact)
         models.ContactCustomFieldValue.objects.create(custom_field=cf_c, contact=contact2, value='222')
         
-        contact3 = mommy.make_one(models.Contact)
+        contact3 = mommy.make(models.Contact)
         models.ContactCustomFieldValue.objects.create(custom_field=cf_c, contact=contact3, value='333')
         models.EntityCustomFieldValue.objects.create(custom_field=cf_e, entity=contact3.entity, value='444')
         
-        contact4 = mommy.make_one(models.Contact)
+        contact4 = mommy.make(models.Contact)
         
         self.assertEqual(contact1.get_custom_field_id_poste, '111')
         self.assertEqual(contact2.get_custom_field_id_poste, '222')
@@ -636,7 +633,7 @@ class CustomFieldTest(BaseTestCase):
         
         
     def test_contact_missing_custom_field(self):
-        contact = mommy.make_one(models.Contact)
+        contact = mommy.make(models.Contact)
         
         contact_custom_field_toto = lambda: contact.custom_field_toto
         self.assertRaises(models.CustomField.DoesNotExist, contact_custom_field_toto)
@@ -688,8 +685,8 @@ class AddressOverloadTest(BaseTestCase):
 
     def test_address_of_contact(self):
         
-        city1 = mommy.make_one(models.City, name='city1')
-        city2 = mommy.make_one(models.City, name='city2')
+        city1 = mommy.make(models.City, name='city1')
+        city2 = mommy.make(models.City, name='city2')
         
         entity_address = {
             'address': u'rue Jules Rimet',
@@ -709,16 +706,16 @@ class AddressOverloadTest(BaseTestCase):
             'city': None,
         }
         
-        entity = mommy.make_one(models.Entity, **entity_address)
-        contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+        entity = mommy.make(models.Entity, **entity_address)
+        contact = mommy.make(models.Contact, entity=entity, **contact_address)
         
         for (att, val) in entity_address.items():
             self.assertEqual(getattr(entity, att), val)
             
     def test_address_overloaded(self):
         
-        city1 = mommy.make_one(models.City, name='city1')
-        city2 = mommy.make_one(models.City, name='city2')
+        city1 = mommy.make(models.City, name='city1')
+        city2 = mommy.make(models.City, name='city2')
         
         entity_address = {
             'address': u'rue Jules Rimet',
@@ -738,16 +735,16 @@ class AddressOverloadTest(BaseTestCase):
             'city': city2,
         }
         
-        entity = mommy.make_one(models.Entity, **entity_address)
-        contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+        entity = mommy.make(models.Entity, **entity_address)
+        contact = mommy.make(models.Contact, entity=entity, **contact_address)
         
         for (att, val) in contact_address.items():
             self.assertEqual(getattr(contact, att), val)
             
     def test_address_overloaded_missing_fields(self):
         
-        city1 = mommy.make_one(models.City, name='city1')
-        city2 = mommy.make_one(models.City, name='city2')
+        city1 = mommy.make(models.City, name='city1')
+        city2 = mommy.make(models.City, name='city2')
         
         entity_address = {
             'address': u'rue Jules Rimet',
@@ -775,8 +772,8 @@ class AddressOverloadTest(BaseTestCase):
                 contact_address['city'] = None
         
         
-            entity = mommy.make_one(models.Entity, **entity_address)
-            contact = mommy.make_one(models.Contact, entity=entity, **contact_address)
+            entity = mommy.make(models.Entity, **entity_address)
+            contact = mommy.make(models.Contact, entity=entity, **contact_address)
         
             for (att, val) in contact_address.items():
                 self.assertEqual(getattr(contact, att), val)
@@ -785,7 +782,7 @@ class AddressOverloadTest(BaseTestCase):
 class SingleContactTest(BaseTestCase):
     
     def test_view_delete_contact(self):
-        entity = mommy.make_one(models.Entity, is_single_contact=True)
+        entity = mommy.make(models.Entity, is_single_contact=True)
         contact = entity.contact_set.all()[0]
         url = reverse('crm_delete_contact', args=[contact.id])
         response = self.client.get(url, follow=True)
@@ -793,7 +790,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(models.Contact.objects.filter(id=contact.id).count(), 1)
         
     def test_delete_single_contact(self):
-        entity = mommy.make_one(models.Entity, is_single_contact=True)
+        entity = mommy.make(models.Entity, is_single_contact=True)
         contact = entity.contact_set.all()[0]
         url = reverse('crm_delete_contact', args=[contact.id])
         data = {'confirm': True}
@@ -803,7 +800,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(models.Contact.objects.filter(id=contact.id).count(), 0)
         
     def test_delete_entity_contact(self):
-        entity = mommy.make_one(models.Entity, is_single_contact=False)
+        entity = mommy.make(models.Entity, is_single_contact=False)
         contact = entity.contact_set.all()[0]
         url = reverse('crm_delete_contact', args=[contact.id])
         data = {'confirm': True}
@@ -814,9 +811,9 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(entity.contact_set.count(), 1)
         
     def test_delete_several_entity_contact(self):
-        entity = mommy.make_one(models.Entity, is_single_contact=False)
+        entity = mommy.make(models.Entity, is_single_contact=False)
         contact = entity.contact_set.all()[0]
-        contact2 = mommy.make_one(models.Contact, entity=entity)
+        contact2 = mommy.make(models.Contact, entity=entity)
         self.assertEqual(entity.contact_set.count(), 2)
         url = reverse('crm_delete_contact', args=[contact.id])
         data = {'confirm': True}
@@ -828,38 +825,206 @@ class SingleContactTest(BaseTestCase):
 class ActionAutoGenerateNumberTestCase(TestCase):
     
     def test_create_action_with_auto_generated_number(self):
-        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 1)
         
     def test_create_action_several_auto_generated_number(self):
-        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 1)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 2)
-        no_gen_type = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=False)
+        no_gen_type = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
         a = models.Action.objects.create(type=no_gen_type, subject="a")
         self.assertEqual(a.number, 0)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 3)
         
     def test_create_action_several_auto_generated_types(self):
-        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=True)
+        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 1)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 2)
-        no_gen_type = mommy.make_one(models.ActionType, last_number=27, number_auto_generated=True)
+        no_gen_type = mommy.make(models.ActionType, last_number=27, number_auto_generated=True)
         a = models.Action.objects.create(type=no_gen_type, subject="a")
         self.assertEqual(a.number, 28)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 3)
         
     def test_create_action_no_number_generation(self):
-        at = mommy.make_one(models.ActionType, last_number=0, number_auto_generated=False)
+        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 0)
         
+class GroupSuggestListTestCase(BaseTestCase):
+    view_name = 'crm_get_group_suggest_list'
+    
+    def test_group_suggest_list1(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=a')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.name)
+        self.assertContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+        
+    def test_group_suggest_list2(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=abcd')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+        
+    def test_group_suggest_list3(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=Abc')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.name)
+        self.assertContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+        
+    def test_group_suggest_list4(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=X')
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertContains(response, g3.name)
+        
+    def test_group_suggest_list5(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=k')
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+        
+    def test_group_suggest_list6(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyzC")
+        
+        response = self.client.get(reverse(self.view_name)+'?term=c')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.name)
+        self.assertContains(response, g2.name)
+        self.assertContains(response, g3.name)
+        
+    def test_group_suggest_list_not_logged(self):
+        self.client.logout()
+        response = self.client.get(reverse(self.view_name)+'?term=c')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
+        self.assertTrue(response['Location'].find(login_url)>0)
+
+
+class GetGroupsListTestCase(GroupSuggestListTestCase):
+    view_name = 'crm_get_groups'
+
+class CitiesSuggestListTestCase(BaseTestCase):
+    
+    def setUp(self):
+        super(CitiesSuggestListTestCase, self).setUp()
+        self.default_country = mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
+        self.foreign_country = mommy.make(models.Zone, name="BB", parent=None)
+        self.parent = mommy.make(models.Zone, name="AA", code="42", parent=self.default_country)
+    
+    def test_cities_not_logged(self):
+        self.client.logout()
+        response = self.client.get(reverse('crm_get_cities')+'?term=c')
+        self.assertEqual(200, response.status_code)
         
         
+    def test_city_in_default_country(self):
+        c1 = mommy.make(models.City, name="ABC", parent=self.parent)
+        c2 = mommy.make(models.City, name="ABD", parent=self.parent)
+        c3 = mommy.make(models.City, name="XYZ", parent=self.parent)
+        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country)
+        
+        response = self.client.get(reverse('crm_get_cities')+'?term=a&country=0')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, c1.name)
+        self.assertContains(response, c2.name)
+        self.assertNotContains(response, c3.name)
+        self.assertNotContains(response, c4.name)
+        
+    def test_city_in_foreign_country(self):
+        c1 = mommy.make(models.City, name="ABC", parent=self.parent)
+        c2 = mommy.make(models.City, name="ABD", parent=self.parent)
+        c3 = mommy.make(models.City, name="XYZ", parent=self.parent)
+        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country)
+        
+        response = self.client.get(reverse('crm_get_cities')+'?term=a&country={0}'.format(
+            self.foreign_country.id))
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, c1.name)
+        self.assertNotContains(response, c2.name)
+        self.assertNotContains(response, c3.name)
+        self.assertContains(response, c4.name)
+        
+
+class ContactEntitiesSuggestListTestCase(BaseTestCase):
+    
+    #def setUp(self):
+    #    super(ContactEntitiesSuggestListTestCase, self).setUp()
+    
+    def test_entities_not_logged(self):
+        self.client.logout()
+        response = self.client.get(reverse('crm_get_entities')+'?term=c')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
+        self.assertTrue(response['Location'].find(login_url)>0)
+    
+    def test_contacts_not_logged(self):
+        self.client.logout()
+        response = self.client.get(reverse('crm_get_contacts')+'?term=c')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
+        self.assertTrue(response['Location'].find(login_url)>0)
+        
+    def test_entities(self):
+        e1 = mommy.make(models.Entity, name="ABCD")
+        e2 = mommy.make(models.Entity, name="CDE")
+        e3 = mommy.make(models.Entity, name="dce")
+        e4 = mommy.make(models.Entity, name="XYZ")
+        
+        response = self.client.get(reverse('crm_get_entities')+'?term=c')
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e1.name)
+        self.assertContains(response, e2.name)
+        self.assertContains(response, e3.name)
+        self.assertNotContains(response, e4.name)
+        
+    def test_contacts(self):
+        e1 = mommy.make(models.Entity, name="ABCD")
+        e2 = mommy.make(models.Entity, name="ZZZ")
+        
+        c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
+        c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
+        c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
+        
+        response = self.client.get(reverse('crm_get_contacts')+'?term=c')
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, c2.lastname)
+        self.assertNotContains(response, c3.lastname)
+
