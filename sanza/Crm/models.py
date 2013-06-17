@@ -503,6 +503,7 @@ class ActionType(NamedElement):
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True)
     last_number = models.IntegerField(_(u'number'), default=0)
     number_auto_generated = models.BooleanField(_(u'number'), default=False)
+    default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="")
 
     class Meta:
         verbose_name = _(u'action type')
@@ -520,7 +521,7 @@ class Action(TimeStampedModel):
     )
 
     entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
-    subject = models.CharField(_('subject'), max_length=200, blank=True, default=True)
+    subject = models.CharField(_('subject'), max_length=200, blank=True, default="")
     planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_('detail'), blank=True, default='')
@@ -552,6 +553,26 @@ class Action(TimeStampedModel):
             
         return super(Action, self).save(*args, **kwargs)
         
+class ActionDocument(models.Model):
+    content = models.TextField(_(u'content'), blank=True, default="")
+    action = models.OneToOneField(Action)
+    template = models.CharField(_(u'template'), max_length=200)
+    
+    def get_edit_url(self):
+        return reverse('crm_edit_action_document', args=[self.action.id])
+        
+    def get_absolute_url(self):
+        return reverse('crm_view_action_document', args=[self.action.id])
+    
+    def get_pdf_url(self):
+        return reverse('crm_pdf_action_document', args=[self.action.id])
+    
+    def can_edit_object(self, user):
+        return self.user.is_staff
+    
+    def can_view_object(self, user):
+        return self.user.is_staff
+    
 class CustomField(models.Model):
     
     MODEL_ENTITY = 1

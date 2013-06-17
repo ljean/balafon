@@ -11,6 +11,7 @@ from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityA
 from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
 from form_utils.forms import BetterModelForm
+from djaloha.widgets import AlohaInput
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
@@ -236,7 +237,7 @@ class ActionForm(BetterModelForm):
         fields = ('type', 'subject', 'date', 'time', 'in_charge', 'contact', 'opportunity', 'detail',
             'priority', 'amount', 'number', 'done', 'display_on_board', 'planned_date', 'archived')
         fieldsets = [
-            ('name', {'fields': ['type', 'subject', 'date', 'time', 'contact', 'done', 'planned_date'], 'legend': _(u'Summary')}),
+            ('name', {'fields': ['type', 'subject', 'date', 'time', 'contact', 'done', 'planned_date', 'doc_template'], 'legend': _(u'Summary')}),
             ('details', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
             ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
         ]
@@ -246,6 +247,12 @@ class ActionForm(BetterModelForm):
         super(ActionForm, self).__init__(*args, **kwargs)
         if entity and not entity.is_single_contact:
             self.fields['contact'].queryset = models.Contact.objects.filter(entity=entity)
+        else:
+            self.fields['contact'].widget = forms.HiddenInput()
+            
+        doc_templates = getattr(settings, 'SANZA_DOCUMENT_TEMPLATES', None)
+        if doc_templates:
+            self.fields['contact'].widget = forms.Select(choices=doc_templates)
         else:
             self.fields['contact'].widget = forms.HiddenInput()
             
@@ -455,3 +462,12 @@ class ContactsImportConfirmForm(ContactsImportForm):
             return self.cleaned_data['default_department']
         else:
             return None
+        
+
+from coop_cms.forms import AlohaEditableModelForm
+class ActionDocumentForm(AlohaEditableModelForm):
+    
+    class Meta:
+        model = models.ActionDocument
+        fields = ('content',)
+        

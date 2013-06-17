@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import patterns, url
+import views
 
 urlpatterns = patterns('sanza.Crm.views',
     url(r'^entities$', 'view_entities_list', name='crm_view_entities_list'),
@@ -62,4 +63,10 @@ urlpatterns = patterns('sanza.Crm.views',
     
     url(r'^toggle-action-bookmark/(?P<action_id>\d+)$', 'toggle_action_bookmark', name='crm_toggle_action_bookmark'),
     url(r'^toggle-opportunity-bookmark/(?P<opportunity_id>\d+)$', 'toggle_opportunity_bookmark', name='crm_toggle_opportunity_bookmark'),
+)
+
+urlpatterns += patterns('',
+    url(r'^action-document/(?P<pk>\d+)/edit/$', views.ActionDocumentEditView.as_view(), name='crm_edit_action_document'),
+    url(r'^action-document/(?P<pk>\d+)/pdf/$', views.ActionDocumentPdfView.as_view(), name='crm_pdf_action_document'),
+    url(r'^action-document/(?P<pk>\d+)/$', views.ActionDocumentDetailView.as_view(), name='crm_view_action_document'),
 )

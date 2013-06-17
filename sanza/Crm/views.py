@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext, Context
+from django.template import RequestContext, Context, TemplateDoesNotExist
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.core.exceptions import PermissionDenied
@@ -19,7 +19,12 @@ import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
- 
+from coop_cms.generic_views import EditableObjectView
+from django.contrib.messages import api as user_message
+from wkhtmltopdf.views import PDFTemplateView
+from django.template.defaultfilters import slugify
+from django.template.loader import find_template
+
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
     
@@ -1476,4 +1481,65 @@ def make_main_contact(request, contact_id):
         },
         context_instance=RequestContext(request)
     )
+
+class ActionDocumentDetailView(EditableObjectView):
+    model = models.ActionDocument
+    edit_mode = False
+    form_class = forms.ActionDocumentForm
+    #varname = "action_doc"
     
+    def get_object(self):
+        action = get_object_or_404(models.Action, pk = self.kwargs['pk'])
+        try:
+            return action.actiondocument
+        except self.model.DoesNotExist:
+            warning_text = ""
+            if not action.type:
+                warning_text = _(u"The action has no type set: Unable to create the corresponding document")
+            elif not action.type.default_template:
+                warning_text = _(u"The action type has no document template defined: Unable to create the corresponding document")
+            if warning_text:
+                logger.warning(warning_text)
+                user_message.warning(self.request, warning_text)
+                raise Http404
+            else:
+                return self.model.objects.create(action=action, template=action.type.default_template)
+    
+    def get_template(self):
+        return self.object.template
+    
+class ActionDocumentEditView(ActionDocumentDetailView):
+    edit_mode = True
+
+class ActionDocumentPdfView(PDFTemplateView):
+    
+    def find_template(self, template_type, action_type):
+        potential_templates = []
+        if action_type:
+            action_type = slugify(action_type.name)
+            potential_templates += [
+                u"documents/_{0}_{1}.html".format(action_type, template_type),
+            ]
+        
+        potential_templates += [
+            "documents/_{0}.html".format(template_type),
+        ]
+        
+        for template_name in potential_templates:
+            try:
+                find_template(template_name)
+                return template_name
+            except TemplateDoesNotExist:
+                pass
+        return ""
+    
+    def render_to_response(self, context, **response_kwargs):
+        action = get_object_or_404(models.Action, pk = self.kwargs['pk'])
+        doc = action.actiondocument
+        context['to_pdf'] = True
+        context['object'] = doc
+        self.template_name = doc.template
+        self.header_template = self.find_template("header", action.type)
+        self.footer_template = self.find_template("footer", action.type)
+        self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
+        return super(ActionDocumentPdfView, self).render_to_response(context, **response_kwargs)

@@ -1,4 +1,4 @@
-{% load i18n sanza_utils %}{% load url from future %}
+{% load i18n sanza_utils staticfiles %}{% load url from future %}
 <table id="entity_actions">
   <tr>
     <th>&nbsp;</th>
@@ -36,7 +36,19 @@
     </td>
     
     <td>{{a.type|default:"&nbsp;"}}</td>
-    <td>{{a.subject}}</td>
+    <td>{{a.subject}}
+    {% if a.actiondocument %}
+      <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
+        <img src="{% static "fugue/document.png" %}" alt="{% trans "document" %}" %}
+      </a>
+    {% else %}
+      {% if a.type.default_template %}
+      <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
+        <img src="{% static "fugue/document--plus.png" %}" alt="{% trans "add document" %}" %}
+      </a>
+      {% endif %}
+    {% endif %}
+    </td>
     
     {% if not contact %}
       {% if a.contact %}
