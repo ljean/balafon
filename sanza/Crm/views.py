@@ -589,7 +589,7 @@ def add_single_contact(request):
             
             default_contact.delete()
             
-            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         contact = None
         contact_form = forms.ContactForm()
