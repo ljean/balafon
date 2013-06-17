@@ -547,7 +547,7 @@ class Action(TimeStampedModel):
             self.done_date = None
             
         #generate number automatically based on action type
-        if self.type and self.type.number_auto_generated:
+        if self.number==0 and self.type and self.type.number_auto_generated:
             self.number = self.type.last_number = self.type.last_number + 1
             self.type.save()
             

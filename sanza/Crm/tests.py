@@ -888,6 +888,13 @@ class ActionAutoGenerateNumberTestCase(TestCase):
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 3)
         
+    def test_save_action_several_auto_generated_number(self):
+        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
+        a = models.Action.objects.create(type=at, subject="a")
+        self.assertEqual(a.number, 1)
+        a.save()
+        self.assertEqual(a.number, 1)
+        
     def test_create_action_several_auto_generated_types(self):
         at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
         a = models.Action.objects.create(type=at, subject="a")
