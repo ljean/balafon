@@ -15,8 +15,12 @@
   {% for c in same_as %}
   {% with c.has_left as has_left %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+    {% if c.entity.is_single_contact %}
+    <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    {% else %}
     <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
     <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
+    {% endif %}
     <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
