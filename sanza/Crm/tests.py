@@ -1075,3 +1075,151 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         self.assertContains(response, c2.lastname)
         self.assertNotContains(response, c3.lastname)
 
+
+class ActionDocumentTestCase(BaseTestCase):
+    
+    def test_new_document_edit(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(200, response.status_code)
+        a = models.Action.objects.get(id=a.id)
+        self.assertNotEqual(a.actiondocument, None)
+        
+    def test_new_document_view(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(200, response.status_code)
+        a = models.Action.objects.get(id=a.id)
+        self.assertNotEqual(a.actiondocument, None)
+        
+    def test_no_document_view(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        a = models.Action.objects.get(id=a.id)
+        try:
+            doc = a.actiondocument
+            exception_raised = False
+        except models.ActionDocument.DoesNotExist:
+            exception_raised = True
+        self.assertEqual(exception_raised, True)
+        
+    def test_no_document_edit(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        a = models.Action.objects.get(id=a.id)
+        try:
+            doc = a.actiondocument
+            exception_raised = False
+        except models.ActionDocument.DoesNotExist:
+            exception_raised = True
+        self.assertEqual(exception_raised, True)
+        
+    def test_no_document_pdf(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        
+    def test_no_type_view(self):
+        c = mommy.make(models.Contact)
+        a = mommy.make(models.Action, type=None, contact=c)
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        
+        response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
+        self.assertEqual(404, response.status_code)
+        
+        a = models.Action.objects.get(id=a.id)
+        try:
+            doc = a.actiondocument
+            exception_raised = False
+        except models.ActionDocument.DoesNotExist:
+            exception_raised = True
+        self.assertEqual(exception_raised, True)
+        
+    def test_view_document_view(self):
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        #Create
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(200, response.status_code)
+        a = models.Action.objects.get(id=a.id)
+        a.actiondocument.content = "This is a test for document actions"
+        a.actiondocument.save()
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, a.actiondocument.content)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, a.actiondocument.content)
+        
+    #def test_pdf_document_view(self):
+    #    c = mommy.make(models.Contact)
+    #    at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+    #    a = mommy.make(models.Action, type=at, contact=c)
+    #    
+    #    response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
+    #    self.assertEqual(200, response.status_code)
+        
+    def test_anonymous_document_view(self):
+        self.client.logout()
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+        response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+    def test_not_staff_document_view(self):
+        self.client.logout()
+        
+        user = User.objects.create(username="titi", is_staff=False)
+        user.set_password("abc")
+        user.save()
+        self.client.login(usernname="titi", password="abc")
+        
+        c = mommy.make(models.Contact)
+        at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        a = mommy.make(models.Action, type=at, contact=c)
+        
+        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+        response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
+        self.assertEqual(403, response.status_code)
+        
+        
+        

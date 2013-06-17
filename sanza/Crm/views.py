@@ -1535,7 +1535,12 @@ class ActionDocumentPdfView(PDFTemplateView):
     
     def render_to_response(self, context, **response_kwargs):
         action = get_object_or_404(models.Action, pk = self.kwargs['pk'])
-        doc = action.actiondocument
+        try:
+            doc = action.actiondocument
+        except models.ActionDocument.DoesNotExist:
+            raise Http404
+        if not self.request.user.has_perm('can_view_object', doc):
+            raise PermissionDenied
         context['to_pdf'] = True
         context['object'] = doc
         self.template_name = doc.template

@@ -568,10 +568,10 @@ class ActionDocument(models.Model):
         return reverse('crm_pdf_action_document', args=[self.action.id])
     
     def can_edit_object(self, user):
-        return self.user.is_staff
+        return user.is_staff
     
     def can_view_object(self, user):
-        return self.user.is_staff
+        return user.is_staff
     
 class CustomField(models.Model):
     
