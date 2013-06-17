@@ -21,6 +21,14 @@
   <h2>{% trans "Create contact" %}</h2>
   {% endif %}
 
+<h3>
+  {% if not entity.is_single_contact %}
+    {{entity.type.name}}: {{entity.name}}
+{% else %}
+  {% trans "Single contact" %}
+{% endif %}
+</h3>
+{% comment %}
   <h3>
   {% if entity.id %}
     {% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
@@ -28,6 +36,7 @@
     {% trans "Single contact" %}
   {% endif %}
   </h3>
+{% endcomment %}
 {% endblock %}
 
 {% block form_buttons %}
