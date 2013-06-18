@@ -61,37 +61,45 @@ def create_profile_contact(user):
     profile.save()
     return profile
 
-def check_category_permission(article, permission, user):
+def check_category_permission(obj, permission, user):
     #check that the object has a category
     
     try:
-        cat_perm = CategoryPermission.objects.get(category=article.category)
-    except:
+        cat_perm = CategoryPermission.objects.get(category=obj.category)
+    except AttributeError:
+        logger.debug('object category has no category')
+        return True
+    except CategoryPermission.DoesNotExist:
         #If no category permission exists : anyone is allowed
+        logger.debug('object category has no permission defined')
         return True
     
     #Get the contact corresponding to the logged user
     try:
         contact = user.contactprofile.contact
-    except:
+    except (ContactProfile.DoesNotExist, Contact.DoesNotExists):
         #If anonymous user or no contact exists for this profile
         #users are not allowed to check the category
+        logger.debug("user contact does't exist")
         return False
     
     if permission == 'can_view_article':
         groups = cat_perm.can_view_groups
     elif permission == 'can_edit_article':
         groups = cat_perm.can_edit_groups
+    elif permission == "can_download_doc":
+        groups = cat_perm.can_view_groups
     else:
         #This perm is not managed : allow it
         return True
-    
+        
     for group in groups.all():
         if group.contacts.filter(id=contact.id).count() or group.entities.filter(id=contact.entity.id).count():
             #user is member of an allowed group
             return True
     #user is not member of a group : do not allow
     return False
+
 
 def notify_registration(profile):
     #send message by email
