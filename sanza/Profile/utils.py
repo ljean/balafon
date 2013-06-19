@@ -67,11 +67,11 @@ def check_category_permission(obj, permission, user):
     try:
         cat_perm = CategoryPermission.objects.get(category=obj.category)
     except AttributeError:
-        logger.debug('object category has no category')
+        #logger.debug('object category has no category')
         return True
     except CategoryPermission.DoesNotExist:
         #If no category permission exists : anyone is allowed
-        logger.debug('object category has no permission defined')
+        #logger.debug('object category has no permission defined')
         return True
     
     #Get the contact corresponding to the logged user
@@ -80,7 +80,7 @@ def check_category_permission(obj, permission, user):
     except (ContactProfile.DoesNotExist, Contact.DoesNotExist, AttributeError):
         #If anonymous user or no contact exists for this profile
         #users are not allowed to check the category
-        logger.debug("user contact does't exist")
+        #logger.debug("user contact does't exist")
         return False
     
     if permission == 'can_view_article':
@@ -92,7 +92,7 @@ def check_category_permission(obj, permission, user):
     else:
         #This perm is not managed : allow it
         return True
-        
+    
     for group in groups.all():
         if group.contacts.filter(id=contact.id).count() or group.entities.filter(id=contact.entity.id).count():
             #user is member of an allowed group
