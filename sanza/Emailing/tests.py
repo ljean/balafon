@@ -663,7 +663,8 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email]) #email verification
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
@@ -703,7 +704,8 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email]) #email verification
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
@@ -769,7 +771,8 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email]) #email verification
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        self.assertTrue(unicode(verification_email.message()).find(url)>0) #email verification
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
