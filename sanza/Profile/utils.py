@@ -87,7 +87,7 @@ def check_category_permission(obj, permission, user):
         groups = cat_perm.can_view_groups
     elif permission == 'can_edit_article':
         groups = cat_perm.can_edit_groups
-    elif permission == "can_download_doc":
+    elif permission == "can_download_file":
         groups = cat_perm.can_view_groups
     else:
         #This perm is not managed : allow it
