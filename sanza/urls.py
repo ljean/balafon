@@ -32,7 +32,7 @@ if 'jhouston' in settings.INSTALLED_APPS:
 
 if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
     urlpatterns += patterns('',
-        url(r'^$', 'sanza.Crm.views.view_board_panel'),
+        url(r'^$', 'sanza.Crm.views.view_board_panel', name='homepage'),
     )
 
 if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
