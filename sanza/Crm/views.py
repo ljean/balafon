@@ -1363,11 +1363,11 @@ def confirm_contacts_import(request, import_id):
                             field = field_name
                         if c[field_name] and field!='city':
                             setattr(obj, field, c[field_name])
-    
+                    
                     if c['city']:
                         contact.city = resolve_city(c['city'], c['zip_code'], c['country'], default_department)
                     if c['entity.city']:
-                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], c['country'], default_department)
+                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], c['entity.country'], default_department)
                     if c['role']:
                         for role_exists, role in zip(c['role_exists'], c['role']):
                             if role_exists:

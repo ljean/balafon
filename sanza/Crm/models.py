@@ -638,6 +638,7 @@ class ContactCustomFieldValue(CustomFieldValue):
 class ContactsImport(TimeStampedModel):
     
     ENCODINGS = (
+        ('utf-8', 'utf-8'),
         ('iso-8859-15', 'iso-8859-15'),
         ('cp1252', 'cp1252')
     )
