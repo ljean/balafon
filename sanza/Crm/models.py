@@ -419,6 +419,10 @@ class Group(TimeStampedModel):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.strip()
+        return super(Group, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = _(u'group')
         verbose_name_plural = _(u'groups')
