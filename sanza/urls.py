@@ -6,7 +6,7 @@ import sys
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-Ò
+
 from django.contrib import admin
 admin.autodiscover()
 
