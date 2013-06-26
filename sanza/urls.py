@@ -6,12 +6,12 @@ import sys
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-
+Ò
 from django.contrib import admin
 admin.autodiscover()
 
 if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
-    raise Exception("Invalid setting : SANZA_NOTIFY_SUBSCRIPTIONS has been replaced by SANZA_NOTIFICATION_EMAIL")
+    raise Exception(u"Invalid setting : SANZA_NOTIFY_SUBSCRIPTIONS has been replaced by SANZA_NOTIFICATION_EMAIL")
 
 urlpatterns = patterns('',
     url(r'^crm/$', 'sanza.Crm.views.view_board_panel', name="sanza_homepage"),
@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
-    url('^sanza-go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
+    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
 )
 
 if 'jhouston' in settings.INSTALLED_APPS:
