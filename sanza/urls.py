@@ -23,6 +23,7 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
+    url('^sanza-go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
 )
 
 if 'jhouston' in settings.INSTALLED_APPS:
