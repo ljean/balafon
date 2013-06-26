@@ -22,24 +22,9 @@
 {% include "Crm/_actions_table_script.html" %}
   
 {% if actions %}
-{% if all_actions %}{% autopaginate actions 25 %}{% endif %}
-{% include "Crm/_actions_table.html" %}
-{% if all_actions %}{% paginate %}{% endif %}
-{% comment%}
-<script>
-  $(function() {
-    $("tr td.status-icon").live('click', function() {
-      if (!$(this).parent().hasClass('not-my-action')){
-        var action_id = $(this).attr('id').substr(2);
-        $.post('{% url "crm_toogle_action" %}', {id: action_id}, function(data) {
-          window.location.reload();
-        });
-      }
-      return false;
-    });
-  })
-</script>
-{% endcomment %}
+  {% if all_actions %}{% autopaginate actions 25 %}{% endif %}
+  {% include "Crm/_actions_table.html" %}
+  {% if all_actions %}{% paginate %}{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -61,7 +46,7 @@
         <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
       {% endif %}
   {% endif %}{% endif %}
-  {% if SANZA_MULTI_USERS %}
+  {% if SANZA_MULTI_USER %}
     <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
   {% endif %}
 {% endblock %}
