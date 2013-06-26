@@ -48,6 +48,13 @@
 
 
 {% block section_action %}
-    <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a>
-    <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a>
+  <a href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a>
+  <a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a>
+  {% if contact.same_as %}
+    {% if contact == contact.same_as.main_contact %}
+      <div class="is-main-contact"><img style="vertical-align: top;" src="{{STATIC_URL}}img/rosette-label.png" />{% trans "Is Main" %}</div>
+    {% else %}
+      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id %}">{% trans "Make main" %}</a>
+    {% endif %}
+  {% endif %}
 {% endblock %}

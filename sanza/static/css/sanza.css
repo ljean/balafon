@@ -373,9 +373,14 @@ body a:hover{
 	/*color: #22a;*/
 }
 
-.column.section-actions a.is-main-contact{
-	background: #fff;
-	border: solid 2px #228;
+.column.section-actions .is-main-contact{
+    padding: 4px 4px 4px 4px;
+    border: solid 2px #262;
+    text-align: center;
+    margin-bottom: 4px;
+    background: #fff;
+    border: solid 2px #228;
+    color: #262;
 }
 
 form {

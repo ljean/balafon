@@ -6,15 +6,18 @@
 {% block section_data %}
 {% if same_as %}
 <table id="entity_contacts">
-  <tr><th>{% trans "Name" %}</th>
-      <th>{% trans "Entity" %}</th>
-      <th>{% trans "Role" %}</th>
-      <th>{% trans "Phone" %}</th>
-      <th>{% trans "Email" %}</th>
+  <tr>
+    <th>&nbsp;</th>
+    <th>{% trans "Name" %}</th>
+    <th>{% trans "Entity" %}</th>
+    <th>{% trans "Role" %}</th>
+    <th>{% trans "Phone" %}</th>
+    <th>{% trans "Email" %}</th>
   </tr>
   {% for c in same_as %}
   {% with c.has_left as has_left %}
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+    <td class="status-icon">{% if c == contact.same_as.main_contact %}<img src="{{STATIC_URL}}img/rosette-label.png" />{% endif %}</td>
     {% if c.entity.is_single_contact %}
     <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
     {% else %}
@@ -33,14 +36,4 @@
 
 {% block section_action %}
   <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
-  
-  {% if contact.same_as %}
-    {% if contact == contact.same_as.main_contact %}
-      <a class="is-main-contact">{% trans "Is Main" %}</a>
-    {% else %}
-      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id %}">{% trans "Make main" %}</a>
-    {% endif %}
-  {% endif %}
-  
-  
 {% endblock %}
