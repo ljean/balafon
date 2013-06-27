@@ -292,10 +292,14 @@ def export_contacts_as_excel(request):
                     if f:
                         ws.write(i+1, j, unicode(f), style)
 
-        response = HttpResponse(mimetype='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('sanza')
-        wb.save(response)
-        return response
+            response = HttpResponse(mimetype='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('sanza')
+            wb.save(response)
+            return response
+        else:
+            messages.add_message(request, messages.ERROR,
+                _(u"{0} actions have been created".format(len(contacts))))
+            logger.error(unicode(form.errors))
     raise Http404
 
 @user_passes_test(can_access)

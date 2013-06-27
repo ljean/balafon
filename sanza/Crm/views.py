@@ -730,7 +730,7 @@ def view_contact_actions(request, contact_id, set_id):
         title = action_set.name
     else:
         filters.append(Q(type__set=None))
-        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _u("Actions")
+        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _(u"Actions")
     
     actions = contact.action_set.filter(*filters).order_by("planned_date", "priority")
     all_actions = True

@@ -190,8 +190,11 @@ class Entity(TimeStampedModel):
             return None
         
     def single_contact(self):
-        if self.is_single_contact:
-            return self.contact_set.all()[0]
+        try:
+            if self.is_single_contact:
+                return self.contact_set.all()[0]
+        except IndexError:
+            pass
         return None
         
     def current_opportunities(self):
