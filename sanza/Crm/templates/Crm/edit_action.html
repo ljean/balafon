@@ -6,9 +6,11 @@
     <img src="{{STATIC_URL}}img/action.png"/>
   </div>
   
+  {% if not contact.entity.is_single_contact %}
   <a class="contact-entity-info">
     <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
   </a>
+  {% endif %}
   
   <a class="contact-entity-info">
     <img src="{{contact.get_safe_photo}}"><span class="text">{{contact}}</span>

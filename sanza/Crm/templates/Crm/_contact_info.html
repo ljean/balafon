@@ -3,7 +3,9 @@
 
 {% block column_section_data %}
 <div class="column-section-data-title">
-  <div class="contact_logo"><img src="{{contact.get_safe_photo}}"/></div>
+  <div class="contact_logo">
+    <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
+  </div>
     
   <div class="contact_info">
     <div>

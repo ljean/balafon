@@ -609,11 +609,11 @@ form.search-form {
     height: 128px;
     width: 128px;
     margin: 5px 5px 5px 5px;
-	border: solid thin #ccc;
+    border: solid thin #ccc;
 }
 
 .entity_logo img, .contact_logo img {
-	width: 100%;
+	margin: auto;
 }
 
 .entity_info, .contact_info {
@@ -940,7 +940,8 @@ tr.not-my-action td, tr.not-my-action a {
 }
 
 .contact-entity-info img{
-	width: 64px;
+	max-width: 64px;
+    max-height: 128px;
 	vertical-align: middle;
 	display: inline-block;
 }

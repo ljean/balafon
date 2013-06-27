@@ -4,7 +4,7 @@
 {% block doc_header %}
   {% if entity.id %}
   <div class="entity_logo">
-    <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{entity.default_logo}}{% endif %}"/>
+    <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
   </div>
   <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
   {% else %}

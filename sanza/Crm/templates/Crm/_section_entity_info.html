@@ -5,7 +5,9 @@
 <div class="column-section-data-title">
   {% spaceless %}
   <div class="entity_logo">
-    <img src="{% if entity.logo %}{{MEDIA_URL}}{{entity.logo_thumbnail}}{% else %}{{entity.default_logo}}{% endif %}"/>
+    <div class="helper">
+      <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
+    </div>
   </div>
   <div class="entity_info">
     <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;

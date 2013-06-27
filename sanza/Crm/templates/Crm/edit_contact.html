@@ -18,11 +18,7 @@
   <h2>
     {% if contact %}
     <div class="contact_logo">
-    {% if contact.photo %}
-      <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
-    {% else %}
-      <img src="{{contact.default_logo}}"/>
-    {% endif %}
+      <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
     </div>
     {% if not contact.entity.is_single_contact %}
       <a class="contact-entity-info">
