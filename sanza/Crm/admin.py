@@ -75,3 +75,4 @@ admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin
 
 admin.site.register(models.ContactsImport)
 admin.site.register(models.ActionSet)
+admin.site.register(models.ActionStatus)

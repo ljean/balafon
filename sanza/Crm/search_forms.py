@@ -128,6 +128,44 @@ class ActionByUser(SearchFieldForm):
     def get_lookup(self):
         return {'action__in_charge': self._value}
 
+class ActionGteAmount(SearchFieldForm):
+    _name = 'action_gte_amount'
+    _label = _(u'Action with amount greater or equal to')
+    
+    def __init__(self, *args, **kwargs):
+        super(ActionGteAmount, self).__init__(*args, **kwargs)
+        field = forms.IntegerField(label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'action__amount__gte': self._value}
+
+class ActionLtAmount(SearchFieldForm):
+    _name = 'action_lt_amount'
+    _label = _(u'Action with amount less than')
+    
+    def __init__(self, *args, **kwargs):
+        super(ActionLtAmount, self).__init__(*args, **kwargs)
+        field = forms.IntegerField(label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'action__amount__lt': self._value}
+    
+class ActionStatus(SearchFieldForm):
+    _name = 'action_status'
+    _label = _(u'Action by status')
+    
+    def __init__(self, *args, **kwargs):
+        super(ActionStatus, self).__init__(*args, **kwargs)
+        qs = models.ActionStatus.objects.all()
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'action__status': self._value}
+
+
 class TypeSearchForm(SearchFieldForm):
     _name = 'type'
     _label = _(u'Entity type')

@@ -287,6 +287,12 @@ class Contact(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    def get_safe_photo(self):
+        if self.photo:
+            return photo_thumbnail().url
+        else:
+            return self.default_logo()
+    
     def default_logo(self):
         if self.entity.is_single_contact:
             logo = "img/single-contact.png"
@@ -455,7 +461,7 @@ class Opportunity(TimeStampedModel):
     entity = models.ForeignKey(Entity, blank=True, null=True, default=None)
     #---------------
     name = models.CharField(_('name'), max_length=200)
-    status = models.ForeignKey(OpportunityStatus)
+    status = models.ForeignKey(OpportunityStatus, default=None, blank=True, null=True)
     type = models.ForeignKey(OpportunityType, blank=True, null=True, default=None)
     detail = models.TextField(_('detail'), blank=True, default='')
     #TO BE REMOVED---
@@ -499,6 +505,15 @@ class ActionSet(NamedElement):
     class Meta:
         verbose_name = _(u'action set')
         verbose_name_plural = _(u'action sets')
+        ordering = ['ordering']
+
+class ActionStatus(NamedElement):
+    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    class Meta:
+        verbose_name = _(u'action status')
+        verbose_name_plural = _(u'action status')
+        ordering = ['ordering']
+
 
 class ActionType(NamedElement):
     
@@ -508,6 +523,8 @@ class ActionType(NamedElement):
     last_number = models.IntegerField(_(u'number'), default=0)
     number_auto_generated = models.BooleanField(_(u'number'), default=False)
     default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="")
+    allowed_status = models.ManyToManyField(ActionStatus, blank=True, default=None, null=True)
+    default_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='type_default_status_set')
 
     class Meta:
         verbose_name = _(u'action type')
@@ -540,6 +557,7 @@ class Action(TimeStampedModel):
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     number = models.IntegerField(_(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.'))
+    status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
 
     def __unicode__(self):
         return u'{0.subject} with {0.entity}'.format(self)

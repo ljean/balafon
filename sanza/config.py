@@ -49,6 +49,9 @@ SEARCH_FORMS = [
             search_forms.ActionByDoneDate,
             search_forms.ActionByPlannedDate,
             search_forms.ActionByUser,
+            search_forms.ActionStatus,
+            search_forms.ActionLtAmount,
+            search_forms.ActionGteAmount,
         ],
     ),(
         _(u'Opportunities'),

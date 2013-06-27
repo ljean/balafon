@@ -10,7 +10,7 @@
   
     <span class="title">{{opportunity.name}}</span>&nbsp;&nbsp;
     {% if opportunity.type %}<span class="label">{{opportunity.type}}</span>{% endif %}
-    <span class="label">{{opportunity.status}}</span>
+    {% if opportunity.status %}<span class="label">{{opportunity.status}}</span>{% endif %}
   </div>
 </div>
 <div class="entity_description">{{opportunity.detail|linebreaksbr}}</div>

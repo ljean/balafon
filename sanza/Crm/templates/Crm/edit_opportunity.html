@@ -2,6 +2,9 @@
 {% load i18n %}{% load url from future %}
 
 {% block doc_header %}
+  <div class="entity_logo">
+    <img src="{{STATIC_URL}}img/folder.png"/>
+  </div>
   {% if opportunity %}
   <h2>{% trans "Edit opportunity" %}</h2>
   {% if opportunity.ended %}

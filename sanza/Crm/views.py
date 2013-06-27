@@ -470,9 +470,8 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
                     contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
-            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
-        else:
-            print form.errors
+            else:
+                return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         form = forms.ContactForm(instance=contact)
         
@@ -495,8 +494,10 @@ def view_contact(request, contact_id):
     actions_by_set = get_actions_by_set(actions)    
     
     opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
-    opportunities.sort(key=lambda x: x.status.ordering)
+    opportunities.sort(key=lambda x: x.status.ordering if x.status else 0)
     opportunities.reverse()
+    
+    request.session["redirect_url"] = reverse('crm_view_contact', args=[contact_id])
     
     if contact.same_as:
         same_as = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
@@ -750,12 +751,15 @@ def edit_action(request, action_id):
         form = forms.ActionForm(request.POST, instance=action)
         if form.is_valid():
             form.save()
-            next_url = request.session.get('redirect_url')
-            if not next_url:
-                if entity:
-                    next_url = reverse('crm_view_entity', args=[entity.id])
-                else:
-                    next_url = reverse('crm_view_contact', args=[contact.id])
+            if request.GET.get('keep_on_edit', False):
+                next_url = reverse('crm_edit_action', args=[action.id])
+            else:
+                next_url = request.session.get('redirect_url')
+                if not next_url:
+                    if entity:
+                        next_url = reverse('crm_view_entity', args=[entity.id])
+                    else:
+                        next_url = reverse('crm_view_contact', args=[contact.id])
             return HttpResponseRedirect(next_url)
     else:
         form = forms.ActionForm(instance=action, entity=entity)
@@ -798,7 +802,7 @@ def delete_action(request, action_id):
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
-            'message': _(u'Are you sure to delete the action "{0}"?').format(action),
+            'message': _(u'Are you sure to delete this action?'),
             'action_url': reverse("crm_delete_action", args=[action_id]),
         },
         context_instance=RequestContext(request)

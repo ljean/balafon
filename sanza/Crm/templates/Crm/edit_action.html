@@ -2,6 +2,18 @@
 {% load i18n %}{% load url from future %}
 
 {% block doc_header %}
+  <div class="entity_logo">
+    <img src="{{STATIC_URL}}img/action.png"/>
+  </div>
+  
+  <a class="contact-entity-info">
+    <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
+  </a>
+  
+  <a class="contact-entity-info">
+    <img src="{{contact.get_safe_photo}}"><span class="text">{{contact}}</span>
+  </a>
+  
   {% if action %}
   <h2>{% trans "Edit action" %}</h2>
   {% else %}

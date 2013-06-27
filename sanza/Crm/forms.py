@@ -234,22 +234,31 @@ class ActionForm(BetterModelForm):
     
     class Meta:
         model = models.Action
-        fields = ('type', 'subject', 'date', 'time', 'in_charge', 'contact', 'opportunity', 'detail',
+        fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'contact', 'opportunity', 'detail',
             'priority', 'amount', 'number', 'done', 'display_on_board', 'planned_date', 'archived')
         fieldsets = [
-            ('name', {'fields': ['type', 'subject', 'date', 'time', 'contact', 'done', 'planned_date', 'doc_template'], 'legend': _(u'Summary')}),
+            ('name', {'fields': ['type', 'subject', 'status', 'date', 'time', 'contact', 'done', 'planned_date', 'doc_template'], 'legend': _(u'Summary')}),
             ('details', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
             ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
         ]
 
     def __init__(self, *args, **kwargs):
         entity = kwargs.pop('entity', None)
+        instance = kwargs.get('instance', None)
         super(ActionForm, self).__init__(*args, **kwargs)
         if entity and not entity.is_single_contact:
             self.fields['contact'].queryset = models.Contact.objects.filter(entity=entity)
         else:
             self.fields['contact'].widget = forms.HiddenInput()
-            
+        
+        if instance and instance.id and instance.type and instance.type.allowed_status.count():
+            default_status = instance.type.default_status
+            choices = [] if default_status else [('', "---------")]
+            self.fields['status'].choices = choices + [(s.id, s.name) for s in instance.type.allowed_status.all()]
+            #self.fields['status'].initial = default_status.id if default_status else None
+        #else:
+        #    self.fields['status'].queryset = forms.HiddenInput()
+        
         doc_templates = getattr(settings, 'SANZA_DOCUMENT_TEMPLATES', None)
         if doc_templates:
             self.fields['contact'].widget = forms.Select(choices=doc_templates)
@@ -267,6 +276,15 @@ class ActionForm(BetterModelForm):
             self.fields["date"].initial = dt.date()
             self.fields["time"].initial = dt.time()
         
+    def clean_status(self):
+        t = self.cleaned_data['type']
+        s = self.cleaned_data['status']
+        if t:
+            allowed_status = ([] if t.default_status else [None]) + list(t.allowed_status.all())
+            if len(allowed_status) > 0 and not (s in allowed_status):
+                raise ValidationError(_(u"This status can't not be used for this action type"))
+        return s
+    
     def clean_planned_date(self):
         d = self.cleaned_data["date"]
         t = self.cleaned_data.get("time", None)

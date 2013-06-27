@@ -15,28 +15,32 @@
 {% endblock %}
 
 {% block doc_header %}
-  {% if contact %}
-  <h2>{% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
+  <h2>
+    {% if contact %}
+    <div class="contact_logo">
+    {% if contact.photo %}
+      <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
+    {% else %}
+      <img src="{{contact.default_logo}}"/>
+    {% endif %}
+    </div>
+    {% if not contact.entity.is_single_contact %}
+      <a class="contact-entity-info">
+        <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
+      </a>
+      {% endif %}
+    {% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
   {% else %}
   <h2>{% trans "Create contact" %}</h2>
   {% endif %}
 
-<h3>
-  {% if not entity.is_single_contact %}
-    {{entity.type.name}}: {{entity.name}}
-{% else %}
-  {% trans "Single contact" %}
-{% endif %}
-</h3>
-{% comment %}
   <h3>
-  {% if entity.id %}
-    {% trans "Entity" %}: <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
+    {% if not entity.is_single_contact %}
+      {{entity.type.name}}: {{entity.name}}
   {% else %}
     {% trans "Single contact" %}
   {% endif %}
   </h3>
-{% endcomment %}
 {% endblock %}
 
 {% block form_buttons %}

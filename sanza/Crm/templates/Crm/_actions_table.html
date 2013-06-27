@@ -8,8 +8,10 @@
     <th>{% trans "Subject" %}</th>
     {% if not contact %}<th>{% trans "Contact" %}</th>{% endif %}
     {% if SANZA_MULTI_USER %}<th>{% trans "In charge" %}</th>{% endif %}
+    <th>{% trans "Status" %}</th>
     <th>{% trans "Number" %}</th>
     <th>{% trans "Amount" %}</th>
+    <th>&nbsp;</th>
     <th>&nbsp;</th>
     <th>&nbsp;</th>
     <th>&nbsp;</th>
@@ -36,19 +38,7 @@
     </td>
     
     <td>{{a.type|default:"&nbsp;"}}</td>
-    <td>{{a.subject}}
-    {% if a.actiondocument %}
-      <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
-        <img src="{% static "fugue/document.png" %}" alt="{% trans "document" %}" %}
-      </a>
-    {% else %}
-      {% if a.type.default_template %}
-      <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
-        <img src="{% static "fugue/document--plus.png" %}" alt="{% trans "add document" %}" %}
-      </a>
-      {% endif %}
-    {% endif %}
-    </td>
+    <td>{{a.subject}}</td>
     
     {% if not contact %}
       {% if a.contact %}
@@ -69,8 +59,22 @@
     {% if SANZA_MULTI_USER %}<td>{{ a.in_charge|default:"&nbsp;" }}</td>{% endif %}
     
     
+    <td>{{a.status|default:'&nbsp;'}}</td>
     <td>{{a.number|default:'&nbsp;'}}</td>
     <td>{{a.amount|default:'&nbsp;'}}</td>
+    <td class="ico-col">
+      {% if a.actiondocument %}
+        <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
+          <img src="{% static "fugue/document.png" %}" alt="{% trans "document" %}" %}
+        </a>
+      {% else %}
+        {% if a.type.default_template %}
+        <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
+          <img src="{% static "fugue/document--plus.png" %}" alt="{% trans "add document" %}" %}
+        </a>
+        {% endif %}
+      {% endif %}
+    </td>
     <td class="note-icon{% if a.detail %} has-note{% endif %}" title="{% trans "Show note" %}">
       {% if a.detail %}
         <div class="action-note" style="display: none">

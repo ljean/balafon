@@ -3,13 +3,7 @@
 
 {% block column_section_data %}
 <div class="column-section-data-title">
-  <div class="contact_logo">
-  {% if contact.photo %}
-    <img src="{{MEDIA_URL}}{{contact.photo_thumbnail}}"/>
-  {% else %}
-    <img src="{{contact.default_logo}}"/>
-  {% endif %}
-  </div>
+  <div class="contact_logo"><img src="{{contact.get_safe_photo}}"/></div>
     
   <div class="contact_info">
     <div>
@@ -25,6 +19,7 @@
     </div>
     <br/>
     <div>
+    <span class="label">{% trans "UPD" %}: {{contact.modified|date:"d/m/Y"}}</span>
     {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
     {% with contact.get_roles as roles %}
       {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}

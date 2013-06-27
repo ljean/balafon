@@ -3,6 +3,11 @@
 
 {% block extra_head %}
 {{ block.super }}
+<style>
+    .doc-header {
+      min-height: 128px;
+    }
+</style>
 <script>
   $(function() {
     var error_index = -1;
@@ -30,16 +35,16 @@
     } else {
       $(".tabbar .tab:first").click();  
     }
-    
-    
   });
 </script>  
 {% endblock %}
 
 {% block document_content %}
   
+  <div class="doc-header">
   {% block doc_header %}
   {% endblock %}
+  </div>
 
   {% if form.errors   %}
   <div class="error-msg">{% trans "The form is not valid." %}</div>
