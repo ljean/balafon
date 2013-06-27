@@ -24,7 +24,7 @@ from django.contrib.messages import api as user_message
 from wkhtmltopdf.views import PDFTemplateView
 from django.template.defaultfilters import slugify
 from django.template.loader import find_template
-from Crm import settings as crm_settings
+from sanza.Crm import settings as crm_settings
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -602,6 +602,7 @@ def add_single_contact(request):
         {
             'contact': contact,
             'form': contact_form,
+            'is_single_contact': True,
         },
         context_instance=RequestContext(request)
     )

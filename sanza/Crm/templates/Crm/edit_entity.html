@@ -9,6 +9,9 @@
   <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
   {% else %}
   <h2>
+    <div class="entity_logo">
+      <img src="{{STATIC_URL}}img/entity.png"/>
+    </div>
     {% if entity.type.is_male %}
       {% trans "NewMale" %} {{entity.type}}
     {% else %}

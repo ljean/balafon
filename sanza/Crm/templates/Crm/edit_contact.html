@@ -27,15 +27,29 @@
       {% endif %}
     {% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
   {% else %}
-  <h2>{% trans "Create contact" %}</h2>
+  <h2>
+    {% if is_single_contact %}
+      <div class="contact_logo">
+        <img src="{{STATIC_URL}}img/single-contact.png"/>
+      </div>
+      {% trans "Create single contact" %}
+    {% else %}
+      <div class="contact_logo">
+        <img src="{{STATIC_URL}}img/contact.png"/>
+      </div>
+      {% trans "Create contact" %}
+    {% endif %}
+  </h2>
   {% endif %}
 
   <h3>
-    {% if not entity.is_single_contact %}
-      {{entity.type.name}}: {{entity.name}}
-  {% else %}
-    {% trans "Single contact" %}
-  {% endif %}
+    {% if contact %}
+      {% if not entity.is_single_contact %}
+        {{entity.type.name}}: {{entity.name}}
+    {% else %}
+      {% trans "Single contact" %}
+    {% endif %}
+    {% endif %}
   </h3>
 {% endblock %}
 

@@ -297,8 +297,6 @@ def export_contacts_as_excel(request):
             wb.save(response)
             return response
         else:
-            messages.add_message(request, messages.ERROR,
-                _(u"{0} actions have been created".format(len(contacts))))
             logger.error(unicode(form.errors))
     raise Http404
 
