@@ -261,7 +261,19 @@ class Contact(TimeStampedModel):
     
     GENDER_MALE = 1
     GENDER_FEMALE = 2
-    GENDER_CHOICE = ((GENDER_MALE, _('Mr')), (GENDER_FEMALE, _('Mrs')))
+    GENDER_COUPLE = 3
+    
+    if settings.ALLOW_COUPLE_GENDER:
+        GENDER_CHOICE = (
+            (GENDER_MALE, _(u'Mr')),
+            (GENDER_FEMALE, _(u'Mrs')),
+            (GENDER_COUPLE, _(u'Mrs and Mr'))
+        )
+    else:
+        GENDER_CHOICE = (
+            (GENDER_MALE, _(u'Mr')),
+            (GENDER_FEMALE, _(u'Mrs')),
+        )
     
     entity = models.ForeignKey(Entity)
     role = models.ManyToManyField(EntityRole, blank=True, null=True, default=None, verbose_name=_(u'Roles'))

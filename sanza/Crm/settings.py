@@ -9,3 +9,5 @@ OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT = getattr(project_settings, 'OPPORTUNITY_DI
 
 def get_default_country():
     return getattr(project_settings, 'SANZA_DEFAULT_COUNTRY', 'France')
+
+ALLOW_COUPLE_GENDER = getattr(project_settings, 'SANZA_ALLOW_COUPLE_GENDER', False)

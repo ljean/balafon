@@ -24,6 +24,7 @@ from django.contrib.messages import api as user_message
 from wkhtmltopdf.views import PDFTemplateView
 from django.template.defaultfilters import slugify
 from django.template.loader import find_template
+from Crm import settings as crm_settings
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -1159,6 +1160,8 @@ def read_contacts(reader, fields, extract_from_email):
                 if c[field]:
                     if c[field] in ('M', 'M.', 'Mr', 'Mr.'):
                         c[field] = models.Contact.GENDER_MALE
+                    elif crm_settings.ALLOW_COUPLE_GENDER and c[field] in ('Mrs and Mr', 'Mme et M.'):
+                        c[field] = models.Contact.GENDER_COUPLE
                     else:
                         c[field] = models.Contact.GENDER_FEMALE
             #Copy value of entity fields with _ rather than . for using it in template
