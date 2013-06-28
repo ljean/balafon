@@ -10,7 +10,12 @@ SEARCH_FORMS = [
             search_forms.EntityNameStartsWithSearchForm,
             search_forms.TypeSearchForm,
             search_forms.RelationshipDateForm,
+         ],
+    ),(
+        _(u'Group'),
+        [
             search_forms.GroupSearchForm,
+            search_forms.GroupSearchFormDropdownWidget,
             search_forms.NotInGroupSearchForm,
         ],
     ),(

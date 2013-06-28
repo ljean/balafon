@@ -183,6 +183,12 @@ class GroupSearchForm(SearchFieldForm):
     _name = 'group'
     _label = _(u'Group')
     
+    def _get_widget(self):
+        return GroupAutoComplete(attrs={
+            'placeholder': _(u'Enter part of the group name'), 'size': '80',
+        })
+    
+    
     def __init__(self, *args, **kwargs):
         super(GroupSearchForm, self).__init__(*args, **kwargs)
         qs = models.Group.objects.all()
@@ -190,12 +196,22 @@ class GroupSearchForm(SearchFieldForm):
             qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
         except:
             qs = qs.order_by('name')
-        field = forms.ModelChoiceField(qs, label=self._label,
-            widget = GroupAutoComplete(attrs={'placeholder': _(u'Enter part of the group name'), 'size': '80'}))
+        kwargs = {}
+        widget = self._get_widget()
+        if widget:
+            kwargs['widget'] = widget
+        field = forms.ModelChoiceField(qs, label=self._label, **kwargs)
         self._add_field(field)
         
     def get_lookup(self):
         return Q(entity__group__id=self._value) | Q(group__id=self._value)
+
+class GroupSearchFormDropdownWidget(GroupSearchForm):
+    _name = 'group_dropdown'
+    _label = _(u'Group (dropdown list)')
+    
+    def _get_widget(self):
+        return None
 
 class NotInGroupSearchForm(SearchFieldForm):
     _name = 'not_in_group'
