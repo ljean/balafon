@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from coop_cms.settings import get_newsletter_templates
 from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
 from sanza.Crm.forms import ModelFormWithCity
+from sanza.Crm import settings as crm_settings
 from datetime import datetime
 from django.template import Context
 from django.template.loader import get_template
@@ -154,7 +155,12 @@ class SubscribeForm(ModelFormWithCity):
             if entity:
                 return Entity.objects.create(name=entity, type=entity_type)
         else:
-            return Entity.objects.create(name=entity, type=None, is_single_contact=True)
+            if crm_settings.ALLOW_SINGLE_CONTACT:
+                return Entity.objects.create(name=entity, type=None, is_single_contact=True)
+            else:
+                entity_type = EntityType.objects.get(id=crm_settings.INDIVIDUAL_ENTITY_ID)
+                entity_name = u"{0} {1}".format(self.cleaned_data['lastname'], self.cleaned_data['firstname'])
+                return Entity.objects.create(name=entity, type=entity_type)
             
     def clean_entity(self):
         entity_type = self.cleaned_data.get('entity_type', None)

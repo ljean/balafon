@@ -18,8 +18,10 @@
             {% for entity_type in SANZA_ENTITY_TYPES %}
                 <li><a href="{% url "crm_create_entity" entity_type.id%}">{{entity_type.name}}</a></li>
             {% endfor %}
+            {% if SANZA_ALLOW_SINGLE_CONTACT %}
                 <li class="separator"></li>
                 <li><a href="{% url "crm_add_single_contact" %}">{% trans "Single contact" %}</a></li>
+            {% endif %}
             </ul>
           </li>
           <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
