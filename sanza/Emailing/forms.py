@@ -160,8 +160,10 @@ class SubscribeForm(ModelFormWithCity):
             if crm_settings.ALLOW_SINGLE_CONTACT:
                 return Entity.objects.create(name=entity, type=None, is_single_contact=True)
             else:
-                entity_type = EntityType.objects.get(id=crm_settings.INDIVIDUAL_ENTITY_ID)
-                entity_name = u"{0} {1}".format(self.cleaned_data['lastname'], self.cleaned_data['firstname'])
+                et_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
+                entity_type = EntityType.objects.get(id=et_id)
+                entity_name = u"{0} {1}".format(
+                    self.cleaned_data['lastname'], self.cleaned_data['firstname'])
                 return Entity.objects.create(name=entity, type=entity_type)
             
     def clean_entity(self):

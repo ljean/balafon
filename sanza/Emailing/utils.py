@@ -44,9 +44,10 @@ def get_emailing_context(emailing, contact):
     links = re.findall('href="(?P<url>.+?)"', html_content)
     
     for link in links:
-        magic_link, _is_new = MagicLink.objects.get_or_create(emailing=emailing, url=link)
-        magic_url = settings.COOP_CMS_SITE_PREFIX+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
-        html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
+        if not link.lower().startswith('mailto:'): #mailto links are not magic
+            magic_link, _is_new = MagicLink.objects.get_or_create(emailing=emailing, url=link)
+            magic_url = settings.COOP_CMS_SITE_PREFIX+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
+            html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
         
     unregister_url = settings.COOP_CMS_SITE_PREFIX+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
     

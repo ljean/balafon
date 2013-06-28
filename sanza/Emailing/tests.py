@@ -12,6 +12,7 @@ from django.core import management
 from django.core import mail
 from django.conf import settings
 from coop_cms import tests as coop_cms_tests
+from captcha.models import CaptchaStore
 
 class BaseTestCase(TestCase):
 
@@ -214,7 +215,7 @@ class SendEmailingTest(BaseTestCase):
         
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
+            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a><a href="mailto:me@me.fr">mailme</a></p>',
             'template': 'test/newsletter_contact.html'
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
@@ -264,6 +265,9 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find(viewonline_url)>=0)
             unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse('emailing_unregister', args=[emailing.id, contact.uuid])
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url)>=0)
+            
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
             
             #check magic links
             self.assertTrue(MagicLink.objects.count()>0)
@@ -606,6 +610,9 @@ class SubscribeTest(TestCase):
         self.group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
         self.group3 = mommy.make(models.Group, name="GHI", subscribe_form=False)
         
+        if not settings.SANZA_ALLOW_SINGLE_CONTACT:
+            settings.SANZA_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
+        
         default_country = mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
     
     def test_view_subscribe_newsletter(self):
@@ -625,6 +632,7 @@ class SubscribeTest(TestCase):
             'firstname': 'Pierre',
             'groups': str(self.group1.id),
         }
+        self._patch_with_captcha(url, data)
         
         self.assertEqual(models.Contact.objects.count(), 0)
         response = self.client.post(url, data=data, follow=False)
@@ -644,6 +652,7 @@ class SubscribeTest(TestCase):
             'groups': str(self.group1.id),
             'email': 'pdupond@apidev.fr',
         }
+        self._patch_with_captcha(url, data)
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
@@ -683,6 +692,7 @@ class SubscribeTest(TestCase):
             'email': 'pdupond@apidev.fr',
             'groups': [self.group1.id, self.group2.id],
         }
+        self._patch_with_captcha(url, data)
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
@@ -722,6 +732,7 @@ class SubscribeTest(TestCase):
             'email': 'pdupond@apidev.fr',
             'groups': [self.group1.id, self.group3.id],
         }
+        self._patch_with_captcha(url, data)
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(200, response.status_code)
@@ -739,6 +750,16 @@ class SubscribeTest(TestCase):
         #unregister_url = reverse('emailing_unregister', args=[0, contact.uuid])
         #self.assertContains(response, unregister_url)
         
+    def _patch_with_captcha(self, url, data):
+        self.failUnlessEqual(CaptchaStore.objects.count(), 0)
+        self.client.get(url)
+        self.failUnlessEqual(CaptchaStore.objects.count(), 1)
+        captcha = CaptchaStore.objects.all()[0]
+        data.update({
+            'captcha_0': captcha.hashkey,
+            'captcha_1': captcha.response
+        })
+    
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
         url = reverse("emailing_subscribe_newsletter")
         
@@ -750,6 +771,8 @@ class SubscribeTest(TestCase):
             'accept_newsletter': accept_newsletter,
             'accept_3rdparty': accept_3rdparty,
         }
+        
+        self._patch_with_captcha(url, data)
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
