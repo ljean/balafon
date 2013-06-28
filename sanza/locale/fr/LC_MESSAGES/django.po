@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-18 00:19+0200\n"
-"PO-Revision-Date: 2013-06-24 14:47+0100\n"
+"POT-Creation-Date: 2013-06-28 15:17+0200\n"
+"PO-Revision-Date: 2013-06-28 15:21+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,701 +16,714 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.5\n"
 
-#: .\config.py:7 .\Crm\forms.py:302 .\Crm\models.py:582
-#: .\Crm\templates\Crm\_section_same_as.html.py:10
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:64
-#: .\Crm\templates\Crm\edit_action.html.py:17
-#: .\Emailing\templates\Emailing\_section_contacts.html.py:13
+#: config.py:7 Crm/forms.py:320 Crm/models.py:647
+#: Crm/templates/Crm/_section_same_as.html:12
+#: Crm/templates/Crm/confirm_contacts_import.html:64
+#: Crm/templates/Crm/edit_action.html:31
+#: Emailing/templates/Emailing/_section_contacts.html:13
 msgid "Entity"
 msgstr "Entité"
 
-#: .\config.py:17
+#: config.py:15 Crm/search_forms.py:184
+#: Search/templates/Search/_section_qs_groups.html:8
+msgid "Group"
+msgstr "Groupe"
+
+#: config.py:22
 msgid "Location"
 msgstr "Lieu"
 
-#: .\config.py:25 .\Crm\templates\Crm\_section_all_entities.html.py:12
-#: .\Crm\templates\Crm\_section_contacts.html.py:4
-#: .\Emailing\templates\Emailing\_section_contacts.html.py:7
-#: .\Search\views.py:63
-#: .\Search\templates\Search\_section_qs_contacts.html.py:9
-#: .\Search\templates\Search\_section_qs_entities.html.py:8
-#: .\Search\templates\Search\_section_search_results.html.py:16
-#: .\templates\sanza\_navigation.html.py:9
+#: config.py:30 Crm/templates/Crm/_section_all_entities.html:12
+#: Crm/templates/Crm/_section_contacts.html:4
+#: Emailing/templates/Emailing/_section_contacts.html:7 Search/views.py:63
+#: Search/templates/Search/_section_qs_contacts.html:9
+#: Search/templates/Search/_section_qs_entities.html:8
+#: Search/templates/Search/_section_search_results.html:16
+#: templates/sanza/_navigation.html:9
 msgid "Contacts"
 msgstr "Contacts"
 
-#: .\config.py:44 .\Crm\utils.py:112
-#: .\Crm\templates\Crm\_section_actions.html.py:11
-#: .\Crm\templates\Crm\_section_opportunities.html.py:24
-#: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:15
+#: config.py:49 Crm/utils.py:112 Crm/views.py:736
+#: Crm/templates/Crm/_section_actions.html:11
+#: Crm/templates/Crm/_section_opportunities.html:24
+#: Emailing/templates/Emailing/subscribe_notification_email.txt:15
 msgid "Actions"
 msgstr "Actions"
 
-#: .\config.py:54 .\Crm\templates\Crm\_section_opportunities.html.py:5
-#: .\templates\sanza\_navigation.html.py:10
+#: config.py:62 Crm/templates/Crm/_section_opportunities.html:5
+#: templates/sanza/_navigation.html:10
 msgid "Opportunities"
 msgstr "Dossiers"
 
-#: .\config.py:71 .\templates\sanza\_navigation.html.py:31
+#: config.py:79 templates/sanza/_navigation.html:33
 msgid "Admin"
 msgstr "Admin"
 
-#: .\config.py:79
+#: config.py:87
 msgid "Options"
 msgstr "Options"
 
-#: .\Crm\coop_bar_cfg.py:13
+#: Crm/coop_bar_cfg.py:13
 msgid "Pdf"
 msgstr "Pdf"
 
-#: .\Crm\forms.py:17
+#: Crm/forms.py:17
 msgid "Group name"
 msgstr "Nom du groupe"
 
-#: .\Crm\forms.py:18 .\Crm\forms.py:33
+#: Crm/forms.py:18 Crm/forms.py:33
 msgid "name of a group"
 msgstr "nom d'un groupe"
 
-#: .\Crm\forms.py:28
+#: Crm/forms.py:28
 msgid "The entity already belong to group {0}"
 msgstr "L'entité appartient déjà au groupe {0}"
 
-#: .\Crm\forms.py:43
+#: Crm/forms.py:43
 msgid "The contact already belong to group {0}"
 msgstr "Le contact appartient déjà au groupe {0}"
 
-#: .\Crm\forms.py:53
+#: Crm/forms.py:53
 msgid "Enter a description for your group"
 msgstr "Entrez une description pour le groupe"
 
-#: .\Crm\forms.py:59
+#: Crm/forms.py:59
 msgid "Enter a name for your group"
 msgstr "Entrez un nom pour le groupe"
 
-#: .\Crm\forms.py:79
+#: Crm/forms.py:79
 msgid "A group with this name already exists"
 msgstr "Un groupe avec ce nom existe déjà"
 
-#: .\Crm\forms.py:88 .\Crm\models.py:221
-#: .\Crm\templates\Crm\_section_my_groups.html.py:20
+#: Crm/forms.py:88 Crm/models.py:237
+#: Crm/templates/Crm/_section_my_groups.html:20
 msgid "entities"
 msgstr "entités"
 
-#: .\Crm\forms.py:93 .\Crm\models.py:409
-#: .\Crm\templates\Crm\_section_my_groups.html.py:21
-#: .\Search\templates\Search\_section_search_results.html.py:6
+#: Crm/forms.py:93 Crm/models.py:455
+#: Crm/templates/Crm/_section_my_groups.html:21
+#: Search/templates/Search/_section_search_results.html:6
 msgid "contacts"
 msgstr "contacts"
 
-#: .\Crm\forms.py:97 .\Crm\search_forms.py:79
+#: Crm/forms.py:97 Crm/search_forms.py:79
 msgid "Country"
 msgstr "Pays"
 
-#: .\Crm\forms.py:109 .\Crm\forms.py:172 .\Crm\forms.py:193
-#: .\Crm\search_forms.py:49 .\Emailing\forms.py:98 .\Profile\forms.py:15
+#: Crm/forms.py:109 Crm/forms.py:172 Crm/forms.py:193 Crm/search_forms.py:49
+#: Emailing/forms.py:100 Profile/forms.py:15
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
-#: .\Crm\forms.py:159
+#: Crm/forms.py:159
 msgid "You must enter a valid zip code for selecting a new city"
 msgstr ""
 "Veuillez entrer un code postal valide ou au minimum le numéro de département"
 
-#: .\Crm\forms.py:171 .\Crm\forms.py:192 .\Crm\search_forms.py:43
-#: .\Crm\templates\Crm\_section_all_entities.html.py:13 .\Emailing\forms.py:97
-#: .\Profile\forms.py:14
-#: .\Search\templates\Search\_section_qs_cities.html.py:8
-#: .\Search\templates\Search\_section_qs_contacts.html.py:10
-#: .\Search\templates\Search\_section_qs_entities.html.py:8
+#: Crm/forms.py:171 Crm/forms.py:192 Crm/search_forms.py:43
+#: Crm/templates/Crm/_section_all_entities.html:13 Emailing/forms.py:99
+#: Profile/forms.py:14 Search/templates/Search/_section_qs_cities.html:8
+#: Search/templates/Search/_section_qs_contacts.html:10
+#: Search/templates/Search/_section_qs_entities.html:8
 msgid "City"
 msgstr "Ville"
 
-#: .\Crm\forms.py:182 .\Crm\forms.py:205 .\Crm\models.py:18
-#: .\Crm\templates\Crm\_section_my_groups.html.py:14
-#: .\Crm\templates\Crm\_section_opportunities.html.py:21
-#: .\Crm\templates\Crm\_section_same_as.html.py:9 .\Profile\forms.py:35
-#: .\Search\templates\Search\_section_qs_entities.html.py:8
+#: Crm/forms.py:182 Crm/forms.py:205 Crm/models.py:19
+#: Crm/templates/Crm/_section_my_groups.html:14
+#: Crm/templates/Crm/_section_opportunities.html:21
+#: Crm/templates/Crm/_section_same_as.html:11 Profile/forms.py:35
+#: Search/templates/Search/_section_qs_entities.html:8
 msgid "Name"
 msgstr "Nom"
 
-#: .\Crm\forms.py:183 .\Crm\forms.py:207 .\Profile\forms.py:36
+#: Crm/forms.py:183 Crm/forms.py:207 Profile/forms.py:36
 msgid "Phone / Web"
 msgstr "Téléphone / Web"
 
-#: .\Crm\forms.py:184 .\Crm\forms.py:208 .\Profile\forms.py:37
+#: Crm/forms.py:184 Crm/forms.py:208 Profile/forms.py:37
 msgid "Address"
 msgstr "Adresse"
 
-#: .\Crm\forms.py:185 .\Crm\forms.py:210
+#: Crm/forms.py:185 Crm/forms.py:210
 msgid "Notes"
 msgstr "Notes"
 
-#: .\Crm\forms.py:186
+#: Crm/forms.py:186
 msgid "Logo"
 msgstr "Logo"
 
-#: .\Crm\forms.py:200
+#: Crm/forms.py:200
 msgid "enter notes about the contact"
 msgstr "Ajouter une note sur ce contact"
 
-#: .\Crm\forms.py:202
+#: Crm/forms.py:202
 msgid "Select roles"
 msgstr "Sélectionnez les rôles de ce contact"
 
-#: .\Crm\forms.py:206
+#: Crm/forms.py:206
 msgid "Job"
 msgstr "Profession"
 
-#: .\Crm\forms.py:209 .\Profile\forms.py:38
+#: Crm/forms.py:209 Profile/forms.py:38
 msgid "Relationship"
 msgstr "Relation"
 
-#: .\Crm\forms.py:211
+#: Crm/forms.py:211
 msgid "Photo"
 msgstr "Photo"
 
-#: .\Crm\forms.py:232 .\Crm\models.py:525 .\Search\forms.py:456
+#: Crm/forms.py:232 Crm/models.py:585 Search/forms.py:456
 msgid "planned date"
 msgstr "date prévue"
 
-#: .\Crm\forms.py:233 .\Search\forms.py:457
+#: Crm/forms.py:233 Search/forms.py:457
 msgid "planned time"
 msgstr "heure prévue"
 
-#: .\Crm\forms.py:240 .\Crm\forms.py:283
+#: Crm/forms.py:240 Crm/forms.py:301
 msgid "Summary"
 msgstr "Résumé"
 
-#: .\Crm\forms.py:241
+#: Crm/forms.py:241
 msgid "Details"
 msgstr "détails"
 
-#: .\Crm\forms.py:242 .\Crm\forms.py:284
+#: Crm/forms.py:242 Crm/forms.py:302
 msgid "Display"
 msgstr "Affichage"
 
-#: .\Crm\forms.py:261 .\Search\forms.py:475
+#: Crm/forms.py:270 Search/forms.py:475
 msgid "Enter the name of an opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: .\Crm\forms.py:263 .\Crm\forms.py:289
+#: Crm/forms.py:272 Crm/forms.py:307
 msgid "enter details"
 msgstr "plus de détails"
 
-#: .\Crm\forms.py:307
+#: Crm/forms.py:285
+msgid "This status can't not be used for this action type"
+msgstr "Cet état ne peut pas être utilisé pour ce type d'action"
+
+#: Crm/forms.py:325
 msgid "Enter the name of an entity"
 msgstr "Entrez le nom d'une entité"
 
-#: .\Crm\forms.py:314
+#: Crm/forms.py:332
 msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
-#: .\Crm\forms.py:323 .\Crm\forms.py:327 .\Crm\forms.py:338
-#: .\Crm\models.py:583 .\Crm\templates\Crm\_actions_table.html.py:9
-#: .\Crm\templates\Crm\_section_contacts.html.py:10
-#: .\Crm\templates\Crm\edit_action.html.py:19 .\Emailing\forms.py:243
-#: .\Emailing\templates\Emailing\_section_contacts.html.py:13
-#: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:3
+#: Crm/forms.py:341 Crm/forms.py:345 Crm/forms.py:356 Crm/models.py:648
+#: Crm/templates/Crm/_actions_table.html:9
+#: Crm/templates/Crm/_section_contacts.html:10
+#: Crm/templates/Crm/edit_action.html:33 Emailing/forms.py:253
+#: Emailing/templates/Emailing/_section_contacts.html:13
+#: Emailing/templates/Emailing/subscribe_notification_email.txt:3
 msgid "Contact"
 msgstr "Contact"
 
-#: .\Crm\forms.py:326
+#: Crm/forms.py:344
 msgid "Enter the name of a contact"
 msgstr "Entrez le nom d'un contact"
 
-#: .\Crm\forms.py:334
+#: Crm/forms.py:352
 msgid "The contact does'nt exist"
 msgstr "Le contact n'existe pas"
 
-#: .\Crm\forms.py:353
+#: Crm/forms.py:371
 msgid "Invalid contact"
 msgstr "Contact invalide"
 
-#: .\Crm\forms.py:356
+#: Crm/forms.py:374
 msgid "Contact does not exist"
 msgstr "Le contact n'existe pas"
 
-#: .\Crm\forms.py:365
+#: Crm/forms.py:383
 msgid "give details bout the action"
 msgstr "plus de détail à propos de cette action"
 
-#: .\Crm\forms.py:438
+#: Crm/forms.py:456
 msgid "The created entities will be added to the selected groups"
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés"
 
-#: .\Crm\forms.py:445
+#: Crm/forms.py:463
 msgid "Invalid separator {0}"
 msgstr "Séparateur invalide {0}"
 
-#: .\Crm\forms.py:450
+#: Crm/forms.py:468
 msgid "Default department"
 msgstr "Département par défaut"
 
-#: .\Crm\forms.py:452
+#: Crm/forms.py:470
 msgid "The city in red will be created with this department as parent"
 msgstr "Les villes en rouge seront crées avec ce département comme parent"
 
-#: .\Crm\forms.py:461
+#: Crm/forms.py:479
 msgid "Please enter a valid code"
 msgstr "Veuillez entrer un code valide"
 
-#: .\Crm\models.py:34
+#: Crm/models.py:35
 msgid "Male"
 msgstr "Masculin"
 
-#: .\Crm\models.py:34
+#: Crm/models.py:35
 msgid "Female"
 msgstr "Féminin"
 
-#: .\Crm\models.py:37 .\Crm\models.py:253
+#: Crm/models.py:38 Crm/models.py:281
 msgid "gender"
 msgstr "civilité"
 
-#: .\Crm\models.py:38
+#: Crm/models.py:39
 msgid "order"
 msgstr "ordre"
 
-#: .\Crm\models.py:39 .\Crm\models.py:110
+#: Crm/models.py:40 Crm/models.py:111
 msgid "logo"
 msgstr "logo"
 
-#: .\Crm\models.py:40 .\Crm\models.py:416 .\Crm\models.py:501
+#: Crm/models.py:41 Crm/models.py:462 Crm/models.py:560
 msgid "Subscribe form"
 msgstr "Affiché sur le formulaire d'inscription"
 
-#: .\Crm\models.py:41
+#: Crm/models.py:42
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: .\Crm\models.py:47 .\Crm\models.py:660
+#: Crm/models.py:48 Crm/models.py:726
 msgid "entity type"
 msgstr "type d'entité"
 
-#: .\Crm\models.py:48
+#: Crm/models.py:49
 msgid "entity types"
 msgstr "types d'entité"
 
-#: .\Crm\models.py:53 .\Crm\models.py:107
+#: Crm/models.py:54 Crm/models.py:108
 msgid "type"
 msgstr "type"
 
-#: .\Crm\models.py:56
+#: Crm/models.py:57
 msgid "zone type"
 msgstr "type de zone"
 
-#: .\Crm\models.py:57
+#: Crm/models.py:58
 msgid "zone types"
 msgstr "types de zone"
 
-#: .\Crm\models.py:79
+#: Crm/models.py:80
 msgid "code"
 msgstr "code"
 
-#: .\Crm\models.py:82
+#: Crm/models.py:83
 msgid "zone"
 msgstr "zone"
 
-#: .\Crm\models.py:83
+#: Crm/models.py:84
 msgid "zones"
 msgstr "zones"
 
-#: .\Crm\models.py:88 .\Crm\models.py:423
+#: Crm/models.py:89 Crm/models.py:473
 msgid "group"
 msgstr "groupe"
 
-#: .\Crm\models.py:91 .\Crm\models.py:123 .\Crm\models.py:280
+#: Crm/models.py:92 Crm/models.py:124 Crm/models.py:308
 msgid "city"
 msgstr "ville"
 
-#: .\Crm\models.py:92
+#: Crm/models.py:93
 msgid "cities"
 msgstr "villes"
 
-#: .\Crm\models.py:105 .\Crm\models.py:412 .\Crm\models.py:453
-#: .\Crm\models.py:586 .\Crm\models.py:655 .\Search\models.py:10
-#: .\Search\models.py:21
+#: Crm/models.py:106 Crm/models.py:458 Crm/models.py:503 Crm/models.py:651
+#: Crm/models.py:721 Search/models.py:10 Search/models.py:21
 msgid "name"
 msgstr "nom"
 
-#: .\Crm\models.py:106 .\Crm\models.py:413
+#: Crm/models.py:107 Crm/models.py:459
 msgid "description"
 msgstr "description"
 
-#: .\Crm\models.py:108
+#: Crm/models.py:109
 msgid "relationship date"
 msgstr "date de mise en relation"
 
-#: .\Crm\models.py:112 .\Crm\models.py:268
+#: Crm/models.py:113 Crm/models.py:296
 msgid "phone"
 msgstr "téléphone"
 
-#: .\Crm\models.py:113
+#: Crm/models.py:114
 msgid "fax"
 msgstr "fax"
 
-#: .\Crm\models.py:114 .\Crm\models.py:270
+#: Crm/models.py:115 Crm/models.py:298
 msgid "email"
 msgstr "email"
 
-#: .\Crm\models.py:115
+#: Crm/models.py:116
 msgid "web site"
 msgstr "site Internet"
 
-#: .\Crm\models.py:117 .\Crm\models.py:275
+#: Crm/models.py:118 Crm/models.py:303
 msgid "address"
 msgstr "adresse"
 
-#: .\Crm\models.py:118 .\Crm\models.py:276
+#: Crm/models.py:119 Crm/models.py:304
 msgid "address 2"
 msgstr "adresse 2"
 
-#: .\Crm\models.py:119 .\Crm\models.py:277
+#: Crm/models.py:120 Crm/models.py:305
 msgid "address 3"
 msgstr "adresse 3"
 
-#: .\Crm\models.py:121 .\Crm\models.py:278 .\Emailing\forms.py:118
+#: Crm/models.py:122 Crm/models.py:306 Emailing/forms.py:121
 msgid "zip code"
 msgstr "code postal"
 
-#: .\Crm\models.py:122 .\Crm\models.py:279
+#: Crm/models.py:123 Crm/models.py:307
 msgid "cedex"
 msgstr "cedex"
 
-#: .\Crm\models.py:125 .\Crm\models.py:282
+#: Crm/models.py:126 Crm/models.py:310
 msgid "notes"
 msgstr "notes"
 
-#: .\Crm\models.py:129
+#: Crm/models.py:130
 msgid "is single contact"
 msgstr "est un particulier"
 
-#: .\Crm\models.py:220
+#: Crm/models.py:236
 msgid "entity"
 msgstr "entité"
 
-#: .\Crm\models.py:226
+#: Crm/models.py:242
 msgid "entity role"
 msgstr "rôle"
 
-#: .\Crm\models.py:227
+#: Crm/models.py:243
 msgid "entity roles"
 msgstr "rôles"
 
-#: .\Crm\models.py:237
+#: Crm/models.py:253
 msgid "Same As: {0}"
 msgstr "Même personne que {0}"
 
-#: .\Crm\models.py:240
+#: Crm/models.py:256
 msgid "same as"
 msgstr "même personne"
 
-#: .\Crm\models.py:241
+#: Crm/models.py:257
 msgid "sames as"
 msgstr "même personne"
 
-#: .\Crm\models.py:248
+#: Crm/models.py:268 Crm/models.py:274
 msgid "Mr"
 msgstr "M."
 
-#: .\Crm\models.py:248
+#: Crm/models.py:269 Crm/models.py:275
 msgid "Mrs"
 msgstr "Mme"
 
-#: .\Crm\models.py:251 .\Crm\templates\Crm\_section_contacts.html.py:11
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:69
+#: Crm/models.py:270
+msgid "Mrs and Mr"
+msgstr "Mme et M."
+
+#: Crm/models.py:279 Crm/templates/Crm/_section_contacts.html:11
+#: Crm/templates/Crm/confirm_contacts_import.html:69
 msgid "Roles"
 msgstr "Rôles"
 
-#: .\Crm\models.py:254
+#: Crm/models.py:282
 msgid "title"
 msgstr "titre"
 
-#: .\Crm\models.py:255
+#: Crm/models.py:283
 msgid "last name"
 msgstr "nom"
 
-#: .\Crm\models.py:256
+#: Crm/models.py:284
 msgid "first name"
 msgstr "prénom"
 
-#: .\Crm\models.py:257
+#: Crm/models.py:285
 msgid "nickname"
 msgstr "surnom"
 
-#: .\Crm\models.py:259
+#: Crm/models.py:287
 msgid "photo"
 msgstr "photo"
 
-#: .\Crm\models.py:260
+#: Crm/models.py:288
 msgid "birth date"
 msgstr "date de naissance"
 
-#: .\Crm\models.py:261
+#: Crm/models.py:289
 msgid "job"
 msgstr "profession"
 
-#: .\Crm\models.py:263
+#: Crm/models.py:291
 msgid "main contact"
 msgstr "contact principal"
 
-#: .\Crm\models.py:264
+#: Crm/models.py:292
 msgid "accept newsletter"
 msgstr "accepte les newsletter"
 
-#: .\Crm\models.py:265
+#: Crm/models.py:293
 msgid "accept third parties"
 msgstr "accepte les offres partenaires"
 
-#: .\Crm\models.py:266
+#: Crm/models.py:294
 msgid "email verified"
 msgstr "email vérifié"
 
-#: .\Crm\models.py:269
+#: Crm/models.py:297
 msgid "mobile"
 msgstr "portable"
 
-#: .\Crm\models.py:286
+#: Crm/models.py:314
 msgid "has left"
 msgstr "a quitté"
 
-#: .\Crm\models.py:386
+#: Crm/models.py:432
 msgid "{1}{0.firstname}{0.lastname}"
 msgstr "{1}{0.firstname} {0.lastname}"
 
-#: .\Crm\models.py:388
+#: Crm/models.py:434
 msgid "{1}{0.firstname} {0.lastname}"
 msgstr "{1}{0.firstname} {0.lastname}"
 
-#: .\Crm\models.py:408
-#: .\Search\templates\Search\_section_search_results.html.py:6
+#: Crm/models.py:454 Search/templates/Search/_section_search_results.html:6
 msgid "contact"
 msgstr "contact"
 
-#: .\Crm\models.py:417
+#: Crm/models.py:463
 msgid "This group will be proposed on the public subscribe form"
 msgstr "Ce groupe sera proposé sur le formulaire d'inscription public"
 
-#: .\Crm\models.py:424 .\Crm\models.py:662
+#: Crm/models.py:474 Crm/models.py:728
 msgid "groups"
 msgstr "groupes"
 
-#: .\Crm\models.py:430 .\Crm\models.py:431
+#: Crm/models.py:480 Crm/models.py:481
 msgid "opportunity status"
 msgstr "Etats d'un dossier"
 
-#: .\Crm\models.py:436
+#: Crm/models.py:486
 msgid "opportunity type"
 msgstr "type de dossier"
 
-#: .\Crm\models.py:437
+#: Crm/models.py:487
 msgid "opportunity types"
 msgstr "types de dossier"
 
-#: .\Crm\models.py:445
+#: Crm/models.py:495
 msgid "low"
 msgstr "basse"
 
-#: .\Crm\models.py:446
+#: Crm/models.py:496
 msgid "medium"
 msgstr "moyenne"
 
-#: .\Crm\models.py:447
+#: Crm/models.py:497
 msgid "high"
 msgstr "haute"
 
-#: .\Crm\models.py:456 .\Crm\models.py:527
+#: Crm/models.py:506 Crm/models.py:587
 msgid "detail"
 msgstr "détail"
 
-#: .\Crm\models.py:458
+#: Crm/models.py:508
 msgid "probability"
 msgstr "probabilité"
 
-#: .\Crm\models.py:460 .\Crm\models.py:537
+#: Crm/models.py:510 Crm/models.py:597
 msgid "amount"
 msgstr "montant"
 
-#: .\Crm\models.py:462
+#: Crm/models.py:512
 msgid "closed"
 msgstr "fermé"
 
-#: .\Crm\models.py:464
+#: Crm/models.py:514
 msgid "starting date"
 msgstr "date de début"
 
-#: .\Crm\models.py:465
+#: Crm/models.py:515
 msgid "closing date"
 msgstr "date de fin"
 
-#: .\Crm\models.py:467 .\Crm\models.py:535
+#: Crm/models.py:517 Crm/models.py:595
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: .\Crm\models.py:490
+#: Crm/models.py:540
 msgid "opportunity"
 msgstr "dossier"
 
-#: .\Crm\models.py:491
+#: Crm/models.py:541
 msgid "opportunities"
 msgstr "dossiers"
 
-#: .\Crm\models.py:494 .\Crm\models.py:590
+#: Crm/models.py:544 Crm/models.py:551 Crm/models.py:655
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
-#: .\Crm\models.py:496
+#: Crm/models.py:546
 msgid "action set"
 msgstr "groupe d'action"
 
-#: .\Crm\models.py:497
+#: Crm/models.py:547
 msgid "action sets"
 msgstr "groupes d'action"
 
-#: .\Crm\models.py:502
+#: Crm/models.py:553 Crm/models.py:554
+msgid "action status"
+msgstr "état d'une action"
+
+#: Crm/models.py:561
 msgid "This action type will be proposed on the public subscribe form"
 msgstr "Ce type d'action sera proposé sur le formulaire d'inscription public"
 
-#: .\Crm\models.py:504 .\Crm\models.py:505 .\Crm\models.py:538
+#: Crm/models.py:563 Crm/models.py:564 Crm/models.py:598
 msgid "number"
 msgstr "numéro"
 
-#: .\Crm\models.py:506
+#: Crm/models.py:565
 msgid "document template"
 msgstr "Modèle de document"
 
-#: .\Crm\models.py:509
+#: Crm/models.py:570
 msgid "action type"
 msgstr "type d'action"
 
-#: .\Crm\models.py:510
+#: Crm/models.py:571
 msgid "action types"
 msgstr "types d'action"
 
-#: .\Crm\models.py:518
+#: Crm/models.py:578
 msgid "low priority"
 msgstr "priorité basse"
 
-#: .\Crm\models.py:519
+#: Crm/models.py:579
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: .\Crm\models.py:520
+#: Crm/models.py:580
 msgid "high priority"
 msgstr "priorité haute"
 
-#: .\Crm\models.py:524
+#: Crm/models.py:584
 msgid "subject"
 msgstr "sujet"
 
-#: .\Crm\models.py:528
+#: Crm/models.py:588
 msgid "priority"
 msgstr "priorité"
 
-#: .\Crm\models.py:531 .\Crm\templates\Crm\_actions_table.html.py:21
+#: Crm/models.py:591 Crm/templates/Crm/_actions_table.html:23
 msgid "done"
 msgstr "réalisé"
 
-#: .\Crm\models.py:532
+#: Crm/models.py:592
 msgid "done date"
 msgstr "date de réalisation"
 
-#: .\Crm\models.py:533
+#: Crm/models.py:593
 msgid "in charge"
 msgstr "en charge"
 
-#: .\Crm\models.py:536
+#: Crm/models.py:596
 msgid "archived"
 msgstr "archivé"
 
-#: .\Crm\models.py:538
+#: Crm/models.py:598
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: .\Crm\models.py:557
+#: Crm/models.py:618
 msgid "content"
 msgstr "contenu"
 
-#: .\Crm\models.py:559 .\Search\forms.py:451
+#: Crm/models.py:620 Search/forms.py:451
 msgid "template"
 msgstr "Modèle"
 
-#: .\Crm\models.py:587
+#: Crm/models.py:652
 msgid "label"
 msgstr "libellé"
 
-#: .\Crm\models.py:588
+#: Crm/models.py:653
 msgid "model"
 msgstr "modèle"
 
-#: .\Crm\models.py:589
+#: Crm/models.py:654
 msgid "widget"
 msgstr "widget"
 
-#: .\Crm\models.py:591
+#: Crm/models.py:656
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: .\Crm\models.py:592
+#: Crm/models.py:657
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: .\Crm\models.py:595
+#: Crm/models.py:660
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: .\Crm\models.py:604 .\Crm\models.py:610
+#: Crm/models.py:669 Crm/models.py:675
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: .\Crm\models.py:605
+#: Crm/models.py:670
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: .\Crm\models.py:611 .\Search\models.py:33
+#: Crm/models.py:676 Search/models.py:33
 msgid "value"
 msgstr "valeur"
 
-#: .\Crm\models.py:614
+#: Crm/models.py:679
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: .\Crm\models.py:615
+#: Crm/models.py:680
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: .\Crm\models.py:622
+#: Crm/models.py:687
 msgid "entity custom field value"
 msgstr "cal"
 
-#: .\Crm\models.py:623
+#: Crm/models.py:688
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: .\Crm\models.py:632
+#: Crm/models.py:697
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: .\Crm\models.py:633
+#: Crm/models.py:698
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: .\Crm\models.py:646
+#: Crm/models.py:712
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: .\Crm\models.py:647
+#: Crm/models.py:713
 msgid "Coma"
 msgstr "Virgule"
 
-#: .\Crm\models.py:653
+#: Crm/models.py:719
 msgid "import file"
 msgstr "fichier d'import"
 
-#: .\Crm\models.py:654
+#: Crm/models.py:720
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: .\Crm\models.py:656
+#: Crm/models.py:722
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -718,568 +731,576 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: .\Crm\models.py:657
+#: Crm/models.py:723
 msgid "imported by"
 msgstr "importé par"
 
-#: .\Crm\models.py:661
+#: Crm/models.py:727
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: .\Crm\models.py:663
+#: Crm/models.py:729
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: .\Crm\models.py:664
+#: Crm/models.py:730
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: .\Crm\models.py:670
+#: Crm/models.py:736
 msgid "contact import"
 msgstr "import de contacts"
 
-#: .\Crm\models.py:671
+#: Crm/models.py:737
 msgid "contact imports"
 msgstr "imports de contacts"
 
-#: .\Crm\search_forms.py:16
+#: Crm/search_forms.py:16
 msgid "Entity name"
 msgstr "Nom de l'entité"
 
-#: .\Crm\search_forms.py:21
+#: Crm/search_forms.py:21
 msgid "Enter a part of the name of the searched entities"
 msgstr "Entrez une partie du nom"
 
-#: .\Crm\search_forms.py:29
+#: Crm/search_forms.py:29
 msgid "Entity name starts with"
 msgstr "Nom de l'entité commence par"
 
-#: .\Crm\search_forms.py:34
+#: Crm/search_forms.py:34
 msgid "Enter the beginning of the name of the searched entities"
 msgstr "Entrez le début du nom des entités recherchés"
 
-#: .\Crm\search_forms.py:65
+#: Crm/search_forms.py:65
 msgid "Department"
 msgstr "Département"
 
-#: .\Crm\search_forms.py:72
+#: Crm/search_forms.py:72
 msgid "Region"
 msgstr "Région"
 
-#: .\Crm\search_forms.py:91
+#: Crm/search_forms.py:91
 msgid "Action in progress"
 msgstr "Action en cours"
 
-#: .\Crm\search_forms.py:102
+#: Crm/search_forms.py:102
 msgid "Action by done date"
 msgstr "Action réalisée pendant la période"
 
-#: .\Crm\search_forms.py:111
+#: Crm/search_forms.py:111
 msgid "Action by planned date"
 msgstr "Action planifiée pendant la période"
 
-#: .\Crm\search_forms.py:120
+#: Crm/search_forms.py:120
 msgid "Action by user"
 msgstr "Action par nom de contact"
 
-#: .\Crm\search_forms.py:133
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:64
+#: Crm/search_forms.py:133
+msgid "Action with amount greater or equal to"
+msgstr "Action avec un montat supérieur ou égal à"
+
+#: Crm/search_forms.py:145
+msgid "Action with amount less than"
+msgstr "Action avec un montat inférieur à"
+
+#: Crm/search_forms.py:157
+msgid "Action by status"
+msgstr "Action par état"
+
+#: Crm/search_forms.py:171 Crm/templates/Crm/confirm_contacts_import.html:64
 msgid "Entity type"
 msgstr "Type d'entité"
 
-#: .\Crm\search_forms.py:146
-#: .\Search\templates\Search\_section_qs_groups.html.py:8
-msgid "Group"
-msgstr "Groupe"
-
-#: .\Crm\search_forms.py:156 .\Crm\search_forms.py:174
+#: Crm/search_forms.py:188 Crm/search_forms.py:228
 msgid "Enter part of the group name"
 msgstr "Entrez une partie du nom du groupe"
 
-#: .\Crm\search_forms.py:164
+#: Crm/search_forms.py:211
+msgid "Group (dropdown list)"
+msgstr "Groupe (liste déroulante)"
+
+#: Crm/search_forms.py:218
 msgid "Not in group"
 msgstr "N'appartient pas au groupe"
 
-#: .\Crm\search_forms.py:182
+#: Crm/search_forms.py:236
 msgid "Contact age"
 msgstr "Age du contact"
 
-#: .\Crm\search_forms.py:198 .\Profile\forms.py:57
+#: Crm/search_forms.py:252 Profile/forms.py:57
 msgid "Accept newsletter"
 msgstr "Accepte les mailings"
 
-#: .\Crm\search_forms.py:205
+#: Crm/search_forms.py:259
 msgid "Accept third parties"
 msgstr "Accepte les offres partenaires"
 
-#: .\Crm\search_forms.py:212
+#: Crm/search_forms.py:266
 msgid "Secondary contact"
 msgstr "Contact secondaire"
 
-#: .\Crm\search_forms.py:216
+#: Crm/search_forms.py:270
 msgid "Include"
 msgstr "Inclure"
 
-#: .\Crm\search_forms.py:216
+#: Crm/search_forms.py:270
 msgid "Only"
 msgstr "Seulement"
 
-#: .\Crm\search_forms.py:229
+#: Crm/search_forms.py:283
 msgid "Contact role"
 msgstr "Rôle du contact"
 
-#: .\Crm\search_forms.py:242
+#: Crm/search_forms.py:296
 msgid "Contact has email"
 msgstr "Dispose d'un email"
 
-#: .\Crm\search_forms.py:253
+#: Crm/search_forms.py:307
 msgid "Contact has pesonal email"
 msgstr "Dispose d'un email personnel"
 
-#: .\Crm\search_forms.py:264
+#: Crm/search_forms.py:318
 msgid "Unknown contacts"
 msgstr "Contacts inconnus"
 
-#: .\Crm\search_forms.py:275
+#: Crm/search_forms.py:329
 msgid "Action type"
 msgstr "Type d'action"
 
-#: .\Crm\search_forms.py:288
+#: Crm/search_forms.py:342
 msgid "Action name"
 msgstr "Nom d'une action"
 
-#: .\Crm\search_forms.py:293
+#: Crm/search_forms.py:347
 msgid "enter a part of the name of the searched action"
 msgstr "Entrez une partie du nom"
 
-#: .\Crm\search_forms.py:301
+#: Crm/search_forms.py:355
 msgid "Relationship date"
 msgstr "Date de mise en relation"
 
-#: .\Crm\search_forms.py:309
+#: Crm/search_forms.py:363
 msgid "Contact name"
 msgstr "Nom du contact"
 
-#: .\Crm\search_forms.py:314
+#: Crm/search_forms.py:368
 msgid "Enter a part of the name of the searched contact"
 msgstr "Entrez une partie du nom"
 
-#: .\Crm\search_forms.py:322
+#: Crm/search_forms.py:376
 msgid "Opportunity status"
 msgstr "Etat d'un dossier"
 
-#: .\Crm\search_forms.py:335
+#: Crm/search_forms.py:389
 msgid "Opportunity"
 msgstr "Dossier"
 
-#: .\Crm\search_forms.py:348
+#: Crm/search_forms.py:402
 msgid "Not in opportunity"
 msgstr "N'est pas dans le dossier"
 
-#: .\Crm\search_forms.py:366
+#: Crm/search_forms.py:420
 msgid "Opportunity name"
 msgstr "Nom d'un dossier"
 
-#: .\Crm\search_forms.py:371 .\Crm\search_forms.py:391
+#: Crm/search_forms.py:425 Crm/search_forms.py:445
 msgid "enter a part of the name of the searched opportunity"
 msgstr "Entrez une partie du nom"
 
-#: .\Crm\search_forms.py:386
+#: Crm/search_forms.py:440
 msgid "No opportunity with name"
 msgstr "Pas de dossier avec ce nom"
 
-#: .\Crm\search_forms.py:503
+#: Crm/search_forms.py:557
 msgid "Opportunity type"
 msgstr "Type de dossier"
 
-#: .\Crm\search_forms.py:523
+#: Crm/search_forms.py:577
 msgid "No opportunity of type"
 msgstr "Pas de dossier de ce type"
 
-#: .\Crm\search_forms.py:547
+#: Crm/search_forms.py:601
 msgid "Opportunity in progress"
 msgstr "Dossier en cours"
 
-#: .\Crm\search_forms.py:570
+#: Crm/search_forms.py:624
 msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
-#: .\Crm\search_forms.py:595
+#: Crm/search_forms.py:649
 msgid "Opportunity reminder"
 msgstr "Relance de dossier"
 
-#: .\Crm\search_forms.py:625
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:40
-#: .\Crm\templates\Crm\new_contacts_import.html.py:21
+#: Crm/search_forms.py:679 Crm/templates/Crm/confirm_contacts_import.html:40
+#: Crm/templates/Crm/new_contacts_import.html:21
 msgid "Import"
 msgstr "Import"
 
-#: .\Crm\utils.py:112 .\Crm\views.py:709 .\Crm\views.py:732
+#: Crm/utils.py:112 Crm/views.py:713 Crm/views.py:736
 msgid "Other kind of actions"
 msgstr "Autres types d'action"
 
-#: .\Crm\views.py:174
+#: Crm/views.py:176
 msgid "Do you want to remove {0.name} from the {1.name} group?"
 msgstr "Voulez vous supprimer {0.name} du groupe {1.name}?"
 
-#: .\Crm\views.py:194
+#: Crm/views.py:196
 msgid "Do you want to remove {0.fullname} from the {1.name} group?"
 msgstr "Voulez vous supprimer {0.fullname} du groupe {1.name}?"
 
-#: .\Crm\views.py:254
+#: Crm/views.py:256
 msgid "Are you sure to delete the group {0.name}?"
 msgstr "Etes-vous sur de supprimer le groupe {0.name}?"
 
-#: .\Crm\views.py:374
+#: Crm/views.py:376
 msgid "Are you sure to delete {0.name}?"
 msgstr "Etes-vous sur de supprimer {0.name}?"
 
-#: .\Crm\views.py:627
+#: Crm/views.py:631
 msgid "Are you sure to delete the contact \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le contact \"{0}\"?"
 
-#: .\Crm\views.py:801
-msgid "Are you sure to delete the action \"{0}\"?"
-msgstr "Etes-vous sur de supprimer l'action \"{0}\"?"
+#: Crm/views.py:808
+msgid "Are you sure to delete this action?"
+msgstr "Etes-vous sur de supprimer cette action?"
 
-#: .\Crm\views.py:933
+#: Crm/views.py:940
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
-#: .\Crm\views.py:1171
+#: Crm/views.py:1180
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: .\Crm\views.py:1479
+#: Crm/views.py:1488
 msgid "Do you want to make this contact the default contact for this person?"
 msgstr "Voulez-vous rendre ce contact prioritaire pour cette personne?"
 
-#: .\Crm\views.py:1498
+#: Crm/views.py:1507
 msgid "The action has no type set: Unable to create the corresponding document"
 msgstr "Cette action n'a pas de type: Impossible de créer un document"
 
-#: .\Crm\views.py:1500
+#: Crm/views.py:1509
 msgid ""
 "The action type has no document template defined: Unable to create the "
 "corresponding document"
 msgstr ""
 "Ce type d'action n'a pas de template défini: Impossible de créer un document"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:6
-#: .\Crm\templates\Crm\_section_opportunities.html.py:25
+#: Crm/templates/Crm/_actions_table.html:6
+#: Crm/templates/Crm/_section_opportunities.html:25
 msgid "Date"
 msgstr "Date"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:7
-#: .\Crm\templates\Crm\_section_opportunities.html.py:22
+#: Crm/templates/Crm/_actions_table.html:7
+#: Crm/templates/Crm/_section_opportunities.html:22
 msgid "Type"
 msgstr "Type"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:8 .\Emailing\forms.py:28
-#: .\Emailing\forms.py:56
+#: Crm/templates/Crm/_actions_table.html:8 Emailing/forms.py:30
+#: Emailing/forms.py:58
 msgid "Subject"
 msgstr "Sujet"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:10
+#: Crm/templates/Crm/_actions_table.html:10
 msgid "In charge"
 msgstr "En charge"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:11
+#: Crm/templates/Crm/_actions_table.html:11
+#: Crm/templates/Crm/_section_opportunities.html:23
+msgid "Status"
+msgstr "Etat"
+
+#: Crm/templates/Crm/_actions_table.html:12
 msgid "Number"
 msgstr "Numéro"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:12
+#: Crm/templates/Crm/_actions_table.html:13
 msgid "Amount"
 msgstr "Montant"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:21
+#: Crm/templates/Crm/_actions_table.html:23
 msgid "to do"
 msgstr "à faire"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:34
+#: Crm/templates/Crm/_actions_table.html:36
 msgid "done on"
 msgstr "réalisé le"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:42
+#: Crm/templates/Crm/_actions_table.html:68
 msgid "document"
 msgstr "document"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:47
+#: Crm/templates/Crm/_actions_table.html:73
 msgid "add document"
 msgstr "ajouter un document"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:74
-#: .\Crm\templates\Crm\_contact_info.html.py:33
-#: .\Crm\templates\Crm\_section_entity_info.html.py:19
+#: Crm/templates/Crm/_actions_table.html:78
+#: Crm/templates/Crm/_contact_info.html:30
+#: Crm/templates/Crm/_section_entity_info.html:22
 msgid "Show note"
 msgstr "Afficher la note"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:81
-#: .\Crm\templates\Crm\_section_opportunities.html.py:46
+#: Crm/templates/Crm/_actions_table.html:85
+#: Crm/templates/Crm/_section_opportunities.html:46
 msgid "Show on board"
 msgstr "Afficher sur le tableau de bord"
 
-#: .\Crm\templates\Crm\_actions_table.html.py:83
-#: .\Crm\templates\Crm\_contact_info.html.py:51
-#: .\Crm\templates\Crm\_opportunity_info.html.py:21
-#: .\Crm\templates\Crm\_section_custom_fields.html.py:22
-#: .\Crm\templates\Crm\_section_entity_info.html.py:42
-#: .\Crm\templates\Crm\_section_my_groups.html.py:23
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:26
+#: Crm/templates/Crm/_actions_table.html:87
+#: Crm/templates/Crm/_contact_info.html:48
+#: Crm/templates/Crm/_opportunity_info.html:21
+#: Crm/templates/Crm/_section_custom_fields.html:22
+#: Crm/templates/Crm/_section_entity_info.html:45
+#: Crm/templates/Crm/_section_my_groups.html:23
+#: Emailing/templates/Emailing/_section_newsletters.html:26
 msgid "Edit"
 msgstr "Editer"
 
-#: .\Crm\templates\Crm\_actions_table_script.html.py:10
+#: Crm/templates/Crm/_actions_table_script.html:10
 msgid "See actions of all"
 msgstr "Actions de tous"
 
-#: .\Crm\templates\Crm\_actions_table_script.html.py:15
-#: .\Crm\templates\Crm\_section_actions.html.py:65
+#: Crm/templates/Crm/_actions_table_script.html:15
+#: Crm/templates/Crm/_section_actions.html:50
 msgid "See my actions"
 msgstr "Mes actions"
 
-#: .\Crm\templates\Crm\_contact_info.html.py:24
+#: Crm/templates/Crm/_contact_info.html:20
 msgid "This contact has left."
 msgstr "Ce contact a quitté la structure"
 
-#: .\Crm\templates\Crm\_contact_info.html.py:52
-#: .\Crm\templates\Crm\_section_entity_info.html.py:43
-#: .\Crm\templates\Crm\edit_action.html.py:28
-#: .\Crm\templates\Crm\edit_group.html.py:31
-#: .\Crm\templates\Crm\edit_opportunity.html.py:19
-#: .\Emailing\templates\Emailing\_section_emailing.html.py:14
+#: Crm/templates/Crm/_contact_info.html:24
+#: Crm/templates/Crm/_section_entity_info.html:17
+msgid "UPD"
+msgstr "MAJ"
+
+#: Crm/templates/Crm/_contact_info.html:49
+#: Crm/templates/Crm/_section_entity_info.html:46
+#: Crm/templates/Crm/edit_action.html:42 Crm/templates/Crm/edit_group.html:31
+#: Crm/templates/Crm/edit_opportunity.html:22
+#: Emailing/templates/Emailing/_section_emailing.html:14
 msgid "Delete"
 msgstr "Supprimer"
 
-#: .\Crm\templates\Crm\_opportunity_info.html.py:22
+#: Crm/templates/Crm/_contact_info.html:52
+msgid "Is Main"
+msgstr "Prioritaire"
+
+#: Crm/templates/Crm/_contact_info.html:54
+msgid "Make main"
+msgstr "Rendre prioritaire"
+
+#: Crm/templates/Crm/_opportunity_info.html:22
 msgid "View contacts"
 msgstr "Voir les contacts"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:14
+#: Crm/templates/Crm/_section_actions.html:14
 #, python-format
 msgid "Next %(d)s days"
 msgstr "Prochains %(d)s jours"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:48
-#: .\Crm\templates\Crm\_section_actions.html.py:54
-#: .\Crm\templates\Crm\_section_actions.html.py:59
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:14
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:20
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:26
-#: .\Crm\templates\Crm\_section_contact_group.html.py:26
-#: .\Crm\templates\Crm\_section_contacts.html.py:38
-#: .\Crm\templates\Crm\_section_entity_group.html.py:20
-#: .\Crm\templates\Crm\_section_entity_group.html.py:22
-#: .\Crm\templates\Crm\_section_my_groups.html.py:34
-#: .\Crm\templates\Crm\_section_my_groups.html.py:36
-#: .\Crm\templates\Crm\_section_opportunities.html.py:58
-#: .\Crm\templates\Crm\edit_group.html.py:29
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:53
-#: .\Search\templates\Search\add_contacts_to_group.html.py:61
-#: .\templates\sanza\_navigation.html.py:16
+#: Crm/templates/Crm/_section_actions.html:33
+#: Crm/templates/Crm/_section_actions.html:39
+#: Crm/templates/Crm/_section_actions.html:44
+#: Crm/templates/Crm/_section_actions_of_set.html:14
+#: Crm/templates/Crm/_section_actions_of_set.html:20
+#: Crm/templates/Crm/_section_actions_of_set.html:26
+#: Crm/templates/Crm/_section_contact_group.html:26
+#: Crm/templates/Crm/_section_contacts.html:38
+#: Crm/templates/Crm/_section_entity_group.html:20
+#: Crm/templates/Crm/_section_entity_group.html:22
+#: Crm/templates/Crm/_section_my_groups.html:34
+#: Crm/templates/Crm/_section_my_groups.html:36
+#: Crm/templates/Crm/_section_opportunities.html:58
+#: Crm/templates/Crm/edit_group.html:29
+#: Emailing/templates/Emailing/_section_newsletters.html:53
+#: Search/templates/Search/add_contacts_to_group.html:61
+#: templates/sanza/_navigation.html:16
 msgid "Add"
 msgstr "Ajouter"
 
-#: .\Crm\templates\Crm\_section_actions.html.py:50
-#: .\Crm\templates\Crm\_section_actions.html.py:56
-#: .\Crm\templates\Crm\_section_actions.html.py:61
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:16
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:22
-#: .\Crm\templates\Crm\_section_actions_of_set.html.py:29
+#: Crm/templates/Crm/_section_actions.html:35
+#: Crm/templates/Crm/_section_actions.html:41
+#: Crm/templates/Crm/_section_actions.html:46
+#: Crm/templates/Crm/_section_actions_of_set.html:16
+#: Crm/templates/Crm/_section_actions_of_set.html:22
+#: Crm/templates/Crm/_section_actions_of_set.html:29
 msgid "All actions"
 msgstr "Toutes"
 
-#: .\Crm\templates\Crm\_section_all_entities.html.py:5
+#: Crm/templates/Crm/_section_all_entities.html:5
 msgid "Latest entities"
 msgstr "Entités récemment consultées"
 
-#: .\Crm\templates\Crm\_section_all_entities.html.py:5
+#: Crm/templates/Crm/_section_all_entities.html:5
 msgid "All entities"
 msgstr "Toutes les entités"
 
-#: .\Crm\templates\Crm\_section_all_entities.html.py:14
+#: Crm/templates/Crm/_section_all_entities.html:14
 msgid "Last action"
 msgstr "Dernière action"
 
-#: .\Crm\templates\Crm\_section_all_entities.html.py:15
+#: Crm/templates/Crm/_section_all_entities.html:15
 msgid "Next action"
 msgstr "Prochaine action"
 
-#: .\Crm\templates\Crm\_section_all_entities.html.py:65
+#: Crm/templates/Crm/_section_all_entities.html:65
 msgid "All"
 msgstr "Tous"
 
-#: .\Crm\templates\Crm\_section_contact_group.html.py:4
-#: .\Crm\templates\Crm\_section_entity_group.html.py:4
-#: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:10
-#: .\Search\views.py:64 .\templates\sanza\_navigation.html.py:11
+#: Crm/templates/Crm/_section_contact_group.html:4
+#: Crm/templates/Crm/_section_entity_group.html:4
+#: Emailing/templates/Emailing/subscribe_notification_email.txt:10
+#: Search/views.py:64 templates/sanza/_navigation.html:11
 msgid "Groups"
 msgstr "Groupes"
 
-#: .\Crm\templates\Crm\_section_contact_group.html.py:18
-#: .\Crm\templates\Crm\_section_entity_group.html.py:11
+#: Crm/templates/Crm/_section_contact_group.html:18
+#: Crm/templates/Crm/_section_entity_group.html:11
 msgid "Remove from group"
 msgstr "Supprimer du groupe"
 
-#: .\Crm\templates\Crm\_section_contacts.html.py:11
-#: .\Crm\templates\Crm\_section_same_as.html.py:12 .\Emailing\forms.py:116
-#: .\Search\templates\Search\_section_qs_contacts.html.py:10
+#: Crm/templates/Crm/_section_contacts.html:11
+#: Crm/templates/Crm/_section_same_as.html:14 Emailing/forms.py:119
+#: Search/templates/Search/_section_qs_contacts.html:10
 msgid "Phone"
 msgstr "Téléphone"
 
-#: .\Crm\templates\Crm\_section_contacts.html.py:11
-#: .\Crm\templates\Crm\_section_same_as.html.py:13
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:66
-#: .\Emailing\forms.py:117 .\Profile\forms.py:53
-#: .\Search\templates\Search\_section_qs_contacts.html.py:10
-#: .\templates\registration\login.html.py:16
+#: Crm/templates/Crm/_section_contacts.html:11
+#: Crm/templates/Crm/_section_same_as.html:15
+#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:120
+#: Profile/forms.py:53 Search/templates/Search/_section_qs_contacts.html:10
+#: templates/registration/login.html:16
 msgid "Email"
 msgstr "Email"
 
-#: .\Crm\templates\Crm\_section_contacts.html.py:41
+#: Crm/templates/Crm/_section_contacts.html:41
 msgid "View old contacts"
 msgstr "Voir les anciens contacts"
 
-#: .\Crm\templates\Crm\_section_contacts.html.py:44
-#: .\Search\templates\Search\_section_search_results.html.py:125
+#: Crm/templates/Crm/_section_contacts.html:44
+#: Search/templates/Search/_section_search_results.html:125
 msgid "Mail to"
 msgstr "Mail à"
 
-#: .\Crm\templates\Crm\_section_custom_fields.html.py:4
+#: Crm/templates/Crm/_section_custom_fields.html:4
 msgid "More information"
 msgstr "Plus d'information"
 
-#: .\Crm\templates\Crm\_section_entity_group.html.py:24
-#: .\Crm\templates\Crm\_section_my_groups.html.py:7
-#: .\Crm\templates\Crm\_section_opportunities.html.py:9
+#: Crm/templates/Crm/_section_entity_group.html:24
+#: Crm/templates/Crm/_section_my_groups.html:7
+#: Crm/templates/Crm/_section_opportunities.html:9
 msgid "By name"
 msgstr "Par nom"
 
-#: .\Crm\templates\Crm\_section_entity_group.html.py:26
-#: .\Crm\templates\Crm\_section_my_groups.html.py:8
-#: .\Crm\templates\Crm\_section_opportunities.html.py:8
+#: Crm/templates/Crm/_section_entity_group.html:26
+#: Crm/templates/Crm/_section_my_groups.html:8
+#: Crm/templates/Crm/_section_opportunities.html:8
 msgid "By date"
 msgstr "Par date"
 
-#: .\Crm\templates\Crm\_section_my_groups.html.py:5
+#: Crm/templates/Crm/_section_my_groups.html:5
 msgid "My groups"
 msgstr "Mes groupes"
 
-#: .\Crm\templates\Crm\_section_my_groups.html.py:14
+#: Crm/templates/Crm/_section_my_groups.html:14
 msgid "Number of members"
 msgstr "Nombre de membres"
 
-#: .\Crm\templates\Crm\_section_my_groups.html.py:15
-#: .\Search\templates\Search\_section_qs_groups.html.py:8
+#: Crm/templates/Crm/_section_my_groups.html:15
+#: Search/templates/Search/_section_qs_groups.html:8
 msgid "Description"
 msgstr "Description"
 
-#: .\Crm\templates\Crm\_section_opportunities.html.py:10
+#: Crm/templates/Crm/_section_opportunities.html:10
 msgid "By type"
 msgstr "Par type"
 
-#: .\Crm\templates\Crm\_section_opportunities.html.py:11
+#: Crm/templates/Crm/_section_opportunities.html:11
 msgid "By status"
 msgstr "Par état"
 
-#: .\Crm\templates\Crm\_section_opportunities.html.py:23
-msgid "Status"
-msgstr "Etat"
-
-#: .\Crm\templates\Crm\_section_opportunities.html.py:48
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:34
-#: .\templates\sanza\_navigation.html.py:7
+#: Crm/templates/Crm/_section_opportunities.html:48
+#: Emailing/templates/Emailing/_section_newsletters.html:34
+#: templates/sanza/_navigation.html:7
 msgid "View"
 msgstr "Voir"
 
-#: .\Crm\templates\Crm\_section_same_as.html.py:4
-#: .\Crm\templates\Crm\_section_same_as.html.py:35
+#: Crm/templates/Crm/_section_same_as.html:4
+#: Crm/templates/Crm/_section_same_as.html:38
 msgid "Same As"
 msgstr "Identique à"
 
-#: .\Crm\templates\Crm\_section_same_as.html.py:11
-#: .\Search\templates\Search\_section_qs_contacts.html.py:9
+#: Crm/templates/Crm/_section_same_as.html:13
+#: Search/templates/Search/_section_qs_contacts.html:9
 msgid "Role"
 msgstr "Rôle"
 
-#: .\Crm\templates\Crm\_section_same_as.html.py:39
-msgid "Is Main"
-msgstr "Prioritaire"
-
-#: .\Crm\templates\Crm\_section_same_as.html.py:41
-msgid "Make main"
-msgstr "Rendre prioritaire"
-
-#: .\Crm\templates\Crm\add_action.html.py:3
-#: .\Crm\templates\Crm\same_as.html.py:3
+#: Crm/templates/Crm/add_action.html:3 Crm/templates/Crm/same_as.html:3
 msgid "Select a contact"
 msgstr "Sélectionner un contact"
 
-#: .\Crm\templates\Crm\add_action.html.py:5
-#: .\Crm\templates\Crm\add_contact_to_group.html.py:19
-#: .\Crm\templates\Crm\add_entity_to_group.html.py:20
-#: .\Crm\templates\Crm\add_opportunity.html.py:5
-#: .\Crm\templates\Crm\same_as.html.py:5
-#: .\Emailing\templates\Emailing\public\subscribe.html.py:11
-#: .\Search\templates\Search\contacts_admin_form.html.py:7
-#: .\templates\sanza\message_dialog.html.py:33
+#: Crm/templates/Crm/add_action.html:5
+#: Crm/templates/Crm/add_contact_to_group.html:19
+#: Crm/templates/Crm/add_entity_to_group.html:20
+#: Crm/templates/Crm/add_opportunity.html:5 Crm/templates/Crm/same_as.html:5
+#: Emailing/templates/Emailing/public/subscribe.html:11
+#: Search/templates/Search/contacts_admin_form.html:7
+#: templates/sanza/message_dialog.html:33
 msgid "Ok"
 msgstr "Ok"
 
-#: .\Crm\templates\Crm\add_contact_to_group.html.py:15
+#: Crm/templates/Crm/add_contact_to_group.html:15
 #, python-format
 msgid "Add %(contact.fullname)s to a group"
 msgstr "Ajouter %(contact.fullname)s à un groupe"
 
-#: .\Crm\templates\Crm\add_entity_to_group.html.py:16
+#: Crm/templates/Crm/add_entity_to_group.html:16
 #, python-format
 msgid "Add %(entity.name)s to a group"
 msgstr "Ajouter %(entity.name)s à un groupe"
 
-#: .\Crm\templates\Crm\add_opportunity.html.py:3
+#: Crm/templates/Crm/add_opportunity.html:3
 msgid "Select an entity"
 msgstr "Sélectionnez une entité"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:36
+#: Crm/templates/Crm/confirm_contacts_import.html:36
 msgid "Confirm contacts import"
 msgstr "Confirmez l'import des contacts"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:39
+#: Crm/templates/Crm/confirm_contacts_import.html:39
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:41
-#: .\Crm\templates\Crm\do_action.html.py:6
-#: .\Crm\templates\Crm\edit_action.html.py:31
-#: .\Crm\templates\Crm\edit_action.html.py:33
-#: .\Crm\templates\Crm\edit_contact.html.py:45
-#: .\Crm\templates\Crm\edit_custom_fields.html.py:9
-#: .\Crm\templates\Crm\edit_entity.html.py:21
-#: .\Crm\templates\Crm\edit_entity.html.py:23
-#: .\Crm\templates\Crm\edit_group.html.py:32
-#: .\Crm\templates\Crm\edit_group.html.py:34
-#: .\Crm\templates\Crm\edit_opportunity.html.py:20
-#: .\Crm\templates\Crm\edit_opportunity.html.py:22
-#: .\Crm\templates\Crm\new_contacts_import.html.py:22 .\Emailing\models.py:67
-#: .\Search\templates\Search\add_contacts_to_group.html.py:60
-#: .\Search\templates\Search\contacts_admin_form.html.py:6
-#: .\Search\templates\Search\create_action_for_contacts.html.py:11
-#: .\Search\templates\Search\export_to_pdf.html.py:43
-#: .\Search\templates\Search\new_emailing.html.py:22
-#: .\templates\sanza\confirmation_dialog.html.py:10
+#: Crm/templates/Crm/confirm_contacts_import.html:41
+#: Crm/templates/Crm/do_action.html:6 Crm/templates/Crm/edit_action.html:45
+#: Crm/templates/Crm/edit_action.html:47
+#: Crm/templates/Crm/edit_contact.html:59
+#: Crm/templates/Crm/edit_custom_fields.html:9
+#: Crm/templates/Crm/edit_entity.html:27 Crm/templates/Crm/edit_entity.html:29
+#: Crm/templates/Crm/edit_group.html:32 Crm/templates/Crm/edit_group.html:34
+#: Crm/templates/Crm/edit_opportunity.html:23
+#: Crm/templates/Crm/edit_opportunity.html:25
+#: Crm/templates/Crm/new_contacts_import.html:22 Emailing/models.py:67
+#: Search/templates/Search/add_contacts_to_group.html:60
+#: Search/templates/Search/contacts_admin_form.html:6
+#: Search/templates/Search/create_action_for_contacts.html:11
+#: Search/templates/Search/export_to_pdf.html:43
+#: Search/templates/Search/new_emailing.html:22
+#: templates/sanza/confirmation_dialog.html:10
 msgid "Cancel"
 msgstr "Annuler"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:48
+#: Crm/templates/Crm/confirm_contacts_import.html:48
 #, python-format
 msgid "No new contacts to import (%(total_contacts)s in csv file)"
 msgstr ""
 "Pas de nouveaux contacts à importer (sur un total de %(total_contacts)s "
 "présents dans le fichier CSV)"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:52
+#: Crm/templates/Crm/confirm_contacts_import.html:52
 #, python-format
 msgid ""
 "It imports only contacts if their email doesn't already exists\n"
@@ -1305,129 +1326,129 @@ msgstr ""
 "        * Bleu : L'email est déjà connu dans la base de données<br />\n"
 "        "
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:65
+#: Crm/templates/Crm/confirm_contacts_import.html:65
 msgid "Gender"
 msgstr "civilité"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:65
-#: .\Emailing\forms.py:114
+#: Crm/templates/Crm/confirm_contacts_import.html:65 Emailing/forms.py:117
 msgid "Lastname"
 msgstr "Nom"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:66
-#: .\Emailing\forms.py:115
+#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:118
 msgid "Firstname"
 msgstr "Prénom"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:67
+#: Crm/templates/Crm/confirm_contacts_import.html:67
 msgid "Entity city"
 msgstr "Ville de l'entité"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:67
+#: Crm/templates/Crm/confirm_contacts_import.html:67
 msgid "Contact city"
 msgstr "Ville du contact"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:68
+#: Crm/templates/Crm/confirm_contacts_import.html:68
 msgid "Entity groups"
 msgstr "Groupe (entités)"
 
-#: .\Crm\templates\Crm\confirm_contacts_import.html.py:68
+#: Crm/templates/Crm/confirm_contacts_import.html:68
 msgid "Contact groups"
 msgstr "Groupes (contacts)"
 
-#: .\Crm\templates\Crm\do_action.html.py:7
+#: Crm/templates/Crm/do_action.html:7
 msgid "Done"
 msgstr "Fait"
 
-#: .\Crm\templates\Crm\do_action.html.py:9
+#: Crm/templates/Crm/do_action.html:9
 msgid "Done & new"
 msgstr "Fait & Nouvelle action"
 
-#: .\Crm\templates\Crm\edit_action.html.py:6
+#: Crm/templates/Crm/edit_action.html:20
 msgid "Edit action"
 msgstr "Editer l'action"
 
-#: .\Crm\templates\Crm\edit_action.html.py:8
-#: .\Search\templates\Search\_section_search_results.html.py:129
+#: Crm/templates/Crm/edit_action.html:22
+#: Search/templates/Search/_section_search_results.html:129
 msgid "Create action"
 msgstr "Ajout d'une action"
 
-#: .\Crm\templates\Crm\edit_action.html.py:12
+#: Crm/templates/Crm/edit_action.html:26
 msgid "This action has be done on"
 msgstr "Cette action a été réalisée le"
 
-#: .\Crm\templates\Crm\edit_action.html.py:26
-#: .\Crm\templates\Crm\edit_contact.html.py:43
-#: .\Crm\templates\Crm\edit_custom_fields.html.py:8
-#: .\Crm\templates\Crm\edit_entity.html.py:19
-#: .\Crm\templates\Crm\edit_group.html.py:29
-#: .\Crm\templates\Crm\edit_opportunity.html.py:17
-#: .\Search\templates\Search\_section_search_form.html.py:143
+#: Crm/templates/Crm/edit_action.html:40
+#: Crm/templates/Crm/edit_contact.html:57
+#: Crm/templates/Crm/edit_custom_fields.html:8
+#: Crm/templates/Crm/edit_entity.html:25 Crm/templates/Crm/edit_group.html:29
+#: Crm/templates/Crm/edit_opportunity.html:20
+#: Search/templates/Search/_section_search_form.html:143
 msgid "Save"
 msgstr "Enregistrer"
 
-#: .\Crm\templates\Crm\edit_contact.html.py:19
+#: Crm/templates/Crm/edit_contact.html:28
 #, python-format
 msgid "Edit contact '%(contact)s'"
 msgstr "Edition du contact '%(contact)s'"
 
-#: .\Crm\templates\Crm\edit_contact.html.py:21
+#: Crm/templates/Crm/edit_contact.html:35
+msgid "Create single contact"
+msgstr "Ajout d'un contact particulier"
+
+#: Crm/templates/Crm/edit_contact.html:40
 msgid "Create contact"
 msgstr "Ajout d'un contact"
 
-#: .\Crm\templates\Crm\edit_contact.html.py:28
-#: .\templates\sanza\_navigation.html.py:22
+#: Crm/templates/Crm/edit_contact.html:50 templates/sanza/_navigation.html:23
 msgid "Single contact"
 msgstr "Particulier"
 
-#: .\Crm\templates\Crm\edit_custom_fields.html.py:5
+#: Crm/templates/Crm/edit_custom_fields.html:5
 #, python-format
 msgid "Edit '%(instance)s'"
 msgstr "Edition de '%(instance)s'"
 
-#: .\Crm\templates\Crm\edit_entity.html.py:6
+#: Crm/templates/Crm/edit_entity.html:9
 #, python-format
 msgid "Edit '%(entity)s'"
 msgstr "Edition de '%(entity)s'"
 
-#: .\Crm\templates\Crm\edit_entity.html.py:10
+#: Crm/templates/Crm/edit_entity.html:16
 msgid "NewMale"
 msgstr "Nouveau"
 
-#: .\Crm\templates\Crm\edit_entity.html.py:12
+#: Crm/templates/Crm/edit_entity.html:18
 msgid "NewFemale"
 msgstr "Nouvelle"
 
-#: .\Crm\templates\Crm\edit_group.html.py:23
+#: Crm/templates/Crm/edit_group.html:23
 #, python-format
 msgid "Edit the '%(group)s' group"
 msgstr "Edition du groupe '%(group)s'"
 
-#: .\Crm\templates\Crm\edit_group.html.py:25
+#: Crm/templates/Crm/edit_group.html:25
 msgid "Create group"
 msgstr "Ajout d'un groupe"
 
-#: .\Crm\templates\Crm\edit_opportunity.html.py:6
+#: Crm/templates/Crm/edit_opportunity.html:9
 msgid "Edit opportunity"
 msgstr "Editer le dossier"
 
-#: .\Crm\templates\Crm\edit_opportunity.html.py:8
+#: Crm/templates/Crm/edit_opportunity.html:11
 msgid "This opportunity has be closed on"
 msgstr "Ce dossier a été fermée le"
 
-#: .\Crm\templates\Crm\edit_opportunity.html.py:11
+#: Crm/templates/Crm/edit_opportunity.html:14
 msgid "Create opportunity"
 msgstr "Ajout d'un dossier"
 
-#: .\Crm\templates\Crm\my_groups.html.py:4
+#: Crm/templates/Crm/my_groups.html:4
 msgid "See my groups"
 msgstr "Voir mes groupes"
 
-#: .\Crm\templates\Crm\new_contacts_import.html.py:18
+#: Crm/templates/Crm/new_contacts_import.html:18
 msgid "Import contacts"
 msgstr "Import de contacts"
 
-#: .\Crm\templates\Crm\new_contacts_import.html.py:27
+#: Crm/templates/Crm/new_contacts_import.html:27
 #, python-format
 msgid ""
 "You can create contacts and entities by importing a csv file.\n"
@@ -1450,314 +1471,317 @@ msgstr ""
 "        Enfin, chargez votre fichier et définissez les options de l'import.\n"
 "        "
 
-#: .\Emailing\coop_bar_cfg.py:9 .\Emailing\views.py:243
+#: Emailing/coop_bar_cfg.py:9 Emailing/views.py:243
 msgid "Sanza"
 msgstr "Sanza"
 
-#: .\Emailing\coop_bar_cfg.py:14
+#: Emailing/coop_bar_cfg.py:14
 msgid "Back to newsletters"
 msgstr "Retour aux newsletters"
 
-#: .\Emailing\forms.py:23
+#: Emailing/forms.py:25
 msgid "Reason"
 msgstr "Raison"
 
-#: .\Emailing\forms.py:27
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:22
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:54
+#: Emailing/forms.py:29
+#: Emailing/templates/Emailing/_section_newsletters.html:22
+#: Emailing/templates/Emailing/_section_newsletters.html:54
 msgid "Newsletter"
 msgstr "Newsletter"
 
-#: .\Emailing\forms.py:29 .\Emailing\forms.py:57
+#: Emailing/forms.py:31 Emailing/forms.py:59
 msgid "Subject of the newsletter"
 msgstr "Sujet de la newsletter"
 
-#: .\Emailing\forms.py:45
+#: Emailing/forms.py:47
 msgid "-- New --"
 msgstr "-- Nouveau --"
 
-#: .\Emailing\forms.py:52
+#: Emailing/forms.py:54
 msgid "Please enter a subject for the newsletter"
 msgstr "Veuillez entrer le sujet de la newsletter"
 
-#: .\Emailing\forms.py:58
+#: Emailing/forms.py:60
 msgid "Template"
 msgstr "Modèle"
 
-#: .\Emailing\forms.py:59
+#: Emailing/forms.py:61
 msgid "Source URL"
 msgstr "URL Surce"
 
-#: .\Emailing\forms.py:92
+#: Emailing/forms.py:94
 msgid "The url is not allowed"
 msgstr "L'URL n'est pas autorisé"
 
-#: .\Emailing\forms.py:102
+#: Emailing/forms.py:104
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
-#: .\Emailing\forms.py:105 .\Emailing\forms.py:213 .\Profile\views.py:81
+#: Emailing/forms.py:107 Emailing/forms.py:223 Profile/views.py:81
 msgid "Message"
 msgstr "Message"
 
-#: .\Emailing\forms.py:129
+#: Emailing/forms.py:108
+msgid "Make sure you are a human"
+msgstr "Vérifier que vous n'êtes pas un robot"
+
+#: Emailing/forms.py:132
 msgid "Individual"
 msgstr "Particulier"
 
-#: .\Emailing\forms.py:148
+#: Emailing/forms.py:151
 msgid "Invalid entity type"
 msgstr "Type d'entité invalide"
 
-#: .\Emailing\forms.py:164
+#: Emailing/forms.py:174
 msgid "{0}: Please enter a name"
 msgstr "{0}: veuillez entrer un nom"
 
-#: .\Emailing\forms.py:175
+#: Emailing/forms.py:185
 msgid "Your message is too long"
 msgstr "Votre message est trop long"
 
-#: .\Emailing\forms.py:182
+#: Emailing/forms.py:192
 msgid "Invalid group"
 msgstr "Groupe invalide"
 
-#: .\Emailing\forms.py:189
+#: Emailing/forms.py:199
 msgid "Invalid action type"
 msgstr "Type d'action invalide"
 
-#: .\Emailing\forms.py:215 .\Emailing\forms.py:267 .\Profile\views.py:70
+#: Emailing/forms.py:225 Emailing/forms.py:277 Profile/views.py:70
 msgid "Message from web site"
 msgstr "Message depuis le site Internet"
 
-#: .\Emailing\forms.py:225
+#: Emailing/forms.py:235
 msgid "newsletter"
 msgstr "newsletter"
 
-#: .\Emailing\forms.py:227
+#: Emailing/forms.py:237
 msgid "3rd parties"
 msgstr "offres partenaires"
 
-#: .\Emailing\forms.py:230
+#: Emailing/forms.py:240
 msgid "Subscription"
 msgstr "Inscriptions"
 
-#: .\Emailing\forms.py:232
+#: Emailing/forms.py:242
 msgid "Subscribe to {0}"
 msgstr "S'inscrire à {0}"
 
-#: .\Emailing\forms.py:273 .\Profile\views.py:75
+#: Emailing/forms.py:283 Profile/views.py:75
 msgid "The message have been sent"
 msgstr "Votre message a bien été envoyé"
 
-#: .\Emailing\forms.py:277 .\Profile\views.py:78
+#: Emailing/forms.py:287 Profile/views.py:78
 msgid "The message couldn't be send."
 msgstr "Votre message n'a pas pu être envoyé"
 
-#: .\Emailing\models.py:30
+#: Emailing/models.py:30
 msgid "Edition in progress"
 msgstr "Edition en cours"
 
-#: .\Emailing\models.py:31
+#: Emailing/models.py:31
 msgid "Sending is scheduled"
 msgstr "Envoi programmé"
 
-#: .\Emailing\models.py:32
+#: Emailing/models.py:32
 msgid "Sending in progress"
 msgstr "Envoi en cours"
 
-#: .\Emailing\models.py:33
+#: Emailing/models.py:33
 msgid "Sent"
 msgstr "Envoyé"
 
-#: .\Emailing\models.py:34
+#: Emailing/models.py:34
 msgid "Credit missing"
 msgstr "Crédit insuffisant"
 
-#: .\Emailing\models.py:42
+#: Emailing/models.py:42
 msgid "scheduling date"
 msgstr "date programmé de l'envoi"
 
-#: .\Emailing\models.py:43
+#: Emailing/models.py:43
 msgid "sending date"
 msgstr "date d'envoi"
 
-#: .\Emailing\models.py:49
+#: Emailing/models.py:49
 msgid "emailing"
 msgstr "emailing"
 
-#: .\Emailing\models.py:50
+#: Emailing/models.py:50
 msgid "emailings"
 msgstr "emailings"
 
-#: .\Emailing\models.py:55 .\Emailing\models.py:57
+#: Emailing/models.py:55 Emailing/models.py:57
 msgid "{0} on {1}"
 msgstr "{0} sur {1}"
 
-#: .\Emailing\models.py:64
+#: Emailing/models.py:64
 msgid "Send"
 msgstr "Envoyer"
 
-#: .\Emailing\models.py:98
+#: Emailing/models.py:98
 msgid "Credit"
 msgstr "Crédit"
 
-#: .\Emailing\models.py:98
+#: Emailing/models.py:98
 msgid "Number of email used"
 msgstr "Nombre d'emails utilisé"
 
-#: .\Emailing\models.py:99
+#: Emailing/models.py:99
 msgid "Total"
 msgstr "Total"
 
-#: .\Emailing\models.py:99
+#: Emailing/models.py:99
 msgid "Number of amails bought"
 msgstr "Nombre d'emails achetés"
 
-#: .\Emailing\models.py:100
+#: Emailing/models.py:100
 msgid "Bought date"
 msgstr "Date d'achat"
 
-#: .\Emailing\models.py:101
+#: Emailing/models.py:101
 msgid "Finished date"
 msgstr "Date de fin"
 
-#: .\Emailing\models.py:104
+#: Emailing/models.py:104
 msgid "Date : {0} - Total: {1} - Credit : {2}"
 msgstr "Date : {0} - Total: {1} - Credit : {2}"
 
-#: .\Emailing\utils.py:67
-#: .\Emailing\templates\Emailing\view_emailing.html.py:3
+#: Emailing/utils.py:68 Emailing/templates/Emailing/view_emailing.html:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: .\Emailing\utils.py:82
+#: Emailing/utils.py:83
 msgid "Credit missing for sending this emailing (available: {0} - required {1}"
 msgstr ""
 "Credit insuffisant pour l'envoi de cet emailing: disponible {0} - necessaire "
 "{1}"
 
-#: .\Emailing\utils.py:151
+#: Emailing/utils.py:152
 msgid "Verification of your email address"
 msgstr "Vérification de votre adresse email"
 
-#: .\Emailing\views.py:50
+#: Emailing/views.py:50
 msgid "Are you sure to delete '{0.newsletter.subject}' {1}?"
 msgstr "Etes-vous sur de supprimer '{0.newsletter.subject}' {1}?"
 
-#: .\Emailing\views.py:79
+#: Emailing/views.py:79
 msgid "Enter the text of your newsletter here"
 msgstr "Entrez le texte de votre newsletter ici"
 
-#: .\Emailing\views.py:111
+#: Emailing/views.py:111
 msgid "The sending has been scheduled"
 msgstr "L'envoi a été programmé"
 
-#: .\Emailing\views.py:113
+#: Emailing/views.py:113
 msgid "The sending can't be scheduled"
 msgstr "L'envoi ne paut pas être programmé"
 
-#: .\Emailing\views.py:119
+#: Emailing/views.py:119
 msgid "Is this newsletter ready to be sent?"
 msgstr "Est-ce que la newsletter est prête à être envoyée?"
 
-#: .\Emailing\views.py:135
+#: Emailing/views.py:135
 msgid "The sending has been cancelled"
 msgstr "L'envoi a été annulé"
 
-#: .\Emailing\views.py:137
+#: Emailing/views.py:137
 msgid "The sending can't be cancelled"
 msgstr "L'anvoi ne peut pas être annulé"
 
-#: .\Emailing\views.py:143
+#: Emailing/views.py:143
 msgid "Cancel the sending?"
 msgstr "Annuler l'envoi?"
 
-#: .\Emailing\views.py:156
+#: Emailing/views.py:156
 msgid "Link"
 msgstr "Lien"
 
-#: .\Emailing\views.py:185
-#: .\Emailing\templates\Emailing\public\unregister_confirm.html.py:4
+#: Emailing/views.py:185
+#: Emailing/templates/Emailing/public/unregister_confirm.html:4
 msgid "Unregister"
 msgstr "Se désinscrire"
 
-#: .\Emailing\views.py:187
+#: Emailing/views.py:187
 msgid "{0} has unregister"
 msgstr "{0} s'est désinscrit"
 
-#: .\Emailing\views.py:242
+#: Emailing/views.py:242
 msgid "An error occured while verifying the email address of this contact."
 msgstr ""
 "Une erreur s'est produite au cours de la vérification de l'adresse email de "
 "ce contact."
 
-#: .\Emailing\views.py:245
+#: Emailing/views.py:245
 msgid "Need to verify the email address"
 msgstr "vérifier votre adresse email"
 
-#: .\Emailing\templates\Emailing\_section_emailing.html.py:15
+#: Emailing/templates/Emailing/_section_emailing.html:15
 msgid "Back"
 msgstr "Retour"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:5
+#: Emailing/templates/Emailing/_section_newsletters.html:5
 msgid "Newsletters"
 msgstr "Newsletters"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:12
+#: Emailing/templates/Emailing/_section_newsletters.html:12
 msgid ""
 "Emailing is disabled: You must buy credits in order to send new emailings"
 msgstr ""
 "L'emailing est désactivé: Vous devez acheter des crédits pour effectuer des "
 "envois"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:14
+#: Emailing/templates/Emailing/_section_newsletters.html:14
 msgid "You have a credit of "
 msgstr "Vous avez un crédit de "
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:14
+#: Emailing/templates/Emailing/_section_newsletters.html:14
 msgid "emails"
 msgstr "emails"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:22
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:55
+#: Emailing/templates/Emailing/_section_newsletters.html:22
+#: Emailing/templates/Emailing/_section_newsletters.html:55
 msgid "Sending"
 msgstr "Envois"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:33
+#: Emailing/templates/Emailing/_section_newsletters.html:33
 msgid "recipients"
 msgstr "destinataires"
 
-#: .\Emailing\templates\Emailing\_section_newsletters.html.py:48
+#: Emailing/templates/Emailing/_section_newsletters.html:48
 msgid "No newsletters"
 msgstr "Aucune newsletter"
 
-#: .\Emailing\templates\Emailing\_section_visitors.html.py:5
+#: Emailing/templates/Emailing/_section_visitors.html:5
 msgid "Links"
 msgstr "Lien"
 
-#: .\Emailing\templates\Emailing\_section_visitors.html.py:10
+#: Emailing/templates/Emailing/_section_visitors.html:10
 msgid "url"
 msgstr "url"
 
-#: .\Emailing\templates\Emailing\_section_visitors.html.py:10
+#: Emailing/templates/Emailing/_section_visitors.html:10
 msgid "visitors"
 msgstr "visiteurs"
 
-#: .\Emailing\templates\Emailing\new_newsletter.html.py:3
+#: Emailing/templates/Emailing/new_newsletter.html:3
 msgid "New newsletter"
 msgstr "Nouvelle newsletter"
 
-#: .\Emailing\templates\Emailing\newsletter.html.py:8
-#: .\templates\sanza_newsletter.html.py:43
+#: Emailing/templates/Emailing/newsletter.html:8
+#: templates/sanza_newsletter.html:43
 msgid "If you can't view this email, "
 msgstr "Si vous ne parvenez pas à lire cet email, "
 
-#: .\Emailing\templates\Emailing\newsletter.html.py:10
-#: .\templates\sanza_newsletter.html.py:45
+#: Emailing/templates/Emailing/newsletter.html:10
+#: templates/sanza_newsletter.html:45
 msgid "read the online version"
 msgstr "consultez le en ligne depuis votre navigateur habituel"
 
-#: .\Emailing\templates\Emailing\newsletter.html.py:14
-#: .\Emailing\templates\Emailing\newsletter.html.py:28
+#: Emailing/templates/Emailing/newsletter.html:14
+#: Emailing/templates/Emailing/newsletter.html:28
 #, python-format
 msgid ""
 "\n"
@@ -1772,24 +1796,24 @@ msgstr ""
 "        Vous pouvez vous désinscrire en cliquant sur\n"
 "        "
 
-#: .\Emailing\templates\Emailing\newsletter.html.py:18
-#: .\Emailing\templates\Emailing\newsletter.html.py:32
+#: Emailing/templates/Emailing/newsletter.html:18
+#: Emailing/templates/Emailing/newsletter.html:32
 msgid "this link"
 msgstr "ce lien"
 
-#: .\Emailing\templates\Emailing\newsletter_list.html.py:3
+#: Emailing/templates/Emailing/newsletter_list.html:3
 msgid "Emailing list"
 msgstr "Liste des emailings"
 
-#: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:21
+#: Emailing/templates/Emailing/subscribe_notification_email.txt:21
 msgid "Comments"
 msgstr "Commentaires"
 
-#: .\Emailing\templates\Emailing\subscribe_notification_email.txt.py:26
+#: Emailing/templates/Emailing/subscribe_notification_email.txt:26
 msgid "More info at"
 msgstr "Plus d'information sur"
 
-#: .\Emailing\templates\Emailing\subscribe_verification_email.txt.py:3
+#: Emailing/templates/Emailing/subscribe_verification_email.txt:3
 #, python-format
 msgid ""
 "\n"
@@ -1820,12 +1844,12 @@ msgstr ""
 "PS: Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet "
 "email.\n"
 
-#: .\Emailing\templates\Emailing\public\subscribe.html.py:4
+#: Emailing/templates/Emailing/public/subscribe.html:4
 msgid "Subscribe"
 msgstr "S'inscrire"
 
-#: .\Emailing\templates\Emailing\public\subscribe_done.html.py:4
-#: .\Emailing\templates\Emailing\public\subscribe_error.html.py:4
+#: Emailing/templates/Emailing/public/subscribe_done.html:4
+#: Emailing/templates/Emailing/public/subscribe_error.html:4
 #, python-format
 msgid ""
 "\n"
@@ -1836,7 +1860,7 @@ msgstr ""
 "      Vous êtes inscrits à la liste de diffusion de %(my_company)s.\n"
 "      "
 
-#: .\Emailing\templates\Emailing\public\subscribe_done.html.py:8
+#: Emailing/templates/Emailing/public/subscribe_done.html:8
 msgid ""
 "\n"
 "      We sent you an email in order to verify your email address. Please "
@@ -1856,7 +1880,7 @@ msgstr ""
 "      réessayer le processus d'inscription.\n"
 "      "
 
-#: .\Emailing\templates\Emailing\public\subscribe_error.html.py:8
+#: Emailing/templates/Emailing/public/subscribe_error.html:8
 msgid ""
 "\n"
 "      An error occured while sending you an address verification email.<br /"
@@ -1872,7 +1896,7 @@ msgstr ""
 "possible pour résoudre ce problème.\n"
 "      "
 
-#: .\Emailing\templates\Emailing\public\unregister_confirm.html.py:7
+#: Emailing/templates/Emailing/public/unregister_confirm.html:7
 #, python-format
 msgid ""
 "<h1>Are you sure to unregister from the %(my_company)s mailing-list?</h1>"
@@ -1880,17 +1904,17 @@ msgstr ""
 "<h1>Etes vous sûr de vous désinscrire de la liste de diffusion de "
 "%(my_company)s?</h1>"
 
-#: .\Emailing\templates\Emailing\public\unregister_confirm.html.py:10
-#: .\Search\forms.py:399
+#: Emailing/templates/Emailing/public/unregister_confirm.html:10
+#: Search/forms.py:399
 msgid "Yes"
 msgstr "Oui"
 
-#: .\Emailing\templates\Emailing\public\unregister_confirm.html.py:11
-#: .\Search\forms.py:399
+#: Emailing/templates/Emailing/public/unregister_confirm.html:11
+#: Search/forms.py:399
 msgid "No"
 msgstr "Non"
 
-#: .\Emailing\templates\Emailing\public\unregister_done.html.py:5
+#: Emailing/templates/Emailing/public/unregister_done.html:5
 #, python-format
 msgid ""
 "\n"
@@ -1901,7 +1925,7 @@ msgstr ""
 "        Vous êtes désinscrit de la liste de diffusion de %(my_company)s.\n"
 "        "
 
-#: .\Emailing\templates\Emailing\public\unregister_done.html.py:9
+#: Emailing/templates/Emailing/public/unregister_done.html:9
 #, python-format
 msgid ""
 "\n"
@@ -1914,11 +1938,11 @@ msgstr ""
 "de diffusion de %(my_company)s.\n"
 "        "
 
-#: .\Emailing\templates\Emailing\public\verification_done.html.py:4
+#: Emailing/templates/Emailing/public/verification_done.html:4
 msgid "Your email has been verified."
 msgstr "Votre email a été vérifié."
 
-#: .\Emailing\templates\Emailing\public\verification_done.html.py:6
+#: Emailing/templates/Emailing/public/verification_done.html:6
 #, python-format
 msgid ""
 "\n"
@@ -1929,7 +1953,7 @@ msgstr ""
 "      Vous êtes inscrits à la liste de diffusion de %(my_company)s.\n"
 "      "
 
-#: .\Profile\forms.py:48
+#: Profile/forms.py:48
 msgid ""
 "This email is already registered. Use the 'forgot password' link on the "
 "login page"
@@ -1937,98 +1961,98 @@ msgstr ""
 "Cette adresse email est déjà inscrite. Utilisez le lien \"Mot de passe "
 "oublié' sur la page de login."
 
-#: .\Profile\forms.py:54 .\templates\registration\login.html.py:20
-#: .\templates\sanza\_navigation.html.py:30
+#: Profile/forms.py:54 templates/registration/login.html:20
+#: templates/sanza/_navigation.html:32
 msgid "Password"
 msgstr "Mot de passe"
 
-#: .\Profile\forms.py:55
+#: Profile/forms.py:55
 msgid "Repeat your password"
 msgstr "Confirmez le mot de passe"
 
-#: .\Profile\forms.py:56
+#: Profile/forms.py:56
 msgid "Accept term of use"
 msgstr "Accepter les conditions d'utilisation"
 
-#: .\Profile\forms.py:58
+#: Profile/forms.py:58
 msgid "Accept 3rd party"
 msgstr "Accepte les offres partenaires"
 
-#: .\Profile\forms.py:70
+#: Profile/forms.py:70
 msgid "Passwords are not the same"
 msgstr "Les mots de passe sont différents"
 
-#: .\Profile\forms.py:75
+#: Profile/forms.py:75
 msgid "Your message"
 msgstr "Votre message"
 
-#: .\Profile\forms.py:81
+#: Profile/forms.py:81
 msgid "Message is too long"
 msgstr "Message trop long"
 
-#: .\Profile\utils.py:41
+#: Profile/utils.py:41
 msgid "Sanza admin"
 msgstr "Admin Sanza"
 
-#: .\Profile\utils.py:43
+#: Profile/utils.py:43
 msgid "A user have registred with email {0} used by several other contacts"
 msgstr ""
 "Un utilisateur s'est incrit avec l'adresse email {0} déjà utilisée par "
 "plusieurs autres contacts."
 
-#: .\Profile\utils.py:47
+#: Profile/utils.py:47
 msgid "You should check that this contact is not duplicated"
 msgstr "Vous devriez vérifier que le contact n'est pas dupliqué."
 
-#: .\Profile\utils.py:110
+#: Profile/utils.py:118
 msgid "New registration"
 msgstr "Nouvelle inscription"
 
-#: .\Profile\views.py:29
+#: Profile/views.py:29
 msgid "Your profile has been updated."
 msgstr "Votre profil a été mis à jour."
 
-#: .\Profile\views.py:83
+#: Profile/views.py:83
 msgid "New message on web site"
 msgstr "Nouveau message depuis le site"
 
-#: .\Profile\templates\Profile\edit_profile.html.py:9
+#: Profile/templates/Profile/edit_profile.html:9
 msgid "Edit your profile"
 msgstr "Editer votre profil"
 
-#: .\Profile\templates\Profile\edit_profile.html.py:15
+#: Profile/templates/Profile/edit_profile.html:15
 msgid "Update"
 msgstr "Mettre à jour"
 
-#: .\Profile\templates\Profile\post_message.html.py:9
+#: Profile/templates/Profile/post_message.html:9
 msgid "Post"
 msgstr "Envoyer"
 
-#: .\Profile\templates\Profile\registration_notification_email.txt.py:3
+#: Profile/templates/Profile/registration_notification_email.txt:3
 msgid "A new user has registred to"
 msgstr "Un nouvel utilisateur s'est enregistré sur"
 
-#: .\Profile\templates\Profile\registration_notification_email.txt.py:5
+#: Profile/templates/Profile/registration_notification_email.txt:5
 msgid "About this user"
 msgstr "A propos de cet utilisateur"
 
-#: .\Profile\templates\registration\activate.html.py:3
+#: Profile/templates/registration/activate.html:3
 msgid "Activate"
 msgstr "Activer"
 
-#: .\Profile\templates\registration\activation_complete.html.py:3
+#: Profile/templates/registration/activation_complete.html:3
 msgid "Your account is now active!"
 msgstr "Votre compte est à présent actif"
 
-#: .\Profile\templates\registration\activation_complete.html.py:4
+#: Profile/templates/registration/activation_complete.html:4
 msgid "Now, you can"
 msgstr "Maintenant vous pouvez"
 
-#: .\Profile\templates\registration\activation_complete.html.py:4
+#: Profile/templates/registration/activation_complete.html:4
 msgid "login!"
 msgstr "connexion!"
 
-#: .\Profile\templates\registration\activation_email.txt.py:2
+#: Profile/templates/registration/activation_email.txt:2
 #, python-format
 msgid ""
 "\n"
@@ -2048,7 +2072,7 @@ msgstr ""
 "Afin de finir la création du compte, merci de l'activer en visitant l'url "
 "suivante:\n"
 
-#: .\Profile\templates\registration\activation_email.txt.py:10
+#: Profile/templates/registration/activation_email.txt:10
 #, python-format
 msgid ""
 "\n"
@@ -2064,15 +2088,15 @@ msgstr ""
 "PS: Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet "
 "email.\n"
 
-#: .\Profile\templates\registration\activation_email_subject.txt.py:2
+#: Profile/templates/registration/activation_email_subject.txt:2
 msgid "Account activation"
 msgstr "Activation de compte"
 
-#: .\Profile\templates\registration\registration_complete.html.py:3
+#: Profile/templates/registration/registration_complete.html:3
 msgid "Registration complete"
 msgstr "Inscription terminée"
 
-#: .\Profile\templates\registration\registration_complete.html.py:4
+#: Profile/templates/registration/registration_complete.html:4
 msgid ""
 "\n"
 "We sent you an email. It will help you to activate your account.\n"
@@ -2080,173 +2104,173 @@ msgstr ""
 "\n"
 "Nous vous avons envoyé un email. Il vous permettra d'activer votre compte.\n"
 
-#: .\Profile\templates\registration\registration_form.html.py:3
+#: Profile/templates/registration/registration_form.html:3
 msgid "Registration"
 msgstr "Inscription"
 
-#: .\Profile\templates\registration\registration_form.html.py:9
+#: Profile/templates/registration/registration_form.html:9
 msgid "Register"
 msgstr "S'inscrire"
 
-#: .\Search\forms.py:32
+#: Search/forms.py:32
 msgid "Quick search"
 msgstr "Recherche rapide"
 
-#: .\Search\forms.py:87
+#: Search/forms.py:87
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Sélectionnez un choix valide. Ce choix n'est pas disponible."
 
-#: .\Search\forms.py:113
+#: Search/forms.py:113
 msgid "Enter a name and click save."
 msgstr "Entrez un nom et cliquez sur Enregistrer"
 
-#: .\Search\forms.py:326
+#: Search/forms.py:326
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: .\Search\forms.py:326
+#: Search/forms.py:326
 msgid "Add block"
 msgstr "Ajouter un bloc"
 
-#: .\Search\forms.py:326
+#: Search/forms.py:326
 msgid "Clear"
 msgstr "Effacer"
 
-#: .\Search\forms.py:326 .\Search\forms.py:366
+#: Search/forms.py:326 Search/forms.py:366
 msgid "Remove"
 msgstr "Supprimer"
 
-#: .\Search\forms.py:326
+#: Search/forms.py:326
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: .\Search\forms.py:390
+#: Search/forms.py:390
 msgid "Two valid dates are required"
 msgstr "Deux dates valides sont requises"
 
-#: .\Search\forms.py:445
+#: Search/forms.py:445
 msgid "small labels"
 msgstr "Petites étiquettes"
 
-#: .\Search\forms.py:446
+#: Search/forms.py:446
 msgid "address strip"
 msgstr "Bande adresse"
 
-#: .\Search\forms.py:447
+#: Search/forms.py:447
 msgid "list of actions"
 msgstr "liste des actions"
 
-#: .\Search\forms.py:452
+#: Search/forms.py:452
 msgid "Select the type of document to generate"
 msgstr "Sélectionner le type de document à générer"
 
-#: .\Search\forms.py:491
+#: Search/forms.py:491
 msgid "Group on contact"
 msgstr "Groupe pour un contact"
 
-#: .\Search\forms.py:492
+#: Search/forms.py:492
 msgid "Define if the group is added on the contact itself or on his entity"
 msgstr ""
 "Définir si le groupe est ajouté sur le contact lui même ou sur son entité"
 
-#: .\Search\forms.py:514
+#: Search/forms.py:514
 msgid "Select groups"
 msgstr "Sélectionnez les groupes"
 
-#: .\Search\models.py:16 .\Search\models.py:20
+#: Search/models.py:16 Search/models.py:20
 msgid "search"
 msgstr "recherche"
 
-#: .\Search\models.py:17
+#: Search/models.py:17
 msgid "searchs"
 msgstr "recherche"
 
-#: .\Search\models.py:27 .\Search\models.py:31
+#: Search/models.py:27 Search/models.py:31
 msgid "search group"
 msgstr "groupe de recherche"
 
-#: .\Search\models.py:28
+#: Search/models.py:28
 msgid "search groups"
 msgstr "groupes de recherches"
 
-#: .\Search\models.py:32
+#: Search/models.py:32
 msgid "field"
 msgstr "champ"
 
-#: .\Search\models.py:39
+#: Search/models.py:39
 msgid "search field"
 msgstr "champ de recherche"
 
-#: .\Search\models.py:40
+#: Search/models.py:40
 msgid "search fied"
 msgstr "champs de recherche"
 
-#: .\Search\tests.py:746 .\Search\views.py:189
+#: Search/tests.py:746 Search/views.py:189
 msgid "Mailto: Error, no emails defined"
 msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 
-#: .\Search\views.py:66
+#: Search/views.py:66
 msgid "Contacts by phone number"
 msgstr "Contacts par numéro de téléphone"
 
-#: .\Search\views.py:103
+#: Search/views.py:103
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: .\Search\views.py:319
+#: Search/views.py:321
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crée"
 
-#: .\Search\views.py:342
+#: Search/views.py:344
 msgid "Create action for contacts"
 msgstr "Créer une action pour les contacts"
 
-#: .\Search\views.py:343 .\Search\views.py:397 .\Search\views.py:456
+#: Search/views.py:345 Search/views.py:399 Search/views.py:458
 msgid "The search results contains no contacts"
 msgstr "Le résultat de la recherche ne contient aucun contact"
 
-#: .\Search\views.py:366
+#: Search/views.py:368
 msgid "{0} contacts have been added to groups"
 msgstr "{0} contacts ont été ajoutés aux groupes"
 
-#: .\Search\views.py:373
+#: Search/views.py:375
 msgid "{0} entities have been added to groups"
 msgstr "{0} entités ont été ajoutés aux groupes"
 
-#: .\Search\views.py:396
+#: Search/views.py:398
 msgid "Add contacts to group"
 msgstr "Ajouter les contacts à un groupe"
 
-#: .\Search\views.py:429
+#: Search/views.py:431
 msgid "{0} contacts have subscribe to the newsletter"
 msgstr "{0} contacts ont été inscrits à la lettre d'information"
 
-#: .\Search\views.py:432
+#: Search/views.py:434
 msgid "{0} contacts have unsubscribe to the newsletter"
 msgstr "{0} contacts ont été désinscrits à la lettre d'information"
 
-#: .\Search\views.py:455
+#: Search/views.py:457
 msgid "Contacts admin"
 msgstr "Administration des contacts"
 
-#: .\Search\templates\Search\_section_qs_cities.html.py:8
+#: Search/templates/Search/_section_qs_cities.html:8
 msgid "Contacts and entities"
 msgstr "Contacts et entités"
 
-#: .\Search\templates\Search\_section_qs_groups.html.py:8
+#: Search/templates/Search/_section_qs_groups.html:8
 msgid "Members"
 msgstr "Membres"
 
-#: .\Search\templates\Search\_section_search_form.html.py:4
+#: Search/templates/Search/_section_search_form.html:4
 msgid "Search criteria"
 msgstr "Critère de recherche"
 
-#: .\Search\templates\Search\_section_search_form.html.py:115
-#: .\templates\sanza\_calendar.html.py:14
+#: Search/templates/Search/_section_search_form.html:115
+#: templates/sanza/_calendar.html:14
 msgid "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
 msgstr "['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa']"
 
-#: .\Search\templates\Search\_section_search_form.html.py:116
+#: Search/templates/Search/_section_search_form.html:116
 msgid ""
 "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', "
 "'September', 'October', 'November', 'December']"
@@ -2254,20 +2278,20 @@ msgstr ""
 "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', "
 "'September', 'October', 'November', 'December']"
 
-#: .\Search\templates\Search\_section_search_form.html.py:142
-#: .\templates\sanza\_navigation.html.py:25
+#: Search/templates/Search/_section_search_form.html:142
+#: templates/sanza/_navigation.html:27
 msgid "Search"
 msgstr "Recherche"
 
-#: .\Search\templates\Search\_section_search_form.html.py:144
+#: Search/templates/Search/_section_search_form.html:144
 msgid "Open"
 msgstr "Ouvrir"
 
-#: .\Search\templates\Search\_section_search_results.html.py:5
+#: Search/templates/Search/_section_search_results.html:5
 msgid "Search results"
 msgstr "Résulats de la recherche"
 
-#: .\Search\templates\Search\_section_search_results.html.py:12
+#: Search/templates/Search/_section_search_results.html:12
 msgid ""
 "The search contains empty entities: These entities may only have secondary "
 "or old contacts"
@@ -2275,15 +2299,15 @@ msgstr ""
 "La recherche contient des entités vides : Ces entités peuvent avoir "
 "seulement des contacts secondaires ou anciens"
 
-#: .\Search\templates\Search\_section_search_results.html.py:23
+#: Search/templates/Search/_section_search_results.html:23
 msgid "No contacts !!"
 msgstr "Aucun contact !!"
 
-#: .\Search\templates\Search\_section_search_results.html.py:38
+#: Search/templates/Search/_section_search_results.html:38
 msgid "exclude"
 msgstr "exclure"
 
-#: .\Search\templates\Search\_section_search_results.html.py:76
+#: Search/templates/Search/_section_search_results.html:76
 msgid ""
 "The search results contains contacts who are refusing the newsletter.\\n"
 "\\nContinue?"
@@ -2291,36 +2315,36 @@ msgstr ""
 "Le résultat de recherche contient des contacts qui refusent la newletter.\\n"
 "\\nContinuer?"
 
-#: .\Search\templates\Search\_section_search_results.html.py:126
+#: Search/templates/Search/_section_search_results.html:126
 msgid "BCC Mail to"
 msgstr "Mail à CCI"
 
-#: .\Search\templates\Search\_section_search_results.html.py:127
+#: Search/templates/Search/_section_search_results.html:127
 msgid "Mailing"
 msgstr "Mailing"
 
-#: .\Search\templates\Search\_section_search_results.html.py:128
+#: Search/templates/Search/_section_search_results.html:128
 msgid "Excel"
 msgstr "Excel"
 
-#: .\Search\templates\Search\_section_search_results.html.py:130
+#: Search/templates/Search/_section_search_results.html:130
 msgid "Add to groups"
 msgstr "Ajouter aux groupes"
 
-#: .\Search\templates\Search\_section_search_results.html.py:131
+#: Search/templates/Search/_section_search_results.html:131
 msgid "PDF"
 msgstr "PDF"
 
-#: .\Search\templates\Search\_section_search_results.html.py:133
-#: .\Search\templates\Search\contacts_admin_form.html.py:3
+#: Search/templates/Search/_section_search_results.html:133
+#: Search/templates/Search/contacts_admin_form.html:3
 msgid "Contacts Admin"
 msgstr "Administration des contacts"
 
-#: .\Search\templates\Search\add_contacts_to_group.html.py:45
+#: Search/templates/Search/add_contacts_to_group.html:45
 msgid "Add  to group"
 msgstr "Ajouter à un groupe"
 
-#: .\Search\templates\Search\add_contacts_to_group.html.py:52
+#: Search/templates/Search/add_contacts_to_group.html:52
 msgid ""
 "\n"
 "    Select groups in the existing ones.<br><br>\n"
@@ -2334,33 +2358,33 @@ msgstr ""
 "est cochée ou non) aux groupes sélectionnés.\n"
 "  "
 
-#: .\Search\templates\Search\create_action_for_contacts.html.py:8
+#: Search/templates/Search/create_action_for_contacts.html:8
 #, python-format
 msgid "Create actions for %(nb_contacts)s contacts"
 msgstr "Créer une action pour %(nb_contacts)s contacts"
 
-#: .\Search\templates\Search\create_action_for_contacts.html.py:12
-#: .\Search\templates\Search\new_emailing.html.py:23
+#: Search/templates/Search/create_action_for_contacts.html:12
+#: Search/templates/Search/new_emailing.html:23
 msgid "Create"
 msgstr "Créer"
 
-#: .\Search\templates\Search\export_to_pdf.html.py:36
+#: Search/templates/Search/export_to_pdf.html:36
 msgid "Export to PDF"
 msgstr "Exporter en PDF"
 
-#: .\Search\templates\Search\export_to_pdf.html.py:44
+#: Search/templates/Search/export_to_pdf.html:44
 msgid "Generate"
 msgstr "Générer"
 
-#: .\Search\templates\Search\mailto_groups.html.py:39
+#: Search/templates/Search/mailto_groups.html:39
 msgid "Mailto"
 msgstr "Mail à"
 
-#: .\Search\templates\Search\mailto_groups.html.py:39
+#: Search/templates/Search/mailto_groups.html:39
 msgid "BCC"
 msgstr "BCC"
 
-#: .\Search\templates\Search\mailto_groups.html.py:43
+#: Search/templates/Search/mailto_groups.html:43
 #, python-format
 msgid ""
 "\n"
@@ -2379,63 +2403,63 @@ msgstr ""
 "liens ci-dessous pour l'envoyer à chaque groupe de destinataires.\n"
 "  "
 
-#: .\Search\templates\Search\new_emailing.html.py:19
+#: Search/templates/Search/new_emailing.html:19
 msgid "New emailing"
 msgstr "Nouveau mailing"
 
-#: .\Search\templates\Search\quicksearch_results.html.py:5
+#: Search/templates/Search/quicksearch_results.html:5
 msgid "Quick search results for"
 msgstr "Résulats de la recherche rapide"
 
-#: .\Search\templates\Search\search.html.py:7
+#: Search/templates/Search/search.html:7
 msgid "Contacts of group"
 msgstr "Contacts du groupe"
 
-#: .\Search\templates\Search\search.html.py:10
+#: Search/templates/Search/search.html:10
 msgid "Contacts in oppportunity"
 msgstr "Contacts d'un dossier"
 
-#: .\Search\templates\Search\search.html.py:12
+#: Search/templates/Search/search.html:12
 msgid "Search for contacts"
 msgstr "Recherche de contacts"
 
-#: .\Search\templates\Search\search_list.html.py:6
+#: Search/templates/Search/search_list.html:6
 msgid "List of searchs"
 msgstr "Liste des recherches"
 
-#: .\Search\templates\pdf\address_strip.html.py:35
-#: .\Search\templates\pdf\small_labels.html.py:41
+#: Search/templates/pdf/address_strip.html:35
+#: Search/templates/pdf/small_labels.html:41
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
 
-#: .\templates\403.html.py:5
+#: templates/403.html:5
 msgid "Permission Denied"
 msgstr "Permission réfusée"
 
-#: .\templates\403.html.py:7
+#: templates/403.html:7
 msgid "You are not allowed to see this page"
 msgstr "Vous n'êtes pas autorisé à voir cette page."
 
-#: .\templates\404.html.py:4 .\templates\404.html.py:6
+#: templates/404.html:4 templates/404.html.py:6
 msgid "Page not found"
 msgstr "Page inconnue"
 
-#: .\templates\404.html.py:8
+#: templates/404.html:8
 msgid "The request page can't be found on the server"
 msgstr "La page demandée ne peut être trouvée sur ce serveur"
 
-#: .\templates\500.html.py:5
+#: templates/500.html:5
 msgid "Server Error"
 msgstr "Erreur du serveur"
 
-#: .\templates\500.html.py:10
+#: templates/500.html:10
 msgid ""
 "Sorry! we can not process your request. The server encountered an error."
 msgstr ""
 "Désolé! Nous ne pouvons pas traiter votre demande. Le serveur a rencontré "
 "une erreur."
 
-#: .\templates\500.html.py:12
+#: templates/500.html:12
 msgid ""
 "We've been informed and we will make our best to fix the problem as soon as "
 "possible"
@@ -2443,171 +2467,181 @@ msgstr ""
 "Nosu avons été informé de cette erreur et ferons tout notre possible pour le "
 "corriger rapidement"
 
-#: .\templates\500.html.py:13
+#: templates/500.html:13
 msgid "Please retry in a short while or go back to the"
 msgstr "merci de réessayer dans un instant ou retourner à la"
 
-#: .\templates\500.html.py:13 .\templates\registration\logged_out.html.py:5
+#: templates/500.html:13 templates/registration/logged_out.html:5
 msgid "homepage"
 msgstr "page d'accueil"
 
-#: .\templates\base.html.py:14
-#: .\templates\registration\password_change_done.html.py:5
+#: templates/base.html:14 templates/registration/password_change_done.html:5
 msgid "Homepage"
 msgstr "page d'accueil"
 
-#: .\templates\registration\logged_out.html.py:3
+#: templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Site d'admin Django"
+
+#: templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "administration Django"
+
+#: templates/admin/base_site.html:11
+msgid "Site"
+msgstr "Site"
+
+#: templates/registration/logged_out.html:3
 msgid "You've been logged out"
 msgstr "Vous avez été déconnecté"
 
-#: .\templates\registration\logged_out.html.py:5
+#: templates/registration/logged_out.html:5
 msgid "You are going to be redirected to the"
 msgstr "Vous allez être redirigé vers"
 
-#: .\templates\registration\login.html.py:3
-#: .\templates\registration\login.html.py:26
-#: .\templates\registration\password_reset_complete.html.py:5
-#: .\templates\registration\password_reset_form.html.py:13
+#: templates/registration/login.html:3 templates/registration/login.html:26
+#: templates/registration/password_reset_complete.html:5
+#: templates/registration/password_reset_form.html:13
 msgid "Login"
 msgstr "Connexion"
 
-#: .\templates\registration\login.html.py:5
+#: templates/registration/login.html:5
 msgid "Login has failed"
 msgstr "La connexion a échouée"
 
-#: .\templates\registration\login.html.py:16
+#: templates/registration/login.html:16
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: .\templates\registration\login.html.py:30
+#: templates/registration/login.html:30
 msgid "Forgotten Password"
 msgstr "Mot de passe oublié"
 
-#: .\templates\registration\password_change_done.html.py:3
-#: .\templates\registration\password_reset_complete.html.py:3
+#: templates/registration/password_change_done.html:3
+#: templates/registration/password_reset_complete.html:3
 msgid "The password has been changed"
 msgstr "Le mot de passe a été modifié"
 
-#: .\templates\registration\password_change_done.html.py:5
+#: templates/registration/password_change_done.html:5
 msgid "Go back to the"
 msgstr "Retour à la"
 
-#: .\templates\registration\password_change_form.html.py:3
+#: templates/registration/password_change_form.html:3
 msgid "Password modification"
 msgstr "Modification du mot de passe"
 
-#: .\templates\registration\password_change_form.html.py:10
+#: templates/registration/password_change_form.html:10
 msgid "Change password"
 msgstr "Changer de mot de passe"
 
-#: .\templates\registration\password_reset_complete.html.py:5
+#: templates/registration/password_reset_complete.html:5
 msgid "Click Here"
 msgstr "Cliquez ici"
 
-#: .\templates\registration\password_reset_confirm.html.py:3
-#: .\templates\registration\password_reset_form.html.py:3
+#: templates/registration/password_reset_confirm.html:3
+#: templates/registration/password_reset_form.html:3
 msgid "Password reset"
 msgstr "Réinitialisation du mot de passe"
 
-#: .\templates\registration\password_reset_confirm.html.py:9
-#: .\templates\registration\password_reset_form.html.py:9
+#: templates/registration/password_reset_confirm.html:9
+#: templates/registration/password_reset_form.html:9
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: .\templates\registration\password_reset_done.html.py:3
+#: templates/registration/password_reset_done.html:3
 msgid "An Email has been sent"
 msgstr "Un email vous a été envoyé"
 
-#: .\templates\registration\password_reset_done.html.py:5
+#: templates/registration/password_reset_done.html:5
 msgid "It contains the procedure to reset the password."
 msgstr "Il contient la procédure de réinitialisation du mot de passe"
 
-#: .\templates\sanza\_calendar.html.py:16
+#: templates/sanza/_calendar.html:16
 msgid "January"
 msgstr "Janvier"
 
-#: .\templates\sanza\_calendar.html.py:16
+#: templates/sanza/_calendar.html:16
 msgid "February"
 msgstr "Février"
 
-#: .\templates\sanza\_calendar.html.py:16
+#: templates/sanza/_calendar.html:16
 msgid "March"
 msgstr "Mars"
 
-#: .\templates\sanza\_calendar.html.py:16
+#: templates/sanza/_calendar.html:16
 msgid "April"
 msgstr "Avril"
 
-#: .\templates\sanza\_calendar.html.py:17
+#: templates/sanza/_calendar.html:17
 msgid "May"
 msgstr "Mai"
 
-#: .\templates\sanza\_calendar.html.py:17
+#: templates/sanza/_calendar.html:17
 msgid "June"
 msgstr "Juin"
 
-#: .\templates\sanza\_calendar.html.py:17
+#: templates/sanza/_calendar.html:17
 msgid "July"
 msgstr "Juillet"
 
-#: .\templates\sanza\_calendar.html.py:17
+#: templates/sanza/_calendar.html:17
 msgid "August"
 msgstr "Août"
 
-#: .\templates\sanza\_calendar.html.py:18
+#: templates/sanza/_calendar.html:18
 msgid "September"
 msgstr "Septembre"
 
-#: .\templates\sanza\_calendar.html.py:18
+#: templates/sanza/_calendar.html:18
 msgid "October"
 msgstr "Octobre"
 
-#: .\templates\sanza\_calendar.html.py:18
+#: templates/sanza/_calendar.html:18
 msgid "November"
 msgstr "Novembre"
 
-#: .\templates\sanza\_calendar.html.py:18
+#: templates/sanza/_calendar.html:18
 msgid "December"
 msgstr "Décembre"
 
-#: .\templates\sanza\_header.html.py:3
+#: templates/sanza/_header.html:3
 msgid "Board panel"
 msgstr "Tableau de bord"
 
-#: .\templates\sanza\_header.html.py:4 .\templates\sanza\base.html.py:5
+#: templates/sanza/_header.html:4 templates/sanza/base.html:5
 msgid "sanza"
 msgstr "sanza"
 
-#: .\templates\sanza\_navigation.html.py:12
+#: templates/sanza/_navigation.html:12
 msgid "Mailings"
 msgstr "Mailings"
 
-#: .\templates\sanza\_navigation.html.py:27
+#: templates/sanza/_navigation.html:29
 msgid "Account"
 msgstr "Compte"
 
-#: .\templates\sanza\_navigation.html.py:29
+#: templates/sanza/_navigation.html:31
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: .\templates\sanza\_navigation.html.py:32
+#: templates/sanza/_navigation.html:34
 msgid "Contacts import"
 msgstr "Import de contacts"
 
-#: .\templates\sanza\_navigation.html.py:33
+#: templates/sanza/_navigation.html:35
 msgid "Export database"
 msgstr "Export DB"
 
-#: .\templates\sanza\base.html.py:38
+#: templates/sanza/base.html:38
 msgid "This application requires javascript to be enabled"
 msgstr "Cette application requiert l'activation de javascript"
 
-#: .\templates\sanza\confirmation_dialog.html.py:3
-#: .\templates\sanza\confirmation_dialog.html.py:11
+#: templates/sanza/confirmation_dialog.html:3
+#: templates/sanza/confirmation_dialog.html:11
 msgid "Confirm"
 msgstr "Confirmer"
 
-#: .\templates\sanza\tab_form.html.py:45
+#: templates/sanza/tab_form.html:50
 msgid "The form is not valid."
 msgstr "Le formulaire n'est pas valide"
 
