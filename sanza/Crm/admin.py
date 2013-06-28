@@ -54,9 +54,9 @@ class OpportunityAdmin(admin.ModelAdmin):
 admin.site.register(models.Opportunity, OpportunityAdmin)
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ['subject', 'entity']
-    search_fields = ['subject', 'entity']
-    raw_id_admin = ('entity',)
+    list_display = ['subject', 'contact']
+    search_fields = ['subject', 'contact']
+    raw_id_admin = ('contact',)
 admin.site.register(models.Action, ActionAdmin)
 
 class CustomFieldAdmin(admin.ModelAdmin):
@@ -76,3 +76,4 @@ admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin
 admin.site.register(models.ContactsImport)
 admin.site.register(models.ActionSet)
 admin.site.register(models.ActionStatus)
+admin.site.register(models.ActionDocument)

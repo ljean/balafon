@@ -65,12 +65,12 @@
     <td class="ico-col">
       {% if a.actiondocument %}
         <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
-          <img src="{% static "fugue/document.png" %}" alt="{% trans "document" %}" %}
+          <img src="{% static "img/document-pdf-text.png" %}" alt="{% trans "document" %}" %}
         </a>
       {% else %}
         {% if a.type.default_template %}
         <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
-          <img src="{% static "fugue/document--plus.png" %}" alt="{% trans "add document" %}" %}
+          <img src="{% static "img/document-pdf.png" %}" alt="{% trans "add document" %}" %}
         </a>
         {% endif %}
       {% endif %}

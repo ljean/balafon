@@ -66,3 +66,10 @@ def try_to_include(parser, token):
             "%r tag requires a single argument" % token.contents.split()[0]
 
     return IncludeNode(template_name[1:-1])
+
+@register.filter
+def split_lines(lines, nb=1):
+    try:
+        return u"\n".join(lines.splitlines()[:nb])
+    except Exception:
+        return u""

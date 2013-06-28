@@ -570,7 +570,6 @@ class ActionType(NamedElement):
         verbose_name = _(u'action type')
         verbose_name_plural = _(u'action types')
 
-
 class Action(TimeStampedModel):
     PRIORITY_LOW = 1
     PRIORITY_MEDIUM = 2
@@ -600,7 +599,7 @@ class Action(TimeStampedModel):
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
 
     def __unicode__(self):
-        return u'{0.subject} with {0.entity}'.format(self)
+        return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
         
     def save(self, *args, **kwargs):
         if not self.done_date and self.done:
@@ -634,6 +633,10 @@ class ActionDocument(models.Model):
     
     def can_view_object(self, user):
         return user.is_staff
+    
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.template, self.action)
+    
     
 class CustomField(models.Model):
     
