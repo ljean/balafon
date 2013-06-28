@@ -19,6 +19,7 @@ from django.contrib import messages
 import urllib2, re
 from bs4 import BeautifulSoup
 from django.utils.importlib import import_module
+from captcha.fields import CaptchaField
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -104,6 +105,7 @@ class SubscribeForm(ModelFormWithCity):
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
+    captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
     
     class Meta:
         model = Contact

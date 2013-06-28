@@ -7,5 +7,5 @@
       {% endfor %}
   </ul>
   {% endif %}
-  {{field}}
+  {{field}}{% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
 </td>
