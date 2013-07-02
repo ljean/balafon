@@ -508,5 +508,35 @@ class ProfileBackendTest(TestCase):
         self.assertEqual(notif_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
         self.assertEqual(notif_email.cc, [])
         self.assertTrue(notif_email.body.find(user.email)>0)
+       
+class RegisterTestCase(TestCase):
+
+    def test_register_with_very_long_email(self):
+        url = reverse('registration_register')
+        data = {
+            'email': ('a'*30)+'@toto.fr',
+            'password1': 'PAss',
+            'password2': 'PAss',
+            'accept_termofuse': True,
+            'accept_newsletter': True,
+            'accept_3rdpart': True,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        user = User.objects.get(email=data['email'])
         
-    
+        self.assertEqual(RegistrationProfile.objects.count(), 1)
+        rp = RegistrationProfile.objects.all()[0]
+        self.assertEqual(rp.user, user)
+        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, [data['email']])
+        self.assertTrue(mail.outbox[0].body.find(activation_url))
+        
+        response = self.client.get(activation_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(email=data['email'])
+        self.assertEqual(contact.accept_newsletter, data['accept_newsletter'])
+        
+        self.assertTrue(self.client.login(email=data['email'], password=data['password1']))

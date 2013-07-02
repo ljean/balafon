@@ -77,6 +77,8 @@ def check_category_permission(obj, permission, user):
     #Get the contact corresponding to the logged user
     try:
         contact = user.contactprofile.contact
+        if not contact.id:
+            return False
     except (ContactProfile.DoesNotExist, Contact.DoesNotExist, AttributeError):
         #If anonymous user or no contact exists for this profile
         #users are not allowed to check the category

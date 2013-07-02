@@ -11,7 +11,7 @@ from coop_cms.perms_backends import ArticlePermissionBackend
 class AcceptNewsletterRegistrationBackend(DefaultBackend):
     
     def register(self, request, **kwargs):
-        kwargs["username"] = kwargs["email"] 
+        kwargs["username"] = kwargs["email"][:30]
         user = super(AcceptNewsletterRegistrationBackend, self).register(request, **kwargs)
         
         #Store if 
@@ -26,7 +26,6 @@ class AcceptNewsletterRegistrationBackend(DefaultBackend):
     
     def activate(self, request, activation_key):
         activated = super(AcceptNewsletterRegistrationBackend, self).activate(request, activation_key)
-        
         #The account has been activated: We can create the corresponding contact in Sanza
         if activated:
             profile = create_profile_contact(activated)
@@ -35,9 +34,10 @@ class AcceptNewsletterRegistrationBackend(DefaultBackend):
         return activated
 
 class EmailModelBackend(ModelBackend):
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, username=None, password=None, email=None):
         try:
-            user = User.objects.get(email=username.strip())
+            email = email or username
+            user = User.objects.get(email=email.strip())
             
             if not user.is_active:
                 return None
