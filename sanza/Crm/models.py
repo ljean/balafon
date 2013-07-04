@@ -135,7 +135,7 @@ class Entity(TimeStampedModel):
             Contact.objects.create(entity=self, main_contact=True, has_left=False)
         elif self.contact_set.filter(main_contact=True, has_left=False).count() == 0:
             #Always at least 1 main contact per entity
-            c = self.contact_set.all()[0]
+            c = self.default_contact
             c.main_contact = True
             c.save()
     
@@ -205,11 +205,15 @@ class Entity(TimeStampedModel):
     def single_contact(self):
         try:
             if self.is_single_contact:
-                return self.contact_set.all()[0]
+                return self.default_contact
         except IndexError:
             pass
         return None
-        
+    
+    @property
+    def default_contact(self):
+        return self.contact_set.all()[0]
+    
     def current_opportunities(self):
         return self.opportunity_set.filter(ended=False).count()
 

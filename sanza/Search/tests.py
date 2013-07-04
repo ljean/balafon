@@ -643,7 +643,7 @@ class MainContactAndHasLeftSearchTest(BaseTestCase):
     
     def _make_contact(self, main_contact, has_left):
         entity = mommy.make(models.Entity, name=u"TinyTinyCorp")
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         contact.lastname = 'TiniMax'
         contact.firstname = 'Boss'
         contact.main_contact = main_contact
@@ -728,7 +728,7 @@ class MailtoContactsTest(BaseTestCase):
         
     def _create_contact(self, email=''):
         entity = mommy.make(models.Entity)
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         contact.lastname = 'TiniMax'
         contact.firstname = 'Boss'
         contact.email = email
@@ -927,12 +927,12 @@ class SameAsTest(BaseTestCase):
         
         contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
-        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.default_contact.delete()
         contact1.entity.save()
         
         contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
-        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.default_contact.delete()
         contact2.entity.save()
         
         group = mommy.make(models.Group, name="GROUP1")
@@ -958,12 +958,12 @@ class SameAsTest(BaseTestCase):
     def test_search_same_as_not_allowed2(self):
         contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
-        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.default_contact.delete()
         contact1.entity.save()
         
         contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
-        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.default_contact.delete()
         contact2.entity.save()
         
         group = mommy.make(models.Group, name="GROUP1")
@@ -989,12 +989,12 @@ class SameAsTest(BaseTestCase):
     def test_search_same_as_allowed(self):
         contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
-        contact1.entity.contact_set.all()[0].delete()
+        contact1.entity.default_contact.delete()
         contact1.entity.save()
         
         contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
-        contact2.entity.contact_set.all()[0].delete()
+        contact2.entity.default_contact.delete()
         contact2.entity.save()
         
         group = mommy.make(models.Group, name="GROUP1")

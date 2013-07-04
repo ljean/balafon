@@ -830,7 +830,7 @@ class SingleContactTest(BaseTestCase):
     
     def test_view_delete_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=True)
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         url = reverse('crm_delete_contact', args=[contact.id])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -838,7 +838,7 @@ class SingleContactTest(BaseTestCase):
         
     def test_delete_single_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=True)
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         url = reverse('crm_delete_contact', args=[contact.id])
         data = {'confirm': True}
         response = self.client.post(url, data=data, follow=True)
@@ -848,7 +848,7 @@ class SingleContactTest(BaseTestCase):
         
     def test_delete_entity_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         url = reverse('crm_delete_contact', args=[contact.id])
         data = {'confirm': True}
         response = self.client.post(url, data=data, follow=True)
@@ -859,7 +859,7 @@ class SingleContactTest(BaseTestCase):
         
     def test_delete_several_entity_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = entity.contact_set.all()[0]
+        contact = entity.default_contact
         contact2 = mommy.make(models.Contact, entity=entity)
         self.assertEqual(entity.contact_set.count(), 2)
         url = reverse('crm_delete_contact', args=[contact.id])
