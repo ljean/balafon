@@ -10,7 +10,7 @@ from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
 from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
-from form_utils.forms import BetterModelForm
+from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
 
 class AddEntityToGroupForm(forms.Form):
@@ -93,18 +93,24 @@ class EditGroupForm(forms.ModelForm):
             widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
 
-class ModelFormWithCity(BetterModelForm):
-    country = forms.ChoiceField(required=False, label=_(u'Country'))
+class _CityBasedForm(object):
+    def _get_city_parent(self, city):
+        parent = city.parent
+        while parent:
+            country = parent
+            parent = parent.parent
+        return country
     
-    def __init__(self, *args, **kwargs):
-        super(ModelFormWithCity, self).__init__(*args, **kwargs)
-        
+    def _post_init(self, *args, **kwargs):
+        self.country_id = 0
         if len(args):
             try:
                 self.country_id = int(args[0]["country"])
             except KeyError:
-                cn = get_default_country()
-                self.country_id = models.Zone.objects.get(name=cn, parent__isnull=True).id
+                pass
+        if not self.country_id:
+            cn = get_default_country()
+            self.country_id = models.Zone.objects.get(name=cn, parent__isnull=True).id
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         
@@ -115,13 +121,6 @@ class ModelFormWithCity(BetterModelForm):
                 self.fields['country'].initial = self._get_city_parent(city).id    
         except:
             pass
-        
-    def _get_city_parent(self, city):
-        parent = city.parent
-        while parent:
-            country = parent
-            parent = parent.parent
-        return country
     
     def _get_country(self, id):
         if id:
@@ -165,6 +164,26 @@ class ModelFormWithCity(BetterModelForm):
             except Exception, msg:
                 raise
                 raise ValidationError(msg)
+
+class ModelFormWithCity(BetterModelForm, _CityBasedForm):
+    country = forms.ChoiceField(required=False, label=_(u'Country'))
+    
+    def __init__(self, *args, **kwargs):
+        super(ModelFormWithCity, self).__init__(*args, **kwargs)
+        self._post_init(*args, **kwargs)
+        
+class FormWithCity(BetterForm, _CityBasedForm):
+    country = forms.ChoiceField(required=False, label=_(u'Country'))
+    zip_code = forms.CharField(required=False, label=_(u'zip code'))
+    city = forms.CharField(required = False, label=_(u'City'))
+    
+    def __init__(self, *args, **kwargs):
+        super(BetterForm, self).__init__(*args, **kwargs)
+        print "****************************************"
+        self._post_init(*args, **kwargs)
+        print "****************************************"
+        
+
     
 class EntityForm(ModelFormWithCity):
     city = forms.CharField(

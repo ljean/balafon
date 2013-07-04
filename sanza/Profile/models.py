@@ -3,7 +3,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import signals
-from sanza.Crm.models import Contact, Group
+from sanza.Crm.models import Contact, Group, City, EntityType
+from django.utils.translation import ugettext, ugettext_lazy as _
 from coop_cms.models import ArticleCategory
 
 class ContactProfile(models.Model):
@@ -11,6 +12,10 @@ class ContactProfile(models.Model):
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
     accept_newsletter = models.BooleanField()
     accept_3rdparty = models.BooleanField()
+    entity_name = models.CharField(_('entity name'), max_length=200, blank=True, default="")
+    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None)
+    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
+    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
 
     #User.profile = property(lambda u: ContactProfile.objects.get_or_create(user=u)[0])
 

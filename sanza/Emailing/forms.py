@@ -174,7 +174,7 @@ class SubscribeForm(ModelFormWithCity):
                 raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
-            entity = u' '.join([x for x in data if x])
+            entity = u' '.join([x for x in data if x]).strip().upper()
             
         return entity
             

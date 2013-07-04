@@ -11,4 +11,4 @@ def get_default_country():
     return getattr(project_settings, 'SANZA_DEFAULT_COUNTRY', 'France')
 
 ALLOW_COUPLE_GENDER = getattr(project_settings, 'SANZA_ALLOW_COUPLE_GENDER', False)
-ALLOW_SINGLE_CONTACT = getattr(project_settings, 'SANZA_ALLOW_SINGLE_CONTACT', True) 
+ALLOW_SINGLE_CONTACT = getattr(project_settings, 'SANZA_ALLOW_SINGLE_CONTACT', True)

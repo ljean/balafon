@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from sanza.Crm.models import Contact, Entity, Action, ActionType
+from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType
 from django.utils.translation import ugettext as _
 from models import ContactProfile, CategoryPermission
 from datetime import datetime
@@ -9,12 +9,14 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
 from django.template import Context
-
+from sanza.Crm import settings as crm_settings
+from django.conf import settings
 
 def create_profile_contact(user):
     profile = user.contactprofile
     if not profile:
         profile = ContactProfile(user=user)
+    rename_entity = False
     
     if profile.contact:
         contact = profile.contact
@@ -29,13 +31,26 @@ def create_profile_contact(user):
             warn_duplicates = True
         
         if not contact:
+            if profile and profile.entity_type:
+                entity_type = profile.entity_type
+            else:
+                if crm_settings.ALLOW_SINGLE_CONTACT:
+                    entity_type = None
+                else:
+                    et_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
+                    entity_type = EntityType.objects.get(id=et_id)
+                    rename_entity = True
+
             entity = Entity(
-                name = user.username,
-                is_single_contact = True
+                name = profile.entity_name if profile else user.username,
+                is_single_contact = (entity_type==None) and crm_settings.ALLOW_SINGLE_CONTACT,
+                type = entity_type
             )
+            
             entity.save()
             #This create a default contact
             contact = entity.contact_set.all()[0]
+            
         
         if warn_duplicates:
             at, _x = ActionType.objects.get_or_create(name=_(u"Sanza admin"))
@@ -55,7 +70,18 @@ def create_profile_contact(user):
     contact.accept_newsletter = profile.accept_newsletter
     contact.accept_3rdparty = profile.accept_3rdparty
     contact.email_verified = True
+    if not contact.lastname:
+        contact.lastname = user.email.split("@")[0]
+    
+    if profile:
+        contact.city = profile.city
+        contact.zip_code = profile.zip_code
+    
     contact.save()
+    
+    if rename_entity:
+        contact.entity.name = u"{0.lastname} {0.firstname}".format(contact).strip().upper()
+        contact.entity.save()
     
     profile.contact = contact
     profile.save()
