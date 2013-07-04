@@ -52,6 +52,19 @@ class CitySearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return Q(entity__city__id=self._value) | Q(city__id=self._value)
+    
+class ZipCodeSearchForm(SearchFieldForm):
+    _name = 'zip_code'
+    _label = _(u'zip code')
+    
+    def __init__(self, *args, **kwargs):
+        super(ZipCodeSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter the beginning of the zip code')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return Q(entity__zip_code__istartswith=self._value) | Q(zip_code__istartswith=self._value)
         
 class ZoneSearchForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
