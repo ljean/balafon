@@ -18,11 +18,11 @@ class Command(BaseCommand):
         
         individual_entity_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
         
-        for e in models.Entity.objects.get(id=individual_entity_id):
+        for e in models.Entity.objects.filter(type__id=individual_entity_id):
             e.name = u"{0.lastname} {0.firstname}".format(e.default_contact).strip().upper()
             e.save()
         
             if verbose:
                 print e.name
-        print models.Entity.objects.get(id=individual_entity_id).count(), "entities have been renamed"
+        print models.Entity.objects.filter(type__id=individual_entity_id).count(), "entities have been renamed"
             
