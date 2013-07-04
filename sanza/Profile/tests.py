@@ -474,7 +474,7 @@ class ProfileBackendTest(TestCase):
     def test_create_sanza_contact_duplicate_email(self):
         user = self._create_user()
         contact = mommy.make(models.Contact, email=user.email)
-        contact.entity.contact_set.all()[0].delete()
+        contact.entity.default_contact.delete()
         self._create_profile_and_check(user)
         self.assertEqual(models.Contact.objects.count(), 1)
         self.assertEqual(models.Action.objects.count(), 0)
@@ -484,8 +484,8 @@ class ProfileBackendTest(TestCase):
         user = self._create_user()
         contact1 = mommy.make(models.Contact, email=user.email)
         contact2 = mommy.make(models.Contact, email=user.email)
-        contact1.entity.contact_set.all()[0].delete()
-        contact2.entity.contact_set.all()[0].delete()
+        contact1.entity.default_contact.delete()
+        contact2.entity.default_contact.delete()
         
         profile = create_profile_contact(user)
         contact = profile.contact

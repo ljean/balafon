@@ -49,7 +49,7 @@ def create_profile_contact(user):
             
             entity.save()
             #This create a default contact
-            contact = entity.contact_set.all()[0]
+            contact = entity.default_contact
             
         
         if warn_duplicates:
