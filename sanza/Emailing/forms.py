@@ -129,6 +129,9 @@ class SubscribeForm(ModelFormWithCity):
         self.fields['email'].required = True
         #self.fields['lastname'].required = True
         
+        #Do not display (Mrs and M) gender on subscribe form
+        self.fields['gender'].choices = self.fields['gender'].choices[:3]
+        
         self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
             (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
         ]

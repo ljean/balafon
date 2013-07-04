@@ -54,6 +54,7 @@ class UserRegistrationForm(FormWithCity):
     email = Email(required=True, label=_(u"Email"), widget=forms.TextInput())
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
+    gender = forms.ChoiceField(_(u'gender'), required=False)
     firstname = forms.CharField(required=False, label=_(u"Firstname"))
     lastname = forms.CharField(required=False, label=_(u"Lastname"))
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
@@ -72,7 +73,9 @@ class UserRegistrationForm(FormWithCity):
             #if not (name.find('accept')==0):
             if field.required:
                 field.widget.attrs['required'] = "required"
-                
+        
+        self.fields['gender'].choices = ((0, u'----------'),)+Contact.GENDER_CHOICE[:2] #do not display Mrs and Mr
+        
         self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
             (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
         ]

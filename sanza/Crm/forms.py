@@ -179,11 +179,7 @@ class FormWithCity(BetterForm, _CityBasedForm):
     
     def __init__(self, *args, **kwargs):
         super(BetterForm, self).__init__(*args, **kwargs)
-        print "****************************************"
         self._post_init(*args, **kwargs)
-        print "****************************************"
-        
-
     
 class EntityForm(ModelFormWithCity):
     city = forms.CharField(

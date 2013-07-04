@@ -62,8 +62,8 @@ def create_profile_contact(user):
                 detail = _(u'You should check that this contact is not duplicated'),
                 display_on_board = True
             )
-            
-    
+
+    contact.gender = profile.gender
     contact.lastname = contact.lastname or user.last_name
     contact.firstname = contact.firstname or user.first_name
     contact.email = user.email
@@ -78,6 +78,16 @@ def create_profile_contact(user):
         contact.zip_code = profile.zip_code
     
     contact.save()
+    
+    at, _x = ActionType.objects.get_or_create(name=_(u"Account creation"))
+    action = Action.objects.create(
+        subject = _(u"Create an account on web site"),
+        type = at,
+        planned_date = datetime.now(),
+        contact = contact,
+        display_on_board = False,
+        done = True
+    )
     
     if rename_entity:
         contact.entity.name = u"{0.lastname} {0.firstname}".format(contact).strip().upper()

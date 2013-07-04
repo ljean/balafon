@@ -24,6 +24,7 @@ class AcceptNewsletterRegistrationBackend(DefaultBackend):
         user.contactprofile.entity_name = kwargs.get('entity', "")
         user.contactprofile.city = kwargs.get('city', None)
         user.contactprofile.zip_code = kwargs.get('zip_code', None)
+        user.contactprofile.gender = kwargs.get('gender', 0)
         
         user.save()
         user.contactprofile.save()

@@ -8,6 +8,12 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from coop_cms.models import ArticleCategory
 
 class ContactProfile(models.Model):
+    
+    GENDER_CHOICE = (
+        (Contact.GENDER_MALE, _(u'Mr')),
+        (Contact.GENDER_FEMALE, _(u'Mrs')),
+    )
+    
     user = models.OneToOneField(User)
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
     accept_newsletter = models.BooleanField()
@@ -16,6 +22,7 @@ class ContactProfile(models.Model):
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None)
     zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
+    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
 
     #User.profile = property(lambda u: ContactProfile.objects.get_or_create(user=u)[0])
 
