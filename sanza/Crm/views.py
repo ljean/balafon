@@ -74,7 +74,7 @@ def view_entity(request, entity_id):
 @user_passes_test(can_access)
 def view_entities_list(request):
     entities = list(models.Entity.objects.all())
-    entities.sort(key=lambda x: x.contact_set.all()[0].lastname.lower() if x.is_single_contact else x.name.lower())
+    entities.sort(key=lambda x: x.default_contact.lastname.lower() if x.is_single_contact else x.name.lower())
     
     return render_to_response(
         'Crm/all_entities.html',
@@ -219,9 +219,9 @@ def edit_group(request, group_id):
     if request.method == "POST":
         form = forms.EditGroupForm(request.POST, instance=group)
         if form.is_valid():
-            form.save()
-        next_url = request.session.pop('next_url', reverse('crm_see_my_groups'))
-        return HttpResponseRedirect(next_url)
+            group = form.save()
+            next_url = request.session.pop('next_url', reverse('crm_see_my_groups'))
+            return HttpResponseRedirect(next_url)
     else:
         form = forms.EditGroupForm(instance=group)
     
@@ -344,7 +344,7 @@ def create_entity(request, entity_type_id):
                 else:
                     entity.logo.save(logo.name, logo)
             if entity.contact_set.count() > 0:
-                return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.contact_set.all()[0].id]))
+                return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.default_contact.id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
         form = forms.EntityForm(instance=entity, initial={'relationship_date': date.today()})
@@ -584,7 +584,7 @@ def add_single_contact(request):
             )
             entity.save()
             #This create a default contact
-            default_contact = entity.contact_set.all()[0]
+            default_contact = entity.default_contact
             
             contact = contact_form.save(commit=False)
             contact.entity = entity

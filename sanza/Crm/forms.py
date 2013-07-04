@@ -75,7 +75,7 @@ class EditGroupForm(forms.ModelForm):
     def clean_name(self):
         name = self.cleaned_data['name']
         if self.instance and not self.instance.id:
-            if models.Group.objects.filter(name=name).count()>0:
+            if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count()>0:
                 raise ValidationError(_(u"A group with this name already exists"))
         return name
     
@@ -84,11 +84,13 @@ class EditGroupForm(forms.ModelForm):
         super(EditGroupForm, self).__init__(*args, **kwargs)
         
         self.fields['entities'] = forms.ModelMultipleChoiceField(
+            required=False,
             queryset=models.Entity.objects.all(),
             widget=FilteredSelectMultiple(_(u"entities"), False)
         )
         
         self.fields['contacts'] = forms.ModelMultipleChoiceField(
+            required=False,
             queryset=models.Contact.objects.all(),
             widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
