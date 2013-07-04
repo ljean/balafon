@@ -112,7 +112,7 @@ class SearchForm(forms.Form):
     name = forms.CharField(max_length=100, required=False,
         help_text=_('Enter a name and click save.'))
     
-    excluded = forms.CharField(max_length=1000, required=False, widget=forms.HiddenInput())
+    excluded = forms.CharField(required=False, widget=forms.HiddenInput())
     #subject = forms.CharField(max_length=1000, required=False, widget=forms.HiddenInput())
     
     def __init__(self, data=None, instance=None, save=False, *args, **kwargs):
@@ -131,14 +131,16 @@ class SearchForm(forms.Form):
             for key, value in data.items():
                 try:
                     #extract search fields
-                    gr, field, id = key.split('-_-')
-                    int(id) #will raise an except for city visible field --> ignore this field
+                    gr, field, fid = key.split('-_-')
+                    int(fid) #will raise an except for city visible field --> ignore this field
                     if not self._forms.has_key(gr):
                         self._forms[gr] = []
                     form_class = get_field_form(field)
-                    self._forms[gr].append(form_class(gr, id, {field: value}))
+                    self._forms[gr].append(form_class(gr, fid, {field: value}))
                 except ValueError:
                     pass
+                except Exception, msg:
+                    print "Oups", msg
             #sort forms of a group according to their id
             for fs in self._forms.values(): 
                 fs.sort(key=lambda f: f._count)
