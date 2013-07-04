@@ -1228,5 +1228,22 @@ class ActionDocumentTestCase(BaseTestCase):
         response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
         self.assertEqual(403, response.status_code)
         
-        
+
+class EditGroupTestCase(BaseTestCase):
+        def test_view_edit_group(self):
+            g = mommy.make(models.Group)
+            response = self.client.get(reverse('crm_edit_group', args=[g.id]))
+            self.assertEqual(200, response.status_code)
+            
+        def test_edit_group(self):
+            g = mommy.make(models.Group)
+            data = {
+                'name': 'my group name',
+                'description': 'my group description',
+            }
+            response = self.client.post(reverse('crm_edit_group', args=[g.id]), data=data)
+            self.assertEqual(302, response.status_code)
+            g = models.Group.objects.get(id=g.id)
+            self.assertEqual(g.name, data['name'])
+            self.assertEqual(g.description, data['description'])
         
