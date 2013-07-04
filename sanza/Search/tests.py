@@ -478,7 +478,36 @@ class GroupSearchTest(BaseTestCase):
         
         self.assertContains(response, entity3.name)
         self.assertContains(response, contact4.lastname)
+    
+    def test_search_city(self):
+        city = mommy.make(models.City)
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp", city=city)
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL")
         
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", city=city)
+        
+        entity3 = mommy.make(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-city-_-0": city.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+    
     def test_search_has_no_email(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr", main_contact=True, has_left=False)
@@ -925,12 +954,12 @@ class SameAsTest(BaseTestCase):
     
     def test_search_same_as_not_allowed1(self):
         
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
         
-        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
@@ -952,16 +981,16 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
-        self.assertContains(response, contact1.entity.name)
-        self.assertNotContains(response, contact2.entity.name)
+        self.assertContains(response, contact1.email)
+        self.assertNotContains(response, contact2.email)
         
     def test_search_same_as_not_allowed2(self):
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
         
-        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
@@ -983,16 +1012,16 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         #print response
-        self.assertNotContains(response, contact1.entity.name)
-        self.assertContains(response, contact2.entity.name)
+        self.assertNotContains(response, contact1.email)
+        self.assertContains(response, contact2.email)
         
     def test_search_same_as_allowed(self):
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False)
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
         
-        contact2 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False)
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
@@ -1003,6 +1032,9 @@ class SameAsTest(BaseTestCase):
         group.save()
         
         contact1.same_as = models.SameAs.objects.create(main_contact=contact1)
+        contact1.save()
+        contact2.same_as = contact1.same_as
+        contact2.save()
         
         url = reverse('search')
         
@@ -1010,7 +1042,41 @@ class SameAsTest(BaseTestCase):
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.email)
+        self.assertContains(response, contact2.email)
         
-        self.assertContains(response, contact1.entity.name)
-        self.assertContains(response, contact2.entity.name)
+    #def test_search_same_as_not_allowed_no_prio(self):
+    #    contact1 = mommy.make(models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False)
+    #    contact1.entity.name = u'Tiny Corp'
+    #    contact1.entity.default_contact.delete()
+    #    contact1.entity.save()
+    #    
+    #    contact2 = mommy.make(models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False)
+    #    contact2.entity.name = u'Other Corp'
+    #    contact2.entity.default_contact.delete()
+    #    contact2.entity.save()
+    #    
+    #    group = mommy.make(models.Group, name="GROUP1")
+    #    group.entities.add(contact1.entity)
+    #    group.entities.add(contact2.entity)
+    #    group.save()
+    #    
+    #    contact1.same_as = models.SameAs.objects.create(main_contact=None)
+    #    contact1.save()
+    #    contact2.same_as = contact1.same_as
+    #    contact2.save()
+    #    
+    #    url = reverse('search')
+    #    
+    #    data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_as-_-1": '0'}
+    #    
+    #    response = self.client.post(url, data=data)
+    #    self.assertEqual(200, response.status_code)
+    #    c1_found = response.content.find(contact1.email)>0
+    #    c2_found = response.content.find(contact2.email)>0
+    #    
+    #    #To be investigated
+    #    self.assertTrue(c1_found or c2_found)
+    #    self.assertFalse(c1_found and c2_found)
+        
         

@@ -265,7 +265,7 @@ class SearchForm(forms.Form):
         #if 'main_contact' in form_names:
         #    return lambda c: (not c.has_left)
         #return lambda c: (not c.has_left) and c.main_contact
-        return lambda c: (not c.has_left)
+        return lambda c: c and (not c.has_left)
 
     def get_contacts_by_entity(self):
         self.contains_refuse_newsletter = False
@@ -276,8 +276,8 @@ class SearchForm(forms.Form):
         empty_entities = {}
         for contact in contacts:
             pass_filter = filter_func(contact)
-            entity = contact.entity
-            if not entities.has_key(entity.id):
+            entity = contact.entity if contact else None
+            if entity and not entities.has_key(entity.id):
                 entities[entity.id] = (entity, [])
                 empty_entities[entity.id] = entity
             if pass_filter:
