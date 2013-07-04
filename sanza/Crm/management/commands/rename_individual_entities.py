@@ -24,6 +24,5 @@ class Command(BaseCommand):
         
             if verbose:
                 print e.name
-        if verbose:
-            print models.Entity.objects.get(id=individual_entity_id).count(), "entities have been renamed"
+        print models.Entity.objects.get(id=individual_entity_id).count(), "entities have been renamed"
             
