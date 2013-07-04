@@ -92,6 +92,8 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(1, models.SameAs.objects.count())
         self.assertEqual(contact1.same_as, models.SameAs.objects.all()[0])
         self.assertEqual(contact2.same_as, contact1.same_as)
+        self.assertEqual(contact1.same_as.main_contact, contact1)
+        self.assertEqual(contact2.same_as.main_contact, contact1)
         
     def test_add_same_as_list(self):
         entity1 = mommy.make(models.Entity, name="Toto")
@@ -142,7 +144,7 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(1, models.SameAs.objects.count())
         self.assertEqual(contact1.same_as, models.SameAs.objects.all()[0])
         self.assertEqual(contact2.same_as, contact1.same_as)
-        self.assertEqual(contact1.same_as.main_contact, None)
+        self.assertEqual(contact1.same_as.main_contact, contact1)
     
     def test_make_main_post(self):
         entity1 = mommy.make(models.Entity, name="Toto")

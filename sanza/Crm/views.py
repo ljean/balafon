@@ -525,7 +525,7 @@ def same_as(request, contact_id):
         form = forms.SameAsForm(contact, request.POST)
         if form.is_valid():
             if not contact.same_as:
-                contact.same_as = models.SameAs.objects.create()
+                contact.same_as = models.SameAs.objects.create(main_contact=contact)
                 contact.save()
             same_as_contact = form.cleaned_data['contact']
             same_as_contact.same_as = contact.same_as
