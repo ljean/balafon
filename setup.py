@@ -34,7 +34,7 @@ setup(
     long_description = open('README.rst').read(),
     url = 'https://bitbucket.org/ljean/apidev-sanza',
     classifiers = [
-        'Development Status :: 5 - Release',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Information Technology',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
