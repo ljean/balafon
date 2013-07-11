@@ -6,7 +6,7 @@
   sanza CRM Copyright
   (C)2013 - Apidev - http://www.apidev.fr/ - ljean@apidev.fr
  
-  This is distributed under CeCILL V1.1
+  This is distributed under CeCILL V2.1
 
   Apidev www.apidev.fr, hereby disclaims all copyright interest in the application 'sanza' written by Luc JEAN.
 

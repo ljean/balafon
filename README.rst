@@ -25,4 +25,4 @@ Python 2.6+, Django 1.4+ required
 License
 =======
 
-CeCCIL.
+CeCCIL 2.1. see license.txt

@@ -2,12 +2,9 @@ BeautifulSoup
 beautifulsoup4
 django-chosen
 django-extensions
-django-floppyforms
 django-pagination
 model-mommy
-pil==1.1.7
-sorl-thumbnail
-django-form-utils
+apidev-coop_cms
 django-wkhtmltopdf
 django-form-utils
 xlwt==0.7.5

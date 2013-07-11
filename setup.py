@@ -10,37 +10,31 @@ except ImportError:
 
 VERSION = __import__('sanza').__version__
 
-import os
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
 setup(
-    name = 'sanza',
+    name = 'apidev-sanza',
     version = VERSION,
     description = 'Contacts management',
     packages = find_packages(),
     include_package_data = True,
     author = 'Luc Jean',
     author_email = 'ljean@apidev.fr',
-    license = 'CeCILL',
+    license = 'CeCILL 2.1',
     zip_safe = False,
     install_requires = [
-        #'coop-cms',
+        'apidev-coop_cms',
         'django-chosen',
         'beautifulsoup4',
         'BeautifulSoup',
         'django-wkhtmltopdf',
         'django-form-utils',
-        'xlwt==0.7.5',
+        'xlwt',
         'xlrd',
         'django-simple-captcha',
     ],
     long_description = open('README.rst').read(),
     url = 'https://bitbucket.org/ljean/apidev-sanza',
     classifiers = [
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Release',
         'Environment :: Web Environment',
         'Intended Audience :: Information Technology',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
