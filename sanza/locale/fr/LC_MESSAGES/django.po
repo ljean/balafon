@@ -186,7 +186,7 @@ msgstr "Résumé"
 
 #: Crm/forms.py:241
 msgid "Details"
-msgstr "détails"
+msgstr "Détails"
 
 #: Crm/forms.py:242 Crm/forms.py:302
 msgid "Display"
@@ -465,7 +465,7 @@ msgstr "contact principal"
 
 #: Crm/models.py:292
 msgid "accept newsletter"
-msgstr "accepte les newsletter"
+msgstr "accepte les newsletters"
 
 #: Crm/models.py:293
 msgid "accept third parties"
@@ -1523,7 +1523,7 @@ msgstr "Message"
 
 #: Emailing/forms.py:108
 msgid "Make sure you are a human"
-msgstr "Vérifier que vous n'êtes pas un robot"
+msgstr "Entrez le texte affiché sur l'image afin que nous vérifions que vous n'êtes pas un robot de spam"
 
 #: Emailing/forms.py:132
 msgid "Individual"
@@ -1791,7 +1791,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"        Vous recevez cet email car vous êtes inscritsà la liste de diffusion "
+"        Vous recevez cet email car vous êtes inscrit à la liste de diffusion "
 "de %(my_company)s.\n"
 "        Vous pouvez vous désinscrire en cliquant sur\n"
 "        "
@@ -1833,10 +1833,10 @@ msgstr ""
 "\n"
 "Bonjour,\n"
 "\n"
-"Vous avez souhaitez vous inscrire à la lettre d'infomration de "
+"Vous avez souhaitez vous inscrire à la lettre d'information de "
 "%(my_company)s. Nous devons confirmer votre adresse email.\n"
 "\n"
-"Veuillez confirmer votre uinscription en visitant l'url suivante:\n"
+"Veuillez confirmer votre inscription en visitant l'url suivante:\n"
 "http://%(site)s%(verification_url)s\n"
 "\n"
 "L'équipe %(my_company)s!\n"
@@ -1857,7 +1857,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"      Vous êtes inscrits à la liste de diffusion de %(my_company)s.\n"
+"      Vous êtes inscrit à la liste de diffusion de %(my_company)s.\n"
 "      "
 
 #: Emailing/templates/Emailing/public/subscribe_done.html:8
@@ -1872,7 +1872,7 @@ msgid ""
 "      "
 msgstr ""
 "\n"
-"      Nous vous avons envoté un email afin de vérifier votre adresse email. "
+"      Nous vous avons envoyé un email afin de vérifier votre adresse email. "
 "Merci de consulter votre messagerie.\n"
 "      et de cliquer sur le lien de confirmation.<br /><br />\n"
 "      Si vous n'avez rien reçu d'ici quelques minutes, vérifier vos messages "
@@ -1950,7 +1950,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Vous êtes inscrits à la liste de diffusion de %(my_company)s.\n"
+"      Vous êtes inscrit à la liste de diffusion de %(my_company)s.\n"
 "      "
 
 #: Profile/forms.py:48
