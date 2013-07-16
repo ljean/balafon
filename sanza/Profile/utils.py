@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.template import Context
 from sanza.Crm import settings as crm_settings
 from django.conf import settings
+from sanza.utils import now_rounded
 
 def create_profile_contact(user):
     profile = user.contactprofile
@@ -57,7 +58,7 @@ def create_profile_contact(user):
             action = Action.objects.create(
                 subject = _(u"A user have registred with email {0} used by several other contacts".format(user.email)),
                 type = at,
-                planned_date = datetime.now(),
+                planned_date = now_rounded(),
                 contact = contact,
                 detail = _(u'You should check that this contact is not duplicated'),
                 display_on_board = True
@@ -83,7 +84,7 @@ def create_profile_contact(user):
     action = Action.objects.create(
         subject = _(u"Create an account on web site"),
         type = at,
-        planned_date = datetime.now(),
+        planned_date = now_rounded(),
         contact = contact,
         display_on_board = False,
         done = True

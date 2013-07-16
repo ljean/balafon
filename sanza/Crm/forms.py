@@ -12,6 +12,7 @@ from sanza.Crm.settings import get_default_country
 from datetime import datetime, date
 from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
+from django.utils import timezone
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
@@ -254,8 +255,8 @@ class ActionForm(BetterModelForm):
         fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'contact', 'opportunity', 'detail',
             'priority', 'amount', 'number', 'done', 'display_on_board', 'planned_date', 'archived')
         fieldsets = [
-            ('name', {'fields': ['type', 'subject', 'status', 'date', 'time', 'contact', 'done', 'planned_date', 'doc_template'], 'legend': _(u'Summary')}),
-            ('details', {'fields': ['in_charge', 'opportunity', 'priority', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
+            ('name', {'fields': ['subject', 'type', 'status', 'date', 'time', 'planned_date', 'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
+            ('details', {'fields': ['done', 'priority', 'contact', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
             ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
         ]
 
@@ -276,9 +277,8 @@ class ActionForm(BetterModelForm):
         #else:
         #    self.fields['status'].queryset = forms.HiddenInput()
         
-        doc_templates = getattr(settings, 'SANZA_DOCUMENT_TEMPLATES', None)
-        if doc_templates:
-            self.fields['contact'].widget = forms.Select(choices=doc_templates)
+        if instance and instance.entity:
+            self.fields['contact'].widget = forms.Select(choices=[(x.id, x.fullname) for x in instance.contact_set.all()])
         else:
             self.fields['contact'].widget = forms.HiddenInput()
             
@@ -291,7 +291,9 @@ class ActionForm(BetterModelForm):
         dt = self.instance.planned_date if self.instance else self.fields['planned_date'].initial
         if dt:
             self.fields["date"].initial = dt.date()
-            self.fields["time"].initial = dt.time()
+            utc_dt = dt.replace(tzinfo=timezone.utc)
+            loc_dt = utc_dt.astimezone(timezone.get_current_timezone())
+            self.fields["time"].initial = loc_dt.time()
         
     def clean_status(self):
         t = self.cleaned_data['type']
@@ -306,7 +308,8 @@ class ActionForm(BetterModelForm):
         d = self.cleaned_data["date"]
         t = self.cleaned_data.get("time", None)
         if d:
-            return datetime.combine(d, t or datetime.min.time())
+            dt = datetime.combine(d, t or datetime.min.time())
+            return dt
         return None
     
 class OpportunityForm(BetterModelForm):

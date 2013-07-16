@@ -14,6 +14,7 @@ from django_extensions.db.models import TimeStampedModel, AutoSlugField
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.html import mark_safe
+from sanza.utils import now_rounded
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -585,13 +586,13 @@ class Action(TimeStampedModel):
     )
 
     entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
-    subject = models.CharField(_('subject'), max_length=200, blank=True, default="")
-    planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
+    subject = models.CharField(_(u'subject'), max_length=200, blank=True, default="")
+    planned_date = models.DateTimeField(_(u'planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
-    detail = models.TextField(_('detail'), blank=True, default='')
-    priority = models.IntegerField(_('priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
-    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True)
-    contact = models.ForeignKey(Contact, blank=True, default=None, null=True)
+    detail = models.TextField(_(u'detail'), blank=True, default='')
+    priority = models.IntegerField(_(u'priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
+    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
+    contact = models.ForeignKey(Contact, blank=True, default=None, null=True, verbose_name=_(u'contact'))
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
@@ -607,7 +608,7 @@ class Action(TimeStampedModel):
         
     def save(self, *args, **kwargs):
         if not self.done_date and self.done:
-            self.done_date = datetime.now()
+            self.done_date = now_rounded()
         elif self.done_date and not self.done:
             self.done_date = None
             

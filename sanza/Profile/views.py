@@ -14,6 +14,7 @@ from datetime import datetime
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import get_template
 from models import ContactProfile
+from sanza.utils import now_rounded
 
 @login_required 
 def edit_profile(request):
@@ -80,7 +81,7 @@ def post_message(request):
             #add an action
             message_action, _is_new = ActionType.objects.get_or_create(name=_(u'Message'))
             action = Action.objects.create(
-                subject=_(u"New message on web site"), planned_date=datetime.now(),
+                subject=_(u"New message on web site"), planned_date=now_rounded(),
                 type = message_action, detail=message, contact=profile.contact, display_on_board=True
             )
         

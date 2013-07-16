@@ -21,6 +21,7 @@ from django.utils.importlib import import_module
 from sanza.permissions import can_access
 from utils import send_verification_email
 from sanza.utils import logger, log_error
+from sanza.utils import now_rounded
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -106,7 +107,7 @@ def confirm_send_mail(request, emailing_id):
         if 'confirm' in request.POST:
             if emailing.status == models.Emailing.STATUS_EDITING:
                 emailing.status = models.Emailing.STATUS_SCHEDULED
-                emailing.scheduling_dt = datetime.now() + timedelta(minutes=1)
+                emailing.scheduling_dt = now_rounded() + timedelta(minutes=1)
                 emailing.save()
                 messages.add_message(request, messages.SUCCESS, _(u"The sending has been scheduled"))
             else:
@@ -155,9 +156,9 @@ def view_link(request, link_uuid, contact_uuid):
         #create action
         link_action, _is_new = ActionType.objects.get_or_create(name=_(u'Link'))
         action = Action.objects.create(
-            entity = contact.entity, subject=link.url, planned_date=datetime.now(),
-            type = link_action, detail='', contact=contact, done=True, display_on_board=False,
-            done_date=datetime.now()
+            entity = contact.entity, subject=link.url, planned_date=now_rounded(),
+            type=link_action, detail='', contact=contact, done=True, display_on_board=False,
+            done_date=now_rounded()
         )
         
     except Contact.DoesNotExist:
@@ -185,8 +186,8 @@ def unregister_contact(request, emailing_id, contact_uuid):
                 emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
                 action = Action.objects.create(
                     entity=entity , subject=_(u'{0} has unregister').format(contact),
-                    planned_date=datetime.now(), type = emailing_action, detail=form.cleaned_data['reason'],
-                    contact=contact, done=True, display_on_board=False, done_date=datetime.now()
+                    planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
+                    contact=contact, done=True, display_on_board=False, done_date=now_rounded()
                 )
                 unregister = True
                 return render_to_response(
@@ -242,7 +243,7 @@ def subscribe_newsletter(request):
                 detail = _(u"An error occured while verifying the email address of this contact.")
                 fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
                 action = Action.objects.create(
-                    subject=_(u"Need to verify the email address"), planned_date=datetime.now(),
+                    subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
                     type = fix_action, detail=detail, contact=contact, display_on_board=True,
                 )
                 
