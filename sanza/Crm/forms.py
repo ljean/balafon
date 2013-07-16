@@ -16,7 +16,7 @@ from django.utils import timezone
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
-        widget=forms.TextInput(attrs={'placeholder': _(u'name of a group')})
+        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
     )
     
     def __init__(self, entity, *args, **kwargs):
@@ -30,8 +30,8 @@ class AddEntityToGroupForm(forms.Form):
         return name
     
 class AddContactToGroupForm(forms.Form):
-    group_name = forms.CharField(
-        widget=forms.TextInput(attrs={'placeholder': _(u'name of a group')})
+    group_name = forms.CharField(label=_(u"Group name"),
+        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
     )
     
     def __init__(self, contact, *args, **kwargs):
@@ -165,7 +165,6 @@ class _CityBasedForm(object):
             except ValidationError:
                 raise
             except Exception, msg:
-                raise
                 raise ValidationError(msg)
 
 class ModelFormWithCity(BetterModelForm, _CityBasedForm):

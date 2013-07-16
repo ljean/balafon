@@ -387,6 +387,22 @@ def get_city_name(request, city):
         return HttpResponse(json.dumps({'name': city.name}), 'application/json')
     except ValueError:
         return HttpResponse(json.dumps({'name': city}), 'application/json')
+    
+@user_passes_test(can_access)
+@log_error
+def get_city_id(request):
+    name = request.GET.get('name')
+    country_id = int(request.GET.get('country', 0))
+    default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
+    if country_id == 0 or country_id == default_country.id:
+        cities = models.City.objects.filter(name__iexact=name).exclude(parent__code='')
+    else:
+        cities = models.City.objects.filter(name__iexact=name, parent__id=country_id)
+    if cities.count()!=1:
+        city_id = name
+    else:
+        city_id = cities[0].id
+    return HttpResponse(json.dumps({'id': city_id}), 'application/json')
 
 #subscribe form : no login required
 #@user_passes_test(can_access)
@@ -408,7 +424,7 @@ def get_opportunity_name(request, opp_id):
     try:
         opp = models.Opportunity.objects.get(id=opp_id)
         return HttpResponse(json.dumps({'name': opp.name}), 'application/json')
-    except models.Opportunity.DoesNotExist:
+    except (models.Opportunity.DoesNotExist, ValueError):
         return HttpResponse(json.dumps({'name': opp_id}), 'application/json')
 
 @user_passes_test(can_access)
@@ -418,6 +434,13 @@ def get_opportunities(request):
     opps = [{'id': x.id, 'name': u'{0}'.format(x.name)}
         for x in models.Opportunity.objects.filter(ended=False, name__icontains=term)]
     return HttpResponse(json.dumps(opps), 'application/json')
+
+@user_passes_test(can_access)
+@log_error
+def get_opportunity_id(request):
+    name = request.GET.get('name')
+    opportunity = get_object_or_404(models.Opportunity, name=name)
+    return HttpResponse(json.dumps({'id': opportunity.id}), 'application/json')
 
 @user_passes_test(can_access)
 def get_entity_name(request, entity_id):
@@ -435,6 +458,13 @@ def get_entities(request):
     return HttpResponse(json.dumps(entities), 'application/json')
 
 @user_passes_test(can_access)
+@log_error
+def get_entity_id(request):
+    name = request.GET.get('name')
+    e = get_object_or_404(models.Entity, name=name)
+    return HttpResponse(json.dumps({'id': e.id}), 'application/json')
+
+@user_passes_test(can_access)
 def get_contact_name(request, contact_id):
     try:
         contact = models.Contact.objects.get(id=contact_id)
@@ -442,14 +472,49 @@ def get_contact_name(request, contact_id):
     except models.Contact.DoesNotExist:
         return HttpResponse(json.dumps({'name': contact_id}), 'application/json')
 
+def get_contacts_from_term(term):
+    terms = [t.strip('()') for t in term.split(' ')]
+        
+    contacts = []
+    contact_set = set()
+    for i, term in enumerate(terms):
+        x = list(models.Contact.objects.filter(
+                Q(firstname__icontains=term) | Q(lastname__icontains=term) | Q(entity__name__icontains=term, entity__is_single_contact=False)
+            ))
+        if not x:
+            contact_set = set()
+            break
+        if i==0:
+            contact_set = set(x)
+        else:
+            contact_set = contact_set.intersection(x)
+        
+    if not contact_set:
+        for term in terms:
+            contacts += list(models.Contact.objects.filter(
+                    Q(firstname__icontains=term) | Q(lastname__icontains=term) | Q(entity__name__icontains=term, entity__is_single_contact=False)
+                ))
+        
+    contacts = list(contact_set or set(contacts))
+    contacts = [{'id': x.id, 'name': x.get_name_and_entity()} for x in contacts]
+    contacts.sort(key = lambda x: x['name'])
+    return contacts
+
+
+@user_passes_test(can_access)
+@log_error
+def get_contact_id(request):
+    name = request.GET.get('name')
+    contacts = get_contacts_from_term(name)
+    if len(contacts)!=1:
+        raise Http404
+    return HttpResponse(json.dumps({'id': contacts[0]['id']}), 'application/json')
+
 @user_passes_test(can_access)
 @log_error
 def get_contacts(request):
     term = request.GET.get('term')
-    contacts = [{'id': x.id, 'name': x.get_name_and_entity()}
-        for x in models.Contact.objects.filter(
-            Q(lastname__icontains=term) | Q(entity__name__icontains=term, entity__is_single_contact=False)
-        )]
+    contacts = get_contacts_from_term(term)
     return HttpResponse(json.dumps(contacts), 'application/json')
 
 @user_passes_test(can_access)
@@ -1448,6 +1513,12 @@ def get_groups(request):
         for x in models.Group.objects.filter(name__icontains=term)[:10]]
     return HttpResponse(json.dumps(groups), 'application/json')
 
+@user_passes_test(can_access)
+@log_error
+def get_group_id(request):
+    name = request.GET.get('name')
+    gr = get_object_or_404(models.Group, name=name)
+    return HttpResponse(json.dumps({'id': gr.id}), 'application/json')
 
 def _toggle_object_bookmark(request, object_model, object_id):
     try:

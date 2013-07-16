@@ -6,3 +6,4 @@
 country_id = $('select[name=country]').val();
 {% endblock %}
 {% block extra_filter %}+"&country="+country_id{% endblock %}
+{% block get_id_url %}{% url "crm_get_city_id" %}{% endblock %}
