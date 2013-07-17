@@ -5,7 +5,6 @@ from sanza.Crm import models
 
 admin.site.register(models.Zone)
 admin.site.register(models.EntityRole)
-admin.site.register(models.ActionType)
 admin.site.register(models.SameAs)
 admin.site.register(models.OpportunityType)
 
@@ -18,6 +17,12 @@ class ZoneTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'type']
 admin.site.register(models.ZoneType, ZoneTypeAdmin)
 
+class ActionTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated', 'default_template']
+    list_filter = ['set', 'subscribe_form', 'number_auto_generated', 'default_template']
+    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated']
+admin.site.register(models.ActionType, ActionTypeAdmin)
+
 class OpportunityStatusAdmin(admin.ModelAdmin):
     list_display = ['name', 'ordering']
 admin.site.register(models.OpportunityStatus, OpportunityStatusAdmin)
@@ -29,8 +34,11 @@ class ContactAdmin(admin.ModelAdmin):
 admin.site.register(models.Contact, ContactAdmin)
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description']
+    list_display = ['name', 'description','subscribe_form']
     search_fields = ['name']
+    list_filter=['subscribe_form']
+    list_editable=['subscribe_form']
+    
     filter_horizontal = ['entities', 'contacts']
 admin.site.register(models.Group, GroupAdmin)
 

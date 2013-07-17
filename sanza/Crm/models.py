@@ -564,13 +564,17 @@ class ActionType(NamedElement):
     
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This action type will be proposed on the public subscribe form'))
-    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True)
-    last_number = models.IntegerField(_(u'number'), default=0)
-    number_auto_generated = models.BooleanField(_(u'number'), default=False)
+    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_(u"action set"))
+    last_number = models.IntegerField(_(u'last number'), default=0)
+    number_auto_generated = models.BooleanField(_(u'generate number automatically'), default=False)
     default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="")
     allowed_status = models.ManyToManyField(ActionStatus, blank=True, default=None, null=True)
     default_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='type_default_status_set')
 
+    def status_defined(self):
+        return self.allowed_status.count()>0
+    status_defined.short_description = _(u"Status defined")
+    
     class Meta:
         verbose_name = _(u'action type')
         verbose_name_plural = _(u'action types')
