@@ -7,6 +7,7 @@ import json
 from model_mommy import mommy
 from sanza.Crm import models
 from django.conf import settings
+from bs4 import BeautifulSoup as BS4
 
 class BaseTestCase(TestCase):
 
@@ -18,7 +19,6 @@ class BaseTestCase(TestCase):
 
     def _login(self):
         self.client.login(username="toto", password="abc")
-
 
 class OpportunityTest(BaseTestCase):
 
@@ -188,10 +188,20 @@ class OpportunityAutoCompleteTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, '55')
         
-        url = reverse('crm_get_opportunity_name', args=[555])
-        url = url.replace('555', 'toto')
+        url = reverse('crm_get_opportunity_name', args=['toto'])
         response = self.client.get(url)
-        self.assertEqual(301, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, 'toto')
+           
+    def test_get_opportunity_id(self):
+        opp = mommy.make(models.Opportunity, name="abcd")
+        response = self.client.get(reverse('crm_get_opportunity_id')+"?name="+opp.name)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, opp.id)
+        
+    def test_get_opportunity_unknown(self):
+        response = self.client.get(reverse('crm_get_opportunity_id')+"?name=toto")
+        self.assertEqual(404, response.status_code)
         
     def test_get_opportunity_list(self):
         opp1 = mommy.make(models.Opportunity, name="defz")
@@ -927,6 +937,53 @@ class GroupSuggestListTestCase(BaseTestCase):
         self.assertContains(response, g1.name)
         self.assertContains(response, g2.name)
         self.assertNotContains(response, g3.name)
+    
+    def test_group_id(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name='+g1.name)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.id)
+        self.assertNotContains(response, g2.id)
+        self.assertNotContains(response, g3.id)
+        
+    def test_group_unknown(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name=ab')
+        self.assertEqual(404, response.status_code)
+    
+    def test_group_case_insensitive(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abc")
+        g3 = mommy.make(models.Group, name="xyz")
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name=abcd')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.id)
+        self.assertNotContains(response, g2.id)
+        self.assertNotContains(response, g3.id)
+        
+    def test_group_case_insensitive_several(self):
+        g1 = mommy.make(models.Group, name="ABCD")
+        g2 = mommy.make(models.Group, name="abcd")
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name=abcd')
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, g1.id)
+        self.assertContains(response, g2.id)
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name=ABCD')
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, g1.id)
+        self.assertNotContains(response, g2.id)
+        
+        response = self.client.get(reverse('crm_get_group_id')+'?name=Abcd')
+        self.assertEqual(404, response.status_code)
         
     def test_group_suggest_list2(self):
         g1 = mommy.make(models.Group, name="ABCD")
@@ -1007,6 +1064,57 @@ class CitiesSuggestListTestCase(BaseTestCase):
         response = self.client.get(reverse('crm_get_cities')+'?term=c')
         self.assertEqual(200, response.status_code)
         
+    def test_get_city_id(self):
+        city = mommy.make(models.City, name="abcd", parent=self.parent)
+        city2 = mommy.make(models.City, name="abce", parent=self.parent)
+        city_in_other_country = mommy.make(models.City, name="abcd", parent=self.foreign_country)
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+city.name+"&country=0")
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, city.id)
+        self.assertNotContains(response, city2.id)
+        
+    def test_get_city_id_case_insensitive(self):
+        city = mommy.make(models.City, name="abcd", parent=self.parent)
+        city2 = mommy.make(models.City, name="abce", parent=self.parent)
+        city_in_other_country = mommy.make(models.City, name="abcd", parent=self.foreign_country)
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+"ABCD"+"&country=0")
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, city.id)
+        self.assertNotContains(response, city2.id)
+        
+    def test_get_city_id_case_insensitive_twice(self):
+        city = mommy.make(models.City, name="abcd", parent=self.parent)
+        city2 = mommy.make(models.City, name="ABCD", parent=self.parent)
+        city_in_other_country = mommy.make(models.City, name="abcd", parent=self.foreign_country)
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+"ABCD"+"&country=0")
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "ABCD")
+        
+    def test_get_city_id_same_name(self):
+        city = mommy.make(models.City, name="abcd", parent=self.parent)
+        parent2 = mommy.make(models.Zone, name="AB", code="43", parent=self.default_country)
+        city2 = mommy.make(models.City, name=city.name, parent=parent2)
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+city.name+"&country=0")
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, city.name)
+        self.assertNotContains(response, city.id)
+        self.assertNotContains(response, city2.id)
+        
+    def test_get_foreign_city(self):
+        city = mommy.make(models.City, name="abcd", parent=self.parent)
+        city2 = mommy.make(models.City, name="abce", parent=self.parent)
+        city_in_other_country = mommy.make(models.City, name="abcd", parent=self.foreign_country)
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+city.name+"&country="+str(self.foreign_country.id))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, city_in_other_country.id)
+        self.assertNotContains(response, city.id)
+        self.assertNotContains(response, city2.id)
+        
+    def test_get_city_unknown(self):
+        name = "abcd"
+        response = self.client.get(reverse('crm_get_city_id')+"?name="+name+"&country=0")
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, name)
         
     def test_city_in_default_country(self):
         c1 = mommy.make(models.City, name="ABC", parent=self.parent)
@@ -1083,7 +1191,56 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         self.assertContains(response, c1.lastname)
         self.assertContains(response, c2.lastname)
         self.assertNotContains(response, c3.lastname)
-
+        
+    def test_get_contact_id(self):
+        
+        e1 = mommy.make(models.Entity, name="ABCD")
+        e2 = mommy.make(models.Entity, name="ZZZ")
+        
+        c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
+        c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
+        c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
+        
+        
+        response = self.client.get(reverse('crm_get_contact_id')+"?name="+c1.lastname)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, c1.id)
+        
+    def test_get_contact_id_from_entity(self):
+        
+        e1 = mommy.make(models.Entity, name="ABCD")
+        e2 = mommy.make(models.Entity, name="ZZZ")
+        
+        c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
+        c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
+        #c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
+        c3 = e2.default_contact
+        e2.default_contact.lastname = "bbb"
+        e2.default_contact.save()
+        
+        response = self.client.get(reverse('crm_get_contact_id')+"?name="+e2.name)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, c3.id)
+        
+    def test_no_contacts(self):
+        
+        e1 = mommy.make(models.Entity, name="ABCD")
+        e1.default_contact.lastname = "abc"
+        e1.default_contact.save()
+        
+        response = self.client.get(reverse('crm_get_contact_id')+"?name=ZZZZ")
+        self.assertEqual(404, response.status_code)
+        
+    def test_several_contacts(self):
+        
+        e1 = mommy.make(models.Entity, name="ABCD")
+        
+        c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
+        c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
+        
+        response = self.client.get(reverse('crm_get_contact_id')+"?name="+e1.name)
+        self.assertEqual(404, response.status_code)
+        
 
 class ActionDocumentTestCase(BaseTestCase):
     
@@ -1232,20 +1389,93 @@ class ActionDocumentTestCase(BaseTestCase):
         
 
 class EditGroupTestCase(BaseTestCase):
-        def test_view_edit_group(self):
-            g = mommy.make(models.Group)
-            response = self.client.get(reverse('crm_edit_group', args=[g.id]))
-            self.assertEqual(200, response.status_code)
-            
-        def test_edit_group(self):
-            g = mommy.make(models.Group)
-            data = {
-                'name': 'my group name',
-                'description': 'my group description',
-            }
-            response = self.client.post(reverse('crm_edit_group', args=[g.id]), data=data)
-            self.assertEqual(302, response.status_code)
-            g = models.Group.objects.get(id=g.id)
-            self.assertEqual(g.name, data['name'])
-            self.assertEqual(g.description, data['description'])
+    def test_view_edit_group(self):
+        g = mommy.make(models.Group)
+        response = self.client.get(reverse('crm_edit_group', args=[g.id]))
+        self.assertEqual(200, response.status_code)
+        
+    def test_edit_group(self):
+        g = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[g.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        g = models.Group.objects.get(id=g.id)
+        self.assertEqual(g.name, data['name'])
+        self.assertEqual(g.description, data['description'])
+        
+class EditContactTestCase(BaseTestCase):
+    fixtures = ['zones.json',]
+    
+    def _check_redirect_url(self, response, next_url):
+        redirect_url = response.redirect_chain[-1][0]
+        self.assertEqual(redirect_url, "http://testserver"+next_url)
+    
+    def test_view_edit_contact(self):
+        c = mommy.make(models.Contact)
+        response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
+        self.assertEqual(200, response.status_code)
+        
+    def test_edit_contact(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self._check_redirect_url(response, next_url)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.id, data['city'])
+        
+    def test_edit_contact_unknwonn_city(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': "ImagineCity",
+            'zip_code': "42999",
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self._check_redirect_url(response, next_url)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.name, data['city'])
+        
+    def test_edit_contact_unknwonn_city_no_zipcode(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': "ImagineCity",
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(response.redirect_chain), 0)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertNotEqual(c.lastname, data['lastname'])
+        self.assertNotEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city, None)
+        
         

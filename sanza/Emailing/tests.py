@@ -13,6 +13,7 @@ from django.core import mail
 from django.conf import settings
 from coop_cms import tests as coop_cms_tests
 from captcha.models import CaptchaStore
+from django.utils import timezone
 
 class BaseTestCase(TestCase):
 
@@ -29,6 +30,10 @@ class BaseTestCase(TestCase):
 
 class EmailingManagementTestCase(BaseTestCase):
     
+    def now(self):
+        return datetime.now().replace(tzinfo=timezone.utc)
+    
+    
     def test_view_newsletters_list(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
@@ -40,20 +45,20 @@ class EmailingManagementTestCase(BaseTestCase):
         
         emailing1 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SCHEDULED,
-            scheduling_dt = datetime.now(), sending_dt = None)
+            scheduling_dt = self.now(), sending_dt = None)
         for c in contacts:
             emailing1.send_to.add(c)
         emailing1.save()
         
         emailing2 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENDING,
-            scheduling_dt = datetime.now(), sending_dt = None)
+            scheduling_dt = self.now(), sending_dt = None)
         emailing2.send_to.add(contacts[0])
         emailing2.save()
         
         emailing3 = mommy.make(Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENT,
-            scheduling_dt = datetime.now(), sending_dt = datetime.now())
+            scheduling_dt = self.now(), sending_dt = self.now())
         emailing3.send_to.add(contacts[-1])
         emailing3.save()
         
@@ -75,7 +80,7 @@ class EmailingManagementTestCase(BaseTestCase):
         
         emailing = mommy.make(Emailing,
             status=Emailing.STATUS_EDITING,
-            scheduling_dt = datetime.now(), sending_dt = None)
+            scheduling_dt = self.now(), sending_dt = None)
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -104,7 +109,7 @@ class EmailingManagementTestCase(BaseTestCase):
         
         emailing = mommy.make(Emailing,
             status=Emailing.STATUS_SENT,
-            scheduling_dt = datetime.now(), sending_dt = datetime.now())
+            scheduling_dt = self.now(), sending_dt = self.now())
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -163,7 +168,7 @@ class EmailingManagementTestCase(BaseTestCase):
         emailing = Emailing.objects.get(id=emailing.id)
         self.assertEqual(emailing.status, Emailing.STATUS_SCHEDULED)
         self.assertNotEqual(emailing.scheduling_dt, None)
-        self.assertTrue(emailing.scheduling_dt > datetime.now())
+        self.assertTrue(emailing.scheduling_dt > datetime.now().replace(tzinfo=timezone.get_current_timezone()))
         
         
     def test_cancel_sending(self):
@@ -172,7 +177,7 @@ class EmailingManagementTestCase(BaseTestCase):
         contacts = [mommy.make(models.Contact, entity=entity,
             email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
         
-        emailing = mommy.make(Emailing, status=Emailing.STATUS_SCHEDULED, scheduling_dt=datetime.now())
+        emailing = mommy.make(Emailing, status=Emailing.STATUS_SCHEDULED, scheduling_dt=self.now())
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -610,7 +615,7 @@ class SubscribeTest(TestCase):
         self.group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
         self.group3 = mommy.make(models.Group, name="GHI", subscribe_form=False)
         
-        if not settings.SANZA_ALLOW_SINGLE_CONTACT:
+        if not getattr(settings, 'SANZA_ALLOW_SINGLE_CONTACT', True):
             settings.SANZA_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
         
         default_country = mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)

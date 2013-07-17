@@ -30,6 +30,8 @@ setup(
         'xlwt',
         'xlrd',
         'django-simple-captcha',
+        'django-registration',
+        'model_mommy',
     ],
     long_description = open('README.rst').read(),
     url = 'https://bitbucket.org/ljean/apidev-sanza',

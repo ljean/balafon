@@ -113,7 +113,15 @@ class _CityBasedForm(object):
                 pass
         if not self.country_id:
             cn = get_default_country()
-            self.country_id = models.Zone.objects.get(name=cn, parent__isnull=True).id
+            try:
+                default_country = models.Zone.objects.get(name=cn, parent__isnull=True)
+            except models.Zone.DoesNotExist:
+                try:
+                    zt = models.ZoneType.objects.get(type="country")
+                except models.ZoneType.DoesNotExist:
+                    zt = models.ZoneType.objects.create(type="country", name=u"Country")
+                default_country = models.Zone.objects.create(name=cn, parent=None, type=zt)
+            self.country_id = default_country.id
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         

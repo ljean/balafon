@@ -1517,7 +1517,10 @@ def get_groups(request):
 @log_error
 def get_group_id(request):
     name = request.GET.get('name')
-    gr = get_object_or_404(models.Group, name=name)
+    try:
+        gr = get_object_or_404(models.Group, name__iexact=name)
+    except models.Group.MultipleObjectsReturned:
+        gr = get_object_or_404(models.Group, name=name)
     return HttpResponse(json.dumps({'id': gr.id}), 'application/json')
 
 def _toggle_object_bookmark(request, object_model, object_id):
