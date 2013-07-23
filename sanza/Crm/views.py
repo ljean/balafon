@@ -1627,6 +1627,11 @@ class ActionDocumentPdfView(PDFTemplateView):
         context['to_pdf'] = True
         context['object'] = doc
         self.template_name = doc.template
+        pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', {}).get(self.template_name, {})
+        if self.cmd_options:
+            self.cmd_options.update(pdf_options)
+        else:
+            self.cmd_options = pdf_options
         self.header_template = self.find_template("header", action.type)
         self.footer_template = self.find_template("footer", action.type)
         self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
