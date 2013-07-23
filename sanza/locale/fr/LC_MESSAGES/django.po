@@ -612,12 +612,12 @@ msgstr "Etat par défaut pour les actions de ce type"
 
 #: Crm/models.py:577
 msgid "is editable"
-msgstr ""
+msgstr "est éditable"
 
 #: Crm/models.py:578
 msgid ""
 "If default_template is set, define if the template has a editable content"
-msgstr ""
+msgstr "Si un modèle est défini, indique si celui-ci a un contenu éditable"
 
 #: Crm/models.py:582
 msgid "Status defined"
