@@ -481,13 +481,14 @@ def export_to_pdf(request):
                         "search_dict": json.loads(form.cleaned_data['search_dict']),
                     }
                     
+                    pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', {})
+                    cmd_options = pdf_options.get(template_name, {})
+                    
                     pdf_view = PDFTemplateView(
                         filename='sanza.pdf',
                         template_name=template_name,
                         request=request,
-                        cmd_options = {
-                            'margin-top': 0, 'margin-bottom': 0, 'margin-right': 0, 'margin-left': 0,
-                        })
+                        cmd_options = cmd_options)
                     return pdf_view.render_to_response(context)
 
                 else:
