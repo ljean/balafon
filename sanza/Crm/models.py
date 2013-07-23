@@ -606,7 +606,7 @@ class Action(TimeStampedModel):
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
-        limit_choices_to={'first_name__regex': '.+'})
+        limit_choices_to={'is_staff': True, 'first_name__regex': '.+'})
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
