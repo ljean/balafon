@@ -63,15 +63,15 @@
     <td>{{a.number|default:'&nbsp;'}}</td>
     <td>{{a.amount|default:'&nbsp;'}}</td>
     <td class="ico-col">
-      {% if a.actiondocument %}
+      {% if a.actiondocument or a.has_non_editable_document %}
         <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
           <img src="{% static "img/document-pdf-text.png" %}" alt="{% trans "document" %}" %}
         </a>
       {% else %}
-        {% if a.type.default_template %}
-        <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
-          <img src="{% static "img/document-pdf.png" %}" alt="{% trans "add document" %}" %}
-        </a>
+        {% if a.has_editable_document %}
+            <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
+              <img src="{% static "img/document-pdf.png" %}" alt="{% trans "add document" %}" %}
+            </a>
         {% endif %}
       {% endif %}
     </td>

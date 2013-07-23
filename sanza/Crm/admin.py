@@ -18,7 +18,7 @@ class ZoneTypeAdmin(admin.ModelAdmin):
 admin.site.register(models.ZoneType, ZoneTypeAdmin)
 
 class ActionTypeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated', 'default_template']
+    list_display = ['name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated', 'default_template', 'is_editable']
     list_filter = ['set', 'subscribe_form', 'number_auto_generated', 'default_template']
     list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated']
 admin.site.register(models.ActionType, ActionTypeAdmin)

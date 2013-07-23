@@ -567,9 +567,15 @@ class ActionType(NamedElement):
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_(u"action set"))
     last_number = models.IntegerField(_(u'last number'), default=0)
     number_auto_generated = models.BooleanField(_(u'generate number automatically'), default=False)
-    default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="")
-    allowed_status = models.ManyToManyField(ActionStatus, blank=True, default=None, null=True)
-    default_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='type_default_status_set')
+    default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="",
+        help_text=_(u'Action of this type will have a document with the given template'))
+    allowed_status = models.ManyToManyField(ActionStatus, blank=True, default=None, null=True,
+        help_text=_(u'Action of this type allow the given status'))
+    default_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True,
+        help_text=_(u'Default status for actions of this type'),
+        related_name='type_default_status_set')
+    is_editable = models.BooleanField(_(u'is editable'), default=True,
+        help_text=_(u'If default_template is set, define if the template has a editable content'))
 
     def status_defined(self):
         return self.allowed_status.count()>0
@@ -609,6 +615,12 @@ class Action(TimeStampedModel):
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
+    
+    def has_non_editable_document(self):
+        return self.type and self.type.default_template and (not self.type.is_editable)
+    
+    def has_editable_document(self):
+        return self.type and self.type.default_template and self.type.is_editable
         
     def save(self, *args, **kwargs):
         if not self.done_date and self.done:
@@ -638,7 +650,7 @@ class ActionDocument(models.Model):
         return reverse('crm_pdf_action_document', args=[self.action.id])
     
     def can_edit_object(self, user):
-        return user.is_staff
+        return user.is_staff and self.action.has_editable_document()
     
     def can_view_object(self, user):
         return user.is_staff
