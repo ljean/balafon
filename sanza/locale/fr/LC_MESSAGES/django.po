@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-23 10:44+0200\n"
+"POT-Creation-Date: 2013-09-11 00:11+0200\n"
 "PO-Revision-Date: 2013-06-28 15:21+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "Entity"
 msgstr "Entité"
 
-#: config.py:15 Crm/search_forms.py:197
+#: config.py:15 Crm/search_forms.py:208
 #: Search/templates/Search/_section_qs_groups.html:8
 msgid "Group"
 msgstr "Groupe"
@@ -34,7 +34,7 @@ msgstr "Groupe"
 msgid "Location"
 msgstr "Lieu"
 
-#: config.py:31 Crm/templates/Crm/_section_all_entities.html:12
+#: config.py:32 Crm/templates/Crm/_section_all_entities.html:12
 #: Crm/templates/Crm/_section_contacts.html:4
 #: Emailing/templates/Emailing/_section_contacts.html:7 Search/views.py:63
 #: Search/templates/Search/_section_qs_contacts.html:9
@@ -44,23 +44,23 @@ msgstr "Lieu"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: config.py:50 Crm/utils.py:112 Crm/views.py:801
+#: config.py:51 Crm/utils.py:112 Crm/views.py:801
 #: Crm/templates/Crm/_section_actions.html:11
 #: Crm/templates/Crm/_section_opportunities.html:24
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:15
 msgid "Actions"
 msgstr "Actions"
 
-#: config.py:63 Crm/templates/Crm/_section_opportunities.html:5
+#: config.py:64 Crm/templates/Crm/_section_opportunities.html:5
 #: templates/sanza/_navigation.html:10
 msgid "Opportunities"
 msgstr "Dossiers"
 
-#: config.py:80 templates/sanza/_navigation.html:33
+#: config.py:81 templates/sanza/_navigation.html:33
 msgid "Admin"
 msgstr "Admin"
 
-#: config.py:88
+#: config.py:89
 msgid "Options"
 msgstr "Options"
 
@@ -822,158 +822,162 @@ msgid "Region"
 msgstr "Région"
 
 #: Crm/search_forms.py:104
+msgid "Has zip code?"
+msgstr "Dispose d'un code postal?"
+
+#: Crm/search_forms.py:115
 msgid "Action in progress"
 msgstr "Action en cours"
 
-#: Crm/search_forms.py:115
+#: Crm/search_forms.py:126
 msgid "Action by done date"
 msgstr "Action réalisée pendant la période"
 
-#: Crm/search_forms.py:124
+#: Crm/search_forms.py:135
 msgid "Action by planned date"
 msgstr "Action planifiée pendant la période"
 
-#: Crm/search_forms.py:133
+#: Crm/search_forms.py:144
 msgid "Action by user"
 msgstr "Action par nom de contact"
 
-#: Crm/search_forms.py:146
+#: Crm/search_forms.py:157
 msgid "Action with amount greater or equal to"
 msgstr "Action avec un montat supérieur ou égal à"
 
-#: Crm/search_forms.py:158
+#: Crm/search_forms.py:169
 msgid "Action with amount less than"
 msgstr "Action avec un montat inférieur à"
 
-#: Crm/search_forms.py:170
+#: Crm/search_forms.py:181
 msgid "Action by status"
 msgstr "Action par état"
 
-#: Crm/search_forms.py:184 Crm/templates/Crm/confirm_contacts_import.html:64
+#: Crm/search_forms.py:195 Crm/templates/Crm/confirm_contacts_import.html:64
 msgid "Entity type"
 msgstr "Type d'entité"
 
-#: Crm/search_forms.py:201 Crm/search_forms.py:241
+#: Crm/search_forms.py:212 Crm/search_forms.py:252
 msgid "Enter part of the group name"
 msgstr "Entrez une partie du nom du groupe"
 
-#: Crm/search_forms.py:224
+#: Crm/search_forms.py:235
 msgid "Group (dropdown list)"
 msgstr "Groupe (liste déroulante)"
 
-#: Crm/search_forms.py:231
+#: Crm/search_forms.py:242
 msgid "Not in group"
 msgstr "N'appartient pas au groupe"
 
-#: Crm/search_forms.py:249
+#: Crm/search_forms.py:260
 msgid "Contact age"
 msgstr "Age du contact"
 
-#: Crm/search_forms.py:265 Profile/forms.py:65
+#: Crm/search_forms.py:276 Profile/forms.py:65
 msgid "Accept newsletter"
 msgstr "Accepte les mailings"
 
-#: Crm/search_forms.py:272
+#: Crm/search_forms.py:283
 msgid "Accept third parties"
 msgstr "Accepte les offres partenaires"
 
-#: Crm/search_forms.py:279
+#: Crm/search_forms.py:290
 msgid "Secondary contact"
 msgstr "Contact secondaire"
 
-#: Crm/search_forms.py:283
+#: Crm/search_forms.py:294
 msgid "Include"
 msgstr "Inclure"
 
-#: Crm/search_forms.py:283
+#: Crm/search_forms.py:294
 msgid "Only"
 msgstr "Seulement"
 
-#: Crm/search_forms.py:296
+#: Crm/search_forms.py:307
 msgid "Contact role"
 msgstr "Rôle du contact"
 
-#: Crm/search_forms.py:309
+#: Crm/search_forms.py:320
 msgid "Contact has email"
 msgstr "Dispose d'un email"
 
-#: Crm/search_forms.py:320
+#: Crm/search_forms.py:331
 msgid "Contact has pesonal email"
 msgstr "Dispose d'un email personnel"
 
-#: Crm/search_forms.py:331
+#: Crm/search_forms.py:342
 msgid "Unknown contacts"
 msgstr "Contacts inconnus"
 
-#: Crm/search_forms.py:342
+#: Crm/search_forms.py:353
 msgid "Action type"
 msgstr "Type d'action"
 
-#: Crm/search_forms.py:355
+#: Crm/search_forms.py:366
 msgid "Action name"
 msgstr "Nom d'une action"
 
-#: Crm/search_forms.py:360
+#: Crm/search_forms.py:371
 msgid "enter a part of the name of the searched action"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:368
+#: Crm/search_forms.py:379
 msgid "Relationship date"
 msgstr "Date de mise en relation"
 
-#: Crm/search_forms.py:376
+#: Crm/search_forms.py:387
 msgid "Contact name"
 msgstr "Nom du contact"
 
-#: Crm/search_forms.py:381
+#: Crm/search_forms.py:392
 msgid "Enter a part of the name of the searched contact"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:389
+#: Crm/search_forms.py:400
 msgid "Opportunity status"
 msgstr "Etat d'un dossier"
 
-#: Crm/search_forms.py:402
+#: Crm/search_forms.py:413
 msgid "Opportunity"
 msgstr "Dossier"
 
-#: Crm/search_forms.py:415
+#: Crm/search_forms.py:426
 msgid "Not in opportunity"
 msgstr "N'est pas dans le dossier"
 
-#: Crm/search_forms.py:433
+#: Crm/search_forms.py:444
 msgid "Opportunity name"
 msgstr "Nom d'un dossier"
 
-#: Crm/search_forms.py:438 Crm/search_forms.py:458
+#: Crm/search_forms.py:449 Crm/search_forms.py:469
 msgid "enter a part of the name of the searched opportunity"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:453
+#: Crm/search_forms.py:464
 msgid "No opportunity with name"
 msgstr "Pas de dossier avec ce nom"
 
-#: Crm/search_forms.py:570
+#: Crm/search_forms.py:581
 msgid "Opportunity type"
 msgstr "Type de dossier"
 
-#: Crm/search_forms.py:590
+#: Crm/search_forms.py:601
 msgid "No opportunity of type"
 msgstr "Pas de dossier de ce type"
 
-#: Crm/search_forms.py:614
+#: Crm/search_forms.py:625
 msgid "Opportunity in progress"
 msgstr "Dossier en cours"
 
-#: Crm/search_forms.py:637
+#: Crm/search_forms.py:648
 msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
-#: Crm/search_forms.py:662
+#: Crm/search_forms.py:673
 msgid "Opportunity reminder"
 msgstr "Relance de dossier"
 
-#: Crm/search_forms.py:692 Crm/templates/Crm/confirm_contacts_import.html:40
+#: Crm/search_forms.py:703 Crm/templates/Crm/confirm_contacts_import.html:40
 #: Crm/templates/Crm/new_contacts_import.html:21
 msgid "Import"
 msgstr "Import"
@@ -2487,7 +2491,7 @@ msgstr "Recherche de contacts"
 msgid "List of searchs"
 msgstr "Liste des recherches"
 
-#: Search/templates/pdf/address_strip.html:35
+#: Search/templates/pdf/address_strip.html:53
 #: Search/templates/pdf/labels_16.html:56
 #: Search/templates/pdf/labels_21.html:56
 #: Search/templates/pdf/small_labels.html:41

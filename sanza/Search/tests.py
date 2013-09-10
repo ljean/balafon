@@ -1079,4 +1079,57 @@ class SameAsTest(BaseTestCase):
     #    self.assertTrue(c1_found or c2_found)
     #    self.assertFalse(c1_found and c2_found)
         
+class HasZipTest(BaseTestCase):
+    
+    def test_has_zip(self):
         
+        contact1 = mommy.make(models.Contact, zip_code="42424", lastname="AAAAAA")
+        contact2 = mommy.make(models.Contact, zip_code="", lastname="BBBBBBB")
+        
+        contact3 = mommy.make(models.Contact, zip_code="", lastname="CCCCCCCC")
+        contact3.entity.zip_code = u'45454'
+        contact3.entity.save()
+        
+        contact4 = mommy.make(models.Contact, zip_code="56565", lastname="DDDDDDDD")
+        contact4.entity.zip_code = u'45454'
+        contact4.entity.save()
+        
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_zip-_-0": 1}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_has_no_zip(self):
+        
+        contact1 = mommy.make(models.Contact, zip_code="42424", lastname="AAAAAA")
+        contact2 = mommy.make(models.Contact, zip_code="", lastname="BBBBBBB")
+        
+        contact3 = mommy.make(models.Contact, zip_code="", lastname="CCCCCCCC")
+        contact3.entity.zip_code = u'45454'
+        contact3.entity.save()
+        
+        contact4 = mommy.make(models.Contact, zip_code="56565", lastname="DDDDDDDD")
+        contact4.entity.zip_code = u'45454'
+        contact4.entity.save()
+        
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_zip-_-0": 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertNotContains(response, contact4.lastname)

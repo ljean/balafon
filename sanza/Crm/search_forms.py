@@ -98,6 +98,17 @@ class CountrySearchForm(ZoneSearchForm):
             return Q(entity__city__parent__type__type='department') | Q(city__parent__type__type='department')
         else:
             return Q(entity__city__parent__id=self._value) | Q(city__parent__id=self._value)
+        
+class HasZipCodeForm(YesNoSearchFieldForm):
+    _name = 'has_zip'
+    _label = _(u'Has zip code?')
+        
+    def get_lookup(self):
+        no_zipcode = (Q(zip_code='') & Q(entity__zip_code=''))
+        if self.is_yes():
+            return ~no_zipcode
+        else:
+            return no_zipcode
             
 class ActionInProgressForm(YesNoSearchFieldForm):
     _name = 'action'

@@ -26,6 +26,7 @@ SEARCH_FORMS = [
             search_forms.RegionSearchForm,
             search_forms.CountrySearchForm,
             search_forms.ZipCodeSearchForm,
+            search_forms.HasZipCodeForm,
         ],
     ),(
         _(u'Contacts'),
