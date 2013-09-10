@@ -466,6 +466,7 @@ def contacts_admin(request):
 
 @user_passes_test(can_access)
 @popup_redirect
+@log_error
 def export_to_pdf(request):
     try:
         if request.method == "POST":
@@ -480,6 +481,8 @@ def export_to_pdf(request):
                         "contacts": contacts,
                         "search_dict": json.loads(form.cleaned_data['search_dict']),
                     }
+                    
+                    context = form.patch_context(context)
                     
                     pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', {})
                     cmd_options = pdf_options.get(template_name, {})

@@ -454,6 +454,29 @@ class PdfTemplateForm(SearchActionForm):
             help_text=_(u'Select the type of document to generate')
         )
         
+        extra_fields = getattr(settings, 'SANZA_PDF_FORM_EXTRA_FIELDS', None)
+        if extra_fields:
+            for field_name, field_label, initial_value in extra_fields:
+                self.fields[field_name] = forms.CharField(label=field_label, initial=initial_value)
+       
+    def patch_context(self, context):
+        template = self.cleaned_data['template']
+        extra_data = self._get_extra_data()
+        context.update(extra_data)
+        hooks = getattr(settings, 'SANZA_PDF_FORM_CONTEXT_HOOKS', {})
+        if hooks and hooks.has_key(template):
+            context = hooks[template](template, context)
+        return context
+    
+    def _get_extra_data(self):
+        #This extra_data comes from additional fields defined in SANZA_PDF_FORM_EXTRA_FIELDS settings
+        #These values are passed to the template
+        extra_data = dict(self.cleaned_data)
+        for f in ('template', 'contacts', 'search_dict'):
+            extra_data.pop(f)
+        return extra_data
+        
+        
 class ActionForContactsForm(forms.ModelForm):
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
