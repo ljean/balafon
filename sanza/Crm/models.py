@@ -240,6 +240,7 @@ class Entity(TimeStampedModel):
     class Meta:
         verbose_name = _(u'entity')
         verbose_name_plural = _(u'entities')
+        ordering = ('name',)
 
 class EntityRole(NamedElement):
 
@@ -421,6 +422,12 @@ class Contact(TimeStampedModel):
         return has_left + [x.name for x in self.role.all()]
         
     def __unicode__(self):
+        if self.entity.is_single_contact:
+            return self.lastname
+        return u"{0} {1} ({2})".format(self.lastname, self.firstname, self.entity.name)
+            
+    @property
+    def fullname(self):
         if not (self.firstname or self.lastname):
             if self.email:
                 return self.email
@@ -437,10 +444,6 @@ class Contact(TimeStampedModel):
             return _(u"{1}{0.firstname}{0.lastname}").format(self, title)
         
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
-            
-    @property
-    def fullname(self):
-        return unicode(self)
 
     def save(self, *args, **kwargs):
         try:
@@ -458,6 +461,7 @@ class Contact(TimeStampedModel):
     class Meta:
         verbose_name = _(u'contact')
         verbose_name_plural = _(u'contacts')
+        ordering = ('lastname', 'firstname')
     
 class Group(TimeStampedModel):
     name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
