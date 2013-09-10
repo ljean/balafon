@@ -104,13 +104,14 @@ def search(request, search_id=0, group_id=0, opportunity_id=0):
     else:
         search = get_object_or_404(models.Search, id=search_id) if search_id else None
         search_form = forms.SearchForm(instance=search)
-        
+    
+    entities_count = len(entities)
     return render_to_response(
         'Search/search.html',
         {
             'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
             'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
-            'search_form': search_form, 'search': search, 'contacts_count': contacts_count,
+            'search_form': search_form, 'search': search, 'contacts_count': contacts_count, 'entities_count': entities_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
         },
         context_instance=RequestContext(request)
