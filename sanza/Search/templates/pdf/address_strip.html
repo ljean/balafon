@@ -2,14 +2,31 @@
 {% load i18n%}
 {% block extra_head %}
 <style>
-    table.contacts {
-        width: 100%;
+    .contacts {
+        margin: 0;
+        padding: 0;
     }
-    td.contact {
-        width: 49.5%;
-        height: 35cm;
-        text-align: center;
+    
+    .page {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+        display: block;
+        page-break-after:always
+    }
+    
+    .col {
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        width: 105mm;
+        height: 297mm;
         vertical-align: middle;
+        text-align: center;
+    }
+    .col:nth-of-type(1) {
+        border-right: solid thin #ccc;
     }
     .warning {
         color: red;
@@ -22,21 +39,22 @@
     <table class="contacts">
     {% for c in contacts %}
         {% if forloop.counter0 == 0 or forloop.counter0|divisibleby:2 %}
-            <tr>
+        <tr class="page">
         {% endif %}
-            <td class="contact">
-                <div class="name">{{ c.fullname }}</div>
+            <td class="col">
+                {% if not c.entity.is_single_contact %}<div class="name">{{ c.entity.name }}</div>{% endif %}
+                <div class="name">{{ c.fullname}}</div>
                 {% if c.get_full_address %}
-                    <div class="address">{{ c.address1 }}</div>
-                    {% if c.address2 %}<div class="address">{{ c.address2 }}</div>{% endif %}
-                    {% if c.address3 %}<div class="address">{{ c.address3 }}</div>{% endif %}
-                    <div class="city">{{ c.zip_code }} {{ c.city }} {{ c.cedex }}</div>
+                    <div class="address">{{ c.get_address1 }}</div>
+                    {% if c.get_address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
+                    {% if c.get_address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
+                    <div class="city">{{ c.get_zip_code }} {{ c.get_city }} {{ c.get_cedex }}</div>
                 {% else %}
                     <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
                 {% endif %}
             </td>
         {% if forloop.counter|divisibleby:2 %}
-            </tr>
+        </tr>
         {% endif %}
     {% endfor %}
     </table>

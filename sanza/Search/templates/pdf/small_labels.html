@@ -34,8 +34,8 @@
                 <div class="name">{{ c.fullname }}</div>
                 {% if c.get_full_address %}
                     <div class="address">{{ c.get_address }}</div>
-                    {% if c.address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
-                    {% if c.address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
+                    {% if c.get_address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
+                    {% if c.get_address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
                     <div class="city">{{ c.get_zip_code }} {{ c.get_city }} {{ c.get_cedex }}</div>
                 {% else %}
                     <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
