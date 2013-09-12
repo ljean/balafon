@@ -92,7 +92,7 @@ class FieldChoiceForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
         super(FieldChoiceForm, self).__init__(*args, **kwargs)
-        choices = []
+        choices = [('', [('', _(u'Please select a filter'))])]#1st line is just a label and can't be selected
         for (cat, fs) in get_search_forms():
             choices.append(
                 (cat, [(reverse('search_get_field', args=[f._name]), f._label) for f in fs])

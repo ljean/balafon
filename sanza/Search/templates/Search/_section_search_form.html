@@ -76,6 +76,17 @@
       $('.search-block[rel="gr0"]').find('.actions a.remove-block').remove();
     }
     
+    $("select[name='field_choice']").live('change', function() {
+      var field_type = $(this).val();
+      var add_field_button = $(this).parent().find(".add-field");
+      if (field_type) {
+        add_field_button.css("color", "#000");
+      } else {
+        add_field_button.css("color", "#ccc");
+      }
+      return false;
+    });
+    $("select[name='field_choice']").trigger('change');
   
     $(".add-field").live('click', function() {
       var field_type = $(this).parent().find("select[name='field_choice']").val();
@@ -86,6 +97,7 @@
           success: function(data){
             field_count += 1;
             $(this).parent().find(".fields").append(data.form);
+            //$(this).parent().find("select[name='field_choice']").val('').trigger('change');
           }
         });
       }
