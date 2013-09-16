@@ -14,7 +14,7 @@
   {% with c.has_left as has_left %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     {% if entity %}
-      <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+      <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
     {% else %}
       {% if c.entity.is_single_contact %}
         <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
