@@ -43,10 +43,10 @@
     {% if not contact %}
       {% if a.contact %}
         <td>
-          <a href="{% url "crm_view_contact" a.contact.id %}">{{ a.contact }}</a>
-          {% if not a.contact.entity.is_single_contact %}
+          <a href="{% url "crm_view_contact" a.contact.id %}">{{ a.contact.fullname }}</a>
+          {% if not a.contact.entity.is_single_contact %}{% if not entity %}
             (<a href="{% url "crm_view_entity" a.contact.entity.id %}">{{ a.contact.entity }}</a>)
-          {% endif %}
+          {% endif %}{% endif %}
         </td>
       {% else %}
         {% if a.entity %}
