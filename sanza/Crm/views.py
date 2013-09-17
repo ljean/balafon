@@ -1291,7 +1291,7 @@ def read_contacts(reader, fields, extract_from_email):
             role_dict[r.lower()] = True
         c['roles'] = [{'name': r, 'exists': e} for (r, e) in zip(c['role'], c['role_exists'])]
         
-        entity_groups = [x for x in c['entity.groups'].strip().split(";") if x]
+        entity_groups = [x.strip() for x in c['entity.groups'].strip().split(";") if x]
         c['entity_groups'] = []
         for g in entity_groups:
             exists = (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
