@@ -1554,7 +1554,7 @@ msgstr "Modèle"
 
 #: Emailing/forms.py:61
 msgid "Source URL"
-msgstr "URL Surce"
+msgstr "URL Source"
 
 #: Emailing/forms.py:94
 msgid "The url is not allowed"
