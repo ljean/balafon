@@ -25,18 +25,17 @@ from django.db.models import Q
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
+from sanza.Crm import settings as crm_settings
 
+#@transaction.commit_manually
 def filter_icontains_unaccent(qs, field, text):
-    try:
+    if crm_settings.is_unaccent_filter_supported():
         qs = qs.extra(
             where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
             params = [u"%{0}%".format(text)]
         )
-        return list(qs)
-    except Exception, msg:
-        print "*** oups", msg
-        qs = qs.filter(**{field+"__icontains": text})
-        return list(qs)
+        return list(qs)    
+    return list(qs.filter(**{field+"__icontains": text}))
 
 @user_passes_test(can_access)
 def quick_search(request):
