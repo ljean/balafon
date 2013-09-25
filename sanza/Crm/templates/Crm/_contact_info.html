@@ -9,7 +9,7 @@
     
   <div class="contact_info">
     <div>
-      <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
+      <span class="title">{{contact.fullname}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
       
       {% if not contact.entity.is_single_contact %}
       <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">

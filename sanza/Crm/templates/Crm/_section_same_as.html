@@ -19,9 +19,9 @@
   <tr class="{% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     <td class="status-icon">{% if c == contact.same_as.main_contact %}<img src="{{STATIC_URL}}img/rosette-label.png" />{% endif %}</td>
     {% if c.entity.is_single_contact %}
-    <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
     {% else %}
-    <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+    <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
     <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
     {% endif %}
     <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
