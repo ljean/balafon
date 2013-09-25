@@ -50,7 +50,7 @@ def view_entity(request, entity_id):
         opportunities = opportunities[:10]
     show_all_contacts = not all_contacts and (entity.contact_set.filter(has_left=True).count()>0)
     multi_user = True
-    entity.save() #update last access
+    #entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])
     
     context = {

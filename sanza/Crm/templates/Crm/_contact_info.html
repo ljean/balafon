@@ -21,7 +21,8 @@
     </div>
     <br/>
     <div>
-    <span class="label">{% trans "UPD" %}: {{contact.modified|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "Created" %}: {{contact.created|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "Updated" %}: {{contact.modified|date:"d/m/Y"}}</span>
     {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
     {% with contact.get_roles as roles %}
       {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}
