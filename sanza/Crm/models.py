@@ -461,7 +461,19 @@ class Contact(TimeStampedModel):
     def get_roles(self):
         has_left = [__(u'has left')] if self.has_left else []
         return has_left + [x.name for x in self.role.all()]
+    
+    def has_entity(self):
+        try:
+            if settings.ALLOW_SINGLE_CONTACT:
+                return (not self.entity.is_single_contact)
+            else:
+                if self.entity.type:
+                    return self.entity.type.id != getattr(project_settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
+                return False
+        except Exception, msg:
+            return True
         
+            
     def __unicode__(self):
         if self.entity.is_single_contact:
             return self.lastname
