@@ -199,7 +199,7 @@ class Entity(TimeStampedModel):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
             country = self.city.get_country()
-            if country.is_foreign_country():
+            if country and country.is_foreign_country():
                 fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return u''
@@ -381,7 +381,7 @@ class Contact(TimeStampedModel):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
             country = self.city.get_country()
-            if country.is_foreign_country():
+            if country and country.is_foreign_country():
                 fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return self.entity.get_full_address()
