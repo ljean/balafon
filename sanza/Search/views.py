@@ -26,6 +26,18 @@ from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
 
+def filter_icontains_unaccent(qs, field, text):
+    try:
+        qs = qs.extra(
+            where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
+            params = [u"%{0}%".format(text)]
+        )
+        return list(qs)
+    except Exception, msg:
+        print "*** oups", msg
+        qs = qs.filter(**{field+"__icontains": text})
+        return list(qs)
+
 @user_passes_test(can_access)
 def quick_search(request):
     if request.method == "POST":
@@ -33,8 +45,11 @@ def quick_search(request):
         if form.is_valid():
             text = form.cleaned_data["text"]
             
-            entities_by_name = list(Entity.objects.filter(is_single_contact=False, name__icontains=text))
-            contacts_by_name = list(Contact.objects.filter(lastname__icontains=text, has_left=False))
+            qs = Entity.objects.filter(is_single_contact=False)
+            entities_by_name = filter_icontains_unaccent(qs, 'name', text)    
+            
+            qs = Contact.objects.filter(has_left=False)
+            contacts_by_name = filter_icontains_unaccent(qs, 'lastname', text)
             
             for e in entities_by_name:
                 setattr(e, 'is_entity', True)
@@ -47,7 +62,8 @@ def quick_search(request):
             contacts = entities_by_name + contacts_by_name
             contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
             
-            groups_by_name = Group.objects.filter(name__icontains=text)
+            qs = Group.objects.all()
+            groups_by_name = filter_icontains_unaccent(qs, 'name', text)
             
             #cities_by_name = []
             #for city in City.objects.filter(name__icontains=text):
