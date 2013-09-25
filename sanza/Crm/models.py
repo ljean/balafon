@@ -79,6 +79,16 @@ class BaseZone(NamedElement):
 class Zone(BaseZone):
     type = models.ForeignKey(ZoneType)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
+    
+    def is_country(self):
+        return self.type.type == 'country'
+    
+    def is_foreign_country(self):
+        if self.is_country():
+            dcn = settings.get_default_country()
+            default_country = Zone.objects.get(name=dcn, type__type='country')
+            return self.id != default_country.id
+        return False
 
     class Meta:
         verbose_name = _(u'zone')
@@ -92,7 +102,16 @@ class City(BaseZone):
     class Meta:
         verbose_name = _(u'city')
         verbose_name_plural = _(u'cities')
-        
+    
+    def get_country(self):
+        obj = self
+        while obj.parent:
+            obj = obj.parent
+        if obj!=self:
+            return obj
+        return None
+    
+    
     def get_friendly_name(self):
         if self.parent:
             return u'{0} ({1})'.format(self.name,
@@ -179,8 +198,17 @@ class Entity(TimeStampedModel):
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            country = self.city.get_country()
+            if country.is_foreign_country():
+                fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return u''
+    
+    def get_country(self):
+        country = None
+        if self.city:
+            country = self.city.get_country()
+        return country
 
     def get_phones(self):
         return [self.phone]
@@ -352,8 +380,21 @@ class Contact(TimeStampedModel):
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            country = self.city.get_country()
+            if country.is_foreign_country():
+                fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return self.entity.get_full_address()
+    
+    def get_country(self):
+        country = None
+        if self.city:
+            country = self.city.get_country()
+        
+        if not country and (not self.entity.is_single_contact):
+            country = self.entity.get_country()
+        
+        return country
     
     def get_custom_fields(self):
         return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
