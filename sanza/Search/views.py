@@ -170,7 +170,7 @@ class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
-        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 50)
+        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 25)
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
