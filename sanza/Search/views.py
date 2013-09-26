@@ -270,15 +270,16 @@ def export_contacts_as_excel(request):
             wb = xlwt.Workbook()
             ws = wb.add_sheet('sanza')
 
-            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
+            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city',
-                'get_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
+                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
             
             #header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
             #create a map of verbose name for each field
             field_dict = dict([(f.name, _(f.verbose_name).capitalize()) for f in Contact._meta.fields])
-            field_dict['country'] = _(u"Country")
+            field_dict['foreign_country'] = _(u"Country")
+            field_dict['entity_name'] = _(u"Entity")
             
             #Add custom fields
             for cf in CustomField.objects.filter(export_order__gt=0).order_by('export_order'):

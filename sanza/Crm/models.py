@@ -107,11 +107,16 @@ class City(BaseZone):
         obj = self
         while obj.parent:
             obj = obj.parent
-        if obj!=self:
-            return obj
+            if obj.is_country():
+                return obj
         return None
     
-    
+    def get_foreign_country(self):
+        country = self.get_country()
+        if country and country.is_foreign_country():
+            return country
+        return None
+
     def get_friendly_name(self):
         if self.parent:
             return u'{0} ({1})'.format(self.name,
@@ -198,17 +203,17 @@ class Entity(TimeStampedModel):
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
-            country = self.city.get_country()
-            if country and country.is_foreign_country():
+            country = self.city.get_foreign_country()
+            if country:
                 fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return u''
     
     def get_country(self):
-        country = None
-        if self.city:
-            country = self.city.get_country()
-        return country
+        return self.city.get_country() if self.city else None
+    
+    def get_foreign_country(self):
+        return self.city.get_foreign_country() if self.city else None
 
     def get_phones(self):
         return [self.phone]
@@ -380,21 +385,23 @@ class Contact(TimeStampedModel):
     def get_full_address(self):
         if self.city:
             fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
-            country = self.city.get_country()
-            if country and country.is_foreign_country():
+            country = self.city.get_foreign_country()
+            if country:
                 fields.append(country.name)
             return u' '.join([f for f in fields if f])
         return self.entity.get_full_address()
     
     def get_country(self):
-        country = None
         if self.city:
-            country = self.city.get_country()
+            return self.city.get_country()
+        if not self.entity.is_single_contact:
+            return self.entity.get_country()
         
-        if not country and (not self.entity.is_single_contact):
-            country = self.entity.get_country()
-        
-        return country
+    def get_foreign_country(self):
+        if self.city:
+            return self.city.get_foreign_country()
+        if not self.entity.is_single_contact:
+            return self.entity.get_foreign_country()
     
     def get_custom_fields(self):
         return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
@@ -473,6 +480,8 @@ class Contact(TimeStampedModel):
         except Exception, msg:
             return True
         
+    def get_entity_name(self):
+        return self.entity.name if self.has_entity() else u""
             
     def __unicode__(self):
         if self.entity.is_single_contact:
