@@ -91,7 +91,7 @@ class NewNewsletterForm(forms.Form):
                         return content
                     except Exception, msg:
                         raise ValidationError(msg)
-                raise ValidationError(_(u"The url is not allowed"))
+            raise ValidationError(_(u"The url is not allowed"))
         return u''
 
 class SubscribeForm(ModelFormWithCity):
