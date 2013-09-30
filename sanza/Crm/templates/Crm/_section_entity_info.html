@@ -14,8 +14,8 @@
     {% if entity.relationship_date %}
       <span class="label">{{entity.relationship_date}}</span>
     {% endif %}
-    <span class="label">{% trans "Created" %}: {{entity.created|date:"d/m/Y"}}</span>
-    <span class="label">{% trans "Updated" %}: {{entity.modified|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "ADD_DT" %} {{entity.created|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "UPD_DT" %} {{entity.modified|date:"d/m/Y"}}</span>
     {% if entity.type %}
       <span class="label">{{entity.type}}</span>
     {% endif %}

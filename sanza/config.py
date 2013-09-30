@@ -84,6 +84,11 @@ SEARCH_FORMS = [
             search_forms.ContactHasEmail,
             search_forms.ContactHasPersonalEmail,
             search_forms.UnknownContact,
+            search_forms.ContactsAndEntitiesByChangeDate,
+            search_forms.ContactsByCreationDate,
+            search_forms.ContactsByUpdateDate,
+            search_forms.EntitiesByCreationDate,
+            search_forms.EntitiesByUpdateDate,
         ],
     ),(
         _(u'Options'),
