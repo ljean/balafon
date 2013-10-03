@@ -1414,7 +1414,7 @@ def confirm_contacts_import(request, import_id):
                     if entity.is_single_contact:
                         is_first_for_entity = True
                     else:
-                        is_first_for_entity = entity_dict.has_key(entity.name)
+                        is_first_for_entity = not entity_dict.has_key(entity.name)
                         entity_dict[entity.name] = True
                     
                     for g in contacts_import.groups.all():
@@ -1476,6 +1476,7 @@ def confirm_contacts_import(request, import_id):
                                 cfv, _x = models.EntityCustomFieldValue.objects.get_or_create(custom_field=cf, entity=contact.entity)
                                 cfv.value = value
                                 cfv.save()
+
                             if cf.model == models.CustomField.MODEL_CONTACT:
                                 cfv, _x = models.ContactCustomFieldValue.objects.get_or_create(custom_field=cf, contact=contact)
                                 cfv.value = value 
