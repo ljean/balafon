@@ -58,22 +58,24 @@ class NewNewsletterForm(forms.Form):
     subject = forms.CharField(label=_(u"Subject"), 
         widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
     template = forms.ChoiceField(label=_(u"Template"), choices = get_newsletter_templates(None, None))
-    content = forms.CharField(label=_(u'Source URL'), max_length=128, required=False)
+    source_url = forms.URLField(label=_(u'Source URL'), required=False)
+    content = forms.CharField(label=_(u'Content'), required=False, widget=forms.HiddenInput())
     
     def __init__(self, *args, **kwargs):
         super(NewNewsletterForm, self).__init__(*args, **kwargs)
         
+        self.source_content = ""
+        
         self.allow_url_sources = getattr(settings, 'SANZA_NEWSLETTER_SOURCES', ())
         if not self.allow_url_sources:
-            self.fields['content'].widget = forms.HiddenInput()
+            self.fields['source_url'].widget = forms.HiddenInput()
     
-    def clean_content(self):
-        url = self.cleaned_data['content']
+    def clean_source_url(self):
+        url = self.cleaned_data['source_url']
         if url:
             #Check in config if the url match with something allowed
             newsletter_sources = getattr(settings, 'SANZA_NEWSLETTER_SOURCES', ())
             for (regex, selector, post_processor) in newsletter_sources:
-                print "#", regex, url, re.match(regex, url)
                 if re.match(regex, url):
                     try:
                         #if so get the content
@@ -88,10 +90,18 @@ class NewNewsletterForm(forms.Form):
                             post_processor_func = getattr(module, processor_name)
                             #call the post_processor and update the content
                             content = post_processor_func(content)
-                        return content
+                        self.source_content = content
+                        return url
                     except Exception, msg:
                         raise ValidationError(msg)
-                raise ValidationError(_(u"The url is not allowed"))
+            raise ValidationError(_(u"The url is not allowed"))
+        return u''
+    
+    
+    def clean_content(self):
+        url = self.cleaned_data['source_url']
+        if url:
+            return self.source_content
         return u''
 
 class SubscribeForm(ModelFormWithCity):

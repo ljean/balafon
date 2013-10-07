@@ -710,3 +710,45 @@ class ContactsImportSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'imported_by': self._value}
+
+class ContactsByUpdateDate(TwoDatesForm):
+    _name = 'contacts_by_update_date'
+    _label = _(u'Contacts by update date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        return Q(modified__gte=dt1, modified__lte=dt2)
+    
+class ContactsByCreationDate(TwoDatesForm):
+    _name = 'contacts_by_creation_date'
+    _label = _(u'Contacts by creation date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        return Q(created__gte=dt1, created__lte=dt2)
+    
+class EntitiesByUpdateDate(TwoDatesForm):
+    _name = 'entities_by_update_date'
+    _label = _(u'Entities by update date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        return Q(entity__modified__gte=dt1, entity__modified__lte=dt2)
+    
+class EntitiesByCreationDate(TwoDatesForm):
+    _name = 'entities_by_creation_date'
+    _label = _(u'Entities by creation date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        return Q(entity__created__gte=dt1, entity__created__lte=dt2)
+    
+class ContactsAndEntitiesByChangeDate(TwoDatesForm):
+    _name = 'contacts_and_entities_by_change_date'
+    _label = _(u'Contacts and entities by change date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        return Q(modified__gte=dt1, modified__lte=dt2) | Q(created__gte=dt1, created__lte=dt2) | \
+            Q(entity__modified__gte=dt1, entity__modified__lte=dt2) | \
+            Q(entity__created__gte=dt1, entity__created__lte=dt2)

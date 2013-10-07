@@ -12,3 +12,7 @@ def get_default_country():
 
 ALLOW_COUPLE_GENDER = getattr(project_settings, 'SANZA_ALLOW_COUPLE_GENDER', False)
 ALLOW_SINGLE_CONTACT = getattr(project_settings, 'SANZA_ALLOW_SINGLE_CONTACT', True)
+
+def is_unaccent_filter_supported():
+    return getattr(project_settings, 'SANZA_UNACCENT_FILTER_SUPPORT', False)
+

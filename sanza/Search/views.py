@@ -25,6 +25,17 @@ from django.db.models import Q
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
+from sanza.Crm import settings as crm_settings
+
+#@transaction.commit_manually
+def filter_icontains_unaccent(qs, field, text):
+    if crm_settings.is_unaccent_filter_supported():
+        qs = qs.extra(
+            where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
+            params = [u"%{0}%".format(text)]
+        )
+        return list(qs)    
+    return list(qs.filter(**{field+"__icontains": text}))
 
 @user_passes_test(can_access)
 def quick_search(request):
@@ -33,8 +44,11 @@ def quick_search(request):
         if form.is_valid():
             text = form.cleaned_data["text"]
             
-            entities_by_name = list(Entity.objects.filter(is_single_contact=False, name__icontains=text))
-            contacts_by_name = list(Contact.objects.filter(lastname__icontains=text, has_left=False))
+            qs = Entity.objects.filter(is_single_contact=False)
+            entities_by_name = filter_icontains_unaccent(qs, 'name', text)    
+            
+            qs = Contact.objects.filter(has_left=False)
+            contacts_by_name = filter_icontains_unaccent(qs, 'lastname', text)
             
             for e in entities_by_name:
                 setattr(e, 'is_entity', True)
@@ -47,7 +61,8 @@ def quick_search(request):
             contacts = entities_by_name + contacts_by_name
             contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
             
-            groups_by_name = Group.objects.filter(name__icontains=text)
+            qs = Group.objects.all()
+            groups_by_name = filter_icontains_unaccent(qs, 'name', text)
             
             #cities_by_name = []
             #for city in City.objects.filter(name__icontains=text):
@@ -155,7 +170,7 @@ class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
-        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 50)
+        nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 25)
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
@@ -220,7 +235,11 @@ def create_emailing(request):
                     for c in contacts:
                         emailing.send_to.add(c)
                     emailing.save()
-                    return HttpResponseRedirect(newsletter.get_edit_url())
+                    
+                    if newsletter.source_url:
+                        return HttpResponseRedirect(newsletter.get_absolute_url())
+                    else:
+                        return HttpResponseRedirect(newsletter.get_edit_url())
                 else:
                     return render_to_response(
                         'Search/create_action_for_contacts.html',
@@ -255,14 +274,16 @@ def export_contacts_as_excel(request):
             wb = xlwt.Workbook()
             ws = wb.add_sheet('sanza')
 
-            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'entity', 'role',
+            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city',
-                'mobile', 'get_phone', 'get_email', 'birth_date']
+                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
             
             #header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
             #create a map of verbose name for each field
             field_dict = dict([(f.name, _(f.verbose_name).capitalize()) for f in Contact._meta.fields])
+            field_dict['foreign_country'] = _(u"Country")
+            field_dict['entity_name'] = _(u"Entity")
             
             #Add custom fields
             for cf in CustomField.objects.filter(export_order__gt=0).order_by('export_order'):

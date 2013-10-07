@@ -285,7 +285,7 @@ class ActionForm(BetterModelForm):
         #    self.fields['status'].queryset = forms.HiddenInput()
         
         if instance and instance.entity:
-            self.fields['contact'].widget = forms.Select(choices=[(x.id, x.fullname) for x in instance.contact_set.all()])
+            self.fields['contact'].widget = forms.Select(choices=[(x.id, x.fullname) for x in instance.entity.contact_set.all()])
         else:
             self.fields['contact'].widget = forms.HiddenInput()
             

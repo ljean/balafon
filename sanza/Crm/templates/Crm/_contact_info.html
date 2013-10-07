@@ -9,7 +9,7 @@
     
   <div class="contact_info">
     <div>
-      <span class="title">{{contact}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
+      <span class="title">{{contact.fullname}}{% if contact.title %} - <span class="contact-title">{{ contact.title }}</span>{% endif %}</span>
       
       {% if not contact.entity.is_single_contact %}
       <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
@@ -21,7 +21,8 @@
     </div>
     <br/>
     <div>
-    <span class="label">{% trans "UPD" %}: {{contact.modified|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "ADD_DT" %} {{contact.created|date:"d/m/Y"}}</span>
+    <span class="label">{% trans "UPD_DT" %} {{contact.modified|date:"d/m/Y"}}</span>
     {% if contact.job %}<span class="contact-job">{{ contact.job }}</span>{% endif %}
     {% with contact.get_roles as roles %}
       {% for role in roles %}<span class="label">{{role}}</span>{% endfor %}

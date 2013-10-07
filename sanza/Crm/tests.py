@@ -224,6 +224,49 @@ class OpportunityAutoCompleteTest(BaseTestCase):
         response = self.client.get(reverse('crm_get_opportunities')+'?term=z')
         self.assertContains(response, opp1.name)
         self.assertContains(response, opp2.name)
+
+class EditActionTest(BaseTestCase):
+    def test_edit_action(self):
+        contact = mommy.make(models.Contact)
+        action = mommy.make(models.Action, contact=contact)
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status':"", 'in_charge': "", 'contact': contact.id, 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "tested")
+        
+    def test_edit_action_on_entity(self):
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, entity=entity)
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status':"", 'in_charge': "", 'contact': entity.default_contact.id, 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "tested")
+        self.assertEqual(action.contact.id, entity.default_contact.id)
+
         
 class DoActionTest(BaseTestCase):
     def test_do_action(self):

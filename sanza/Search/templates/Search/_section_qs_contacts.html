@@ -21,7 +21,7 @@
         {% if not forloop.first %}
           <tr>
         {%endif %}
-        <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+        <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
         <td>{{c.get_roles|seq_to_dash}}</td>
         <td>{{c.get_phones|seq_to_dash}}</td>
         <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
@@ -35,10 +35,10 @@
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     {% with x.entity as e %}
       {% if e.is_single_contact %}
-        <td colspan=2><a href="{% url "crm_view_contact" x.id %}">{{x}}</a></td>
+        <td colspan=2><a href="{% url "crm_view_contact" x.id %}">{{x.fullname}}</a></td>
       {% else %}
         <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
-        <td><a href="{% url "crm_view_contact" x.id %}">{{x}}</a></td>
+        <td><a href="{% url "crm_view_contact" x.id %}">{{x.fullname}}</a></td>
       {% endif %}
       <td>{{x.get_roles|seq_to_dash}}</td>
       <td>{{x.get_phones|seq_to_dash}}</td>

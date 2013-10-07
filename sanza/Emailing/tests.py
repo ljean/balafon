@@ -220,7 +220,7 @@ class SendEmailingTest(BaseTestCase):
         
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a><a href="mailto:me@me.fr">mailme</a></p>',
+            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a><a href="mailto:me@me.fr">mailme</a><a href="#art1">internal link</a></p>',
             'template': 'test/newsletter_contact.html'
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
@@ -273,6 +273,9 @@ class SendEmailingTest(BaseTestCase):
             
             #Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
+            
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("#art1")>0)
             
             #check magic links
             self.assertTrue(MagicLink.objects.count()>0)

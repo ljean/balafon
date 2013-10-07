@@ -17,10 +17,10 @@
       <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
     {% else %}
       {% if c.entity.is_single_contact %}
-        <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+        <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
       {% else %}
         <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
-        <td><a href="{% url "crm_view_contact" c.id %}">{{c}}</a></td>
+        <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
       {% endif %}
     {% endif %}
     <td>{{c.get_roles|seq_to_dash|default:"&nbsp;"}}</td>
