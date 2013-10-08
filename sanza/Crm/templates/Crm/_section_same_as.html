@@ -35,6 +35,9 @@
 
 {% with contact.get_relationships as relationships %}
 {% if relationships %}
+{% if same_as %}
+<br />
+{% endif %}
 <table class="contact-relationships">
   <tr>
     <th>{% trans "Relationship" %}</th>
