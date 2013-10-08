@@ -295,6 +295,30 @@ class SameAs(models.Model):
         verbose_name = _(u'same as')
         verbose_name_plural = _(u'sames as')
 
+class RelationshipType(models.Model):
+    name = models.CharField(max_length=100, blank=False, verbose_name=_(u"name"))
+    reverse = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"reverse relation"))
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _(u'relationship type')
+        verbose_name_plural = _(u'relationship types')
+    
+    
+class Relationship(TimeStampedModel):
+    contact1 = models.ForeignKey("Contact", verbose_name=_(u"contact 1"), related_name=u"relationships1")
+    contact2 = models.ForeignKey("Contact", verbose_name=_(u"contact 2"), related_name=u"relationships2")
+    relationship_type = models.ForeignKey("RelationshipType", verbose_name=_(u"relationship type"))
+    
+    def __unicode__(self):
+        return _(u"{0} {1} of {2}").format(self.contact1, self.relationship_type, self.contact2)
+    
+    class Meta:
+        verbose_name = _(u'relationship')
+        verbose_name_plural = _(u'relationships')
+    
 
 class Contact(TimeStampedModel):
     
@@ -350,9 +374,34 @@ class Contact(TimeStampedModel):
     
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
     
+    relationships = models.ManyToManyField("Contact", blank=True, null=True, default=None, through=Relationship)
+    
     has_left = models.BooleanField(_(u'has left'), default=False)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    def get_relationships(self):
+        class ContactRelationship(object):
+            def __init__(self, contact, type, type_name):
+                self.contact = contact
+                self.type = type
+                self.type_name = type_name
+
+        relationships = []
+        for r in Relationship.objects.filter(contact1=self):
+            relationships.append(ContactRelationship(
+                contact=r.contact2, type=r.relationship_type, type_name=r.relationship_type.name))
+            
+        for r in Relationship.objects.filter(contact2=self):
+            relationships.append(ContactRelationship(
+                contact=r.contact1, type=r.relationship_type,
+                type_name=(r.relationship_type.reverse or r.relationship_type.name)))
+            
+        return relationships
+    
+    def can_add_relation(self, ):
+        return RelationshipType.objects.count()>0
+    
     
     def get_safe_photo(self):
         if self.photo:

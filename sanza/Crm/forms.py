@@ -401,6 +401,46 @@ class SameAsForm(forms.Form):
             raise ValidationError(_(u"Contact does not exist"))
         
         
+class AddRelationshipForm(forms.Form):
+    relationship_type = forms.IntegerField(label=_(u"relationship type"))
+    contact2 = forms.CharField(label=_(u"Contact"))
+    
+    def __init__(self, contact1, *args, **kwargs):
+        super(AddRelationshipForm, self).__init__(*args, **kwargs)
+        
+        self.contact1 = contact1
+        
+        relationship_types = [(r.id, r.name) for r in models.RelationshipType.objects.all()]
+        self.fields["relationship_type"].widget = forms.Select(choices=relationship_types) 
+        
+        widget = ContactAutoComplete(
+            attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'})
+        self.fields["contact2"] = forms.CharField(label=_(u"Contact"), widget=widget)
+        
+    def clean_relationship_type(self):
+        try:
+            relationship_type = int(self.cleaned_data["relationship_type"])
+            return models.RelationshipType.objects.get(id=relationship_type)
+        except ValueError:
+            raise ValidationError(_(u"Invalid data"))
+        except models.RelationshipType.DoesNotExist:
+            raise ValidationError(_(u"Relationship type does not exist"))
+        
+    def clean_contact2(self):
+        try:
+            contact2 = int(self.cleaned_data["contact2"])
+            return models.Contact.objects.get(id=contact2)
+        except ValueError:
+            raise ValidationError(_(u"Invalid data"))
+        except models.Contact.DoesNotExist:
+            raise ValidationError(_(u"Contact does not exist"))
+        
+    def save(self):
+        contact2 = self.cleaned_data["contact2"]
+        rt = self.cleaned_data["relationship_type"]
+        return models.Relationship.objects.create(
+                contact1=self.contact1, contact2=contact2, relationship_type=rt)    
+        
 class ActionDoneForm(forms.ModelForm):
     
     class Meta:

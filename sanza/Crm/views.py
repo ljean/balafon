@@ -584,6 +584,27 @@ def view_contact(request, contact_id):
 
 @user_passes_test(can_access)
 @popup_redirect
+def add_relationship(request, contact_id):
+    contact1 = get_object_or_404(models.Contact, id=contact_id)
+    if request.method == "POST":
+        form = forms.AddRelationshipForm(contact1, request.POST)
+        if form.is_valid():
+            relationship = form.save()
+            
+            #Todo : message?
+            
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact1.id]))
+    else:
+        form = forms.AddRelationshipForm(contact1)
+    
+    return render_to_response(
+        'Crm/add_relationship.html',
+        {'contact': contact1, 'form': form},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
 def same_as(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     if request.method == "POST":

@@ -1521,4 +1521,179 @@ class EditContactTestCase(BaseTestCase):
         self.assertNotEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city, None)
         
+class RelationshipTest(BaseTestCase):
+
+    def test_view_add_relationship(self):
+        entity1 = mommy.make(models.Entity, name="The Beatles")
+        entity2 = mommy.make(models.Entity, name="Apple Records")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="Paul", lastname="McCartney")
         
+        relation_type = mommy.make(models.RelationshipType, name="Partners")
+        
+        url = reverse("crm_add_relationship", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, relation_type.name)
+
+    def test_add_relationship(self):
+        entity1 = mommy.make(models.Entity, name="The Beatles")
+        entity2 = mommy.make(models.Entity, name="Apple Records")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname="Paul", lastname="McCartney")
+        
+        relation_type = mommy.make(models.RelationshipType, name="Partners")
+        mommy.make(models.RelationshipType, name="Friends")
+        mommy.make(models.RelationshipType, name="Enemies")
+        
+        url = reverse("crm_add_relationship", args=[contact1.id])
+        response = self.client.post(url, data={'contact2': contact2.id, 'relationship_type': relation_type.id})
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(list(errors), [])
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        r = models.Relationship.objects.get(contact1=contact1, contact2=contact2)
+        self.assertEqual(r.relationship_type, relation_type)
+        
+    def test_add_relationship_no_contact(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        relation_type = mommy.make(models.RelationshipType, name="Partners")
+        mommy.make(models.RelationshipType, name="Friends")
+        mommy.make(models.RelationshipType, name="Enemies")
+        
+        url = reverse("crm_add_relationship", args=[contact1.id])
+        response = self.client.post(url, data={'contact2': '', 'relationship_type': relation_type.id})
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
+        
+    def test_add_relationship_no_type(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        relation_type = mommy.make(models.RelationshipType, name="Partners")
+        mommy.make(models.RelationshipType, name="Friends")
+        mommy.make(models.RelationshipType, name="Enemies")
+        
+        url = reverse("crm_add_relationship", args=[contact1.id])
+        response = self.client.post(url, data={'contact2': contact2.id, 'relationship_type': ''})
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
+        
+    def test_add_relationship_invaliddata(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        relation_type = mommy.make(models.RelationshipType, name="Partners")
+        mommy.make(models.RelationshipType, name="Friends")
+        mommy.make(models.RelationshipType, name="Enemies")
+        
+        url = reverse("crm_add_relationship", args=[contact1.id])
+        response = self.client.post(url, data={'contact2': "AAAA", 'relationship_type': 'ZZZZZ'})
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 2)
+        
+        self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
+        
+    def test_get_relationship(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        relationship_type = mommy.make(models.RelationshipType, name="Partenaires")
+        
+        models.Relationship.objects.create(contact1=contact1, contact2=contact2, relationship_type=relationship_type)
+        
+        for r in contact1.get_relationships():
+            self.assertEqual(r.contact, contact2)
+            self.assertEqual(r.type, relationship_type)
+            self.assertEqual(r.type_name, relationship_type.name)
+            
+        for r in contact2.get_relationships():
+            self.assertEqual(r.contact, contact1)
+            self.assertEqual(r.type, relationship_type)
+            self.assertEqual(r.type_name, relationship_type.name)
+            
+    def test_get_relationship_with_reverse(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        relationship_type = mommy.make(models.RelationshipType, name="Parain", reverse="Filleul")
+        
+        models.Relationship.objects.create(contact1=contact1, contact2=contact2, relationship_type=relationship_type)
+        
+        for r in contact1.get_relationships():
+            self.assertEqual(r.contact, contact2)
+            self.assertEqual(r.type, relationship_type)
+            self.assertEqual(r.type_name, relationship_type.name)
+            
+        for r in contact2.get_relationships():
+            self.assertEqual(r.contact, contact1)
+            self.assertEqual(r.type, relationship_type)
+            self.assertEqual(r.type_name, relationship_type.reverse)
+            
+    def test_view_relationships(self):
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker")
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        leia = mommy.make(models.Contact, firstname="Leia", lastname="Princess")
+        ian = mommy.make(models.Contact, firstname="Ian", lastname="Solo")
+        chewe = mommy.make(models.Contact, firstname="Chewbacca")
+    
+        master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
+        father = mommy.make(models.RelationshipType, name="Father", reverse="Child")
+        friends = mommy.make(models.RelationshipType, name="Friend")
+        
+        models.Relationship.objects.create(contact1=anakin, contact2=luke, relationship_type=father)
+        models.Relationship.objects.create(contact1=anakin, contact2=leia, relationship_type=father)
+        models.Relationship.objects.create(contact1=obi, contact2=luke, relationship_type=master)
+        models.Relationship.objects.create(contact1=obi, contact2=anakin, relationship_type=master)
+        models.Relationship.objects.create(contact1=luke, contact2=ian, relationship_type=friends)
+        models.Relationship.objects.create(contact1=chewe, contact2=luke, relationship_type=friends)
+        
+        response = self.client.get(reverse("crm_view_contact", args=[luke.id]))
+        soup = BS4(response.content)
+        
+        self.assertEqual(len(soup.select("table.contact-relationships tr")), 5)# 4 + title 
+        self.assertEqual(len(soup.select(".add-relation")), 1) # add button is enabled
+        
+        self.assertContains(response, anakin.fullname)
+        self.assertContains(response, obi.fullname)
+        self.assertContains(response, ian.fullname)
+        self.assertContains(response, chewe.fullname)
+        self.assertNotContains(response, leia.fullname)
+        
+    def test_view_relations_disabeld(self):
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker")
+        
+        response = self.client.get(reverse("crm_view_contact", args=[luke.id]))
+        soup = BS4(response.content)
+        
+        self.assertEqual(len(soup.select("table.contact-relationships")), 0)
+        self.assertEqual(len(soup.select(".add-relation")), 0)# add button is disabled
+        
+    def test_view_no_relations(self):
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker")
+        friends = mommy.make(models.RelationshipType, name="Friend")
+        
+        response = self.client.get(reverse("crm_view_contact", args=[luke.id]))
+        soup = BS4(response.content)
+        
+        self.assertEqual(len(soup.select("table.contact-relationships")), 0)
+        self.assertEqual(len(soup.select(".add-relation")), 1)# add button is disabled
+       
+    
