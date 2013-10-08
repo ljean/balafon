@@ -382,7 +382,8 @@ class Contact(TimeStampedModel):
     
     def get_relationships(self):
         class ContactRelationship(object):
-            def __init__(self, contact, type, type_name):
+            def __init__(self, id, contact, type, type_name):
+                self.id = id
                 self.contact = contact
                 self.type = type
                 self.type_name = type_name
@@ -390,11 +391,11 @@ class Contact(TimeStampedModel):
         relationships = []
         for r in Relationship.objects.filter(contact1=self):
             relationships.append(ContactRelationship(
-                contact=r.contact2, type=r.relationship_type, type_name=r.relationship_type.name))
+                id=r.id, contact=r.contact2, type=r.relationship_type, type_name=r.relationship_type.name))
             
         for r in Relationship.objects.filter(contact2=self):
             relationships.append(ContactRelationship(
-                contact=r.contact1, type=r.relationship_type,
+                id=r.id, contact=r.contact1, type=r.relationship_type,
                 type_name=(r.relationship_type.reverse or r.relationship_type.name)))
             
         return relationships

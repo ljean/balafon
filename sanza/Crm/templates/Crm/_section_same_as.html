@@ -45,6 +45,7 @@
     <th>{% trans "Entity" %}</th>
     <th>{% trans "Phone" %}</th>
     <th>{% trans "Email" %}</th>
+    <th>&nbsp;</th>
   </tr>
   {% for r in relationships %}
   {% with r.contact.has_left as has_left %}
@@ -58,6 +59,9 @@
     {% endif %}
     <td>{{r.contact.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{r.contact.get_email}}">{{r.contact.get_email}}</a></td>
+    <td><a class="colorbox-form" href="{% url "crm_delete_relationship" contact.id r.id %}">
+      <img src="{{STATIC_URL}}img/delete-icon.png">
+    </a></td>
   </tr>
   {% endwith %}
   {% endfor %}

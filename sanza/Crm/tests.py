@@ -1696,4 +1696,50 @@ class RelationshipTest(BaseTestCase):
         self.assertEqual(len(soup.select("table.contact-relationships")), 0)
         self.assertEqual(len(soup.select(".add-relation")), 1)# add button is disabled
        
-    
+    def test_view_delete_relationship(self):
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        
+        master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
+        
+        r = models.Relationship.objects.create(contact1=obi, contact2=anakin, relationship_type=master)
+        
+        response = self.client.get(reverse("crm_delete_relationship", args=[obi.id, r.id]))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(1, models.Relationship.objects.filter(id=r.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=obi.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=anakin.id).count())
+        
+    def test_cancel_delete_relationship(self):
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        
+        master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
+        
+        r = models.Relationship.objects.create(contact1=obi, contact2=anakin, relationship_type=master)
+        
+        response = self.client.post(
+            reverse("crm_delete_relationship", args=[obi.id, r.id]), {})
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(1, models.Relationship.objects.filter(id=r.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=obi.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=anakin.id).count())
+            
+        
+    def test_delete_relationship(self):
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        
+        master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
+        
+        r = models.Relationship.objects.create(contact1=obi, contact2=anakin, relationship_type=master)
+        
+        response = self.client.post(
+            reverse("crm_delete_relationship", args=[obi.id, r.id]), {'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(0, models.Relationship.objects.filter(id=r.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=obi.id).count())
+        self.assertEqual(1, models.Contact.objects.filter(id=anakin.id).count())

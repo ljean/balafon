@@ -590,9 +590,6 @@ def add_relationship(request, contact_id):
         form = forms.AddRelationshipForm(contact1, request.POST)
         if form.is_valid():
             relationship = form.save()
-            
-            #Todo : message?
-            
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact1.id]))
     else:
         form = forms.AddRelationshipForm(contact1)
@@ -600,6 +597,25 @@ def add_relationship(request, contact_id):
     return render_to_response(
         'Crm/add_relationship.html',
         {'contact': contact1, 'form': form},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def delete_relationship(request, contact_id, relationship_id):
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    relationship = get_object_or_404(models.Relationship, id=relationship_id)
+    if request.method == 'POST':
+        if 'confirm' in request.POST:
+            relationship.delete()
+        return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+        
+    return render_to_response(
+        'sanza/confirmation_dialog.html',
+        {
+            'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
+            'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
+        },
         context_instance=RequestContext(request)
     )
 
