@@ -220,7 +220,7 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by', 'entity')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
