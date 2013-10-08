@@ -1743,3 +1743,32 @@ class RelationshipTest(BaseTestCase):
         self.assertEqual(0, models.Relationship.objects.filter(id=r.id).count())
         self.assertEqual(1, models.Contact.objects.filter(id=obi.id).count())
         self.assertEqual(1, models.Contact.objects.filter(id=anakin.id).count())
+        
+    def test_delete_unknown_relationship(self):
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        
+        response = self.client.get(
+            reverse("crm_delete_relationship", args=[obi.id, 100]))
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.post(
+            reverse("crm_delete_relationship", args=[obi.id, 100]), {'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        
+    def test_delete_relationship_unknown_contact(self):
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        
+        master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
+        
+        r = models.Relationship.objects.create(contact1=obi, contact2=anakin, relationship_type=master)
+        
+        response = self.client.post(
+            reverse("crm_delete_relationship", args=[8765, r.id]), {'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.post(
+            reverse("crm_delete_relationship", args=[8755, r.id]), {'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        
+        

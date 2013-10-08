@@ -603,21 +603,45 @@ def add_relationship(request, contact_id):
 @user_passes_test(can_access)
 @popup_redirect
 def delete_relationship(request, contact_id, relationship_id):
-    contact = get_object_or_404(models.Contact, id=contact_id)
-    relationship = get_object_or_404(models.Relationship, id=relationship_id)
-    if request.method == 'POST':
-        if 'confirm' in request.POST:
-            relationship.delete()
-        return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
-        
-    return render_to_response(
-        'sanza/confirmation_dialog.html',
-        {
-            'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
-            'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
-        },
-        context_instance=RequestContext(request)
-    )
+    err_msg = ""
+    try:
+        contact = models.Contact.objects.get(id=contact_id)
+    except models.Contact.DoesNotExist:
+        contact = None
+        err_msg = _(u"The contact doesn't exist anymore")
+    
+    try:
+        relationship = models.Relationship.objects.get(id=relationship_id)
+    except models.Relationship.DoesNotExist:
+        err_msg = _(u"The relationship doesn't exist anymore")
+    
+    if err_msg:
+        if contact:
+            next_url = reverse("crm_view_contact", args=[contact.id])
+        else:
+            next_url = reverse('crm_board_panel')
+        return render_to_response(
+            'sanza/message_dialog.html',
+            {
+                'message': err_msg,
+                'next_url':  next_url,
+            },
+            context_instance=RequestContext(request)
+        )   
+    else:
+        if request.method == 'POST':
+            if 'confirm' in request.POST:
+                relationship.delete()
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+            
+        return render_to_response(
+            'sanza/confirmation_dialog.html',
+            {
+                'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
+                'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
+            },
+            context_instance=RequestContext(request)
+        )
 
 @user_passes_test(can_access)
 @popup_redirect

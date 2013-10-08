@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-08 17:59+0200\n"
-"PO-Revision-Date: 2013-10-08 18:00+0100\n"
+"POT-Creation-Date: 2013-10-08 18:20+0200\n"
+"PO-Revision-Date: 2013-10-08 18:20+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "Lieu"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: config.py:51 Crm/utils.py:112 Crm/views.py:838
+#: config.py:51 Crm/utils.py:112 Crm/views.py:862
 #: Crm/templates/Crm/_section_actions.html:11
 #: Crm/templates/Crm/_section_opportunities.html:24
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:15
@@ -1046,7 +1046,7 @@ msgstr "Entités par date de création"
 msgid "Contacts and entities by change date"
 msgstr "Contacts et entités par date de création/modification"
 
-#: Crm/utils.py:112 Crm/views.py:815 Crm/views.py:838
+#: Crm/utils.py:112 Crm/views.py:839 Crm/views.py:862
 msgid "Other kind of actions"
 msgstr "Autres types d'action"
 
@@ -1066,35 +1066,43 @@ msgstr "Etes-vous sur de supprimer le groupe {0.name}?"
 msgid "Are you sure to delete {0.name}?"
 msgstr "Etes-vous sur de supprimer {0.name}?"
 
+#: Crm/views.py:611
+msgid "The contact doesn't exist anymore"
+msgstr "Le contact n'existe pas"
+
 #: Crm/views.py:616
+msgid "The relationship doesn't exist anymore"
+msgstr "La relation n'existe pas"
+
+#: Crm/views.py:640
 msgid "Are you sure to delete the relationship \"{0}\"?"
 msgstr "Etes-vous sur de supprimer la relation \"{0}\"?"
 
-#: Crm/views.py:733
+#: Crm/views.py:757
 msgid "Are you sure to delete the contact \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le contact \"{0}\"?"
 
-#: Crm/views.py:910
+#: Crm/views.py:934
 msgid "Are you sure to delete this action?"
 msgstr "Etes-vous sur de supprimer cette action?"
 
-#: Crm/views.py:1042
+#: Crm/views.py:1066
 msgid "Are you sure to delete the opportunity \"{0}\"?"
 msgstr "Etes-vous sur de supprimer le dossier \"{0}\"?"
 
-#: Crm/views.py:1282
+#: Crm/views.py:1306
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: Crm/views.py:1600
+#: Crm/views.py:1624
 msgid "Do you want to make this contact the default contact for this person?"
 msgstr "Voulez-vous rendre ce contact prioritaire pour cette personne?"
 
-#: Crm/views.py:1619
+#: Crm/views.py:1643
 msgid "The action has no type set: Unable to create the corresponding document"
 msgstr "Cette action n'a pas de type: Impossible de créer un document"
 
-#: Crm/views.py:1621
+#: Crm/views.py:1645
 msgid ""
 "The action type has no document template defined: Unable to create the "
 "corresponding document"
@@ -1376,7 +1384,7 @@ msgstr "Sélectionner un contact"
 #: Crm/templates/Crm/add_relationship.html:5 Crm/templates/Crm/same_as.html:5
 #: Emailing/templates/Emailing/public/subscribe.html:11
 #: Search/templates/Search/contacts_admin_form.html:7
-#: templates/sanza/message_dialog.html:33
+#: templates/sanza/message_dialog.html:36
 msgid "Ok"
 msgstr "Ok"
 
