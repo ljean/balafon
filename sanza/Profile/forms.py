@@ -28,7 +28,7 @@ class ProfileForm(ModelFormWithCity):
         fields = (
             'gender', 'lastname', 'firstname', 'birth_date', 'email', 'phone', 'mobile',
             'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
-            'accept_newsletter', 'accept_3rdparty',
+            'accept_newsletter', 'accept_3rdparty', 'accept_notifications',
             #'photo'
         )
         
