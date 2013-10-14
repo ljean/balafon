@@ -8,10 +8,9 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-14 18:07+0200\n"
-"PO-Revision-Date: 2013-10-08 18:20+0100\n"
+"PO-Revision-Date: 2013-10-14 21:26+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -516,7 +515,7 @@ msgstr "accepte les newsletters"
 
 #: Crm/models.py:356
 msgid "Keep this checked if you want to receive our newsletter."
-msgstr ""
+msgstr "Garder ceci coché pour recevoir notre newsletter"
 
 #: Crm/models.py:357
 msgid "accept third parties"
@@ -524,16 +523,17 @@ msgstr "accepte les offres partenaires"
 
 #: Crm/models.py:358
 msgid "Receive emails from some of our partners."
-msgstr ""
+msgstr "Accepter les emails de nos partenaires"
 
 #: Crm/models.py:359
-#, fuzzy
 msgid "accept notifications"
-msgstr "accepte les offres partenaires"
+msgstr "accepte les notifications"
 
 #: Crm/models.py:360
 msgid "We may have to notify you some events (e.g. a new message)."
 msgstr ""
+"Nous pouvons avoir besoin de vosu notifier des évènements (par exemple un "
+"message en attente poru vous sur notre site)"
 
 #: Crm/models.py:361
 msgid "email verified"
@@ -2809,9 +2809,8 @@ msgid "Account"
 msgstr "Compte"
 
 #: templates/sanza/_navigation.html:31
-#, fuzzy
 msgid "Back to site"
-msgstr "Retour aux newsletters"
+msgstr "Retour aux site"
 
 #: templates/sanza/_navigation.html:32
 msgid "Logout"
