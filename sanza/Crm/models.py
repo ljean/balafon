@@ -124,7 +124,7 @@ class City(BaseZone):
         return self.name
     
 
-def _get_entity_logo_dir(instance, filename):
+def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 class Entity(TimeStampedModel):
@@ -133,7 +133,7 @@ class Entity(TimeStampedModel):
     type = models.ForeignKey(EntityType, verbose_name=_(u'type'), blank=True, null=True, default=None)
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
-    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_entity_logo_dir)
+    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=get_entity_logo_dir)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
     fax = models.CharField(_('fax'), max_length=200, blank=True, default= u'')
@@ -281,7 +281,7 @@ class EntityRole(NamedElement):
         verbose_name = _(u'entity role')
         verbose_name_plural = _(u'entity roles')    
 
-def _get_contact_photo_dir(instance, filename):
+def get_contact_photo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
 
 class SameAs(models.Model):
@@ -347,7 +347,7 @@ class Contact(TimeStampedModel):
     firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
     nickname = models.CharField(_(u'nickname'), max_length=200, blank=True, default=u'')
     
-    photo = models.ImageField(_(u"photo"), blank=True, default=u"", upload_to=_get_contact_photo_dir)
+    photo = models.ImageField(_(u"photo"), blank=True, default=u"", upload_to=get_contact_photo_dir)
     birth_date = models.DateField(_(u"birth date"), blank=True, default=None, null=True)
     job = models.CharField(_(u"job"), max_length=200, blank=True, default=u"")
     

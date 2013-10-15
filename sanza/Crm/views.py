@@ -310,13 +310,6 @@ def edit_entity(request, entity_id):
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
-            logo = form.cleaned_data['logo']
-            if logo:
-                if type(logo)==bool:
-                    entity.logo = None
-                    entity.save()
-                else:
-                    entity.logo.save(logo.name, logo)
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
         form = forms.EntityForm(instance=entity)
@@ -528,13 +521,6 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
         
         if form.is_valid():
             contact = form.save()
-            photo = form.cleaned_data['photo']
-            if photo != None:
-                if type(photo)==bool:
-                    contact.photo = None
-                    contact.save()
-                else:
-                    contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             else:

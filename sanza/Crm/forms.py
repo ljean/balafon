@@ -210,6 +210,20 @@ class EntityForm(ModelFormWithCity):
             ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
+        
+    def clean_logo(self):
+        logo = self.cleaned_data["logo"]
+        instance = self.instance
+        if not instance:
+            instance = ""
+            try:
+                instance.id = models.Entity.objects.latest('id').id
+            except models.Entity.DoesNotExist:
+                instance.id = 1
+        target_name = models.get_entity_logo_dir(instance, logo)
+        if len(target_name) >= models.Entity._meta.get_field('logo').max_length:
+            raise ValidationError(_(u"The file name is too long"))
+        return logo
     
 
 class ContactForm(ModelFormWithCity):
@@ -244,6 +258,20 @@ class ContactForm(ModelFormWithCity):
             self.fields["accept_notifications"].widget = forms.HiddenInput()
         
         self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
+
+    def clean_photo(self):
+        photo = self.cleaned_data["photo"]
+        instance = self.instance
+        if not instance:
+            instance = ""
+            try:
+                instance.id = models.Contact.objects.latest('id').id
+            except models.Contact.DoesNotExist:
+                instance.id = 1
+        target_name = models.get_contact_photo_dir(instance, photo)
+        if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
+            raise ValidationError(_(u"The file name is too long"))
+        return photo
 
 
 class EntityTypeForm(forms.ModelForm):
