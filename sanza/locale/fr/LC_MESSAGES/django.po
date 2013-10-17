@@ -2814,7 +2814,7 @@ msgstr "Compte"
 
 #: templates/sanza/_navigation.html:31
 msgid "Back to site"
-msgstr "Retour aux site"
+msgstr "Retour au site"
 
 #: templates/sanza/_navigation.html:32
 msgid "Logout"
