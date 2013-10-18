@@ -85,3 +85,12 @@ admin.site.register(models.ContactsImport)
 admin.site.register(models.ActionSet)
 admin.site.register(models.ActionStatus)
 admin.site.register(models.ActionDocument)
+
+class RelationshipTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'reverse']
+    list_editable = ['name', 'reverse']
+admin.site.register(models.RelationshipType, RelationshipTypeAdmin)
+
+class RelationshipAdmin(admin.ModelAdmin):
+    list_display = ['id', 'contact1', 'relationship_type', 'contact2']
+admin.site.register(models.Relationship, RelationshipAdmin)

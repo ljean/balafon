@@ -7,6 +7,9 @@
       $(document).bind('cbox_complete', function(){
         $("a.cancel_button").click(function() {
           $.colorbox.close();
+          if ('{{next_url}}') {
+            window.location = '{{next_url}}';
+          }
           return false;
         });
 

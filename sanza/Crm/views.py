@@ -310,13 +310,6 @@ def edit_entity(request, entity_id):
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
-            logo = form.cleaned_data['logo']
-            if logo:
-                if type(logo)==bool:
-                    entity.logo = None
-                    entity.save()
-                else:
-                    entity.logo.save(logo.name, logo)
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
         form = forms.EntityForm(instance=entity)
@@ -528,13 +521,6 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
         
         if form.is_valid():
             contact = form.save()
-            photo = form.cleaned_data['photo']
-            if photo != None:
-                if type(photo)==bool:
-                    contact.photo = None
-                    contact.save()
-                else:
-                    contact.photo.save(photo.name, photo)
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             else:
@@ -581,6 +567,67 @@ def view_contact(request, contact_id):
         },
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+@popup_redirect
+def add_relationship(request, contact_id):
+    contact1 = get_object_or_404(models.Contact, id=contact_id)
+    if request.method == "POST":
+        form = forms.AddRelationshipForm(contact1, request.POST)
+        if form.is_valid():
+            relationship = form.save()
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact1.id]))
+    else:
+        form = forms.AddRelationshipForm(contact1)
+    
+    return render_to_response(
+        'Crm/add_relationship.html',
+        {'contact': contact1, 'form': form},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def delete_relationship(request, contact_id, relationship_id):
+    err_msg = ""
+    try:
+        contact = models.Contact.objects.get(id=contact_id)
+    except models.Contact.DoesNotExist:
+        contact = None
+        err_msg = _(u"The contact doesn't exist anymore")
+    
+    try:
+        relationship = models.Relationship.objects.get(id=relationship_id)
+    except models.Relationship.DoesNotExist:
+        err_msg = _(u"The relationship doesn't exist anymore")
+    
+    if err_msg:
+        if contact:
+            next_url = reverse("crm_view_contact", args=[contact.id])
+        else:
+            next_url = reverse('crm_board_panel')
+        return render_to_response(
+            'sanza/message_dialog.html',
+            {
+                'message': err_msg,
+                'next_url':  next_url,
+            },
+            context_instance=RequestContext(request)
+        )   
+    else:
+        if request.method == 'POST':
+            if 'confirm' in request.POST:
+                relationship.delete()
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+            
+        return render_to_response(
+            'sanza/confirmation_dialog.html',
+            {
+                'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
+                'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
+            },
+            context_instance=RequestContext(request)
+        )
 
 @user_passes_test(can_access)
 @popup_redirect

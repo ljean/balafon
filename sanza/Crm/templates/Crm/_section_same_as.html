@@ -1,7 +1,7 @@
 {% extends "sanza/_section.html" %}
 {% load i18n sanza_utils %}{% load url from future %}
 
-{% block section_title %}{% trans "Same As" %}{% endblock %}
+{% block section_title %}{% trans "Relationships" %}{% endblock %}
   
 {% block section_data %}
 {% if same_as %}
@@ -32,8 +32,49 @@
   {% endfor %}
 </table>
 {% endif %}
+
+{% with contact.get_relationships as relationships %}
+{% if relationships %}
+{% if same_as %}
+<br />
+{% endif %}
+<table class="contact-relationships">
+  <tr>
+    <th>{% trans "Relationship" %}</th>
+    <th>{% trans "Contact" %}</th>
+    <th>{% trans "Entity" %}</th>
+    <th>{% trans "Phone" %}</th>
+    <th>{% trans "Email" %}</th>
+    <th>&nbsp;</th>
+  </tr>
+  {% for r in relationships %}
+  {% with r.contact.has_left as has_left %}
+  <tr class="{% if r.contact.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+    <td>{{r.type_name}}</td>
+    {% if r.contact.entity.is_single_contact %}
+    <td colspan="2"><a href="{% url "crm_view_contact" r.contact.id %}">{{r.contact.fullname}}</a></td>
+    {% else %}
+    <td><a href="{% url "crm_view_contact" r.contact.id %}">{{r.contact.fullname}}</a></td>
+    <td><a href="{% url "crm_view_entity" r.contact.entity.id %}">{{ r.contact.entity }}</a></td>
+    {% endif %}
+    <td>{{r.contact.get_phones|seq_to_br}}</td>
+    <td><a href="mailto:{{r.contact.get_email}}">{{r.contact.get_email}}</a></td>
+    <td><a class="colorbox-form" href="{% url "crm_delete_relationship" contact.id r.id %}">
+      <img src="{{STATIC_URL}}img/delete-icon.png">
+    </a></td>
+  </tr>
+  {% endwith %}
+  {% endfor %}
+</table>
+{% endif %}
+{% endwith %}
+  
+
 {% endblock %}
 
 {% block section_action %}
   <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
+  {% if contact.can_add_relation %}
+  <a class="colorbox-form add-relation" href="{% url "crm_add_relationship" contact.id %}">{% trans "Add relationship" %}</a>
+  {% endif %}
 {% endblock %}

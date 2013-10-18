@@ -124,7 +124,7 @@ class City(BaseZone):
         return self.name
     
 
-def _get_entity_logo_dir(instance, filename):
+def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 class Entity(TimeStampedModel):
@@ -133,7 +133,7 @@ class Entity(TimeStampedModel):
     type = models.ForeignKey(EntityType, verbose_name=_(u'type'), blank=True, null=True, default=None)
     relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
     
-    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_entity_logo_dir)
+    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=get_entity_logo_dir)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
     fax = models.CharField(_('fax'), max_length=200, blank=True, default= u'')
@@ -281,7 +281,7 @@ class EntityRole(NamedElement):
         verbose_name = _(u'entity role')
         verbose_name_plural = _(u'entity roles')    
 
-def _get_contact_photo_dir(instance, filename):
+def get_contact_photo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
 
 class SameAs(models.Model):
@@ -295,6 +295,30 @@ class SameAs(models.Model):
         verbose_name = _(u'same as')
         verbose_name_plural = _(u'sames as')
 
+class RelationshipType(models.Model):
+    name = models.CharField(max_length=100, blank=False, verbose_name=_(u"name"))
+    reverse = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"reverse relation"))
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = _(u'relationship type')
+        verbose_name_plural = _(u'relationship types')
+    
+    
+class Relationship(TimeStampedModel):
+    contact1 = models.ForeignKey("Contact", verbose_name=_(u"contact 1"), related_name=u"relationships1")
+    contact2 = models.ForeignKey("Contact", verbose_name=_(u"contact 2"), related_name=u"relationships2")
+    relationship_type = models.ForeignKey("RelationshipType", verbose_name=_(u"relationship type"))
+    
+    def __unicode__(self):
+        return _(u"{0} {1} of {2}").format(self.contact1, self.relationship_type, self.contact2)
+    
+    class Meta:
+        verbose_name = _(u'relationship')
+        verbose_name_plural = _(u'relationships')
+    
 
 class Contact(TimeStampedModel):
     
@@ -323,13 +347,17 @@ class Contact(TimeStampedModel):
     firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
     nickname = models.CharField(_(u'nickname'), max_length=200, blank=True, default=u'')
     
-    photo = models.ImageField(_(u"photo"), blank=True, default=u"", upload_to=_get_contact_photo_dir)
+    photo = models.ImageField(_(u"photo"), blank=True, default=u"", upload_to=get_contact_photo_dir)
     birth_date = models.DateField(_(u"birth date"), blank=True, default=None, null=True)
     job = models.CharField(_(u"job"), max_length=200, blank=True, default=u"")
     
     main_contact = models.BooleanField(_("main contact"), default=True, db_index=True)
-    accept_newsletter = models.BooleanField(_("accept newsletter"), default=False, db_index=True)
-    accept_3rdparty = models.BooleanField(_("accept third parties"), default=False)
+    accept_newsletter = models.BooleanField(_("accept newsletter"), default=False, db_index=True,
+        help_text = _(u'Keep this checked if you want to receive our newsletter.'))
+    accept_3rdparty = models.BooleanField(_("accept third parties"), default=False,
+        help_text = _(u'Receive emails from some of our partners.'))
+    accept_notifications = models.BooleanField(_("accept notifications"), default=True,
+        help_text = _(u'We may have to notify you some events (e.g. a new message).'))
     email_verified = models.BooleanField(_("email verified"), default=False)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
@@ -350,9 +378,35 @@ class Contact(TimeStampedModel):
     
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
     
+    relationships = models.ManyToManyField("Contact", blank=True, null=True, default=None, through=Relationship)
+    
     has_left = models.BooleanField(_(u'has left'), default=False)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    
+    def get_relationships(self):
+        class ContactRelationship(object):
+            def __init__(self, id, contact, type, type_name):
+                self.id = id
+                self.contact = contact
+                self.type = type
+                self.type_name = type_name
+
+        relationships = []
+        for r in Relationship.objects.filter(contact1=self):
+            relationships.append(ContactRelationship(
+                id=r.id, contact=r.contact2, type=r.relationship_type, type_name=r.relationship_type.name))
+            
+        for r in Relationship.objects.filter(contact2=self):
+            relationships.append(ContactRelationship(
+                id=r.id, contact=r.contact1, type=r.relationship_type,
+                type_name=(r.relationship_type.reverse or r.relationship_type.name)))
+            
+        return relationships
+    
+    def can_add_relation(self, ):
+        return RelationshipType.objects.count()>0
+    
     
     def get_safe_photo(self):
         if self.photo:

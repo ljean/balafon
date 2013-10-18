@@ -210,6 +210,20 @@ class EntityForm(ModelFormWithCity):
             ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
+        
+    def clean_logo(self):
+        logo = self.cleaned_data["logo"]
+        instance = self.instance
+        if not instance:
+            instance = ""
+            try:
+                instance.id = models.Entity.objects.latest('id').id
+            except models.Entity.DoesNotExist:
+                instance.id = 1
+        target_name = models.get_entity_logo_dir(instance, logo)
+        if len(target_name) >= models.Entity._meta.get_field('logo').max_length:
+            raise ValidationError(_(u"The file name is too long"))
+        return logo
     
 
 class ContactForm(ModelFormWithCity):
@@ -220,7 +234,7 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by', 'entity')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
@@ -231,7 +245,7 @@ class ContactForm(ModelFormWithCity):
             ('job', {'fields': ['title', 'role', 'job'], 'legend': _(u'Job')}),
             ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'has_left'], 'legend': _(u'Relationship')}),
+            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'accept_notifications', 'has_left'], 'legend': _(u'Relationship')}),
             ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
@@ -240,7 +254,24 @@ class ContactForm(ModelFormWithCity):
         super(ContactForm, self).__init__(*args, **kwargs)
         self.fields["role"].help_text = ""
         
+        if not 'sanza.Profile' in settings.INSTALLED_APPS:
+            self.fields["accept_notifications"].widget = forms.HiddenInput()
+        
         self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
+
+    def clean_photo(self):
+        photo = self.cleaned_data["photo"]
+        instance = self.instance
+        if not instance:
+            instance = ""
+            try:
+                instance.id = models.Contact.objects.latest('id').id
+            except models.Contact.DoesNotExist:
+                instance.id = 1
+        target_name = models.get_contact_photo_dir(instance, photo)
+        if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
+            raise ValidationError(_(u"The file name is too long"))
+        return photo
 
 
 class EntityTypeForm(forms.ModelForm):
@@ -400,6 +431,46 @@ class SameAsForm(forms.Form):
         except models.Contact.DoesNotExist:
             raise ValidationError(_(u"Contact does not exist"))
         
+        
+class AddRelationshipForm(forms.Form):
+    relationship_type = forms.IntegerField(label=_(u"relationship type"))
+    contact2 = forms.CharField(label=_(u"Contact"))
+    
+    def __init__(self, contact1, *args, **kwargs):
+        super(AddRelationshipForm, self).__init__(*args, **kwargs)
+        
+        self.contact1 = contact1
+        
+        relationship_types = [(r.id, r.name) for r in models.RelationshipType.objects.all()]
+        self.fields["relationship_type"].widget = forms.Select(choices=relationship_types) 
+        
+        widget = ContactAutoComplete(
+            attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'})
+        self.fields["contact2"] = forms.CharField(label=_(u"Contact"), widget=widget)
+        
+    def clean_relationship_type(self):
+        try:
+            relationship_type = int(self.cleaned_data["relationship_type"])
+            return models.RelationshipType.objects.get(id=relationship_type)
+        except ValueError:
+            raise ValidationError(_(u"Invalid data"))
+        except models.RelationshipType.DoesNotExist:
+            raise ValidationError(_(u"Relationship type does not exist"))
+        
+    def clean_contact2(self):
+        try:
+            contact2 = int(self.cleaned_data["contact2"])
+            return models.Contact.objects.get(id=contact2)
+        except ValueError:
+            raise ValidationError(_(u"Invalid data"))
+        except models.Contact.DoesNotExist:
+            raise ValidationError(_(u"Contact does not exist"))
+        
+    def save(self):
+        contact2 = self.cleaned_data["contact2"]
+        rt = self.cleaned_data["relationship_type"]
+        return models.Relationship.objects.create(
+                contact1=self.contact1, contact2=contact2, relationship_type=rt)    
         
 class ActionDoneForm(forms.ModelForm):
     

@@ -28,6 +28,7 @@
           <li>
             <a>{% trans "Account" %}</a>
             <ul>
+              {%if SANZA_SITE_URL %}<li><a href="{{ SANZA_SITE_URL }}">{% trans "Back to site" %}</a></li>{% endif %}
               <li><a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a></li>
               <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
               {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
