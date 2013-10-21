@@ -276,7 +276,7 @@ def export_contacts_as_excel(request):
 
             fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city',
-                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
+                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date', 'job']
             
             #header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
