@@ -20,6 +20,8 @@ import urllib2, re
 from bs4 import BeautifulSoup
 from django.utils.importlib import import_module
 from captcha.fields import CaptchaField
+from django.utils.safestring import mark_safe
+from coop_cms.utils import dehtml
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -181,7 +183,7 @@ class SubscribeForm(ModelFormWithCity):
             
     def clean_entity(self):
         entity_type = self.cleaned_data.get('entity_type', None)
-        entity = self.cleaned_data['entity']
+        entity = self._dehtmled_field("entity")
         if entity_type:
             if not entity:
                 raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
@@ -190,10 +192,34 @@ class SubscribeForm(ModelFormWithCity):
             entity = u' '.join([x for x in data if x]).strip().upper()
             
         return entity
-            
+         
+    def _dehtmled_field(self, fieldname, **kwargs):
+        value = self.cleaned_data[fieldname]
+        return dehtml(value, **kwargs)
+        
+    def clean_lastname(self):
+        return self._dehtmled_field("lastname")
+    
+    def clean_firstname(self):
+        return self._dehtmled_field("firstname")
+    
+    def clean_phone(self):
+        return self._dehtmled_field("phone")
+    
+    def clean_mobile(self):
+        return self._dehtmled_field("mobile")
+    
+    def clean_address(self):
+        return self._dehtmled_field("address")
+    
+    def clean_address2(self):
+        return self._dehtmled_field("address2")
+    
+    def clean_address3(self):
+        return self._dehtmled_field("address3")
     
     def clean_message(self):
-        message = self.cleaned_data["message"]
+        message = self._dehtmled_field("message", allow_spaces=True)
         if len(message) > 10000:
             raise ValidationError(_(u"Your message is too long"))
         return message
@@ -278,7 +304,7 @@ class SubscribeForm(ModelFormWithCity):
                 'contact': contact,
                 'groups': contact.entity.group_set.all(),
                 'actions': actions,
-                'message': message,
+                'message': mark_safe(message),
                 'site': settings.COOP_CMS_SITE_PREFIX,
             }
             t = get_template('Emailing/subscribe_notification_email.txt')

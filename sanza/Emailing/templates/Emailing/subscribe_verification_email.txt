@@ -3,12 +3,12 @@
 {% blocktrans %}
 Hello,
 
-You have requested to subscribe to the newsletter of {{my_company}}. We need to confirm your email address.
+You have requested to subscribe to our newsletter. We need to confirm your email address.
 
 Please confirm it by visiting the following url:
 http://{{site}}{{verification_url}}
 
-The {{my_company}} team!
+{{my_company}}
 
 PS: If you did not subscribe to the newsletter, please just ignore this email.
 {% endblocktrans %}

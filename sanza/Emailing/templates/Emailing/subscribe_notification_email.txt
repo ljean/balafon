@@ -2,10 +2,10 @@
 
 {% trans "Contact" %}
 -----------------
-{{contact.fullname}}
-{{contact.get_full_address}}
-{{contact.get_phones|seq_to_dash}}
-{{contact.email}}
+{{contact.fullname|safe}}
+{{contact.get_full_address|safe}}
+{{contact.get_phones|seq_to_dash|safe}}
+{{contact.email|safe}}
 
 {% trans "Groups" %}
 -----------------
@@ -20,7 +20,7 @@
 {% if contact.notes %}
 {% trans "Comments" %}
 -----------------
-{{contact.notes}}
+{{contact.notes|safe}}
 {% endif %}
 
 {% trans "More info at" %} {{site}}{% url "crm_view_entity" contact.entity.id  %}

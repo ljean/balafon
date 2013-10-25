@@ -17,6 +17,7 @@ from coop_cms.utils import make_links_absolute
 from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
+from django.utils.safestring import mark_safe
 
 class CreditMissing(Exception): pass
 
@@ -141,7 +142,7 @@ def send_verification_email(contact):
             'contact': contact,
             'verification_url': reverse('emailing_email_verification', args=[contact.uuid]),
             'site': Site.objects.get_current(),
-            'my_company': settings.SANZA_MY_COMPANY,
+            'my_company': mark_safe(settings.SANZA_MY_COMPANY),
         }
         t = get_template('Emailing/subscribe_verification_email.txt')
         content = t.render(Context(data))

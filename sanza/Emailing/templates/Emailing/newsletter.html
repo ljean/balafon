@@ -12,7 +12,7 @@
     </div>
     <div class="top-header-item">
         {% blocktrans %}
-        You receive this email because you subscribe to the mailing list of {{my_company}}.
+        You receive this email because you subscribe to our mailing list. {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
         <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
@@ -26,7 +26,7 @@
 <div class="bottom-footer email-only">
     <div class="item">
         {% blocktrans %}
-        You receive this email because you subscribe to the mailing list of {{my_company}}.
+        You receive this email because you subscribe to our mailing list. {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
         <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>

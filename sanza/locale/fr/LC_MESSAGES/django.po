@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-15 16:13+0200\n"
-"PO-Revision-Date: 2013-10-15 16:13+0100\n"
+"POT-Creation-Date: 2013-10-25 14:11+0200\n"
+"PO-Revision-Date: 2013-10-25 14:14+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +109,7 @@ msgid "contacts"
 msgstr "contacts"
 
 #: Crm/forms.py:126 Crm/forms.py:197 Crm/forms.py:232 Crm/search_forms.py:49
-#: Emailing/forms.py:110 Profile/forms.py:16
+#: Emailing/forms.py:112 Profile/forms.py:16
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
@@ -124,12 +124,12 @@ msgid "Country"
 msgstr "Pays"
 
 #: Crm/forms.py:187 Crm/models.py:147 Crm/models.py:373 Crm/search_forms.py:58
-#: Emailing/forms.py:131 Profile/models.py:23
+#: Emailing/forms.py:133 Profile/models.py:23
 msgid "zip code"
 msgstr "code postal"
 
 #: Crm/forms.py:188 Crm/forms.py:196 Crm/forms.py:231 Crm/search_forms.py:43
-#: Crm/templates/Crm/_section_all_entities.html:13 Emailing/forms.py:109
+#: Crm/templates/Crm/_section_all_entities.html:13 Emailing/forms.py:111
 #: Profile/forms.py:15 Search/templates/Search/_section_qs_cities.html:8
 #: Search/templates/Search/_section_qs_contacts.html:10
 #: Search/templates/Search/_section_qs_entities.html:8
@@ -229,7 +229,7 @@ msgstr "L'entité n'existe pas"
 #: Crm/forms.py:449 Crm/models.py:789 Crm/templates/Crm/_actions_table.html:9
 #: Crm/templates/Crm/_section_contacts.html:10
 #: Crm/templates/Crm/_section_same_as.html:44
-#: Crm/templates/Crm/edit_action.html:33 Emailing/forms.py:266
+#: Crm/templates/Crm/edit_action.html:33 Emailing/forms.py:292
 #: Emailing/templates/Emailing/_section_contacts.html:13
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:3
 msgid "Contact"
@@ -1141,8 +1141,8 @@ msgstr "Date"
 msgid "Type"
 msgstr "Type"
 
-#: Crm/templates/Crm/_actions_table.html:8 Emailing/forms.py:30
-#: Emailing/forms.py:58
+#: Crm/templates/Crm/_actions_table.html:8 Emailing/forms.py:32
+#: Emailing/forms.py:60
 msgid "Subject"
 msgstr "Sujet"
 
@@ -1311,7 +1311,7 @@ msgstr "Supprimer du groupe"
 
 #: Crm/templates/Crm/_section_contacts.html:11
 #: Crm/templates/Crm/_section_same_as.html:14
-#: Crm/templates/Crm/_section_same_as.html:46 Emailing/forms.py:129
+#: Crm/templates/Crm/_section_same_as.html:46 Emailing/forms.py:131
 #: Search/templates/Search/_section_qs_contacts.html:10
 msgid "Phone"
 msgstr "Téléphone"
@@ -1319,7 +1319,7 @@ msgstr "Téléphone"
 #: Crm/templates/Crm/_section_contacts.html:11
 #: Crm/templates/Crm/_section_same_as.html:15
 #: Crm/templates/Crm/_section_same_as.html:47
-#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:130
+#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:132
 #: Profile/forms.py:54 Search/templates/Search/_section_qs_contacts.html:10
 #: templates/registration/login.html:16
 msgid "Email"
@@ -1492,12 +1492,12 @@ msgstr ""
 msgid "Gender"
 msgstr "civilité"
 
-#: Crm/templates/Crm/confirm_contacts_import.html:65 Emailing/forms.py:127
+#: Crm/templates/Crm/confirm_contacts_import.html:65 Emailing/forms.py:129
 #: Profile/forms.py:59
 msgid "Lastname"
 msgstr "Nom"
 
-#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:128
+#: Crm/templates/Crm/confirm_contacts_import.html:66 Emailing/forms.py:130
 #: Profile/forms.py:58
 msgid "Firstname"
 msgstr "Prénom"
@@ -1643,107 +1643,107 @@ msgstr "Sanza"
 msgid "Back to newsletters"
 msgstr "Retour aux newsletters"
 
-#: Emailing/forms.py:25
+#: Emailing/forms.py:27
 msgid "Reason"
 msgstr "Raison"
 
-#: Emailing/forms.py:29
+#: Emailing/forms.py:31
 #: Emailing/templates/Emailing/_section_newsletters.html:22
 #: Emailing/templates/Emailing/_section_newsletters.html:59
 msgid "Newsletter"
 msgstr "Newsletter"
 
-#: Emailing/forms.py:31 Emailing/forms.py:59
+#: Emailing/forms.py:33 Emailing/forms.py:61
 msgid "Subject of the newsletter"
 msgstr "Sujet de la newsletter"
 
-#: Emailing/forms.py:47
+#: Emailing/forms.py:49
 msgid "-- New --"
 msgstr "-- Nouveau --"
 
-#: Emailing/forms.py:54
+#: Emailing/forms.py:56
 msgid "Please enter a subject for the newsletter"
 msgstr "Veuillez entrer le sujet de la newsletter"
 
-#: Emailing/forms.py:60
+#: Emailing/forms.py:62
 msgid "Template"
 msgstr "Modèle"
 
-#: Emailing/forms.py:61
+#: Emailing/forms.py:63
 msgid "Source URL"
 msgstr "URL Source"
 
-#: Emailing/forms.py:62
+#: Emailing/forms.py:64
 msgid "Content"
 msgstr "Contenu"
 
-#: Emailing/forms.py:97
+#: Emailing/forms.py:99
 msgid "The url is not allowed"
 msgstr "L'URL n'est pas autorisé"
 
-#: Emailing/forms.py:114 Profile/forms.py:62
+#: Emailing/forms.py:116 Profile/forms.py:62
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
-#: Emailing/forms.py:117 Emailing/forms.py:236 Profile/views.py:82
+#: Emailing/forms.py:119 Emailing/forms.py:262 Profile/views.py:82
 msgid "Message"
 msgstr "Message"
 
-#: Emailing/forms.py:118
+#: Emailing/forms.py:120
 msgid "Make sure you are a human"
 msgstr ""
 "Entrez le texte affiché sur l'image afin que nous vérifions que vous n'êtes "
 "pas un robot de spam"
 
-#: Emailing/forms.py:145 Profile/forms.py:79
+#: Emailing/forms.py:147 Profile/forms.py:79
 msgid "Individual"
 msgstr "Particulier"
 
-#: Emailing/forms.py:164 Profile/forms.py:95
+#: Emailing/forms.py:166 Profile/forms.py:95
 msgid "Invalid entity type"
 msgstr "Type d'entité invalide"
 
-#: Emailing/forms.py:187 Profile/forms.py:88
+#: Emailing/forms.py:189 Profile/forms.py:88
 msgid "{0}: Please enter a name"
 msgstr "{0}: veuillez entrer un nom"
 
-#: Emailing/forms.py:198
+#: Emailing/forms.py:224
 msgid "Your message is too long"
 msgstr "Votre message est trop long"
 
-#: Emailing/forms.py:205
+#: Emailing/forms.py:231
 msgid "Invalid group"
 msgstr "Groupe invalide"
 
-#: Emailing/forms.py:212
+#: Emailing/forms.py:238
 msgid "Invalid action type"
 msgstr "Type d'action invalide"
 
-#: Emailing/forms.py:238 Emailing/forms.py:290 Profile/views.py:71
+#: Emailing/forms.py:264 Emailing/forms.py:316 Profile/views.py:71
 msgid "Message from web site"
 msgstr "Message depuis le site Internet"
 
-#: Emailing/forms.py:248
+#: Emailing/forms.py:274
 msgid "newsletter"
 msgstr "newsletter"
 
-#: Emailing/forms.py:250
+#: Emailing/forms.py:276
 msgid "3rd parties"
 msgstr "offres partenaires"
 
-#: Emailing/forms.py:253
+#: Emailing/forms.py:279
 msgid "Subscription"
 msgstr "Inscriptions"
 
-#: Emailing/forms.py:255
+#: Emailing/forms.py:281
 msgid "Subscribe to {0}"
 msgstr "S'inscrire à {0}"
 
-#: Emailing/forms.py:296 Profile/views.py:76
+#: Emailing/forms.py:322 Profile/views.py:76
 msgid "The message have been sent"
 msgstr "Votre message a bien été envoyé"
 
-#: Emailing/forms.py:300 Profile/views.py:79
+#: Emailing/forms.py:326 Profile/views.py:79
 msgid "The message couldn't be send."
 msgstr "Votre message n'a pas pu être envoyé"
 
@@ -1819,17 +1819,17 @@ msgstr "Date de fin"
 msgid "Date : {0} - Total: {1} - Credit : {2}"
 msgstr "Date : {0} - Total: {1} - Credit : {2}"
 
-#: Emailing/utils.py:68 Emailing/templates/Emailing/view_emailing.html:3
+#: Emailing/utils.py:69 Emailing/templates/Emailing/view_emailing.html:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: Emailing/utils.py:83
+#: Emailing/utils.py:84
 msgid "Credit missing for sending this emailing (available: {0} - required {1}"
 msgstr ""
 "Credit insuffisant pour l'envoi de cet emailing: disponible {0} - necessaire "
 "{1}"
 
-#: Emailing/utils.py:152
+#: Emailing/utils.py:153
 msgid "Verification of your email address"
 msgstr "Vérification de votre adresse email"
 
@@ -1955,14 +1955,14 @@ msgstr "consultez le en ligne depuis votre navigateur habituel"
 #, python-format
 msgid ""
 "\n"
-"        You receive this email because you subscribe to the mailing list of "
+"        You receive this email because you subscribe to our mailing list. "
 "%(my_company)s.\n"
 "        You can unsubscribe by clicking \n"
 "        "
 msgstr ""
 "\n"
-"        Vous recevez cet email car vous êtes inscrit à la liste de diffusion "
-"de %(my_company)s.\n"
+"        Vous recevez cet email car vous êtes inscrit à notre liste de "
+"diffusion. %(my_company)s.\n"
 "        Vous pouvez vous désinscrire en cliquant sur\n"
 "        "
 
@@ -1989,13 +1989,13 @@ msgid ""
 "\n"
 "Hello,\n"
 "\n"
-"You have requested to subscribe to the newsletter of %(my_company)s. We need "
-"to confirm your email address.\n"
+"You have requested to subscribe to our newsletter. We need to confirm your "
+"email address.\n"
 "\n"
 "Please confirm it by visiting the following url:\n"
 "http://%(site)s%(verification_url)s\n"
 "\n"
-"The %(my_company)s team!\n"
+"%(my_company)s\n"
 "\n"
 "PS: If you did not subscribe to the newsletter, please just ignore this "
 "email.\n"
@@ -2003,13 +2003,13 @@ msgstr ""
 "\n"
 "Bonjour,\n"
 "\n"
-"Vous avez souhaitez vous inscrire à la lettre d'information de "
-"%(my_company)s. Nous devons confirmer votre adresse email.\n"
+"Vous avez souhaitez vous inscrire à notre lettre d'information. Nous devons "
+"confirmer votre adresse email.\n"
 "\n"
 "Veuillez confirmer votre inscription en visitant l'url suivante:\n"
 "http://%(site)s%(verification_url)s\n"
 "\n"
-"L'équipe %(my_company)s!\n"
+"%(my_company)s\n"
 "\n"
 "PS: Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet "
 "email.\n"
@@ -2020,14 +2020,13 @@ msgstr "S'inscrire"
 
 #: Emailing/templates/Emailing/public/subscribe_done.html:4
 #: Emailing/templates/Emailing/public/subscribe_error.html:4
-#, python-format
 msgid ""
 "\n"
-"      You have subscribed to the %(my_company)s mailing-list.\n"
+"      You have subscribed to our mailing-list.\n"
 "      "
 msgstr ""
 "\n"
-"      Vous êtes inscrit à la liste de diffusion de %(my_company)s.\n"
+"      Vous êtes inscrit à notre liste de diffusion.\n"
 "      "
 
 #: Emailing/templates/Emailing/public/subscribe_done.html:8
@@ -2067,12 +2066,9 @@ msgstr ""
 "      "
 
 #: Emailing/templates/Emailing/public/unregister_confirm.html:7
-#, python-format
-msgid ""
-"<h1>Are you sure to unregister from the %(my_company)s mailing-list?</h1>"
+msgid "<h1>Are you sure to unregister from our mailing-list?</h1>"
 msgstr ""
-"<h1>Etes vous sûr de vous désinscrire de la liste de diffusion de "
-"%(my_company)s?</h1>"
+"<h1>Etes vous sûr de vous désinscrire de notre liste de diffusion?</h1>"
 
 #: Emailing/templates/Emailing/public/unregister_confirm.html:10
 #: Search/forms.py:401
@@ -2085,27 +2081,25 @@ msgid "No"
 msgstr "Non"
 
 #: Emailing/templates/Emailing/public/unregister_done.html:5
-#, python-format
 msgid ""
 "\n"
-"        You have been unregistered from the %(my_company)s mailing-list.\n"
+"        You have been unregistered from our mailing-list.\n"
 "        "
 msgstr ""
 "\n"
-"        Vous êtes désinscrit de la liste de diffusion de %(my_company)s.\n"
+"        Vous êtes désinscrit de notre liste de diffusion.\n"
 "        "
 
 #: Emailing/templates/Emailing/public/unregister_done.html:9
-#, python-format
 msgid ""
 "\n"
-"        You have cancelled the operation. You are still member of the "
-"%(my_company)s mailing-list.\n"
+"        You have cancelled the operation. You are still member of our "
+"mailing-list.\n"
 "        "
 msgstr ""
 "\n"
-"        Vous avez annulé l'opération. Vous êtes toujours membre de la liste "
-"de diffusion de %(my_company)s.\n"
+"        Vous avez annulé l'opération. Vous êtes toujours membre de notre "
+"liste de diffusion.\n"
 "        "
 
 #: Emailing/templates/Emailing/public/verification_done.html:4
@@ -2258,21 +2252,13 @@ msgstr ""
 "Afin de finir la création du compte, merci de l'activer en visitant l'url "
 "suivante:\n"
 
-#: Profile/templates/registration/activation_email.txt:10
-#, python-format
+#: Profile/templates/registration/activation_email.txt:11
 msgid ""
 "\n"
-"\n"
-"The %(site)s team!\n"
-"\n"
-"PS: If you did not request this account creation, please ignore this email.\n"
+"If you did not request this account creation, please ignore this email.\n"
 msgstr ""
 "\n"
-"\n"
-"L'équipe %(site)s\n"
-"\n"
-"PS: Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet "
-"email.\n"
+"Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet email.\n"
 
 #: Profile/templates/registration/activation_email_subject.txt:2
 msgid "Account activation"
