@@ -1561,6 +1561,31 @@ class RelationshipTest(BaseTestCase):
         r = models.Relationship.objects.get(contact1=contact1, contact2=contact2)
         self.assertEqual(r.relationship_type, relation_type)
         
+    def test_add_reversed_relationship(self):
+        contact1 = mommy.make(models.Contact, firstname="Alex", lastname="Ferguson")
+        contact2 = mommy.make(models.Contact, firstname="Eric", lastname="Cantona")
+        
+        relation_type = mommy.make(models.RelationshipType, name="Coach of", reverse="Player of")
+        
+        url = reverse("crm_add_relationship", args=[contact2.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, relation_type.name)
+        self.assertContains(response, relation_type.reverse)
+        
+        response = self.client.post(url, data={'contact2': contact1.id, 'relationship_type': -relation_type.id})
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(list(errors), [])
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        r = models.Relationship.objects.get(contact1=contact1, contact2=contact2)
+        self.assertEqual(r.relationship_type, relation_type)
+        
     def test_add_relationship_no_contact(self):
         contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
         contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")

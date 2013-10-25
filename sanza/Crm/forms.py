@@ -441,7 +441,11 @@ class AddRelationshipForm(forms.Form):
         
         self.contact1 = contact1
         
-        relationship_types = [(r.id, r.name) for r in models.RelationshipType.objects.all()]
+        relationship_types = []
+        for r in models.RelationshipType.objects.all():
+            relationship_types.append((r.id, r.name))
+            if r.reverse:
+                relationship_types.append((-r.id, r.reverse))
         self.fields["relationship_type"].widget = forms.Select(choices=relationship_types) 
         
         widget = ContactAutoComplete(
@@ -450,7 +454,11 @@ class AddRelationshipForm(forms.Form):
         
     def clean_relationship_type(self):
         try:
+            self.reversed_relation = False
             relationship_type = int(self.cleaned_data["relationship_type"])
+            if relationship_type<0:
+                self.reversed_relation = True
+                relationship_type = -relationship_type
             return models.RelationshipType.objects.get(id=relationship_type)
         except ValueError:
             raise ValidationError(_(u"Invalid data"))
@@ -467,10 +475,16 @@ class AddRelationshipForm(forms.Form):
             raise ValidationError(_(u"Contact does not exist"))
         
     def save(self):
-        contact2 = self.cleaned_data["contact2"]
+        if self.reversed_relation:
+            contact1 = self.cleaned_data["contact2"]
+            contact2 = self.contact1
+        else:
+            contact1 = self.contact1
+            contact2 = self.cleaned_data["contact2"]
+        
         rt = self.cleaned_data["relationship_type"]
         return models.Relationship.objects.create(
-                contact1=self.contact1, contact2=contact2, relationship_type=rt)    
+                contact1=contact1, contact2=contact2, relationship_type=rt)    
         
 class ActionDoneForm(forms.ModelForm):
     
