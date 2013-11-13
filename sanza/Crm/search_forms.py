@@ -781,3 +781,49 @@ class ContactsAndEntitiesByChangeDate(TwoDatesForm):
         return Q(modified__gte=dt1, modified__lte=dt2) | Q(created__gte=dt1, created__lte=dt2) | \
             Q(entity__modified__gte=dt1, entity__modified__lte=dt2) | \
             Q(entity__created__gte=dt1, entity__created__lte=dt2)
+        
+class ContactsRelationshipByType(SearchFieldForm):
+    _name = 'contacts_by_relationship_type'
+    _label = _(u'Relationship type')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactsRelationshipByType, self).__init__(*args, **kwargs)
+        relationship_types = []
+        for r in models.RelationshipType.objects.all():
+            relationship_types.append((r.id, r.name))
+            if r.reverse:
+                relationship_types.append((-r.id, r.reverse))
+        field = forms.CharField(label=self._label, widget=forms.Select(choices=relationship_types))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        relationship_ids = []
+        value, is_reverse = int(self._value), False
+        if value<0:
+            value, is_reverse = -value, True
+        t = models.RelationshipType.objects.get(id=value)
+        for r in models.Relationship.objects.filter(relationship_type__id=t.id):
+            if t.reverse:
+                if is_reverse:
+                    relationship_ids.append(r.contact2.id)
+                else:
+                    relationship_ids.append(r.contact1.id)
+            else:
+                relationship_ids += [r.contact1.id, r.contact2.id]
+        relationship_ids = list(set(relationship_ids))  
+        return Q(id__in=(relationship_ids))
+    
+class ContactsRelationshipByDate(TwoDatesForm):
+    _name = 'contacts_by_relationship_dates'
+    _label = _(u'Relationship dates')
+        
+    def get_lookup(self):
+        relationship_ids = []
+        dt1, dt2 = self._get_dates()
+        dt2 = dt2 + timedelta(1)
+        for r in models.Relationship.objects.filter(created__gte=dt1, created__lt=dt2):
+            relationship_ids = [r.contact1.id, r.contact2.id]
+        relationship_ids = list(set(relationship_ids))  
+        return Q(id__in=(relationship_ids))
+
+    
