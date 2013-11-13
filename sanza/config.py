@@ -10,6 +10,7 @@ SEARCH_FORMS = [
             search_forms.EntityNameSearchForm,
             search_forms.EntityNameStartsWithSearchForm,
             search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
+            search_forms.HasEntityForm if (settings.ALLOW_SINGLE_CONTACT) else None,
             search_forms.RelationshipDateForm,
          ],
     ),(

@@ -38,6 +38,18 @@ class EntityNameStartsWithSearchForm(SearchFieldForm):
         return {'entity__name__istartswith': self._value}
 
 
+class HasEntityForm(YesNoSearchFieldForm):
+    _name = 'has_entity'
+    _label = _(u'Has entity?')
+        
+    def get_lookup(self):
+        no_entity = Q(entity__is_single_contact=True)
+        if self.is_yes():
+            return ~no_entity
+        else:
+            return no_entity
+
+
 class CitySearchForm(SearchFieldForm):
     _name = 'city'
     _label = _(u'City')
