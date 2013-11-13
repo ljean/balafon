@@ -56,7 +56,7 @@ class EntityByModifiedDate(TwoDatesForm):
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
         dt2 += timedelta(1)
-        return {'entity__modified__gte': dt1, 'entity__modified__lt': dt2, }
+        return Q(entity__is_single_contact=False, entity__modified__gte=dt1, entity__modified__lt=dt2)
 
 class ContactByModifiedDate(TwoDatesForm):
     _name = 'contact_by_modified_date'

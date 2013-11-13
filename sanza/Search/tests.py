@@ -1226,6 +1226,24 @@ class ModifiedSearchTest(BaseTestCase):
         
         self.assertContains(response, contact1.lastname)
         
+    def test_entity_modified_today_no_single_contact(self):
+        
+        contact1 = mommy.make(models.Contact, lastname="Azertuiop")
+        entity2 = mommy.make(models.Entity, is_single_contact=True)
+        contact2 = entity2.default_contact
+        contact2.lastname = "QWERTYUIOP"
+        contact2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-entity_by_modified_date-_-0": '{0} {0}'.format(date.today().strftime("%d/%m/%Y"))}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        
     def test_entity_modified_tomorrow(self):
         
         contact1 = mommy.make(models.Contact, lastname="Azertuiop")
