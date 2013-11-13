@@ -12,10 +12,14 @@
     <div class="entity_logo">
       <img src="{{STATIC_URL}}img/entity.png"/>
     </div>
-    {% if entity.type.is_male %}
-      {% trans "NewMale" %} {{entity.type}}
+    {% if SANZA_NO_ENTITY_TYPE %}
+      {% trans "New entity" %}
     {% else %}
-      {% trans "NewFemale" %} {{entity.type}}
+      {% if entity.type.is_male %}
+        {% trans "NewMale" %} {{entity.type}}
+      {% else %}
+        {% trans "NewFemale" %} {{entity.type}}
+      {% endif %}
     {% endif %}
   </h2>
   {% endif %}

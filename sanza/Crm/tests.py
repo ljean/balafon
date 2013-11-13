@@ -19,6 +19,89 @@ class BaseTestCase(TestCase):
 
     def _login(self):
         self.client.login(username="toto", password="abc")
+        
+class CreateEntityTest(BaseTestCase):
+
+    def test_view_create_entity_no_type(self):
+        url = reverse('crm_create_entity', args=[0])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+    
+    def test_view_create_entity_with_type(self):
+        t = mommy.make(models.EntityType)
+        url = reverse('crm_create_entity', args=[t.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+    def test_create_entity_no_type(self):
+        url = reverse('crm_create_entity', args=[0])
+        response = self.client.post(url, data={'name': "ABC"})
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        e = models.Entity.objects.all()[0]
+        self.assertEqual(response["Location"],
+            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertEqual(e.name, "ABC")
+        self.assertEqual(e.type, None)
+    
+    def test_create_entity_with_type(self):
+        t = mommy.make(models.EntityType)
+        url = reverse('crm_create_entity', args=[t.id])
+        response = self.client.post(url, data={'name': "ABC", "type": t.id})
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        e = models.Entity.objects.all()[0]
+        self.assertEqual(response["Location"],
+            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertEqual(e.name, "ABC")
+        self.assertEqual(e.type, t)
+        
+    def test_create_entity_with_type_after(self):
+        t = mommy.make(models.EntityType)
+        url = reverse('crm_create_entity', args=[0])
+        response = self.client.post(url, data={'name': "ABC", "type": t.id})
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        e = models.Entity.objects.all()[0]
+        self.assertEqual(response["Location"],
+            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertEqual(e.name, "ABC")
+        self.assertEqual(e.type, t)
+        
+    def test_view_create_entity_unknown_type(self):
+        t = mommy.make(models.EntityType)
+        url = reverse('crm_create_entity', args=[2222])
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+        response = self.client.post(url, data={'name': "ABC", "type": 2222})
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+        url = reverse('crm_create_entity', args=[t.id])
+        response = self.client.post(url, data={'name': "ABC", "type": "2222"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+        
+    def test_view_create_entity_invalid_type(self):
+        t = mommy.make(models.EntityType)
+        url = reverse('crm_create_entity', args=[2222]).replace("2222", "aaa")
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+        response = self.client.post(url, data={'name': "ABC", "type": 2222})
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
+        
+        url = reverse('crm_create_entity', args=[t.id])
+        response = self.client.post(url, data={'name': "ABC", "type": "aaaaa"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 0)
 
 class OpportunityTest(BaseTestCase):
 

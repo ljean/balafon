@@ -322,20 +322,20 @@ def edit_entity(request, entity_id):
 
 @user_passes_test(can_access)
 def create_entity(request, entity_type_id):
-    entity_type = get_object_or_404(models.EntityType, id=entity_type_id)
-    entity = models.Entity(type=entity_type)
+    try:
+        entity_type_id = int(entity_type_id)
+    except ValueError:
+        raise Http404
+    if entity_type_id:
+        entity_type = get_object_or_404(models.EntityType, id=entity_type_id)
+        entity = models.Entity(type=entity_type)
+    else:
+        entity = models.Entity()
     
     if request.method == "POST":
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
-            logo = form.cleaned_data['logo']
-            if logo:
-                if type(logo)==bool:
-                    entity.logo = None
-                    entity.save()
-                else:
-                    entity.logo.save(logo.name, logo)
             if entity.contact_set.count() > 0:
                 return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.default_contact.id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))

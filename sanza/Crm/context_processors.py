@@ -17,6 +17,7 @@ def crm(request):
     return {
         'SANZA_SITE_URL': site_url,
         'SANZA_ALLOW_SINGLE_CONTACT': crm_settings.ALLOW_SINGLE_CONTACT,
+        'SANZA_NO_ENTITY_TYPE': crm_settings.NO_ENTITY_TYPE,
         'SANZA_ENTITY_TYPES': EntityType.objects.all(),
         'SANZA_MULTI_USER': getattr(settings, 'SANZA_MULTI_USER', True),
         'SANZA_EMAIL_LOGIN': ('sanza.Profile.backends.EmailModelBackend' in settings.AUTHENTICATION_BACKENDS),

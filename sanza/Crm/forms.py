@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
-from sanza.Crm.settings import get_default_country
+from sanza.Crm.settings import get_default_country, NO_ENTITY_TYPE
 from datetime import datetime, date
 from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
@@ -199,6 +199,9 @@ class EntityForm(ModelFormWithCity):
     
     def __init__(self, *args, **kwargs):
         super(EntityForm, self).__init__(*args, **kwargs)
+        
+        if NO_ENTITY_TYPE:
+            self.fields["type"].widget = forms.HiddenInput()
         
     class Meta:
         model = models.Entity

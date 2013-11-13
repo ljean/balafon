@@ -41,7 +41,7 @@ def get_field_form(field):
     _forms = []
     for (cat, fs) in get_search_forms():
         _forms.extend(fs)
-    x = dict([(f._name, f) for f in _forms])
+    x = dict([(f._name, f) for f in _forms if f])
     return x[field]
 
 
@@ -95,7 +95,7 @@ class FieldChoiceForm(forms.Form):
         choices = [('', [('', _(u'Please select a filter'))])]#1st line is just a label and can't be selected
         for (cat, fs) in get_search_forms():
             choices.append(
-                (cat, [(reverse('search_get_field', args=[f._name]), f._label) for f in fs])
+                (cat, [(reverse('search_get_field', args=[f._name]), f._label) for f in fs if f])
             )
         self.fields['field_choice'] = GroupedChoiceField(choices)
         

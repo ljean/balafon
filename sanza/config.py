@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from sanza.Crm import search_forms, models, forms
 from django.utils.translation import ugettext as _
+from sanza.Crm import settings
 
 SEARCH_FORMS = [
     (
@@ -8,7 +9,7 @@ SEARCH_FORMS = [
         [
             search_forms.EntityNameSearchForm,
             search_forms.EntityNameStartsWithSearchForm,
-            search_forms.TypeSearchForm,
+            search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
             search_forms.RelationshipDateForm,
          ],
     ),(
