@@ -274,9 +274,9 @@ def export_contacts_as_excel(request):
             wb = xlwt.Workbook()
             ws = wb.add_sheet('sanza')
 
-            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'role',
+            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'job', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city',
-                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date', 'job']
+                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
             
             #header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
