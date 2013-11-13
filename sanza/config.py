@@ -12,6 +12,7 @@ SEARCH_FORMS = [
             search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
             search_forms.HasEntityForm if (settings.ALLOW_SINGLE_CONTACT) else None,
             search_forms.RelationshipDateForm,
+            search_forms.EntityByModifiedDate,
          ],
     ),(
         _(u'Group'),
@@ -35,6 +36,7 @@ SEARCH_FORMS = [
         [
             search_forms.ContactNameSearchForm,
             search_forms.ContactRoleSearchForm,
+            search_forms.ContactByModifiedDate,
             search_forms.ContactNewsletterSearchForm,
             search_forms.Contact3rdPartySearchForm,
             search_forms.SecondarySearchForm,

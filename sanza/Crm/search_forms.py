@@ -49,6 +49,23 @@ class HasEntityForm(YesNoSearchFieldForm):
         else:
             return no_entity
 
+class EntityByModifiedDate(TwoDatesForm):
+    _name = 'entity_by_modified_date'
+    _label = _(u'Entity by modified date')
+        
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        dt2 += timedelta(1)
+        return {'entity__modified__gte': dt1, 'entity__modified__lt': dt2, }
+
+class ContactByModifiedDate(TwoDatesForm):
+    _name = 'contact_by_modified_date'
+    _label = _(u'Contact by modified date')
+        
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
+        dt2 += timedelta(1)
+        return {'modified__gte': dt1, 'modified__lt': dt2, }
 
 class CitySearchForm(SearchFieldForm):
     _name = 'city'

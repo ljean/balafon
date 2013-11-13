@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from model_mommy import mommy
 from sanza.Crm import models
 from sanza.Emailing.models import Emailing, MagicLink
@@ -13,7 +13,6 @@ from django.core import mail
 from django.conf import settings
 from BeautifulSoup import BeautifulSoup
 from bs4 import BeautifulSoup as BeautifulSoup4
-from datetime import date
 from django.utils.translation import ugettext as _
 
 def get_form_errors(response):
@@ -1133,3 +1132,111 @@ class HasZipTest(BaseTestCase):
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
         self.assertNotContains(response, contact4.lastname)
+
+class HasEntitySearchTest(BaseTestCase):
+    
+    def test_contact_has_entity(self):
+        
+        entity1 = mommy.make(models.Entity, is_single_contact=False)
+        entity2 = mommy.make(models.Entity, is_single_contact=True)
+        
+        contact1 = entity1.default_contact
+        contact1.lastname = "AZERTYUIOP"
+        contact1.save()
+        
+        contact2 = entity2.default_contact
+        contact2.lastname = "QWERTYUIOP"
+        contact2.save()
+        
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_entity-_-0": 1}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_contact_doesnt_have_entity(self):
+        
+        entity1 = mommy.make(models.Entity, is_single_contact=False)
+        entity2 = mommy.make(models.Entity, is_single_contact=True)
+        
+        contact1 = entity1.default_contact
+        contact1.lastname = "AZERTYUIOP"
+        contact1.save()
+        
+        contact2 = entity2.default_contact
+        contact2.lastname = "QWERTYUIOP"
+        contact2.save()
+        
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_entity-_-0": 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+
+        
+class ModifiedSearchTest(BaseTestCase):
+    
+    def test_contact_modified_today(self):
+        
+        contact1 = mommy.make(models.Contact, lastname="Azertuiop")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_by_modified_date-_-0": '{0} {0}'.format(date.today().strftime("%d/%m/%Y"))}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.lastname)
+        
+    def test_contact_modified_tomorrow(self):
+        
+        contact1 = mommy.make(models.Contact, lastname="Azertuiop")
+        
+        url = reverse('search')
+        
+        dt = date.today() + timedelta(1)
+        data = {"gr0-_-contact_by_modified_date-_-0": '{0} {0}'.format(dt.strftime("%d/%m/%Y"))}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, contact1.lastname)
+        
+    def test_entity_modified_today(self):
+        
+        contact1 = mommy.make(models.Contact, lastname="Azertuiop")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-entity_by_modified_date-_-0": '{0} {0}'.format(date.today().strftime("%d/%m/%Y"))}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, contact1.lastname)
+        
+    def test_entity_modified_tomorrow(self):
+        
+        contact1 = mommy.make(models.Contact, lastname="Azertuiop")
+        
+        url = reverse('search')
+        
+        dt = date.today() + timedelta(1)
+        data = {"gr0-_-entity_by_modified_date-_-0": '{0} {0}'.format(dt.strftime("%d/%m/%Y"))}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, contact1.lastname)
+        
