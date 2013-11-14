@@ -864,7 +864,7 @@ class ContactsImport(TimeStampedModel):
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     encoding = models.CharField(max_length=50, default='iso-8859-15', choices=ENCODINGS)
     separator = models.CharField(max_length=5, default=';', choices=SEPARATORS)
-    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'),
+    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None,
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
     groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
         help_text=_(u'The created entities will be added to the selected groups.'))
