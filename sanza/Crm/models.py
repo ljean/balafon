@@ -102,6 +102,7 @@ class City(BaseZone):
     class Meta:
         verbose_name = _(u'city')
         verbose_name_plural = _(u'cities')
+        ordering = ['name']
     
     def get_country(self):
         obj = self
