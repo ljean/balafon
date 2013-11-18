@@ -78,6 +78,22 @@ def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
         #yield [codecs.decode(cell, 'iso-8859-15') for cell in row] #'cp1252'
         yield [codecs.decode(cell, encoding) for cell in row]
 
+def check_city_exists(city_name, zip_code, country):
+    default_country = get_default_country()
+    foreign_city = bool(country) and (country!=default_country)
+    if foreign_city:
+        zone_type = models.ZoneType.objects.get(type='country')
+        qs = models.Zone.objects.filter(name=country, type=zone_type)
+    else:
+        code = zip_code[:2]
+        qs = models.Zone.objects.filter(code=code)
+    
+    if qs.count()==0:
+        #The parent doesn't exist so th city can't exist
+        return False
+    parent = qs[0]
+    return (models.City.objects.filter(name__iexact=city_name, parent=parent).count()==1)
+    
 def resolve_city(city_name, zip_code, country='', default_department=''):
     default_country = get_default_country()
     foreign_city = bool(country) and (country!=default_country)

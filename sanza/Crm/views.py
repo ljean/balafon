@@ -16,7 +16,7 @@ from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
 from django.conf import settings
 import os.path
-from sanza.Crm.utils import unicode_csv_reader, resolve_city
+from sanza.Crm.utils import unicode_csv_reader, resolve_city, check_city_exists
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from coop_cms.generic_views import EditableObjectView
@@ -1282,9 +1282,12 @@ def read_contacts(reader, fields, extract_from_email):
                 c[field.replace('.', '_')] = c[field]
             if field.find('city')>=0 and c[field]:
                 field = field.replace('.', '_')
-                c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
+                #c[field+'_exists'] = (models.City.objects.filter(name__iexact=c[field]).count()>0)
             if field.find("accept_")==0:
                 c[field] = True if c[field] else False
+        
+        c["entity_city_exists"] = check_city_exists(c["entity_city"], c["entity_zip_code"], c["entity_country"])
+        c["city_exists"] = check_city_exists(c["city"], c["zip_code"], c["country"])
         
         if not any(c.values()):
             continue

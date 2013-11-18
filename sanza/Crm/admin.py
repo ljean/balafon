@@ -3,7 +3,14 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse
 from sanza.Crm import models
 
-admin.site.register(models.Zone)
+
+class ZoneAdmin(admin.ModelAdmin):
+    list_display = ['name', 'parent', 'type']
+    ordering = ['type', 'name']
+    list_filter = ['type', 'parent']
+    search_fields = ['name']
+admin.site.register(models.Zone, ZoneAdmin)
+
 admin.site.register(models.EntityRole)
 admin.site.register(models.SameAs)
 admin.site.register(models.OpportunityType)
@@ -50,6 +57,7 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'parent']
     search_fields = ['name']
     ordering = ['name']
+    list_filer = ['parent']
 admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):
