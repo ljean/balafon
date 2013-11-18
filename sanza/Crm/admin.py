@@ -15,6 +15,7 @@ admin.site.register(models.EntityType, EntityTypeAdmin)
 
 class ZoneTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'type']
+    ordering = ['type', 'name']
 admin.site.register(models.ZoneType, ZoneTypeAdmin)
 
 class ActionTypeAdmin(admin.ModelAdmin):
@@ -48,6 +49,7 @@ class GroupInline(admin.TabularInline):
 class CityAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'parent']
     search_fields = ['name']
+    ordering = ['name']
 admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):
