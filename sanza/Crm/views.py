@@ -1345,7 +1345,7 @@ def read_contacts(reader, fields, extract_from_email):
             groups_dict[g] = True
             c['entity_groups'].append({'name': g, 'exists': exists})
             
-        contact_groups = [x for x in c['groups'].strip().split(";") if x]
+        contact_groups = [x.strip() for x in c['groups'].strip().split(";") if x]
         c['contact_groups'] = []
         for g in contact_groups:
             exists = (models.Group.objects.filter(name__iexact=g).count()!=0) or (g in groups_dict)
