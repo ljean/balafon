@@ -8,7 +8,7 @@
 <table id="entity_contacts">
   <tr>
     <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
-    <th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
+    <th>{% trans "Job" %}</th><th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
   </tr>
   {% for c in contacts %}
   {% with c.has_left as has_left %}
@@ -23,8 +23,9 @@
         <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
       {% endif %}
     {% endif %}
-    <td>{{c.get_roles|seq_to_dash|default:"&nbsp;"}}</td>
-    <td>{{c.get_phones|seq_to_br}}</td>
+    <td>{{ c.job|default:"&nbsp;" }}</td>
+    <td>{{ c.get_roles|seq_to_dash|default:"&nbsp;" }}</td>
+    <td>{{ c.get_phones|seq_to_br }}</td>
     <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
   </tr>
   {% endwith %}
