@@ -156,6 +156,31 @@ class OpportunityTest(BaseTestCase):
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
         
+    def test_view_opportunityies_date_mixes(self):
+        opp1 = mommy.make(models.Opportunity)
+        opp2 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC')
+        act1 = mommy.make(models.Action, opportunity=opp1, contact=contact1, planned_date='2013-11-29')
+        
+        response = self.client.get(reverse('crm_all_opportunities'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, opp1.name)
+        self.assertContains(response, opp2.name)
+        
+    def test_view_opportunityies_date_mixes_none(self):
+        opp1 = mommy.make(models.Opportunity)
+        opp2 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC')
+        act1 = mommy.make(models.Action, opportunity=opp1, contact=contact1)
+        
+        response = self.client.get(reverse('crm_all_opportunities'))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, opp1.name)
+        self.assertContains(response, opp2.name)
+        
+        
 class SameAsTest(BaseTestCase):
 
     def test_add_same_as(self):

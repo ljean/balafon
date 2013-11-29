@@ -25,6 +25,7 @@ from wkhtmltopdf.views import PDFTemplateView
 from django.template.defaultfilters import slugify
 from django.template.loader import find_template
 from sanza.Crm import settings as crm_settings
+from datetime import datetime
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -969,7 +970,7 @@ def view_all_opportunities(request, ordering=None):
         opportunities = opportunities.order_by('type')
     elif ordering == 'date':
         opportunities = list(opportunities)
-        opportunities.sort(key=lambda o: o.get_start_date())
+        opportunities.sort(key=lambda o: o.get_start_date() or datetime(1970, 1, 1))
         opportunities.reverse()
         
     all_opportunities = True
