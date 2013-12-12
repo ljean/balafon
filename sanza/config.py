@@ -5,16 +5,6 @@ from sanza.Crm import settings
 
 SEARCH_FORMS = [
     (
-        _(u'Entity'),
-        [
-            search_forms.EntityNameSearchForm,
-            search_forms.EntityNameStartsWithSearchForm,
-            search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
-            search_forms.HasEntityForm if (settings.ALLOW_SINGLE_CONTACT) else None,
-            search_forms.RelationshipDateForm,
-            search_forms.EntityByModifiedDate,
-         ],
-    ),(
         _(u'Group'),
         [
             search_forms.GroupSearchForm,
@@ -32,6 +22,17 @@ SEARCH_FORMS = [
             search_forms.HasZipCodeForm,
         ],
     ),(
+        _(u'Entity'),
+        [
+            search_forms.EntityNameSearchForm,
+            search_forms.EntityNameStartsWithSearchForm,
+            search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
+            search_forms.HasEntityForm if (settings.ALLOW_SINGLE_CONTACT) else None,
+            search_forms.RelationshipDateForm,
+            search_forms.EntityByModifiedDate,
+            search_forms.EntityWithCustomField,
+         ],
+    ),(
         _(u'Contacts'),
         [
             search_forms.ContactNameSearchForm,
@@ -43,6 +44,7 @@ SEARCH_FORMS = [
             search_forms.ContactAgeSearchForm,
             search_forms.ContactsRelationshipByType,
             search_forms.ContactsRelationshipByDate,
+            search_forms.ContactWithCustomField,
             #search_forms.ContactOpportunityStatusSearchForm,
             #search_forms.ContactOpportunityNameSearchForm,
             #search_forms.ContactNoOpportunityWithNameSearchForm,

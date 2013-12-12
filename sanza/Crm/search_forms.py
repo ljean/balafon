@@ -825,5 +825,38 @@ class ContactsRelationshipByDate(TwoDatesForm):
             relationship_ids = [r.contact1.id, r.contact2.id]
         relationship_ids = list(set(relationship_ids))  
         return Q(id__in=(relationship_ids))
+    
+class ContactWithCustomField(SearchFieldForm):
+    _name = 'contact_with_custom_field'
+    _label = _(u'Contacts with custom field')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactWithCustomField, self).__init__(*args, **kwargs)
+        custom_fields = []
+        for cf in models.CustomField.objects.filter(model=models.CustomField.MODEL_CONTACT):
+            custom_fields.append((cf.id, cf.label))
+        field = forms.CharField(label=self._label, widget=forms.Select(choices=custom_fields))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        value = int(self._value)
+        cf = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_CONTACT)
+        return Q(contactcustomfieldvalue__custom_field=cf)
 
+class EntityWithCustomField(SearchFieldForm):
+    _name = 'entity_with_custom_field'
+    _label = _(u'Entities with custom field')
+    
+    def __init__(self, *args, **kwargs):
+        super(EntityWithCustomField, self).__init__(*args, **kwargs)
+        custom_fields = []
+        for cf in models.CustomField.objects.filter(model=models.CustomField.MODEL_ENTITY):
+            custom_fields.append((cf.id, cf.label))
+        field = forms.CharField(label=self._label, widget=forms.Select(choices=custom_fields))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        value = int(self._value)
+        cf = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_ENTITY)
+        return Q(entity__entitycustomfieldvalue__custom_field=cf)
     
