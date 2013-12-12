@@ -17,3 +17,5 @@ NO_ENTITY_TYPE = getattr(project_settings, 'SANZA_NO_ENTITY_TYPE', False)
 def is_unaccent_filter_supported():
     return getattr(project_settings, 'SANZA_UNACCENT_FILTER_SUPPORT', False)
 
+def city_formatters():
+    return getattr(project_settings, 'SANZA_CITY_FORMATTERS', ())
