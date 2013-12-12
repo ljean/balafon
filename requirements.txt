@@ -10,3 +10,5 @@ django-form-utils
 xlwt==0.7.5
 xlrd
 django-simple-captcha
+django-localeurl
+django-modeltranslation
