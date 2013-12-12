@@ -236,10 +236,7 @@ def create_emailing(request):
                         emailing.send_to.add(c)
                     emailing.save()
                     
-                    if newsletter.source_url:
-                        return HttpResponseRedirect(newsletter.get_absolute_url())
-                    else:
-                        return HttpResponseRedirect(newsletter.get_edit_url())
+                    return HttpResponseRedirect(newsletter.get_absolute_url())
                 else:
                     return render_to_response(
                         'Search/create_action_for_contacts.html',

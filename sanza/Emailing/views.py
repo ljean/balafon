@@ -14,7 +14,7 @@ from sanza.Emailing import models, forms
 from django.contrib import messages
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
-from sanza.Emailing.utils import get_emailing_context, get_credit
+from sanza.Emailing.utils import get_emailing_context
 from django.template.loader import get_template
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -27,11 +27,9 @@ from sanza.utils import now_rounded
 def newsletter_list(request):
     newsletters = Newsletter.objects.all().order_by('-id')
     
-    credits = sum([c.credit for c in models.EmailingCounter.objects.filter(credit__gt=0)])
-    
     return render_to_response(
         'Emailing/newsletter_list.html',
-        {'newsletters': newsletters, 'credits': credits},
+        {'newsletters': newsletters},
         context_instance=RequestContext(request)
     )
 
@@ -105,19 +103,23 @@ def new_newsletter(request):
 def confirm_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     if request.method == "POST":
-        if 'confirm' in request.POST:
+        form = forms.NewsletterSchedulingForm(request.POST, instance=emailing)
+        if form.is_valid() and ("confirm" in request.POST):
             if emailing.status == models.Emailing.STATUS_EDITING:
+                emailing = form.save()
                 emailing.status = models.Emailing.STATUS_SCHEDULED
-                emailing.scheduling_dt = now_rounded() + timedelta(minutes=1)
                 emailing.save()
                 messages.add_message(request, messages.SUCCESS, _(u"The sending has been scheduled"))
             else:
                 messages.add_message(request, messages.ERROR, _(u"The sending can't be scheduled"))
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
+    else:
+        form = forms.NewsletterSchedulingForm(instance=emailing)
     
     return render_to_response(
-        'sanza/confirmation_dialog.html',
+        'Emailing/confirm_send_mail.html',
         {
+            'form': form,
             'message': _(u'Is this newsletter ready to be sent?'),
             'action_url': reverse("emailing_confirm_send_mail", args=[emailing_id]),
         },
@@ -130,7 +132,7 @@ def cancel_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     if request.method == "POST":
         if 'confirm' in request.POST:
-            if emailing.status in (models.Emailing.STATUS_SCHEDULED, models.Emailing.STATUS_CREDIT_MISSING):
+            if emailing.status in (models.Emailing.STATUS_SCHEDULED, ):
                 emailing.status = models.Emailing.STATUS_EDITING
                 emailing.scheduling_dt = None
                 emailing.save()

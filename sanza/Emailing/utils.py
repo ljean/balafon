@@ -19,8 +19,6 @@ from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.utils.safestring import mark_safe
 
-class CreditMissing(Exception): pass
-
 def format_context(text, data):
     # { and } need to be escaped for the format function
     text = text.replace('{', '{{').replace('}', '}}')
@@ -61,9 +59,6 @@ def get_emailing_context(emailing, contact):
         'unregister_url': unregister_url, 'contact': contact, 'emailing': emailing,
     }
     
-def get_credit():
-    return sum([c.credit for c in EmailingCounter.objects.all()])
-    
 def send_newsletter(emailing, max_nb):
     #Create automatically an action type for logging one action by contact
     emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
@@ -76,15 +71,6 @@ def send_newsletter(emailing, max_nb):
     emails = []
     
     nb_contacts = emailing.send_to.count()
-    credit_available = get_credit()
-    if nb_contacts > credit_available:
-        emailing.status = Emailing.STATUS_CREDIT_MISSING
-        emailing.save()
-        raise CreditMissing(
-            _(u'Credit missing for sending this emailing (available: {0} - required {1}').format(
-                credit_available, nb_contacts
-            )
-        )
         
     contacts = list(emailing.send_to.all()[:max_nb])
     for contact in contacts:
@@ -114,27 +100,9 @@ def send_newsletter(emailing, max_nb):
         emailing.send_to.remove(contact)
         emailing.sent_to.add(contact)
     
-    #print "emailing", emailing.send_to.all(), emailing.sent_to.all()
     emailing.save()
     nb_sent = connection.send_messages(emails)
-    
-    if nb_sent:
-        taken_credit = nb_sent
-        for counter in EmailingCounter.objects.all().order_by('-credit'):
-            if counter.credit > taken_credit:
-                counter.credit -= taken_credit
-                taken_credit = 0 
-            else:
-                counter.credit = 0
-                taken_credit -= counter.credit 
-            if counter.credit == 0:
-                counter.finshed_date = date.today()
-            counter.save()
-            if taken_credit == 0:
-                break
-        return nb_sent
-    else:
-        return 0
+    return nb_sent or 0
     
 def send_verification_email(contact):
     if contact.email:

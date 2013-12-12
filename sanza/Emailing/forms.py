@@ -22,6 +22,8 @@ from django.utils.importlib import import_module
 from captcha.fields import CaptchaField
 from django.utils.safestring import mark_safe
 from coop_cms.utils import dehtml
+from django.utils.timezone import now as dt_now
+from datetime import timedelta
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -326,5 +328,24 @@ class SubscribeForm(ModelFormWithCity):
                         _(u"The message couldn't be send."))
                 
         return contact
-    
+
+class NewsletterSchedulingForm(forms.ModelForm):
+    class Meta:
+        model = models.Emailing
+        fields = ('scheduling_dt',)
+
+    def __init__(self, *args, **kwargs):
+        kwargs['initial'] = {'scheduling_dt': dt_now() + timedelta(minutes=5)}
+        super(NewsletterSchedulingForm, self).__init__(*args, **kwargs)
+
+    def clean_scheduling_dt(self):
+        sch_dt = self.cleaned_data['scheduling_dt']
+
+        if not sch_dt:
+            raise ValidationError(_(u"This field is required"))
+
+        if sch_dt < dt_now():
+            raise ValidationError(_(u"The scheduling date must be in future"))
+
+        return sch_dt
         

@@ -2,7 +2,7 @@
 
 from django.core.management.base import BaseCommand
 from sanza.Emailing.models import Emailing
-from sanza.Emailing.utils import send_newsletter, CreditMissing
+from sanza.Emailing.utils import send_newsletter
 from datetime import datetime
 
 class Command(BaseCommand):
@@ -22,13 +22,7 @@ class Command(BaseCommand):
             emailing.status = Emailing.STATUS_SENDING
             emailing.save()
             
-            try:
-                nb_sent = send_newsletter(emailing, max_nb)
-            except CreditMissing, msg:
-                if verbose:
-                    print "ERRROR: ", msg
-                nb_sent = 0
-                continue
+            nb_sent = send_newsletter(emailing, max_nb)
             
             if verbose:
                 print nb_sent, "emails sent for emailing", emailing.id

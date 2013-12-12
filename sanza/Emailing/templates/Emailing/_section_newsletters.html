@@ -7,14 +7,6 @@
   
 {% block section_data %}
   
-  <div class="user-info {% if not credits %}warning{% else %}ok{% endif %}">
-  {% if not credits %}
-    {% trans "Emailing is disabled: You must buy credits in order to send new emailings" %}  
-  {% else %}
-    {% trans "You have a credit of " %} {{credits}} {% trans "emails" %}  
-  {% endif %}
-  </div>
-  
   {% if newsletters %}
   {% autopaginate newsletters 10 %}
   <table class="newsletters">

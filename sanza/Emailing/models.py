@@ -24,14 +24,12 @@ class Emailing(TimeStampedModel):
     STATUS_SCHEDULED = 2
     STATUS_SENDING = 3
     STATUS_SENT = 4
-    STATUS_CREDIT_MISSING = 5
     
     STATUS_CHOICES = (
         (STATUS_EDITING, _(u'Edition in progress')),
         (STATUS_SCHEDULED, _(u'Sending is scheduled')),
         (STATUS_SENDING, _(u'Sending in progress')),
         (STATUS_SENT, _(u'Sent')),
-        (STATUS_CREDIT_MISSING, _(u'Credit missing')),
     )
     
     newsletter = models.ForeignKey(Newsletter) 
@@ -62,11 +60,9 @@ class Emailing(TimeStampedModel):
         if self.status == Emailing.STATUS_EDITING:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id]))
-        if self.status == Emailing.STATUS_SCHEDULED or self.status == Emailing.STATUS_CREDIT_MISSING:
+        if self.status == Emailing.STATUS_SCHEDULED:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
                 ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id]))
-        #if self.status == Emailing.STATUS_CREDIT_MISSING:
-            #action = '<a href="mailto:{1}">{0}</a>'.format(ugettext(u'Buy'), settings.ADMINS[0][1])
         return mark_safe(action)
     
     def get_contacts(self):
