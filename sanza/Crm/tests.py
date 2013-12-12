@@ -8,7 +8,10 @@ from model_mommy import mommy
 from sanza.Crm import models
 from django.conf import settings
 from bs4 import BeautifulSoup as BS4
-
+from django.core import management
+from cStringIO import StringIO
+import sys
+        
 class BaseTestCase(TestCase):
 
     def setUp(self):
@@ -1903,5 +1906,93 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(
             reverse("crm_delete_relationship", args=[8755, r.id]), {'confirm': 1})
         self.assertEqual(response.status_code, 200)
+        
+        
+class FindSameAsTest(BaseTestCase):
+
+    def test_find_same_as(self):
+        
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        contact3 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        buf = StringIO()
+        sysout = sys.stdout
+        sys.stdout = buf
+        management.call_command('find_same_as', verbosity=0, interactive=False, stdout=buf)
+        buf.seek(0, 0)
+        sys.stdout = sysout
+        self.assertEqual(2, len(buf.readlines()))
+        
+    def test_find_same_as_with_group(self):
+        
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        contact3 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        buf = StringIO()
+        sysout = sys.stdout
+        sys.stdout = buf
+        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        buf.seek(0, 0)
+        sys.stdout = sysout
+        self.assertEqual(2, len(buf.readlines()))
+        qs = models.Group.objects.filter(name="SameAs")
+        self.assertEqual(1, qs.count())
+        self.assertEqual(qs[0].contacts.count(), 2)
+        self.assertFalse(contact1 in qs[0].contacts.all())
+        self.assertTrue(contact2 in qs[0].contacts.all())
+        self.assertTrue(contact3 in qs[0].contacts.all())
+        
+    def test_find_same_as_with_existing_group(self):
+        
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        contact3 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        
+        gr = models.Group.objects.create(name="SameAs")
+        gr.contacts.add(contact1)
+        gr.save()
+        
+        buf = StringIO()
+        sysout = sys.stdout
+        sys.stdout = buf
+        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        buf.seek(0, 0)
+        sys.stdout = sysout
+        self.assertEqual(2, len(buf.readlines()))
+        
+        qs = models.Group.objects.filter(name="SameAs")
+        self.assertEqual(1, qs.count())
+        self.assertEqual(qs[0].contacts.count(), 3)
+        self.assertTrue(contact1 in qs[0].contacts.all())
+        self.assertTrue(contact2 in qs[0].contacts.all())
+        self.assertTrue(contact3 in qs[0].contacts.all())
+        
+    def test_find_same_as_with_no_name(self):
+        
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        contact3 = mommy.make(models.Contact, firstname="Paul", lastname="McCartney")
+        contact4 = mommy.make(models.Contact, firstname="", lastname="")
+        contact5 = mommy.make(models.Contact, firstname="", lastname="")
+        
+        buf = StringIO()
+        sysout = sys.stdout
+        sys.stdout = buf
+        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        buf.seek(0, 0)
+        sys.stdout = sysout
+        self.assertEqual(2, len(buf.readlines()))
+        
+        qs = models.Group.objects.filter(name="SameAs")
+        self.assertEqual(1, qs.count())
+        self.assertEqual(qs[0].contacts.count(), 2)
+        self.assertFalse(contact1 in qs[0].contacts.all())
+        self.assertTrue(contact2 in qs[0].contacts.all())
+        self.assertTrue(contact3 in qs[0].contacts.all())
+        self.assertFalse(contact4 in qs[0].contacts.all())
+        self.assertFalse(contact5 in qs[0].contacts.all())
+        
         
         

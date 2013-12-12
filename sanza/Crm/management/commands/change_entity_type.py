@@ -5,13 +5,13 @@ from sanza.Crm import models
 from datetime import date
 
 class Command(BaseCommand):
-    help = u"add a new credit of emailings"
+    help = u"change the entity type"
 
     def handle(self, *args, **options):
         verbose = options.get('verbosity', 0)
 
         if len(args) < 1:
-            print "usage : new_type_name [old_type_id] [group=group_id]"
+            print "usage : change_entity_type new_type_name [old_type_id] [group=group_id]"
             return
         
         new_type_name = args[0]
