@@ -3,6 +3,18 @@
 from django.contrib.auth.models import User
 from sanza.Crm import models
 from django.utils.translation import ugettext as _
+from sanza.Crm import settings as crm_settings
+from sanza.utils import logger
+
+#@transaction.commit_manually
+def filter_icontains_unaccent(qs, field, text):
+    if crm_settings.is_unaccent_filter_supported():
+        qs = qs.extra(
+            where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
+            params = [u"%{0}%".format(text)]
+        )
+        return qs    
+    return qs.filter(**{field+"__icontains": text})
 
 def get_users(self):
     return User.objects.exclude(firstame="", lastname="")
@@ -95,20 +107,45 @@ def check_city_exists(city_name, zip_code, country):
     return (models.City.objects.filter(name__iexact=city_name, parent=parent).count()==1)
     
 def resolve_city(city_name, zip_code, country='', default_department=''):
+    country = country.strip()
+    city_name = city_name.strip()
     default_country = get_default_country()
     foreign_city = bool(country) and (country!=default_country)
     if foreign_city:
         zone_type = models.ZoneType.objects.get(type='country')
-        parent, _is_new = models.Zone.objects.get_or_create(name=country, type=zone_type)
+        qs = models.Zone.objects.filter(type=zone_type)
+        qs = filter_icontains_unaccent(qs, '"Crm_zone"."name"', country)
+        country_count = qs.count()
+        if country_count == 0:
+            parent = models.Zone.objects.create(name=country.capitalize(), type=zone_type)
+        else:
+            parent = qs[0]
+            if country_count>1:
+                logger.warning(u"{0} different zones for '{1}'".format(country_count, country))   
     else:
         code = zip_code[:2] or default_department
         try:
             parent = models.Zone.objects.get(code=code)
         except models.Zone.DoesNotExist, msg:
             parent = None
-    try:
-        return models.City.objects.get(name__iexact=city_name, parent=parent)
-    except models.City.DoesNotExist:
+    
+    for formatter in crm_settings.city_formatters():
+        if formatter[0] == "replace":
+            c1, c2 = formatter[1:]
+            city_name = city_name.replace(c1, c2)
+        if formatter[0] == "capitalize_words":
+            sep = formatter[1]
+            words = [w.capitalize() for w in city_name.split(sep)]
+            city_name = sep.join(words)
+    
+    qs = models.City.objects.filter(parent=parent)
+    qs = filter_icontains_unaccent(qs, '"Crm_city"."name"', city_name)
+    cities_count = qs.count()
+    if cities_count:
+        if cities_count>1:
+            logger.warning(u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent))
+        return qs[0]
+    else:
         return models.City.objects.create(name=city_name, parent=parent)
         
 def get_actions_by_set(actions):
