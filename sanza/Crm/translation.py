@@ -3,7 +3,7 @@
 from modeltranslation.translator import translator, TranslationOptions
 from models import EntityType
 
-class ArticleTranslationOptions(TranslationOptions):
+class EntityTypeTranslationOptions(TranslationOptions):
     fields = ('name',)
 
-translator.register(EntityType, ArticleTranslationOptions)
+translator.register(EntityType, EntityTypeTranslationOptions)
