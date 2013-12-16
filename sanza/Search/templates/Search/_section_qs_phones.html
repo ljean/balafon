@@ -5,10 +5,16 @@
   
 {% block section_data %}
 <table>
+  <tr>
+    <th colspan="2">{% trans "Phone" %}</th>
+  </tr>
   {% for c in contacts_and_entities %}
   <tr>
     <td>
-      <a href="{{ c.get_absolute_url }}">{{c.fullname|default:c}}</a> : {{ c.get_phones|seq_to_dash }}<br \>
+      {{ c.get_phones|seq_to_dash }}
+    </td>
+    <td>
+      <a href="{{ c.get_absolute_url }}">{{c.fullname|default:c}}</a>
     </td>
   </tr>
   {% endfor %}
