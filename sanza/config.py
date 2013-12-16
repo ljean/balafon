@@ -46,6 +46,7 @@ SEARCH_FORMS = [
             search_forms.ContactsRelationshipByType,
             search_forms.ContactsRelationshipByDate,
             search_forms.ContactWithCustomField,
+            search_forms.ContactNotesSearchForm,
             #search_forms.ContactOpportunityStatusSearchForm,
             #search_forms.ContactOpportunityNameSearchForm,
             #search_forms.ContactNoOpportunityWithNameSearchForm,
