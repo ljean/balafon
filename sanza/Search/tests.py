@@ -409,14 +409,14 @@ class GroupSearchTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         
         self.assertContains(response, entity1.name)
-        self.assertContains(response, contact1.lastname)
-        self.assertNotContains(response, contact3.lastname)
+        self.assertContains(response, contact1.firstname)
+        self.assertNotContains(response, contact3.firstname)
         
         self.assertNotContains(response, entity2.name)
-        self.assertNotContains(response, contact2.lastname)
+        self.assertNotContains(response, contact2.firstname)
         
         self.assertContains(response, entity3.name)
-        self.assertContains(response, contact4.lastname)
+        self.assertContains(response, contact4.firstname)
         
     def test_search_contact_of_group(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
