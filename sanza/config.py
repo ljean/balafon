@@ -36,6 +36,7 @@ SEARCH_FORMS = [
         _(u'Contacts'),
         [
             search_forms.ContactNameSearchForm,
+            search_forms.ContactFirstnameSearchForm,
             search_forms.ContactRoleSearchForm,
             search_forms.ContactByModifiedDate,
             search_forms.ContactNewsletterSearchForm,

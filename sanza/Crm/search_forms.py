@@ -423,6 +423,19 @@ class ContactNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'lastname__icontains': self._value}
+    
+class ContactFirtsnameSearchForm(SearchFieldForm):
+    _name = 'contact_firstname'
+    _label = _(u'Contact firstname')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactFirtsnameSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the firstname of the searched contact')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'firstname__icontains': self._value}
 
 class OpportunityStatusSearchForm(SearchFieldForm):
     _name = 'opportunity_status'

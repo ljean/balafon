@@ -390,6 +390,34 @@ class GroupSearchTest(BaseTestCase):
         self.assertContains(response, entity3.name)
         self.assertContains(response, contact4.lastname)
         
+    def test_search_contact_firstname(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, firstname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, firstname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, firstname=u"WXYZ", main_contact=True, has_left=False)
+        
+        entity3 = mommy.make(models.Entity, name=u"The big Org")
+        contact4 = mommy.make(models.Contact, entity=entity3, firstname=u"ABCABC", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_firstname-_-0": 'ABC'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
     def test_search_contact_of_group(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
