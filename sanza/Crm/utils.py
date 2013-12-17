@@ -106,9 +106,21 @@ def check_city_exists(city_name, zip_code, country):
     parent = qs[0]
     return (models.City.objects.filter(name__iexact=city_name, parent=parent).count()==1)
     
+def format_city_name(city_name):
+    city_name = city_name.strip()
+    for formatter in crm_settings.city_formatters():
+        if formatter[0] == "replace":
+            c1, c2 = formatter[1:]
+            city_name = city_name.replace(c1, c2)
+        if formatter[0] == "capitalize_words":
+            sep = formatter[1]
+            words = [w.capitalize() for w in city_name.split(sep)]
+            city_name = sep.join(words)
+    return city_name
+    
 def resolve_city(city_name, zip_code, country='', default_department=''):
     country = country.strip()
-    city_name = city_name.strip()
+    city_name = format_city_name(city_name)
     default_country = get_default_country()
     foreign_city = bool(country) and (country!=default_country)
     if foreign_city:
@@ -128,15 +140,6 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
             parent = models.Zone.objects.get(code=code)
         except models.Zone.DoesNotExist, msg:
             parent = None
-    
-    for formatter in crm_settings.city_formatters():
-        if formatter[0] == "replace":
-            c1, c2 = formatter[1:]
-            city_name = city_name.replace(c1, c2)
-        if formatter[0] == "capitalize_words":
-            sep = formatter[1]
-            words = [w.capitalize() for w in city_name.split(sep)]
-            city_name = sep.join(words)
     
     qs = models.City.objects.filter(parent=parent)
     qs = filter_icontains_unaccent(qs, '"Crm_city"."name"', city_name)
