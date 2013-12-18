@@ -1,0 +1,48 @@
+{% extends "colorbox/popup_form_base.html" %}
+{% load i18n %}{% load url from future %}
+
+{% block extra_head %}
+{{block.super}}
+<script>
+  var enableEntityInput = function() {
+    $("input[name=entity_visible]").removeAttr("disabled");
+    $("input[name=entity_visible]").closest('tr').css("color", "#000");
+  }
+  
+  var disableEntityInput = function() {
+    $("input[name=entity_visible]").attr("disabled", "disabled");
+    $("input[name=entity_visible]").closest('tr').css("color", "#ccc");
+  }
+  
+  disableEntityInput();
+  $(function() {
+      $("select[name=option]").change(function() {
+        if ($(this).val() == '1') {
+          enableEntityInput();
+        } else {
+          disableEntityInput();
+        }
+      });
+  });
+  </script>
+{% endblock %}
+
+{% block title %}{% trans "Change the entity of" %} {{contact.fullname}}{% endblock %}
+
+{% block form_fields %}
+<div class="warning">
+  {% blocktrans %}
+  <h3>Warning: use if carefully!</h3>
+  <div>
+    Do not reassign a contact who move to another entity. You might lose the history of actions with this entity.<br /><br />
+    You should create a new contact in the other entity and then, you can check the `has left` option of the current contact.<br /><br />
+    The goal of reassigning is to fix errors: For example if you create an entity twice and want to merge the contacts into a single one.
+  </div>
+  {% endblocktrans %}
+</div>
+{{ block.super }}
+{% endblock %}
+
+{% block form_url %}{% url "crm_change_contact_entity" contact.id %}{% endblock %}
+
+{% block form_ok %}{% trans "Ok" %}{% endblock %}

@@ -149,6 +149,36 @@ def add_contact_to_group(request, contact_id):
     except Exception, msg:
         print "#ERR", msg
         raise
+    
+@user_passes_test(can_access)
+@popup_redirect
+def change_contact_entity(request, contact_id):
+    try:
+        contact = get_object_or_404(models.Contact, id=contact_id)
+        
+        if request.method == "POST":
+            form = forms.ChangeContactEntityForm(contact, request.POST)
+            if form.is_valid():
+                form.change_entity()
+                next_url = reverse('crm_view_contact', args=[contact_id])
+                return HttpResponseRedirect(next_url)
+        else:
+            form = forms.ChangeContactEntityForm(contact)
+        
+        context_dict = {
+            'contact': contact,
+            'form': form,
+        }
+    
+        return render_to_response(
+            'Crm/change_contact_entity.html',
+            context_dict,
+            context_instance=RequestContext(request)
+        )
+    except Exception, msg:
+        print "#ERR", msg
+        raise
+
 
 @user_passes_test(can_access)
 def get_group_suggest_list(request):

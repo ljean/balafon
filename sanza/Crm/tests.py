@@ -2094,6 +2094,192 @@ class FindSameAsTest(BaseTestCase):
         self.assertTrue(contact3 in qs[0].contacts.all())
         self.assertFalse(contact4 in qs[0].contacts.all())
         self.assertFalse(contact5 in qs[0].contacts.all())
+   
+class ChangeContactEntityTest(BaseTestCase):
+   
+    OPTION_ADD_TO_EXISTING_ENTITY = 1
+    OPTION_CREATE_NEW_ENTITY = 2
+    OPTION_SWITCH_SINGLE_CONTACT = 3
+    OPTION_SWITCH_ENTITY_CONTACT = 4
+    
+    def test_view_change_contact_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        soup = BS4(response.content)
+        expected = [
+            self.OPTION_ADD_TO_EXISTING_ENTITY,
+            self.OPTION_CREATE_NEW_ENTITY,
+            self.OPTION_SWITCH_SINGLE_CONTACT,
+            #self.OPTION_SWITCH_ENTITY_CONTACT
+        ]
+        self.assertEqual(
+            [x["value"] for x in soup.select("select option")],
+            ["0"]+[str(x) for x in expected]
+        )
         
+    def test_view_change_contact_entity_single(self):
+        entity = mommy.make(models.Entity, is_single_contact=True)
+        contact = mommy.make(models.Contact, entity=entity)
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        soup = BS4(response.content)
+        expected = [
+            self.OPTION_ADD_TO_EXISTING_ENTITY,
+            #self.OPTION_CREATE_NEW_ENTITY,
+            #self.OPTION_SWITCH_SINGLE_CONTACT,
+            self.OPTION_SWITCH_ENTITY_CONTACT
+        ]
+        self.assertEqual(
+            [x["value"] for x in soup.select("select option")],
+            ["0"]+[str(x) for x in expected]
+        )
         
+    def test_change_contact_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        entity2 = mommy.make(models.Entity, is_single_contact=False)
         
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_ADD_TO_EXISTING_ENTITY,
+            'entity': entity2.id
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity, entity2)
+        
+    def test_make_single_contact_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_SWITCH_SINGLE_CONTACT,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity.is_single_contact, True)
+    
+    def test_change_to_new_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_CREATE_NEW_ENTITY,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertNotEqual(contact.entity, entity)
+        self.assertNotEqual(contact.entity.contact_set.count(), 1)
+    
+    def test_change_single_to_existing_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=True)
+        contact = mommy.make(models.Contact, entity=entity)
+        entity2 = mommy.make(models.Entity, is_single_contact=False)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_ADD_TO_EXISTING_ENTITY,
+            'entity': entity2.id,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity.is_single_contact, False)
+        self.assertEqual(contact.entity, entity2)
+    
+    def test_change_single_to_contact_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=True)
+        contact = mommy.make(models.Contact, entity=entity)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_SWITCH_ENTITY_CONTACT,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity.is_single_contact, False)
+    
+    def test_change_contact_entity_no_value(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_SWITCH_ENTITY_CONTACT,
+            'entity': '',
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity, entity)
+    
+    def test_change_contact_entity_invalid_value(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_ADD_TO_EXISTING_ENTITY,
+            'entity': 'AAA',
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity, entity)
+    
+    def test_change_contact_to_single_contact_entity(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        entity2 = mommy.make(models.Entity, is_single_contact=True)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': self.OPTION_SWITCH_ENTITY_CONTACT,
+            'entity': entity2.id,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity, entity)
+        
+    def test_change_unknown_command(self):
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        contact = mommy.make(models.Contact, entity=entity)
+        entity2 = mommy.make(models.Entity, is_single_contact=True)
+        
+        url = reverse('crm_change_contact_entity', args=[contact.id])
+        data= {
+            'option': 555,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.entity, entity)
+    
+    

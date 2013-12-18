@@ -2,7 +2,7 @@
 
 import floppyforms as forms
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -26,7 +26,7 @@ class AddEntityToGroupForm(forms.Form):
     def clean_group_name(self):
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
-            raise ValidationError(_(u"The entity already belong to group {0}").format(name))
+            raise ValidationError(ugettext(u"The entity already belong to group {0}").format(name))
         return name
     
 class AddContactToGroupForm(forms.Form):
@@ -41,7 +41,7 @@ class AddContactToGroupForm(forms.Form):
     def clean_group_name(self):
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
-            raise ValidationError(_(u"The contact already belong to group {0}").format(name))
+            raise ValidationError(ugettext(u"The contact already belong to group {0}").format(name))
         return name
 
 class EditGroupForm(forms.ModelForm):
@@ -77,7 +77,7 @@ class EditGroupForm(forms.ModelForm):
         name = self.cleaned_data['name']
         if self.instance and not self.instance.id:
             if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count()>0:
-                raise ValidationError(_(u"A group with this name already exists"))
+                raise ValidationError(ugettext(u"A group with this name already exists"))
         return name
     
     def __init__(self, *args, **kwargs):
@@ -166,7 +166,7 @@ class _CityBasedForm(object):
                     city, _is_new = models.City.objects.get_or_create(name=city, parent=country)
                 else:
                     if len(zip_code)<2:
-                        raise ValidationError(_(u'You must enter a valid zip code for selecting a new city'))
+                        raise ValidationError(ugettext(u'You must enter a valid zip code for selecting a new city'))
                     dep = models.Zone.objects.get(code=zip_code[:2])
                     city, _is_new = models.City.objects.get_or_create(name=city, parent=dep)
                 return city
@@ -225,7 +225,7 @@ class EntityForm(ModelFormWithCity):
                 instance.id = 1
         target_name = models.get_entity_logo_dir(instance, logo)
         if len(target_name) >= models.Entity._meta.get_field('logo').max_length:
-            raise ValidationError(_(u"The file name is too long"))
+            raise ValidationError(ugettext(u"The file name is too long"))
         return logo
     
 
@@ -273,7 +273,7 @@ class ContactForm(ModelFormWithCity):
                 instance.id = 1
         target_name = models.get_contact_photo_dir(instance, photo)
         if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
-            raise ValidationError(_(u"The file name is too long"))
+            raise ValidationError(ugettext(u"The file name is too long"))
         return photo
 
 
@@ -342,7 +342,7 @@ class ActionForm(BetterModelForm):
         if t:
             allowed_status = ([] if t.default_status else [None]) + list(t.allowed_status.all())
             if len(allowed_status) > 0 and not (s in allowed_status):
-                raise ValidationError(_(u"This status can't not be used for this action type"))
+                raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         return s
     
     def clean_planned_date(self):
@@ -390,7 +390,7 @@ class SelectEntityForm(forms.Form):
             entity_id = int(self.cleaned_data["entity"])
             return models.Entity.objects.get(id=entity_id)
         except (ValueError, models.Entity.DoesNotExist):
-            raise ValidationError(_(u"The entity does'nt exist"))
+            raise ValidationError(ugettext(u"The entity does'nt exist"))
 
 class SelectContactForm(forms.Form):
     
@@ -410,7 +410,7 @@ class SelectContactForm(forms.Form):
             contact_id = int(self.cleaned_data["contact"])
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
-            raise ValidationError(_(u"The contact does'nt exist"))
+            raise ValidationError(ugettext(u"The contact does'nt exist"))
 
     
 class SameAsForm(forms.Form):
@@ -429,10 +429,10 @@ class SameAsForm(forms.Form):
         contact_id = self.cleaned_data["contact"]
         try:
             if contact_id not in [x[0] for x in self._same_as]:
-                raise ValidationError(_(u"Invalid contact"))
+                raise ValidationError(ugettext(u"Invalid contact"))
             return models.Contact.objects.get(id=contact_id)
         except models.Contact.DoesNotExist:
-            raise ValidationError(_(u"Contact does not exist"))
+            raise ValidationError(ugettext(u"Contact does not exist"))
         
         
 class AddRelationshipForm(forms.Form):
@@ -464,18 +464,18 @@ class AddRelationshipForm(forms.Form):
                 relationship_type = -relationship_type
             return models.RelationshipType.objects.get(id=relationship_type)
         except ValueError:
-            raise ValidationError(_(u"Invalid data"))
+            raise ValidationError(ugettext(u"Invalid data"))
         except models.RelationshipType.DoesNotExist:
-            raise ValidationError(_(u"Relationship type does not exist"))
+            raise ValidationError(ugettext(u"Relationship type does not exist"))
         
     def clean_contact2(self):
         try:
             contact2 = int(self.cleaned_data["contact2"])
             return models.Contact.objects.get(id=contact2)
         except ValueError:
-            raise ValidationError(_(u"Invalid data"))
+            raise ValidationError(ugettext(u"Invalid data"))
         except models.Contact.DoesNotExist:
-            raise ValidationError(_(u"Contact does not exist"))
+            raise ValidationError(ugettext(u"Contact does not exist"))
         
     def save(self):
         if self.reversed_relation:
@@ -575,7 +575,7 @@ class ContactsImportForm(forms.ModelForm):
         
     def clean_separator(self):
         if len(self.cleaned_data["separator"]) != 1:
-            raise ValidationError(_(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
+            raise ValidationError(ugettext(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
         return self.cleaned_data["separator"]
         
         
@@ -591,7 +591,7 @@ class ContactsImportConfirmForm(ContactsImportForm):
         code = self.cleaned_data['default_department']
         if code:
             if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
-                raise ValidationError(_(u'Please enter a valid code'))
+                raise ValidationError(ugettext(u'Please enter a valid code'))
             return self.cleaned_data['default_department']
         else:
             return None
@@ -603,4 +603,92 @@ class ActionDocumentForm(AlohaEditableModelForm):
     class Meta:
         model = models.ActionDocument
         fields = ('content',)
+        
+class ChangeContactEntityForm(forms.Form):
+    OPTION_ADD_TO_EXISTING_ENTITY = 1
+    OPTION_CREATE_NEW_ENTITY = 2
+    OPTION_SWITCH_SINGLE_CONTACT = 3
+    OPTION_SWITCH_ENTITY_CONTACT = 4
+    
+    OPTION_CHOICES = (
+        (0, ""),
+        (OPTION_ADD_TO_EXISTING_ENTITY, _(u"Reassign to an existing entity")),
+        (OPTION_CREATE_NEW_ENTITY, _(u"Create a new entity")),
+        (OPTION_SWITCH_SINGLE_CONTACT, _(u"Switch to single contact")),
+        (OPTION_SWITCH_ENTITY_CONTACT, _(u"Switch to entity contact")),
+    )
+    
+    option = forms.ChoiceField(label=_(u"What to do?"))
+    entity = forms.IntegerField(label=_(u"Which one?"), required=False, widget=EntityAutoComplete(
+        attrs={'placeholder': _(u'Enter the name of the entity'), 'size': '50', 'class': 'colorbox'}))
+    
+    def __init__(self, contact, *args, **kwargs):
+        self.contact = contact
+        super(ChangeContactEntityForm, self).__init__(*args, **kwargs)
+        if contact.entity.is_single_contact:
+            choices = [c for c in self.OPTION_CHOICES
+                if not (c[0] in (self.OPTION_CREATE_NEW_ENTITY, self.OPTION_SWITCH_SINGLE_CONTACT)) ]
+        else:
+            choices = [c for c in self.OPTION_CHOICES
+                if (c[0] != self.OPTION_SWITCH_ENTITY_CONTACT) ]
+    
+        self.fields['option'].choices = choices
+        
+        self.meth_map = {
+            self.OPTION_ADD_TO_EXISTING_ENTITY: self._add_to_existing_entity,
+            self.OPTION_CREATE_NEW_ENTITY: self._create_new_entity,
+            self.OPTION_SWITCH_SINGLE_CONTACT: self._switch_single_contact,
+            self.OPTION_SWITCH_ENTITY_CONTACT: self._switch_entity_contact,
+        }
+        
+    def clean_option(self):
+        try:
+            option = int(self.cleaned_data["option"])
+            if option == 0:
+                raise ValidationError(ugettext(u"Please select one of this options"))
+            try:
+                self.meth_map[option]
+            except KeyError:
+                raise ValidationError(ugettext(u"Invalid value"))
+        except ValueError:
+            raise ValidationError(ugettext(u"Invalid data"))
+        return option
+        
+    def clean_entity(self):
+        option = self.cleaned_data.get("option", 0)
+        if option != self.OPTION_ADD_TO_EXISTING_ENTITY:
+            return None
+        else:
+            entity_id = self.cleaned_data["entity"]
+            try:
+                return models.Entity.objects.get(id=entity_id)
+            except models.Entity.DoesNotExist:
+                raise ValidationError(ugettext(u"Please select an existing entity"))
+            
+    def _add_to_existing_entity(self):
+        old_entity = self.contact.entity
+        self.contact.entity = self.cleaned_data["entity"]
+        self.contact.save()
+        old_entity.save()
+    
+    def _create_new_entity(self):
+        old_entity = self.contact.entity
+        self.contact.entity = models.Entity.objects.create()
+        self.contact.save()
+        old_entity.save()
+        #old_entity.default_contact.delete()
+    
+    def _switch_single_contact(self):
+        self.contact.entity.is_single_contact = True
+        self.contact.entity.save()
+        
+    def _switch_entity_contact(self):
+        self.contact.entity.is_single_contact = False
+        self.contact.entity.save()
+        
+    def change_entity(self):
+        option = self.cleaned_data["option"]
+        meth = self.meth_map[option]
+        meth()
+        
         
