@@ -994,6 +994,107 @@ class AddressOverloadTest(BaseTestCase):
     
 class SingleContactTest(BaseTestCase):
     
+    def test_view_add_single_contact(self):
+        url = reverse('crm_add_single_contact')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+    def test_add_single_contact(self):
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        
+        self.assertEqual(models.Contact.objects.count(), 1)
+        john_doe = models.Contact.objects.all()[0]
+        self.assertEqual(john_doe.lastname, "Doe")
+        self.assertEqual(john_doe.firstname, "John")
+        self.assertEqual(john_doe.entity.is_single_contact, True)
+        
+    def test_add_single_contact_existing_city(self):
+        url = reverse('crm_add_single_contact')
+        zone = mommy.make(models.Zone)
+        city = mommy.make(models.City)
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+            'city': city.id,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        
+        
+        self.assertEqual(models.Contact.objects.count(), 1)
+        john_doe = models.Contact.objects.all()[0]
+        self.assertEqual(john_doe.lastname, "Doe")
+        self.assertEqual(john_doe.firstname, "John")
+        self.assertEqual(john_doe.entity.is_single_contact, True)
+        self.assertEqual(john_doe.city.id, city.id)
+        
+    def test_add_single_contact_new_city(self):
+        url = reverse('crm_add_single_contact')
+        zone = mommy.make(models.Zone, code="42")
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+            'zip_code': '42810',
+            'city': "Rozier en Donzy"
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 0)
+        
+        self.assertEqual(models.Contact.objects.count(), 1)
+        john_doe = models.Contact.objects.all()[0]
+        self.assertEqual(john_doe.lastname, "Doe")
+        self.assertEqual(john_doe.firstname, "John")
+        self.assertEqual(john_doe.entity.is_single_contact, True)
+        self.assertEqual(john_doe.city.name, data['city'])
+        self.assertEqual(john_doe.city.parent, zone)
+        
+    def test_add_single_contact_unknown_code(self):
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+            'zip_code': '42810',
+            'city': "Rozier en Donzy"
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+    def test_add_single_contact_new_city_no_zip(self):
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+            'zip_code': '',
+            'city': "Rozier en Donzy"
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+        errors = BS4(response.content).select('.errorlist')
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(response.redirect_chain), 0)
+        
+    
     def test_view_delete_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=True)
         contact = entity.default_contact
