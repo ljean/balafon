@@ -2165,6 +2165,8 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity.is_single_contact, True)
+        entity = models.Entity.objects.get(id=entity.id)
+        self.assertNotEqual(contact.entity.id, entity.id)
     
     def test_change_to_new_entity(self):
         entity = mommy.make(models.Entity, is_single_contact=False)

@@ -679,8 +679,13 @@ class ChangeContactEntityForm(forms.Form):
         #old_entity.default_contact.delete()
     
     def _switch_single_contact(self):
-        self.contact.entity.is_single_contact = True
-        self.contact.entity.save()
+        old_entity = self.contact.entity
+        self.contact.entity = models.Entity.objects.create(
+            is_single_contact=True,
+            name=u"{0.lastname} {0.firstname}".format(self.contact).upper()
+        )
+        self.contact.save()
+        old_entity.save()
         
     def _switch_entity_contact(self):
         self.contact.entity.is_single_contact = False
