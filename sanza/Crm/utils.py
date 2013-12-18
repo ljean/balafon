@@ -114,7 +114,7 @@ def format_city_name(city_name):
             city_name = city_name.replace(c1, c2)
         if formatter[0] == "capitalize_words":
             sep = formatter[1]
-            words = [w.capitalize() for w in city_name.split(sep)]
+            words = [w.capitalize() for w in city_name.split(sep) if w]
             city_name = sep.join(words)
     return city_name
     
