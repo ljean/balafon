@@ -24,13 +24,25 @@
         }
       });
   });
-  </script>
+</script>
+<style>
+  .my-warning {
+    padding: 5px;
+    background: #ccc;
+    max-width: 600px;
+    margin-bottom: 10px;
+  }
+  
+  .my-warning h3{
+    margin: 0;
+  }
+</style>
 {% endblock %}
 
-{% block title %}{% trans "Change the entity of" %} {{contact.fullname}}{% endblock %}
+{% block title %}{{contact.fullname}} - {% trans "Reassign entity" %} {% endblock %}
 
 {% block form_fields %}
-<div class="warning">
+<div class="my-warning">
   {% blocktrans %}
   <h3>Warning: use if carefully!</h3>
   <div>
