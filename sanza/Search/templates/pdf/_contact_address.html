@@ -1,0 +1,18 @@
+{% load i18n %}
+{% if c %}
+    {% if c.lastname %}<div class="name">{{ c.fullname }}</div>{% endif %}
+    {% if not c.entity.is_single_contact %}<div class="name">{{ c.entity.name }}</div>{% endif %}
+    {% if c.get_full_address %}
+        {% with c.get_city as city %}
+        <div class="address">{{ c.get_address }}</div>
+        {% if c.get_address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
+        {% if c.get_address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
+        <div class="city">{{ c.get_zip_code }} {{ city }} {{ c.get_cedex }}</div>
+        {% with city.get_country as country %}
+        {% if country.is_foreign_country %}{{ country }}{% endif %}
+        {% endwith %}{% endwith %}
+    {% else %}
+        {{c}}
+        <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
+    {% endif %}
+{% endif %}

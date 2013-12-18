@@ -1,93 +1,70 @@
 {% extends "pdf/base.html" %}
-{% load i18n%}
+{% load i18n %}
 {% block extra_head %}
 <style>
     body {
+        margin: 0;
+        padding: 0;
+    }
+    .contacts {
+        width: 210mm;
+        padding: 0;
+        margin: 0;
+        display: block;
+    }
+    .line {
+        display: block;
+    }
+    .footer, .header {
+        height: 12.9mm;    
+    }
+    .cell {
         font-family: "Calibri";
-        font-size: 11px;
-        margin: 0;
-        padding: 0;
-        width: 210mm;
-    }
-    table.contacts {
-        width: 210mm;
-        padding: 0;
-        margin: 0;
-        display: block;
-    }
-    tr {
-        display: block;
-        margin-left: 6.3mm;
-    }
-    tr.header td {
-        width: 70mm;
-        padding: 0;
-        margin: 0;
-        height: 6.85mm;
-    }
-    tr.footer {
-        page-break-after: auto;
-        padding: 0;
-        margin: 0;
-        height: 0;
-    }
-    tr.footer td {
-        width: 70mm;
-        padding: 0;
-        margin: 0;
-        height: 6.85mm;
-    }
-    td.contact {
+        font-size: 9px;
         display: inline-block;
         width: 63.5mm;
         height: 33.9mm;
         margin: 0;
-        text-align: center;
+        text-align: left;
         vertical-align: middle;
-        font-size: 0.9em;
-        border: solid thin #ccc;
-        margin-right: 2.9mm;
+    }
+    .cell-content {
+        margin-top: 10mm;
+        margin-left: 0mm;
+    }
+    
+    .line .cell {
+        margin-left: 2.8mm
+    }
+    .line .cell:nth-of-type(1) {
+        margin-left: 6.3mm;
     }
     .warning {
         color: red;
-        font-size: 0.9em;
+        font-size: 1.2em;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <table class="contacts">
+    <div class="contacts">
     {% for c in contacts %}
         {% if forloop.counter0 == 0 %}
-            <tr class="header"><td colspan="3">&nbsp;</td></tr>
+            <div class="header">&nbsp;</div>
         {% endif %}
         {% if forloop.counter0 == 0 or forloop.counter0|divisibleby:3 %}
-            <tr>
+            <div class="line">
         {% endif %}
-            <td class="contact">
-                <div class="name">{{ c.fullname }}</div>
-                {% if c.has_entity %}<div>{{ c.entity.name.upper }}</div>{% endif %}
-                {% if c.get_full_address %}
-                    {% with c.get_city as city %}
-                        <div class="address">{{ c.get_address }}</div>
-                        {% if c.address2 %}<div class="address">{{ c.get_address2 }}</div>{% endif %}
-                        {% if c.address3 %}<div class="address">{{ c.get_address3 }}</div>{% endif %}
-                        <div class="city">{{ c.get_zip_code }} {{ city }} {{ c.get_cedex }}</div>
-                        {% with city.get_country as country %}
-                            {% if country.is_foreign_country %}<div>{{ country }}</div>{% endif %}
-                        {% endwith %}
-                    {% endwith %}
-                {% else %}
-                    <div class="warning">{% trans "WARNING : NO ADDRESS DEFINED" %}</div>
-                {% endif %}
-            </td>
+            <div class="cell"><div class="cell-content">
+                {% include "pdf/_contact_address.html" %}
+            </div></div>
         {% if forloop.counter|divisibleby:3 %}
-            </tr>
+            </div>
         {% endif %}
         {% if forloop.counter|divisibleby:24 %}
-            <tr class="footer"><td colspan="3">&nbsp;</td></tr>
-            <tr class="header"><td colspan="3">&nbsp;</td></tr>
+            <div class="footer">&nbsp;</div>
+            <div class="header">&nbsp;</div>
         {% endif %}
     {% endfor %}
-    </table>
+    </div>
 {% endblock %}
