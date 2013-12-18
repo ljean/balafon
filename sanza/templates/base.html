@@ -1,5 +1,8 @@
 {% load i18n static coop_navigation coop_bar_tags %}{% load url from future %}<!DOCYTPE HTML>
 <head>
+    <meta charset="utf-8"/>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
     {% block jquery_declaration %}
     <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
