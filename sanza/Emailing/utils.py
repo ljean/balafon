@@ -18,6 +18,7 @@ from django.utils import translation
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.utils.safestring import mark_safe
+from coop_cms.settings import get_newsletter_context_callbacks
 
 def format_context(text, data):
     # { and } need to be escaped for the format function
@@ -52,12 +53,19 @@ def get_emailing_context(emailing, contact):
     
     newsletter.content = html_content
     
-    return {
+    context_dict = {
         'title': newsletter.subject, 'newsletter': newsletter, 'by_email': True,
         'MEDIA_URL': settings.MEDIA_URL, 'STATIC_URL': settings.STATIC_URL,
         'SITE_PREFIX': settings.COOP_CMS_SITE_PREFIX, 'my_company': settings.SANZA_MY_COMPANY,
         'unregister_url': unregister_url, 'contact': contact, 'emailing': emailing,
     }
+    
+    for callback in get_newsletter_context_callbacks():
+        d = callback(newsletter)
+        if d:
+            context_dict.update(d)
+    
+    return context_dict
     
 def send_newsletter(emailing, max_nb):
     #Create automatically an action type for logging one action by contact
