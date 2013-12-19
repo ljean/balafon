@@ -162,7 +162,7 @@ class Migration(SchemaMigration):
         },
         'coop_cms.newsletter': {
             'Meta': {'object_name': 'Newsletter'},
-            'content': ('html_field.db.models.fields.HTMLField', [], {'default': "'<br>'", 'blank': 'True'}),
+            'content': ('django.db.models.fields.TextField', [], {'default': "'<br>'", 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'items': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['coop_cms.NewsletterItem']", 'symmetrical': 'False', 'blank': 'True'}),
             'subject': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),

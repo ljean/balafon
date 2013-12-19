@@ -35,6 +35,7 @@ class Emailing(TimeStampedModel):
     newsletter = models.ForeignKey(Newsletter) 
     send_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_to_be_received")
     sent_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_received")
+    opened_emails = models.ManyToManyField(Contact, blank=True, related_name="emailing_opened")
     status = models.IntegerField(default=STATUS_EDITING, choices=STATUS_CHOICES)
     
     scheduling_dt = models.DateTimeField(_(u"scheduling date"), blank=True, default=None, null=True)
@@ -73,7 +74,6 @@ class Emailing(TimeStampedModel):
             self.sending_dt = datetime.now()
         return super(Emailing, self).save(*args, **kwargs)
 
-
 class MagicLink(models.Model):
     emailing = models.ForeignKey(Emailing)
     url = models.URLField()
@@ -88,13 +88,4 @@ class MagicLink(models.Model):
         if not self.uuid:
             name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
-            return super(MagicLink, self).save()        
-        
-class EmailingCounter(models.Model):
-    credit = models.IntegerField(default=0, verbose_name=_(u"Credit"), help_text=_(u"Number of email used"))
-    total = models.IntegerField(default=0, verbose_name=_(u"Total"), help_text=_(u"Number of amails bought"))
-    bought_date = models.DateField(_(u"Bought date"), blank=True, default=None, null=True)
-    finished_date = models.DateField(_(u"Finished date"), blank=True, default=None, null=True)
-    
-    def __unicode__(self):
-        return _(u"Date : {0} - Total: {1} - Credit : {2}").format(self.bought_date, self.total, self.credit)
+            return super(MagicLink, self).save()

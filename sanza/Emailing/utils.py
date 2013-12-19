@@ -7,7 +7,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from sanza.Crm.models import Contact, Action, ActionType
 from datetime import date, timedelta, datetime
-from sanza.Emailing.models import MagicLink, EmailingCounter, Emailing
+from sanza.Emailing.models import MagicLink, Emailing
 from django.core.mail import get_connection, EmailMultiAlternatives
 import re
 from coop_cms.models import Newsletter
@@ -46,10 +46,10 @@ def get_emailing_context(emailing, contact):
     for link in links:
         if (not link.lower().startswith('mailto:')) and (link[0]!="#"): #mailto and internal links are not magic
             magic_link, _is_new = MagicLink.objects.get_or_create(emailing=emailing, url=link)
-            magic_url = settings.COOP_CMS_SITE_PREFIX+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
+            magic_url = newsletter.get_site_prefix()+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
             html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
         
-    unregister_url = settings.COOP_CMS_SITE_PREFIX+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
+    unregister_url = newsletter.get_site_prefix()+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
     
     newsletter.content = html_content
     

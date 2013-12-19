@@ -2,15 +2,15 @@
 {% load i18n %}{% load url from future %}
 
 {% block section_title %}
-  {% trans "Links" %}
+  {% trans "Statistics" %}
 {% endblock %}
   
 {% block section_data %}
 <table class="entities-table">
-<tr><th>{% trans "url" %}</th><th>{% trans "visitors" %}</th></tr>
+<tr><td>{% trans "Sendings" %}</td><td class="test-sendings">{{ emailing.sent_to.count }}</td></tr>
+<tr><td>{% trans "Openings" %}</td><td class="test-openings">{{ emailing.opened_emails.count }}</td></tr>
 {% for l in emailing.magiclink_set.all %}
     <tr><td><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></td><td>{{ l.visitors.count }}</td></tr>
 {% endfor %}
 </table>
-</div>
 {% endblock %}

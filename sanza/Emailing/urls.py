@@ -15,4 +15,5 @@ urlpatterns = patterns('sanza.Emailing.views',
     url(r'^unregister/(?P<emailing_id>\d+)/(?P<contact_uuid>[\w\d-]+)/$', 'unregister_contact', name='emailing_unregister'),
     url(r'^view-online/(?P<emailing_id>\d+)/(?P<contact_uuid>[\w\d-]+)/$', 'view_emailing_online', name='emailing_view_online'),
     url(r'^link/(?P<link_uuid>[\w\d-]+)/(?P<contact_uuid>[\w\d-]+)/$', 'view_link', name='emailing_view_link'),
+    url(r'^email-img/(?P<emailing_id>\d+)/(?P<contact_uuid>[\w\d-]+)/$', 'email_tracking', name='emailing_email_tracking'),
 )

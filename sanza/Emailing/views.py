@@ -22,6 +22,8 @@ from sanza.permissions import can_access
 from utils import send_verification_email
 from sanza.utils import logger, log_error
 from sanza.utils import now_rounded
+import os.path
+from django.core.servers.basehttp import FileWrapper
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -296,3 +298,16 @@ def email_verification(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
+
+def email_tracking(request, emailing_id, contact_uuid):
+    emailing = get_object_or_404(models.Emailing, id=emailing_id)
+    contact = get_object_or_404(Contact, uuid=contact_uuid)
+    
+    emailing.opened_emails.add(contact)
+    emailing.save()
+    
+    dir_name = os.path.dirname(os.path.abspath(__file__))
+    file_name = os.path.join(dir_name, "email-tracking.png")
+    response = HttpResponse(FileWrapper(open(file_name, 'r')), content_type='image/png')
+    response['Content-Length'] = os.path.getsize(file_name)
+    return response

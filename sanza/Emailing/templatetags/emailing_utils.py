@@ -2,24 +2,23 @@
 
 from django import template
 register = template.Library()
-#from djaloha.templatetags.djaloha_utils import DjalohaEditNode
-#from sanza.Emailing.models import HtmlFragment
-#
-#class HtmlFragmentEditNode(DjalohaEditNode):
-#    def render(self, context):
-#        context.dicts[0]['can_edit_template'] = True
-#        for (k, v) in self._lookup.items():
-#            new_v = v.strip('"').strip("'")
-#            if len(v)-2 == len(new_v):
-#                self._lookup[k] = new_v
-#            else:
-#                self._lookup[k] = context[v]
-#        return super(HtmlFragmentEditNode, self).render(context)
-#
-#@register.tag
-#def html_edit(parser, token):
-#    div_id = token.split_contents()[1]
-#    return HtmlFragmentEditNode(HtmlFragment, {'div_id': div_id}, 'content')
+from django.core.urlresolvers import reverse
+from django.conf import settings
+
+class EmailTrackingEditNode(template.Node):
+    
+    def render(self, context):
+        emailing = context.get('emailing', None)
+        contact = context.get('contact', None)
+        if emailing and contact:
+            tracking_url = reverse("emailing_email_tracking", args=[emailing.id, contact.uuid])
+            return u'<img src="{0}" />'.format(tracking_url)
+        return u"<!-- tracking -->"
+
+@register.tag
+def email_tracking(parser, token):
+    return EmailTrackingEditNode()
+
 
 @register.filter
 def dir_debug(obj):
