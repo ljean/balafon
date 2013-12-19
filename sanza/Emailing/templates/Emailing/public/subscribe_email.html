@@ -1,0 +1,21 @@
+{% extends "Emailing/public/base_iframe.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+<script>
+  $(function() {
+    $("input[name=email]").click(function() {
+      $(this).closest('form').submit();
+    })
+  })
+</script>
+{% endblock %}
+  
+{% block content %}
+  {{ block.super }}
+  
+  <form method="post" action="{% url "emailing_email_subscribe_newsletter" %}">{% csrf_token %}
+    {{form.as_p}}
+    <input style="display: none;" type="submit" value="{% trans "Ok" %}">
+  </form>
+{% endblock %}

@@ -2,6 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
+from django.views.generic.base import View, TemplateView
 from django.template import RequestContext, Context, Template
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
@@ -225,47 +226,6 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     t = get_template(emailing.newsletter.get_template_name())
     return HttpResponse(t.render(context))
 
-def subscribe_newsletter(request):
-    try:
-        form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
-        module_name, class_name = form_name.rsplit('.', 1)
-        module = import_module(module_name)
-        SubscribeForm = getattr(module, class_name)
-    except AttributeError:
-        SubscribeForm = forms.SubscribeForm
-    
-    if request.method == "POST":
-        form = SubscribeForm(request.POST, request.FILES)
-        if form.is_valid():
-            contact = form.save(request)
-            try:
-                send_verification_email(contact)
-                return HttpResponseRedirect(reverse('emailing_subscribe_done', args=[contact.uuid]))
-            except:
-                logger.exception('send_verification_email')
-                
-                #create action
-                detail = _(u"An error occured while verifying the email address of this contact.")
-                fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
-                action = Action.objects.create(
-                    subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
-                    type = fix_action, detail=detail, contact=contact, display_on_board=True,
-                )
-                
-                return HttpResponseRedirect(reverse('emailing_subscribe_error', args=[contact.uuid]))
-    else:
-        form = SubscribeForm()
-        
-    context_dict = {
-        'form': form,
-    }
-        
-    return render_to_response(
-        'Emailing/public/subscribe.html',
-        context_dict,
-        context_instance=RequestContext(request)
-    )
-
 def subscribe_done(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     my_company = settings.SANZA_MY_COMPANY
@@ -311,3 +271,83 @@ def email_tracking(request, emailing_id, contact_uuid):
     response = HttpResponse(FileWrapper(open(file_name, 'r')), content_type='image/png')
     response['Content-Length'] = os.path.getsize(file_name)
     return response
+
+class SubscribeView(View):
+    template_name = 'Emailing/public/subscribe.html'
+        
+    def get_form_class(self):
+        try:
+            form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
+            module_name, class_name = form_name.rsplit('.', 1)
+            module = import_module(module_name)
+            SubscribeForm = getattr(module, class_name)
+        except AttributeError:
+            SubscribeForm = forms.SubscribeForm
+        return SubscribeForm 
+        
+    def get_template(self):
+        return self.template_name
+    
+    def get_success_url(self, contact):
+        return reverse('emailing_subscribe_done', args=[contact.uuid])
+    
+    def get_error_url(self, contact):
+        return reverse('emailing_subscribe_error', args=[contact.uuid])
+    
+    def _display_form(self, form):
+        context_dict = {
+            'form': form,
+        }
+            
+        return render_to_response(
+            self.get_template(),
+            context_dict,
+            context_instance=RequestContext(self.request)
+        )
+    
+    
+    def get(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = form_class()
+        return self._display_form(form)
+        
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = form_class(request.POST, request.FILES)
+        if form.is_valid():
+            contact = form.save(request)
+            try:
+                send_verification_email(contact)
+                return HttpResponseRedirect(self.get_success_url(contact))
+            except:
+                logger.exception('send_verification_email')
+                
+                #create action
+                detail = _(u"An error occured while verifying the email address of this contact.")
+                fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
+                action = Action.objects.create(
+                    subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
+                    type = fix_action, detail=detail, contact=contact, display_on_board=True,
+                )
+                
+                return HttpResponseRedirect(self.get_error_url(contact))
+        
+        return self._display_form(form)
+    
+class EmailSubscribeView(SubscribeView):
+    template_name = 'Emailing/public/subscribe_email.html'
+    
+    def get_success_url(self, contact):
+        return reverse('emailing_subscribe_email_done')
+    
+    def get_error_url(self, contact):
+        return reverse('emailing_subscribe_email_error')
+    
+    def get_form_class(self):
+        return forms.EmailSubscribeForm
+    
+class EmailSubscribeDoneView(TemplateView):
+    template_name = 'Emailing/public/subscribe_email_done.html'
+    
+class EmailSubscribeErrorView(TemplateView):
+    template_name = 'Emailing/public/subscribe_email_error.html'

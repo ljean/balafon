@@ -19,6 +19,7 @@ from django.contrib.sites.models import Site
 from django.core.mail import EmailMessage
 from django.utils.safestring import mark_safe
 from coop_cms.settings import get_newsletter_context_callbacks
+from django.contrib import messages
 
 def format_context(text, data):
     # { and } need to be escaped for the format function
@@ -111,6 +112,45 @@ def send_newsletter(emailing, max_nb):
     emailing.save()
     nb_sent = connection.send_messages(emails)
     return nb_sent or 0
+ 
+def create_subscription_action(contact, subscriptions):
+    at, _x = ActionType.objects.get_or_create(name=_(u"Subscription"))
+    return Action.objects.create(
+        subject = _(u"Subscribe to {0}").format(u", ".join(subscriptions)),
+        type = at,
+        planned_date = datetime.now(),
+        contact = contact,
+        display_on_board = False
+    )
+
+def send_notification_email(request, contact, actions, message):
+    #send an email
+    notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
+    if notification_email:
+        data = {
+            'contact': contact,
+            'groups': contact.entity.group_set.all(),
+            'actions': actions,
+            'message': mark_safe(message),
+            'site': Site.objects.get_current(),
+        }
+        t = get_template('Emailing/subscribe_notification_email.txt')
+        content = t.render(Context(data))
+        
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
+        
+        email = EmailMessage(
+            _(u"Message from web site"), content, from_email,
+            [notification_email], headers = {'Reply-To': contact.email})
+        try:
+            email.send()
+            if request:
+                messages.add_message(request, messages.SUCCESS,
+                    _(u"The message have been sent"))
+        except Exception, msg:
+            if request:
+                messages.add_message(request, messages.ERROR,
+                    _(u"The message couldn't be send."))
     
 def send_verification_email(contact):
     if contact.email:

@@ -15,6 +15,7 @@ from coop_cms import tests as coop_cms_tests
 from captcha.models import CaptchaStore
 from django.utils import timezone
 from django.contrib.sites.models import Site
+from bs4 import BeautifulSoup as BS4
 
 class BaseTestCase(TestCase):
 
@@ -377,6 +378,71 @@ class SubscribeTest(TestCase):
         self.assertContains(response, self.group1.name)
         self.assertContains(response, self.group2.name)
         self.assertNotContains(response, self.group3.name)
+        
+    def test_view_email_subscribe_newsletter(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+    def test_email_subscribe_newsletter(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+        
+        data = {
+            'email': 'pdupond@apidev.fr',
+        }
+        
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+        
+        contact = models.Contact.objects.all()[0]
+        
+        self.assertNotEqual(contact.uuid, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done'))>=0)
+        
+        self.assertEqual(contact.email, data['email'])
+        
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        
+    def test_email_subscribe_newsletter_no_email(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+        
+        data = {
+            'email': '',
+        }
+        
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(len(soup.select("ul.errorlist")), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+        self.assertEqual(len(mail.outbox), 0) #email verification
+        
+    def test_email_subscribe_newsletter_invalid_email(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+        
+        data = {
+            'email': 'coucou',
+        }
+        
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(len(soup.select("ul.errorlist")), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        
+        self.assertEqual(len(mail.outbox), 0) #email verification
+        
         
     def test_subscribe_newsletter_no_email(self):
         url = reverse("emailing_subscribe_newsletter")

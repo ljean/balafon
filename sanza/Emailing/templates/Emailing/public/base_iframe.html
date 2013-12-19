@@ -1,0 +1,15 @@
+{% load i18n %}{% load url from future %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{LANG}}" xml:lang="{{LANG}}">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %}</title>
+  {% block jquery_declaration %}
+  <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
+  {% endblock %}
+  {% block extra_head %}
+  {% endblock %}
+</head>
+<body>
+  {% block content %}
+  {% endblock %}
+</body>

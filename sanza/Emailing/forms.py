@@ -24,6 +24,7 @@ from django.utils.safestring import mark_safe
 from coop_cms.utils import dehtml
 from django.utils.timezone import now as dt_now
 from datetime import timedelta
+from sanza.Emailing.utils import create_subscription_action, send_notification_email
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -107,6 +108,34 @@ class NewNewsletterForm(forms.Form):
         if url:
             return self.source_content
         return u''
+
+class EmailSubscribeForm(forms.ModelForm):
+    email = forms.EmailField(
+        required= True, label="",   
+        widget=forms.TextInput(attrs={'placeholder': _(u'subscribe to our newsletter? Please enter your email.'), 'size': '80'})
+    )
+    
+    class Meta:
+        model = Contact
+        fields = ('email',)
+    
+    def save(self, request=None):
+        contact = super(EmailSubscribeForm, self).save(commit=False)
+        
+        if crm_settings.ALLOW_SINGLE_CONTACT:
+            contact.entity = Entity.objects.create(name=contact.email, type=None, is_single_contact=True)
+        else:
+            et_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
+            entity_type = EntityType.objects.get(id=et_id)
+            contact.entity = Entity.objects.create(name=contact.email, type=entity_type)
+        contact.save()
+        #delete unknown contacts for the current entity
+        contact.entity.contact_set.exclude(id=contact.id).delete()
+        
+        create_subscription_action(contact, [_(u'newsletter')])
+        send_notification_email(request, contact, [], "")
+                
+        return contact
 
 class SubscribeForm(ModelFormWithCity):
     city = forms.CharField(
@@ -278,14 +307,7 @@ class SubscribeForm(ModelFormWithCity):
             subscriptions += [_(u'3rd parties')]
         
         if subscriptions:
-            at, _x = ActionType.objects.get_or_create(name=_(u"Subscription"))
-            action = Action.objects.create(
-                subject = _(u"Subscribe to {0}").format(u", ".join(subscriptions)),
-                type = at,
-                planned_date = datetime.now(),
-                contact = contact,
-                display_on_board = False
-            )
+            create_subscription_action(contact, subscriptions)
         
         action_types = self.cleaned_data['action_types']
         actions = []
@@ -300,33 +322,8 @@ class SubscribeForm(ModelFormWithCity):
             actions.append(action)
             
         #send an email
-        notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
-        if notification_email:
-            data = {
-                'contact': contact,
-                'groups': contact.entity.group_set.all(),
-                'actions': actions,
-                'message': mark_safe(message),
-                'site': settings.COOP_CMS_SITE_PREFIX,
-            }
-            t = get_template('Emailing/subscribe_notification_email.txt')
-            content = t.render(Context(data))
-            
-            from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
-            
-            email = EmailMessage(
-                _(u"Message from web site"), content, from_email,
-                [notification_email], headers = {'Reply-To': contact.email})
-            try:
-                email.send()
-                if request:
-                    messages.add_message(request, messages.SUCCESS,
-                        _(u"The message have been sent"))
-            except Exception, msg:
-                if request:
-                    messages.add_message(request, messages.ERROR,
-                        _(u"The message couldn't be send."))
-                
+        send_notification_email(request, contact, actions, message)
+        
         return contact
 
 class NewsletterSchedulingForm(forms.ModelForm):
