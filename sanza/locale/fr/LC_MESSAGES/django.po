@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-18 15:58+0100\n"
+"POT-Creation-Date: 2013-12-19 15:31+0100\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,8 +30,7 @@ msgstr "Lieu"
 #: Crm/templates/Crm/_section_same_as.html:12
 #: Crm/templates/Crm/_section_same_as.html:45
 #: Crm/templates/Crm/confirm_contacts_import.html:64
-#: Crm/templates/Crm/edit_action.html:31
-#: Emailing/templates/Emailing/_section_contacts.html:13 Search/views.py:283
+#: Crm/templates/Crm/edit_action.html:31 Search/views.py:283
 #: templates/sanza/_navigation.html:19
 msgid "Entity"
 msgstr "Entité"
@@ -234,7 +233,6 @@ msgstr "L'entité n'existe pas"
 #: Crm/templates/Crm/_section_contacts.html:10
 #: Crm/templates/Crm/_section_same_as.html:44
 #: Crm/templates/Crm/edit_action.html:33 Emailing/forms.py:294
-#: Emailing/templates/Emailing/_section_contacts.html:13
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:3
 msgid "Contact"
 msgstr "Contact"
@@ -1572,7 +1570,7 @@ msgstr "Prévisualiser"
 #: Crm/templates/Crm/edit_group.html:32 Crm/templates/Crm/edit_group.html:34
 #: Crm/templates/Crm/edit_opportunity.html:23
 #: Crm/templates/Crm/edit_opportunity.html:25
-#: Crm/templates/Crm/new_contacts_import.html:22 Emailing/models.py:65
+#: Crm/templates/Crm/new_contacts_import.html:22 Emailing/models.py:66
 #: Emailing/templates/Emailing/confirm_send_mail.html:10
 #: Search/templates/Search/add_contacts_to_group.html:60
 #: Search/templates/Search/contacts_admin_form.html:6
@@ -1767,7 +1765,7 @@ msgstr ""
 "        Enfin, chargez votre fichier et définissez les options de l'import.\n"
 "        "
 
-#: Emailing/coop_bar_cfg.py:9 Emailing/views.py:247
+#: Emailing/coop_bar_cfg.py:9 Emailing/views.py:249
 msgid "Sanza"
 msgstr "Sanza"
 
@@ -1903,118 +1901,90 @@ msgstr "Envoi en cours"
 msgid "Sent"
 msgstr "Envoyé"
 
-#: Emailing/models.py:40
+#: Emailing/models.py:41
 msgid "scheduling date"
 msgstr "date programmé de l'envoi"
 
-#: Emailing/models.py:41
+#: Emailing/models.py:42
 msgid "sending date"
 msgstr "date d'envoi"
 
-#: Emailing/models.py:47
+#: Emailing/models.py:48
 msgid "emailing"
 msgstr "emailing"
 
-#: Emailing/models.py:48
+#: Emailing/models.py:49
 msgid "emailings"
 msgstr "emailings"
 
-#: Emailing/models.py:53 Emailing/models.py:55
+#: Emailing/models.py:54 Emailing/models.py:56
 msgid "{0} on {1}"
 msgstr "{0} sur {1}"
 
-#: Emailing/models.py:62
+#: Emailing/models.py:63
 msgid "Send"
 msgstr "Envoyer"
 
-#: Emailing/models.py:94
-msgid "Credit"
-msgstr "Crédit"
-
-#: Emailing/models.py:94
-msgid "Number of email used"
-msgstr "Nombre d'emails utilisé"
-
-#: Emailing/models.py:95
-msgid "Total"
-msgstr "Total"
-
-#: Emailing/models.py:95
-msgid "Number of amails bought"
-msgstr "Nombre d'emails achetés"
-
-#: Emailing/models.py:96
-msgid "Bought date"
-msgstr "Date d'achat"
-
-#: Emailing/models.py:97
-msgid "Finished date"
-msgstr "Date de fin"
-
-#: Emailing/models.py:100
-msgid "Date : {0} - Total: {1} - Credit : {2}"
-msgstr "Date : {0} - Total: {1} - Credit : {2}"
-
-#: Emailing/utils.py:64 Emailing/templates/Emailing/view_emailing.html:3
+#: Emailing/utils.py:72 Emailing/templates/Emailing/view_emailing.html:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: Emailing/utils.py:121
+#: Emailing/utils.py:129
 msgid "Verification of your email address"
 msgstr "Vérification de votre adresse email"
 
-#: Emailing/views.py:49
+#: Emailing/views.py:51
 msgid "Are you sure to delete '{0.newsletter.subject}' {1}?"
 msgstr "Etes-vous sur de supprimer '{0.newsletter.subject}' {1}?"
 
-#: Emailing/views.py:78
+#: Emailing/views.py:80
 msgid "Enter the text of your newsletter here"
 msgstr "Entrez le texte de votre newsletter ici"
 
-#: Emailing/views.py:112
+#: Emailing/views.py:114
 msgid "The sending has been scheduled"
 msgstr "L'envoi a été programmé"
 
-#: Emailing/views.py:114
+#: Emailing/views.py:116
 msgid "The sending can't be scheduled"
 msgstr "L'envoi ne paut pas être programmé"
 
-#: Emailing/views.py:123
+#: Emailing/views.py:125
 msgid "Is this newsletter ready to be sent?"
 msgstr "Est-ce que la newsletter est prête à être envoyée?"
 
-#: Emailing/views.py:139
+#: Emailing/views.py:141
 msgid "The sending has been cancelled"
 msgstr "L'envoi a été annulé"
 
-#: Emailing/views.py:141
+#: Emailing/views.py:143
 msgid "The sending can't be cancelled"
 msgstr "L'anvoi ne peut pas être annulé"
 
-#: Emailing/views.py:147
+#: Emailing/views.py:149
 msgid "Cancel the sending?"
 msgstr "Annuler l'envoi?"
 
-#: Emailing/views.py:160
+#: Emailing/views.py:162
 msgid "Link"
 msgstr "Lien"
 
-#: Emailing/views.py:189
+#: Emailing/views.py:191
 #: Emailing/templates/Emailing/public/unregister_confirm.html:4
 msgid "Unregister"
 msgstr "Se désinscrire"
 
-#: Emailing/views.py:191
+#: Emailing/views.py:193
 msgid "{0} has unregister"
 msgstr "{0} s'est désinscrit"
 
-#: Emailing/views.py:246
+#: Emailing/views.py:248
 msgid "An error occured while verifying the email address of this contact."
 msgstr ""
 "Une erreur s'est produite au cours de la vérification de l'adresse email de "
 "ce contact."
 
-#: Emailing/views.py:249
+#: Emailing/views.py:251
 msgid "Need to verify the email address"
 msgstr "vérifier votre adresse email"
 
@@ -2040,16 +2010,16 @@ msgid "No newsletters"
 msgstr "Aucune newsletter"
 
 #: Emailing/templates/Emailing/_section_visitors.html:5
-msgid "Links"
-msgstr "Lien"
+msgid "Statistics"
+msgstr "Statistiques"
 
 #: Emailing/templates/Emailing/_section_visitors.html:10
-msgid "url"
-msgstr "url"
+msgid "Sendings"
+msgstr "Envois"
 
-#: Emailing/templates/Emailing/_section_visitors.html:10
-msgid "visitors"
-msgstr "visiteurs"
+#: Emailing/templates/Emailing/_section_visitors.html:11
+msgid "Openings"
+msgstr "Ouvertures"
 
 #: Emailing/templates/Emailing/confirm_send_mail.html:3
 #: Emailing/templates/Emailing/confirm_send_mail.html:11
@@ -2725,10 +2695,8 @@ msgstr "Recherche de contacts"
 msgid "List of searchs"
 msgstr "Liste des recherches"
 
+#: Search/templates/pdf/_contact_address.html:16
 #: Search/templates/pdf/address_strip.html:53
-#: Search/templates/pdf/labels_16.html:56
-#: Search/templates/pdf/labels_21.html:56
-#: Search/templates/pdf/labels_24.html:69
 #: Search/templates/pdf/small_labels.html:41
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
@@ -2956,6 +2924,36 @@ msgstr "Cette application requiert l'activation de javascript"
 #: templates/sanza/tab_form.html:50
 msgid "The form is not valid."
 msgstr "Le formulaire n'est pas valide"
+
+#~ msgid "Credit"
+#~ msgstr "Crédit"
+
+#~ msgid "Number of email used"
+#~ msgstr "Nombre d'emails utilisé"
+
+#~ msgid "Total"
+#~ msgstr "Total"
+
+#~ msgid "Number of amails bought"
+#~ msgstr "Nombre d'emails achetés"
+
+#~ msgid "Bought date"
+#~ msgstr "Date d'achat"
+
+#~ msgid "Finished date"
+#~ msgstr "Date de fin"
+
+#~ msgid "Date : {0} - Total: {1} - Credit : {2}"
+#~ msgstr "Date : {0} - Total: {1} - Credit : {2}"
+
+#~ msgid "Links"
+#~ msgstr "Lien"
+
+#~ msgid "url"
+#~ msgstr "url"
+
+#~ msgid "visitors"
+#~ msgstr "visiteurs"
 
 #~ msgid "Change the entity of"
 #~ msgstr "Réaffecter l'entité de"
