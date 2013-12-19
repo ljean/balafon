@@ -10,18 +10,27 @@
 {% block section_data %}
 
 <table>
-  <tr><th>{% trans "Contact" %}</th><th>{% trans "Entity" %}</th></tr>
   {% autopaginate contacts 25 %}
   {% for c in contacts %}
   <tr>
-    <td>
-      <a href="{{c.get_absolute_url}}">{{c}}</a>
-      &nbsp;&nbsp;&nbsp;
-      <a href="{% url "crm_view_entity" c.entity.id %}">{{c.entity.name}}</a>{{ c.get_roles|seq_to_dash|default:'' }}
-      &nbsp;&nbsp;&nbsp;
-      {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+    {% if c.entity.is_single_contact %}
+    <td colspan="3">
+      <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>
     </td>
-    <td><a href="{{c.entity.get_absolute_url}}">{{ c.entity }}</a></td>
+    {% else %}
+    <td>
+      <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>
+    </td>
+    <td>
+      <a href="{% url "crm_view_entity" c.entity.id %}">{{c.entity.name}}</a>
+    </td>
+    <td>
+      {{ c.get_roles|seq_to_dash|default:'' }}
+    </td>
+    {% endif %}
+    <td>
+     {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+    </td>
   </tr>
   {% endfor %}
 </table>
