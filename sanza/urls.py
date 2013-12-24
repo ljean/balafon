@@ -26,6 +26,11 @@ urlpatterns = patterns('',
     url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
 )
 
+if 'sanza.Apis' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'', include('sanza.Apis.urls')),
+    )
+    
 if 'jhouston' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'^jhouston/', include('jhouston.urls')),

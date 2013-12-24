@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
 from django.core.urlresolvers import reverse
@@ -590,6 +591,10 @@ class Group(TimeStampedModel):
 
     def __unicode__(self):
         return self.name
+    
+    @property
+    def all_contacts(self):
+        return Contact.objects.filter(Q(id__in=self.contacts.all()) | Q(entity__id__in=self.entities.all()))
 
     def save(self, *args, **kwargs):
         self.name = self.name.strip()
