@@ -4,6 +4,9 @@ from tastypie.authorization import Authorization
 from tastypie import fields
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from sanza.Crm.models import Group, Contact
+from tastypie.authentication import ApiKeyAuthentication
+from tastypie.authorization import DjangoAuthorization
+
 
 class ContactResource(ModelResource):
     fullname = fields.CharField('fullname', readonly=True)
@@ -15,6 +18,8 @@ class ContactResource(ModelResource):
         queryset = Contact.objects.all()
         resource_name = 'contact'
         fields = ['id']
+        authentication = ApiKeyAuthentication()
+        authorization = DjangoAuthorization()
 
 
 class GroupResource(ModelResource):
@@ -25,6 +30,8 @@ class GroupResource(ModelResource):
         queryset = Group.objects.all()
         resource_name = 'group'
         fields = ['name', 'description']
+        authentication = ApiKeyAuthentication()
+        authorization = DjangoAuthorization()
         
     #def obj_get(self, bundle, **kwargs):
     #    print "obj_get", kwargs
