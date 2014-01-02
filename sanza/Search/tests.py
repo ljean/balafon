@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 def get_form_errors(response):
     soup = BeautifulSoup(response.content)
     errors = soup.findAll('ul', {'class':'errorlist'})
-    return len(errors)
+    return errors
 
 class BaseTestCase(TestCase):
 
@@ -1418,4 +1418,67 @@ class RelationshipSearchTest(BaseTestCase):
         self.assertNotContains(response, ringo.lastname)
         self.assertNotContains(response, doe.lastname)
         
+class EmailingSearchTest(BaseTestCase):
+    
+    def test_contact_by_emailing_sent(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        emailing = mommy.make(Emailing)
+        emailing.sent_to.add(obi)
+        emailing.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_sent-_-0": emailing.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+    def test_contact_by_emailing_opened(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        emailing = mommy.make(Emailing)
+        emailing.sent_to.add(obi)
+        emailing.sent_to.add(anakin)
+        emailing.opened_emails.add(obi)
+        
+        emailing.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_opened-_-0": emailing.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+    def test_contact_by_emailing_error(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_opened-_-0": 333}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+        self.assertEqual(1, len(get_form_errors(response)))
+
         
