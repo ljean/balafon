@@ -74,53 +74,40 @@ header, nav {
 	background: #eee;
 }
 
-#nav, #nav ul {
+ul.nav {
 	padding: 0;
 	margin: 0;
 	list-style: none;
 	position: relative;
 	vertical-align: top;
+	display: inline-block;
 }
 
-#nav a {
-	display: block;
+ul.nav a {
+	display: inline-block;
 	width: 9em;
 	padding: 0;
 }
 
-#nav li {
+
+ul.nav li {
 	float: left;
 	width: 9em;
+	padding: 0;
 }
 
-#nav li ul {
+ul.nav li ul {
 	position: absolute;
 	width: 11em;
 	left: -999em;
+	padding: 0;
 }
 
-#nav li:hover ul {
+ul.nav li:hover ul {
 	left: auto;
 }
 
-#nav li:hover ul, #nav li.sfhover ul {
-	left: auto;
-}
-
-#nav li ul ul {
-	margin: -1em 0 0 11em;
-}
-
-#nav li:hover ul ul, #nav li.sfhover ul ul {
-	left: -999em;
-}
-
-
-#nav li:hover ul, #nav li li:hover ul, #nav li.sfhover ul, #nav li li.sfhover ul {
-	left: auto;
-}
-
-#nav li.separator {
+ul.nav li.separator {
 	border-top: solid 8px #000;
 	/*width: 100%;*/
 }
@@ -131,74 +118,56 @@ header, nav {
 /* @block Personnalisation Menu CSS */
 
 
-#nav {
-	/*height: 30px;*/
-	/*width: 880px;*/
+ul.nav {
 	border-right-style: none;
 	border-left-style: none;
     z-index: 1;
-	/*border-bottom: solid 2px #ef9300;*/
-	/*border-top: solid 2px #efddaa;*/
-	/*background: #eeeee7;*/
 	height: 1px;
 }
 
-#nav li ul {
-	/*width: 121px;*/
-}
-
-#nav ul > li{
+ul.nav > li{
 	padding: 5px 20px;
 	height: 100%;
 }
 	
-#nav li a{
+ul.nav li a{
 	text-decoration: none;
 	padding: 0;
-	/*font-weight: bolder;*/
 	text-align: center;
 	background: #ccc;
 }
 
-#nav li ul li a{
+ul.nav li ul li a{
 	text-align: center;
-
 }
 
-#nav, #nav ul {
+ul.nav {
 	padding: 0;
 	line-height: 2;
 }
 
-#nav ul li ul li {
-	/*margin: -2.4em 0 0 9em;*/
-	margin: 0;
-	padding: 0 0;
-}
-
-#nav > li {
+ul.nav > li {
 	height: 100%;
 }
 
-#nav ul > li a{
+ul.nav > li a{
 	font-size: 1em;
 }
 
-#nav ul ul > li a{
-	/*text-align: left;*/
+ul.nav ul > li a{
 	font-size: 1em;
 }
 
-#nav li:hover a {
+ul.nav li:hover a {
     color: #fff;
 	background-color: #333;
 }
 
-#nav li:hover > a {
+ul.nav li:hover > a {
 	background-color: #888;
 }
 
-#nav form {
+ul.nav form {
     margin-top: 3px;
 	margin-left: 0px;
 	padding: 1px 1px 1px 1px;
@@ -206,10 +175,9 @@ header, nav {
 	border: none;
 	width: 150%;
 	height: 100%;
-	
 }
 
-#nav form input{
+ul.nav form input{
     margin: 0 1px 0 1px;
 	width: 100%;
 }
