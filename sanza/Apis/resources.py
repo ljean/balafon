@@ -12,12 +12,12 @@ class ContactResource(ModelResource):
     fullname = fields.CharField('fullname', readonly=True)
     full_address = fields.CharField('get_full_address', readonly=True)
     phone = fields.CharField('get_phone', readonly=True)
-    email = fields.CharField('email', readonly=True)
+    email = fields.CharField('get_email', readonly=True)
     
     class Meta:
-        queryset = Contact.objects.all()
+        queryset = Contact.objects.all().order_by('lastname', 'firstname')
         resource_name = 'contact'
-        fields = ['id']
+        fields = ['id', 'lastname', 'firstname']
         authentication = ApiKeyAuthentication()
         authorization = DjangoAuthorization()
 
