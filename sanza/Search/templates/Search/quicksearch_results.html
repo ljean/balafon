@@ -17,4 +17,8 @@
 {% include "Search/_section_qs_phones.html" with contacts_and_entities=contacts_by_phone name=phone_title %}
 {% endif %}
 
+{% if contacts_by_email %}    
+{% include "Search/_section_qs_emails.html" with contacts_and_entities=contacts_by_email name=email_title %}
+{% endif %}
+
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends "sanza/_section.html" %}
+{% load i18n sanza_utils %}{% load url from future %}
+
+{% block section_title %}{{ name.capitalize }}{% endblock %}
+  
+{% block section_data %}
+<table>
+  <tr>
+    <th colspan="2">{% trans "Emails" %}</th>
+  </tr>
+  {% for c in contacts_and_entities %}
+  <tr>
+    <td>
+      {{ c.get_email }}
+    </td>
+    <td>
+      <a href="{{ c.get_absolute_url }}">{{c.fullname|default:c}}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

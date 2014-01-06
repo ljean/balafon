@@ -64,6 +64,12 @@ def quick_search(request):
             qs = Group.objects.all()
             groups_by_name = filter_icontains_unaccent(qs, 'name', text)
             
+            if "@" in text:
+                contacts_by_email = Contact.objects.filter(
+                    Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
+            else:
+                contacts_by_email = Contact.objects.none()
+            
             #cities_by_name = []
             #for city in City.objects.filter(name__icontains=text):
             #    contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
@@ -79,6 +85,7 @@ def quick_search(request):
             groups_title = _(u'Groups')
             #cities_title = _(u'Contacts and entities by city')
             phones_title = _(u'Contacts by phone number')
+            emails_by_email = _(u'Contacts by email')
             
             return render_to_response(
                 'Search/quicksearch_results.html',
