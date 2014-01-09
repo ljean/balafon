@@ -14,6 +14,8 @@ from django.conf import settings
 from BeautifulSoup import BeautifulSoup
 from bs4 import BeautifulSoup as BeautifulSoup4
 from django.utils.translation import ugettext as _
+from django.utils.unittest.case import SkipTest
+from sanza.Crm import settings as crm_settings
 
 def get_form_errors(response):
     soup = BeautifulSoup(response.content)
@@ -1193,6 +1195,9 @@ class HasEntitySearchTest(BaseTestCase):
     
     def test_contact_has_entity(self):
         
+        if not crm_settings.ALLOW_SINGLE_CONTACT:
+            raise SkipTest()
+        
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)
         
@@ -1216,6 +1221,9 @@ class HasEntitySearchTest(BaseTestCase):
         self.assertNotContains(response, contact2.lastname)
         
     def test_contact_doesnt_have_entity(self):
+        
+        if not crm_settings.ALLOW_SINGLE_CONTACT:
+            raise SkipTest()
         
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)
@@ -1590,15 +1598,15 @@ class QuickSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
-        self.assertNotContains(response, anakin.email)
-        self.assertNotContains(response, obi.email)
-        self.assertNotContains(response, sw.email)
+        self.assertContains(response, anakin.email)
+        self.assertContains(response, obi.email)
+        self.assertContains(response, sw.email)
         self.assertNotContains(response, doe.email)
         self.assertNotContains(response, sidious.email)
         
-        self.assertNotContains(response, anakin.firstname)
-        self.assertNotContains(response, obi.firstname)
-        self.assertNotContains(response, luke.firstname)
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, luke.firstname)
         self.assertNotContains(response, doe.firstname)
         self.assertNotContains(response, sidious.firstname)
         

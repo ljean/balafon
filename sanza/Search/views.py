@@ -64,11 +64,8 @@ def quick_search(request):
             qs = Group.objects.all()
             groups_by_name = filter_icontains_unaccent(qs, 'name', text)
             
-            if "@" in text:
-                contacts_by_email = Contact.objects.filter(
-                    Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
-            else:
-                contacts_by_email = Contact.objects.none()
+            contacts_by_email = Contact.objects.filter(
+                Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
             
             #cities_by_name = []
             #for city in City.objects.filter(name__icontains=text):
