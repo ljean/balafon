@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-02 18:18+0100\n"
+"POT-Creation-Date: 2014-01-09 22:53+0100\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,14 +30,14 @@ msgstr "Lieu"
 #: Crm/templates/Crm/_section_same_as.html:12
 #: Crm/templates/Crm/_section_same_as.html:45
 #: Crm/templates/Crm/confirm_contacts_import.html:64
-#: Crm/templates/Crm/edit_action.html:31 Search/views.py:283
+#: Crm/templates/Crm/edit_action.html:31 Search/views.py:287
 #: templates/sanza/_navigation.html:27
 msgid "Entity"
 msgstr "Entité"
 
 #: config.py:37 Crm/templates/Crm/_section_all_entities.html:12
 #: Crm/templates/Crm/_section_contacts.html:4
-#: Emailing/templates/Emailing/_section_contacts.html:7 Search/views.py:78
+#: Emailing/templates/Emailing/_section_contacts.html:7 Search/views.py:81
 #: Search/templates/Search/_section_qs_contacts.html:9
 #: Search/templates/Search/_section_qs_entities.html:8
 #: Search/templates/Search/_section_search_results.html:18
@@ -127,7 +127,7 @@ msgstr ""
 "Veuillez entrer un code postal valide ou au minimum le numéro de département"
 
 #: Crm/forms.py:179 Crm/forms.py:186 Crm/search_forms.py:121
-#: Search/views.py:282
+#: Search/views.py:286
 msgid "Country"
 msgstr "Pays"
 
@@ -1395,7 +1395,7 @@ msgstr "Tous"
 #: Crm/templates/Crm/_section_contact_group.html:4
 #: Crm/templates/Crm/_section_entity_group.html:4
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:10
-#: Search/views.py:79 templates/sanza/_navigation.html:19
+#: Search/views.py:82 templates/sanza/_navigation.html:19
 msgid "Groups"
 msgstr "Groupes"
 
@@ -1819,7 +1819,7 @@ msgstr "L'URL n'est pas autorisé"
 
 #: Emailing/forms.py:115
 msgid "subscribe to our newsletter? Please enter your email."
-msgstr ""
+msgstr "souscrire à notre newsletter? Veuillez entrer votre email."
 
 #: Emailing/forms.py:135 Emailing/forms.py:305
 msgid "newsletter"
@@ -2163,11 +2163,11 @@ msgstr ""
 msgid ""
 "Thank you. You've subscribed to our newsletter. You will receive an email to "
 "confirm your address."
-msgstr ""
+msgstr "Merci de vous êtes inscrit à notre newsletter. Vous recevrez un email de confirmation."
 
 #: Emailing/templates/Emailing/public/subscribe_email_error.html:5
 msgid "Thank you. We will contact you to check your email"
-msgstr ""
+msgstr "Merci. Nous vous contacterons pour vérifier votre email"
 
 #: Emailing/templates/Emailing/public/subscribe_error.html:8
 msgid ""
@@ -2501,57 +2501,65 @@ msgstr "champ de recherche"
 msgid "search fied"
 msgstr "champs de recherche"
 
-#: Search/tests.py:830 Search/views.py:205
+#: Search/tests.py:832 Search/views.py:209
 msgid "Mailto: Error, no emails defined"
 msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 
-#: Search/views.py:81
+#: Search/views.py:84
 msgid "Contacts by phone number"
 msgstr "Contacts par numéro de téléphone"
 
-#: Search/views.py:118
+#: Search/views.py:85
+msgid "Contacts by email"
+msgstr "Contacts par email"
+
+#: Search/views.py:122
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: Search/views.py:340
+#: Search/views.py:344
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crée"
 
-#: Search/views.py:363
+#: Search/views.py:367
 msgid "Create action for contacts"
 msgstr "Créer une action pour les contacts"
 
-#: Search/views.py:364 Search/views.py:418 Search/views.py:477
+#: Search/views.py:368 Search/views.py:422 Search/views.py:481
 msgid "The search results contains no contacts"
 msgstr "Le résultat de la recherche ne contient aucun contact"
 
-#: Search/views.py:387
+#: Search/views.py:391
 msgid "{0} contacts have been added to groups"
 msgstr "{0} contacts ont été ajoutés aux groupes"
 
-#: Search/views.py:394
+#: Search/views.py:398
 msgid "{0} entities have been added to groups"
 msgstr "{0} entités ont été ajoutés aux groupes"
 
-#: Search/views.py:417
+#: Search/views.py:421
 msgid "Add contacts to group"
 msgstr "Ajouter les contacts à un groupe"
 
-#: Search/views.py:450
+#: Search/views.py:454
 msgid "{0} contacts have subscribe to the newsletter"
 msgstr "{0} contacts ont été inscrits à la lettre d'information"
 
-#: Search/views.py:453
+#: Search/views.py:457
 msgid "{0} contacts have unsubscribe to the newsletter"
 msgstr "{0} contacts ont été désinscrits à la lettre d'information"
 
-#: Search/views.py:476
+#: Search/views.py:480
 msgid "Contacts admin"
 msgstr "Administration des contacts"
 
 #: Search/templates/Search/_section_qs_cities.html:8
 msgid "Contacts and entities"
 msgstr "Contacts et entités"
+
+#: Search/templates/Search/_section_qs_emails.html:9
+msgid "Emails"
+msgstr "Emails"
 
 #: Search/templates/Search/_section_qs_groups.html:8
 msgid "Members"
@@ -2728,6 +2736,22 @@ msgstr "Liste des recherches"
 #: Search/templates/pdf/small_labels.html:41
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
+
+#: Users/models.py:9
+msgid "Notify due actions"
+msgstr "Notifier les actions à échéance"
+
+#: Users/management/commands/notify_due_actions.py:30
+msgid "Sanza: You have due actions"
+msgstr "Sanza: Vos actions à échéance"
+
+#: Users/templates/Users/due_actions_notification_email.txt:3
+msgid "Hello"
+msgstr "Bonjour"
+
+#: Users/templates/Users/due_actions_notification_email.txt:5
+msgid "Here is some things to do for you today"
+msgstr "Voici vos actions arrivées à échéance"
 
 #: templates/403.html:5
 msgid "Permission Denied"
