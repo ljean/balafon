@@ -1,0 +1,9 @@
+{% load i18n %}
+
+{% trans "Hello" %} {{user.firstname}}
+
+{% trans "Here is some things to do for you today" %}
+
+{% for action in actions %}
+    * {{ action.planned_date|date:"d/m/Y" }} {{ action.planned_date|time:"H:i" }}: {{ action.subject }}
+{% endfor %}

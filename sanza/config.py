@@ -2,6 +2,7 @@
 from sanza.Crm import search_forms, models, forms
 from django.utils.translation import ugettext as _
 from sanza.Crm import settings
+from sanza.Emailing import search_forms as emailing_search_forms
 
 SEARCH_FORMS = [
     (
@@ -86,6 +87,12 @@ SEARCH_FORMS = [
             #search_forms.NoOpportunityWithNameSearchForm,
             #search_forms.NoOpportunityOfTypeSearchForm,
             #search_forms.NoOpportunityBetween,
+        ],
+    ),(
+        _(u'Emailing'),
+        [
+            emailing_search_forms.EmailingSentSearchForm,
+            emailing_search_forms.EmailingOpenedSearchForm,
         ],
     ),(
         _(u'Admin'),

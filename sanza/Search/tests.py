@@ -14,11 +14,13 @@ from django.conf import settings
 from BeautifulSoup import BeautifulSoup
 from bs4 import BeautifulSoup as BeautifulSoup4
 from django.utils.translation import ugettext as _
+from django.utils.unittest.case import SkipTest
+from sanza.Crm import settings as crm_settings
 
 def get_form_errors(response):
     soup = BeautifulSoup(response.content)
     errors = soup.findAll('ul', {'class':'errorlist'})
-    return len(errors)
+    return errors
 
 class BaseTestCase(TestCase):
 
@@ -1193,6 +1195,9 @@ class HasEntitySearchTest(BaseTestCase):
     
     def test_contact_has_entity(self):
         
+        if not crm_settings.ALLOW_SINGLE_CONTACT:
+            raise SkipTest()
+        
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)
         
@@ -1216,6 +1221,9 @@ class HasEntitySearchTest(BaseTestCase):
         self.assertNotContains(response, contact2.lastname)
         
     def test_contact_doesnt_have_entity(self):
+        
+        if not crm_settings.ALLOW_SINGLE_CONTACT:
+            raise SkipTest()
         
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)
@@ -1418,4 +1426,187 @@ class RelationshipSearchTest(BaseTestCase):
         self.assertNotContains(response, ringo.lastname)
         self.assertNotContains(response, doe.lastname)
         
+class EmailingSearchTest(BaseTestCase):
+    
+    def test_contact_by_emailing_sent(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        emailing = mommy.make(Emailing)
+        emailing.sent_to.add(obi)
+        emailing.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_sent-_-0": emailing.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+    def test_contact_by_emailing_opened(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        emailing = mommy.make(Emailing)
+        emailing.sent_to.add(obi)
+        emailing.sent_to.add(anakin)
+        emailing.opened_emails.add(obi)
+        
+        emailing.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_opened-_-0": emailing.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+    def test_contact_by_emailing_error(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-emailing_opened-_-0": 333}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+        
+        self.assertEqual(1, len(get_form_errors(response)))
+
+class QuickSearchTest(BaseTestCase):
+    
+    def test_contact_by_name(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        sw = mommy.make(models.Entity)
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"Skywalker"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertNotContains(response, obi.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+        
+    def test_contact_by_entity_name(self):    
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        sw = mommy.make(models.Entity, name="Starwars")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        st = mommy.make(models.Entity, name="StarTrek")
+        pic = mommy.make(models.Contact, firstname="Jean-Luc", lastname="Piccard", entity=st)
+        ds = mommy.make(models.Entity, name="DarkSide")
+        palpatine = mommy.make(models.Contact, firstname="Senateur", lastname="Palpatine", entity=ds)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"Star"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, pic.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+        self.assertNotContains(response, palpatine.firstname)
+        
+    def test_contact_by_phone(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", phone="04.99.99.99.99")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi", mobile="04.99.00.00.00")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", phone="03.33.33.33.33")
+        sw = mommy.make(models.Entity, phone="04.99.11.22.33")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"04.99"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.phone)
+        self.assertContains(response, obi.mobile)
+        self.assertContains(response, sw.phone)
+        self.assertNotContains(response, doe.phone)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, sw.name)
+        self.assertNotContains(response, doe.firstname)
+
+        
+    def test_contact_by_email(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", email="anakin@starwars.com")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi", email="obiwan@starwars.com")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", email="john.doe@toto.fr")
+        sw = mommy.make(models.Entity, email="contact@starwars.com")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        sidious = mommy.make(models.Contact, firstname="Dark", lastname="Sidious", entity=sw, email="sidious@darkside.com")
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"@starwars.com"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.email)
+        self.assertContains(response, obi.email)
+        self.assertContains(response, sw.email)
+        self.assertNotContains(response, doe.email)
+        self.assertNotContains(response, sidious.email)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+        self.assertNotContains(response, sidious.firstname)
+        
+    def test_contact_by_email_no_at(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", email="anakin@starwars.com")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi", email="obiwan@starwars.com")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", email="john.doe@toto.fr")
+        sw = mommy.make(models.Entity, email="contact@starwars.com")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        sidious = mommy.make(models.Contact, firstname="Dark", lastname="Sidious", entity=sw, email="sidious@darkside.com")
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"starwars.com"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.email)
+        self.assertContains(response, obi.email)
+        self.assertContains(response, sw.email)
+        self.assertNotContains(response, doe.email)
+        self.assertNotContains(response, sidious.email)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+        self.assertNotContains(response, sidious.firstname)
         
