@@ -1,47 +1,51 @@
-{% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n sanza_utils %}
 
 {% block section_title %}{% trans "Contacts" %}{% endblock %}
   
 {% block section_data %}
-{% if contacts %}
-<table id="entity_contacts">
-  <tr>
-    <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
-    <th>{% trans "Job" %}</th><th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
-  </tr>
-  {% for c in contacts %}
-  {% with c.has_left as has_left %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
-    {% if entity %}
-      <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
-    {% else %}
-      {% if c.entity.is_single_contact %}
-        <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
-      {% else %}
-        <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
-        <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
-      {% endif %}
+<div class="row">
+  <div class="col-md-12">
+    {% if contacts %}
+    <table class="table table-responsive table-bordered">
+      <tr>
+        <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
+        <th>{% trans "Job" %}</th><th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
+      </tr>
+      {% for c in contacts %}
+      {% with c.has_left as has_left %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+        {% if entity %}
+          <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+        {% else %}
+          {% if c.entity.is_single_contact %}
+            <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+          {% else %}
+            <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
+            <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+          {% endif %}
+        {% endif %}
+        <td>{{ c.job|default:"&nbsp;" }}</td>
+        <td>{{ c.get_roles|seq_to_dash|default:"&nbsp;" }}</td>
+        <td>{{ c.get_phones|seq_to_br }}</td>
+        <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </table>
     {% endif %}
-    <td>{{ c.job|default:"&nbsp;" }}</td>
-    <td>{{ c.get_roles|seq_to_dash|default:"&nbsp;" }}</td>
-    <td>{{ c.get_phones|seq_to_br }}</td>
-    <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
-  </tr>
-  {% endwith %}
-  {% endfor %}
-</table>
-{% endif %}
+  </div>
+</div>
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   {% if entity %}
-    <a href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a>
+    <li><a class="" href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a></li>
   {% endif %}
   {% if entity and show_all_contacts %}
-    <a href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a>
+    <li><a class="" href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a></li>
   {% endif %}
   {% if mailto and opportunity %}
-    <a href="{% url "crm_mailto_opportunity_contacts" opportunity.id %}" target="_blank">{% trans "Mail to" %}</a>
+    <li><a class="" href="{% url "crm_mailto_opportunity_contacts" opportunity.id %}" target="_blank">{% trans "Mail to" %}</a></li>
   {% endif %}
 {% endblock %}

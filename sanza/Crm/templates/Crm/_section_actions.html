@@ -1,4 +1,4 @@
-{% extends "sanza/_section.html" %}
+{% extends "sanza/_bs_section.html" %}
 {% load i18n sanza_utils pagination_tags %}{% load url from future %}
 
 {% block section_title %}
@@ -19,34 +19,39 @@
   
   
 {% block section_data %}
+<div class="row"><div class="col-md-12">
 {% include "Crm/_actions_table_script.html" %}
-  
 {% if actions %}
   {% if all_actions %}{% autopaginate actions 25 %}{% endif %}
   {% include "Crm/_actions_table.html" %}
   {% if all_actions %}{% paginate %}{% endif %}
 {% endif %}
+</div></div>
 {% endblock %}
 
 {% block section_action %}
   {% if contact %}
-    <a href="{% url "crm_add_action_for_contact" contact.id %}">{% trans "Add" %}</a>
+    <li><a class="" href="{% url "crm_add_action_for_contact" contact.id %}">{% trans "Add" %}</a></li>
     {% if not all_actions %}
-      <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
+      <li><a class="" href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a></li>
     {% endif %}
   {% else %}
     {% if entity %}
-      <a class="colorbox-form" href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a>
+      <li><a class="colorbox-form" href="{% url "crm_add_action_for_entity" entity.id %}">
+        {% trans "Add" %}
+      </a></li>
       {% if not all_actions %}
-      <a href="{% url "crm_entity_actions" entity.id %}">{% trans "All actions" %}</a>
+      <li><a class="" href="{% url "crm_entity_actions" entity.id %}">{% trans "All actions" %}</a></li>
       {% endif %}
     {% else %} 
-      <a class="colorbox-form" href="{% url "crm_add_action" %}?x=0{% if opportunity %}&opp_id={{opportunity.id}}{% endif %}">{% trans "Add" %}</a>
+      <li><a class="colorbox-form" href="{% url "crm_add_action" %}?x=0{% if opportunity %}&opp_id={{opportunity.id}}{% endif %}">
+        {% trans "Add" %}
+      </a></li>
       {% if not all_actions %}
-        <a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a>
+        <li><a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a></li>
       {% endif %}
   {% endif %}{% endif %}
   {% if SANZA_MULTI_USER %}
-    <a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a>
+    <li><a href="" id="toggle_my_actions" class="all">{% trans "See my actions" %}</a></li>
   {% endif %}
 {% endblock %}

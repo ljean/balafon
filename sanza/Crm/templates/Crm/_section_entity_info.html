@@ -1,48 +1,76 @@
-{% extends "sanza/_section.html" %}
-{% load i18n thumbnail %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n thumbnail %}
 
-{% block column_section_data %}
-<div class="column-section-data-title">
-  {% spaceless %}
-  <div class="entity_logo">
-    <div class="helper">
-      <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
-    </div>
+{% block section_header_extra_class %}main-section-header{% endblock %}
+
+{% block section_title %}
+<div class="logo" style="display: inline-block; vertical-align: middle;">
+  <div class="logo-container">
+    <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
   </div>
-  <div class="entity_info">
-    <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;
-    {% if entity.relationship_date %}
-      <span class="label">{{entity.relationship_date}}</span>
-    {% endif %}
-    <span class="label">{% trans "ADD_DT" %} {{entity.created|date:"d/m/Y"}}</span>
-    <span class="label">{% trans "UPD_DT" %} {{entity.modified|date:"d/m/Y"}}</span>
-    {% if entity.type %}
-      <span class="label">{{entity.type}}</span>
-    {% endif %}
+</div>
+<div style="display: inline-block; vertical-align: middle;">
+{{entity.name}}
+<div class="section-subtitle">{{entity.description}}</div>
+</div>
+{% endblock %}
+
+{% block section_data %}
+<div class="row">
+  <div class="col-md-4">
+    <table class="table">
+      <tr><td>
+        <span class="glyphicon glyphicon-home"></span> {{entity.get_display_address}}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}">{{entity.website}}</a>{% endif %}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-print"></span> {{entity.fax}}
+      </td></tr>
+    </table>
+  </div>
+  
+  <div class="col-md-7">
     {% if entity.notes %}
-      <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
-        <img src="{{STATIC_URL}}img/notebook.png">
-        <div class="action-note" style="display: none;">
-          {{entity.notes|linebreaksbr}}
-        </div>
-     </a>
+    <div class="note">
+      {{entity.notes|linebreaksbr}}
+    </div>
     {% endif %}
-    <br /><br />
-    <span class="entity_description">{{entity.description}}</span>
+    
+    {% include "Crm/_entity_groups.html" %}
+    
+    {% with entity.get_custom_fields as custom_fields %}
+    {% if custom_fields %}
+        {% include "Crm/_custom_fields.html" with instance=entity  model="entity" %}
+    {% endif %}
+    {% endwith %}
   </div>
-  {% endspaceless %}
+  
+  <div class="col-md-1">
+    <table class="table micro-table table-striped">
+      <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "ADD_DT" %}</b> {{entity.created|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "UPD_DT" %}</b> {{entity.modified|date:"d/m/Y"}}</td></tr>
+      {% if entity.type %}
+      <tr><td><b>{% trans "Type" %}</b> {{entity.type}}</td></tr> 
+      {% endif %}
+    </table>
+  </div>
 </div>  
-
-  {% if entity.get_display_address %}<span class="entity_address addr-info">{{entity.get_display_address}}</span>{% endif %}
-  <br /><br />
-  {% if entity.website %}<span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>{% endif %}
-  {% if entity.email %}<span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>{% endif %}
-  {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
-  {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
 
 {% endblock %}
 
-{% block section_action %}
-    <a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a>
-    <a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a>
+{% block section_buttons %}
+  <li><a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add to group" %}</a></li>
+  <li><a class="" href="{% url "crm_edit_custom_fields" "entity" entity.id %}">{% trans "Edit fields" %}</a></li>
+
 {% endblock %}

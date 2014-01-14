@@ -1,23 +1,22 @@
-{% extends "sanza/_section.html" %}
-{% load i18n thumbnail sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n thumbnail sanza_utils %}
 
 {% block section_title %}{% trans "More information" %}{% endblock %}
   
 {% block section_data %}
-  <div class="custom-fields">
+<div class="row"><div class="col-md-12">
   {% for f in custom_fields %}
     {% with instance|custom_field:f.name as cfv %}
     {% if cfv %}
     <span class="custom-field">
-      <span class="custom-field-label">{{f.label}}:</span>
-        <span class="custom-field-value">{{cfv}}</span>
+      <span class="custom-field-label">{{f.label}}:</span><span class="custom-field-value">{{cfv}}</span>
     </span>
     {% endif %}
     {% endwith %}
   {% endfor %}
-  </div>
+</div></div>
 {% endblock %}
 
 {% block section_action %}
-  <a href="{% url "crm_edit_custom_fields" model instance.id %}">{% trans "Edit" %}</a>
+  <a class="btn btn-primary btn-xs" href="{% url "crm_edit_custom_fields" model instance.id %}">{% trans "Edit" %}</a>
 {% endblock %}

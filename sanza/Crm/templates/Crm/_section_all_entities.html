@@ -7,7 +7,7 @@
   
 {% block section_data %}
 {% autopaginate entities 25 %}
-<table class="entities-table">
+<table class="table table-striped">
   <tr>
     <th colspan="2">{% trans "Contacts" %}</th>
     <th>{% trans "City" %}</th>
@@ -60,8 +60,8 @@
 {% paginate %}
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   {% if partial %}
-  <a href="{% url "crm_view_entities_list" %}">{% trans "All" %}</a>
+  </li><a href="{% url "crm_view_entities_list" %}">{% trans "All" %}</a></li>
   {% endif %}
 {% endblock %}

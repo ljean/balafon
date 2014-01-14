@@ -1,5 +1,5 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags %}
 
 {% block section_title %}
   {% trans "Newsletters" %}
@@ -9,7 +9,7 @@
   
   {% if newsletters %}
   {% autopaginate newsletters 10 %}
-  <table class="newsletters">
+  <table class="table table-striped">
     <tr>
       <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
     </tr>
@@ -46,8 +46,7 @@
   {% endif %}
 {% endblock %}
 
-{% block section_action %}
-  <div class="header">{% trans "Add" %}</div>
-  <a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">{% trans "Newsletter" %}</a>
-  <a href="{% url "search" %}">{% trans "Sending" %}</a>
+{% block section_buttons %}
+  <li><a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">{% trans "Add Newsletter" %}</a></li>
+  <li><a href="{% url "search" %}">{% trans "Add Sending" %}</a></li>
 {% endblock %}

@@ -1,5 +1,5 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags %}
 
 {% block section_title %}
     {% trans "My groups" %}
@@ -10,7 +10,7 @@
 {% endblock %}
   
 {% block section_data %}
-  <table>
+  <table class="table table-striped">
   <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th>
       <th>{% trans "Description" %}</th><th>&nbsp;</th></tr>
   {% autopaginate groups 50 %}
@@ -21,7 +21,8 @@
       - {{g.contacts.count}} {% trans "contacts" %}</td>
       <td>{{g.description|default:"&nbsp;"}}</td>
       <td class="ico-col" title="{% trans "Edit" %}">
-        <a href="{% url "crm_edit_group" g.id %}"><img src="{{STATIC_URL}}img/gear.png">
+        <a href="{% url "crm_edit_group" g.id %}">
+            <span class="glyphicon glyphicon-cog"></span>
       </a></td>
     </tr>
   {% endfor %}
@@ -29,10 +30,10 @@
   {% paginate %}
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   {% if entity %}
-    <a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a>
+    <li><a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a></li>
   {% else %}
-    <a href="{% url "crm_add_group" %}">{% trans "Add" %}</a>
+    <li><a href="{% url "crm_add_group" %}">{% trans "Add" %}</a></li>
   {% endif %}
 {% endblock %}

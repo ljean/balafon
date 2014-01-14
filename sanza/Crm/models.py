@@ -172,14 +172,14 @@ class Entity(TimeStampedModel):
     def get_safe_logo(self):
         if self.logo:
             w, h = self.logo.width, self.logo.height
-            fmt = "128" if w>h else "x128"
+            fmt = "64" if w>h else "x64"
             return sorl_thumbnail.backend.get_thumbnail(self.logo.file, fmt, crop='center').url
         else:
             return self.default_logo()
     
     def default_logo(self):
         if self.type and self.type.logo:
-            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "128x128", crop='center')
+            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "64x64", crop='center')
             return file.url
         
         if self.is_single_contact:
@@ -193,11 +193,11 @@ class Entity(TimeStampedModel):
         if self.logo:
             w, h = self.logo.width, self.logo.height
             if w > h:
-                w, h = 128, h*128/w
-                return mark_safe('style="margin-top: {0}px"'.format((128-h)/2))
+                w, h = 64, h*64/w
+                return mark_safe('style="margin: {0}px 0"'.format((64-h)/2))
             else:
-                w, h = w*128/h, h
-                return mark_safe('style="margin-left: {0}px"'.format((128-w)/2))
+                w, h = w*64/h, h
+                return mark_safe('style="margin-left: 0 {0}px"'.format((64-w)/2))
                 
     def get_absolute_url(self):
         return reverse('crm_view_entity', args=[self.id])
@@ -420,11 +420,12 @@ class Contact(TimeStampedModel):
         if self.photo:
             w, h = self.photo.width, self.photo.height
             if w > h:
-                w, h = 128, h*128/w
-                return mark_safe('style="margin-top: {0}px"'.format((128-h)/2))
+                w, h = 64, h*64/w
+                return mark_safe('style="margin: {0}px 0"'.format((64-h)/2))
             else:
-                w, h = w*128/h, h
-                return mark_safe('style="margin-left: {0}px"'.format((128-w)/2))
+                w, h = w*64/h, h
+                return mark_safe('style="margin: 0 {0}px"'.format((64-w)/2))
+        
     
     def default_logo(self):
         if self.entity.is_single_contact:
@@ -435,7 +436,7 @@ class Contact(TimeStampedModel):
     
     def photo_thumbnail(self):
         w, h = self.photo.width, self.photo.height
-        fmt = "128" if w>h else "x128"
+        fmt = "64" if w>h else "x64"
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, fmt, crop='center')
 
     def get_full_address(self):

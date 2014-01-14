@@ -1,12 +1,12 @@
-{% extends "sanza/_section.html" %}
-{% load i18n %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n %}
 
 {% block section_title %}
   {% trans "Statistics" %}
 {% endblock %}
   
 {% block section_data %}
-<table class="entities-table">
+<table class="table table-striped">
 <tr><td>{% trans "Sendings" %}</td><td class="test-sendings">{{ emailing.sent_to.count }}</td></tr>
 <tr><td>{% trans "Openings" %}</td><td class="test-openings">{{ emailing.opened_emails.count }}</td></tr>
 {% for l in emailing.magiclink_set.all %}

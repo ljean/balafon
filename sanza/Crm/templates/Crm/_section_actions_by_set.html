@@ -1,7 +1,43 @@
-{% load i18n sanza_utils pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n sanza_utils pagination_tags %}
 
-{% include "Crm/_actions_table_script.html" %}
+{% block section_title %}
+  {% trans "Actions" %}
+{% endblock %}
+  
+{% block section_data %}
+  {% include "Crm/_actions_table_script.html" %}
+  {% for set_id, set_title, actions in actions_by_set %}
+    <div class="row"><div class="col-md-12">
+    {% if set_title %}<div class="section-action-set-title">{{ set_title }}</div>{% endif %}
+    {% include "Crm/_actions_table.html" %}
+    </div></div>
+  {% endfor %}
+{% endblock %}
 
-{% for set_id, set_title, actions in actions_by_set %}
-  {% include "Crm/_section_actions_of_set.html" %}
-{% endfor %}
+{% block section_buttons %}
+  {% if contact %}
+    <li><a class="" href="{% url "crm_add_action_for_contact" contact.id %}">{% trans "Add" %}</a></li>
+    {% comment %}
+    {% if not all_actions %}
+      <a class="btn btn-default btn-xs" href="{% url "crm_contact_actions" contact.id set_id %}">{% trans "All actions" %}</a>
+    {% endif %}
+    {% endcomment %}
+  {% else %}
+    {% if entity %}
+      <li><a class="colorbox-form" href="{% url "crm_add_action_for_entity" entity.id %}">{% trans "Add" %}</a></li>
+      {% comment %}
+      {% if not all_actions %}
+      <a class="btn btn-default btn-xs" href="{% url "crm_entity_actions" entity.id set_id %}">{% trans "All actions" %}</a>
+      {% endif %}
+      {% endcomment %}
+    {% else %}
+      <li><a class="colorbox-form" href="{% url "crm_add_action" %}?x=0{% if opportunity %}&opp_id={{opportunity.id}}{% endif %}">
+        {% trans "Add" %}
+      </a></li>
+      {% if not all_actions %}
+        <li><a href="{% url "crm_all_actions" %}">{% trans "All actions" %}</a></li>
+      {% endif %}
+  {% endif %}{% endif %}
+{% endblock %}
+

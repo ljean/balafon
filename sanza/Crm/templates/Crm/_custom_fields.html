@@ -1,0 +1,17 @@
+{% load i18n thumbnail sanza_utils %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="custom-field-list">
+    {% for f in custom_fields %}
+      {% with instance|custom_field:f.name as cfv %}
+      {% if cfv %}
+      <span class="custom-field">
+        <span class="custom-field-label">{{f.label}}:</span><span class="custom-field-value">{{cfv}}</span>
+      </span>
+      {% endif %}
+      {% endwith %}
+    {% endfor %}
+    </div>
+  </div>
+</div>
