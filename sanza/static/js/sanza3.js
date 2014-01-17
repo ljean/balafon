@@ -3,5 +3,5 @@ $(function() {
         return false;
     });
     
-    $(".chosen-select").chosen();
+    $(".chosen-select").chosen({disable_search: false, width: "50%"});
 })

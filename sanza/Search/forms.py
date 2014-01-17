@@ -48,8 +48,8 @@ def get_field_form(field):
 class GroupedSelect(forms.Select): 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = '' 
-        final_attrs = self.build_attrs(attrs, name=name) 
-        output = [u'<select%s>' % flatatt(final_attrs)] 
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = [u'<select {0}>'.format(flatatt(final_attrs))] 
         str_value = smart_unicode(value)
         for group_label, group in self.choices: 
             if group_label: # should belong to an optgroup
@@ -61,13 +61,13 @@ class GroupedSelect(forms.Select):
                 selected_html = (option_value == str_value) and u' selected="selected"' or ''
                 output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(option_label))) 
             if group_label:
-                output.append(u'</optgroup>') 
+                output.append(u'</optgroup>')
         output.append(u'</select>') 
         return u'\n'.join(output)
 
 class GroupedChoiceField(ChoiceField):
-    def __init__(self, choices=(), required=True, widget=GroupedSelect, label=None, initial=None, help_text=None):
-        super(ChoiceField, self).__init__(required, widget, label, initial, help_text)
+    def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
+        super(ChoiceField, self).__init__(required, widget, label, initial, help_text, *args, **kwargs)
         self.choices = choices
         
     def clean(self, value):
@@ -92,12 +92,17 @@ class FieldChoiceForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
         super(FieldChoiceForm, self).__init__(*args, **kwargs)
-        choices = [('', [('', _(u'Please select a filter'))])]#1st line is just a label and can't be selected
+        choices = [('', [('', '')])]#[('', [('', _(u'Please select a filter'))])]#1st line is just a label and can't be selected
         for (cat, fs) in get_search_forms():
             choices.append(
                 (cat, [(reverse('search_get_field', args=[f._name]), f._label) for f in fs if f])
             )
-        self.fields['field_choice'] = GroupedChoiceField(choices)
+        widget = GroupedSelect(attrs={
+            'class': 'form-control half-width',
+            'data-placeholder': _(u'Please select a filter'),
+        })
+        self.fields['field_choice'] = GroupedChoiceField(choices, widget=widget)
+       
         
     def as_it_is(self):
         "Returns this form rendered as HTML <p>s."
@@ -111,6 +116,14 @@ class FieldChoiceForm(forms.Form):
 class SearchForm(forms.Form):
     name = forms.CharField(max_length=100, required=False,
         help_text=_('Enter a name and click save.'))
+    
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css', 'chosen/chosen-bootstrap.css')
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
     
     excluded = forms.CharField(required=False, widget=forms.HiddenInput())
     #subject = forms.CharField(max_length=1000, required=False, widget=forms.HiddenInput())
@@ -320,11 +333,11 @@ class SearchForm(forms.Form):
         f = FieldChoiceForm()
         return u"""
             {0}
-            <a class="add-field" href="">{1}</a>
-            <a class="add-block" href="">{2}</a>
-            <a class="duplicate-block" href="">{5}</a>
-            <a class="clear-block" href="">{3}</a>
-            <a class="remove-block" href="">{4}</a>""".format(
+            <a class="btn btn-xs btn-primary add-field" href="">{1}</a>
+            <a class="btn btn-xs btn-default add-block" href="">{2}</a>
+            <a class="btn btn-xs btn-default duplicate-block" href="">{5}</a>
+            <a class="btn btn-xs btn-danger clear-block" href="">{3}</a>
+            <a class="btn btn-xs btn-danger remove-block" href="">{4}</a>""".format(
                 f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate'))
     
     def as_html(self):
@@ -365,7 +378,7 @@ class SearchFieldForm(forms.Form):
     def as_it_is(self):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
-            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s <a href="" class="remove-field">{0}</a></p>'.format(_(u'Remove')),
+            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s <a href="" class="btn btn-xs btn-warning remove-field">{0}</a></p>'.format(_(u'Remove')),
             error_row = u'%s',
             row_ender = '</p>',
             help_text_html = u' <span class="helptext">%s</span>',

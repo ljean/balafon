@@ -1,6 +1,11 @@
 {% extends "sanza/bs_base.html" %}
 {% load i18n %}
 
+{% block extra_head %}
+    {{ block.super }}
+    {{ search_form.media }}
+{% endblock %}
+
 {% block document_title %}
 {% if group %}
     {% trans "Contacts of group" %} <a href="{% url "crm_edit_group" group.id %}">{{group.name}}</a>

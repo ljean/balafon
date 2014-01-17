@@ -276,3 +276,21 @@ li.quick-search-form {
 .font-small {
   font-size: 0.8em;
 }
+.search-block {
+  font-size: 0.9em;
+  padding: 10px;
+  background: #eee;
+  border: 2px groove #888;
+  margin-bottom: 10px;
+}
+.half-width {
+  width: 250px;
+  display: inline-block;
+}
+.chosen-container .chosen-drop .chosen-results li.group-result {
+  cursor: default;
+  display: list-item;
+  font-weight: bold;
+  color: #888;
+  margin-left: -15px;
+}
