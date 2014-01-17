@@ -3,10 +3,8 @@
 
 {% block section_title %}
     {% trans "My groups" %}
-    <span class="day-selector">
-    <a href="{% url "crm_see_my_groups" %}?ordering=name" class="{% if ordering == 'name' %}selected{% endif %}">{% trans "By name" %}</a>
-    <a href="{% url "crm_see_my_groups" %}?ordering=date" class="{% if ordering == 'date' %}selected{% endif %}">{% trans "By date" %}</a>
-    </span>
+    {% if ordering == 'name' %}{% trans "by name" %}{% endif %}
+    {% if ordering == 'date' %}{% trans "by date" %}{% endif %}
 {% endblock %}
   
 {% block section_data %}
@@ -31,9 +29,13 @@
 {% endblock %}
 
 {% block section_buttons %}
-  {% if entity %}
-    <li><a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a></li>
-  {% else %}
-    <li><a href="{% url "crm_add_group" %}">{% trans "Add" %}</a></li>
-  {% endif %}
+    {% if entity %}
+        <li><a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a></li>
+    {% else %}
+        <li><a href="{% url "crm_add_group" %}">{% trans "Add" %}</a></li>
+    {% endif %}
+    
+    <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=name">{% trans "Order by name" %}</a></li>
+  
+    <li><a class="{% if ordering == 'date' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=date">{% trans "Order by date" %}</a></li>
 {% endblock %}

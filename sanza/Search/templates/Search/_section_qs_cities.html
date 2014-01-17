@@ -1,10 +1,10 @@
-{% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n sanza_utils %}
 
 {% block section_title %}{{ name.capitalize }}{% endblock %}
   
 {% block section_data %}
-<table>
+<table class="table table-striped">
   <tr><th>{% trans "City" %}</th><th>{% trans "Contacts and entities" %}</th>
   </tr>
   {% for city in cities %}

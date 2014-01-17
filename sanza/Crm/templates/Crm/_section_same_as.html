@@ -9,7 +9,13 @@
   {% for c in same_as %}
   {% with c.has_left as has_left %}
   <tr>
-    <td>{%trans "Same As"%} {% if c == contact.same_as.main_contact %}({% trans "Is Main"%}){% endif %}</td>
+    <td>{%trans "Same As"%}
+      {% if c == contact.same_as.main_contact %}
+      <span class="glyphicon glyphicon-certificate highlight" title="{% trans "Is Main"%}"> </span>
+      {% else %}
+        <span class="glyphicon glyphicon-certificate disabled" title="{% trans "Not Main"%}"> </span>
+      {% endif %}
+    </td>
     {% if c.entity.is_single_contact %}
     <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
     {% else %}

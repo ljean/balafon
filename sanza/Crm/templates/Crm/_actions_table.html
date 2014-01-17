@@ -1,40 +1,53 @@
 {% load i18n sanza_utils staticfiles %}
 <div class="actions">
+  <script>
+          $(function() {
+            $(".show-note").click(function() {
+              $(this).closest(".action").find(".action-note").toggle();
+              return false;  
+            });
+          })
+        </script>
 {% for a in actions %}
   <div class="row">
     <div class="col-md-12">
-      <div class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} action {% if a.archived %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+      <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} action {% if a.archived %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
         
         <div class="pull-right">
           
-        {% if not a.done %}
-          <a href="{% url "crm_do_action" a.id %}" class="colorbox-form">
-            <span title="{% trans "to do" %}" class="prio-{{a.priority}} glyphicon glyphicon-unchecked {% if a.in_charge and a.in_charge != user %}disabled{% endif %}"></span>
-          </a>
-        {% else %}
-          <span class="prio-{{a.priority}} glyphicon glyphicon-check" title="{% trans "done" %}"></span>
-        {% endif %}
-        
-        {% if a.planned_date %}
-          
-          {% if SANZA_MULTI_USER and a.in_charge %}
-          <div class="label label-in-charge {% if user == a.in_charge %}me-in-charge{% endif %}">
-            {{a.in_charge}}
-          </div>
+          {% if SANZA_MULTI_USER %}
+            <div class="label label-in-charge {% if user == a.in_charge %}me-in-charge{% endif %}">
+            {% if a.in_charge %}
+              {{a.in_charge}}
+            {% else %}
+              {% trans "Not assigned" %}
+            {% endif %}
+            </div>
           {% endif %}
-      
-          <div class="label label-date">
-            {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}}
+          
+          <div class="label label-date {{a|get_ation_date_label}}">
+            {% if a.planned_date %}
+              {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}}
+            {% else %}
+              {% trans "Not planned" %}
+            {% endif %}
           </div>
+          
+          <a href="{% url "crm_do_action" a.id %}" class="colorbox-form">
+          {% if not a.done %}
+              <span title="{% trans "to do" %}" class="glyphicon glyphicon-unchecked {% if a.in_charge and a.in_charge != user %}disabled{% endif %}"></span>
+          {% else %}
+            <span class="glyphicon glyphicon-check" title="{% trans "done" %}"></span>
+          {% endif %}
+          </a>
+          
+          {% comment %}
+          {% if a.done_date %}
+            {% trans "done on" %} {{ a.done_date|date:'j F Y'|default:''}}<br/>
+          {% endif %}
+          {% endcomment %}
         
-        {% endif %}
-        {% comment %}
-        {% if a.done_date %}
-          {% trans "done on" %} {{ a.done_date|date:'j F Y'|default:''}}<br/>
-        {% endif %}
-        {% endcomment %}
-      
-        
+          
         </div>
         
         
@@ -45,42 +58,21 @@
       
         
         
-        <div class="action-details">
-        {% if a.type %}<div class="label label-default">{{ a.type }}</div>{% endif %}
-        {% if a.number %}<div class="label label-default">{% trans "Number"%}: {{a.number }}</div>{% endif %}
-          
-        {% if a.status %}<div class="label label-default">{{a.status}}</div>{% endif %}
-        {% if a.amount %}<div class="label label-default">{% trans "Amount"%}:{{a.amount }}</div>{% endif %}
         
-        <a href="{% url "crm_edit_action" a.id %}">
-            <span class="glyphicon glyphicon-cog" title="{% trans "Edit" %}"></span>
-        </a>
         
-        {% if a.actiondocument or a.has_non_editable_document %}
-        <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
-          <span class="glyphicon glyphicon-file" title="{% trans "document" %}"></span>
-        </a>
-      {% else %}
-        {% if a.has_editable_document %}
-            <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
-              <span class="glyphicon glyphicon-file" title="{% trans "add document" %}"></span>
-            </a>
-        {% endif %}
-      {% endif %}
+        <div class="action-subject">
+          <span style="font-weight: 500;" contenteditable="true">{{a.subject}}</span>
+          <a href="" class="show-note {% if a.detail %}has-note{% endif %}">
+            <span class="glyphicon glyphicon-collapse-down" title="{% trans "Show note" %}"></span>
+          </a>
         </div>
         
-        <div class="action-subject" contenteditable="true">{{a.subject}}</div>
-        
-        {% if a.detail %}
-        <a href="">
-          <span class="glyphicon glyphicon-comment" title="{% trans "Show note" %}"></span>
-        </a>
-        <div class="action-note" style="display: none">
+        <div contenteditable="true" class="action-note" style="display: none">
           {{ a.detail|linebreaksbr }}
         </div>
-      {% endif %}
-          
         
+          
+      <div>
         <div class="action-contacts">
         <span class="glyphicon glyphicon-user"></span>
         {% if not contact %}
@@ -99,6 +91,39 @@
         {% endif %}
         &nbsp;<span class="glyphicon glyphicon-plus"></span>
         </div>
+        
+        <div class="action-details pull-right">
+          
+          {% if a.type %}<div class="label label-default">{{ a.type }}</div>{% endif %}
+          {% if a.number %}<div class="label label-default">{% trans "Number"%}: {{a.number }}</div>{% endif %}
+            
+          {% if a.status %}<div class="label label-default">{{a.status}}</div>{% endif %}
+          {% if a.amount %}<div class="label label-default">{% trans "Amount"%}:{{a.amount }}</div>{% endif %}
+          
+          
+          {% if a.actiondocument or a.has_non_editable_document %}
+            <div class="btn btn-xs btn-default">
+              <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
+                <span class="glyphicon glyphicon-file" title="{% trans "document" %}"></span>
+                {% trans "View document" %}
+              </a>
+            </div>
+          {% else %}
+            {% if a.has_editable_document %}
+              <div class="btn btn-xs btn-default">
+                <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
+                  <span class="glyphicon glyphicon-file" title="{% trans "add document" %}"></span>
+                  {% trans "Create document" %}
+                </a>
+              </div>
+            {% endif %}
+          {% endif %}
+          
+          <a href="{% url "crm_edit_action" a.id %}">
+              <span class="glyphicon glyphicon-cog" title="{% trans "Edit" %}"></span>
+          </a>
+        </div>
+      </div>
       </div>  
     </div>
       

@@ -65,18 +65,22 @@
   
   <div class="col-md-7">
     
-    {% if contact.notes %}
-    <div class="note">
-      {{contact.notes|linebreaksbr}}
+    <div class="note" style="margin-bottom: 5px;">
+      <span contenteditable=true>{{contact.notes|linebreaksbr|default:"&nbsp;"}}</span>
     </div>
-    {% endif %}
     
-    <div class="">
+    <div class="">{% trans "Roles" %}: 
     {% with contact.get_roles as roles %}
       {% for role in roles %}<span class="label label-primary">{{role}}</span>{% endfor %}
     {% endwith %}
     </div>
     
+    <div class="groups-header" style="margin: 10px 0 0 0; text-decoration: underline;">
+      {% trans "Groups" %}
+      <a class="colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">
+        <span class="glyphicon glyphicon-plus"></span>
+      </a>
+    </div>
     {% include "Crm/_contact_groups.html" %}
     
     {% with contact.get_custom_fields as custom_fields %}
@@ -107,7 +111,6 @@
     <li><a class="" href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a></li>
     <li><a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a></li>
     <li><a class="colorbox-form" href="{% url "crm_change_contact_entity" contact.id%}">{% trans "Reassign" %}</a></li>
-    <li><a class="colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">{% trans "Add to group" %}</a></li>
     <li><a class="" href="{% url "crm_edit_custom_fields" "contact" contact.id %}">{% trans "Edit fields" %}</a></li>
 {% endblock %}
 

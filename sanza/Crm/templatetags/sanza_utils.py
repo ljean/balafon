@@ -2,7 +2,7 @@
 from django.utils.safestring import mark_safe
 from django import template
 register = template.Library()
-from datetime import date
+from datetime import date, datetime
 
 @register.filter
 def seq_to_br(seq):
@@ -33,6 +33,14 @@ def cut_null_hour(value):
     except:
         pass
     return value
+
+@register.filter
+def get_ation_date_label(action):
+    if not action.planned_date:
+        return "label-warning"
+    if action.planned_date < datetime.now():
+        return "label-danger"
+    return "label-not-yet"
     
 @register.filter
 def custom_field(instance, field_name):

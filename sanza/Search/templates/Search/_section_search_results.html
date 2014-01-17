@@ -1,5 +1,5 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}
   {% trans "Search results" %} :
@@ -14,7 +14,7 @@
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
   {% autopaginate entities nb_entities_by_page %}
-  <table>
+  <table class="table table-striped">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -121,17 +121,17 @@
 
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   
 {% if entities %}
-<a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a>
-<a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a>
-<a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a>
-<a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">{% trans "Excel" %}</a>
-<a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a>
-<a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a>
-<a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a>
+<li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a></li>
+<li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a></li>
+<li><a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a></li>
+<li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">{% trans "Excel" %}</a></li>
+<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a></li>
+<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a></li>
+<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a></li>
 
-{% if user.is_superuser %}<a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a>{% endif %}
+{% if user.is_superuser %}<li><a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a></li>{% endif %}
 {% endif %}
 {% endblock %}

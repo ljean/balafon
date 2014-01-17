@@ -15,7 +15,7 @@ body {
   margin-bottom: 5px;
 }
 .row.section .section-content {
-  background: #f8f8f8;
+  background: #eee;
   padding: 1px;
   min-height: 100px;
 }
@@ -31,7 +31,7 @@ body {
 }
 .row.section .section-data .table.table-striped > tbody > tr:nth-child(even) > td,
 .row.section .section-data .table.table-striped > tbody > tr:nth-child(even) > th {
-  background-color: #eef;
+  background-color: #f8f8f8;
 }
 .row.section .section-data .table.table-bordered > tbody > tr > th {
   color: #888;
@@ -40,10 +40,10 @@ body {
   background-color: #fff;
 }
 .row.section .section-data .table.table-bordered > tbody > tr:nth-child(even) > td {
-  background-color: #eee;
+  background-color: #f8f8f8;
 }
 .note {
-  background: #ffc;
+  background: #ffeecc;
   padding: 2px;
 }
 .table-row {
@@ -87,6 +87,10 @@ body {
   background: #888888;
   margin-right: 2px;
 }
+.label-date {
+  color: #000;
+  margin-right: 2px;
+}
 .actions .action .label-in-charge {
   margin-top: 4px;
 }
@@ -116,21 +120,23 @@ body {
     border: solid thin #eee;
     background: #fff;
 }*/
-.label-date {
-  color: #000;
+.label-not-yet {
   background: #ccc;
 }
 .action-subject {
   display: inline-block;
   border: solid thin #f0f0fc;
-  min-width: 2px;
   vertical-align: top;
+  padding: 1px 4px;
+  background: #ffeecc;
+  color: #000;
 }
 .label-action-contact {
   background: #ccc;
 }
 .action-contacts {
   margin-top: 5px;
+  display: inline-block;
 }
 .row.section .section-data .table.table-bordered > tbody > tr > td,
 .row.section .section-data .table.table-bordered > tbody > tr > th {
@@ -146,7 +152,13 @@ body {
   margin-bottom: 2px;
 }
 .actions .action.even {
-  background: #eee;
+  background: #f8f8f8;
+}
+.actions .action .show-note {
+  color: #888;
+}
+.actions .action .show-note.has-note {
+  color: #000;
 }
 .prio-1,
 .prio-1 a {
@@ -190,7 +202,7 @@ body {
 .glyphicon-certificate.highlight {
   color: #fd4;
 }
-a .glyphicon-certificate.disabled {
+.glyphicon-certificate.disabled {
   color: #ccc;
 }
 .contact-entity-info,
@@ -237,35 +249,30 @@ li.quick-search-form {
 @media (max-width: 480px) {
   
 }
-.navbar {
-  background: #000;
-  color: #fff;
-}
-.navbar a:hover {
-  color: #ddd;
-}
-.navbar .dropdown-menu {
-  background: #000;
-  color: #fff;
-}
-.navbar .dropdown-menu a {
-  color: #fff;
-}
-.navbar .dropdown-menu a:hover {
-  color: #ddd;
-}
 .navbar img {
   background: #fff;
 }
-.navbar-default .navbar-text {
-  color: #fff;
+.action-note {
+  background: #ffeecc;
+  padding: 2px;
 }
-.navbar-default .navbar-nav > li > a {
-  color: #fff;
+.dropdown-menu > li > a.disabled {
+  color: #ccc;
 }
-.navbar-default .navbar-nav > .open > a,
-.navbar-default .navbar-nav > .open > a:hover,
-.navbar-default .navbar-nav > .open > a:focus {
-  color: #fff;
-  background-color: #000;
+.import-contact-intro {
+  padding: 10px;
+  font-size: 0.9em;
+  border: solid thin #444;
+  background: #eee;
+  margin-bottom: 10px;
+}
+.confirm-import-intro {
+  padding: 10px;
+  font-size: 0.9em;
+  border: solid thin #444;
+  background: #eee;
+  margin: 10px 0;
+}
+.font-small {
+  font-size: 0.8em;
 }

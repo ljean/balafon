@@ -13,6 +13,7 @@ from datetime import datetime, date
 from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
 from django.utils import timezone
+from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
@@ -549,7 +550,7 @@ class ContactCustomFieldForm(CustomFieldForm):
         return models.Contact
 
 
-class ContactsImportForm(forms.ModelForm):
+class ContactsImportForm(BsModelForm):
     
     class Meta:
         model = models.ContactsImport
@@ -557,7 +558,7 @@ class ContactsImportForm(forms.ModelForm):
         
     class Media:
         css = {
-            'all': ('chosen/chosen.css',)
+            'all': ('chosen/chosen.css', 'chosen/chosen-bootstrap.css')
         }
         js = (
             'chosen/chosen.jquery.js',
@@ -567,11 +568,12 @@ class ContactsImportForm(forms.ModelForm):
         super(ContactsImportForm, self).__init__(*args, **kwargs)
         
         self.fields['groups'].widget.attrs = {
-            'class': 'chzn-select',
+            'class': 'chosen-select form-control',
             'data-placeholder': _(u'The created entities will be added to the selected groups'),
-            'style': "width:600px;"
+            #'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
+        
         
     def clean_separator(self):
         if len(self.cleaned_data["separator"]) != 1:
