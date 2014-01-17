@@ -284,7 +284,7 @@ li.quick-search-form {
   margin-bottom: 10px;
 }
 .half-width {
-  width: 250px;
+  width: 50%;
   display: inline-block;
 }
 .chosen-container .chosen-drop .chosen-results li.group-result {
@@ -293,4 +293,11 @@ li.quick-search-form {
   font-weight: bold;
   color: #888;
   margin-left: -15px;
+}
+.search-btn {
+  margin-top: 10px;
+  margin-right: 5px;
+}
+.search-form .form .fields {
+  margin-top: 10px;
 }

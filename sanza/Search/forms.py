@@ -19,6 +19,9 @@ SEARCH_FORMS = None
 from django.utils import importlib
 from itertools import chain
 from datetime import datetime
+from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
+from django.template.loader import get_template
+from django.template import Context
 
 def load_from_name(constant_full_name):
     x = constant_full_name.split('.')
@@ -26,7 +29,7 @@ def load_from_name(constant_full_name):
     module = importlib.import_module(constant_path)
     return getattr(module, constant_name)
 
-class QuickSearchForm(forms.Form):
+class QuickSearchForm(BsForm):
     """Quick search form which is included in the menu"""
     text = forms.CharField(required=True,
         widget=forms.TextInput(attrs={'placeholder': _(u'Quick search')}))
@@ -333,11 +336,11 @@ class SearchForm(forms.Form):
         f = FieldChoiceForm()
         return u"""
             {0}
-            <a class="btn btn-xs btn-primary add-field" href="">{1}</a>
-            <a class="btn btn-xs btn-default add-block" href="">{2}</a>
-            <a class="btn btn-xs btn-default duplicate-block" href="">{5}</a>
-            <a class="btn btn-xs btn-danger clear-block" href="">{3}</a>
-            <a class="btn btn-xs btn-danger remove-block" href="">{4}</a>""".format(
+            <a class="btn btn-xs btn-primary add-field" href=""><span class="glyphicon glyphicon-filter"></span> {1}</a>
+            <a class="btn btn-xs btn-default add-block" href=""><span class="glyphicon glyphicon-th-list"></span> {2}</a>
+            <a class="btn btn-xs btn-default duplicate-block" href=""><span class="glyphicon glyphicon-share"></span> {5}</a>
+            <a class="btn btn-xs btn-danger clear-block" href=""><span class="glyphicon glyphicon-remove"></span> {3}</a>
+            <a class="btn btn-xs btn-danger remove-block" href=""><span class="glyphicon glyphicon-trash"></span> {4}</a>""".format(
                 f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate'))
     
     def as_html(self):
@@ -352,7 +355,7 @@ class SearchForm(forms.Form):
                 html += '</div></div>'
         return html
 
-class SearchFieldForm(forms.Form):
+class SearchFieldForm(BsForm):
     def __init__(self, block, count, data=None, *args, **kwargs):
         self._block = block
         self._count = count
@@ -367,6 +370,7 @@ class SearchFieldForm(forms.Form):
         
     def _add_field(self, field):
         field.required = True
+        field.widget.attrs['class'] = "form-control"
         self.fields[self._get_field_name()] = field
         
     def clean(self):
@@ -376,13 +380,16 @@ class SearchFieldForm(forms.Form):
         return {self._name: self._value}
         
     def as_it_is(self):
-        "Returns this form rendered as HTML <p>s."
-        return self._html_output(
-            normal_row = u'<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s <a href="" class="btn btn-xs btn-warning remove-field">{0}</a></p>'.format(_(u'Remove')),
-            error_row = u'%s',
-            row_ender = '</p>',
-            help_text_html = u' <span class="helptext">%s</span>',
-            errors_on_separate_row = True)
+        t = get_template("Search/_search_field_form.html")
+        return t.render(Context({"form": self}))
+        #delete_btn = '<a href="" class="btn btn-xs btn-warning remove-field"><span class="glyphicon glyphicon-minus-sign"></span> {0}</a>'.format(_(u'Remove'))
+        #"Returns this form rendered as HTML <p>s."
+        #return self._html_output(
+        #    normal_row = u'<div class="form-group"><div class="">%(label)s{0} %(field)s %(help_text)s</div>'.format(delete_btn),
+        #    error_row = u'%s',
+        #    row_ender = '</p>',
+        #    help_text_html = u' <span class="helptext">%s</span>',
+        #    errors_on_separate_row = True)
         
 class TwoDatesForm(SearchFieldForm):
     

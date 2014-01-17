@@ -15,7 +15,10 @@
 </div>
 
 <form role="form" class="form-horizontal search-form" action="{% url "search" %}" method="post">{% csrf_token %}
-  <a class="btn btn-primary pull-right" href="" id="search-button">{% trans "Search" %}</a>
+  <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
+    <span class="glyphicon glyphicon-search"></span>
+    {% trans "Search" %}
+  </a>
   {{search_form.as_html|safe}}
   <div class="form">
   </div>

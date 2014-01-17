@@ -14,7 +14,7 @@
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
   {% autopaginate entities nb_entities_by_page %}
-  <table class="table table-striped">
+  <table class="table table-bordered font-small">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -35,9 +35,11 @@
       {% if contacts %}
         {% for c in contacts %}
           <div class="contact contact-sr">
-            <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
+            <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
             {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-            <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
+            <a class="btn btn-xs btn-warning pull-right" href="" class="exclude-contact" rel="{{c.id}}">
+              <span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}
+            </a>
           </div>
         {% endfor %}
       {% else %}
