@@ -1,5 +1,5 @@
-{% extends "sanza/base.html" %}
-{% load i18n %}{% load url from future %}
+{% extends "sanza/bs_base.html" %}
+{% load i18n %}
 
 {% block extra_head %}
   {{block.super}}
@@ -25,17 +25,21 @@
     {% trans "Create group" %}
   {% endif %}</h2>
   <form method="POST" action="">{% csrf_token %}
-    <div class="buttons">
-    <input type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
-    {% if group %}
-      <a class="colorbox-form" href="{% url "crm_delete_group" group.id %}">{% trans "Delete" %}</a>
-      <a href="{{ next_url }}">{% trans "Cancel" %}</a>
-    {% else %}
-      <a href="{% url "crm_see_my_groups" %}">{% trans "Cancel" %}</a>
-    {% endif %}
-    </div>
-    <table class="edit-group-fields">
+    <table class="table">
       {{form.as_table}}
-    </ul>
+    </table>
+    <div class="row">
+      <div class="col-md-10">
+        <div class="buttons pull-right">
+          <input class="btn btn-md btn-primary" type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
+          {% if group %}
+            <a class="btn btn-md btn-default" class="colorbox-form" href="{% url "crm_delete_group" group.id %}">{% trans "Delete" %}</a>
+            <a class="btn btn-md btn-default" href="{{ next_url }}">{% trans "Cancel" %}</a>
+          {% else %}
+            <a class="btn btn-md btn-default" href="{% url "crm_see_my_groups" %}">{% trans "Cancel" %}</a>
+          {% endif %}
+          </div>
+      </div>
+    </div>
   </form>
 {% endblock %}

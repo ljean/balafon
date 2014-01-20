@@ -333,3 +333,14 @@ a.link-warning {
 .contact-table tr.excluded .include-btn {
   display: inline-block;
 }
+.selector h2 {
+  font-size: 14px;
+  margin: 0;
+  padding: 4px 0;
+}
+.selector select,
+.selector .selector-filter {
+  margin: 0;
+  border: solid thin #ccc !important;
+  margin-top: -10px;
+}

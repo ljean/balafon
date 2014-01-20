@@ -45,7 +45,7 @@ class AddContactToGroupForm(forms.Form):
             raise ValidationError(ugettext(u"The contact already belong to group {0}").format(name))
         return name
 
-class EditGroupForm(forms.ModelForm):
+class EditGroupForm(BsModelForm):
     class Meta:
         model = models.Group
         fields = ('name', 'description', 'subscribe_form', 'entities', 'contacts')
@@ -67,12 +67,24 @@ class EditGroupForm(forms.ModelForm):
     class Media:
         try:
             css = {
-                'all': (settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',)
+                'all': (
+                    settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',
+                    'css/bootstrap-transfer.css',
+                )
             }
+            js = (
+                'js/bootstrap-transfer.js',
+            )
         except AttributeError:
             css = {
-                'all': (settings.STATIC_URL+'admin/css/widgets.css',)
+                'all': (
+                    settings.STATIC_URL+'admin/css/widgets.css',
+                    'css/bootstrap-transfer.css',
+                )
             }
+            js = (
+                'js/bootstrap-transfer.js',
+            )
         
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -84,6 +96,8 @@ class EditGroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance')
         super(EditGroupForm, self).__init__(*args, **kwargs)
+        
+        widget = forms.SelectMultiple(attrs={'class': "bootstrap-transfer"})
         
         self.fields['entities'] = forms.ModelMultipleChoiceField(
             required=False,
