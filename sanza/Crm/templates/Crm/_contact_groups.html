@@ -1,4 +1,10 @@
 {% load i18n %}
+<div class="groups-header" style="margin: 10px 0 0 0;">
+  <span style="text-decoration: underline; font-weight: 600;">{% trans "Groups" %}</span>
+  <a title="{% trans "Add to group" %}" class="colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">
+    <span class="btn btn-primary btn-xs glyphicon glyphicon-plus" style="margin-top: -10px;"></span>
+  </a>
+</div>
 <div class="row">
   <div class="col-md-12">
     <div class="data-groups">
