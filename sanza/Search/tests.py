@@ -18,8 +18,9 @@ from django.utils.unittest.case import SkipTest
 from sanza.Crm import settings as crm_settings
 
 def get_form_errors(response):
-    soup = BeautifulSoup(response.content)
-    errors = soup.findAll('ul', {'class':'errorlist'})
+    soup = BeautifulSoup4(response.content)
+    #errors = soup.findAll('ul', {'class':'errorlist'})
+    errors = soup.select('.field-error .label')
     return errors
 
 class BaseTestCase(TestCase):

@@ -37,7 +37,7 @@
 {% if relationships %}
   {% for r in relationships %}
   {% with r.contact.has_left as has_left %}
-  <tr class="{% if r.contact.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+  <tr class="relationship {% if r.contact.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
     <td>{{r.type_name}}</td>
     {% if r.contact.entity.is_single_contact %}
     <td colspan="2"><a href="{% url "crm_view_contact" r.contact.id %}">{{r.contact.fullname}}</a></td>

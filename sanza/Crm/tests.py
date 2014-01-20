@@ -1905,7 +1905,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.get(reverse("crm_view_contact", args=[luke.id]))
         soup = BS4(response.content)
         
-        self.assertEqual(len(soup.select("table.contact-relationships tr")), 5)# 4 + title 
+        self.assertEqual(len(soup.select("table tr.relationship")), 4)# 4 + title 
         self.assertEqual(len(soup.select(".add-relation")), 1) # add button is enabled
         
         self.assertContains(response, anakin.fullname)
