@@ -382,14 +382,6 @@ class SearchFieldForm(BsForm):
     def as_it_is(self):
         t = get_template("Search/_search_field_form.html")
         return t.render(Context({"form": self}))
-        #delete_btn = '<a href="" class="btn btn-xs btn-warning remove-field"><span class="glyphicon glyphicon-minus-sign"></span> {0}</a>'.format(_(u'Remove'))
-        #"Returns this form rendered as HTML <p>s."
-        #return self._html_output(
-        #    normal_row = u'<div class="form-group"><div class="">%(label)s{0} %(field)s %(help_text)s</div>'.format(delete_btn),
-        #    error_row = u'%s',
-        #    row_ender = '</p>',
-        #    help_text_html = u' <span class="helptext">%s</span>',
-        #    errors_on_separate_row = True)
         
 class TwoDatesForm(SearchFieldForm):
     

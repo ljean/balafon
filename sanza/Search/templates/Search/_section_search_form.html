@@ -42,7 +42,7 @@
     }
     
     $(".remove-field").live('click', function() {
-      $(this).parent().remove();
+      $(this).closest(".field-form").remove();
       return false;
     });
     

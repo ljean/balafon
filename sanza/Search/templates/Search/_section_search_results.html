@@ -33,15 +33,23 @@
         
       {% with e.search_contacts as contacts %}
       {% if contacts %}
+        <table class="table contact-table table-striped font-small">
         {% for c in contacts %}
-          <div class="contact contact-sr">
+            <tr>
+            <td>
             <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
-            {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-            <a class="btn btn-xs btn-warning pull-right" href="" class="exclude-contact" rel="{{c.id}}">
-              <span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}
+              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}
+            </a>{% endif %}
+            </td>
+            <td>
+            <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+              <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+              <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
             </a>
-          </div>
+            </td>
+            </tr>
         {% endfor %}
+        </table>
       {% else %}
         &nbsp;
       {% endif %}
@@ -56,11 +64,12 @@
       $('a.exclude-contact').live('click', function() {
         var val = $("input[name=excluded]").val();
         var cid = '#'+$(this).attr('rel')+'#';
+        var parent = $(this).closest("tr");
         if (val.search(cid) >= 0) {
-          $(this).parent().removeClass('excluded');
+          parent.removeClass('excluded');
           val = val.replace('#'+$(this).attr('rel')+'#', '');
         } else {
-          $(this).parent().addClass('excluded');
+          parent.addClass('excluded');
           val += '#'+$(this).attr('rel')+'#';
         }
         $("input[name=excluded]").val(val);
