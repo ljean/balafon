@@ -19,7 +19,9 @@
     <span class="glyphicon glyphicon-search"></span>
     {% trans "Search" %}
   </a>
+  <div class="cur-form">
   {{search_form.as_html|safe}}
+  </div>
   <div class="form">
   </div>
 </form>
@@ -28,6 +30,8 @@
   $(function() {
     var block_count = {{search_form.block_count|default:0}};
     var field_count = 0;
+    
+    $(".cur-form select").chosen({width: "50%"});
     
     var add_block = function(no_remove) {
       var gr = $(".form").append($(".search-block-template").html());
@@ -101,8 +105,9 @@
           context: $(this).parent(),
           success: function(data){
             field_count += 1;
-            $(this).parent().find(".fields").append('<div class="form-group">'+data.form+'</div>');
+            $(this).parent().find(".fields").append(data.form);
             //$(this).parent().find("select[name='field_choice']").val('').trigger('change');
+            $(this).parent().find(".fields").find(".chosen-select").chosen();
           }
         });
       }

@@ -370,7 +370,10 @@ class SearchFieldForm(BsForm):
         
     def _add_field(self, field):
         field.required = True
-        field.widget.attrs['class'] = "form-control"
+        if not field.widget.attrs.get('class', None):
+            field.widget.attrs['class'] = "form-control"
+        else:
+            field.widget.attrs['class'] += " form-control"
         self.fields[self._get_field_name()] = field
         
     def clean(self):

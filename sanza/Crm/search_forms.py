@@ -264,7 +264,12 @@ class GroupSearchFormDropdownWidget(GroupSearchForm):
     _label = _(u'Group (dropdown list)')
     
     def _get_widget(self):
-        return None
+        return forms.Select(attrs={
+            'class': "chosen-select",
+            'data-placeholder': _(u'Group names'),
+            'style': "width: 100%", 
+        })
+
 
 class NotInGroupSearchForm(SearchFieldForm):
     _name = 'not_in_group'
