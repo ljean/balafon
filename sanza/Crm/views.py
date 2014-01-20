@@ -542,6 +542,7 @@ def get_contacts(request):
     return HttpResponse(json.dumps(contacts), 'application/json')
 
 @user_passes_test(can_access)
+@popup_redirect
 def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     contact = get_object_or_404(models.Contact, id=contact_id)
     
@@ -685,6 +686,7 @@ def same_as(request, contact_id):
 
 
 @user_passes_test(can_access)
+@popup_redirect
 def add_contact(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     contact = models.Contact(entity=entity)

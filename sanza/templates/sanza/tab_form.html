@@ -1,15 +1,17 @@
-{% extends "sanza/base.html" %}
+{% extends "colorbox/popup_form_base.html" %}
 {% load i18n %}
 
 {% block extra_head %}
 {{ block.super }}
-<style>
-    .doc-header {
-      min-height: 128px;
-    }
-</style>
+<link type="text/css" href="{{ STATIC_URL }}css/chosen-bootstrap.css" rel="Stylesheet" />
 <script>
   $(function() {
+    try {
+        $(".chosen-select").chosen({disable_search: false, width: "100%"});
+    } catch(e) {
+        //silence
+    }
+    
     var error_index = -1;
     $("form fieldset").each(function(idx, elt) {
       $(elt).addClass('item'+idx);
@@ -23,12 +25,14 @@
       $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').text()+'</span>');
       
     });
+    parent.$.colorbox.resize({width: "60%"});
     $(".tabbar .tab").live('click', function() {
       var item = $(this).attr('rel');
       $(this).siblings().removeClass("selected");
       $(this).addClass("selected");
       $("fieldset").hide();
       $("fieldset."+item).show();
+      parent.$.colorbox.resize(/*{width:x, height:y}*/);
     })
     if (error_index>0) {
       $(".tabbar .tab[rel=item"+error_index+"]").click();  
@@ -39,53 +43,37 @@
 </script>  
 {% endblock %}
 
-{% block document_content %}
+{% block form_fields %}
   
   <div class="doc-header">
   {% block doc_header %}
   {% endblock %}
   </div>
 
-  {% if form.errors   %}
-  <div class="error-msg">{% trans "The form is not valid." %}</div>
+  {% if form.errors %}
+  <div class="error-msg label label-danger">{% trans "The form is not valid." %}</div>
   {% endif %}
       
   <div class="tabbar"></div>
-  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
-  
-    <div class="buttons">
-    {% block form_buttons %}
-    {% endblock %}
-    </div>
-
-    <div class="">
-      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
-        {% for fieldset in form.fieldsets %}
-          <fieldset class="{{ fieldset.classes }}">
-          {% if fieldset.legend %}
-            <legend>{{ fieldset.legend }}</legend>
-          {% endif %}
-          {% if fieldset.description %}
-            <p class="description">{{ fieldset.description }}</p>
-          {% endif %}
-          <ul>
-          {% for field in fieldset %}
-            {% if field.is_hidden %}
-              {{ field }}
-            {% else %}
-              <li{{ field.row_attrs }}>
-                {{ field.errors }}
-                {{ field.label_tag }}
-                {{ field }}
-              </li>
+    <div class="tabbar-form">
+        {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+          {% for fieldset in form.fieldsets %}
+            <fieldset class="{{ fieldset.classes }}">
+            {% if fieldset.legend %}
+              <legend>{{ fieldset.legend }}</legend>
             {% endif %}
+            {% if fieldset.description %}
+              <p class="description">{{ fieldset.description }}</p>
+            {% endif %}
+            <div class="fieldsets">
+            {% for field in fieldset %}
+              {% include "sanza/_field_form.html" %}
+            {% endfor %}
+            </div>
+            </fieldset>
           {% endfor %}
-          </ul>
-          </fieldset>
-        {% endfor %}
     </div>
-  </form>
-  
-  {% block doc_footer %}
-  {% endblock %}
+    {% block doc_footer %}
+    {% endblock %}
+
 {% endblock %}

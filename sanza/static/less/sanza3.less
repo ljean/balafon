@@ -396,7 +396,7 @@ li.quick-search-form {
     margin-top: 10px;
 }
 
-.search-form .fields .field-error {
+.field-error {
     margin-top: -20px;
     margin-right: 20px;
     float: right;
@@ -456,4 +456,37 @@ a.link-warning {
 .contenteditable {
     min-height: 14px;
     padding: 2px; 
+}
+
+
+.tabbar {
+	border-bottom: solid 1px #ccc;
+    padding-right: 20px;
+}
+
+.tabbar .tab {
+	padding: 5px 10px;
+	border: solid 1px #aaa;
+	border-bottom: none;
+	background: #eee;
+	cursor: pointer;
+	border-radius: 5px 5px 0 0;
+	display: inline-block;
+	min-width: 50px;
+}
+
+.tabbar .tab.selected {
+	background: #ccc;
+}
+
+.tabbar .tab.error {
+	background: #e20;
+}
+
+.tabbar .tab.error.selected {
+	background: #d00;
+}
+
+.fieldsets .row {
+    margin-bottom: 15px;
 }

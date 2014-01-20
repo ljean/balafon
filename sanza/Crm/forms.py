@@ -13,7 +13,25 @@ from datetime import datetime, date
 from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
 from django.utils import timezone
-from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
+from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm, BootstrapableMixin
+
+class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css',)
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
+        
+    def __init__(self, *args, **kwargs):
+        super(BetterBsModelForm, self).__init__(*args, **kwargs)
+        self._bs_patch_field_class()
+        for field in self.fields.values():
+            if field.widget.__class__.__name__ == forms.Select().__class__.__name__:
+                klass = field.widget.attrs.get("class", "") 
+                if not "chosen-select" in klass:
+                    field.widget.attrs["class"] = klass + " chosen-select"
 
 class AddEntityToGroupForm(forms.Form):
     group_name = forms.CharField(label=_(u"Group name"),
@@ -190,7 +208,7 @@ class _CityBasedForm(object):
             except Exception, msg:
                 raise ValidationError(msg)
 
-class ModelFormWithCity(BetterModelForm, _CityBasedForm):
+class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
     def __init__(self, *args, **kwargs):
@@ -252,19 +270,17 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
-                'class': 'chzn-select', 'data-placeholder': _(u'Select roles'), 'style': "width:600px;"}),
+                'class': 'chosen-select', 'data-placeholder': _(u'Select roles'), 'style': "width: 100%;"}),
         }
         fieldsets = [
-            ('name', {'fields': ['gender', 'lastname', 'firstname', 'nickname', 'birth_date'], 'legend': _(u'Name')}),
-            ('job', {'fields': ['title', 'role', 'job'], 'legend': _(u'Job')}),
-            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
+            ('name', {'fields': ['gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'], 'legend': _(u'Name')}),
+            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact data')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'accept_notifications', 'has_left'], 'legend': _(u'Relationship')}),
-            ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
+            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'accept_notifications', 'has_left'], 'legend': _(u'Options')}),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
