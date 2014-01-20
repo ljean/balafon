@@ -40,10 +40,20 @@ def auto_save_data(request, model_type, field_name, obj_id):
     try:
         model = {
             "group": Group,
+            "contact": Contact,
+            "entity": Entity,
+            "action": Action,
         }[model_type]
         
         obj = get_object_or_404(model, id=obj_id)
-        setattr(obj, field_name, request.POST["value"])
+        
+        value = request.POST["value"]
+        value = value.strip(u" \t\r\n")
+        if value[-4:] == u"<br>":
+            value = value[:-4]
+        value = value.replace(u"<br>", u"\n").replace(u"&nbsp;", u" ")
+        
+        setattr(obj, field_name, value)
         obj.save()   
     except Http404:
         raise

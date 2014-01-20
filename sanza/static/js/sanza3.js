@@ -10,11 +10,12 @@ $(function() {
     }
     
     $(".contenteditable").blur(function() {
+        var t = (new Date()).getTime();
         var _that = $(this);
         $.ajax({
             type: "POST",
-            url: $(this).attr('rel'),
-            data: {value: $(this).text()},
+            url: $(this).attr('rel')+"?t="+t,
+            data: {value: $(this).html()},
             success: function(data) {
                 if (data.ok) {
                     //var elt = _that.after('<span class="success glyphicon glyphicon-saved"></span>');

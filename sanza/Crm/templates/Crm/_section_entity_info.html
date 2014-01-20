@@ -38,11 +38,12 @@
   </div>
   
   <div class="col-md-7">
-    {% if entity.notes %}
-    <div class="note">
-      {{entity.notes|linebreaksbr}}
+    
+    <div class="note" style="margin-bottom: 5px;">
+      <span class="contenteditable" contenteditable="true" rel="{% url "auto_save_data" "entity" "notes" entity.id %}">
+        {{entity.notes|linebreaksbr|default:"&nbsp;"}}
+      </span>
     </div>
-    {% endif %}
     
     {% include "Crm/_entity_groups.html" %}
     
