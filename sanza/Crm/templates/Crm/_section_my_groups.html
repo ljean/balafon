@@ -17,10 +17,11 @@
       <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
       <td>{{g.entities.count}} {% trans "entities" %}
       - {{g.contacts.count}} {% trans "contacts" %}</td>
-      <td>{{g.description|default:"&nbsp;"}}</td>
+      <td><span class="description contenteditable" contenteditable="true" rel="{% url "auto_save_data" "group" "description" g.id %}">
+        {{g.description}}</span></td>
       <td class="ico-col" title="{% trans "Edit" %}">
-        <a href="{% url "crm_edit_group" g.id %}">
-            <span class="glyphicon glyphicon-cog"></span>
+        <a class="btn btn-xs btn-default" href="{% url "crm_edit_group" g.id %}">
+            <span class="glyphicon glyphicon-cog"></span> {% trans "Edit" %}
       </a></td>
     </tr>
   {% endfor %}

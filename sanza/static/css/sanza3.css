@@ -344,3 +344,7 @@ a.link-warning {
   border: solid thin #ccc !important;
   margin-top: -10px;
 }
+.description.contenteditable {
+  background: #ffeecc;
+  padding: 2px;
+}

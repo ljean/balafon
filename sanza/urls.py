@@ -23,7 +23,8 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
-    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
+    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage"),
+    url(r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$', 'sanza.views.auto_save_data', name="auto_save_data"),
 )
 
 if 'sanza.Apis' in settings.INSTALLED_APPS:
