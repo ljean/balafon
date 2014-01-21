@@ -5,7 +5,8 @@
 {{ block.super }}
 <link type="text/css" href="{{ STATIC_URL }}css/chosen-bootstrap.css" rel="Stylesheet" />
 <script>
-  $(function() {
+  $(document).bind('cbox_complete', function(){
+    $(document).unbind('cbox_complete');
     try {
         $(".chosen-select").chosen({disable_search: false, width: "100%"});
     } catch(e) {
@@ -16,7 +17,7 @@
     $("form fieldset").each(function(idx, elt) {
       $(elt).addClass('item'+idx);
       var err_cls = "";
-      if ($(elt).find('.errorlist').length>0) {
+      if ($(elt).find('.field-error').length>0) {
         if (error_index==-1) {
           error_index = idx;
         }
@@ -48,11 +49,12 @@
   <div class="doc-header">
   {% block doc_header %}
   {% endblock %}
+  {% if form.errors %}
+  <div class="pull-right error-msg label label-danger">{% trans "The form is not valid." %}</div>
+  {% endif %}
   </div>
 
-  {% if form.errors %}
-  <div class="error-msg label label-danger">{% trans "The form is not valid." %}</div>
-  {% endif %}
+  
       
   <div class="tabbar"></div>
     <div class="tabbar-form">
