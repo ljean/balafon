@@ -241,9 +241,8 @@ class EntityForm(ModelFormWithCity):
         exclude = ('imported_by', 'is_single_contact')
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Phone / Web')}),
+            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Contact details')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('notes', {'fields': ['notes'], 'legend': _(u'Notes')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
         
@@ -278,7 +277,7 @@ class ContactForm(ModelFormWithCity):
         }
         fieldsets = [
             ('name', {'fields': ['gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact data')}),
+            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact details')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
             ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'accept_notifications', 'has_left'], 'legend': _(u'Options')}),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
@@ -286,7 +285,7 @@ class ContactForm(ModelFormWithCity):
         
     def __init__(self, *args, **kwargs):
         super(ContactForm, self).__init__(*args, **kwargs)
-        self.fields["role"].help_text = ""
+        self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
         
         if not 'sanza.Profile' in settings.INSTALLED_APPS:
             self.fields["accept_notifications"].widget = forms.HiddenInput()

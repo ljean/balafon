@@ -69,7 +69,7 @@
 {% endblock %}
 
 {% block section_buttons %}
-  <li><a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
   <li><a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a></li>
   <li><a class="" href="{% url "crm_edit_custom_fields" "entity" entity.id %}">{% trans "Edit fields" %}</a></li>
 

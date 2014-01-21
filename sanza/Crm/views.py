@@ -334,6 +334,7 @@ def see_my_groups(request):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def edit_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     entity.save() #update last access

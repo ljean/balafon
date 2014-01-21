@@ -377,3 +377,7 @@ a.link-warning {
 .fieldsets .row {
   margin-bottom: 15px;
 }
+ul.chosen-choices .search-field input {
+  height: 25px !important;
+  width: 300px !important;
+}
