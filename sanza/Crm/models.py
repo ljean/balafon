@@ -549,7 +549,7 @@ class Contact(TimeStampedModel):
             
     def __unicode__(self):
         if self.entity.is_single_contact:
-            return self.lastname
+            return u"{0} {1}".format(self.lastname, self.firstname)
         return u"{0} {1} ({2})".format(self.lastname, self.firstname, self.entity.name)
             
     @property

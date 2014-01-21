@@ -27,7 +27,7 @@
     <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
     <td>{{c.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
-    <td><a class="colorbox-form" href="javascript:alert('TODO')">
+    <td><a class="colorbox-form" href="{% url "crm_remove_same_as" contact.id c.id %}">
       <span class="glyphicon glyphicon-remove">
     </a></td>
   </tr>

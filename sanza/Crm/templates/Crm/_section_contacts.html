@@ -40,7 +40,7 @@
 
 {% block section_buttons %}
   {% if entity %}
-    <li><a class="" href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a></li>
+    <li><a class="colorbox-form" href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a></li>
   {% endif %}
   {% if entity and show_all_contacts %}
     <li><a class="" href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a></li>

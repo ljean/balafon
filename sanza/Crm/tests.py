@@ -234,6 +234,89 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, None)
         
+    def test_suggestion_list(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(1, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertTrue(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        
+    def test_suggestion_list_two_choices(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(2, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertTrue(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        self.assertTrue(contact4.id in ids)
+        
+    def test_suggestion_list_two_choices_existing_same_as(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(1, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertFalse(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        self.assertTrue(contact4.id in ids)
+        
+    def test_suggestion_list_two_choices_existing_same_as_with_all(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact4]:
+            c.same_as = same_as
+            c.save()
+            
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(0, len(soup.select('select')))
+        
+    def test_suggestion_list_nohomonymous(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+            
+        url = reverse("crm_same_as", args=[contact3.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(0, len(soup.select('select')))
+        
     def test_make_main_view(self):
         entity1 = mommy.make(models.Entity, name="Toto")
         entity2 = mommy.make(models.Entity, name="Titi")
@@ -281,6 +364,292 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, contact1.same_as)
         self.assertEqual(contact1.same_as.main_contact, contact1)
         
+    def test_remove_same_as_two_clones(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_two_clones_prio1(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        same_as.main_contact = contact1
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+        
+    def test_remove_same_as_two_clones_prio2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        same_as.main_contact = contact2
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_three_clones(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, None)
+        
+    def test_remove_same_as_three_clones_prio1(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact1
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact1)
+        
+    def test_remove_same_as_three_clones_prio2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact2
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact1)
+        
+    def test_remove_same_as_not_same(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_not_in_same_as(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact3.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, None)
+        
+    def test_remove_same_as_not_in_same_as_2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact3.id, contact1.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, None)
+        
+    def test_remove_same_as_three_clones_prio3(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact3
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact3)
+        
+    def test_remove_same_as_cancel(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact3
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact3)
+    
         
 class OpportunityAutoCompleteTest(BaseTestCase):
     def test_get_add_action(self):

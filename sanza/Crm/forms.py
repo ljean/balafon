@@ -448,12 +448,19 @@ class SameAsForm(forms.Form):
     
     def __init__(self, contact, *args, **kwargs):
         super(SameAsForm, self).__init__(*args, **kwargs)
-        self._same_as = [(c.id, u"{0} - {1}".format(unicode(c), c.entity))
-            for c in models.Contact.objects.filter(
-                lastname__iexact=contact.lastname, firstname__iexact=contact.firstname
-            ).exclude(id=contact.id)
-        ]
-        self.fields["contact"].widget = forms.Select(choices=self._same_as)
+        potential_contacts = models.Contact.objects.filter(
+            lastname__iexact=contact.lastname, firstname__iexact=contact.firstname,
+        ).exclude(id=contact.id)
+        if contact.same_as:
+            potential_contacts = potential_contacts.exclude(same_as=contact.same_as) # Do not propose again current SameAs
+        self._same_as = [(c.id, u"{0}".format(c)) for c in potential_contacts]
+        if len(self._same_as):
+            self.fields["contact"].widget = forms.Select(choices=self._same_as)
+        else:
+            self.fields["contact"].widget = forms.HiddenInput()    
+    
+    def has_choices(self):
+        return len(self._same_as)
         
     def clean_contact(self):
         contact_id = self.cleaned_data["contact"]

@@ -680,6 +680,16 @@ def same_as(request, contact_id):
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
     else:
         form = forms.SameAsForm(contact)
+        if not form.has_choices():
+            return render_to_response(
+                'sanza/message_dialog.html',
+                {
+                    'title': _(u'SameAs contacts'),
+                    'message': _(u"No homonymous for {0}").format(contact),
+                    'next_url': reverse('crm_view_contact', args=[contact.id]),
+                },
+                context_instance=RequestContext(request)
+            ) 
     
     return render_to_response(
         'Crm/same_as.html',
@@ -687,7 +697,48 @@ def same_as(request, contact_id):
         context_instance=RequestContext(request)
     )
 
-
+@user_passes_test(can_access)
+@popup_redirect
+def remove_same_as(request, current_contact_id, contact_id):
+    current_contact = get_object_or_404(models.Contact, id=current_contact_id)
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    if (not contact.same_as) or (not current_contact.same_as):
+        raise Http404
+    
+    same_as = contact.same_as
+    
+    if request.method == 'POST':
+        if 'confirm' in request.POST:
+            if same_as.contact_set.count()<=2:
+                for c in same_as.contact_set.all():
+                    c.same_as = None
+                    c.save()
+                same_as = models.SameAs.objects.get(id=same_as.id) # refresh
+                same_as.delete()
+            else:
+                if same_as.main_contact == contact:
+                    if contact.id != current_contact_id:
+                        same_as.main_contact = current_contact
+                    else:
+                        same_as.main_contact = None
+                    same_as.save()
+                contact.same_as = None
+                contact.save()
+        return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
+    
+    confirm_message = _(u'Are you sure that "{0}" and "{1}" are not identical?').format(contact, current_contact)
+    if same_as.contact_set.count()>2 and same_as.main_contact == contact:
+        confirm_message += _(u"\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(contact, current_contact)
+        
+    return render_to_response(
+        'sanza/confirmation_dialog.html',
+        {
+            'message': confirm_message,
+            'action_url': reverse("crm_remove_same_as", args=[current_contact_id, contact_id]),
+        },
+        context_instance=RequestContext(request)
+    )
+    
 @user_passes_test(can_access)
 @popup_redirect
 def add_contact(request, entity_id):

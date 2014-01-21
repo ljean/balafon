@@ -29,7 +29,7 @@
 <body>
   <div class="main">
     <div class="popup_content popup_form">
-      {% block content %}{{message}}{% endblock %}
+      {% block content %}{{message|linebreaksbr}}{% endblock %}
     </div>
     <div class="popup_buttons">
         {% block popup_buttons %}
