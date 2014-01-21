@@ -29,14 +29,14 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Add" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
           {% if SANZA_NO_ENTITY_TYPE %}
-              <li><a href="{% url "crm_create_entity" 0 %}">{% trans "Entity" %}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_create_entity" 0 %}">{% trans "Entity" %}</a></li>
           {% else %}
           {% for entity_type in SANZA_ENTITY_TYPES %}
-              <li><a href="{% url "crm_create_entity" entity_type.id %}">{{entity_type.name}}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">{{entity_type.name}}</a></li>
           {% endfor %}
           {% endif %}
           {% if SANZA_ALLOW_SINGLE_CONTACT %}
-              <li><a href="{% url "crm_add_single_contact" %}">{% trans "Single contact" %}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_add_single_contact" %}">{% trans "Single contact" %}</a></li>
           {% endif %}
           </ul>
         </li>

@@ -353,6 +353,7 @@ def edit_entity(request, entity_id):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def create_entity(request, entity_type_id):
     try:
         entity_type_id = int(entity_type_id)
@@ -719,6 +720,7 @@ def add_contact(request, entity_id):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def add_single_contact(request):
     if request.method == 'POST':
         contact = models.Contact()
