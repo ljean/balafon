@@ -8,7 +8,7 @@
 
 {% block title %}{% if contact %}{% trans "Edit contact" %}{% else %}{% trans "Create contact" %}{% endif %}{% endblock %}
 
-{% block form_url %}{% url "crm_edit_contact" contact.id %}{% endblock %}
+{% block form_url %}{% if contact %}{% url "crm_edit_contact" contact.id %}{% else %}{% if entity %}{% url "crm_add_contact" entity.id %}{% else %}{% url "crm_add_single_contact" %}{% endif %}{% endif %}{% endblock %}
 
 {% block doc_header %}
   <h2>

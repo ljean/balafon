@@ -380,6 +380,7 @@ def create_entity(request, entity_type_id):
             'entity': entity,
             'form': form,
             'create_entity': True,
+            'entity_type_id': entity_type_id,
         },
         context_instance=RequestContext(request)
     )

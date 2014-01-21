@@ -1008,7 +1008,7 @@ class SingleContactTest(BaseTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         self.assertEqual(models.Contact.objects.count(), 1)
@@ -1028,7 +1028,7 @@ class SingleContactTest(BaseTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         
@@ -1051,7 +1051,7 @@ class SingleContactTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         self.assertEqual(models.Contact.objects.count(), 1)
@@ -1073,7 +1073,7 @@ class SingleContactTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         self.assertEqual(models.Contact.objects.count(), 0)
@@ -1090,7 +1090,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Contact.objects.count(), 0)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         self.assertEqual(len(response.redirect_chain), 0)
         
@@ -1681,19 +1681,20 @@ class EditContactTestCase(BaseTestCase):
             'firstname': 'Paul',
             'city': models.City.objects.get(name="Paris").id,
         }
-        response = self.client.post(url, data, follow=True)
+        response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         next_url = reverse('crm_view_contact', args=[c.id])
-        self._check_redirect_url(response, next_url)
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
         
         c = models.Contact.objects.get(id=c.id)
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
         
-    def test_edit_contact_unknwonn_city(self):
+    def test_edit_contact_unknown_city(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
@@ -1702,19 +1703,20 @@ class EditContactTestCase(BaseTestCase):
             'city': "ImagineCity",
             'zip_code': "42999",
         }
-        response = self.client.post(url, data, follow=True)
+        response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         next_url = reverse('crm_view_contact', args=[c.id])
-        self._check_redirect_url(response, next_url)
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
         
         c = models.Contact.objects.get(id=c.id)
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.name, data['city'])
         
-    def test_edit_contact_unknwonn_city_no_zipcode(self):
+    def test_edit_contact_unknown_city_no_zipcode(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
@@ -1724,7 +1726,7 @@ class EditContactTestCase(BaseTestCase):
         }
         response = self.client.post(url, data, follow=True)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         self.assertEqual(len(response.redirect_chain), 0)
         
