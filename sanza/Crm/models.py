@@ -203,13 +203,16 @@ class Entity(TimeStampedModel):
         return reverse('crm_view_entity', args=[self.id])
 
     def get_full_address(self):
+        return u' '.join(self.get_address_fields())
+        
+    def get_address_fields(self):
         if self.city:
-            fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            fields = [self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])]
             country = self.city.get_foreign_country()
             if country:
                 fields.append(country.name)
-            return u' '.join([f for f in fields if f])
-        return u''
+            return [f for f in fields if f]
+        return []
     
     def get_country(self):
         return self.city.get_country() if self.city else None
@@ -440,13 +443,17 @@ class Contact(TimeStampedModel):
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, fmt, crop='center')
 
     def get_full_address(self):
+        return u' '.join(self.get_address_fields())
+    
+    def get_address_fields(self):
         if self.city:
-            fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            fields = [self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])]
             country = self.city.get_foreign_country()
             if country:
                 fields.append(country.name)
-            return u' '.join([f for f in fields if f])
-        return self.entity.get_full_address()
+            return [f for f in fields if f]
+        return self.entity.get_address_fields() 
+    
     
     def get_country(self):
         if self.city:

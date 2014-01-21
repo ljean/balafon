@@ -20,7 +20,7 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span class="glyphicon glyphicon-home"></span> {{entity.get_display_address}}
+        <span class="glyphicon glyphicon-home"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-home" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
         <span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
