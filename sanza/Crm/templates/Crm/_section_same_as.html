@@ -13,7 +13,9 @@
       {% if c == contact.same_as.main_contact %}
       <span class="glyphicon glyphicon-certificate highlight" title="{% trans "Is Main"%}"> </span>
       {% else %}
-        <span class="glyphicon glyphicon-certificate disabled" title="{% trans "Not Main"%}"> </span>
+        <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id c.id %}">
+          <span class="glyphicon glyphicon-certificate disabled" title="{% trans "Make main" %}"> </span>
+        </a>
       {% endif %}
     </td>
     {% if c.entity.is_single_contact %}
@@ -65,15 +67,6 @@
   <li>
     <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
   </li>
-  {% if contact.same_as %}
-    {% if contact == contact.same_as.main_contact %}
-      
-    {% else %}
-      <li><a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id %}">
-        {% trans "Make main" %}
-      </a></li>
-    {% endif %}
-  {% endif %}
   {% if contact.can_add_relation %}
     <li><a class="colorbox-form add-relation" href="{% url "crm_add_relationship" contact.id %}">{% trans "Add relationship" %}</a><li>
   {% endif %}

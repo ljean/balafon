@@ -69,7 +69,7 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^groups/list/$', 'get_groups', name='crm_get_groups'),
     url(r'^group-id/$', 'get_group_id', name='crm_get_group_id'),
     
-    url(r'^make-main-contact/(?P<contact_id>\d+)/$', 'make_main_contact', name='crm_make_main_contact'),
+    url(r'^make-main-contact/(?P<current_contact_id>\d+)/(?P<contact_id>\d+)/$', 'make_main_contact', name='crm_make_main_contact'),
     
     url(r'^toggle-action-bookmark/(?P<action_id>\d+)/$', 'toggle_action_bookmark', name='crm_toggle_action_bookmark'),
     url(r'^toggle-opportunity-bookmark/(?P<opportunity_id>\d+)/$', 'toggle_opportunity_bookmark', name='crm_toggle_opportunity_bookmark'),

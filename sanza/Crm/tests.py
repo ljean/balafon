@@ -244,7 +244,7 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data={'contact': contact2.id})
         self.assertEqual(200, response.status_code)
         
-        url = reverse("crm_make_main_contact", args=[contact1.id])
+        url = reverse("crm_make_main_contact", args=[contact1.id, contact1.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
@@ -267,7 +267,7 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data={'contact': contact2.id})
         self.assertEqual(200, response.status_code)
         
-        url = reverse("crm_make_main_contact", args=[contact1.id])
+        url = reverse("crm_make_main_contact", args=[contact1.id, contact1.id])
         
         response = self.client.post(url, data={'confirm': 1})
         self.assertEqual(200, response.status_code)

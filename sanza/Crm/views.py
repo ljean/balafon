@@ -1632,7 +1632,7 @@ def toggle_opportunity_bookmark(request, opportunity_id):
 
 @user_passes_test(can_access)
 @popup_redirect
-def make_main_contact(request, contact_id):
+def make_main_contact(request, current_contact_id, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     if not contact.same_as:
         raise Http404
@@ -1641,13 +1641,13 @@ def make_main_contact(request, contact_id):
         if 'confirm' in request.POST:
             contact.same_as.main_contact = contact
             contact.same_as.save()
-        return HttpResponseRedirect(reverse('crm_view_contact', args=[contact_id]))
+        return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
     
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
-            'message': _(u'Do you want to make this contact the default contact for this person?').format(contact),
-            'action_url': reverse("crm_make_main_contact", args=[contact_id]),
+            'message': _(u'Do you want to make the contact {0} to be the default contact for this person?').format(contact),
+            'action_url': reverse("crm_make_main_contact", args=[current_contact_id, contact_id]),
         },
         context_instance=RequestContext(request)
     )

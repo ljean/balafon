@@ -15,7 +15,7 @@
       {% if contact == contact.same_as.main_contact %}
         <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
     {% else %}
-      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id %}">
+      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id contact.id %}">
         <span class="glyphicon glyphicon-certificate disabled"  title="Make main contact"> </span>
       </a>
     {% endif %}
