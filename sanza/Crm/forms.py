@@ -317,28 +317,23 @@ class EntityRoleForm(forms.ModelForm):
     class Meta:
         model = models.EntityRole
 
-class ActionForm(BetterModelForm):
+class ActionForm(BetterBsModelForm):
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
     
     class Meta:
         model = models.Action
-        fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'contact', 'opportunity', 'detail',
-            'priority', 'amount', 'number', 'done', 'display_on_board', 'planned_date', 'archived')
+        fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
+            'amount', 'number', 'done', 'display_on_board', 'planned_date',)
         fieldsets = [
-            ('name', {'fields': ['subject', 'type', 'status', 'date', 'time', 'planned_date', 'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
-            ('details', {'fields': ['done', 'priority', 'contact', 'amount', 'number', 'detail'], 'legend': _(u'Details')}),
-            ('address', {'fields': ['display_on_board', 'archived'], 'legend': _(u'Display')}),
+            ('name', {'fields': ['subject', 'type', 'status', 'date', 'time', 'planned_date', 'in_charge'], 'legend': _(u'Summary')}),
+            ('details', {'fields': ['amount', 'number', 'detail'], 'legend': _(u'Details')}),
         ]
 
     def __init__(self, *args, **kwargs):
         entity = kwargs.pop('entity', None)
         instance = kwargs.get('instance', None)
         super(ActionForm, self).__init__(*args, **kwargs)
-        if entity and not entity.is_single_contact:
-            self.fields['contact'].queryset = models.Contact.objects.filter(entity=entity)
-        else:
-            self.fields['contact'].widget = forms.HiddenInput()
         
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             default_status = instance.type.default_status
@@ -347,16 +342,7 @@ class ActionForm(BetterModelForm):
             #self.fields['status'].initial = default_status.id if default_status else None
         #else:
         #    self.fields['status'].queryset = forms.HiddenInput()
-        
-        if instance and instance.entity:
-            self.fields['contact'].widget = forms.Select(choices=[(x.id, x.fullname) for x in instance.entity.contact_set.all()])
-        else:
-            self.fields['contact'].widget = forms.HiddenInput()
             
-        if 'opportunity' in self.fields:
-            self.fields['opportunity'].queryset = models.Opportunity.objects.filter(ended=False)
-            self.fields['opportunity'].widget = OpportunityAutoComplete(attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80'})
-        
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
         self.fields['planned_date'].widget = forms.HiddenInput()
         dt = self.instance.planned_date if self.instance else self.fields['planned_date'].initial

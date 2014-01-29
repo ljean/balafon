@@ -9,11 +9,6 @@
       {{title}} - <a href="{% url "crm_view_contact" contact.id %}">{{contact.fullname}}</a>
     {% else %}
       {% trans "Actions" %}
-      <span class="day-selector">
-        {% for d in days_choice %}
-        <a href="{% url "crm_board_panel" %}?days={{d}}" class="{% if days == d %}selected{% endif %}">{% blocktrans %}Next {{d}} days{% endblocktrans %}</a>
-        {% endfor %}
-      </span>
   {% endif %}{% endif %}
 {% endblock %}
   

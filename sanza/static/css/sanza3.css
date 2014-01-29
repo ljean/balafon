@@ -375,9 +375,20 @@ a.link-warning {
   background: #d00;
 }
 .fieldsets .row {
-  margin-bottom: 15px;
+  margin: 10px 0;
 }
 ul.chosen-choices .search-field input {
   height: 25px !important;
   width: 300px !important;
+}
+
+.confirm-message {
+  width: 300px;
+  font-size: 14px;
+  padding: 10px;
+}
+
+.popup-form-fields{
+  font-size: 14px;
+  padding: 10px;
 }

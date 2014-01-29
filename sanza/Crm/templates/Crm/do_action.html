@@ -1,4 +1,4 @@
-{% extends "colorbox/popup_form_base.html" %}
+{% extends "sanza/popup_form.html" %}
 {% load i18n %}{% load url from future %}
 {% block title %}{{action.subject}}{% endblock %}
 {% block form_url %}{% url "crm_do_action" action.id %}{% endblock %}

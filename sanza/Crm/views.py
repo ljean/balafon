@@ -870,6 +870,7 @@ def add_action_for_entity(request, entity_id):
     #)
 
 @user_passes_test(can_access)
+@popup_redirect
 def add_action_for_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     action = models.Action(contact=contact)
@@ -947,34 +948,23 @@ def view_contact_actions(request, contact_id, set_id):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def edit_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
-    entity = get_object_or_404(models.Entity, id=action.entity.id) if action.entity else None
-    contact = get_object_or_404(models.Contact, id=action.contact.id) if action.contact else None
-    
     if request.method == 'POST':
         form = forms.ActionForm(request.POST, instance=action)
         if form.is_valid():
             form.save()
-            if request.GET.get('keep_on_edit', False):
-                next_url = reverse('crm_edit_action', args=[action.id])
-            else:
-                next_url = request.session.get('redirect_url')
-                if not next_url:
-                    if entity:
-                        next_url = reverse('crm_view_entity', args=[entity.id])
-                    else:
-                        next_url = reverse('crm_view_contact', args=[contact.id])
+            next_url = request.session.get('redirect_url')
+            if not next_url:
+                next_url = reverse('crm_board_panel')
             return HttpResponseRedirect(next_url)
     else:
-        form = forms.ActionForm(instance=action, entity=entity)
-    
+        form = forms.ActionForm(instance=action)
     
     context = {
         'form': form,
         'action': action,
-        'entity': entity,
-        'contact': contact,
     }
     
     return render_to_response(

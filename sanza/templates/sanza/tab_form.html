@@ -1,8 +1,7 @@
-{% extends "colorbox/popup_form_base.html" %}
+{% extends "sanza/popup_form.html" %}
 {% load i18n %}
 
-{% block extra_head %}
-{{ block.super }}
+{% block extra_script %}
 <link type="text/css" href="{{ STATIC_URL }}css/chosen-bootstrap.css" rel="Stylesheet" />
 <script>
   $(document).bind('cbox_complete', function(){
@@ -23,7 +22,7 @@
         }
         var err_cls = "error";  
       }
-      $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').text()+'</span>');
+      $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').hide().text()+'</span>');
       
     });
     parent.$.colorbox.resize({width: "60%"});
@@ -56,24 +55,20 @@
 
   <div class="tabbar"></div>
     <div class="tabbar-form">
-        {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
-          {% for fieldset in form.fieldsets %}
-            <fieldset class="{{ fieldset.classes }}">
-            {% if fieldset.legend %}
-              <legend>{{ fieldset.legend }}</legend>
-            {% endif %}
-            {% if fieldset.description %}
-              <p class="description">{{ fieldset.description }}</p>
-            {% endif %}
-            <div class="fieldsets">
-            {% for field in fieldset %}
-              {% include "sanza/_field_form.html" %}
-            {% endfor %}
-            </div>
-            </fieldset>
-          {% endfor %}
+      {% if form.non_field_errors %}<div class="label label-danger">{{ form.non_field_errors }}</div>{% endif %}
+      {% for fieldset in form.fieldsets %}
+        <fieldset class="{{ fieldset.classes }}">
+        {% if fieldset.legend %}
+          <legend>{{ fieldset.legend }}</legend>
+        {% endif %}
+        <div class="fieldsets">
+        {% for field in fieldset %}
+          {% include "sanza/_field_form.html" %}
+        {% endfor %}
+        </div>
+        </fieldset>
+      {% endfor %}
     </div>
     {% block doc_footer %}
     {% endblock %}
-
 {% endblock %}

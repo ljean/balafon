@@ -29,11 +29,11 @@
 <body>
   <div class="main">
     <div class="popup_content popup_form">
-      {% block content %}{{message|linebreaksbr}}{% endblock %}
+      <div class="confirm-message">{% block content %}{{message|linebreaksbr}}{% endblock %}</div>
     </div>
     <div class="popup_buttons">
         {% block popup_buttons %}
-        <a href="" class="cancel_button">{% trans "Ok" %}</a>
+        <a href="" class="btn btn-primary cancel_button">{% trans "Ok" %}</a>
         {% endblock %}
     </div>
     
