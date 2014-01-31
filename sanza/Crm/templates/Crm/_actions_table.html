@@ -72,62 +72,76 @@
         </div>
         
           
-      <div>
-        <div class="action-contacts">
-        <span class="glyphicon glyphicon-user"></span>
-        {% if not contact %}
-          <div class="label label-action-contact">
-          {% if a.contact %}        
-              <a href="{% url "crm_view_contact" a.contact.id %}">{{ a.contact.fullname }}</a>
-              {% if not a.contact.entity.is_single_contact %}{% if not entity %}
-                (<a href="{% url "crm_view_entity" a.contact.entity.id %}">{{ a.contact.entity }}</a>)
-              {% endif %}{% endif %}
-          {% else %}
-            {% if a.entity %}
-              <a href="{% url "crm_view_entity" a.entity.id %}">{{ a.entity }}</a><
-            {% endif %}
-          {% endif %}
-          </div>
-        {% endif %}
-        &nbsp;<span class="glyphicon glyphicon-plus"></span>
-        </div>
-        
-        <div class="action-details pull-right">
-          
-          {% if a.type %}<div class="label label-default">{{ a.type }}</div>{% endif %}
-          {% if a.number %}<div class="label label-default">{% trans "Number"%}: {{a.number }}</div>{% endif %}
+        <div class="row">
+          <div class="col-md-7">
+            <div class="action-contacts">
+              <span class="label label-primary">
+                <span class="glyphicon glyphicon-user"></span>
+                <a href="{% url "crm_add_contact_to_action" a.id %}" class="colorbox-form">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </a>
+              </span>&nbsp;
+              {% for c in a.contacts.all %}
+                <span class="label label-default"><a href="{% url "crm_view_contact" c.id %}">{{ c.fullname }}</a>
+                  {% if not c.entity.is_single_contact %}
+                    <a href="{% url "crm_view_entity" c.entity.id %}">({{ c.entity }})</a>
+                  {% endif %}
+                  <a href="{% url "crm_remove_contact_from_action" a.id c.id %}" class="colorbox-form"><span class="glyphicon glyphicon-remove"></span></a>
+                </span>&nbsp;
+              {% endfor %}
             
-          {% if a.status %}<div class="label label-default">{{a.status}}</div>{% endif %}
-          {% if a.amount %}<div class="label label-default">{% trans "Amount"%}:{{a.amount }}</div>{% endif %}
-          
-          
-          {% if a.actiondocument or a.has_non_editable_document %}
-            <div class="btn btn-xs btn-default">
-              <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
-                <span class="glyphicon glyphicon-file" title="{% trans "document" %}"></span>
-                {% trans "View document" %}
+            <span class="label label-primary">
+              <span class="glyphicon glyphicon-tower"></span>
+              <a href="{% url "crm_add_entity_to_action" a.id %}" class="colorbox-form">
+                <span class="glyphicon glyphicon-plus"></span> 
+              </a>
+            </span>&nbsp;
+            
+            {% for e in a.entities.all %}
+              <span class="label label-default">
+                <a href="{% url "crm_view_entity" e.id %}">{{ e }}</a>
+                <a href="{% url "crm_remove_entity_from_action" a.id e.id %}" class="colorbox-form"><span class="glyphicon glyphicon-remove"></span></a>
+              </span>&nbsp;
+            {% endfor %}
+            &nbsp;
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="action-details pull-right">
+              
+              {% if a.type %}<div class="label label-default">{{ a.type }}</div>{% endif %}
+              {% if a.number %}<div class="label label-default">{% trans "Number"%}: {{a.number }}</div>{% endif %}
+                
+              {% if a.status %}<div class="label label-default">{{a.status}}</div>{% endif %}
+              {% if a.amount %}<div class="label label-default">{% trans "Amount"%}:{{a.amount }}</div>{% endif %}
+              
+              
+              {% if a.actiondocument or a.has_non_editable_document %}
+                <div class="btn btn-xs btn-default">
+                  <a href="{% url "crm_view_action_document" a.id %}" target="_blank">
+                    <span class="glyphicon glyphicon-file" title="{% trans "document" %}"></span>
+                    {% trans "View document" %}
+                  </a>
+                </div>
+              {% else %}
+                {% if a.has_editable_document %}
+                  <div class="btn btn-xs btn-default">
+                    <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
+                      <span class="glyphicon glyphicon-file" title="{% trans "add document" %}"></span>
+                      {% trans "Create document" %}
+                    </a>
+                  </div>
+                {% endif %}
+              {% endif %}
+              
+              <a href="{% url "crm_edit_action" a.id %}" class="colorbox-form">
+                  <span class="glyphicon glyphicon-cog" title="{% trans "Edit" %}"></span>
               </a>
             </div>
-          {% else %}
-            {% if a.has_editable_document %}
-              <div class="btn btn-xs btn-default">
-                <a href="{% url "crm_edit_action_document" a.id %}" target="_blank">
-                  <span class="glyphicon glyphicon-file" title="{% trans "add document" %}"></span>
-                  {% trans "Create document" %}
-                </a>
-              </div>
-            {% endif %}
-          {% endif %}
-          
-          <a href="{% url "crm_edit_action" a.id %}" class="colorbox-form">
-              <span class="glyphicon glyphicon-cog" title="{% trans "Edit" %}"></span>
-          </a>
+          </div>
         </div>
-      </div>
       </div>  
     </div>
-      
-    
   </div>
 {% endfor %}
 </div>

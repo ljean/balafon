@@ -20,7 +20,7 @@
 
 {% block title %}{% if action %}{% trans "Edit action" %}{% else %}{% trans "Create action" %}{% endif %}{% endblock %}
 
-{% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_add_action" owner.id %}{% endif %}{% endblock %}
+{% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_create_action" entity_id contact_id %}{% endif %}{% endblock %}
 
 
 {% block popup_buttons %}
@@ -28,11 +28,7 @@
     {% if action %}
     <a class="btn btn-default colorbox-form" href="{% url "crm_delete_action" action.id %}">{% trans "Delete" %}</a>
     {% endif %}
-    {% if entity %}
-      <a class="btn btn-default" href="{% url "crm_view_entity" entity.id %}">{% trans "Cancel" %}</a>
-    {% else %}{% if contact %}
-      <a class="btn btn-default" href="{% url "crm_view_contact" contact.id %}">{% trans "Cancel" %}</a>
-    {% endif %}{% endif %}
+    <a class="btn btn-default cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}
 
 {% block doc_footer %}

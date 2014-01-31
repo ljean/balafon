@@ -26,42 +26,31 @@ from django.template.defaultfilters import slugify
 from django.template.loader import find_template
 from sanza.Crm import settings as crm_settings
 from datetime import datetime
+from sanza.utils import HttpResponseRedirectMailtoAllowed
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
     
     all_contacts = request.GET.get('all', 0)
     
-    last_week = date.today() - timedelta(7)
     entity = get_object_or_404(models.Entity, id=entity_id)
     contacts = entity.contact_set.all().order_by("-main_contact", "lastname", "firstname")
     if not all_contacts:
         contacts = contacts.filter(has_left=False)
-    actions = models.Action.objects.filter(Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity),
-        Q(archived=False)).order_by("planned_date", "priority")
-    
-    #opportunities = models.Opportunity.objects.filter(Q(entity=entity)).order_by("type__name", "status__ordering", "start_date", "end_date", "ended")
-    opportunities = models.Opportunity.objects.filter(
-        Q(action__contact__entity=entity)).distinct().order_by("status__ordering")
+    actions = models.Action.objects.filter(Q(entities=entity) | Q(contacts__entity=entity),
+        Q(archived=False)).distinct().order_by("planned_date", "priority")
     
     actions_by_set = get_actions_by_set(actions)    
     
-    show_all_button = opportunities.count() > 10
-    if show_all_button:
-        opportunities = opportunities[:10]
     show_all_contacts = not all_contacts and (entity.contact_set.filter(has_left=True).count()>0)
     multi_user = True
-    #entity.save() #update last access
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])
     
     context = {
         'all_contacts': all_contacts,
-        'last_week': last_week,
         "entity": entity,
         'contacts': contacts,
         'actions_by_set': actions_by_set,
-        'opportunities': opportunities,
-        'show_all_button': show_all_button,
         'show_all_contacts': show_all_contacts,
         'multi_user': multi_user,
     }
@@ -197,13 +186,17 @@ def remove_entity_from_group(request, group_id, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     group = get_object_or_404(models.Group, id=group_id)
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            group.entities.remove(entity)
-        return HttpResponseRedirect(reverse('crm_view_entity', args=[entity_id]))
-    
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                group.entities.remove(entity)
+            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity_id]))
+    else:
+        form = forms.ConfirmForm()
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Do you want to remove {0.name} from the {1.name} group?').format(entity, group),
             'action_url': reverse("crm_remove_entity_from_group", args=[group_id, entity_id]),
         },
@@ -217,13 +210,17 @@ def remove_contact_from_group(request, group_id, contact_id):
         contact = get_object_or_404(models.Contact, id=contact_id)
         group = get_object_or_404(models.Group, id=group_id)
         if request.method == 'POST':
-            if 'confirm' in request.POST:
-                group.contacts.remove(contact)
+            form = forms.ConfirmForm(request.POST)
+            if form.is_valid():
+                if form.cleaned_data["confirm"]:
+                    group.contacts.remove(contact)
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact_id]))
-        
+        else:
+            form = forms.ConfirmForm()
         return render_to_response(
             'sanza/confirmation_dialog.html',
             {
+                'form': form,
                 'message': _(u'Do you want to remove {0.fullname} from the {1.name} group?').format(contact, group),
                 'action_url': reverse("crm_remove_contact_from_group", args=[group_id, contact_id]),
             },
@@ -275,15 +272,19 @@ def delete_group(request, group_id):
     group = get_object_or_404(models.Group, id=group_id)
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            group.delete()
-            return HttpResponseRedirect(reverse("crm_see_my_groups"))
-        else:
-            return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
-    
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                group.delete()
+                return HttpResponseRedirect(reverse("crm_see_my_groups"))
+            else:
+                return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
+    else:
+        form = forms.ConfirmForm()
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Are you sure to delete the group {0.name}?').format(group),
             'action_url': reverse("crm_delete_group", args=[group_id]),
         },
@@ -391,15 +392,19 @@ def create_entity(request, entity_type_id):
 def delete_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            entity.delete()
-            return HttpResponseRedirect(reverse('sanza_homepage'))
-        else:
-            return HttpResponseRedirect(reverse('crm_edit_entity', args=[entity.id]))
-    
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                entity.delete()
+                return HttpResponseRedirect(reverse('sanza_homepage'))
+            else:
+                return HttpResponseRedirect(reverse('crm_edit_entity', args=[entity.id]))
+    else:
+        form = forms.ConfirmForm()
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Are you sure to delete {0.name}?').format(entity),
             'action_url': reverse("crm_delete_entity", args=[entity_id]),
         },
@@ -651,13 +656,17 @@ def delete_relationship(request, contact_id, relationship_id):
         )   
     else:
         if request.method == 'POST':
-            if 'confirm' in request.POST:
-                relationship.delete()
-            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
-            
+            form = forms.ConfirmForm(request.POST)
+            if form.is_valid():
+                if form.cleaned_data["confirm"]:
+                    relationship.delete()
+                return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+        else:
+            form = forms.ConfirmForm()
         return render_to_response(
             'sanza/confirmation_dialog.html',
             {
+                'form': form,
                 'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
                 'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
             },
@@ -708,24 +717,27 @@ def remove_same_as(request, current_contact_id, contact_id):
     same_as = contact.same_as
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            if same_as.contact_set.count()<=2:
-                for c in same_as.contact_set.all():
-                    c.same_as = None
-                    c.save()
-                same_as = models.SameAs.objects.get(id=same_as.id) # refresh
-                same_as.delete()
-            else:
-                if same_as.main_contact == contact:
-                    if contact.id != current_contact_id:
-                        same_as.main_contact = current_contact
-                    else:
-                        same_as.main_contact = None
-                    same_as.save()
-                contact.same_as = None
-                contact.save()
-        return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
-    
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                if same_as.contact_set.count()<=2:
+                    for c in same_as.contact_set.all():
+                        c.same_as = None
+                        c.save()
+                    same_as = models.SameAs.objects.get(id=same_as.id) # refresh
+                    same_as.delete()
+                else:
+                    if same_as.main_contact == contact:
+                        if contact.id != current_contact_id:
+                            same_as.main_contact = current_contact
+                        else:
+                            same_as.main_contact = None
+                        same_as.save()
+                    contact.same_as = None
+                    contact.save()
+            return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
+    else:
+        form = forms.ConfirmForm()
     confirm_message = _(u'Are you sure that "{0}" and "{1}" are not identical?').format(contact, current_contact)
     if same_as.contact_set.count()>2 and same_as.main_contact == contact:
         confirm_message += _(u"\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(contact, current_contact)
@@ -733,6 +745,7 @@ def remove_same_as(request, current_contact_id, contact_id):
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': confirm_message,
             'action_url': reverse("crm_remove_same_as", args=[current_contact_id, contact_id]),
         },
@@ -817,19 +830,24 @@ def delete_contact(request, contact_id):
     entity = contact.entity
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            if contact.entity.is_single_contact:
-                contact.entity.delete()
-                return HttpResponseRedirect(reverse('crm_board_panel'))
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                if contact.entity.is_single_contact:
+                    contact.entity.delete()
+                    return HttpResponseRedirect(reverse('crm_board_panel'))
+                else:
+                    contact.delete()
+                    return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
             else:
-                contact.delete()
-                return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
-        else:
-            return HttpResponseRedirect(reverse('crm_edit_contact', args=[contact.id]))
+                return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
+    else:
+        form = forms.ConfirmForm()
     
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Are you sure to delete the contact "{0}"?').format(contact),
             'action_url': reverse("crm_delete_contact", args=[contact_id]),
         },
@@ -949,6 +967,54 @@ def view_contact_actions(request, contact_id, set_id):
 
 @user_passes_test(can_access)
 @popup_redirect
+def create_action(request, entity_id, contact_id):
+    #entity_id or contact_id can be 0
+    #add from menu -> both are 0 / add from contact -> entity_id = 0 / add from entity -> contact_id = 0
+    contact_id = int(contact_id)
+    entity_id = int(entity_id)
+    contact = get_object_or_404(models.Contact, id=contact_id) if contact_id else None
+    entity = get_object_or_404(models.Entity, id=entity_id) if entity_id else None
+    
+    if request.method == 'POST':
+        form = forms.ActionForm(request.POST)
+        if form.is_valid():
+            next_url = request.session.get('redirect_url')
+            action = form.save()
+            if entity:
+                action.entities.add(entity)
+                if not next_url:
+                    next_url = reverse("crm_view_entity", args=[entity.id])
+            elif contact:
+                action.contacts.add(contact)
+                if not next_url:
+                    next_url = reverse("crm_view_contact", args=[contact.id])
+            else:
+                action.display_on_board = True
+            action.save()
+            
+            if not next_url:
+                next_url = reverse('crm_board_panel')
+            return HttpResponseRedirect(next_url)
+    else:
+        initial = {}
+        if request.user.is_staff and request.user.first_name:
+            initial['in_charge'] = request.user
+        form = forms.ActionForm(initial=initial)
+    
+    context = {
+        'form': form,
+        'contact_id': contact_id,
+        'entity_id': entity_id,
+    }
+    
+    return render_to_response(
+        'Crm/edit_action.html',
+        context,
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
 def edit_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
     if request.method == 'POST':
@@ -979,24 +1045,27 @@ def delete_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            next_url = request.session.get('redirect_url')
-            
-            if not next_url and action.entity:
-                next_url = reverse('crm_view_entity', args=[action.entity.id])    
-            
-            if not next_url and action.contact:
-                next_url = reverse('crm_view_contact', args=[action.contact.id])
-            
-            action.delete()
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                next_url = request.session.get('redirect_url')
+                
+                if not next_url and action.entities.count():
+                    next_url = reverse('crm_view_entity', args=[action.entities.all()[0].id])    
+                
+                if not next_url and action.contacts.count():
+                    next_url = reverse('crm_view_contact', args=[action.contacts.all()[0].id])
+                
+                action.delete()
             
             return HttpResponseRedirect(next_url or reverse('sanza_homepage'))
-        else:
-            return HttpResponseRedirect(reverse('crm_edit_action', args=[action.id]))
-    
+    else:
+        form = forms.ConfirmForm()
+        
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Are you sure to delete this action?'),
             'action_url': reverse("crm_delete_action", args=[action_id]),
         },
@@ -1084,13 +1153,21 @@ def view_opportunity(request, opportunity_id):
     actions = opportunity.action_set.filter(archived=False)
     actions_by_set = get_actions_by_set(actions)
     
+    contacts = []
+    for action in actions:
+        contacts += [c for c in action.contacts.all()]
+        for e in action.entities.all():
+            contacts += [c for c in e.contact_set.all()]
+    contacts = list(set(contacts))
+    contacts.sort(key=lambda x: x.lastname.lower())
+    
     #contacts = list(set([a.contact for a in actions if a.contact]))
     #contacts.sort(key=lambda x: x.lastname.lower())
     #
     context = {
         'opportunity': opportunity,
         'actions_by_set': actions_by_set,
-        #'contacts': contacts,
+        'contacts': contacts,
         #'mailto': True
     }
         
@@ -1105,12 +1182,17 @@ def mailto_opportunity_contacts(request, opportunity_id):
     """Open the mail client in order to send email to contacts"""
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
     actions = opportunity.action_set.all()
-    emails = set([a.contact.get_email for a in actions if a.contact and a.contact.get_email])
-    if len(emails)>50:
-        return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
+    emails = []
+    for action in actions:
+        emails += [c.get_email for c in action.contacts.all() if c.get_email]
+        for e in action.entities.all():
+            emails += [c.get_email for c in e.contact_set.all() if c.get_email]
+    emails = set(emails)
+    if len(emails)>25:
+        return HttpResponse(' '.join(emails), mimetype='text/plain')
     else:
         mailto = u'mailto:'+','.join(emails)
-        return HttpResponseRedirect(mailto)
+        return HttpResponseRedirectMailtoAllowed(mailto)
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1119,16 +1201,21 @@ def delete_opportunity(request, opportunity_id):
     #entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            opportunity.delete()
-            next_url = reverse('crm_board_panel')    
-            return HttpResponseRedirect(next_url)
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                opportunity.delete()
+                next_url = reverse('crm_board_panel')    
+                return HttpResponseRedirect(next_url)
         else:
-            return HttpResponseRedirect(reverse('crm_edit_opportunity', args=[opportunity.id]))
-    
+            return HttpResponseRedirect(reverse('crm_view_opportunity', args=[opportunity.id]))
+    else:
+        form = forms.ConfirmForm()
+                
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Are you sure to delete the opportunity "{0}"?').format(opportunity),
             'action_url': reverse("crm_delete_opportunity", args=[opportunity_id]),
         },
@@ -1137,26 +1224,15 @@ def delete_opportunity(request, opportunity_id):
 
 @user_passes_test(can_access)
 def view_board_panel(request):
-    days = getattr(settings, 'SANZA_DAYS_OF_ACTIONS_ON_PANEL', 30)
+    #dt_filter = [Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)]
     
-    try:
-        days = int(request.GET.get('days', days))
-    except ValueError:
-        logger.exception("view_board_panel --> 404")
-        raise Http404
-    
-    until_date = date.today() + timedelta(days)
-    dt_filter = [Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)]
-    
-    actions = models.Action.objects.filter(archived=False, display_on_board=True, *dt_filter).order_by(
+    actions = models.Action.objects.filter(archived=False, display_on_board=True).order_by(
         "planned_date", "priority")
     
     opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("status__ordering")
     partial = True
     
     default_my_actions = True
-    days_choice = list(set((days, 7, 14, 30)))
-    days_choice.sort()
     
     request.session["redirect_url"] = reverse('crm_board_panel')
     return render_to_response(
@@ -1245,6 +1321,100 @@ def select_contact_and_redirect(request, view_name, template_name, choices=None)
     return render_to_response(
         template_name,
         {'form': form, 'post_url': post_url},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def add_contact_to_action(request, action_id):
+    action = get_object_or_404(models.Action, id=action_id)
+    if request.method == 'POST':
+        form = forms.SelectContactForm(request.POST)
+        if form.is_valid():
+            next_url = request.session.get('redirect_url') or reverse("crm_board_panel")
+            contact = form.cleaned_data["contact"]
+            action.contacts.add(contact)
+            action.save()
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.SelectContactForm()
+    
+    return render_to_response(
+        "Crm/add_contact_to_action.html",
+        {'form': form, 'action': action},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def remove_contact_from_action(request, action_id, contact_id):
+    action = get_object_or_404(models.Action, id=action_id)
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    if request.method == 'POST':
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                next_url = request.session.get('redirect_url') or reverse("crm_board_panel")
+                action.contacts.remove(contact)
+                action.save()
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.ConfirmForm()
+    
+    return render_to_response(
+        'sanza/confirmation_dialog.html',
+        {
+            'form': form,
+            'message': _(u'Do you to remove {0} from this action?').format(contact),
+            'action_url': reverse("crm_remove_contact_from_action", args=[action_id, contact_id]),
+        },
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def add_entity_to_action(request, action_id):
+    action = get_object_or_404(models.Action, id=action_id)
+    if request.method == 'POST':
+        form = forms.SelectEntityForm(request.POST)
+        if form.is_valid():
+            next_url = request.session.get('redirect_url') or reverse("crm_board_panel")
+            entity = form.cleaned_data["entity"]
+            action.entities.add(entity)
+            action.save()
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.SelectEntityForm()
+    
+    return render_to_response(
+        "Crm/add_entity_to_action.html",
+        {'form': form, 'action': action},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def remove_entity_from_action(request, action_id, entity_id):
+    action = get_object_or_404(models.Action, id=action_id)
+    entity = get_object_or_404(models.Contact, id=entity_id)
+    if request.method == 'POST':
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                next_url = request.session.get('redirect_url') or reverse("crm_board_panel")
+                action.entities.remove(entity)
+                action.save()
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.ConfirmForm()
+    
+    return render_to_response(
+        'sanza/confirmation_dialog.html',
+        {
+            'form': form,
+            'message': _(u'Do you to remove {0} from this action?').format(entity),
+            'action_url': reverse("crm_remove_entity_from_action", args=[action_id, entity_id]),
+        },
         context_instance=RequestContext(request)
     )
 
@@ -1682,14 +1852,19 @@ def make_main_contact(request, current_contact_id, contact_id):
         raise Http404
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            contact.same_as.main_contact = contact
-            contact.same_as.save()
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                contact.same_as.main_contact = contact
+                contact.same_as.save()
         return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
-    
+    else:
+        form = forms.ConfirmForm()
+        
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Do you want to make the contact {0} to be the default contact for this person?').format(contact),
             'action_url': reverse("crm_make_main_contact", args=[current_contact_id, contact_id]),
         },

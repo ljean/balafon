@@ -324,10 +324,11 @@ class ActionForm(BetterBsModelForm):
     class Meta:
         model = models.Action
         fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
-            'amount', 'number', 'done', 'display_on_board', 'planned_date',)
+            'amount', 'number', 'planned_date',)
         fieldsets = [
-            ('name', {'fields': ['subject', 'type', 'status', 'date', 'time', 'planned_date', 'in_charge'], 'legend': _(u'Summary')}),
-            ('details', {'fields': ['amount', 'number', 'detail'], 'legend': _(u'Details')}),
+            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'in_charge'], 'legend': _(u'Summary')}),
+            ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
+            ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
 
     def __init__(self, *args, **kwargs):
@@ -348,9 +349,12 @@ class ActionForm(BetterBsModelForm):
         dt = self.instance.planned_date if self.instance else self.fields['planned_date'].initial
         if dt:
             self.fields["date"].initial = dt.date()
-            utc_dt = dt.replace(tzinfo=timezone.utc)
-            loc_dt = utc_dt.astimezone(timezone.get_current_timezone())
-            self.fields["time"].initial = loc_dt.time()
+            if settings.USE_TZ:
+                utc_dt = dt.replace(tzinfo=timezone.utc)
+                loc_dt = utc_dt.astimezone(timezone.get_current_timezone())
+                self.fields["time"].initial = loc_dt.time()
+            else:
+                self.fields["time"].initial = dt.time()
         
     def clean_status(self):
         t = self.cleaned_data['type']
@@ -427,8 +431,7 @@ class SelectContactForm(forms.Form):
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
             raise ValidationError(ugettext(u"The contact does'nt exist"))
-
-    
+        
 class SameAsForm(forms.Form):
     contact = forms.IntegerField(label=_(u"Contact"))
     
@@ -720,4 +723,6 @@ class ChangeContactEntityForm(forms.Form):
         meth = self.meth_map[option]
         meth()
         
-        
+class ConfirmForm(forms.Form):
+    confirm = forms.BooleanField(initial=True, widget=forms.HiddenInput(), required=False)
+    

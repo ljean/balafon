@@ -100,10 +100,12 @@ def send_newsletter(emailing, max_nb):
             
             #create action
             action = Action.objects.create(
-                entity = contact.entity, subject=context['title'], planned_date=emailing.scheduling_dt,
-                type = emailing_action_type, detail=text, contact=contact, done=True,
+                subject=context['title'], planned_date=emailing.scheduling_dt,
+                type = emailing_action_type, detail=text, done=True,
                 display_on_board=False, done_date=datetime.now()
             )
+            action.contacts.add(contact)
+            action.save()
             
         #print contact, "processed"
         emailing.send_to.remove(contact)
@@ -115,13 +117,15 @@ def send_newsletter(emailing, max_nb):
  
 def create_subscription_action(contact, subscriptions):
     at, _x = ActionType.objects.get_or_create(name=_(u"Subscription"))
-    return Action.objects.create(
+    action = Action.objects.create(
         subject = _(u"Subscribe to {0}").format(u", ".join(subscriptions)),
         type = at,
         planned_date = datetime.now(),
-        contact = contact,
         display_on_board = False
     )
+    action.contacts.add(contact)
+    action.save()
+    return action
 
 def send_notification_email(request, contact, actions, message):
     #send an email

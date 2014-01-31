@@ -392,3 +392,11 @@ ul.chosen-choices .search-field input {
   font-size: 14px;
   padding: 10px;
 }
+
+.label.label-default a, .label.label-primary a {
+  color: #fff;
+}
+
+.label.label-default a:hover, .label.label-primary a:hover {
+  color: #eee;
+}

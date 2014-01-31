@@ -729,14 +729,12 @@ class Action(TimeStampedModel):
         (PRIORITY_HIGH, _(u'high priority')),
     )
 
-    entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
     subject = models.CharField(_(u'subject'), max_length=200, blank=True, default="")
     planned_date = models.DateTimeField(_(u'planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_(u'detail'), blank=True, default='')
     priority = models.IntegerField(_(u'priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
     opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
-    contact = models.ForeignKey(Contact, blank=True, default=None, null=True, verbose_name=_(u'contact'))
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
@@ -746,6 +744,8 @@ class Action(TimeStampedModel):
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     number = models.IntegerField(_(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.'))
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
+    contacts = models.ManyToManyField(Contact, blank=True, default=None, null=True, verbose_name=_(u'contacts'))
+    entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)

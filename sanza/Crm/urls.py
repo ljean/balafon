@@ -74,6 +74,12 @@ urlpatterns = patterns('sanza.Crm.views',
     
     url(r'^toggle-action-bookmark/(?P<action_id>\d+)/$', 'toggle_action_bookmark', name='crm_toggle_action_bookmark'),
     url(r'^toggle-opportunity-bookmark/(?P<opportunity_id>\d+)/$', 'toggle_opportunity_bookmark', name='crm_toggle_opportunity_bookmark'),
+
+    url(r'^add-contact-to-action/(?P<action_id>\d+)/$', 'add_contact_to_action', name='crm_add_contact_to_action'),
+    url(r'^add-entity-to-action/(?P<action_id>\d+)/$', 'add_entity_to_action', name='crm_add_entity_to_action'),
+    url(r'^remove-contact-from-action/(?P<action_id>\d+)/(?P<contact_id>\d+)/$', 'remove_contact_from_action', name='crm_remove_contact_from_action'),
+    url(r'^remove-entity-from-action/(?P<action_id>\d+)/(?P<entity_id>\d+)/$', 'remove_entity_from_action', name='crm_remove_entity_from_action'),
+    url(r'^create-action/(?P<entity_id>\d+)/(?P<contact_id>\d+)/$', 'create_action', name='crm_create_action'),
 )
 
 urlpatterns += patterns('',

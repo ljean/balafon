@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
@@ -11,11 +11,18 @@ class Migration(DataMigration):
         # Note: Don't use "from appname.models import ModelName". 
         # Use orm.ModelName to refer to models in this application,
         # and orm['appname.ModelName'] for models in other applications.
-        for g in orm['Crm.Group'].objects.all(): g.save() #It should strip the names
+        for a in orm.Action.objects.all():
+            if a.contact: a.contacts.add(a.contact)
+            if a.entity: a.entities.add(a.entity)
+            a.save()    
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        #No ways to go backwards
+        for a in orm.Action.objects.all():
+            if a.contacts.count():
+                a.contact = a.contacts.all()[0]
+            if a.entities.count():
+                a.entity = a.entities.all()[0]
+            a.save()
 
     models = {
         u'Crm.action': {
@@ -23,11 +30,13 @@ class Migration(DataMigration):
             'amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '11', 'decimal_places': '2'}),
             'archived': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'null': 'True', 'blank': 'True'}),
+            'contacts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'contact_actions'", 'default': 'None', 'to': u"orm['Crm.Contact']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'detail': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'display_on_board': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'db_index': 'True'}),
             'done': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
             'done_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'entities': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'entity_actions'", 'default': 'None', 'to': u"orm['Crm.Entity']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'entity': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Entity']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'in_charge': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
@@ -36,6 +45,7 @@ class Migration(DataMigration):
             'opportunity': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Opportunity']", 'null': 'True', 'blank': 'True'}),
             'planned_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
             'priority': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
+            'status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ActionStatus']", 'null': 'True', 'blank': 'True'}),
             'subject': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ActionType']", 'null': 'True', 'blank': 'True'})
         },
@@ -47,15 +57,24 @@ class Migration(DataMigration):
             'template': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'Crm.actionset': {
-            'Meta': {'object_name': 'ActionSet'},
+            'Meta': {'ordering': "['ordering']", 'object_name': 'ActionSet'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '10'})
+        },
+        u'Crm.actionstatus': {
+            'Meta': {'ordering': "['ordering']", 'object_name': 'ActionStatus'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'ordering': ('django.db.models.fields.IntegerField', [], {'default': '10'})
         },
         u'Crm.actiontype': {
             'Meta': {'object_name': 'ActionType'},
+            'allowed_status': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.ActionStatus']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
+            'default_status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'type_default_status_set'", 'null': 'True', 'blank': 'True', 'to': u"orm['Crm.ActionStatus']"}),
             'default_template': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'last_number': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'number_auto_generated': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -63,16 +82,17 @@ class Migration(DataMigration):
             'subscribe_form': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         u'Crm.city': {
-            'Meta': {'object_name': 'City'},
+            'Meta': {'ordering': "['name']", 'object_name': 'City'},
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'city_groups_set'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['Crm.Zone']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Zone']", 'null': 'True', 'blank': 'True'})
         },
         u'Crm.contact': {
-            'Meta': {'object_name': 'Contact'},
+            'Meta': {'ordering': "('lastname', 'firstname')", 'object_name': 'Contact'},
             'accept_3rdparty': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'accept_newsletter': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
+            'accept_notifications': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'address2': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'address3': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
@@ -97,6 +117,7 @@ class Migration(DataMigration):
             'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'photo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
+            'relationships': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'through': u"orm['Crm.Relationship']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'role': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.EntityRole']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
             'same_as': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.SameAs']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
@@ -113,16 +134,16 @@ class Migration(DataMigration):
         u'Crm.contactsimport': {
             'Meta': {'object_name': 'ContactsImport'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'encoding': ('django.db.models.fields.CharField', [], {'default': "'iso-8859-15'", 'max_length': '50'}),
+            'encoding': ('django.db.models.fields.CharField', [], {'default': "'utf-8'", 'max_length': '50'}),
             'entity_name_from_email': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'entity_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.EntityType']"}),
+            'entity_type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.EntityType']", 'null': 'True', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Group']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'import_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'imported_by': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'separator': ('django.db.models.fields.CharField', [], {'default': "';'", 'max_length': '5'})
+            'separator': ('django.db.models.fields.CharField', [], {'default': "','", 'max_length': '5'})
         },
         u'Crm.customfield': {
             'Meta': {'ordering': "('ordering',)", 'object_name': 'CustomField'},
@@ -136,7 +157,7 @@ class Migration(DataMigration):
             'widget': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'})
         },
         u'Crm.entity': {
-            'Meta': {'object_name': 'Entity'},
+            'Meta': {'ordering': "('name',)", 'object_name': 'Entity'},
             'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'address2': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'address3': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
@@ -205,7 +226,7 @@ class Migration(DataMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'probability': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
             'start_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'status': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.OpportunityStatus']"}),
+            'status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.OpportunityStatus']", 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.OpportunityType']", 'null': 'True', 'blank': 'True'})
         },
         u'Crm.opportunitystatus': {
@@ -218,6 +239,21 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'OpportunityType'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
+        u'Crm.relationship': {
+            'Meta': {'object_name': 'Relationship'},
+            'contact1': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'relationships1'", 'to': u"orm['Crm.Contact']"}),
+            'contact2': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'relationships2'", 'to': u"orm['Crm.Contact']"}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'relationship_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.RelationshipType']"})
+        },
+        u'Crm.relationshiptype': {
+            'Meta': {'object_name': 'RelationshipType'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'reverse': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'})
         },
         u'Crm.sameas': {
             'Meta': {'object_name': 'SameAs'},

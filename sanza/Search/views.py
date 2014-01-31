@@ -26,6 +26,7 @@ from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
 from sanza.Crm import settings as crm_settings
+from sanza.utils import HttpResponseRedirectMailtoAllowed
 
 #@transaction.commit_manually
 def filter_icontains_unaccent(qs, field, text):
@@ -166,9 +167,6 @@ def get_field(request, name):
     except Exception, msg:
         logger.exception("get_field")
         raise
-    
-class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
-    allowed_schemes = ['http', 'https', 'ftp', 'mailto']
 
 @user_passes_test(can_access)
 def mailto_contacts(request, bcc):
