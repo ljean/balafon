@@ -1160,43 +1160,33 @@ class DoActionTest(BaseTestCase):
         action = mommy.make(models.Action, done=False)
         response = self.client.get(reverse('crm_do_action', args=[action.id]))
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, action.detail)
         self.assertEqual(action.done, False)
         
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested"})
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_board_panel"))
         action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
-#        
-#    def test_do_action_entity_and_new(self):
-#        action = mommy.make(models.Action, done=False)
-#        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
-#        self.assertEqual(200, response.status_code)
-#        self.assertContains(response, reverse("crm_add_action_for_entity", args=[action.entity.id]))
-#        action = models.Action.objects.get(id=action.id)
-#        self.assertEqual(action.detail, "tested")
-#        self.assertEqual(action.done, True)
-#        
-#    def test_do_action_contact_and_new(self):
-#        contact = mommy.make(models.Contact)
-#        action = mommy.make(models.Action, done=False, contact=contact)
-#        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
-#        self.assertEqual(200, response.status_code)
-#        self.assertContains(response, reverse("crm_add_action_for_contact", args=[action.contact.id]))
-#        action = models.Action.objects.get(id=action.id)
-#        self.assertEqual(action.detail, "tested")
-#        self.assertEqual(action.done, True)
-#        
-#    def test_do_action_contact_and_new(self):
-#        action = mommy.make(models.Action, done=False)
-#        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
-#        self.assertEqual(200, response.status_code)
-#        self.assertContains(response, reverse("crm_board_panel"))
-#        action = models.Action.objects.get(id=action.id)
-#        self.assertEqual(action.detail, "tested")
-#        self.assertEqual(action.done, True)
+        
+    def test_undo_action(self):
+        action = mommy.make(models.Action, done=True)
+        response = self.client.get(reverse('crm_do_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(action.done, True)
+        
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': False})
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse("crm_board_panel"))
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.done, False)
+        
+    def test_view_action_warning_not_in_charge(self):
+        user = mommy.make(User, is_active=True, is_staff=True, last_name="L", first_name="F")
+        action = mommy.make(models.Action, done=True, in_charge=user)
+        response = self.client.get(reverse('crm_do_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "warning")
+        
         
 class GroupTest(BaseTestCase):
     

@@ -33,6 +33,7 @@ body {
 .row.section .section-data .table.table-striped > tbody > tr:nth-child(even) > th {
   background-color: #f8f8f8;
 }
+
 .row.section .section-data .table.table-bordered > tbody > tr > th {
   color: #888;
 }
@@ -97,6 +98,7 @@ body {
 .label-in-charge.me-in-charge {
   background: #44aa44;
 }
+
 /*
 .actions .row.action .col-action {
     border: solid thin #eee;
@@ -160,6 +162,16 @@ body {
 .actions .action .show-note.has-note {
   color: #000;
 }
+
+.actions .action.done {
+  background: #ddd;
+}
+
+.actions .action.done.even {
+  background: #ccc;
+}
+
+
 .prio-1,
 .prio-1 a {
   color: #888;

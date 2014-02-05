@@ -519,11 +519,16 @@ class ActionDoneForm(forms.ModelForm):
     
     class Meta:
         model = models.Action
-        fields = ['detail']
+        fields = ['done']
         widgets = {
-            'detail': forms.Textarea(attrs={'placeholder': _(u'give details bout the action'), 'cols':'72'})
+            'done': forms.HiddenInput(),
         }
     
+    def __init__(self, *args, **kwargs):
+        inst = kwargs.get('instance')
+        inst.done = not inst.done
+        kwargs['instance'] = inst
+        super(ActionDoneForm, self).__init__(*args, **kwargs)    
     
 class CustomFieldForm(forms.Form):
     

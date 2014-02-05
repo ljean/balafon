@@ -11,7 +11,7 @@
 {% for a in actions %}
   <div class="row">
     <div class="col-md-12">
-      <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} action {% if a.archived %}old-action{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+      <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
         
         <div class="pull-right">
           
