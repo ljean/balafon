@@ -61,13 +61,13 @@
         
         
         <div class="action-subject">
-          <span style="font-weight: 500;" contenteditable="true">{{a.subject}}</span>
+          <span class="contenteditable" rel="{% url "auto_save_data" "action" "subject" a.id %}" style="font-weight: 500;" contenteditable="true">{{a.subject}}</span>
           <a href="" class="show-note {% if a.detail %}has-note{% endif %}">
             <span class="glyphicon glyphicon-collapse-down" title="{% trans "Show note" %}"></span>
           </a>
         </div>
         
-        <div contenteditable="true" class="action-note" style="display: none">
+        <div rel="{% url "auto_save_data" "action" "detail" a.id %}" contenteditable="true" class="contenteditable action-note" style="display: none">
           {{ a.detail|linebreaksbr }}
         </div>
         
