@@ -1989,6 +1989,10 @@ class ActionMonthArchiveView(MonthArchiveView):
     allow_future = True
     allow_empty = True
     
+    def get(self, *args, **kwargs):
+        self.request.session["redirect_url"] = self.request.path
+        return super(ActionMonthArchiveView, self).get(*args, **kwargs)
+    
 class ActionWeekArchiveView(WeekArchiveView):
     queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
@@ -1996,3 +2000,7 @@ class ActionWeekArchiveView(WeekArchiveView):
     week_format = "%U"
     allow_future = True
     allow_empty = True
+    
+    def get(self, *args, **kwargs):
+        self.request.session["redirect_url"] = self.request.path
+        return super(ActionWeekArchiveView, self).get(*args, **kwargs)

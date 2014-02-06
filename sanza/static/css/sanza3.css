@@ -399,3 +399,9 @@ ul.chosen-choices .search-field input {
 .action-overflow-warning a:hover {
   color: #eee;
 }
+.label-primary a {
+  color: #fff;
+}
+.label-primary a:hover {
+  color: #eee;
+}
