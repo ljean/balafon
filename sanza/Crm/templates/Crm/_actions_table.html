@@ -45,7 +45,8 @@
         </a>
         
         <div class="action-subject">
-          <span class="contenteditable" rel="{% url "auto_save_data" "action" "subject" a.id %}" style="font-weight: 500;" contenteditable="true">{{a.subject}}</span>
+          <span class="contenteditable inline-block" rel="{% url "auto_save_data" "action" "subject" a.id %}" style="font-weight: 500;" contenteditable="true">
+            {{a.subject}}</span>
           <a href="" class="show-note {% if a.detail %}has-note{% endif %}">
             <span class="glyphicon glyphicon-collapse-down" title="{% trans "Show note" %}"></span>
           </a>

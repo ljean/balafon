@@ -151,20 +151,24 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
     else:
         return models.City.objects.create(name=city_name, parent=parent)
         
-def get_actions_by_set(actions):
-    actions_dict = {}
-    for a in actions:
-        key = a.type.set if a.type else None
-        try:
-            actions_dict[key].append(a)
-        except KeyError:
-            actions_dict[key] = [a]
+def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):
+    actions_by_set = []
+    if action_set_list == None:
+        action_set_list = [None] + list(models.ActionSet.objects.all().order_by('ordering'))
     
-    actions_by_set = []    
-    for a_set in models.ActionSet.objects.all().order_by('ordering'):
-        acts = actions_dict.get(a_set, None)
-        if acts:
-            actions_by_set.append((a_set.id, a_set.name, acts))
-    title = _(u"Actions") if models.ActionSet.objects.count() else _(u"Actions")
-    actions_by_set = [(0, "", actions_dict.get(None, []))] + actions_by_set
+    for a_set in action_set_list:
+        qs = actions_qs.filter(type__set=a_set)
+        qs_count = qs.count()
+        if qs_count:
+            if max_nb:
+                actions = qs[:max_nb]
+            else:
+                actions = qs
+            actions_by_set += [(
+                a_set.id if a_set else 0,
+                a_set.name if a_set else u"",
+                actions,
+                qs_count
+            )]
+            
     return actions_by_set

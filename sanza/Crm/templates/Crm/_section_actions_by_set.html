@@ -7,9 +7,22 @@
   
 {% block section_data %}
   {% include "Crm/_actions_table_script.html" %}
-  {% for set_id, set_title, actions in actions_by_set %}
+  {% for set_id, set_title, actions, total_count in actions_by_set %}
     <div class="row"><div class="col-md-12">
-    {% if set_title %}<div class="section-action-set-title">{{ set_title }}</div>{% endif %}
+    {% if set_title %}
+      <div class="section-action-set-title">
+      {{ set_title }}
+      </div>
+    {% endif %}
+    {% if total_count > actions.count %}
+        <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
+          <span class="glyphicon glyphicon-warning-sign"></span>
+          {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
+          <a href="{% if contact %}{% url "crm_view_contact_actions" contact.id set_id %}{% else %}{% url "crm_view_entity_actions" entity.id set_id %}{% endif %}">
+            {% trans "View all" %}
+          </a>
+        </div>
+      {% endif %}
     {% include "Crm/_actions_table.html" %}
     </div></div>
   {% endfor %}

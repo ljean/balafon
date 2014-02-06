@@ -455,9 +455,13 @@ a.link-warning {
 
 .contenteditable {
     min-height: 14px;
-    padding: 2px; 
+    padding: 2px;
+    min-width: 5px;
 }
 
+.inline-block {
+  display: inline-block;
+}
 
 .tabbar {
 	border-bottom: solid 1px #ccc;
@@ -495,3 +499,22 @@ ul.chosen-choices .search-field input{
     height: 25px !important;
     width: 300px !important;
 }
+
+.action-overflow-warning {
+  color: #000;
+  background: #888;
+  padding: 2px 10px;
+}
+
+.action-overflow-warning.no-set-title{
+  margin-top: -10px;
+}
+
+.action-overflow-warning a{
+  color: #fff;
+}
+
+.action-overflow-warning a:hover{
+  color: #eee;
+}
+

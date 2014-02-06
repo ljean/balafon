@@ -860,6 +860,258 @@ class ActionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.content.count(action.subject))
         
+    def test_view_contact_actions_more_than_five(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        actions = [mommy.make(models.Action, subject=u"--{0}--".format(i), archived=False) for i in range(10)]
+        for a in actions:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in actions[5:]:
+            self.assertContains(response, a.subject)
+        
+        for a in actions[:5]:
+            self.assertNotContains(response, a.subject)
+
+    def test_view_contact_all_actions_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        url = reverse("crm_view_contact_actions", args=[c1.id, s1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+            
+    def test_view_entity_all_actions_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        url = reverse("crm_view_entity_actions", args=[entity.id, s1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+            
+    def test_view_contact_actions_more_than_five_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(5):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+
+
+        
     def test_view_contact_actions(self):
         entity = mommy.make(models.Entity)
         c1 = entity.default_contact

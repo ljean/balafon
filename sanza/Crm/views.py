@@ -40,7 +40,7 @@ def view_entity(request, entity_id):
     actions = models.Action.objects.filter(Q(entities=entity) | Q(contacts__entity=entity),
         Q(archived=False)).distinct().order_by("planned_date", "priority")
     
-    actions_by_set = get_actions_by_set(actions)    
+    actions_by_set = get_actions_by_set(actions, 5)    
     
     show_all_contacts = not all_contacts and (entity.contact_set.filter(has_left=True).count()>0)
     multi_user = True
@@ -584,7 +584,7 @@ def view_contact(request, contact_id):
     same_as = None
     
     actions = contact.action_set.filter(archived=False)
-    actions_by_set = get_actions_by_set(actions)    
+    actions_by_set = get_actions_by_set(actions, 5)    
     
     opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
     opportunities.sort(key=lambda x: x.status.ordering if x.status else 0)
@@ -604,6 +604,52 @@ def view_contact(request, contact_id):
             'opportunities': opportunities,
             'same_as': same_as,
             'entity': contact.entity
+        },
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+def view_all_contact_actions(request, contact_id, action_set_id):
+    contact = get_object_or_404(models.Contact, id=contact_id)
+    if int(action_set_id):
+        action_set_list = [get_object_or_404(models.ActionSet, id=action_set_id)]
+    else:
+        action_set_list = [None]
+    
+    request.session["redirect_url"] = reverse('crm_view_contact_actions', args=[contact_id, action_set_id])
+    
+    actions = contact.action_set.filter(archived=False).order_by("planned_date", "priority")
+    actions_by_set = get_actions_by_set(actions, 0, action_set_list)    
+    
+    return render_to_response(
+        'Crm/view_contact_actions.html',
+        {
+            'contact': contact,
+            'actions_by_set': actions_by_set,
+            'entity': contact.entity
+        },
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+def view_all_entity_actions(request, entity_id, action_set_id):
+    entity = get_object_or_404(models.Entity, id=entity_id)
+    if int(action_set_id):
+        action_set_list = [get_object_or_404(models.ActionSet, id=action_set_id)]
+    else:
+        action_set_list = [None]
+    
+    request.session["redirect_url"] = reverse('crm_view_entity_actions', args=[entity_id, action_set_id])
+    
+    actions = models.Action.objects.filter(Q(entities=entity) | Q(contacts__entity=entity),
+        Q(archived=False)).distinct().order_by("planned_date", "priority")
+    actions_by_set = get_actions_by_set(actions, 0, action_set_list)    
+    
+    return render_to_response(
+        'Crm/view_entity_actions.html',
+        {
+            'actions_by_set': actions_by_set,
+            'entity': entity
         },
         context_instance=RequestContext(request)
     )
