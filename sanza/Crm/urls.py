@@ -82,6 +82,12 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^remove-contact-from-action/(?P<action_id>\d+)/(?P<contact_id>\d+)/$', 'remove_contact_from_action', name='crm_remove_contact_from_action'),
     url(r'^remove-entity-from-action/(?P<action_id>\d+)/(?P<entity_id>\d+)/$', 'remove_entity_from_action', name='crm_remove_entity_from_action'),
     url(r'^create-action/(?P<entity_id>\d+)/(?P<contact_id>\d+)/$', 'create_action', name='crm_create_action'),
+    
+    url(r'^actions-of-month/(?P<year>\d{4})/(?P<month>\d+)/$',
+        views.ActionMonthArchiveView.as_view(), name="crm_actions_of_month"),
+    url(r'^actions-of-week/(?P<year>\d{4})/(?P<week>\d+)/$',
+        views.ActionWeekArchiveView.as_view(), name="crm_actions_of_week"),
+    
 )
 
 urlpatterns += patterns('',

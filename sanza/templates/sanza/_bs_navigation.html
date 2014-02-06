@@ -23,6 +23,9 @@
             <li><a href="{% url "crm_all_opportunities" %}">{% trans "Opportunities" %}</a></li>
             <li><a href="{% url "crm_see_my_groups" %}">{% trans "Groups" %}</a></li>
             <li><a href="{% url "emailing_newsletter_list" %}">{% trans "Mailings" %}</a></li>
+            <li><a href="{% url "crm_actions_of_month" NOW.year NOW.month %}">{% trans "Monthly actions" %}</a></li>
+            <li><a href="{% url "crm_actions_of_week" NOW.year 5 %}">{% trans "Weekly actions" %}</a></li>
+            
           </ul>
         </li>
         <li class="dropdown">

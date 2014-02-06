@@ -81,3 +81,10 @@ def split_lines(lines, nb=1):
         return u"\n".join(lines.splitlines()[:nb])
     except Exception:
         return u""
+    
+@register.filter
+def previous_week(dt):
+    try:
+        return u"\n".join(lines.splitlines()[:nb])
+    except Exception:
+        return u""

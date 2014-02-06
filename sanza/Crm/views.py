@@ -27,6 +27,7 @@ from django.template.loader import find_template
 from sanza.Crm import settings as crm_settings
 from datetime import datetime
 from sanza.utils import HttpResponseRedirectMailtoAllowed
+from django.views.generic.dates import MonthArchiveView, WeekArchiveView
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -1979,3 +1980,19 @@ class ActionDocumentPdfView(PDFTemplateView):
         self.footer_template = self.find_template("footer", action.type)
         self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
         return super(ActionDocumentPdfView, self).render_to_response(context, **response_kwargs)
+
+class ActionMonthArchiveView(MonthArchiveView):
+    queryset = models.Action.objects.all().order_by("planned_date", "priority")
+    date_field = "planned_date"
+    month_format ='%m'
+    #make_object_list = True
+    allow_future = True
+    allow_empty = True
+    
+class ActionWeekArchiveView(WeekArchiveView):
+    queryset = models.Action.objects.all().order_by("planned_date", "priority")
+    date_field = "planned_date"
+    #make_object_list = True
+    week_format = "%U"
+    allow_future = True
+    allow_empty = True
