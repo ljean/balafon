@@ -29,5 +29,10 @@ $(function() {
             },
             dataType: 'json'
         });
-    });  
+    });
+    
+    $(".show-note").click(function() {
+        $(this).closest(".action").find(".action-note").toggle();
+        return false;  
+    });
 })

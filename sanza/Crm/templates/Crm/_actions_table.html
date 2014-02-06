@@ -1,13 +1,5 @@
 {% load i18n sanza_utils staticfiles %}
 <div class="actions">
-  <script>
-          $(function() {
-            $(".show-note").click(function() {
-              $(this).closest(".action").find(".action-note").toggle();
-              return false;  
-            });
-          })
-        </script>
 {% for a in actions %}
   <div class="row">
     <div class="col-md-12">
@@ -45,20 +37,12 @@
           {% if a.done_date %}
             {% trans "done on" %} {{ a.done_date|date:'j F Y'|default:''}}<br/>
           {% endif %}
-          {% endcomment %}
-        
-          
+          {% endcomment %}  
         </div>
-        
-        
         
         <a class="" href="" rel="{% url "crm_toggle_action_bookmark" a.id %}">
           <span class="glyphicon glyphicon-star{% if not a.display_on_board %}-empty{% endif %}" title="{% trans "Show on board" %}"></span>
         </a>
-      
-        
-        
-        
         
         <div class="action-subject">
           <span class="contenteditable" rel="{% url "auto_save_data" "action" "subject" a.id %}" style="font-weight: 500;" contenteditable="true">{{a.subject}}</span>
