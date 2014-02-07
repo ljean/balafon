@@ -3543,3 +3543,59 @@ class ActionArchiveTest(BaseTestCase):
             [u"t{0}".format(v.id)] + [u"u{0}".format(u.id)],
             [x["value"] for x in soup.select("select option[selected=selected]")]
         )
+        
+    def test_view_not_planned_action(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=None, type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=None, type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now(), in_charge=u, type=v)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_not_planned')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_not_planned_action_type_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=None, type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=None, type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now(), in_charge=u, type=v)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_not_planned')+"?filter=u{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(v.id)] + [u"u{0}".format(u.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+        

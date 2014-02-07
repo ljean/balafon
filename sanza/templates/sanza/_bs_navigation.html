@@ -26,8 +26,7 @@
             <li><a href="{% url "crm_actions_of_month" NOW.year NOW.month %}">{% trans "Monthly actions" %}</a></li>
             <li><a href="{% url "crm_actions_of_week" NOW.year NOW|date:"W" %}">{% trans "Weekly actions" %}</a></li>
             <li><a href="{% url "crm_actions_of_day" NOW.year NOW.month NOW.day %}">{% trans "Daily actions" %}</a></li>
-
-            
+            <li><a href="{% url "crm_actions_not_planned" %}">{% trans "Not planned actions" %}</a></li>
           </ul>
         </li>
         <li class="dropdown">

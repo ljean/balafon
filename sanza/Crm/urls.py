@@ -89,6 +89,7 @@ urlpatterns = patterns('sanza.Crm.views',
         views.ActionWeekArchiveView.as_view(), name="crm_actions_of_week"),
     url(r'^actions-of-day/(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$',
         views.ActionDayArchiveView.as_view(), name="crm_actions_of_day"),
+    url(r'^actions-not-planned/$', views.NotPlannedActionArchiveView.as_view(), name="crm_actions_not_planned"),
 )
 
 urlpatterns += patterns('',

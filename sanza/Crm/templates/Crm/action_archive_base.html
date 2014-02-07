@@ -11,7 +11,14 @@
             var values = $(this).val();
             window.location = "{% block this_url %}{% endblock%}?filter="+values;
             return false;
-        });  
+        });
+        
+        $(".action-archive-filter a.btn").each(function(idx, elt) {
+            var href = $(elt).attr("href");
+            if (("" ===  href) || (href.charAt(0)==="?")) {
+                $(elt).hide();
+            }
+        });
     })
 </script>
 {% endblock %}

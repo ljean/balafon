@@ -28,6 +28,7 @@ from sanza.Crm import settings as crm_settings
 from datetime import datetime
 from sanza.utils import HttpResponseRedirectMailtoAllowed
 from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
+from django.views.generic import ListView
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -2073,4 +2074,7 @@ class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
     allow_empty = True
     month_format ='%m'
     
+class NotPlannedActionArchiveView(ActionArchiveView, ListView):
+    queryset = models.Action.objects.filter(planned_date=None).order_by("priority")
+    template_name = "Crm/action_archive_not_planned.html"
     
