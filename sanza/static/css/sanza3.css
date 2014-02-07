@@ -427,3 +427,24 @@ ul.chosen-choices .search-field input {
 .groups-header .btn-xs {
   height: 18px;
 }
+.tabbar-form fieldset {
+  padding-top: 20px;
+}
+.action-dt-label {
+  font-size: 12px;
+  padding: 2px 4px;
+  background: #888;
+  color: #fff;
+  border: solid 1px #000;
+  border-radius: 2px 0 0 2px;
+}
+.action-dt-value {
+  font-size: 12px;
+  padding: 2px 4px;
+  background: #eee;
+  color: #000;
+  border: solid 1px #000;
+  border-radius: 0 2px 2px 0;
+  margin-left: -5px;
+  border-left: none;
+}

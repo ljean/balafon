@@ -3598,4 +3598,98 @@ class ActionArchiveTest(BaseTestCase):
             [x["value"] for x in soup.select("select option[selected=selected]")]
         )
         
+class ViewContactsTest(BaseTestCase):
+   
+    def test_view_contacts(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        e2 = mommy.make(models.Entity, is_single_contact=True)
+        c2 = e2.default_contact
+        c2.lastname = "#Contact{0}#".format(c2.id)
+        c2.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        
+    def test_view_entities_actions(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        a1 = mommy.make(models.Action, subject="#Action1#", done=True, done_date=datetime.now())
+        a1.entities.add(e1)
+        a1.save()
+        
+        a2 = mommy.make(models.Action, subject="#Action2#", done=True, done_date=datetime.now()-timedelta(days=1))
+        a2.entities.add(e1)
+        a2.save()
+        
+        a3 = mommy.make(models.Action, subject="#Action3#", done=False, planned_date=datetime.now())
+        a3.entities.add(e1)
+        a3.save()
+        
+        a4 = mommy.make(models.Action, subject="#Action4#", done=False, planned_date=datetime.now()+timedelta(days=1))
+        a4.entities.add(e1)
+        a4.save()
+        
+        a5 = mommy.make(models.Action, subject="#Action5#", done=False)
+        a5.entities.add(e1)
+        a5.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+    def test_view_contact_actions(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        a1 = mommy.make(models.Action, subject="#Action1#", done=True, done_date=datetime.now())
+        a1.contacts.add(c1)
+        a1.save()
+        
+        a2 = mommy.make(models.Action, subject="#Action2#", done=True, done_date=datetime.now()-timedelta(days=1))
+        a2.contacts.add(c1)
+        a2.save()
+        
+        a3 = mommy.make(models.Action, subject="#Action3#", done=False, planned_date=datetime.now())
+        a3.contacts.add(c1)
+        a3.save()
+        
+        a4 = mommy.make(models.Action, subject="#Action4#", done=False, planned_date=datetime.now()+timedelta(days=1))
+        a4.contacts.add(c1)
+        a4.save()
+        
+        a5 = mommy.make(models.Action, subject="#Action5#", done=False)
+        a5.contacts.add(c1)
+        a5.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
         

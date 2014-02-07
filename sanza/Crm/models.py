@@ -231,13 +231,18 @@ class Entity(TimeStampedModel):
     
     def last_action(self):
         try:
-            return Action.objects.filter(contact__entity=self, done_date__isnull=False).order_by("-done_date")[0]
+            return Action.objects.filter(
+                Q(contacts__entity=self) | Q(entities=self), done=True,
+                done_date__isnull=False).order_by("-done_date")[0]
         except IndexError:
             return None
         
     def next_action(self):
         try:
-            return Action.objects.filter(contact__entity=self, planned_date__isnull=False, done_date__isnull=True).order_by("-planned_date")[0]
+            return Action.objects.filter(
+                Q(contacts__entity=self) | Q(entities=self), done=False,
+                planned_date__isnull=False,
+                done_date__isnull=True).order_by("planned_date")[0]
         except IndexError:
             return None
         

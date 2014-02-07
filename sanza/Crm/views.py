@@ -372,8 +372,6 @@ def create_entity(request, entity_type_id):
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
             entity = form.save()
-            if entity.contact_set.count() > 0:
-                return HttpResponseRedirect(reverse('crm_edit_contact_after_entity_created', args=[entity.default_contact.id]))
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity.id]))
     else:
         form = forms.EntityForm(instance=entity, initial={'relationship_date': date.today()})

@@ -17,7 +17,7 @@
             </div>
           {% endif %}
           
-          <div class="label label-date {{a|get_ation_date_label}}">
+          <div class="label label-date {{a|get_action_date_label}}">
             {% if a.planned_date %}
               {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}}
             {% else %}

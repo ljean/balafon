@@ -35,7 +35,7 @@ def cut_null_hour(value):
     return value
 
 @register.filter
-def get_ation_date_label(action):
+def get_action_date_label(action):
     if not action.planned_date:
         return "label-warning"
     if action.planned_date < datetime.now():

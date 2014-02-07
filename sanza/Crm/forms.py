@@ -241,7 +241,7 @@ class EntityForm(ModelFormWithCity):
         exclude = ('imported_by', 'is_single_contact')
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Contact details')}),
+            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Enity details')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
