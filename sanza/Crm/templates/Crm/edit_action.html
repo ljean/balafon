@@ -4,6 +4,28 @@
 {% block extra_head %}
   {{block.super}}
   {% include "sanza/_calendar.html" with field="date" yearRange="c:c+2" %}
+<script>
+  $(function() {
+    $("select#id_type").change(function() {
+      $.ajax({
+          url: "{% url "crm_get_action_status" %}?t="+$(this).val(),
+          success: function(data){
+            var allowed_status = data.allowed_status;
+            $("select#id_status option").each(function(idx, elt) {
+              if ($(elt).val() in allowed_status) {
+                $(elt).removeAttr("disabled");
+              } else {
+                $(elt).attr("disabled", "disabled");
+              }
+            });
+            $("select#id_status option").trigger("chosen:updated");
+          }
+      });
+      return false;
+    });
+    $("select#id_type").change();
+  })
+</script>
 {% endblock %}
 
 {% block doc_header %}

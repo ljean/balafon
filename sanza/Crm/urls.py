@@ -90,6 +90,8 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^actions-of-day/(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$',
         views.ActionDayArchiveView.as_view(), name="crm_actions_of_day"),
     url(r'^actions-not-planned/$', views.NotPlannedActionArchiveView.as_view(), name="crm_actions_not_planned"),
+    
+    url(r'allowed-action-status/$', 'get_action_status', name="crm_get_action_status"),
 )
 
 urlpatterns += patterns('',
