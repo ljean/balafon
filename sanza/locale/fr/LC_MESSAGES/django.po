@@ -1311,7 +1311,7 @@ msgstr "Voir les contacts"
 #: Crm/templates/Crm/_section_actions_of_set.html:17
 #: Crm/templates/Crm/_section_actions_of_set.html:19
 msgid "Add action"
-msgstr "Ajouter uen action"
+msgstr "Ajouter une action"
 
 #: Crm/templates/Crm/_section_actions_by_set.html:20
 msgid "Only display the"
