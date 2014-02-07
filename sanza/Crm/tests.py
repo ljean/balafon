@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup as BS4
 from django.core import management
 from cStringIO import StringIO
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
         
 class BaseTestCase(TestCase):
 
@@ -3321,4 +3321,225 @@ class ChangeContactEntityTest(BaseTestCase):
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity, entity)
     
+class ActionArchiveTest(BaseTestCase):
+   
+    def test_view_monthly_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=31))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=31))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+    def test_view_weekly_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=7))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=7))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_week', args=[n.year, n.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+
+    def test_view_daily_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=1))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=1))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_day', args=[n.year, n.month, n.day])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
     
+    def test_view_monthly_action_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(User, first_name="Jack", is_staff=True)
+        w = mommy.make(User, first_name="William", is_staff=True)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), in_charge=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), in_charge=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u{0},u{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"u{0}".format(y.id) for y in [u, v]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_filter(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(y.id) for y in [u, v]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_none(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t0"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(["t0"], [x["value"] for x in soup.select("select option[selected=selected]")])
+        
+    def test_view_monthly_action_type_none_and_defined(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t0,t{0}".format(u.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t0"] +[u"t{0}".format(y.id) for y in [u,]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_filter_invalid(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=abc"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+    
+    def test_view_monthly_action_filter_invalid_user(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u2"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_filter_invalid_type(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t2"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(v.id)] + [u"u{0}".format(u.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )

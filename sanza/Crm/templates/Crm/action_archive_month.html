@@ -1,20 +1,11 @@
-{% extends "sanza/bs_base.html" %}
+{% extends "Crm/action_archive_base.html" %}
 {% load i18n %}
 
-{% block document_content %}
-{% if previous_month %}
-    <a class="btn pull-left btn-default" href="{% url "crm_actions_of_month" previous_month.year previous_month.month %}">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-    </a>
-{% endif %}
-<h2 class="inline-block">{{month|date:"F Y"}}</h2>
+{% block prev_url %}{% url "crm_actions_of_month" previous_month.year previous_month.month %}{% endblock %}
 
-{% if next_month %}
-    <a class="btn btn-default pull-right" href="{% url "crm_actions_of_month" next_month.year next_month.month %}">
-        <span class="glyphicon glyphicon-chevron-right"></span>
-    </a>
-{% endif %}
+{% block this_url %}{% url "crm_actions_of_month" month.year month.month %}{% endblock %}
 
-{% include "Crm/_section_actions.html" with actions=object_list %}
+{% block next_url %}{% url "crm_actions_of_month" next_month.year next_month.month %}{% endblock %}
 
-{% endblock %}
+{% block this_title %}{{month|date:"F Y"}}{% endblock %}
+

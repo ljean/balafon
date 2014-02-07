@@ -18,6 +18,9 @@ def filter_icontains_unaccent(qs, field, text):
 
 def get_users(self):
     return User.objects.exclude(firstame="", lastname="")
+
+def get_in_charge_users():
+    return User.objects.filter(is_staff=True).exclude(first_name="")
     
 #import csv, codecs, cStringIO
 #

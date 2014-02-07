@@ -16,7 +16,7 @@ from colorbox.decorators import popup_redirect
 from sanza.Crm.settings import get_default_country
 from django.conf import settings
 import os.path
-from sanza.Crm.utils import unicode_csv_reader, resolve_city, check_city_exists
+from sanza.Crm.utils import unicode_csv_reader, resolve_city, check_city_exists, get_in_charge_users
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from coop_cms.generic_views import EditableObjectView
@@ -27,7 +27,7 @@ from django.template.loader import find_template
 from sanza.Crm import settings as crm_settings
 from datetime import datetime
 from sanza.utils import HttpResponseRedirectMailtoAllowed
-from django.views.generic.dates import MonthArchiveView, WeekArchiveView
+from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -1981,26 +1981,96 @@ class ActionDocumentPdfView(PDFTemplateView):
         self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
         return super(ActionDocumentPdfView, self).render_to_response(context, **response_kwargs)
 
-class ActionMonthArchiveView(MonthArchiveView):
+class ActionArchiveView(object):
+    
+    def _get_selection(self, filter_value):
+        try:
+            values = {}
+            for x in filter_value.split(","):
+                pfx, val = x[0], int(x[1:])
+                if pfx in values:
+                    values[pfx].append(val)
+                else:
+                    values[pfx] = [val]
+            return dict(values)
+        except ValueError:
+            raise Http404
+    
+    def get_queryset(self):
+        values = self.request.GET.get("filter", None)
+        qs = self.queryset
+        if values and values!="null":
+            values_dict = self._get_selection(values)
+            
+            selected_types = values_dict.get("t", [])
+            if selected_types:
+                if 0 in selected_types:
+                    if len(selected_types) == 1:
+                        #only : no types
+                        qs = qs.filter(type__isnull=True)
+                    else:
+                        #combine no types and some types
+                        qs = qs.filter(Q(type__isnull=True) | Q(type__in=selected_types))
+                else:
+                    #only some types
+                    qs = qs.filter(type__in=selected_types)
+            
+            selected_users = values_dict.get("u", [])
+            if selected_users:
+                qs = qs.filter(in_charge__in=selected_users)
+                
+        return qs
+        
+    def get_context_data(self, *args, **kwargs):
+        context = super(ActionArchiveView, self).get_context_data(*args, **kwargs)
+        ats = models.ActionType.objects.all()
+        in_charge = get_in_charge_users()
+        values = self.request.GET.get("filter", None)
+        if values and values!="null":
+            context["filter"] = values
+            values_dict = self._get_selection(values)
+            
+            selected_types = values_dict.get("t", [])
+            for at in ats:
+                if at.id in selected_types:
+                    setattr(at, 'selected', True)
+            if 0 in selected_types:
+                context["no_type_selected"] = True
+            
+            selected_users = values_dict.get("u", [])
+            for u in in_charge:
+                if u.id in selected_users:
+                    setattr(u, 'selected', True)
+                    
+        context["action_types"] = ats
+        context["in_charge"] = in_charge
+        return context
+        
+    def get(self, *args, **kwargs):
+        self.request.session["redirect_url"] = self.request.path
+        return super(ActionArchiveView, self).get(*args, **kwargs)
+
+    
+class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
     queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
     month_format ='%m'
-    #make_object_list = True
     allow_future = True
     allow_empty = True
+
     
-    def get(self, *args, **kwargs):
-        self.request.session["redirect_url"] = self.request.path
-        return super(ActionMonthArchiveView, self).get(*args, **kwargs)
-    
-class ActionWeekArchiveView(WeekArchiveView):
+class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
     queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
-    #make_object_list = True
     week_format = "%U"
     allow_future = True
     allow_empty = True
     
-    def get(self, *args, **kwargs):
-        self.request.session["redirect_url"] = self.request.path
-        return super(ActionWeekArchiveView, self).get(*args, **kwargs)
+class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
+    queryset = models.Action.objects.all().order_by("planned_date", "priority")
+    date_field = "planned_date"
+    allow_future = True
+    allow_empty = True
+    month_format ='%m'
+    
+    
