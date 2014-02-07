@@ -775,6 +775,31 @@ class EditActionTest(BaseTestCase):
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "tested")
         
+    def test_allowed_status(self, ):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([as1.id, as2.id], data['allowed_status'])
+        
+    def test_no_allowed_status(self, ):
+        at = mommy.make(models.ActionType)
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status'])
+    
+        
     def test_edit_action_on_entity(self):
         entity = mommy.make(models.Entity)
         action = mommy.make(models.Action)
