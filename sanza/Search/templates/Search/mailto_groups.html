@@ -1,5 +1,5 @@
-{% extends "sanza/base.html" %}
-{% load i18n %}{% load url from future %}
+{% extends "sanza/bs_base.html" %}
+{% load i18n %}
 
 {% block extra_head %}
 {{block.super}}
@@ -7,15 +7,15 @@
   .email-group {
     margin: 15px 0;
     padding: 5px 0;
-    background: #ddf;
+    background: #eee;
   }
   
   .email-group:hover {
-    background: #ccf;
+    background: #ccc;
   }
   
   .email-group.checked, .email-group.checked:hover {
-    background: #77f;
+    background: #444;
   }
   
   .email-group a {
