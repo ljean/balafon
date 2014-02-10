@@ -27,9 +27,14 @@
           
           <a href="{% url "crm_do_action" a.id %}" class="colorbox-form">
           {% if not a.done %}
-              <span title="{% trans "to do" %}" class="glyphicon glyphicon-unchecked {% if a.in_charge and a.in_charge != user %}disabled{% endif %}"></span>
+              <span title="{% trans "to do" %}" class="glyphicon glyphicon-unchecked"></span>
           {% else %}
-            <span class="glyphicon glyphicon-check" title="{% trans "done" %}"></span>
+            <div class="done-action-flag">
+              <span class="glyphicon glyphicon-check"></span>
+              <span class="done-date">
+                <span class="glyphicon glyphicon-check"></span> {% trans "done on" %}<br />
+                {{a.done_date|date:'d/m/Y H:i'|cut_null_hour}}</span>
+            </div>
           {% endif %}
           </a>
           
