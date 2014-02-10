@@ -160,7 +160,7 @@ def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):
         action_set_list = [None] + list(models.ActionSet.objects.all().order_by('ordering'))
     
     for a_set in action_set_list:
-        qs = actions_qs.filter(type__set=a_set)
+        qs = actions_qs.filter(type__set=a_set).order_by("-planned_date", "-id")
         qs_count = qs.count()
         if qs_count:
             if max_nb:

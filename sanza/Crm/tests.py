@@ -981,6 +981,75 @@ class ActionTest(BaseTestCase):
         
         for a in actions[:5]:
             self.assertNotContains(response, a.subject)
+            
+    def test_view_contact_actions_more_than_five_datetime(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        def _get_dt(x=0):
+            n = datetime.now()
+            if x > 0:
+                return n + timedelta(days=x)
+            elif x < 0:
+                return n - timedelta(days=-x)
+            return n
+        
+        a1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=_get_dt())
+        a2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=_get_dt(-1))
+        a3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=_get_dt(-2))
+        a4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=_get_dt(-3))
+        a5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=_get_dt(+1))
+        a6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=_get_dt(+2))
+        a7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=_get_dt(+3))
+        
+        for a in [a1, a2, a3, a4, a5, a6, a7]:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        #print BS4(response.content).select(".action-subject")
+        self.assertEqual(200, response.status_code)
+        
+        for a in [a1, a2, a5, a6, a7]:
+            self.assertContains(response, a.subject)
+        
+        for a in [a3, a4]:
+            self.assertNotContains(response, a.subject)
+
+    def test_view_entity_actions_more_than_five_datetime(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        def _get_dt(x=0):
+            n = datetime.now()
+            if x > 0:
+                return n + timedelta(days=x)
+            elif x < 0:
+                return n - timedelta(days=-x)
+            return n
+        
+        a1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=_get_dt())
+        a2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=_get_dt(-1))
+        a3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=_get_dt(-2))
+        a4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=_get_dt(-3))
+        a5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=_get_dt(+1))
+        a6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=_get_dt(+2))
+        a7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=_get_dt(+3))
+        
+        for a in [a1, a2, a3, a4, a5, a6, a7]:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_entity", args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in [a1, a2, a5, a6, a7]:
+            self.assertContains(response, a.subject)
+        
+        for a in [a3, a4]:
+            self.assertNotContains(response, a.subject)
 
     def test_view_contact_all_actions_by_set(self):
         entity = mommy.make(models.Entity)
