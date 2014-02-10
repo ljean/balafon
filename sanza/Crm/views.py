@@ -1180,7 +1180,9 @@ def view_all_opportunities(request, ordering=None):
         opportunities = list(opportunities)
         opportunities.sort(key=lambda o: o.get_start_date() or datetime(1970, 1, 1))
         opportunities.reverse()
-        
+    
+    request.session["redirect_url"] = reverse('crm_all_opportunities')
+     
     all_opportunities = True
     request.session["redirect_url"] = reverse('crm_all_opportunities')
     return render_to_response(
@@ -1190,6 +1192,7 @@ def view_all_opportunities(request, ordering=None):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def edit_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
     
@@ -1197,13 +1200,14 @@ def edit_opportunity(request, opportunity_id):
         form = forms.OpportunityForm(request.POST, instance=opportunity)
         if form.is_valid():
             opportunity= form.save()
-            return HttpResponseRedirect(reverse('crm_view_opportunity', args=[opportunity.id]))
+            next_url = request.session.get('redirect_url') or reverse('crm_view_opportunity', args=[opportunity.id])   
+            return HttpResponseRedirect(next_url)
     else:
         form = forms.OpportunityForm(instance=opportunity)
     
     return render_to_response(
         'Crm/edit_opportunity.html',
-        locals(),
+        {'opportunity': opportunity, 'form': form},
         context_instance=RequestContext(request)
     )
 
@@ -1224,6 +1228,9 @@ def view_opportunity(request, opportunity_id):
     #contacts = list(set([a.contact for a in actions if a.contact]))
     #contacts.sort(key=lambda x: x.lastname.lower())
     #
+    
+    request.session["redirect_url"] = reverse('crm_view_opportunity', args=[opportunity.id])
+    
     context = {
         'opportunity': opportunity,
         'actions_by_set': actions_by_set,
@@ -1533,6 +1540,7 @@ def remove_action_from_opportunity(request, action_id, opportunity_id):
 #    )
 
 @user_passes_test(can_access)
+@popup_redirect
 def add_opportunity(request):
     next_url = request.session.get('redirect_url')
     if request.method == 'POST':

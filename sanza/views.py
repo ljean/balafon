@@ -7,7 +7,7 @@ from django.core.management import call_command
 from StringIO import StringIO
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from sanza.Crm.models import Contact, Entity, Group, Action
+from sanza.Crm.models import Contact, Entity, Group, Action, Opportunity
 from django.shortcuts import get_object_or_404
 from sanza.permissions import can_access
 import json
@@ -43,6 +43,7 @@ def auto_save_data(request, model_type, field_name, obj_id):
             "contact": Contact,
             "entity": Entity,
             "action": Action,
+            "opportunity": Opportunity,
         }[model_type]
         
         obj = get_object_or_404(model, id=obj_id)

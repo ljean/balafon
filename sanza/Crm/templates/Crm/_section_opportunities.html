@@ -11,8 +11,7 @@
 <table class="table table-striped">
   <tr>
     <th>{% trans "Name" %}</th>
-    <th>{% trans "Type" %}</th>
-    <th>{% trans "Status" %}</th>
+    <th>&nbsp;</th>
     <th>{% trans "Actions" %}</th>
     <th>{% trans "Date" %}</th>
     <th></th>
@@ -20,9 +19,10 @@
   </tr>
   {% for o in opportunities %}
   <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td>{{o.name}}</td>
-    <td>{{o.type|default:"&nbsp;"}}</td>
-    <td>{{o.status|default:"&nbsp;"}}</td>
+    <td><a href="{% url "crm_view_opportunity" o.id %}"><span class="glyphicon glyphicon-tag"></span> {{o.name}}</a></td>
+    <td><span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" o.id %}" contenteditable="true">
+      {{o.detail|linebreaksbr}}
+    </span></td>
     <td>{{o.action_set.count}}</td>
     <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
    
@@ -33,7 +33,7 @@
     </td>
    
     <td>
-      <a href="{% url "crm_view_opportunity" o.id %}">
+      <a class="colorbox-form" href="{% url "crm_edit_opportunity" o.id %}">
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </td>
@@ -46,11 +46,6 @@
 
 {% block section_buttons %}
   {% if not entity and not contact %}
-  <li><a href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a></li>
-  <li><a href="{% url "crm_all_opportunities_by" "date" %}" class="{% if ordering == "date" %}disabled{% endif %}">{% trans "Order by date" %}</a></li>
-  <li><a href="{% url "crm_all_opportunities_by" "name" %}" class="{% if ordering == "name" %}disabled{% endif %}">{% trans "Order by name" %}</a></li>
-  <li><a href="{% url "crm_all_opportunities_by" "type" %}" class="{% if ordering == "type" %}disabled{% endif %}">{% trans "Order by type" %}</a></li>
-  <li><a href="{% url "crm_all_opportunities_by" "status" %}" class="{% if ordering == "status" %}disabled{% endif %}">{% trans "Order by status" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a></li>
   {% endif %}
-
 {% endblock %}

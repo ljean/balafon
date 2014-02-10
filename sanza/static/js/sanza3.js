@@ -35,4 +35,10 @@ $(function() {
         $(this).closest(".action").find(".action-note").toggle();
         return false;  
     });
+    
+    $(".section-buttons ul.dropdown-menu").each(function(idx, elt) {
+        if ($(this).find("li").length==0) {
+            $(this).closest(".section-buttons").hide();
+        }
+    });
 })

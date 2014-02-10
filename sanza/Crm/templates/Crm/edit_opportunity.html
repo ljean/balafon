@@ -1,10 +1,7 @@
 {% extends "sanza/tab_form.html" %}
-{% load i18n %}{% load url from future %}
+{% load i18n %}
 
 {% block doc_header %}
-  <div class="entity_logo">
-    <img src="{{STATIC_URL}}img/folder.png"/>
-  </div>
   {% if opportunity %}
   <h2>{% trans "Edit opportunity" %}</h2>
   {% if opportunity.ended %}
@@ -15,14 +12,15 @@
   {% endif %}
 {% endblock %}
 
-  {% block form_buttons %}
-    <div class="buttons">
-    <input type="submit" value="{% trans "Save"%}" />
-    {% if opportunity %}
-    <a class="colorbox-form" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a>
-    <a href="{% url "crm_view_opportunity" opportunity.id %}">{% trans "Cancel" %}</a>
-    {% else %}
-      <a href="{{ next_url }}">{% trans "Cancel" %}</a>
-    {% endif %}
-    </div>
+{% block form_url %}{% if opportunity.id %}{% url "crm_edit_opportunity" opportunity.id %}{% else %}{% url "crm_add_opportunity" %}{% endif %}{% endblock %}
+
+
+{% block popup_buttons %}
+  <div class="buttons">
+  <input class="btn btn-primary" type="submit" value="{% trans "Save"%}" />
+  {% if opportunity %}
+  <a class="colorbox-form btn btn-default" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a>
+  {% endif %}
+  <a class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
+  </div>
 {% endblock %}

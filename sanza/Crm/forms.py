@@ -379,11 +379,11 @@ class ActionForm(BetterBsModelForm):
 class OpportunityForm(BetterModelForm):
     class Meta:
         model = models.Opportunity
-        fields=('name', 'status', 'type', 'ended', 'display_on_board', 'detail')
+        fields=('name', 'ended', 'display_on_board', 'detail')
         
         fieldsets = [
-                ('name', {'fields': ['name', 'type', 'status', 'detail'], 'legend': _(u'Summary')}),
-                ('address', {'fields': ['display_on_board', 'ended'], 'legend': _(u'Display')}),
+                ('name', {'fields': ['name', 'detail'], 'legend': _(u'Summary')}),
+                ('address', {'fields': ['display_on_board', 'ended'], 'legend': _(u'Show')}),
             ]
 
     def __init__(self, *args, **kwargs):

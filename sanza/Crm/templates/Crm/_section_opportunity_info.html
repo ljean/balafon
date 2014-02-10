@@ -1,18 +1,28 @@
 {% extends "sanza/_bs_section.html" %}
 {% load i18n sanza_utils %}
 
-{% block column_section_data %}
+{% block section_title %}
+  <div class="row">
+  <div class="col-md-12">
+    <h2><span class="glyphicon glyphicon-tag"></span> {{opportunity.name}}</h2>
+  </div>
+</div>
+{% endblock %}
+
+{% block section_data %}
 <div class="row">
   <div class="col-md-12">
-    <span class="title">{{opportunity.name}}</span>&nbsp;&nbsp;
-    {% if opportunity.type %}<span class="label">{{opportunity.type}}</span>{% endif %}
-    {% if opportunity.status %}<span class="label">{{opportunity.status}}</span>{% endif %}
+    <div class="">
+      <span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" opportunity.id %}" contenteditable="true">
+        {{opportunity.detail|linebreaksbr}}
+      </span>
+    </div>
   </div>
 </div>
 {% endblock %}
 
 
-{% block section_action %}
-    <li><a href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
+{% block section_buttons %}
+    <li><a class="colorbox-form" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
     <li><a href="{% url "search_opportunity" opportunity.id %}">{% trans "View contacts" %}</a></li>
 {% endblock %}
