@@ -63,7 +63,7 @@
         
           
         <div class="row">
-          <div class="col-md-7">
+          <div class="col-md-6">
             <div class="action-contacts">
               <span class="label label-primary">
                 <span class="glyphicon glyphicon-user"></span>
@@ -96,8 +96,22 @@
             &nbsp;
             </div>
           </div>
-          <div class="col-md-5">
+          <div class="col-md-6">
             <div class="action-details pull-right">
+              
+              <span class="action-opprtunity">
+              {% if a.opportunity %}
+                <span class="label label-primary">
+                  <span class="glyphicon glyphicon-tag"></span>
+                    <a href="{% url "crm_view_opportunity" a.opportunity.id %}">{{a.opportunity.name}}</a>
+                  <a href="{% url "crm_remove_action_from_opportunity" a.id a.opportunity.id %}" class="colorbox-form"><span class="glyphicon glyphicon-remove"></span></a>
+                </span>
+              {% else %}
+                <span class="label label-primary">
+                  <a href="{% url "crm_add_action_to_opportunity" a.id %}" class="colorbox-form"><span class="glyphicon glyphicon-tag"></span></a>
+                </span>
+              {% endif %}
+              </span>
               
               {% if a.type %}<div class="label label-default">{{ a.type }}</div>{% endif %}
               {% if a.number %}<div class="label label-default">{% trans "Number"%}: {{a.number }}</div>{% endif %}

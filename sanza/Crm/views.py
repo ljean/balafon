@@ -1469,6 +1469,59 @@ def remove_entity_from_action(request, action_id, entity_id):
         context_instance=RequestContext(request)
     )
 
+@user_passes_test(can_access)
+@popup_redirect
+def add_action_to_opportunity(request, action_id):
+    action = get_object_or_404(models.Action, id=action_id)
+
+    if request.method == "POST":
+        form = forms.SelectOpportunityForm(request.POST)
+        if form.is_valid():
+            opportunity = form.cleaned_data["opportunity"]
+            action.opportunity = opportunity
+            action.save()
+            next_url = request.session.get('redirect_url')
+            next_url = next_url or reverse('crm_view_opportunity', args=[opportunity.id])    
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.SelectOpportunityForm()
+    
+    return render_to_response(
+        'Crm/add_action_to_opportunity.html',
+        {'action': action, 'form': form},
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+@popup_redirect
+def remove_action_from_opportunity(request, action_id, opportunity_id):
+    action = get_object_or_404(models.Action, id=action_id)
+    opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
+
+    if request.method == "POST":
+        form = forms.ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                if action.opportunity == opportunity:
+                    action.opportunity = None
+                    action.save()
+            next_url = request.session.get('redirect_url')
+            next_url = next_url or reverse('crm_view_opportunity', args=[opportunity.id])    
+            return HttpResponseRedirect(next_url)
+    else:
+        form = forms.ConfirmForm()
+    
+    
+    return render_to_response(
+        'sanza/confirmation_dialog.html',
+        {
+            'form': form,
+            'message': _(u'Do you want to remove the action {0} from opportunity {1}?').format(action.subject, opportunity.name),
+            'action_url': reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity.id]),
+        },
+        context_instance=RequestContext(request)
+    )
+
 
 #@user_passes_test(can_access)
 #@popup_redirect

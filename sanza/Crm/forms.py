@@ -435,6 +435,22 @@ class SelectContactForm(forms.Form):
         except (ValueError, models.Contact.DoesNotExist):
             raise ValidationError(ugettext(u"The contact does'nt exist"))
         
+class SelectOpportunityForm(forms.Form):
+    
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop('choices', None)
+        super(SelectOpportunityForm, self).__init__(*args, **kwargs)
+        widget = OpportunityAutoComplete(
+            attrs={'placeholder': _(u'Enter the name of a opportunity'), 'size': '50', 'class': 'colorbox'})
+        self.fields["opportunity"] = forms.CharField(label=_(u"Opportunity"), widget=widget)
+
+    def clean_opportunity(self):
+        try:
+            opportunity_id = int(self.cleaned_data["opportunity"])
+            return models.Opportunity.objects.get(id=opportunity_id)
+        except (ValueError, models.Opportunity.DoesNotExist):
+            raise ValidationError(ugettext(u"The opportunity does'nt exist"))
+        
 class SameAsForm(forms.Form):
     contact = forms.IntegerField(label=_(u"Contact"))
     

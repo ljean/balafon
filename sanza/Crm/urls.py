@@ -92,6 +92,8 @@ urlpatterns = patterns('sanza.Crm.views',
     url(r'^actions-not-planned/$', views.NotPlannedActionArchiveView.as_view(), name="crm_actions_not_planned"),
     
     url(r'allowed-action-status/$', 'get_action_status', name="crm_get_action_status"),
+    url(r'add-action-to-opportunity/(?P<action_id>\d+)/$', 'add_action_to_opportunity', name='crm_add_action_to_opportunity'),
+    url(r'remove-action-from-opportunity/(?P<action_id>\d+)/(?P<opportunity_id>\d+)/$', 'remove_action_from_opportunity', name='crm_remove_action_from_opportunity'),    
 )
 
 urlpatterns += patterns('',

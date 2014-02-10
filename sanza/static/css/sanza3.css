@@ -468,3 +468,6 @@ ul.chosen-choices .search-field input {
 .done-action-flag:hover .done-date {
   display: inline;
 }
+.action-opprtunity {
+  margin-right: 2px;
+}
