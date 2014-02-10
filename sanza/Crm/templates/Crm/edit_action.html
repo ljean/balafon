@@ -6,6 +6,7 @@
   {% include "sanza/_calendar.html" with field="date" yearRange="c:c+2" %}
 <script>
   $(function() {
+    var dont_change_status = true;
     $("select#id_type").change(function() {
       $.ajax({
           url: "{% url "crm_get_action_status" %}?t="+$(this).val(),
@@ -21,6 +22,10 @@
             $("select#id_status option").trigger("chosen:updated");
           }
       });
+      if (!dont_change_status) {
+        $("select#id_status").val("");
+      }
+      dont_change_status = false;
       return false;
     });
     $("select#id_type").change();

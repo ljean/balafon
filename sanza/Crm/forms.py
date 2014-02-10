@@ -363,6 +363,9 @@ class ActionForm(BetterBsModelForm):
             allowed_status = ([] if t.default_status else [None]) + list(t.allowed_status.all())
             if len(allowed_status) > 0 and not (s in allowed_status):
                 raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+        else:
+            if s:
+                raise ValidationError(ugettext(u"Please select a type before defining the status"))
         return s
     
     def clean_planned_date(self):

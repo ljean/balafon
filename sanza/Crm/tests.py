@@ -798,7 +798,23 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual([], data['allowed_status'])
-    
+        
+    def test_allowed_status_no_type(self, ):
+        url = reverse("crm_get_action_status")+"?t="+str(0)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status'])
+        
+    def test_allowed_status_unknown_type(self, ):
+        url = reverse("crm_get_action_status")+"?t=100"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        
+    def test_allowed_status_unknown_type(self, ):
+        url = reverse("crm_get_action_status")+"?t=toto"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
         
     def test_edit_action_on_entity(self):
         entity = mommy.make(models.Entity)
@@ -825,6 +841,68 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.entities.count(), 1)
         self.assertEqual(action.entities.all()[0], entity)
         
+        
+    def test_edit_action_status_not_allowed(self):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="not tested", type=at, status=as1)
+        action.entities.add(entity)
+        action.save()
+    
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "", 'time': "",
+            'status': as3.id, 'in_charge': "", 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "not tested")
+        
+    def test_edit_action_status_no_type(self):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="not tested", type=at, status=as1)
+        action.entities.add(entity)
+        action.save()
+    
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status': as3.id, 'in_charge': "", 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "not tested")
 
 class BoardPanelTest(BaseTestCase):
     def test_view_board_panel(self):

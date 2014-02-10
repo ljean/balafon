@@ -315,7 +315,10 @@ def add_group(request):
 
 @user_passes_test(can_access)
 def get_action_status(request):
-    action_type_id = request.GET.get("t", 0)
+    try:
+        action_type_id = int(request.GET.get("t", 0))
+    except ValueError:
+        raise Http404
     if action_type_id:
         action_type = get_object_or_404(models.ActionType, id=action_type_id)
         allowed_status = [s.id for s in action_type.allowed_status.all()]
