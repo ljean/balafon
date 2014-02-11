@@ -10,31 +10,32 @@
 {% if all_opportunities %}{% autopaginate opportunities 25 %}{% endif %}
 <table class="table table-striped">
   <tr>
+    <th></th>
     <th>{% trans "Name" %}</th>
     <th>&nbsp;</th>
     <th>{% trans "Actions" %}</th>
     <th>{% trans "Date" %}</th>
     <th></th>
-    <th></th>
   </tr>
   {% for o in opportunities %}
   <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="{% url "crm_view_opportunity" o.id %}"><span class="glyphicon glyphicon-tag"></span> {{o.name}}</a></td>
-    <td><span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" o.id %}" contenteditable="true">
-      {{o.detail|linebreaksbr}}
-    </span></td>
-    <td>{{o.action_set.count}}</td>
-    <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
-   
     <td>
       <a rel="{% url "crm_toggle_opportunity_bookmark" o.id %}">
         <span class="glyphicon glyphicon-{% if o.display_on_board %}star{% else %}star-empty{% endif %}"></span>
       </a>
     </td>
    
+    <td><a href="{% url "crm_view_opportunity" o.id %}"><span class="glyphicon glyphicon-tag"></span> {{o.name}}</a></td>
+    
+    <td><span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" o.id %}" contenteditable="true">
+      {{o.detail|linebreaksbr}}
+    </span></td>
+    <td>{{o.action_set.count}}</td>
+    <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
+    
     <td>
-      <a class="colorbox-form" href="{% url "crm_edit_opportunity" o.id %}">
-        <span class="glyphicon glyphicon-cog"></span>
+      <a class="colorbox-form" href="{% url "crm_delete_opportunity" o.id %}">
+        <span class="glyphicon glyphicon-remove"></span>
       </a>
     </td>
   </tr>

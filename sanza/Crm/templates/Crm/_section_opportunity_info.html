@@ -25,5 +25,6 @@
 
 
 {% block section_buttons %}
-    <li><a class="colorbox-form" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a></li>
 {% endblock %}

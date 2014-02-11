@@ -161,6 +161,44 @@ class CreateEntityTest(BaseTestCase):
 
 class OpportunityTest(BaseTestCase):
 
+    def test_view_delete_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, models.Opportunity.objects.count())
+    
+    def test_delete_empty_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': True})
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(0, models.Opportunity.objects.count())
+    
+    def test_delete_opportunity_actions(self):
+        opportunity = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': True})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, models.Opportunity.objects.count())
+        self.assertEqual(1, models.Action.objects.count())
+        self.assertEqual(action, models.Action.objects.all()[0])
+    
+    
+    def test_delete_opportunity_cancel(self):
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': False})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, models.Opportunity.objects.count())
+        
+
     def test_view_add_action_to_opportunity(self):
         action = mommy.make(models.Action)
         opportunity = mommy.make(models.Opportunity)

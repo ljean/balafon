@@ -1271,6 +1271,9 @@ def delete_opportunity(request, opportunity_id):
         form = forms.ConfirmForm(request.POST)
         if form.is_valid():
             if form.cleaned_data["confirm"]:
+                for a in opportunity.action_set.all():
+                    a.opportunity = None
+                    a.save()
                 opportunity.delete()
                 next_url = reverse('crm_board_panel')    
                 return HttpResponseRedirect(next_url)
