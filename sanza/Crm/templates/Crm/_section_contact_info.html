@@ -11,15 +11,23 @@
     </div>
     <div style="display: inline-block; vertical-align: middle;">
     {{contact.fullname}}
-    {% if contact.same_as %}
-      {% if contact == contact.same_as.main_contact %}
-        <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
-    {% else %}
-      <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id contact.id %}">
-        <span class="glyphicon glyphicon-certificate disabled"  title="Make main contact"> </span>
-      </a>
-    {% endif %}
-    {% endif %}
+      {% if contact.same_as %}
+        {% if contact == contact.same_as.main_contact %}
+            <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
+        {% else %}
+          <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id contact.id %}">
+            <span class="glyphicon glyphicon-certificate disabled"  title="Make main contact"> </span>
+          </a>
+        {% endif %}
+      {% endif %}
+      
+      {% if not contact.main_contact %}
+        <div class="label label-default">{% trans "secondary" %}</div> 
+      {% endif %}
+      
+      {% if contact.has_left %}
+        <div class="label label-warning">{% trans "has left" %}</div> 
+      {% endif %}
     <div class="section-subtitle">{{contact.title}}</div>
     </div>
   </div>

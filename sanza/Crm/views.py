@@ -33,27 +33,21 @@ from django.views.generic import ListView
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
     
-    all_contacts = request.GET.get('all', 0)
-    
     entity = get_object_or_404(models.Entity, id=entity_id)
-    contacts = entity.contact_set.all().order_by("-main_contact", "lastname", "firstname")
-    if not all_contacts:
-        contacts = contacts.filter(has_left=False)
+    contacts = entity.contact_set.all().order_by("has_left", "-main_contact", "lastname", "firstname")
+    
     actions = models.Action.objects.filter(Q(entities=entity) | Q(contacts__entity=entity),
         Q(archived=False)).distinct().order_by("planned_date", "priority")
     
     actions_by_set = get_actions_by_set(actions, 5)    
     
-    show_all_contacts = not all_contacts and (entity.contact_set.filter(has_left=True).count()>0)
     multi_user = True
     request.session["redirect_url"] = reverse('crm_view_entity', args=[entity_id])
     
     context = {
-        'all_contacts': all_contacts,
         "entity": entity,
         'contacts': contacts,
         'actions_by_set': actions_by_set,
-        'show_all_contacts': show_all_contacts,
         'multi_user': multi_user,
     }
     

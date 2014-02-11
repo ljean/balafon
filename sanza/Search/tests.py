@@ -792,7 +792,6 @@ class MainContactAndHasLeftSearchTest(BaseTestCase):
         c = models.Contact.objects.all()[0]
         self.assertEqual(c.main_contact, True)
         
-        
     def test_two_main_contacts(self):
         e, c = self._make_contact(False, False)
         c2 = self._make_another_contact(e, True, False)
@@ -805,6 +804,57 @@ class MainContactAndHasLeftSearchTest(BaseTestCase):
         self.assertContains(response, e.name)
         self.assertNotContains(response, c.lastname)
         self.assertContains(response, c2.lastname)
+        
+    def test_search_has_left_exclude(self):
+        e, c1 = self._make_contact(True, True)
+        c2 = self._make_another_contact(e, True, False)
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(e)
+        group.save()
+        
+        url = reverse('search')
+        data = {"gr0-_-group-_-0": group.id}
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertNotContains(response, c1.lastname)
+        self.assertContains(response, c2.lastname)
+        
+    def test_search_has_left_include(self):
+        e, c1 = self._make_contact(True, True)
+        c2 = self._make_another_contact(e, True, False)
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(e)
+        group.save()
+        
+        url = reverse('search')
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-contact_has_left-_-1": 1, }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, c2.lastname)
+        
+    def test_search_has_left_only(self):
+        e, c1 = self._make_contact(True, True)
+        c2 = self._make_another_contact(e, True, False)
+        
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(e)
+        group.save()
+        
+        url = reverse('search')
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-contact_has_left-_-1": 0, }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, e.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, c2.lastname)
         
 class MailtoContactsTest(BaseTestCase):
     
@@ -1511,6 +1561,40 @@ class QuickSearchTest(BaseTestCase):
         self.assertContains(response, luke.firstname)
         self.assertNotContains(response, doe.firstname)
         
+    def test_has_left_contact_by_name(self):    
+        sw = mommy.make(models.Entity)
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", entity=sw, has_left=True)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"Skywalker"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, luke.firstname)
+        
+    def test_has_left_contact_by_entity_name(self):    
+        sw = mommy.make(models.Entity, name="Star-Wars", is_single_contact=False)
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", entity=sw, has_left=True)
+        leia = mommy.make(models.Contact, firstname="Leia", lastname="Skywalker", entity=sw)
+        shmi = mommy.make(models.Contact, firstname="Shmi", lastname="Skywalker", entity=sw, main_contact=False)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"Star-Wars"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, anakin.firstname)
+        self.assertNotContains(response, shmi.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertContains(response, leia.firstname)
+        
     def test_contact_by_entity_name(self):    
         doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
         sw = mommy.make(models.Entity, name="Starwars")
@@ -1555,6 +1639,30 @@ class QuickSearchTest(BaseTestCase):
         self.assertContains(response, obi.firstname)
         self.assertContains(response, sw.name)
         self.assertNotContains(response, doe.firstname)
+        
+    def test_contact_by_phone_has_left(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", phone="04.99.99.99.99", has_left=True)
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi", mobile="04.99.00.00.00", has_left=True)
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", phone="03.33.33.33.33")
+        sw = mommy.make(models.Entity, phone="04.99.11.22.33")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw, has_left=True)
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"04.99"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.phone)
+        self.assertContains(response, obi.mobile)
+        self.assertContains(response, sw.phone)
+        self.assertNotContains(response, doe.phone)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, sw.name)
+        self.assertNotContains(response, doe.firstname)
 
         
     def test_contact_by_email(self):    
@@ -1563,6 +1671,33 @@ class QuickSearchTest(BaseTestCase):
         doe = mommy.make(models.Contact, firstname="Doe", lastname="John", email="john.doe@toto.fr")
         sw = mommy.make(models.Entity, email="contact@starwars.com")
         luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw)
+        sidious = mommy.make(models.Contact, firstname="Dark", lastname="Sidious", entity=sw, email="sidious@darkside.com")
+            
+        url = reverse('quick_search')
+        
+        data = {"text": u"@starwars.com"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, anakin.email)
+        self.assertContains(response, obi.email)
+        self.assertContains(response, sw.email)
+        self.assertNotContains(response, doe.email)
+        self.assertNotContains(response, sidious.email)
+        
+        self.assertContains(response, anakin.firstname)
+        self.assertContains(response, obi.firstname)
+        self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+        self.assertNotContains(response, sidious.firstname)
+        
+    def test_contact_by_email_has_left(self):    
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker", email="anakin@starwars.com", has_left=True)
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi", email="obiwan@starwars.com", has_left=True)
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", email="john.doe@toto.fr")
+        sw = mommy.make(models.Entity, email="contact@starwars.com")
+        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=sw, has_left=True)
         sidious = mommy.make(models.Contact, firstname="Dark", lastname="Sidious", entity=sw, email="sidious@darkside.com")
             
         url = reverse('quick_search')

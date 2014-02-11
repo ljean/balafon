@@ -23,6 +23,55 @@ class BaseTestCase(TestCase):
 
     def _login(self):
         self.client.login(username="toto", password="abc")
+
+class ViewEntityTest(BaseTestCase):
+
+    def test_view_entity(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        self.assertContains(response, reverse("crm_view_contact", args=[contact.id]))
+        
+    def test_view_entity_secondary_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        contact1 = mommy.make(models.Contact, main_contact=True, entity=entity)
+        contact2 = mommy.make(models.Contact, main_contact=False, entity=entity)
+        
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        url1 = reverse("crm_view_contact", args=[contact1.id])
+        url2 = reverse("crm_view_contact", args=[contact2.id])
+        self.assertContains(response, url1)
+        self.assertContains(response, url2)
+        tag1 = BS4(response.content).select('.ut-contact-{0.id} .ut-secondary-contact'.format(contact1))
+        self.assertEqual(len(tag1), 0)
+        tag2 = BS4(response.content).select('.ut-contact-{0.id} .ut-secondary-contact'.format(contact2))
+        self.assertEqual(len(tag2), 1)
+        
+    def test_view_entity_has_left_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        contact1 = mommy.make(models.Contact, has_left=False, entity=entity)
+        contact2 = mommy.make(models.Contact, has_left=True, entity=entity)
+        
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        url1 = reverse("crm_view_contact", args=[contact.id])
+        url2 = reverse("crm_view_contact", args=[contact2.id])
+        self.assertContains(response, url1)
+        self.assertContains(response, url2)
+        tag1 = BS4(response.content).select('.ut-contact-{0.id} .ut-has-left'.format(contact1))
+        self.assertEqual(len(tag1), 0)
+        tag2 = BS4(response.content).select('.ut-contact-{0.id} .ut-has-left'.format(contact2))
+        self.assertEqual(len(tag2), 1)
         
 class CreateEntityTest(BaseTestCase):
 

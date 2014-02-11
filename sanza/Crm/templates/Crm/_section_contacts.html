@@ -14,9 +14,14 @@
       </tr>
       {% for c in contacts %}
       {% with c.has_left as has_left %}
-      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}has-left{% endif %}">
         {% if entity %}
-          <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+          <td class="ut-contact-{{c.id}}">
+            <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
+            
+            {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
+            {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+          </td>
         {% else %}
           {% if c.entity.is_single_contact %}
             <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
@@ -41,9 +46,6 @@
 {% block section_buttons %}
   {% if entity %}
     <li><a class="colorbox-form" href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a></li>
-  {% endif %}
-  {% if entity and show_all_contacts %}
-    <li><a class="" href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a></li>
   {% endif %}
   {% if opportunity %}
     <li><a href="{% url "search_opportunity" opportunity.id %}">{% trans "View in search" %}</a></li>

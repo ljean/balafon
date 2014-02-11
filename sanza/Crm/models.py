@@ -227,7 +227,7 @@ class Entity(TimeStampedModel):
         return self.get_full_address()
     
     def main_contacts(self):
-        return [c for c in self.contact_set.filter(main_contact=True).order_by("lastname", "firstname")]
+        return [c for c in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")]
     
     def last_action(self):
         try:
@@ -535,8 +535,8 @@ class Contact(TimeStampedModel):
         return [x for x in (self.phone, self.mobile) if x]
     
     def get_roles(self):
-        has_left = [__(u'has left')] if self.has_left else []
-        return has_left + [x.name for x in self.role.all()]
+        #has_left = [__(u'has left')] if self.has_left else []
+        return [x.name for x in self.role.all()]
     
     def has_entity(self):
         try:

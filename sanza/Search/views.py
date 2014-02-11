@@ -48,7 +48,7 @@ def quick_search(request):
             qs = Entity.objects.filter(is_single_contact=False)
             entities_by_name = filter_icontains_unaccent(qs, 'name', text)    
             
-            qs = Contact.objects.filter(has_left=False)
+            qs = Contact.objects.all()#.filter(has_left=False)
             contacts_by_name = filter_icontains_unaccent(qs, 'lastname', text)
             
             for e in entities_by_name:

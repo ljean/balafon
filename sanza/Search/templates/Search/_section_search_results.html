@@ -37,9 +37,9 @@
         {% for c in contacts %}
             <tr>
             <td>
-            <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
-              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}
-            </a>{% endif %}
+              <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+              {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
             </td>
             <td>
             <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">

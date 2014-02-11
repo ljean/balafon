@@ -351,6 +351,23 @@ class SecondarySearchForm(SearchFieldForm):
         elif value == 0:
             return {'main_contact': False}
 
+class ContactHasLeft(SearchFieldForm):
+    _name = 'contact_has_left'
+    _label = _(u'Contact has left')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactHasLeft, self).__init__(*args, **kwargs)
+        choices = ((0, _('Only')), (1, _('Include')),)
+        field = forms.ChoiceField(choices=choices, label=self._label)
+        self._add_field(field)
+            
+    def get_lookup(self):
+        value = int(self._value)
+        if value == 1:
+            return {} #the lookup 'has_left' will be removed by the search form
+        elif value == 0:
+            return {'has_left': True}
+
 class ContactRoleSearchForm(SearchFieldForm):
     _name = 'contact_role'
     _label = _(u'Contact role')

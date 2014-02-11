@@ -277,10 +277,9 @@ class SearchForm(forms.Form):
         return list(contacts)
     
     def _get_filter_func(self):
-        #form_names = [f._name for f in chain.from_iterable(self._forms.values())]
-        #if 'main_contact' in form_names:
-        #    return lambda c: (not c.has_left)
-        #return lambda c: (not c.has_left) and c.main_contact
+        form_names = [f._name for f in chain.from_iterable(self._forms.values())]
+        if 'contact_has_left' in form_names:
+            return lambda c: c
         return lambda c: c and (not c.has_left)
 
     def get_contacts_by_entity(self):
