@@ -1059,6 +1059,12 @@ def create_action(request, entity_id, contact_id):
         initial = {}
         if request.user.is_staff and request.user.first_name:
             initial['in_charge'] = request.user
+        try:
+            opp_id = int(request.GET.get('opportunity', 0))
+            initial['opportunity'] = models.Opportunity.objects.get(id=opp_id)
+        except (ValueError, models.Opportunity.DoesNotExist):
+            pass
+        
         form = forms.ActionForm(initial=initial)
     
     context = {
@@ -1557,7 +1563,7 @@ def add_opportunity(request):
     next_url = next_url or reverse('crm_board_panel')    
     return render_to_response(
         'Crm/edit_opportunity.html',
-        locals(),
+        {'next_url': next_url, 'form': form},
         context_instance=RequestContext(request)
     )
 

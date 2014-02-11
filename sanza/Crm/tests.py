@@ -47,7 +47,7 @@ class CreateEntityTest(BaseTestCase):
         e = models.Entity.objects.all()[0]
         self.assertContains(response, 'colorbox')
         self.assertContains(response,
-            reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, None)
     
@@ -60,7 +60,7 @@ class CreateEntityTest(BaseTestCase):
         e = models.Entity.objects.all()[0]
         self.assertContains(response, 'colorbox')
         self.assertContains(response,
-            reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, t)
         
@@ -73,7 +73,7 @@ class CreateEntityTest(BaseTestCase):
         e = models.Entity.objects.all()[0]
         self.assertContains(response, 'colorbox')
         self.assertContains(response,
-            reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, t)
         
@@ -215,20 +215,76 @@ class OpportunityTest(BaseTestCase):
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.opportunity, None)
         
-
-    def test_add_opportunity(self):
-        
-        entity1 = mommy.make(models.Entity, name='ent1', relationship_date='2012-01-30')
-        entity2 = mommy.make(models.Entity, name='ent2', relationship_date='2012-01-30')
-        other_entity = mommy.make(models.Entity, name='ent3', relationship_date='2012-01-30')
-        
+    def test_view_add_opportunity(self):
         url = reverse("crm_add_opportunity")
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+    def test_add_opportunity(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "ABC",
+            "detail": "ooo",
+            "ended": True,
+            "display_on_board": True
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
         
-    def test_add_opportunity_for_entity(self):
-        pass
-        #self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
+            
+    def test_add_opportunity2(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "DEF",
+            "detail": "",
+            "ended": False,
+            "display_on_board": False
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
+        
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
+            
+    def test_add_opportunityno_name(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "",
+            "detail": "",
+            "ended": False,
+            "display_on_board": False
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(BS4(response.content).select('.field-error')), 1)
+        
+        self.assertEqual(0, models.Opportunity.objects.count())
+
+    def test_edit_opportunity(self):
+        o = mommy.make(models.Opportunity)
+        url = reverse("crm_edit_opportunity", args=[o.id])
+        data = {
+            'name': "ABC",
+            "detail": "ooo",
+            "ended": True,
+            "display_on_board": True
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
+        
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
 
     def test_view_opportunity(self):
         entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
@@ -283,28 +339,28 @@ class OpportunityTest(BaseTestCase):
         self.assertTrue(content.find(contact2.email)>=0)
         self.assertFalse(content.find(contact3.email)>=0)
     
-    #def test_view_opportunity_contacts(self):
-    #    entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
-    #    entity2 = mommy.make(models.Entity, relationship_date='2012-01-30')
-    #    opp1 = mommy.make(models.Opportunity, entity=entity1)
-    #    contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
-    #    contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity2)
-    #    contact3 = mommy.make(models.Contact, lastname='GHI', entity=entity1)
-    #    act1 = mommy.make(models.Action, opportunity=opp1)
-    #    act1.contacts.add(contact1)
-    #    act1.save()
-    #    act2 = mommy.make(models.Action, opportunity=opp1)
-    #    act2.entities.add(entity2)
-    #    act2.save()
-    #    act3 = mommy.make(models.Action)
-    #    act3.contacts.add(contact3)
-    #    act3.save()
-    #    
-    #    response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
-    #    self.assertEqual(200, response.status_code)
-    #    self.assertContains(response, contact1.lastname)
-    #    self.assertContains(response, contact2.lastname)
-    #    self.assertNotContains(response, contact3.lastname)
+    def test_view_opportunity_contacts(self):
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        entity2 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity, entity=entity1)
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity2)
+        contact3 = mommy.make(models.Contact, lastname='GHI', entity=entity1)
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.contacts.add(contact1)
+        act1.save()
+        act2 = mommy.make(models.Action, opportunity=opp1)
+        act2.entities.add(entity2)
+        act2.save()
+        act3 = mommy.make(models.Action)
+        act3.contacts.add(contact3)
+        act3.save()
+        
+        response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
         
     def test_view_opportunityies_date_mixes(self):
         opp1 = mommy.make(models.Opportunity)
@@ -1508,6 +1564,31 @@ class ActionTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Action.objects.count(), 0)
+        
+    def test_view_add_action_from_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        url = reverse('crm_create_action', args=[0, 0])+"?opportunity={0}".format(opportunity.id)
+        response = self.client.get(url)
+        self.assertEqual(BS4(response.content).select('#id_opportunity')[0]["value"], str(opportunity.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 0)
+    
+    def test_add_action_from_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        url = reverse('crm_create_action', args=[0, 0])+"?opportunity={0}".format(opportunity.id)
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status': "", 'in_charge': "", 'detail':"ABCDEF", 'opportunity': opportunity.id,
+            'amount': 0, 'number': 0}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(list(errors), [])
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.subject, data["subject"])
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(action.opportunity, opportunity)
         
     def test_add_action_from_board(self):
         url = reverse('crm_create_action', args=[0, 0])

@@ -324,9 +324,9 @@ class ActionForm(BetterBsModelForm):
     class Meta:
         model = models.Action
         fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
-            'amount', 'number', 'planned_date',)
+            'amount', 'number', 'planned_date', 'opportunity')
         fieldsets = [
-            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'in_charge'], 'legend': _(u'Summary')}),
+            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
             ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
             ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
@@ -341,9 +341,8 @@ class ActionForm(BetterBsModelForm):
             choices = [] if default_status else [('', "---------")]
             self.fields['status'].choices = choices + [(s.id, s.name) for s in instance.type.allowed_status.all()]
             #self.fields['status'].initial = default_status.id if default_status else None
-        #else:
-        #    self.fields['status'].queryset = forms.HiddenInput()
-            
+        
+        self.fields['opportunity'].widget = forms.HiddenInput()    
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
         self.fields['planned_date'].widget = forms.HiddenInput()
         dt = self.instance.planned_date if self.instance else self.fields['planned_date'].initial
