@@ -1250,22 +1250,22 @@ def view_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
-@user_passes_test(can_access)
-def mailto_opportunity_contacts(request, opportunity_id):
-    """Open the mail client in order to send email to contacts"""
-    opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-    actions = opportunity.action_set.all()
-    emails = []
-    for action in actions:
-        emails += [c.get_email for c in action.contacts.all() if c.get_email]
-        for e in action.entities.all():
-            emails += [c.get_email for c in e.contact_set.all() if c.get_email]
-    emails = set(emails)
-    if len(emails)>25:
-        return HttpResponse(' '.join(emails), mimetype='text/plain')
-    else:
-        mailto = u'mailto:'+','.join(emails)
-        return HttpResponseRedirectMailtoAllowed(mailto)
+#@user_passes_test(can_access)
+#def mailto_opportunity_contacts(request, opportunity_id):
+#    """Open the mail client in order to send email to contacts"""
+#    opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
+#    actions = opportunity.action_set.all()
+#    emails = []
+#    for action in actions:
+#        emails += [c.get_email for c in action.contacts.all() if c.get_email]
+#        for e in action.entities.all():
+#            emails += [c.get_email for c in e.contact_set.all() if c.get_email]
+#    emails = set(emails)
+#    if len(emails)>25:
+#        return HttpResponse(' '.join(emails), mimetype='text/plain')
+#    else:
+#        mailto = u'mailto:'+','.join(emails)
+#        return HttpResponseRedirectMailtoAllowed(mailto)
 
 @user_passes_test(can_access)
 @popup_redirect

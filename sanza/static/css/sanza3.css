@@ -471,3 +471,8 @@ ul.chosen-choices .search-field input {
 .action-opprtunity {
   margin-right: 2px;
 }
+.opportunity-title h2 {
+  margin: 0;
+  padding: 0;
+  font-size: 24px;
+}

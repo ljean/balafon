@@ -45,7 +45,7 @@
   {% if entity and show_all_contacts %}
     <li><a class="" href="{% url "crm_view_entity" entity.id %}?all=1">{% trans "View old contacts" %}</a></li>
   {% endif %}
-  {% if mailto and opportunity %}
-    <li><a class="" href="{% url "crm_mailto_opportunity_contacts" opportunity.id %}" target="_blank">{% trans "Mail to" %}</a></li>
+  {% if opportunity %}
+    <li><a href="{% url "search_opportunity" opportunity.id %}">{% trans "View in search" %}</a></li>
   {% endif %}
 {% endblock %}

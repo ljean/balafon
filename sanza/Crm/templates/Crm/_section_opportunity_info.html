@@ -4,7 +4,9 @@
 {% block section_title %}
   <div class="row">
   <div class="col-md-12">
-    <h2><span class="glyphicon glyphicon-tag"></span> {{opportunity.name}}</h2>
+    <div class="opportunity-title">
+      <h2><span class="glyphicon glyphicon-tag"></span> {{opportunity.name}}</h2>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -24,5 +26,4 @@
 
 {% block section_buttons %}
     <li><a class="colorbox-form" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
-    <li><a href="{% url "search_opportunity" opportunity.id %}">{% trans "View contacts" %}</a></li>
 {% endblock %}
