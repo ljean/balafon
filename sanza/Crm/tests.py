@@ -12,14 +12,19 @@ from django.core import management
 from cStringIO import StringIO
 import sys
 from datetime import datetime, timedelta
-        
+import logging
+  
 class BaseTestCase(TestCase):
-
+    
     def setUp(self):
+        logging.disable(logging.CRITICAL)
         self.user = User.objects.create(username="toto", is_staff=True)
         self.user.set_password("abc")
         self.user.save()
         self._login()
+        
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def _login(self):
         self.client.login(username="toto", password="abc")

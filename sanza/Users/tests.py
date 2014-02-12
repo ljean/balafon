@@ -19,16 +19,21 @@ from sanza.Users.models import UserPreferences, Favorite
 from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
 import json
+import logging
 
 
 class BaseTestCase(TestCase):
 
     def setUp(self):
+        logging.disable(logging.CRITICAL)
         self.user = User.objects.create(username="toto")
         self.user.set_password("abc")
         self.user.is_staff = True
         self.user.save()
         self._login()
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def _login(self):
         return self.client.login(username="toto", password="abc")
