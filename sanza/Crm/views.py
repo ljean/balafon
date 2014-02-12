@@ -1577,6 +1577,7 @@ def add_action(request):
     )
 
 @user_passes_test(can_access)
+@popup_redirect
 def edit_custom_fields(request, model_name, instance_id):
     try:
         form_class = {
@@ -1598,7 +1599,7 @@ def edit_custom_fields(request, model_name, instance_id):
     
     return render_to_response(
         'Crm/edit_custom_fields.html',
-        {'form': form, 'instance': instance},
+        {'form': form, 'instance': instance, 'model_name': model_name},
         context_instance=RequestContext(request)
     )
     

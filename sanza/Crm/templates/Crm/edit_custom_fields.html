@@ -1,16 +1,16 @@
 {% extends "sanza/popup_form.html" %}
 {% load i18n %}
 
-{% block document_content %}
-  <h2>{% blocktrans %}Edit '{{instance}}'{% endblocktrans %}</h2>
-  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
-    <div class="buttons">
-    <input type="submit" value="{% trans "Save"%}">
-    <a href="{{ instance.get_absolute_url }}">{% trans "Cancel" %}</a>
-    </div>
-    <ul>
-      {{form.as_ul}}
-    </ul>
-  </form>
+{% block extra_head %}
+  {{block.super}}
   {% include "sanza/_calendar.html" %}
+{% endblock %}
+
+{% block title %}Edit '{{instance}}'{% endblock %}
+
+{% block form_url %}{% url "crm_edit_custom_fields" model_name instance.id %}{% endblock %}
+
+{% block popup_buttons %}
+  <input class="btn btn-md btn-primary" type="submit" value="{% trans "Save"%}" />
+  <a class="btn btn-md btn-default cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}
