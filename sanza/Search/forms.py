@@ -558,3 +558,6 @@ class GroupForContactsForm(forms.Form):
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
         return Contact.objects.filter(id__in=ids)
+
+class SearchNameForm(forms.Form):
+    name = forms.CharField(required=True, label=_(u"Name"))

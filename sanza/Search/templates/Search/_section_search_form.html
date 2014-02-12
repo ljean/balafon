@@ -120,6 +120,7 @@
       return false;
     })
     
+    /*
     $("#save-button").click(function() {
       if ($("input[name=name]").parent().is(":visible")) {
         $("form.search-form").attr('action', $(this).attr('href'));
@@ -130,6 +131,7 @@
       }
       return false;
     })
+    */
     
     $('.datepicker').live('click', function() {
       $(this).datepicker({
@@ -161,5 +163,8 @@
 {% endblock %}
 
 {% block section_buttons %}
+{% comment %}
 <li><a href="{% url "search_save" search.id %}" id="save-button">{% trans "Save" %}</a></li>
+{% endcomment %}
+<li><a href="{% url "search_name" search.id %}" class="colorbox-form">{% trans "Save" %}</a></li>
 {% endblock %}

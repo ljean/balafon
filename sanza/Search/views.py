@@ -104,7 +104,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     data = None
     contacts_count = 0
     has_empty_entities = False
-    group = opportunity = None
+    group = opportunity = city = None
     
     if request.method == "POST":
         data = request.POST
@@ -137,10 +137,41 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count, 'entities_count': entities_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
+            'city': city,
         },
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+def search_name(request, search_id=0):
+    if request.method == "POST":
+        form = forms.SearchNameForm(request.POST)
+        if form.is_valid():
+            save_url = reverse("search_save", args=[search_id])
+            script = u'''
+                $("input[name=name]").val("{0}")
+                $("form.search-form").attr('action', "{1}");
+                $("form.search-form").submit();
+                $("form.search-form").attr('action', '');
+                $.colorbox.close();
+            '''.format(form.cleaned_data["name"], save_url)
+            return HttpResponse(u"<script>{0}</script>".format(script))
+    else:
+        initial = {}
+        if search_id:
+            search = get_object_or_404(models.Search, id=search_id)
+            initial = {'name': search.name}
+        form = forms.SearchNameForm(initial=initial)
     
+    return render_to_response(
+        'Search/search_name.html',
+        {
+            'form': form,
+            'search_id': search_id,
+        },
+        context_instance=RequestContext(request)
+    )
+
 @user_passes_test(can_access)
 def save_search(request, search_id=0):
     if search_id:

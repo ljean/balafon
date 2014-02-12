@@ -18,4 +18,5 @@ urlpatterns = patterns('sanza.Search.views',
     url(r'^add-contacts-to-group$', 'add_contacts_to_group', name='search_add_contacts_to_group'),
     url(r'^contacts-admin$', 'contacts_admin', name='search_contacts_admin'),
     url(r'^export_to_pdf$', 'export_to_pdf', name='search_export_to_pdf'),
+    url(r'^search-name/(?P<search_id>\d*)$', 'search_name', name='search_name'),
 )
