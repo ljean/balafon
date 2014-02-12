@@ -312,8 +312,6 @@ class OpportunityTest(BaseTestCase):
         data = {
             'name': "ABC",
             "detail": "ooo",
-            "ended": True,
-            "display_on_board": True
         }
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -329,8 +327,6 @@ class OpportunityTest(BaseTestCase):
         data = {
             'name': "DEF",
             "detail": "",
-            "ended": False,
-            "display_on_board": False
         }
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -346,8 +342,6 @@ class OpportunityTest(BaseTestCase):
         data = {
             'name': "",
             "detail": "",
-            "ended": False,
-            "display_on_board": False
         }
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -361,8 +355,6 @@ class OpportunityTest(BaseTestCase):
         data = {
             'name': "ABC",
             "detail": "ooo",
-            "ended": True,
-            "display_on_board": True
         }
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -1153,12 +1145,9 @@ class EditActionTest(BaseTestCase):
 
 class BoardPanelTest(BaseTestCase):
     def test_view_board_panel(self):
-        action1 = mommy.make(models.Action, subject="Obladi-oblada", done=False, display_on_board=True)
-        action2 = mommy.make(models.Action, subject="Hey bulldog", done=False, display_on_board=False)
         response = self.client.get(reverse("crm_board_panel"))
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, action1.subject)
-        self.assertNotContains(response, action2.subject)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], "http://testserver{0}".format(reverse('users_favorites_list')))
         
 class ActionTest(BaseTestCase):
     def test_view_add_contact_to_action(self):
