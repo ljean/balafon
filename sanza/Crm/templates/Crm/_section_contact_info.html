@@ -42,9 +42,16 @@
     <div class="logo-container">
       <img {{contact.entity.get_logo_center_style}} class="contact-entity-logo" src="{{contact.entity.get_safe_logo}}">
     </div>
-    <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
-      {{contact.entity}}
-    </a>
+    <div class="inline-block">
+      <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
+        {{contact.entity}}
+      </a>
+      <div style="margin-top: 3px;">
+      {% with contact.get_roles as roles %}
+        {% for role in roles %}<span class="label label-xs label-default">{{role}}</span>{% endfor %}
+      {% endwith %}
+      </div>
+    </div>
     {% endif %}
   </div>
 </div>
@@ -81,12 +88,6 @@
       </span>
       
       <!-- <span contenteditable=true>{{contact.notes|linebreaksbr|default:"&nbsp;"}}</span>-->
-    </div>
-    
-    <div class="">{% trans "Roles" %}: 
-    {% with contact.get_roles as roles %}
-      {% for role in roles %}<span class="label label-primary">{{role}}</span>{% endfor %}
-    {% endwith %}
     </div>
     
     {% include "Crm/_contact_groups.html" %}
