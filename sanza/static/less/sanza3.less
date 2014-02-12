@@ -314,9 +314,6 @@ body {
     color: #888;
 }
 
-.custom-field-list {
-    padding-top: 10px;
-}
 
 li.quick-search-form {
     margin-top: 15px;
@@ -485,6 +482,7 @@ table.contact-table {
     min-height: 14px;
     padding: 2px;
     min-width: 5px;
+    background: @note_background;
 }
 
 .inline-block {
@@ -568,9 +566,10 @@ ul.chosen-choices .search-field input{
   height: 32px;
 }
 
-.groups-header .btn-xs {
-  height: 18px;
+.groups-header .btn-xs, .custom-field-list .btn-xs {
+  height: 19px;
 }
+
 
 .tabbar-form fieldset{
   padding-top: 20px;
@@ -631,4 +630,50 @@ ul.chosen-choices .search-field input{
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.btn-yellow {
+  background: #ffb;
+}
+
+.btn-yellow:hover {
+  background: #ffa;
+}
+
+.custom-field-list {
+  border: solid #bbb thin;
+  border-radius: 8px;
+  padding: 2px;
+  margin-top: 5px;
+  padding-bottom: 5px;
+}
+
+.groups-box {
+  border: solid #bbb thin;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.groups-box .groups-header, .custom-field-list .custom-field-list-header{
+  background: #bbb;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3px;
+  border-radius: 2px;
+}
+
+.groups-box .groups-header .btn, .custom-field-list .custom-field-list-header .btn{
+  background: #bbb;
+  border: solid thin #fff;
+  color: #000;
+  padding: 1px 5px !important;
+}
+
+.groups-box .groups-header .btn:hover,
+.custom-field-list .custom-field-list-header .btn:hover {
+  background: #aaa;
+}
+
+.section-favorite .glyphicon {
+  margin-top: 3px;
 }

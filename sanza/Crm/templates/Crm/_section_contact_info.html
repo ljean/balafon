@@ -6,7 +6,7 @@
 {% block section_title %}
 <div class="row">
   <div class="col-md-5">
-    {% favorite_item object=contact %}
+    <span class="glyphicon glyphicon-user"></span>
     <div class="logo-container">
       <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
     </div>
@@ -55,10 +55,10 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span class="glyphicon glyphicon-home"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-home" style="color:transparent"></span> '}}
+        <span class="glyphicon glyphicon-envelope"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
+        <span class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
       </td></tr>
       <tr><td>
         <span class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
@@ -119,7 +119,10 @@
     <li><a class="colorbox-form" href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a></li>
     <li><a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a></li>
     <li><a class="colorbox-form" href="{% url "crm_change_contact_entity" contact.id%}">{% trans "Reassign" %}</a></li>
-    <li><a class="" href="{% url "crm_edit_custom_fields" "contact" contact.id %}">{% trans "Edit fields" %}</a></li>
+{% endblock %}
+
+{% block section_favorite %}
+  {% favorite_item object=contact %}
 {% endblock %}
 
 

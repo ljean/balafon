@@ -68,33 +68,34 @@ def quick_search(request):
             contacts_by_email = Contact.objects.filter(
                 Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
             
-            #cities_by_name = []
-            #for city in City.objects.filter(name__icontains=text):
-            #    contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
-            #    if contacts_and_entities:
-            #        setattr(city, 'contacts_and_entities', contacts_and_entities)
-            #        cities_by_name.append(city)
-            #
+            cities_by_name = []
+            for city in City.objects.filter(name__icontains=text):
+                entities_count, contacts_count = city.contact_set.count(), city.entity_set.count()
+                if entities_count + contacts_count:
+                    cities_by_name.append((city, entities_count, contacts_count))
+            
             contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
             contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
             
-            #entities_title = _(u'Entities')
-            contacts_title = _(u'Contacts')
-            groups_title = _(u'Groups')
-            #cities_title = _(u'Contacts and entities by city')
-            phones_title = _(u'Contacts by phone number')
-            emails_by_email = _(u'Contacts by email')
-            
+            context_dict = {
+                'contacts_by_phone': contacts_by_phone,
+                'cities_by_name': cities_by_name,
+                'text': text,
+                'contacts_by_email': contacts_by_email,
+                'contacts': contacts,
+                'groups_by_name': groups_by_name,
+            }
+                
             return render_to_response(
                 'Search/quicksearch_results.html',
-                locals(),
+                context_dict,
                 context_instance=RequestContext(request)
             )
     else:
         raise Http404
       
 @user_passes_test(can_access)
-def search(request, search_id=0, group_id=0, opportunity_id=0):
+def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
     entities = []
     search=None
@@ -113,6 +114,9 @@ def search(request, search_id=0, group_id=0, opportunity_id=0):
     elif opportunity_id:
         opportunity = get_object_or_404(Opportunity, id=opportunity_id)
         data = {"gr0-_-opportunity-_-0": opportunity_id}
+    elif city_id:
+        city = get_object_or_404(City, id=city_id)
+        data = {"gr0-_-city-_-0": city_id}
             
     if data:
         search_form = forms.SearchForm(data)

@@ -44,7 +44,13 @@
           {% endif %}
           </ul>
         </li>
-        <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url "search" %}">{% trans "New search" %}</a></li>
+            <li><a href="{% url "search_list" %}">{% trans "Saved searches" %}</a></li>
+          </ul>
+        </li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
             <ul class="dropdown-menu">

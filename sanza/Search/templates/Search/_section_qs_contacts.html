@@ -1,12 +1,12 @@
 {% extends "sanza/_bs_section.html" %}
 {% load i18n sanza_utils %}
 
-{% block section_title %}{{ name.capitalize }}{% endblock %}
+{% block section_title %}{% trans "Contacts" %}{% endblock %}
   
 {% block section_data %}
 <table class="table table-striped">
   <tr>
-    <th colspan="2">{% trans "Contacts" %}</th><th>{% trans "Role" %}</th>
+    <th colspan="2">&nbsp;</th><th>{% trans "Role" %}</th>
     <th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th><th>{% trans "City" %}</th>
   </tr>
   

@@ -2,9 +2,7 @@
 {% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
-    {% trans "My groups" %}
-    {% if ordering == 'name' %}{% trans "by name" %}{% endif %}
-    {% if ordering == 'date' %}{% trans "by date" %}{% endif %}
+    {% trans "Groups" %}
 {% endblock %}
   
 {% block section_data %}
@@ -35,8 +33,8 @@
     {% else %}
         <li><a href="{% url "crm_add_group" %}">{% trans "Add" %}</a></li>
     {% endif %}
-    
+    {% comment %}
     <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=name">{% trans "Order by name" %}</a></li>
-  
     <li><a class="{% if ordering == 'date' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=date">{% trans "Order by date" %}</a></li>
+    {% endcomment %}
 {% endblock %}

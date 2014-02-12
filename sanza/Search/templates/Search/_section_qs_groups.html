@@ -1,12 +1,10 @@
 {% extends "sanza/_bs_section.html" %}
 {% load i18n sanza_utils %}
 
-{% block section_title %}{{ name.capitalize }}{% endblock %}
+{% block section_title %}{% trans "Group" %}{% endblock %}
   
 {% block section_data %}
 <table class="table table-striped">
-  <tr><th>{% trans "Group" %}</th><th>{% trans "Description" %}</th><th>{% trans "Members" %}</th>
-  </tr>
   {% for g in groups %}
   <tr>
     <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>

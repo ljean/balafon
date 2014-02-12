@@ -5,7 +5,7 @@
 
 {% block section_title %}
 <div class="logo" style="display: inline-block; vertical-align: middle;">
-  {% favorite_item object=entity %}
+  <span class="glyphicon glyphicon-tower"></span>
   <div class="logo-container">
     <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
   </div>
@@ -21,10 +21,10 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span class="glyphicon glyphicon-home"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-home" style="color:transparent"></span> '}}
+        <span class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+        <span class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
       </td></tr>
       <tr><td>
         <span class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
@@ -72,6 +72,8 @@
 {% block section_buttons %}
   <li><a class="colorbox-form" href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
   <li><a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a></li>
-  <li><a class="" href="{% url "crm_edit_custom_fields" "entity" entity.id %}">{% trans "Edit fields" %}</a></li>
+{% endblock %}
 
+{% block section_favorite %}
+  {% favorite_item object=entity %}
 {% endblock %}

@@ -35,6 +35,120 @@ class BaseTestCase(TestCase):
     def _login(self):
         self.client.login(username="toto", password="abc")
 
+class CitySearchTest(BaseTestCase):
+    
+    def test_view_search(self):
+        city1 = mommy.make(models.City)
+        city2 = mommy.make(models.City)
+        
+        entity1 = mommy.make(models.Entity, city=city1)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.save()
+        
+        entity2 = mommy.make(models.Entity)
+        contact2 = entity2.default_contact
+        contact2.lastname = "EFGH"
+        contact2.main_contact = True
+        contact2.has_left = False
+        contact2.city = city1
+        contact2.save()
+        
+        entity3 = mommy.make(models.Entity)
+        contact3 = entity3.default_contact
+        contact3.lastname = "IJKL"
+        contact3.main_contact = True
+        contact3.has_left = False
+        contact3.city = city2
+        contact3.save()
+        
+        entity4 = mommy.make(models.Entity)
+        contact4 = entity3.default_contact
+        contact4.lastname = "MNOP"
+        contact4.main_contact = True
+        contact4.has_left = False
+        contact4.save()
+        
+        url = reverse("search_cities", args=[city1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertNotContains(response, contact4.lastname)
+        
+    def test_quick_search_city1(self):
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
+        
+        entity1 = mommy.make(models.Entity, city=city1)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.save()
+        
+        url = reverse("quick_search")
+        data = {"text": "Zoo"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, city1.name)
+        self.assertNotContains(response, city2.name)
+        
+    def test_quick_search_city2(self):
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
+        
+        entity1 = mommy.make(models.Entity, city=city1)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.save()
+        
+        url = reverse("quick_search")
+        data = {"text": "oo"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, city1.name)
+        self.assertNotContains(response, city2.name)
+        
+    def test_quick_search_city3(self):
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
+        
+        entity1 = mommy.make(models.Entity, city=city1)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.save()
+        
+        entity3 = mommy.make(models.Entity)
+        contact3 = entity3.default_contact
+        contact3.lastname = "IJKL"
+        contact3.main_contact = True
+        contact3.has_left = False
+        contact3.city = city2
+        contact3.save()
+        
+        url = reverse("quick_search")
+        data = {"text": "oo"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, city1.name)
+        self.assertContains(response, city2.name)
+
+
+
 class GroupSearchTest(BaseTestCase):
     
     def test_view_search(self):

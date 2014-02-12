@@ -11,6 +11,9 @@
             </div>
             <div class="col-md-1">
               <div class="section-buttons pull-right">
+                <div class="section-favorite text-center">
+                  {% block section_favorite %}{% endblock %}
+                </div>
                 <div class="dropdown btn-group pull-right">
                     <a class="btn btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                       {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span>{% endblock %}

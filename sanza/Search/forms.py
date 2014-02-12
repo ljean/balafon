@@ -335,7 +335,7 @@ class SearchForm(forms.Form):
         f = FieldChoiceForm()
         return u"""
             {0}
-            <a class="btn btn-xs btn-primary add-field" href=""><span class="glyphicon glyphicon-filter"></span> {1}</a>
+            <a class="btn btn-xs btn-default btn-yellow add-field" href=""><span class="glyphicon glyphicon-filter"></span> {1}</a>
             <a class="btn btn-xs btn-default add-block" href=""><span class="glyphicon glyphicon-th-list"></span> {2}</a>
             <a class="btn btn-xs btn-default duplicate-block" href=""><span class="glyphicon glyphicon-share"></span> {5}</a>
             <a class="btn btn-xs btn-danger clear-block" href=""><span class="glyphicon glyphicon-remove"></span> {3}</a>

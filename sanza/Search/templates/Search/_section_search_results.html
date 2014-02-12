@@ -2,7 +2,7 @@
 {% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}
-  {% trans "Search results" %} :
+  <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
   {% if entities_count > 1 %}{{entities_count}} {% trans "entities" %}{% else %}{{entities_count}} {% trans "entity" %}{% endif %} -
   {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
   

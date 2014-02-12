@@ -1,19 +1,24 @@
 {% extends "sanza/_bs_section.html" %}
 {% load i18n sanza_utils %}
 
-{% block section_title %}{{ name.capitalize }}{% endblock %}
+{% block section_title %}{% trans "City" %}{% endblock %}
   
 {% block section_data %}
 <table class="table table-striped">
-  <tr><th>{% trans "City" %}</th><th>{% trans "Contacts and entities" %}</th>
-  </tr>
-  {% for city in cities %}
+  {% for city, entities_count, contacts_count in cities %}
   <tr>
     <td>{{city.name}}</td>
-    <td>
-      {% for x in city.contacts_and_entities %}
-        <a href="{{ x.get_absolute_url }}">{{x}}</a><br \>
-      {% endfor %}
+    <td style="text-align: right;">
+      {% if entities_count == 1 %}{{entities_count}} {% trans "entity" %}{% endif %}
+      {% if entities_count > 1 %}{{entities_count}} {% trans "entities" %}{% endif %}
+      
+      {% if entities_count and contacts_count %} - {% endif %}
+      
+      {% if contacts_count == 1 %}{{contacts_count}} {% trans "contact" %}{% endif %}
+      {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% endif %}
+      
+      <a href="{% url "search_cities" city.id %}"><span class="glyphicon glyphicon-search"></span></a>
+      
     </td>
   </tr>
   {% endfor %}
