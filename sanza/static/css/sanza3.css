@@ -492,3 +492,6 @@ ul.chosen-choices .search-field input {
   padding: 0;
   font-size: 24px;
 }
+.cursor-pointer {
+  cursor: pointer;
+}

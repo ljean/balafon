@@ -41,4 +41,25 @@ $(function() {
             $(this).closest(".section-buttons").hide();
         }
     });
+    
+    $(".favorite-icon").live('click', function() {
+        var form = $(this).find('form');
+        var elt = $(this);
+        $.ajax({
+            type: "POST",
+            url: form.attr('action'),
+            dataType: 'json',
+            data: form.serialize(),
+            success: function(data) {
+                if (data.success) {
+                    var glyphicon = elt.find(".glyphicon");
+                    glyphicon.removeClass('glyphicon-star').removeClass('glyphicon-star-empty');
+                    glyphicon.addClass(data.status?'glyphicon-star':'glyphicon-star-empty');
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+        return false;
+    })
 })

@@ -1,4 +1,4 @@
-{% load i18n sanza_utils staticfiles %}
+{% load i18n sanza_utils staticfiles favorite_tags %}
 <div class="actions">
 {% for a in actions %}
   <div class="row">
@@ -37,17 +37,9 @@
             </div>
           {% endif %}
           </a>
-          
-          {% comment %}
-          {% if a.done_date %}
-            {% trans "done on" %} {{ a.done_date|date:'j F Y'|default:''}}<br/>
-          {% endif %}
-          {% endcomment %}  
         </div>
         
-        <a class="" href="" rel="{% url "crm_toggle_action_bookmark" a.id %}">
-          <span class="glyphicon glyphicon-star{% if not a.display_on_board %}-empty{% endif %}" title="{% trans "Show on board" %}"></span>
-        </a>
+        {% favorite_item object=a %}
         
         <div class="action-subject">
           <span class="contenteditable inline-block" rel="{% url "auto_save_data" "action" "subject" a.id %}" style="font-weight: 500;" contenteditable="true">

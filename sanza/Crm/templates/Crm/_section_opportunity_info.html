@@ -1,11 +1,11 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils favorite_tags %}
 
 {% block section_title %}
   <div class="row">
   <div class="col-md-12">
     <div class="opportunity-title">
-      <h2><span class="glyphicon glyphicon-tag"></span> {{opportunity.name}}</h2>
+      <h2>{% favorite_item object=opportunity %} {{opportunity.name}}</h2>
     </div>
   </div>
 </div>

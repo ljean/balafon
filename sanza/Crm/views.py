@@ -1296,6 +1296,8 @@ def delete_opportunity(request, opportunity_id):
 def view_board_panel(request):
     #dt_filter = [Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)]
     
+    return HttpResponseRedirect(reverse("users_favorites_list"))
+    
     actions = models.Action.objects.filter(archived=False, display_on_board=True).order_by(
         "planned_date", "priority")
     

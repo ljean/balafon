@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
   {% trans "Opportunities" %}
@@ -18,11 +18,9 @@
     <th></th>
   </tr>
   {% for o in opportunities %}
-  <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+  <tr class="{% if o.ended %}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td>
-      <a rel="{% url "crm_toggle_opportunity_bookmark" o.id %}">
-        <span class="glyphicon glyphicon-{% if o.display_on_board %}star{% else %}star-empty{% endif %}"></span>
-      </a>
+      {% favorite_item object=o %}
     </td>
    
     <td><a href="{% url "crm_view_opportunity" o.id %}"><span class="glyphicon glyphicon-tag"></span> {{o.name}}</a></td>

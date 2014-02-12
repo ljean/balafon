@@ -1,11 +1,12 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n sanza_utils thumbnail %}
+{% load i18n sanza_utils favorite_tags thumbnail %}
 
 {% block section_header_extra_class %}main-section-header{% endblock %}
 
 {% block section_title %}
 <div class="row">
   <div class="col-md-5">
+    {% favorite_item object=contact %}
     <div class="logo-container">
       <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
     </div>

@@ -1,5 +1,5 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
   {%if partial %}{% trans "Latest entities" %}{% else %}{% trans "All entities" %}{%endif%}
@@ -19,18 +19,17 @@
     
     {% if e.is_single_contact %}
       {% with e.single_contact as c %}
-      <td colspan="2"><a href="{% url "crm_view_contact" c.id%}">{{c.lastname}} {{c.firstname}}</a></td>
+      <td colspan="2">{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id%}">{{c.lastname}} {{c.firstname}}</a></td>
       {% endwith %}
     {% else %}
-    <td><a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></td>
-
-    <td>
-      {% if e.main_contacts %}
-      {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}
-      {% else %}
-        &nbsp;
-      {% endif %}
-    </td>
+      <td>{% favorite_item object=e %}<a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></td>
+      <td>
+        {% if e.main_contacts %}
+        {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}
+        {% else %}
+          &nbsp;
+        {% endif %}
+      </td>
     {% endif %}
 
     <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>

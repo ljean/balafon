@@ -31,6 +31,11 @@ if 'sanza.Apis' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'', include('sanza.Apis.urls')),
     )
+
+if 'sanza.Users' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^users/', include('sanza.Users.urls')),
+    )
     
 if 'jhouston' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',

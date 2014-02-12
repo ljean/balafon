@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
   {% trans "Newsletters" %}
@@ -27,7 +27,7 @@
           <table>
           {% for e in nl.emailing_set.all %}
             <tr><td>
-              {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+              {% favorite_item object=e %}{{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
               <a href="{% url "emailing_view" e.id %}">{% trans "View" %}</a>
             </td></tr>
           {% endfor %}

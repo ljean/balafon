@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n sanza_utils %}
+{% load i18n sanza_utils favorite_tags %}
 
 {% block section_title %}{% trans "Contacts" %}{% endblock %}
   
@@ -17,6 +17,7 @@
       <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}has-left{% endif %}">
         {% if entity %}
           <td class="ut-contact-{{c.id}}">
+            {% favorite_item object=c %}
             <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
             
             {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
@@ -26,8 +27,8 @@
           {% if c.entity.is_single_contact %}
             <td colspan=2><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
           {% else %}
+            <td>{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
             <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
-            <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
           {% endif %}
         {% endif %}
         <td>{{ c.job|default:"&nbsp;" }}</td>

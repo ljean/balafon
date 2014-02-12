@@ -733,6 +733,10 @@ class Action(TimeStampedModel):
         (PRIORITY_MEDIUM, _(u'medium priority')),
         (PRIORITY_HIGH, _(u'high priority')),
     )
+    
+    class Meta:
+        verbose_name = _(u'action')
+        verbose_name_plural = _(u'actions')
 
     subject = models.CharField(_(u'subject'), max_length=200, blank=True, default="")
     planned_date = models.DateTimeField(_(u'planned date'), default=None, blank=True, null=True, db_index=True)

@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags %}
+{% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
     {% trans "My groups" %}
@@ -14,7 +14,7 @@
   {% autopaginate groups 50 %}
   {% for g in groups %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
+      <td>{% favorite_item object=g %} <a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
       <td>{{g.entities.count}} {% trans "entities" %}
       - {{g.contacts.count}} {% trans "contacts" %}</td>
       <td><span class="description contenteditable" contenteditable="true" rel="{% url "auto_save_data" "group" "description" g.id %}">
