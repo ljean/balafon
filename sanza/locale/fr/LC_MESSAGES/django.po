@@ -1016,7 +1016,7 @@ msgstr "Age du contact"
 
 #: Crm/search_forms.py:325 Profile/forms.py:65
 msgid "Accept newsletter"
-msgstr "Accepte les mailings"
+msgstr "Accepte les newsletters"
 
 #: Crm/search_forms.py:332
 msgid "Accept third parties"
