@@ -148,6 +148,139 @@ class CitySearchTest(BaseTestCase):
         self.assertContains(response, city2.name)
 
 
+class EmailSearchTest(BaseTestCase):
+    
+    def test_search_email(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, email="abcd@mailinator.com", entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp", email="contact@mailinator.com")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_entity_email-_-0": "mailinator"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+    def test_search_email_empty(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, email="abcd@mailinator.com", entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp", email="contact@mailinator.com")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_entity_email-_-0": ""}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(1, len(soup.select('.field-error')))
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_search_email_entity(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp", email="contact@mailinator.com")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, entity=entity2, lastname=u"RTYU", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_entity_email-_-0": "mailinator"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_email_full(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, email="abcd@mailinator.com", entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp", email="contact@mailinator.com")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, entity=entity2, lastname=u"RTYU", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_entity_email-_-0": "contact@mailinator.com"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_email_none(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, email="abcd@mailinator.com", entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp", email="contact@mailinator.com")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, entity=entity2, lastname=u"RTYU", main_contact=True, has_left=False)
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_entity_email-_-0": "toto@toto.com"}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertNotContains(response, contact4.lastname)
+
 
 class GroupSearchTest(BaseTestCase):
     

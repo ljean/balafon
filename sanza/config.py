@@ -49,6 +49,7 @@ SEARCH_FORMS = [
             search_forms.ContactWithCustomField,
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
+            search_forms.EmailSearchForm,
             
             #search_forms.ContactOpportunityStatusSearchForm,
             #search_forms.ContactOpportunityNameSearchForm,

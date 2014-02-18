@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-12 15:41+0100\n"
+"POT-Creation-Date: 2014-02-18 11:21+0100\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,29 +42,29 @@ msgstr "Entité"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: config.py:64 Crm/views.py:1011 Crm/templates/Crm/_section_actions.html:11
+#: config.py:65 Crm/views.py:1011 Crm/templates/Crm/_section_actions.html:11
 #: Crm/templates/Crm/_section_actions_by_set.html:5
 #: Crm/templates/Crm/_section_opportunities.html:16
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:15
 msgid "Actions"
 msgstr "Actions"
 
-#: config.py:77 Crm/templates/Crm/_section_opportunities.html:5
+#: config.py:78 Crm/templates/Crm/_section_opportunities.html:5
 #: templates/sanza/_bs_navigation.html:24 templates/sanza/_navigation.html:18
 msgid "Opportunities"
 msgstr "Dossiers"
 
-#: config.py:94 Emailing/utils.py:73
+#: config.py:95 Emailing/utils.py:73
 #: Emailing/templates/Emailing/view_emailing.html:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: config.py:100 templates/sanza/_bs_navigation.html:61
+#: config.py:101 templates/sanza/_bs_navigation.html:61
 #: templates/sanza/_navigation.html:45
 msgid "Admin"
 msgstr "Admin"
 
-#: config.py:113 Crm/forms.py:282
+#: config.py:114 Crm/forms.py:282
 msgid "Options"
 msgstr "Options"
 
@@ -247,7 +247,7 @@ msgstr "Le contact n'existe pas"
 msgid "Enter the name of a opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: Crm/forms.py:444 Crm/search_forms.py:505
+#: Crm/forms.py:444 Crm/search_forms.py:518
 msgid "Opportunity"
 msgstr "Dossier"
 
@@ -1042,108 +1042,119 @@ msgstr "Ce contact a quitté l'entité"
 msgid "Contact role"
 msgstr "Rôle du contact"
 
-#: Crm/search_forms.py:386
+#: Crm/search_forms.py:386 Crm/templates/Crm/_section_contacts.html:13
+#: Crm/templates/Crm/confirm_contacts_import.html:72 Emailing/forms.py:163
+#: Profile/forms.py:54 Search/templates/Search/_section_qs_contacts.html:10
+#: templates/registration/login.html:16
+msgid "Email"
+msgstr "Email"
+
+#: Crm/search_forms.py:391
+msgid "Enter a part of the email of a contact or an entity"
+msgstr "Entrez une partie de l'email du contact ou de l'entité"
+
+#: Crm/search_forms.py:399
 msgid "Contact has email"
 msgstr "Dispose d'un email"
 
-#: Crm/search_forms.py:397
+#: Crm/search_forms.py:410
 msgid "Contact has pesonal email"
 msgstr "Dispose d'un email personnel"
 
-#: Crm/search_forms.py:408
+#: Crm/search_forms.py:421
 msgid "Unknown contacts"
 msgstr "Contacts inconnus"
 
-#: Crm/search_forms.py:419
+#: Crm/search_forms.py:432
 msgid "Action type"
 msgstr "Type d'action"
 
-#: Crm/search_forms.py:432
+#: Crm/search_forms.py:445
 msgid "Action subject"
 msgstr "Sujet d'une action"
 
-#: Crm/search_forms.py:437
+#: Crm/search_forms.py:450
 msgid "enter a part of the name of the searched action"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:445
+#: Crm/search_forms.py:458
 msgid "Relationship date"
 msgstr "Date de mise en relation"
 
-#: Crm/search_forms.py:453
+#: Crm/search_forms.py:466
 msgid "Contact name"
 msgstr "Nom du contact"
 
-#: Crm/search_forms.py:458
+#: Crm/search_forms.py:471
 msgid "Enter a part of the name of the searched contact"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:466
+#: Crm/search_forms.py:479
 msgid "Contact firstname"
 msgstr "Prénom du contact"
 
-#: Crm/search_forms.py:471
+#: Crm/search_forms.py:484
 msgid "Enter a part of the firstname of the searched contact"
 msgstr "Entrez une partie du prénom recherché"
 
-#: Crm/search_forms.py:479
+#: Crm/search_forms.py:492
 msgid "Contact notes"
 msgstr "Notes d'un contact"
 
-#: Crm/search_forms.py:484
+#: Crm/search_forms.py:497
 msgid "Enter a part of a note of the searched contact"
 msgstr "Entrez une partie du texte à chercher dans les notes"
 
-#: Crm/search_forms.py:536
+#: Crm/search_forms.py:549
 msgid "Opportunity name"
 msgstr "Nom d'un dossier"
 
-#: Crm/search_forms.py:541
+#: Crm/search_forms.py:554
 msgid "enter a part of the name of the searched opportunity"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:740
+#: Crm/search_forms.py:753
 msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
-#: Crm/search_forms.py:795 Crm/templates/Crm/confirm_contacts_import.html:44
+#: Crm/search_forms.py:808 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
 msgid "Import"
 msgstr "Import"
 
-#: Crm/search_forms.py:808
+#: Crm/search_forms.py:821
 msgid "Contacts by update date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:816
+#: Crm/search_forms.py:829
 msgid "Contacts by creation date"
 msgstr "Contacts par date de création"
 
-#: Crm/search_forms.py:824
+#: Crm/search_forms.py:837
 msgid "Entities by update date"
 msgstr "Entités par date de mise à jour"
 
-#: Crm/search_forms.py:832
+#: Crm/search_forms.py:845
 msgid "Entities by creation date"
 msgstr "Entités par date de création"
 
-#: Crm/search_forms.py:840
+#: Crm/search_forms.py:853
 msgid "Contacts and entities by change date"
 msgstr "Contacts et entités par date de création/modification"
 
-#: Crm/search_forms.py:850
+#: Crm/search_forms.py:863
 msgid "Relationship type"
 msgstr "type de relation"
 
-#: Crm/search_forms.py:881
+#: Crm/search_forms.py:894
 msgid "Relationship dates"
 msgstr "Date de relation"
 
-#: Crm/search_forms.py:894
+#: Crm/search_forms.py:907
 msgid "Contacts with custom field"
 msgstr "Contacts avec un champ personnalisé"
 
-#: Crm/search_forms.py:911
+#: Crm/search_forms.py:924
 msgid "Entities with custom field"
 msgstr "Entités avec champ personnalisé"
 
@@ -1426,13 +1437,6 @@ msgstr "Profession"
 #: Search/templates/Search/_section_qs_phones.html:4
 msgid "Phone"
 msgstr "Téléphone"
-
-#: Crm/templates/Crm/_section_contacts.html:13
-#: Crm/templates/Crm/confirm_contacts_import.html:72 Emailing/forms.py:163
-#: Profile/forms.py:54 Search/templates/Search/_section_qs_contacts.html:10
-#: templates/registration/login.html:16
-msgid "Email"
-msgstr "Email"
 
 #: Crm/templates/Crm/_section_contacts.html:52
 msgid "View in search"
@@ -2545,7 +2549,7 @@ msgstr "champ de recherche"
 msgid "search fied"
 msgstr "champs de recherche"
 
-#: Search/tests.py:997 Search/views.py:242
+#: Search/tests.py:1103 Search/views.py:242
 msgid "Mailto: Error, no emails defined"
 msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 
@@ -2843,11 +2847,12 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    <p>Vous pouvez cliquer sur une étoile vide (<span class=\"glyphicon glyphicon-"
-"star-empty\"></span>) pour afficher l'élément correspondant sur la page des favoris.</"
-"p>\n"
+"    <p>Vous pouvez cliquer sur une étoile vide (<span class=\"glyphicon "
+"glyphicon-star-empty\"></span>) pour afficher l'élément correspondant sur la "
+"page des favoris.</p>\n"
 "    <p>Les favoris sont précédés d'une étoile pleine (<span class="
-"\"glyphicon glyphicon-star\"></span>). Cliquer sur celle-ci pour enlever l'élément des favoris.</p>\n"
+"\"glyphicon glyphicon-star\"></span>). Cliquer sur celle-ci pour enlever "
+"l'élément des favoris.</p>\n"
 "    <p>Les favoris sont propres à chaque utilisateur.</p>\n"
 "    "
 

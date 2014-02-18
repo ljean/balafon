@@ -381,6 +381,19 @@ class ContactRoleSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'role': self._value}
 
+class EmailSearchForm(SearchFieldForm):
+    _name = 'contact_entity_email'
+    _label = _(u'Email')
+    
+    def __init__(self, *args, **kwargs):
+        super(EmailSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the email of a contact or an entity')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return Q(entity__email__icontains=self._value) | Q(email__icontains=self._value)
+
 class ContactHasEmail(YesNoSearchFieldForm):
     _name = 'contact_has_email'
     _label = _(u'Contact has email')
