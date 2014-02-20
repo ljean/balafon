@@ -38,7 +38,7 @@ def cut_null_hour(value):
 def get_action_date_label(action):
     if not action.planned_date:
         return "label-warning"
-    if action.planned_date < datetime.now():
+    if (not action.done) and action.planned_date < datetime.now():
         return "label-danger"
     return "label-not-yet"
     

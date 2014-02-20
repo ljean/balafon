@@ -6,12 +6,14 @@
 {% block section_title %}
 <div class="row">
   <div class="col-md-5">
-    <span class="glyphicon glyphicon-user"></span>
-    <div class="logo-container">
-      <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
-    </div>
+    <a class="header-link" href="{% url "crm_view_contact" contact.id %}">
+      <span class="glyphicon glyphicon-user"></span>
+      <div class="logo-container">
+        <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
+      </div>
+    </a>
     <div style="display: inline-block; vertical-align: middle;">
-    {{contact.fullname}}
+      <a class="header-link" href="{% url "crm_view_contact" contact.id %}">{{contact.fullname}}</a>
       {% if contact.same_as %}
         {% if contact == contact.same_as.main_contact %}
             <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
@@ -107,9 +109,6 @@
       {% endif %}
       <tr><td><b>{% trans "ADD_DT" %}</b> {{contact.created|date:"d/m/Y"}}</td></tr>
       <tr><td><b>{% trans "UPD_DT" %}</b> {{contact.modified|date:"d/m/Y"}}</td></tr>
-      {% if entity.type %}
-      <tr><th>{% trans "Type" %}</th><td>{{entity.type}}</td></tr> 
-      {% endif %}
     </table>
   </div>
 </div>  

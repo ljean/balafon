@@ -4,14 +4,16 @@
 {% block section_header_extra_class %}main-section-header{% endblock %}
 
 {% block section_title %}
-<div class="logo" style="display: inline-block; vertical-align: middle;">
-  <span class="glyphicon glyphicon-tower"></span>
-  <div class="logo-container">
-    <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
+<a class="header-link" href="{% url "crm_view_entity" entity.id %}">
+  <div class="logo" style="display: inline-block; vertical-align: middle;">
+    <span class="glyphicon glyphicon-tower"></span>
+    <div class="logo-container">
+      <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
+    </div>
   </div>
-</div>
-<div style="display: inline-block; vertical-align: middle;">
-{{entity.name}}
+  <div style="display: inline-block; vertical-align: middle;">
+  {{entity.name}}
+</a>
 <div class="section-subtitle">{{entity.description}}</div>
 </div>
 {% endblock %}
