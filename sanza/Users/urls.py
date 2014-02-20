@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns('sanza.Users.views',
     url(r'^toggle/$', 'toggle_favorite', name='users_toggle_favorite'),
