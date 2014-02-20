@@ -168,7 +168,7 @@ class Entity(TimeStampedModel):
         if self.is_single_contact:
             c = self.default_contact
             self.name = u"{0} {1}".format(c.lastname, c.firstname).lower()
-            super(Entity, self).save(*args, **kwargs)
+            super(Entity, self).save() #don't put *args, *kwargs -> it may cause integrity error
     
     def __unicode__(self):
         return self.name
@@ -592,7 +592,11 @@ class Contact(TimeStampedModel):
             name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ln, self.email)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(Contact, self).save()
-
+        
+        if self.entity.is_single_contact:
+            #force the entity name for ordering
+            self.entity.save()
+            
     class Meta:
         verbose_name = _(u'contact')
         verbose_name_plural = _(u'contacts')

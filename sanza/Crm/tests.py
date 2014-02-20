@@ -3630,7 +3630,7 @@ class ChangeContactEntityTest(BaseTestCase):
         
     def test_make_single_contact_entity(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname=u"John")
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
         data= {
@@ -3642,6 +3642,8 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertEqual(contact.entity.is_single_contact, True)
         entity = models.Entity.objects.get(id=entity.id)
         self.assertNotEqual(contact.entity.id, entity.id)
+        self.assertEqual(contact.entity.name, u"{0} {1}".format(contact.lastname, contact.firstname).lower())
+        
     
     def test_change_to_new_entity(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
