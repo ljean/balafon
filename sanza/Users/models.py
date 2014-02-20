@@ -16,8 +16,8 @@ class UserPreferences(models.Model):
         return self.user.username
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, verbose_name=_("user"))
-    content_type = models.ForeignKey(ContentType, verbose_name=_("content_type"))
+    user = models.ForeignKey(User, verbose_name=_("user"), related_name="user_favorite_set")
+    content_type = models.ForeignKey(ContentType, verbose_name=_("content_type"), related_name="user_favorite_set")
     object_id = models.PositiveIntegerField(verbose_name=_("object id"))
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     
