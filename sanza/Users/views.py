@@ -60,7 +60,7 @@ def toggle_favorite(request):
 @user_passes_test(can_access)
 def list_favorites(request):
     
-    content_types = ContentType.objects.filter(favorite__user=request.user).distinct()
+    content_types = ContentType.objects.filter(user_favorite_set__user=request.user).distinct()
     
     favs_by_type = []
     for ct in content_types:
