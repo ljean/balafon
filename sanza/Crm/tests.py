@@ -2471,6 +2471,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(john_doe.lastname, "Doe")
         self.assertEqual(john_doe.firstname, "John")
         self.assertEqual(john_doe.entity.is_single_contact, True)
+        self.assertEqual(john_doe.entity.name, u"doe john")
         
     def test_add_single_contact_existing_city(self):
         url = reverse('crm_add_single_contact')

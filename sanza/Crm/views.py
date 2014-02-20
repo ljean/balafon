@@ -858,6 +858,7 @@ def add_single_contact(request):
             contact.save()
             
             default_contact.delete()
+            contact.save() # change name of the entity
             
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
         else:
