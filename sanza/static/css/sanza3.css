@@ -57,6 +57,8 @@ body {
 }
 .custom-field {
   margin-right: 10px;
+  margin-bottom: 8px;
+  display: inline-block;
 }
 .custom-field .custom-field-label {
   border: solid thin #ccc;
