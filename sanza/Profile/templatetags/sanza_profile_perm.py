@@ -6,7 +6,7 @@ from sanza.Profile.models import CategoryPermission
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from coop_cms.settings import get_article_class
-from coop_cms.utils import get_article
+from coop_cms.shortcuts import get_article
 from sanza.Profile.utils import create_profile_contact, check_category_permission
 from django.template.defaultfilters import slugify
 
