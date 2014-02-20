@@ -165,6 +165,10 @@ class Entity(TimeStampedModel):
             c = self.default_contact
             c.main_contact = True
             c.save()
+        if self.is_single_contact:
+            c = self.default_contact
+            self.name = u"{0} {1}".format(c.lastname, c.firstname).lower()
+            super(Entity, self).save(*args, **kwargs)
     
     def __unicode__(self):
         return self.name

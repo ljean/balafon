@@ -60,7 +60,7 @@ def view_entity(request, entity_id):
 @user_passes_test(can_access)
 def view_entities_list(request):
     entities = list(models.Entity.objects.all())
-    entities.sort(key=lambda x: x.default_contact.lastname.lower() if x.is_single_contact else x.name.lower())
+    #entities.sort(key=lambda x: x.default_contact.lastname.lower() if x.is_single_contact else x.name.lower())
     
     return render_to_response(
         'Crm/all_entities.html',
