@@ -52,7 +52,7 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
-            search_forms.ContactNotesForm,
+            #search_forms.ContactNotesForm,
             
             #search_forms.ContactOpportunityStatusSearchForm,
             #search_forms.ContactOpportunityNameSearchForm,
