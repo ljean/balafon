@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(User)
-    notify_due_actions = models.BooleanField(default=None, verbose_name=_(u"Notify due actions"))
+    notify_due_actions = models.BooleanField(default=False, verbose_name=_(u"Notify due actions"))
     
     def __unicode__(self):
         return self.user.username

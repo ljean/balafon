@@ -16,8 +16,8 @@ class ContactProfile(models.Model):
     
     user = models.OneToOneField(User)
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
-    accept_newsletter = models.BooleanField()
-    accept_3rdparty = models.BooleanField()
+    accept_newsletter = models.BooleanField(default=False)
+    accept_3rdparty = models.BooleanField(default=False)
     entity_name = models.CharField(_('entity name'), max_length=200, blank=True, default="")
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None)
     zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
+if 'localeurl' in settings.INSTALLED_APPS:
+    from localeurl.models import patch_reverse
+    patch_reverse()
+    
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
@@ -16,6 +21,7 @@ from bs4 import BeautifulSoup as BeautifulSoup4
 from django.utils.translation import ugettext as _
 from django.utils.unittest.case import SkipTest
 from sanza.Crm import settings as crm_settings
+from unittest import skipIf
 
 def get_form_errors(response):
     soup = BeautifulSoup4(response.content)
@@ -33,7 +39,7 @@ class BaseTestCase(TestCase):
         self._login()
 
     def _login(self):
-        self.client.login(username="toto", password="abc")
+        rc = self.client.login(username="toto", password="abc")
 
 class CitySearchTest(BaseTestCase):
     
@@ -626,6 +632,38 @@ class GroupSearchTest(BaseTestCase):
         url = reverse('search')
         
         data = {"gr0-_-contact_name-_-0": 'ABC'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
+    def test_search_contact_notes(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False, notes="NOTE: 20/20")
+        
+        entity3 = mommy.make(models.Entity, name=u"The big Org")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
+        
+        for c in [contact1, contact4]:
+            c.notes = "{0} - Hello Dolly - {0}".format(c.lastname)
+            c.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-contact_notes-_-0": 'Dolly'}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -1491,10 +1529,8 @@ class HasZipTest(BaseTestCase):
 
 class HasEntitySearchTest(BaseTestCase):
     
+    @skipIf(not crm_settings.ALLOW_SINGLE_CONTACT, "ALLOW_SINGLE_CONTACT disabled")
     def test_contact_has_entity(self):
-        
-        if not crm_settings.ALLOW_SINGLE_CONTACT:
-            raise SkipTest()
         
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)
@@ -1518,10 +1554,8 @@ class HasEntitySearchTest(BaseTestCase):
         self.assertContains(response, contact1.lastname)
         self.assertNotContains(response, contact2.lastname)
         
+    @skipIf(not crm_settings.ALLOW_SINGLE_CONTACT, "ALLOW_SINGLE_CONTACT disabled")
     def test_contact_doesnt_have_entity(self):
-        
-        if not crm_settings.ALLOW_SINGLE_CONTACT:
-            raise SkipTest()
         
         entity1 = mommy.make(models.Entity, is_single_contact=False)
         entity2 = mommy.make(models.Entity, is_single_contact=True)

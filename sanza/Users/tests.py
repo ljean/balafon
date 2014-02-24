@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
+if 'localeurl' in settings.INSTALLED_APPS:
+    from localeurl.models import patch_reverse
+    patch_reverse()
+    
 from django.test import TestCase
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.core.urlresolvers import reverse

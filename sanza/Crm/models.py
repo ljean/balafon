@@ -666,7 +666,7 @@ class Opportunity(TimeStampedModel):
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
     #----------------
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'),
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board', default=False),
         default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
     
     def get_start_date(self):

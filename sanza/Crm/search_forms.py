@@ -23,7 +23,33 @@ class EntityNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'entity__name__icontains': self._value}
+    
+class EntityDescriptionForm(SearchFieldForm):
+    _name = 'entity_description'
+    _label = _(u'Entity description')
+    
+    def __init__(self, *args, **kwargs):
+        super(EntityDescriptionForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the description of the searched entities')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'entity__description__icontains': self._value}
 
+class EntityNotesForm(SearchFieldForm):
+    _name = 'entity_notes'
+    _label = _(u'Entity notes')
+    
+    def __init__(self, *args, **kwargs):
+        super(EntityNotesForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the notes of the searched entities')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'entity__notes__icontains': self._value}
+    
 class EntityNameStartsWithSearchForm(SearchFieldForm):
     _name = 'entity_name_sw'
     _label = _(u'Entity name starts with')
@@ -473,6 +499,19 @@ class ContactNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'lastname__icontains': self._value}
+    
+class ContactNotesForm(SearchFieldForm):
+    _name = 'contact_notes'
+    _label = _(u'Contact notes')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactNotesForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the notes of the searched contacts')}))
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'notes__icontains': self._value}
     
 class ContactFirstnameSearchForm(SearchFieldForm):
     _name = 'contact_firstname'

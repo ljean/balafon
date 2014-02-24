@@ -196,7 +196,7 @@ def get_field(request, name):
         form_class = forms.get_field_form(name)
         t = Template('{{form.as_it_is}}')
         c = Context({'form': form_class(block, count)})
-        return HttpResponse(json.dumps({'form': t.render(c)}), mimetype="application/json")
+        return HttpResponse(json.dumps({'form': t.render(c)}), content_type="application/json")
     except KeyError:
         raise Http404
     except Exception, msg:
@@ -216,7 +216,7 @@ def mailto_contacts(request, bcc):
                     if getattr(settings, 'SANZA_MAILTO_LIMIT_AS_TEXT', False):
                         #conf49 : La poste required only ' ' as separator
                         #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
-                        return HttpResponse(', '.join(emails), mimetype='text/plain')
+                        return HttpResponse(', '.join(emails), content_type='text/plain')
                     else:
                         index_from, email_groups = 0, []
                         nb_emails = len(emails)
@@ -239,7 +239,7 @@ def mailto_contacts(request, bcc):
                     mailto += ','.join(emails)
                     return HttpResponseRedirectMailtoAllowed(mailto)
             else:
-                return HttpResponse(_(u'Mailto: Error, no emails defined'), mimetype='text/plain')
+                return HttpResponse(_(u'Mailto: Error, no emails defined'), content_type='text/plain')
     raise Http404
 
 @user_passes_test(can_access)
@@ -348,7 +348,7 @@ def export_contacts_as_excel(request):
                     if f:
                         ws.write(i+1, j, unicode(f), style)
 
-            response = HttpResponse(mimetype='application/vnd.ms-excel')
+            response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('sanza')
             wb.save(response)
             return response

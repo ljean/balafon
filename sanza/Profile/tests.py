@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
+if 'localeurl' in settings.INSTALLED_APPS:
+    from localeurl.models import patch_reverse
+    patch_reverse()
+    
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
@@ -16,6 +21,8 @@ from django.template import Template, Context
 from utils import create_profile_contact, notify_registration
 from registration.models import RegistrationProfile
 import os.path
+from unittest import skipIf
+from django.contrib.contenttypes.models import ContentType
 
 class BaseTestCase(TestCase):
 
@@ -41,6 +48,13 @@ class IfProfilePermTemplateTagsTest(BaseTestCase):
                 self.LANGUAGE_CODE = settings.LANGUAGES[0][0]
                 self.user = user
         return DummyRequest(self.user)
+    
+    def setUp(self):
+        super(IfProfilePermTemplateTagsTest, self).setUp()
+        ct = ContentType.objects.get_for_model(get_article_class())
+        perm = Permission.objects.get(codename='change_article', content_type=ct)
+        self.user.user_permissions.add(perm)
+        self.user.save()
     
     def test_create_article(self):
         tpl = Template('{% load sanza_profile_perm %}{% if_can_do_article "test" %}HELLO{% endif %}')
@@ -477,7 +491,7 @@ class ProfileBackendTest(TestCase):
         contact.entity.default_contact.delete()
         self._create_profile_and_check(user)
         self.assertEqual(models.Contact.objects.count(), 1)
-        self.assertEqual(models.Action.objects.count(), 0)
+        self.assertEqual(models.Action.objects.count(), 1)#account
         
         
     def test_create_sanza_contact_multiple_email(self):
@@ -493,9 +507,9 @@ class ProfileBackendTest(TestCase):
         self.assertEqual(contact.firstname, user.first_name)
         
         self.assertEqual(models.Contact.objects.count(), 3)
-        self.assertEqual(models.Action.objects.count(), 1)
-        action = models.Action.objects.all()[0]
-        self.assertEqual(action.contact, contact)
+        self.assertEqual(models.Action.objects.count(), 2) # wran duplicates + account creation
+        for action in models.Action.objects.all():
+            self.assertEqual(list(action.contacts.all()), [contact])
     
     def test_notifiy_registration(self):
         user = self._create_user()
@@ -511,6 +525,7 @@ class ProfileBackendTest(TestCase):
        
 class RegisterTestCase(TestCase):
 
+    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_register_with_very_long_email(self):
         url = reverse('registration_register')
         data = {

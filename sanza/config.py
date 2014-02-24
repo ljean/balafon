@@ -32,6 +32,8 @@ SEARCH_FORMS = [
             search_forms.RelationshipDateForm,
             search_forms.EntityByModifiedDate,
             search_forms.EntityWithCustomField,
+            search_forms.EntityDescriptionForm,
+            search_forms.EntityNotesForm,
          ],
     ),(
         _(u'Contacts'),
@@ -50,6 +52,7 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
+            search_forms.ContactNotesForm,
             
             #search_forms.ContactOpportunityStatusSearchForm,
             #search_forms.ContactOpportunityNameSearchForm,

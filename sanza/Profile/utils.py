@@ -39,7 +39,7 @@ def create_profile_contact(user):
                     entity_type = None
                 else:
                     et_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
-                    entity_type = EntityType.objects.get(id=et_id)
+                    entity_type, x = EntityType.objects.get_or_create(id=et_id)
                     rename_entity = True
 
             entity = Entity(
@@ -59,10 +59,11 @@ def create_profile_contact(user):
                 subject = _(u"A user have registred with email {0} used by several other contacts".format(user.email)),
                 type = at,
                 planned_date = now_rounded(),
-                contact = contact,
                 detail = _(u'You should check that this contact is not duplicated'),
                 display_on_board = True
             )
+            action.contacts.add(contact)
+            action.save()
 
     contact.gender = profile.gender
     contact.lastname = contact.lastname or user.last_name
@@ -85,10 +86,11 @@ def create_profile_contact(user):
         subject = _(u"Create an account on web site"),
         type = at,
         planned_date = now_rounded(),
-        contact = contact,
         display_on_board = False,
         done = True
     )
+    action.contacts.add(contact)
+    action.save()
     
     if rename_entity:
         contact.entity.name = u"{0.lastname} {0.firstname}".format(contact).strip().upper()
