@@ -30,7 +30,7 @@ setup(
         'xlwt',
         'xlrd',
         'django-simple-captcha',
-        'django-registration',
+        'django-registration==0.8',
         'model_mommy',
         'django-localeurl',
         'django-modeltranslation',
