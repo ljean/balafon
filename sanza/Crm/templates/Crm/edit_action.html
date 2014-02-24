@@ -8,17 +8,31 @@
   $(function() {
     var dont_change_status = true;
     $("select#id_type").change(function() {
+      var dt = new Date().getTime();
       $.ajax({
-          url: "{% url "crm_get_action_status" %}?t="+$(this).val(),
+          url: "{% url "crm_get_action_status" %}?t="+$(this).val()+"&timestamp="+dt,
           success: function(data){
             var allowed_status = data.allowed_status;
+            var default_status = parseInt(data.default_status, 10);
             $("select#id_status option").each(function(idx, elt) {
-              if ($(elt).val() in allowed_status) {
-                $(elt).removeAttr("disabled");
+              var elt_val = parseInt($(elt).val(), 10);
+              if (elt_val) {
+                if (allowed_status.indexOf(elt_val) >= 0) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
               } else {
-                $(elt).attr("disabled", "disabled");
+                if (!default_status) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
               }
             });
+            if (default_status) {
+              $("select#id_status").val(default_status);
+            }
             $("select#id_status option").trigger("chosen:updated");
           }
       });

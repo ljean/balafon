@@ -1071,11 +1071,29 @@ class EditActionTest(BaseTestCase):
         at.allowed_status.add(as2)
         at.save()
         
-        url = reverse("crm_get_action_status")+"?t="+str(at.id)
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)+"&timestamp=777"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual([as1.id, as2.id], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
+        
+    def test_allowed_status_default_value(self, ):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.default_status = as2
+        at.save()
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)+"&timestamp=777"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([as1.id, as2.id], data['allowed_status'])
+        self.assertEqual(as2.id, data['default_status'])
         
     def test_no_allowed_status(self, ):
         at = mommy.make(models.ActionType)
@@ -1085,6 +1103,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual([], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
         
     def test_allowed_status_no_type(self, ):
         url = reverse("crm_get_action_status")+"?t="+str(0)
@@ -1092,6 +1111,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertEqual([], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
         
     def test_allowed_status_unknown_type(self, ):
         url = reverse("crm_get_action_status")+"?t=100"

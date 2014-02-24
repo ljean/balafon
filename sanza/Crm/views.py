@@ -313,12 +313,16 @@ def get_action_status(request):
         action_type_id = int(request.GET.get("t", 0))
     except ValueError:
         raise Http404
+    
+    default_status = 0
     if action_type_id:
         action_type = get_object_or_404(models.ActionType, id=action_type_id)
         allowed_status = [s.id for s in action_type.allowed_status.all()]
+        if action_type.default_status:
+            default_status = action_type.default_status.id   
     else:
         allowed_status = []
-    return HttpResponse(json.dumps({'allowed_status': allowed_status}), mimetype="application/json")
+    return HttpResponse(json.dumps({'allowed_status': allowed_status, 'default_status': default_status}), mimetype="application/json")
 
 
 @user_passes_test(can_access)

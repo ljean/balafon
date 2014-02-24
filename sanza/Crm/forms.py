@@ -338,7 +338,8 @@ class ActionForm(BetterBsModelForm):
         
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             default_status = instance.type.default_status
-            choices = [] if default_status else [('', "---------")]
+            #choices = [] if default_status else [('', "---------")]
+            choices = [('', "---------")] # let javascript disable the blank value if default_status
             self.fields['status'].choices = choices + [(s.id, s.name) for s in instance.type.allowed_status.all()]
             #self.fields['status'].initial = default_status.id if default_status else None
         
