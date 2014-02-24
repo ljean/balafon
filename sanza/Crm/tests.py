@@ -451,6 +451,44 @@ class OpportunityTest(BaseTestCase):
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
         
+    def test_view_opportunity_entity_contacts_has_left(self):
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity1, has_left=True)
+        
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.entities.add(entity1)
+        act1.save()
+        
+        response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_view_opportunity_contact_has_left(self):
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity1, has_left=True)
+        
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.contacts.add(contact1)
+        act1.contacts.add(contact2)
+        act1.save()
+        
+        response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        soup = BS4(response.content)
+        
+        self.assertEqual(len(soup.select("td.ut-contact-{0} .ut-has-left".format(contact1.id))), 0)
+        self.assertEqual(len(soup.select("td.ut-contact-{0} .ut-has-left".format(contact2.id))), 1)
+        
+        
     def test_view_opportunityies_date_mixes(self):
         opp1 = mommy.make(models.Opportunity)
         opp2 = mommy.make(models.Opportunity)

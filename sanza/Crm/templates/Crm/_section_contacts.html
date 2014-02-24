@@ -27,7 +27,10 @@
           {% if c.entity.is_single_contact %}
             <td colspan=2>{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
           {% else %}
-            <td>{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+            <td class="ut-contact-{{c.id}}">
+              {% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
+              {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+            </td>
             <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
           {% endif %}
         {% endif %}

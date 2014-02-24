@@ -594,9 +594,9 @@ def view_contact(request, contact_id):
     actions = contact.action_set.filter(archived=False)
     actions_by_set = get_actions_by_set(actions, 5)    
     
-    opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
-    opportunities.sort(key=lambda x: x.status.ordering if x.status else 0)
-    opportunities.reverse()
+    #opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
+    #opportunities.sort(key=lambda x: x.status.ordering if x.status else 0)
+    #opportunities.reverse()
     
     request.session["redirect_url"] = reverse('crm_view_contact', args=[contact_id])
     
@@ -609,7 +609,7 @@ def view_contact(request, contact_id):
             'contact': contact,
             #'actions': actions,
             'actions_by_set': actions_by_set,
-            'opportunities': opportunities,
+            #'opportunities': opportunities,
             'same_as': same_as,
             'entity': contact.entity
         },
@@ -1222,7 +1222,7 @@ def view_opportunity(request, opportunity_id):
     for action in actions:
         contacts += [c for c in action.contacts.all()]
         for e in action.entities.all():
-            contacts += [c for c in e.contact_set.all()]
+            contacts += [c for c in e.contact_set.filter(has_left=False)]
     contacts = list(set(contacts))
     contacts.sort(key=lambda x: x.lastname.lower())
     
