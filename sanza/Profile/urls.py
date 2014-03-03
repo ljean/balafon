@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.conf.urls import patterns, url, include
-#from django.views.generic.simple import direct_to_template
 from django.views.generic import TemplateView
-
-from registration.views import activate
-from registration.views import register
+from views import AcceptNewsletterActivationView, AcceptNewsletterRegistrationView
 
 urlpatterns = patterns('sanza.Profile.views',
     url(r'edit/$', 'edit_profile', name='profile_edit'),
@@ -21,12 +18,10 @@ urlpatterns += patterns('',
     # that way it can return a sensible "invalid key" message instead of a
     # confusing 404.
     url(r'^activate/(?P<activation_key>\w+)/$',
-        activate,
-        {'backend': 'sanza.Profile.backends.AcceptNewsletterRegistrationBackend'},
+        AcceptNewsletterActivationView.as_view(),
         name='registration_activate'),
     url(r'^register/$',
-        register,
-        {'backend': 'sanza.Profile.backends.AcceptNewsletterRegistrationBackend'},
+        AcceptNewsletterRegistrationView.as_view(),
         name='registration_register'),
     url(r'^register/complete/$',
         TemplateView.as_view(template_name='registration/registration_complete.html'),

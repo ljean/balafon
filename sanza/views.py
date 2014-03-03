@@ -62,4 +62,4 @@ def auto_save_data(request, model_type, field_name, obj_id):
         raise
     except Exception, msg:
         return HttpResponse(json.dumps({"ok": False, "error": unicode(msg)}), content_type='application/json')
-    return HttpResponse(json.dumps({"ok": True}), mimetype='application/json')
+    return HttpResponse(json.dumps({"ok": True}), content_type='application/json')

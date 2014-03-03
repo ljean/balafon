@@ -172,7 +172,7 @@ def get_group_suggest_list(request):
         term = request.GET["term"]#the 1st chars entered in the autocomplete
         for group in models.Group.objects.filter(name__icontains=term):
             suggestions.append(group.name)
-        return HttpResponse(json.dumps(suggestions), mimetype='application/json')
+        return HttpResponse(json.dumps(suggestions), content_type='application/json')
     except Exception, msg:
         print '###', msg
         
@@ -322,7 +322,7 @@ def get_action_status(request):
             default_status = action_type.default_status.id   
     else:
         allowed_status = []
-    return HttpResponse(json.dumps({'allowed_status': allowed_status, 'default_status': default_status}), mimetype="application/json")
+    return HttpResponse(json.dumps({'allowed_status': allowed_status, 'default_status': default_status}), content_type="application/json")
 
 
 @user_passes_test(can_access)
@@ -1261,7 +1261,7 @@ def view_opportunity(request, opportunity_id):
 #            emails += [c.get_email for c in e.contact_set.all() if c.get_email]
 #    emails = set(emails)
 #    if len(emails)>25:
-#        return HttpResponse(' '.join(emails), mimetype='text/plain')
+#        return HttpResponse(' '.join(emails), content_type='text/plain')
 #    else:
 #        mailto = u'mailto:'+','.join(emails)
 #        return HttpResponseRedirectMailtoAllowed(mailto)
@@ -1776,7 +1776,7 @@ def contacts_import_template(request):
     
     template_file = u";".join([u'"{0}"'.format(unicode(col)) for col in cols])+u"\n"
     
-    return HttpResponse(template_file, mimetype="text/csv", )
+    return HttpResponse(template_file, content_type="text/csv", )
 
 
 @user_passes_test(can_access)

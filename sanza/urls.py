@@ -19,7 +19,6 @@ urlpatterns = patterns('',
     (r'^crm-search/', include('sanza.Search.urls')),
     (r'^emailing/', include('sanza.Emailing.urls')),
     #url(r'^accounts/profile/$', 'sanza.Crm.views.view_board_panel'),
-    (r'^accounts/', include('django.contrib.auth.urls')),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     #url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
@@ -34,8 +33,12 @@ if 'sanza.Apis' in settings.INSTALLED_APPS:
     
 if 'sanza.Profile' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
-        (r'^profile/', include('sanza.Profile.urls')),
-    )                        
+        (r'^accounts/', include('sanza.Profile.urls')),
+    )
+
+urlpatterns += patterns('',
+    (r'^accounts/', include('django.contrib.auth.urls')),
+)
 
 if 'sanza.Users' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
