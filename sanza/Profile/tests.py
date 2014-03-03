@@ -628,3 +628,35 @@ class RegisterTestCase(TestCase):
         self.assertEqual(contact.gender, data['gender'])
         
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
+        
+    def test_register_no_password(self):
+        url = reverse('registration_register')
+        data = {
+            'email': 'toto@toto.fr',
+            'password1': '',
+            'password2': '',
+            'accept_termofuse': True,
+            'accept_newsletter': True,
+            'accept_3rdpart': True,
+            'gender': 1,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email=data['email']).count(), 0)
+        
+    def test_register_different_passwords(self):
+        url = reverse('registration_register')
+        data = {
+            'email': 'toto@toto.fr',
+            'password1': 'ABC',
+            'password2': 'DEF',
+            'accept_termofuse': True,
+            'accept_newsletter': True,
+            'accept_3rdpart': True,
+            'gender': 1,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(email=data['email']).count(), 0)
+        
+        

@@ -104,7 +104,9 @@ class UserRegistrationForm(FormWithCity):
     
         
     def clean(self, *args, **kwargs):
-        if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+        password1 = self.cleaned_data.get('password1', "")
+        password2 = self.cleaned_data.get('password2', "")
+        if password1 and (password1 != password2):
             raise forms.ValidationError(_(u'Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
         
