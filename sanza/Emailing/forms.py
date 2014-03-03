@@ -295,10 +295,11 @@ class SubscribeForm(ModelFormWithCity):
                 subject = _(u"Message from web site"),
                 type = at,
                 planned_date = datetime.now(),
-                contact = contact,
                 detail = message,
                 display_on_board = True
             )
+            action.contacts.add(contact)
+            action.save()
             
         subscriptions = []
         if accept_newsletter:
@@ -316,9 +317,10 @@ class SubscribeForm(ModelFormWithCity):
                 subject = _(u"Contact"),
                 type = at,
                 planned_date = datetime.now(),
-                contact = contact,
                 display_on_board = True
             )
+            action.contacts.add(contact)
+            action.save()
             actions.append(action)
             
         #send an email

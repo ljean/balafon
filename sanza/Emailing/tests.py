@@ -366,9 +366,6 @@ class NewsletterTest(coop_cms_tests.NewsletterTest):
 class SubscribeTest(TestCase):
     
     def setUp(self):
-        self.group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
-        self.group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
-        self.group3 = mommy.make(models.Group, name="GHI", subscribe_form=False)
         
         if not getattr(settings, 'SANZA_ALLOW_SINGLE_CONTACT', True):
             settings.SANZA_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
@@ -379,10 +376,6 @@ class SubscribeTest(TestCase):
         url = reverse("emailing_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        
-        self.assertContains(response, self.group1.name)
-        self.assertContains(response, self.group2.name)
-        self.assertNotContains(response, self.group3.name)
         
     def test_view_email_subscribe_newsletter(self):
         url = reverse("emailing_email_subscribe_newsletter")
@@ -450,12 +443,14 @@ class SubscribeTest(TestCase):
         
         
     def test_subscribe_newsletter_no_email(self):
+        group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
+        
         url = reverse("emailing_subscribe_newsletter")
         
         data = {
             'lastname': 'Dupond',
             'firstname': 'Pierre',
-            'groups': str(self.group1.id),
+            'groups': str(group1.id),
         }
         self._patch_with_captcha(url, data)
         
@@ -466,15 +461,90 @@ class SubscribeTest(TestCase):
         
         self.assertEqual(len(mail.outbox), 0)
         
-        
-    def test_subscribe_newsletter_no_entity(self):
+    def test_subscribe_newsletter_message(self):
         url = reverse("emailing_subscribe_newsletter")
         
         data = {
             'entity_type': 0,
             'lastname': 'Dupond',
             'firstname': 'Pierre',
-            'groups': str(self.group1.id),
+            'email': "pierre.dupond@mon-mail.fr",
+            'message': "Hello",
+        }
+        self._patch_with_captcha(url, data)
+        
+        self.assertEqual(models.Contact.objects.count(), 0)
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+        contact = models.Contact.objects.all()[0]
+        
+        self.assertEqual(contact.email, data["email"])
+        self.assertEqual(contact.lastname, data["lastname"])
+        self.assertEqual(contact.firstname, data["firstname"])
+        
+        self.assertEqual(1, contact.action_set.count())
+        action = contact.action_set.all()[0]
+        self.assertEqual(data["message"], action.detail)
+        
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+    
+    def test_subscribe_newsletter_empty_message(self):
+        url = reverse("emailing_subscribe_newsletter")
+        
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'email': "pierre.dupond@mon-mail.fr",
+            'message': "",
+        }
+        self._patch_with_captcha(url, data)
+        
+        self.assertEqual(models.Contact.objects.count(), 0)
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(models.Contact.objects.count(), 1)
+        contact = models.Contact.objects.all()[0]
+        
+        self.assertEqual(contact.email, data["email"])
+        self.assertEqual(contact.lastname, data["lastname"])
+        self.assertEqual(contact.firstname, data["firstname"])
+        
+        self.assertEqual(0, contact.action_set.count())
+        
+        self.assertEqual(len(mail.outbox), 2) #email verification
+        
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url)>0) #email verification
+        
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        
+        
+    def test_subscribe_newsletter_no_entity(self):
+        group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
+        
+        url = reverse("emailing_subscribe_newsletter")
+        
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'groups': str(group1.id),
             'email': 'pdupond@apidev.fr',
         }
         self._patch_with_captcha(url, data)
@@ -490,7 +560,7 @@ class SubscribeTest(TestCase):
         
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
-        self.assertEqual(list(contact.entity.group_set.all()), [self.group1])
+        self.assertEqual(list(contact.entity.group_set.all()), [group1])
         
         self.assertEqual(len(mail.outbox), 2) #email verification
         
@@ -505,6 +575,9 @@ class SubscribeTest(TestCase):
         
         
     def test_subscribe_newsletter_entity(self):
+        group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
+        group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
+        
         url = reverse("emailing_subscribe_newsletter")
         
         entity_type = mommy.make(models.EntityType, name='Pro', subscribe_form=True)
@@ -515,7 +588,7 @@ class SubscribeTest(TestCase):
             'lastname': 'Dupond',
             'firstname': 'Pierre',
             'email': 'pdupond@apidev.fr',
-            'groups': [self.group1.id, self.group2.id],
+            'groups': [group1.id, group2.id],
         }
         self._patch_with_captcha(url, data)
         
@@ -532,7 +605,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.entity.name, data['entity'])
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
-        self.assertEqual(list(contact.entity.group_set.all()), [self.group1, self.group2])
+        self.assertEqual(list(contact.entity.group_set.all()), [group1, group2])
         
         self.assertEqual(len(mail.outbox), 2) #email verification
         
@@ -546,6 +619,9 @@ class SubscribeTest(TestCase):
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
         
     def test_subscribe_newsletter_private_group(self):
+        group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
+        group2 = mommy.make(models.Group, name="DEF", subscribe_form=False)
+        
         url = reverse("emailing_subscribe_newsletter")
         
         entity_type = mommy.make(models.EntityType, name='Pro', subscribe_form=True)
@@ -555,7 +631,7 @@ class SubscribeTest(TestCase):
             'lastname': 'Dupond',
             'firstname': 'Pierre',
             'email': 'pdupond@apidev.fr',
-            'groups': [self.group1.id, self.group3.id],
+            'groups': [group1.id, group2.id],
         }
         self._patch_with_captcha(url, data)
         
