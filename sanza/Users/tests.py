@@ -23,8 +23,11 @@ import sys
 from sanza.Users.models import UserPreferences, Favorite
 from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
+from sanza.Crm.models import Action, ActionType
 import json
 import logging
+from django.utils.translation import ugettext
+
 
 
 class BaseTestCase(TestCase):
@@ -434,4 +437,29 @@ class ListFavoritesTestCase(BaseTestCase):
         for u in faved_groups:
             self.assertContains(response, u)
         
+class ActionInFavoriteTestCase(BaseTestCase):
+
+    def test_create_action_in_favorite(self):
+        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
+        up = mommy.make(UserPreferences, user=u, message_in_favorites=True)
+        
+        at = mommy.make(ActionType, name=ugettext(u"Message"))
+        a = mommy.make(Action, type=at)
+        
+        self.assertEqual(1, u.user_favorite_set.count())
+        fav = u.user_favorite_set.all()[0]
+        self.assertEqual(a, fav.content_object)
+        
+    def test_create_action_not_in_favorite(self):
+        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
+        up = mommy.make(UserPreferences, user=u, message_in_favorites=False)
+        
+        at = mommy.make(ActionType, name=ugettext(u"Message"))
+        a = mommy.make(Action, type=at)
+        
+        self.assertEqual(0, u.user_favorite_set.count())
+        
+        
+
+
     

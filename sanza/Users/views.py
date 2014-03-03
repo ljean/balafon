@@ -60,6 +60,8 @@ def toggle_favorite(request):
 @user_passes_test(can_access)
 def list_favorites(request):
     
+    request.session["redirect_url"] = reverse('users_favorites_list')
+    
     content_types = ContentType.objects.filter(user_favorite_set__user=request.user).distinct()
     
     favs_by_type = []

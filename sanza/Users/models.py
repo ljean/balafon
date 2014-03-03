@@ -7,10 +7,13 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from datetime import date
 from django.core.urlresolvers import reverse
+from sanza.Crm.models import Action
+from django.db.models import signals
 
 class UserPreferences(models.Model):
     user = models.OneToOneField(User)
     notify_due_actions = models.BooleanField(default=False, verbose_name=_(u"Notify due actions"))
+    message_in_favorites = models.BooleanField(default=False, verbose_name=_(u"Create automatically a favorite for message posted from the public form"))
     
     def __unicode__(self):
         return self.user.username
@@ -28,3 +31,17 @@ class Favorite(models.Model):
         
     def __unicode__(self):
         return u"{0} - {1}".format(self.user, self.content_object)
+
+   
+def force_message_in_favorites(sender, instance, signal, created, **kwargs):
+    action = instance
+    if created and action.type and action.type.name == _(u"Message"):
+        for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
+            ct = ContentType.objects.get_for_model(action.__class__)
+            favorite, _x = Favorite.objects.get_or_create(
+                user = user_pref.user,
+                content_type = ct,
+                object_id = action.id
+            )
+            
+signals.post_save.connect(force_message_in_favorites, sender=Action)

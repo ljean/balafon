@@ -5,7 +5,7 @@ from sanza.Users.forms import UserPreferencesAdminForm
 
 class UserPreferencesAdmin(admin.ModelAdmin):
     form = UserPreferencesAdminForm
-    list_display = ['user', 'notify_due_actions']
+    list_display = ['user', 'notify_due_actions', 'message_in_favorites']
     #list_editable = ['notify_due_actions']
 admin.site.register(models.UserPreferences, UserPreferencesAdmin)
 

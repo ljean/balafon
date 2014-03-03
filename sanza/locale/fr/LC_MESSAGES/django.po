@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-24 17:53+0100\n"
+"POT-Creation-Date: 2014-03-03 15:36+0100\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,7 +229,7 @@ msgstr "L'entité n'existe pas"
 
 #: Crm/forms.py:425 Crm/forms.py:429 Crm/forms.py:455 Crm/forms.py:485
 #: Crm/forms.py:501 Crm/models.py:820
-#: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:316
+#: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:317
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:3
 msgid "Contact"
 msgstr "Contact"
@@ -1106,14 +1106,6 @@ msgstr "Nom du contact"
 msgid "Enter a part of the name of the searched contact"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:505 Crm/search_forms.py:531
-msgid "Contact notes"
-msgstr "Notes d'un contact"
-
-#: Crm/search_forms.py:510
-msgid "Enter a part of the notes of the searched contacts"
-msgstr "Entrez un texte à rechercher dans les notes d'un contact"
-
 #: Crm/search_forms.py:518
 msgid "Contact firstname"
 msgstr "Prénom du contact"
@@ -1121,6 +1113,10 @@ msgstr "Prénom du contact"
 #: Crm/search_forms.py:523
 msgid "Enter a part of the firstname of the searched contact"
 msgstr "Entrez une partie du prénom recherché"
+
+#: Crm/search_forms.py:531
+msgid "Contact notes"
+msgstr "Notes d'un contact"
 
 #: Crm/search_forms.py:536
 msgid "Enter a part of a note of the searched contact"
@@ -1870,7 +1866,7 @@ msgstr "L'URL n'est pas autorisé"
 msgid "subscribe to our newsletter? Please enter your email."
 msgstr "souscrire à notre newsletter? Veuillez entrer votre email."
 
-#: Emailing/forms.py:135 Emailing/forms.py:305
+#: Emailing/forms.py:135 Emailing/forms.py:306
 msgid "newsletter"
 msgstr "newsletter"
 
@@ -1879,6 +1875,7 @@ msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
 #: Emailing/forms.py:150 Emailing/forms.py:293 Profile/views.py:82
+#: Users/models.py:38 Users/tests.py:446 Users/tests.py:457
 msgid "Message"
 msgstr "Message"
 
@@ -1916,15 +1913,15 @@ msgstr "Type d'action invalide"
 msgid "Message from web site"
 msgstr "Message depuis le site Internet"
 
-#: Emailing/forms.py:307
+#: Emailing/forms.py:308
 msgid "3rd parties"
 msgstr "offres partenaires"
 
-#: Emailing/forms.py:342
+#: Emailing/forms.py:344
 msgid "This field is required"
 msgstr "Ce champ est requis"
 
-#: Emailing/forms.py:345
+#: Emailing/forms.py:347
 msgid "The scheduling date must be in future"
 msgstr "La date d'envoi doit être dans le futur"
 
@@ -2807,27 +2804,31 @@ msgstr "Attention : Pas d'adresse définie"
 msgid "The content type {0} doesn't exist"
 msgstr "Le contenu de type {0} n'existe pas"
 
-#: Users/models.py:13
+#: Users/models.py:15
 msgid "Notify due actions"
 msgstr "Notifier les actions à échéance"
 
-#: Users/models.py:19
+#: Users/models.py:16
+msgid "Create automatically a favorite for message posted from the public form"
+msgstr "Crée automatiquement un favori si un message est posté depuis le formulaire de contact"
+
+#: Users/models.py:22
 msgid "user"
 msgstr "utilisateur"
 
-#: Users/models.py:20
+#: Users/models.py:23
 msgid "content_type"
 msgstr "type de contenu"
 
-#: Users/models.py:21
+#: Users/models.py:24
 msgid "object id"
 msgstr "id objet"
 
-#: Users/models.py:25
+#: Users/models.py:28
 msgid "Favorite"
 msgstr "Favori"
 
-#: Users/models.py:26 templates/sanza/_bs_navigation.html:22
+#: Users/models.py:29 templates/sanza/_bs_navigation.html:22
 msgid "Favorites"
 msgstr "Favoris"
 
@@ -3129,6 +3130,9 @@ msgstr "Gestion du contact"
 #: templates/sanza/popup_form.html:27 templates/sanza/tab_form.html:52
 msgid "The form is not valid."
 msgstr "Le formulaire n'est pas valide"
+
+#~ msgid "Enter a part of the notes of the searched contacts"
+#~ msgstr "Entrez un texte à rechercher dans les notes d'un contact"
 
 #~ msgid "Display"
 #~ msgstr "Affichage"
