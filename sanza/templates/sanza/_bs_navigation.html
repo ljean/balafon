@@ -65,7 +65,6 @@
                 <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
                 {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
                 {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">{% trans "Contacts import" %}</a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url "export_database_json" %}">{% trans "Export database" %}</a></li>{% endif %}
             </ul>
         </li>
       </ul>

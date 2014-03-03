@@ -13,19 +13,19 @@ from django.shortcuts import get_object_or_404
 from sanza.permissions import can_access
 import json
 
-@user_passes_test(can_access)
-def export_database_json(request):
-    
-    if not request.user.is_staff:
-        raise PermissionDenied
-    
-    content = StringIO()
-    
-    call_command('dumpdata', 'auth', 'Crm', 'Search',  'Emailing', indent=1, stdout=content)
-    content.seek(0)
-    response = HttpResponse(content.read(), mimetype='application/json')
-    response['Content-Disposition'] = 'attachment; filename={0}.json'.format('sanza')
-    return response
+#@user_passes_test(can_access)
+#def export_database_json(request):
+#    
+#    if not request.user.is_staff:
+#        raise PermissionDenied
+#    
+#    content = StringIO()
+#    
+#    call_command('dumpdata', 'auth', 'Crm', 'Search',  'Emailing', indent=1, stdout=content)
+#    content.seek(0)
+#    response = HttpResponse(content.read(), content_type='application/json')
+#    response['Content-Disposition'] = 'attachment; filename={0}.json'.format('sanza')
+#    return response
 
 def redirect_to_homepage(request):
     if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
@@ -61,5 +61,5 @@ def auto_save_data(request, model_type, field_name, obj_id):
     except Http404:
         raise
     except Exception, msg:
-        return HttpResponse(json.dumps({"ok": False, "error": unicode(msg)}), mimetype='application/json')
+        return HttpResponse(json.dumps({"ok": False, "error": unicode(msg)}), content_type='application/json')
     return HttpResponse(json.dumps({"ok": True}), mimetype='application/json')
