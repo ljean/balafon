@@ -24,6 +24,8 @@ from sanza.Users.models import UserPreferences, Favorite
 from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
 from sanza.Crm.models import Action, ActionType
+from sanza.Emailing.models import Emailing
+from sanza.Search.models import Search
 import json
 import logging
 from django.utils.translation import ugettext
@@ -437,29 +439,23 @@ class ListFavoritesTestCase(BaseTestCase):
         for u in faved_groups:
             self.assertContains(response, u)
         
-class ActionInFavoriteTestCase(BaseTestCase):
-
-    def test_create_action_in_favorite(self):
-        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
-        up = mommy.make(UserPreferences, user=u, message_in_favorites=True)
-        
-        at = mommy.make(ActionType, name=ugettext(u"Message"))
-        a = mommy.make(Action, type=at)
-        
-        self.assertEqual(1, u.user_favorite_set.count())
-        fav = u.user_favorite_set.all()[0]
-        self.assertEqual(a, fav.content_object)
-        
-    def test_create_action_not_in_favorite(self):
-        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
-        up = mommy.make(UserPreferences, user=u, message_in_favorites=False)
-        
-        at = mommy.make(ActionType, name=ugettext(u"Message"))
-        a = mommy.make(Action, type=at)
-        
-        self.assertEqual(0, u.user_favorite_set.count())
-        
-        
-
-
+class DeleteFavoriteTestCase(BaseTestCase):
     
+    def test_favorite_deleted_after_action_deleted(self):
+        the_models = (models.Action, models.Entity, models.Contact, models.Group, models.Opportunity,
+            Emailing, Search)
+        
+        for model_class in the_models:
+            obj = mommy.make(model_class)
+            logged_user = self.user
+    
+            ct = ContentType.objects.get_for_model(model_class)
+    
+            fav = Favorite.objects.create(user=logged_user, content_type=ct, object_id=obj.id)
+            
+            self.assertEqual(1, Favorite.objects.count())
+        
+            obj.delete()
+        
+            self.assertEqual(0, Favorite.objects.count())
+

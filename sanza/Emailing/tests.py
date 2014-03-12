@@ -21,6 +21,8 @@ from captcha.models import CaptchaStore
 from django.utils import timezone
 from django.contrib.sites.models import Site
 from bs4 import BeautifulSoup as BS4
+from sanza.Users.models import UserPreferences
+from django.utils.translation import ugettext
 
 class BaseTestCase(TestCase):
 
@@ -880,3 +882,25 @@ class EmailTrackingTest(BaseTestCase):
                 args=[emailing.id, contact.uuid])
             self.assertTrue(email.alternatives[0][1], "text/html")
             self.assertTrue(email.alternatives[0][0].find(tracking_url)>=0)
+
+class ActionInFavoriteTestCase(BaseTestCase):
+
+    def test_create_action_in_favorite(self):
+        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
+        up = mommy.make(UserPreferences, user=u, message_in_favorites=True)
+        
+        at = mommy.make(models.ActionType, name=ugettext(u"Message"))
+        a = mommy.make(models.Action, type=at)
+        
+        self.assertEqual(1, u.user_favorite_set.count())
+        fav = u.user_favorite_set.all()[0]
+        self.assertEqual(a, fav.content_object)
+        
+    def test_create_action_not_in_favorite(self):
+        u = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
+        up = mommy.make(UserPreferences, user=u, message_in_favorites=False)
+        
+        at = mommy.make(models.ActionType, name=ugettext(u"Message"))
+        a = mommy.make(models.Action, type=at)
+        
+        self.assertEqual(0, u.user_favorite_set.count())

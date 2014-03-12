@@ -5,9 +5,13 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.models import TimeStampedModel, AutoSlugField
 from django.contrib.auth.models import User
 from datetime import date
+from django.contrib.contenttypes.generic import GenericRelation
+from sanza.Users.models import Favorite
 
 class Search(TimeStampedModel):
     name = models.CharField(_('name'), max_length=100)
+    
+    favorites = GenericRelation(Favorite)
 
     def __unicode__(self):
         return self.name

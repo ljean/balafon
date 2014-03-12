@@ -1,6 +1,6 @@
 {% load i18n sanza_utils staticfiles favorite_tags %}
 <div class="actions">
-{% for a in actions %}
+{% for a in actions %}{% if a %}
   <div class="row">
     <div class="col-md-12">
       <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
@@ -139,5 +139,5 @@
       </div>  
     </div>
   </div>
-{% endfor %}
+{% endif %}{% endfor %}
 </div>

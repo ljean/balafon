@@ -7,7 +7,8 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django_extensions.db.models import TimeStampedModel, AutoSlugField
 from django.contrib.auth.models import User
-from sanza.Crm.models import Contact
+from sanza.Crm.models import Contact, Action
+from sanza.Users.models import UserPreferences, Favorite
 from datetime import datetime
 from django.conf import settings
 import uuid
@@ -17,6 +18,8 @@ from coop_cms.models import Newsletter
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.utils.dateformat import DateFormat
+from django.db.models import signals
+from django.contrib.contenttypes.generic import GenericRelation
 
 class Emailing(TimeStampedModel):
     
@@ -40,6 +43,8 @@ class Emailing(TimeStampedModel):
     
     scheduling_dt = models.DateTimeField(_(u"scheduling date"), blank=True, default=None, null=True)
     sending_dt = models.DateTimeField(_(u"sending date"), blank=True, default=None, null=True)
+
+    favorites = GenericRelation(Favorite)
 
     def __unicode__(self):
         return self.newsletter.subject
@@ -89,3 +94,17 @@ class MagicLink(models.Model):
             name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(MagicLink, self).save()
+
+
+def force_message_in_favorites(sender, instance, signal, created, **kwargs):
+    action = instance
+    if created and action.type and action.type.name == ugettext(u"Message"):
+        for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
+            ct = ContentType.objects.get_for_model(action.__class__)
+            favorite, _x = Favorite.objects.get_or_create(
+                user = user_pref.user,
+                content_type = ct,
+                object_id = action.id
+            )
+            
+signals.post_save.connect(force_message_in_favorites, sender=Action)

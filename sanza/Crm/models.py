@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.html import mark_safe
 from sanza.utils import now_rounded
+from django.contrib.contenttypes.generic import GenericRelation
+from sanza.Users.models import Favorite
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -155,6 +157,8 @@ class Entity(TimeStampedModel):
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     is_single_contact = models.BooleanField(_("is single contact"), default=False)
+    
+    favorites = GenericRelation(Favorite)
     
     def save(self, *args, **kwargs):
         super(Entity, self).save(*args, **kwargs)
@@ -398,6 +402,8 @@ class Contact(TimeStampedModel):
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
+    favorites = GenericRelation(Favorite)
+    
     def get_relationships(self):
         class ContactRelationship(object):
             def __init__(self, id, contact, type, type_name):
@@ -609,6 +615,8 @@ class Group(TimeStampedModel):
     contacts = models.ManyToManyField(Contact, blank=True, null=True)
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This group will be proposed on the public subscribe form'))
+    
+    favorites = GenericRelation(Favorite)
 
     def __unicode__(self):
         return self.name
@@ -668,6 +676,8 @@ class Opportunity(TimeStampedModel):
     #----------------
     display_on_board = models.BooleanField(verbose_name=_(u'display on board', default=False),
         default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
+    
+    favorites = GenericRelation(Favorite)
     
     def get_start_date(self):
         try:
@@ -763,6 +773,7 @@ class Action(TimeStampedModel):
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
     contacts = models.ManyToManyField(Contact, blank=True, default=None, null=True, verbose_name=_(u'contacts'))
     entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
+    favorites = GenericRelation(Favorite)
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
