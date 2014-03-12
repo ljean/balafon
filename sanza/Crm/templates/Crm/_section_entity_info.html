@@ -1,48 +1,81 @@
-{% extends "sanza/_section.html" %}
-{% load i18n thumbnail %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n thumbnail favorite_tags %}
 
-{% block column_section_data %}
-<div class="column-section-data-title">
-  {% spaceless %}
-  <div class="entity_logo">
-    <div class="helper">
+{% block section_header_extra_class %}main-section-header{% endblock %}
+
+{% block section_title %}
+<a class="header-link" href="{% url "crm_view_entity" entity.id %}">
+  <div class="logo" style="display: inline-block; vertical-align: middle;">
+    <span class="glyphicon glyphicon-tower"></span>
+    <div class="logo-container">
       <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
     </div>
   </div>
-  <div class="entity_info">
-    <span class="entity_title">{{entity.name}}</span>&nbsp;&nbsp;
-    {% if entity.relationship_date %}
-      <span class="label">{{entity.relationship_date}}</span>
-    {% endif %}
-    <span class="label">{% trans "ADD_DT" %} {{entity.created|date:"d/m/Y"}}</span>
-    <span class="label">{% trans "UPD_DT" %} {{entity.modified|date:"d/m/Y"}}</span>
-    {% if entity.type %}
-      <span class="label">{{entity.type}}</span>
-    {% endif %}
-    {% if entity.notes %}
-      <a href="" class="note-icon has-note" title="{% trans "Show note" %}">
-        <img src="{{STATIC_URL}}img/notebook.png">
-        <div class="action-note" style="display: none;">
-          {{entity.notes|linebreaksbr}}
-        </div>
-     </a>
-    {% endif %}
-    <br /><br />
-    <span class="entity_description">{{entity.description}}</span>
-  </div>
-  {% endspaceless %}
-</div>  
+  <div style="display: inline-block; vertical-align: middle;">
+  {{entity.name}}
+</a>
+<div class="section-subtitle">{{entity.description}}</div>
+</div>
+{% endblock %}
 
-  {% if entity.get_display_address %}<span class="entity_address addr-info">{{entity.get_display_address}}</span>{% endif %}
-  <br /><br />
-  {% if entity.website %}<span class="entity_website addr-info"><a href="{{entity.website}}" target="_blank">{{entity.website}}</a></span>{% endif %}
-  {% if entity.email %}<span class="entity_email addr-info"><a href="mailto:{{entity.email}}">{{entity.email}}</a></span>{% endif %}
-  {% if entity.phone %}<span class="entity_phone addr-info">{{entity.phone}}</span>{% endif %}
-  {% if entity.fax %}<span class="entity_fax addr-info">{{entity.fax}}</span>{% endif %}
+{% block section_data %}
+<div class="row">
+  <div class="col-md-4">
+    <table class="table">
+      <tr><td>
+        <span class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
+      </td></tr>
+      <tr><td>
+        <span class="glyphicon glyphicon-print"></span> {{entity.fax}}
+      </td></tr>
+    </table>
+  </div>
+  
+  <div class="col-md-7">
+    
+    <div class="note" style="margin-bottom: 5px;">
+      <span class="contenteditable" contenteditable="true" rel="{% url "auto_save_data" "entity" "notes" entity.id %}">
+        {{entity.notes|linebreaksbr|default:"&nbsp;"}}
+      </span>
+    </div>
+    
+    {% include "Crm/_entity_groups.html" %}
+    
+    {% with entity.get_custom_fields as custom_fields %}
+    {% if custom_fields %}
+        {% include "Crm/_custom_fields.html" with instance=entity  model="entity" %}
+    {% endif %}
+    {% endwith %}
+  </div>
+  
+  <div class="col-md-1">
+    <table class="table micro-table table-striped">
+      <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "ADD_DT" %}</b> {{entity.created|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "UPD_DT" %}</b> {{entity.modified|date:"d/m/Y"}}</td></tr>
+      {% if entity.type %}
+      <tr><td><b>{% trans "Type" %}</b> {{entity.type}}</td></tr> 
+      {% endif %}
+    </table>
+  </div>
+</div>  
 
 {% endblock %}
 
-{% block section_action %}
-    <a href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a>
-    <a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a>
+{% block section_buttons %}
+  <li><a class="colorbox-form" href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a></li>
+{% endblock %}
+
+{% block section_favorite %}
+  {% favorite_item object=entity %}
 {% endblock %}

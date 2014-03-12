@@ -1,8 +1,8 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags sanza_utils %}
 
 {% block section_title %}
-  {% trans "Search results" %} :
+  <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
   {% if entities_count > 1 %}{{entities_count}} {% trans "entities" %}{% else %}{{entities_count}} {% trans "entity" %}{% endif %} -
   {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
   
@@ -14,7 +14,7 @@
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
   {% autopaginate entities nb_entities_by_page %}
-  <table>
+  <table class="table table-bordered font-small">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
   {% for e in entities %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
@@ -33,13 +33,23 @@
         
       {% with e.search_contacts as contacts %}
       {% if contacts %}
+        <table class="table contact-table table-striped font-small">
         {% for c in contacts %}
-          <div class="contact contact-sr">
-            <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;
-            {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-            <a href="" class="exclude-contact" rel="{{c.id}}">{% trans "exclude" %}</a>
-          </div>
+            <tr>
+            <td>
+              <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+              {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+            </td>
+            <td>
+            <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+              <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+              <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+            </a>
+            </td>
+            </tr>
         {% endfor %}
+        </table>
       {% else %}
         &nbsp;
       {% endif %}
@@ -54,11 +64,12 @@
       $('a.exclude-contact').live('click', function() {
         var val = $("input[name=excluded]").val();
         var cid = '#'+$(this).attr('rel')+'#';
+        var parent = $(this).closest("tr");
         if (val.search(cid) >= 0) {
-          $(this).parent().removeClass('excluded');
+          parent.removeClass('excluded');
           val = val.replace('#'+$(this).attr('rel')+'#', '');
         } else {
-          $(this).parent().addClass('excluded');
+          parent.addClass('excluded');
           val += '#'+$(this).attr('rel')+'#';
         }
         $("input[name=excluded]").val(val);
@@ -121,17 +132,17 @@
 
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   
 {% if entities %}
-<a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a>
-<a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a>
-<a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a>
-<a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">{% trans "Excel" %}</a>
-<a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a>
-<a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a>
-<a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a>
+<li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a></li>
+<li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a></li>
+<li><a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a></li>
+<li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">{% trans "Excel" %}</a></li>
+<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a></li>
+<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a></li>
+<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a></li>
 
-{% if user.is_superuser %}<a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a>{% endif %}
+{% if user.is_superuser %}<li><a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a></li>{% endif %}
 {% endif %}
 {% endblock %}

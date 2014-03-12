@@ -1,67 +1,34 @@
 {% extends "sanza/tab_form.html" %}
-{% load i18n %}{% load url from future %}
+{% load i18n %}
 
 {% block extra_head %}
   {{block.super}}
-  <link rel="stylesheet" href="{{STATIC_URL}}chosen/chosen.css" />
-  <style>
-    .chzn-container-multi .chzn-choices .search-choice .search-choice-close {
-      height: 8px;
-    }
-    .chzn-container-multi .chzn-choices .search-field input {
-      height: 27px;
-    }
-  </style>
+  {% include "sanza/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
 {% endblock %}
+
+{% block title %}{% if contact %}{% trans "Edit contact" %}{% else %}{% trans "Create contact" %}{% endif %}{% endblock %}
+
+{% block form_url %}{% if contact %}{% url "crm_edit_contact" contact.id %}{% else %}{% if entity %}{% url "crm_add_contact" entity.id %}{% else %}{% url "crm_add_single_contact" %}{% endif %}{% endif %}{% endblock %}
 
 {% block doc_header %}
   <h2>
     {% if contact %}
-    <div class="contact_logo">
-      <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
-    </div>
-    {% if not contact.entity.is_single_contact %}
-      <a class="contact-entity-info">
-        <img src="{{contact.entity.get_safe_logo}}"><span class="text">{{contact.entity}}</span>
-      </a>
-      {% endif %}
-    {% blocktrans %}Edit contact '{{contact}}'{% endblocktrans %}</h2>
-  {% else %}
-  <h2>
+    {{contact}}</h2>
+    {% else %}
     {% if is_single_contact %}
-      <div class="contact_logo">
-        <img src="{{STATIC_URL}}img/single-contact.png"/>
-      </div>
       {% trans "Create single contact" %}
     {% else %}
-      <div class="contact_logo">
-        <img src="{{STATIC_URL}}img/contact.png"/>
-      </div>
       {% trans "Create contact" %}
     {% endif %}
-  </h2>
   {% endif %}
-
-  <h3>
-    {% if contact %}
-      {% if not entity.is_single_contact %}
-        {{entity.type.name}}: {{entity.name}}
-    {% else %}
-      {% trans "Single contact" %}
-    {% endif %}
-    {% endif %}
-  </h3>
+  </h2>
 {% endblock %}
-
-{% block form_buttons %}
-    <input type="submit" value="{% trans "Save"%}" />
-    {% if contact %}
-    <a href="{% url "crm_view_contact" contact.id %}">{% trans "Cancel" %}</a>
-    {% endif %}
+  
+{% block popup_buttons %}
+    <input class="btn btn-primary" type="submit" value="{% trans "Save"%}" />
+    <a href="" class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
 {% endblock %}
 
 {% block doc_footer %}
-  {% include "sanza/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
-  <script src="{{STATIC_URL}}chosen/chosen.jquery.js" type="text/javascript"></script>
-  <script type="text/javascript"> $(".chzn-select").chosen();</script>
+  
 {% endblock %}

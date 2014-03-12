@@ -12,3 +12,4 @@ xlrd
 django-simple-captcha
 django-localeurl
 django-modeltranslation
+django-tastypie

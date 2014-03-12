@@ -1,0 +1,6 @@
+{% extends "sanza/popup_form.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Save search" %}{% endblock %}
+
+{% block form_url %}{% url "search_name" search_id %}{% endblock %}

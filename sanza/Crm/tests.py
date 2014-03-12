@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
+if 'localeurl' in settings.INSTALLED_APPS:
+    from localeurl.models import patch_reverse
+    patch_reverse()
+    
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
@@ -11,17 +16,72 @@ from bs4 import BeautifulSoup as BS4
 from django.core import management
 from cStringIO import StringIO
 import sys
-        
+from datetime import datetime, timedelta
+import logging
+  
 class BaseTestCase(TestCase):
-
+    
     def setUp(self):
+        logging.disable(logging.CRITICAL)
         self.user = User.objects.create(username="toto", is_staff=True)
         self.user.set_password("abc")
         self.user.save()
         self._login()
+        
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def _login(self):
         self.client.login(username="toto", password="abc")
+
+class ViewEntityTest(BaseTestCase):
+
+    def test_view_entity(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        self.assertContains(response, reverse("crm_view_contact", args=[contact.id]))
+        
+    def test_view_entity_secondary_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        contact1 = mommy.make(models.Contact, main_contact=True, entity=entity)
+        contact2 = mommy.make(models.Contact, main_contact=False, entity=entity)
+        
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        url1 = reverse("crm_view_contact", args=[contact1.id])
+        url2 = reverse("crm_view_contact", args=[contact2.id])
+        self.assertContains(response, url1)
+        self.assertContains(response, url2)
+        tag1 = BS4(response.content).select('.ut-contact-{0.id} .ut-secondary-contact'.format(contact1))
+        self.assertEqual(len(tag1), 0)
+        tag2 = BS4(response.content).select('.ut-contact-{0.id} .ut-secondary-contact'.format(contact2))
+        self.assertEqual(len(tag2), 1)
+        
+    def test_view_entity_has_left_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        contact1 = mommy.make(models.Contact, has_left=False, entity=entity)
+        contact2 = mommy.make(models.Contact, has_left=True, entity=entity)
+        
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        url1 = reverse("crm_view_contact", args=[contact.id])
+        url2 = reverse("crm_view_contact", args=[contact2.id])
+        self.assertContains(response, url1)
+        self.assertContains(response, url2)
+        tag1 = BS4(response.content).select('.ut-contact-{0.id} .ut-has-left'.format(contact1))
+        self.assertEqual(len(tag1), 0)
+        tag2 = BS4(response.content).select('.ut-contact-{0.id} .ut-has-left'.format(contact2))
+        self.assertEqual(len(tag2), 1)
         
 class CreateEntityTest(BaseTestCase):
 
@@ -41,11 +101,12 @@ class CreateEntityTest(BaseTestCase):
     def test_create_entity_no_type(self):
         url = reverse('crm_create_entity', args=[0])
         response = self.client.post(url, data={'name': "ABC"})
-        self.assertEqual(302, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertEqual(models.Entity.objects.count(), 1)
         e = models.Entity.objects.all()[0]
-        self.assertEqual(response["Location"],
-            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertContains(response, 'colorbox')
+        self.assertContains(response,
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, None)
     
@@ -53,11 +114,12 @@ class CreateEntityTest(BaseTestCase):
         t = mommy.make(models.EntityType)
         url = reverse('crm_create_entity', args=[t.id])
         response = self.client.post(url, data={'name': "ABC", "type": t.id})
-        self.assertEqual(302, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertEqual(models.Entity.objects.count(), 1)
         e = models.Entity.objects.all()[0]
-        self.assertEqual(response["Location"],
-            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertContains(response, 'colorbox')
+        self.assertContains(response,
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, t)
         
@@ -65,11 +127,12 @@ class CreateEntityTest(BaseTestCase):
         t = mommy.make(models.EntityType)
         url = reverse('crm_create_entity', args=[0])
         response = self.client.post(url, data={'name': "ABC", "type": t.id})
-        self.assertEqual(302, response.status_code)
+        self.assertEqual(200, response.status_code)
         self.assertEqual(models.Entity.objects.count(), 1)
         e = models.Entity.objects.all()[0]
-        self.assertEqual(response["Location"],
-            "http://testserver"+reverse("crm_edit_contact_after_entity_created", args=[e.default_contact.id]))
+        self.assertContains(response, 'colorbox')
+        self.assertContains(response,
+            reverse("crm_view_entity", args=[e.id]))
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, t)
         
@@ -108,19 +171,209 @@ class CreateEntityTest(BaseTestCase):
 
 class OpportunityTest(BaseTestCase):
 
-    def test_add_opportunity(self):
+    def test_view_delete_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
         
-        entity1 = mommy.make(models.Entity, name='ent1', relationship_date='2012-01-30')
-        entity2 = mommy.make(models.Entity, name='ent2', relationship_date='2012-01-30')
-        other_entity = mommy.make(models.Entity, name='ent3', relationship_date='2012-01-30')
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, models.Opportunity.objects.count())
+    
+    def test_delete_empty_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
         
-        url = reverse("crm_add_opportunity")
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': True})
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(0, models.Opportunity.objects.count())
+    
+    def test_delete_opportunity_actions(self):
+        opportunity = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': True})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, models.Opportunity.objects.count())
+        self.assertEqual(1, models.Action.objects.count())
+        self.assertEqual(action, models.Action.objects.all()[0])
+    
+    
+    def test_delete_opportunity_cancel(self):
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_delete_opportunity", args=[opportunity.id])
+        response = self.client.post(url, {'confirm': False})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, models.Opportunity.objects.count())
+        
+
+    def test_view_add_action_to_opportunity(self):
+        action = mommy.make(models.Action)
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_add_action_to_opportunity", args=[action.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
-    def test_add_opportunity_for_entity(self):
-        pass
-        #self.assertEqual(response.status_code, 200)
+        self.assertEqual(action.opportunity, None)
+    
+    def test_view_add_action_to_opportunity_no_opp(self):
+        action = mommy.make(models.Action)
+        
+        url = reverse("crm_add_action_to_opportunity", args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(action.opportunity, None)
+    
+    def test_add_action_to_opportunity(self):
+        action = mommy.make(models.Action)
+        opportunity = mommy.make(models.Opportunity)
+        
+        url = reverse("crm_add_action_to_opportunity", args=[action.id])
+        response = self.client.post(url, data={'opportunity': opportunity.id})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, opportunity)
+        
+    def test_add_action_to_opportunity_existing(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity1)
+
+        url = reverse("crm_add_action_to_opportunity", args=[action.id])
+        response = self.client.post(url, data={'opportunity': opportunity2.id})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, opportunity2)
+    
+    def test_add_action_to_opportunity_invalid(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity1)
+        
+        url = reverse("crm_add_action_to_opportunity", args=[action.id])
+        response = self.client.post(url, data={'opportunity': "AAAA"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(BS4(response.content).select(".field-error")), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, opportunity1)
+        
+    def test_remove_action_from_opportunity(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity1)
+        
+        url = reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity1.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, None)
+        
+    def test_remove_action_from_opportunity_badone(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity1)
+        
+        url = reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity2.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, opportunity1)
+        
+    def test_remove_action_from_opportunity_no_confirm(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=opportunity1)
+        
+        url = reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity1.id])
+        response = self.client.post(url, data={'confirm': 0})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, opportunity1)
+    
+    def test_remove_action_from_opportunity_no_opp(self):
+        opportunity1 = mommy.make(models.Opportunity)
+        opportunity2 = mommy.make(models.Opportunity)
+        action = mommy.make(models.Action, opportunity=None)
+        
+        url = reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity2.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.opportunity, None)
+        
+    def test_view_add_opportunity(self):
+        url = reverse("crm_add_opportunity")
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_add_opportunity(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "ABC",
+            "detail": "ooo",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
+        
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
+            
+    def test_add_opportunity2(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "DEF",
+            "detail": "",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
+        
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
+            
+    def test_add_opportunityno_name(self):
+        url = reverse("crm_add_opportunity")
+        data = {
+            'name': "",
+            "detail": "",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(BS4(response.content).select('.field-error')), 1)
+        
+        self.assertEqual(0, models.Opportunity.objects.count())
+
+    def test_edit_opportunity(self):
+        o = mommy.make(models.Opportunity)
+        url = reverse("crm_edit_opportunity", args=[o.id])
+        data = {
+            'name': "ABC",
+            "detail": "ooo",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(BS4(response.content).select('.field-error'), [])
+        
+        self.assertEqual(1, models.Opportunity.objects.count())
+        o = models.Opportunity.objects.all()[0]
+        for k, v in data.items():
+            self.assertEqual(getattr(o, k), v)
 
     def test_view_opportunity(self):
         entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
@@ -133,15 +386,47 @@ class OpportunityTest(BaseTestCase):
         entity1 = mommy.make(models.Entity, name='ent1', relationship_date='2012-01-30')
         entity2 = mommy.make(models.Entity, name='ent2', relationship_date='2012-01-30')
         opp1 = mommy.make(models.Opportunity, name='OPP1', entity=entity1)
-        act1 = mommy.make(models.Action, subject='ABC', opportunity=opp1, entity=entity1)
-        act2 = mommy.make(models.Action, subject='DEF', opportunity=opp1, entity=entity2)
-        act3 = mommy.make(models.Action, subject='GHI', entity=entity1)
+        act1 = mommy.make(models.Action, subject='ABC', opportunity=opp1)
+        act1.entities.add(entity1)
+        act1.save()
+        act2 = mommy.make(models.Action, subject='DEF', opportunity=opp1)
+        act2.entities.add(entity2)
+        act2.save()
+        act3 = mommy.make(models.Action, subject='GHI')
+        act3.entities.add(entity1)
+        act3.save()
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, opp1.name)
         self.assertContains(response, act1.subject)
         self.assertContains(response, act2.subject)
         self.assertNotContains(response, act3.subject)
+        
+    #def test_mailto_opportunity_contacts(self):
+    #    entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+    #    entity2 = mommy.make(models.Entity, relationship_date='2012-01-30')
+    #    opp1 = mommy.make(models.Opportunity, entity=entity1)
+    #    contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1, email="c1@sanza.fr")
+    #    contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity2, email="c2@sanza.fr")
+    #    contact3 = mommy.make(models.Contact, lastname='GHI', entity=entity1, email="c3@sanza.fr")
+    #    contact4 = mommy.make(models.Contact, lastname='JKL', entity=entity1)
+    #    act1 = mommy.make(models.Action, opportunity=opp1)
+    #    act1.contacts.add(contact1)
+    #    act1.contacts.add(contact4)
+    #    act1.save()
+    #    act2 = mommy.make(models.Action, opportunity=opp1)
+    #    act2.entities.add(entity2)
+    #    act2.save()
+    #    act3 = mommy.make(models.Action)
+    #    act3.contacts.add(contact3)
+    #    act3.save()
+    #    
+    #    response = self.client.get(reverse('crm_mailto_opportunity_contacts', args=[opp1.id]))
+    #    self.assertEqual(302, response.status_code)
+    #    content = response['Location']
+    #    self.assertTrue(content.find(contact1.email)>=0)
+    #    self.assertTrue(content.find(contact2.email)>=0)
+    #    self.assertFalse(content.find(contact3.email)>=0)
     
     def test_view_opportunity_contacts(self):
         entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
@@ -150,21 +435,68 @@ class OpportunityTest(BaseTestCase):
         contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
         contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity2)
         contact3 = mommy.make(models.Contact, lastname='GHI', entity=entity1)
-        act1 = mommy.make(models.Action, opportunity=opp1, entity=entity1, contact=contact1)
-        act2 = mommy.make(models.Action, opportunity=opp1, entity=entity2, contact=contact2)
-        act3 = mommy.make(models.Action, entity=entity1, contact=contact3)
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.contacts.add(contact1)
+        act1.save()
+        act2 = mommy.make(models.Action, opportunity=opp1)
+        act2.entities.add(entity2)
+        act2.save()
+        act3 = mommy.make(models.Action)
+        act3.contacts.add(contact3)
+        act3.save()
+        
         response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
         self.assertEqual(200, response.status_code)
         self.assertContains(response, contact1.lastname)
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
         
+    def test_view_opportunity_entity_contacts_has_left(self):
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity1, has_left=True)
+        
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.entities.add(entity1)
+        act1.save()
+        
+        response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        
+    def test_view_opportunity_contact_has_left(self):
+        entity1 = mommy.make(models.Entity, relationship_date='2012-01-30')
+        opp1 = mommy.make(models.Opportunity)
+        
+        contact1 = mommy.make(models.Contact, lastname='ABC', entity=entity1)
+        contact2 = mommy.make(models.Contact, lastname='DEF', entity=entity1, has_left=True)
+        
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.contacts.add(contact1)
+        act1.contacts.add(contact2)
+        act1.save()
+        
+        response = self.client.get(reverse('crm_view_opportunity', args=[opp1.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        soup = BS4(response.content)
+        
+        self.assertEqual(len(soup.select("td.ut-contact-{0} .ut-has-left".format(contact1.id))), 0)
+        self.assertEqual(len(soup.select("td.ut-contact-{0} .ut-has-left".format(contact2.id))), 1)
+        
+        
     def test_view_opportunityies_date_mixes(self):
         opp1 = mommy.make(models.Opportunity)
         opp2 = mommy.make(models.Opportunity)
         
         contact1 = mommy.make(models.Contact, lastname='ABC')
-        act1 = mommy.make(models.Action, opportunity=opp1, contact=contact1, planned_date='2013-11-29')
+        act1 = mommy.make(models.Action, opportunity=opp1, planned_date='2013-11-29')
+        act1.contacts.add(contact1)
+        act1.save()
         
         response = self.client.get(reverse('crm_all_opportunities'))
         self.assertEqual(200, response.status_code)
@@ -176,7 +508,9 @@ class OpportunityTest(BaseTestCase):
         opp2 = mommy.make(models.Opportunity)
         
         contact1 = mommy.make(models.Contact, lastname='ABC')
-        act1 = mommy.make(models.Action, opportunity=opp1, contact=contact1)
+        act1 = mommy.make(models.Action, opportunity=opp1)
+        act1.contacts.add(contact1)
+        act1.save()
         
         response = self.client.get(reverse('crm_all_opportunities'))
         self.assertEqual(200, response.status_code)
@@ -234,6 +568,89 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, None)
         
+    def test_suggestion_list(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(1, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertTrue(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        
+    def test_suggestion_list_two_choices(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(2, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertTrue(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        self.assertTrue(contact4.id in ids)
+        
+    def test_suggestion_list_two_choices_existing_same_as(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        ids = [int(x["value"]) for x in soup.select("select option")]
+        self.assertEqual(1, len(ids))
+        self.assertFalse(contact1.id in ids)
+        self.assertFalse(contact2.id in ids)
+        self.assertFalse(contact3.id in ids)
+        self.assertTrue(contact4.id in ids)
+        
+    def test_suggestion_list_two_choices_existing_same_as_with_all(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact4]:
+            c.same_as = same_as
+            c.save()
+            
+        url = reverse("crm_same_as", args=[contact1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(0, len(soup.select('select')))
+        
+    def test_suggestion_list_nohomonymous(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
+        contact4 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+            
+        url = reverse("crm_same_as", args=[contact3.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(0, len(soup.select('select')))
+        
     def test_make_main_view(self):
         entity1 = mommy.make(models.Entity, name="Toto")
         entity2 = mommy.make(models.Entity, name="Titi")
@@ -244,7 +661,7 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data={'contact': contact2.id})
         self.assertEqual(200, response.status_code)
         
-        url = reverse("crm_make_main_contact", args=[contact1.id])
+        url = reverse("crm_make_main_contact", args=[contact1.id, contact1.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
@@ -267,7 +684,7 @@ class SameAsTest(BaseTestCase):
         response = self.client.post(url, data={'contact': contact2.id})
         self.assertEqual(200, response.status_code)
         
-        url = reverse("crm_make_main_contact", args=[contact1.id])
+        url = reverse("crm_make_main_contact", args=[contact1.id, contact1.id])
         
         response = self.client.post(url, data={'confirm': 1})
         self.assertEqual(200, response.status_code)
@@ -281,6 +698,292 @@ class SameAsTest(BaseTestCase):
         self.assertEqual(contact2.same_as, contact1.same_as)
         self.assertEqual(contact1.same_as.main_contact, contact1)
         
+    def test_remove_same_as_two_clones(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_two_clones_prio1(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        same_as.main_contact = contact1
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+        
+    def test_remove_same_as_two_clones_prio2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+            
+        same_as.main_contact = contact2
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_three_clones(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, None)
+        
+    def test_remove_same_as_three_clones_prio1(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact1
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact1)
+        
+    def test_remove_same_as_three_clones_prio2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact2
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact1)
+        
+    def test_remove_same_as_not_same(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, None)
+        self.assertEqual(contact2.same_as, None)
+        
+    def test_remove_same_as_not_in_same_as(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact3.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, None)
+        
+    def test_remove_same_as_not_in_same_as_2(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2]:
+            c.same_as = same_as
+            c.save()
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact3.id, contact1.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(404, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, None)
+        
+    def test_remove_same_as_three_clones_prio3(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact3
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, None)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact3)
+        
+    def test_remove_same_as_cancel(self):
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for c in [contact1, contact2, contact3]:
+            c.same_as = same_as
+            c.save()
+        same_as.main_contact = contact3
+        same_as.save()
+        
+        url = reverse("crm_remove_same_as", args=[contact1.id, contact2.id])
+        
+        response = self.client.post(url, data={})
+        self.assertEqual(200, response.status_code)
+        
+        #refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+        contact3 = models.Contact.objects.get(id=contact3.id)
+        
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact3.same_as, same_as)
+        self.assertEqual(same_as.main_contact, contact3)
+    
         
 class OpportunityAutoCompleteTest(BaseTestCase):
     def test_get_add_action(self):
@@ -339,89 +1042,904 @@ class OpportunityAutoCompleteTest(BaseTestCase):
 class EditActionTest(BaseTestCase):
     def test_edit_action(self):
         contact = mommy.make(models.Contact)
-        action = mommy.make(models.Action, contact=contact)
+        action = mommy.make(models.Action)
+        action.contacts.add(contact)
+        action.save()
         url = reverse('crm_edit_action', args=[action.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
         data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
-            'status':"", 'in_charge': "", 'contact': contact.id, 'opportunity': "", 'detail':"",
+            'status':"", 'in_charge': "", 'opportunity': "", 'detail':"",
             'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
             'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
         
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "tested")
+        
+    def test_allowed_status(self, ):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)+"&timestamp=777"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([as1.id, as2.id], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
+        
+    def test_allowed_status_default_value(self, ):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.default_status = as2
+        at.save()
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)+"&timestamp=777"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([as1.id, as2.id], data['allowed_status'])
+        self.assertEqual(as2.id, data['default_status'])
+        
+    def test_no_allowed_status(self, ):
+        at = mommy.make(models.ActionType)
+        
+        url = reverse("crm_get_action_status")+"?t="+str(at.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
+        
+    def test_allowed_status_no_type(self, ):
+        url = reverse("crm_get_action_status")+"?t="+str(0)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status'])
+        self.assertEqual(0, data['default_status'])
+        
+    def test_allowed_status_unknown_type(self, ):
+        url = reverse("crm_get_action_status")+"?t=100"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        
+    def test_allowed_status_unknown_type(self, ):
+        url = reverse("crm_get_action_status")+"?t=toto"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
         
     def test_edit_action_on_entity(self):
         entity = mommy.make(models.Entity)
-        action = mommy.make(models.Action, entity=entity)
+        action = mommy.make(models.Action)
+        action.entities.add(entity)
+        action.save()
         url = reverse('crm_edit_action', args=[action.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         
         data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
-            'status':"", 'in_charge': "", 'contact': entity.default_contact.id, 'opportunity': "", 'detail':"",
+            'status':"", 'in_charge': "", 'opportunity': "", 'detail':"",
             'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
             'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
         
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "tested")
-        self.assertEqual(action.contact.id, entity.default_contact.id)
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 1)
+        self.assertEqual(action.entities.all()[0], entity)
+        
+        
+    def test_edit_action_status_not_allowed(self):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="not tested", type=at, status=as1)
+        action.entities.add(entity)
+        action.save()
+    
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "", 'time': "",
+            'status': as3.id, 'in_charge': "", 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "not tested")
+        
+    def test_edit_action_status_no_type(self):
+        at = mommy.make(models.ActionType)
+        as1 = mommy.make(models.ActionStatus)
+        as2 = mommy.make(models.ActionStatus)
+        as3 = mommy.make(models.ActionStatus)
+        at.allowed_status.add(as1)
+        at.allowed_status.add(as2)
+        at.save()
+        
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="not tested", type=at, status=as1)
+        action.entities.add(entity)
+        action.save()
+    
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status': as3.id, 'in_charge': "", 'opportunity': "", 'detail':"",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False}
+        
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "not tested")
 
+class BoardPanelTest(BaseTestCase):
+    def test_view_board_panel(self):
+        response = self.client.get(reverse("crm_board_panel"))
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], "http://testserver{0}".format(reverse('users_favorites_list')))
+        
+class ActionTest(BaseTestCase):
+    def test_view_add_contact_to_action(self):
+        action = mommy.make(models.Action)
+        url = reverse('crm_add_contact_to_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+    def test_view_add_entity_to_action(self):
+        action = mommy.make(models.Action)
+        url = reverse('crm_add_entity_to_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+    
+    def test_add_contact_to_action(self):
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        url = reverse('crm_add_contact_to_action', args=[action.id])
+        response = self.client.post(url, data={'contact': contact.id}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(action.contacts.all()[0], contact)
+        
+    def test_add_entity_to_action(self):
+        action = mommy.make(models.Action)
+        entity = mommy.make(models.Entity)
+        url = reverse('crm_add_entity_to_action', args=[action.id])
+        response = self.client.post(url, data={'entity': entity.id}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 1)
+        self.assertEqual(action.entities.all()[0], entity)
+        
+    def test_view_entity_actions(self):
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="should be only once", archived=False)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        action.contacts.add(c1)
+        action.contacts.add(c2)
+        action.entities.add(entity)
+        action.save()
+        
+        url = reverse("crm_view_entity", args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.content.count(action.subject))
+        
+    def test_view_contact_actions_more_than_five(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        actions = [mommy.make(models.Action, subject=u"--{0}--".format(i), archived=False) for i in range(10)]
+        for a in actions:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in actions[5:]:
+            self.assertContains(response, a.subject)
+        
+        for a in actions[:5]:
+            self.assertNotContains(response, a.subject)
+            
+    def test_view_contact_actions_more_than_five_datetime(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        def _get_dt(x=0):
+            n = datetime.now()
+            if x > 0:
+                return n + timedelta(days=x)
+            elif x < 0:
+                return n - timedelta(days=-x)
+            return n
+        
+        a1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=_get_dt())
+        a2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=_get_dt(-1))
+        a3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=_get_dt(-2))
+        a4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=_get_dt(-3))
+        a5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=_get_dt(+1))
+        a6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=_get_dt(+2))
+        a7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=_get_dt(+3))
+        
+        for a in [a1, a2, a3, a4, a5, a6, a7]:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        #print BS4(response.content).select(".action-subject")
+        self.assertEqual(200, response.status_code)
+        
+        for a in [a1, a2, a5, a6, a7]:
+            self.assertContains(response, a.subject)
+        
+        for a in [a3, a4]:
+            self.assertNotContains(response, a.subject)
+
+    def test_view_entity_actions_more_than_five_datetime(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        def _get_dt(x=0):
+            n = datetime.now()
+            if x > 0:
+                return n + timedelta(days=x)
+            elif x < 0:
+                return n - timedelta(days=-x)
+            return n
+        
+        a1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=_get_dt())
+        a2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=_get_dt(-1))
+        a3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=_get_dt(-2))
+        a4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=_get_dt(-3))
+        a5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=_get_dt(+1))
+        a6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=_get_dt(+2))
+        a7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=_get_dt(+3))
+        
+        for a in [a1, a2, a3, a4, a5, a6, a7]:
+            a.contacts.add(c1)
+            a.save()
+        
+        url = reverse("crm_view_entity", args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in [a1, a2, a5, a6, a7]:
+            self.assertContains(response, a.subject)
+        
+        for a in [a3, a4]:
+            self.assertNotContains(response, a.subject)
+
+    def test_view_contact_all_actions_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        url = reverse("crm_view_contact_actions", args=[c1.id, s1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+            
+    def test_view_entity_all_actions_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(10):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            if i%2:
+                a.contacts.add(c1)
+            else:
+                a.entities.add(entity)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        url = reverse("crm_view_entity_actions", args=[entity.id, s1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+            
+    def test_view_contact_actions_more_than_five_by_set(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        
+        at1 = mommy.make(models.ActionType)
+        s1 = mommy.make(models.ActionSet)
+        at2 = mommy.make(models.ActionType, set=s1)
+        at3 = mommy.make(models.ActionType, set=s1)
+        s2 = mommy.make(models.ActionSet)
+        at4 = mommy.make(models.ActionType, set=s2)
+        
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+            
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at1, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(2):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        for i in range(3):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            hidden_actions.append(a)
+            counter += 1
+        
+        for i in range(5):
+            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
+            a.contacts.add(c1)
+            a.save()
+            visible_actions.append(a)
+            counter += 1
+        
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        
+        for a in visible_actions:
+            self.assertContains(response, a.subject)
+        
+        for a in hidden_actions:
+            self.assertNotContains(response, a.subject)
+
+
+        
+    def test_view_contact_actions(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        action2 = mommy.make(models.Action, subject="another action to do", archived=False)
+        action2.contacts.add(c1)
+        action2.save()
+        
+        action3 = mommy.make(models.Action, subject="i believe i can fly", archived=False)
+        action3.entities.add(entity)
+        action3.save()
+        
+        action4 = mommy.make(models.Action, subject="hard days night", archived=False)
+        action4.contacts.add(c2)
+        action4.save()
+        
+        url = reverse("crm_view_contact", args=[c1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.content.count(action1.subject))
+        self.assertEqual(1, response.content.count(action2.subject))
+        self.assertEqual(0, response.content.count(action3.subject))
+        self.assertEqual(0, response.content.count(action4.subject))
+        
+    def test_view_remove_contact_from_action(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        url = reverse('crm_remove_contact_from_action', args=[action1.id, c1.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        action1 = models.Action.objects.get(id=action1.id)
+        self.assertEqual(action1.contacts.count(), 2)
+        self.assertEqual(action1.entities.count(), 1)
+        
+    def test_remove_contact_from_action(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        url = reverse('crm_remove_contact_from_action', args=[action1.id, c1.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        action1 = models.Action.objects.get(id=action1.id)
+        self.assertEqual(action1.contacts.count(), 1)
+        self.assertEqual(action1.contacts.all()[0], c2)
+        self.assertEqual(action1.entities.count(), 1)
+        self.assertEqual(action1.entities.all()[0], entity)
+        
+    def test_remove_entity_from_action(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        url = reverse('crm_remove_entity_from_action', args=[action1.id, entity.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        action1 = models.Action.objects.get(id=action1.id)
+        self.assertEqual(action1.contacts.count(), 2)
+        self.assertEqual(action1.entities.count(), 0)
+        
+    def test_view_remove_entity_from_action(self):
+        entity = mommy.make(models.Entity)
+        c1 = entity.default_contact
+        c2 = mommy.make(models.Contact, entity=entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        url = reverse('crm_remove_entity_from_action', args=[action1.id, entity.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(action1.contacts.count(), 2)
+        self.assertEqual(action1.entities.count(), 1)
+        
+    def test_add_entity_to_action(self):
+        action = mommy.make(models.Action)
+        entity = mommy.make(models.Entity)
+        url = reverse('crm_add_entity_to_action', args=[action.id])
+        response = self.client.post(url, data={'entity': entity.id}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 1)
+        self.assertEqual(action.entities.all()[0], entity)
+        
+    def test_view_add_action_from_board(self):
+        url = reverse('crm_create_action', args=[0, 0])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 0)
+        
+    def test_view_add_action_from_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        url = reverse('crm_create_action', args=[0, 0])+"?opportunity={0}".format(opportunity.id)
+        response = self.client.get(url)
+        self.assertEqual(BS4(response.content).select('#id_opportunity')[0]["value"], str(opportunity.id))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 0)
+    
+    def test_add_action_from_opportunity(self):
+        opportunity = mommy.make(models.Opportunity)
+        url = reverse('crm_create_action', args=[0, 0])+"?opportunity={0}".format(opportunity.id)
+        data = {'subject': "tested", 'type': "", 'date': "", 'time': "",
+            'status': "", 'in_charge': "", 'detail':"ABCDEF", 'opportunity': opportunity.id,
+            'amount': 0, 'number': 0}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(list(errors), [])
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.subject, data["subject"])
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(action.opportunity, opportunity)
+        
+    def test_add_action_from_board(self):
+        url = reverse('crm_create_action', args=[0, 0])
+        at = mommy.make(models.ActionType)
+        ast = mommy.make(models.ActionStatus)
+        at.allowed_status.add(ast)
+        at.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': ast.id, 'in_charge': user.id, 'detail':"ABCDEF",
+            'amount': 200, 'number': 5}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(list(errors), [])
+        
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        for x in data:
+            if x in ("type", "status", "in_charge"):
+                self.assertEqual(getattr(action, x).id, data[x])
+            elif x in ("date", "time"):
+                pass
+            else:
+                self.assertEqual(getattr(action, x), data[x])
+        self.assertEqual(action.planned_date, datetime(2014, 1, 31, 11, 34, 00))
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 0)
+        
+        
+    def test_view_add_action_from_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[0, contact.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 0)
+    
+    def test_add_action_from_contact(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[0, contact.id])
+        
+        at = mommy.make(models.ActionType)
+        ast = mommy.make(models.ActionStatus)
+        at.allowed_status.add(ast)
+        at.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': ast.id, 'in_charge': user.id, 'detail':"ABCDEF",
+            'amount': 200, 'number': 5}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(list(errors), [])
+        
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        for x in data:
+            if x in ("type", "status", "in_charge"):
+                self.assertEqual(getattr(action, x).id, data[x])
+            elif x in ("date", "time"):
+                pass
+            else:
+                self.assertEqual(getattr(action, x), data[x])
+        self.assertEqual(action.planned_date, datetime(2014, 1, 31, 11, 34, 00))
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.contacts.all()[0], contact)
+        
+        self.assertEqual(action.entities.count(), 0)
+        
+    def test_view_add_action_from_entity(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[entity.id, 0])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 0)
+        
+    def test_add_action_from_entity(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[entity.id, 0])
+        
+        at = mommy.make(models.ActionType)
+        ast = mommy.make(models.ActionStatus)
+        at.allowed_status.add(ast)
+        at.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': ast.id, 'in_charge': user.id, 'detail':"ABCDEF",
+            'amount': 200, 'number': 5}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(list(errors), [])
+        
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        for x in data:
+            if x in ("type", "status", "in_charge"):
+                self.assertEqual(getattr(action, x).id, data[x])
+            elif x in ("date", "time"):
+                pass
+            else:
+                self.assertEqual(getattr(action, x), data[x])
+        self.assertEqual(action.planned_date, datetime(2014, 1, 31, 11, 34, 00))
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 1)
+        self.assertEqual(action.entities.all()[0], entity)
+    
+    def test_view_edit_action(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        pld = datetime(2014, 1, 31, 11, 34, 00)
+        action = mommy.make(models.Action, display_on_board=True, done=True, planned_date=pld)
+        action.contacts.add(contact)
+        action.entities.add(entity)
+        action.save()
+        
+        at = mommy.make(models.ActionType)
+        ast = mommy.make(models.ActionStatus)
+        at.allowed_status.add(ast)
+        at.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        soup = BS4(response.content)
+        self.assertEqual(soup.select("input#id_date")[0]["value"], "2014-01-31")
+        self.assertEqual(soup.select("input#id_time")[0]["value"], "11:34:00")
+        
+    def test_edit_action(self):
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        action = mommy.make(models.Action, display_on_board=True, done=True)
+        action.contacts.add(contact)
+        action.entities.add(entity)
+        action.save()
+        act_id = action.id
+        
+        at = mommy.make(models.ActionType)
+        ast = mommy.make(models.ActionStatus)
+        at.allowed_status.add(ast)
+        at.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        
+        data = {'subject': "tested", 'type': at.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': ast.id, 'in_charge': user.id, 'detail':"ABCDEF",
+            'amount': 200, 'number': 5}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.id, act_id)
+        
+        self.assertEqual(action.display_on_board, True)
+        self.assertEqual(action.done, True)
+        for x in data:
+            if x in ("type", "status", "in_charge"):
+                self.assertEqual(getattr(action, x).id, data[x])
+            elif x in ("date", "time"):
+                pass
+            else:
+                self.assertEqual(getattr(action, x), data[x])
+        self.assertEqual(action.planned_date, datetime(2014, 1, 31, 11, 34, 00))
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 1)
         
 class DoActionTest(BaseTestCase):
     def test_do_action(self):
         action = mommy.make(models.Action, done=False)
         response = self.client.get(reverse('crm_do_action', args=[action.id]))
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, action.detail)
         self.assertEqual(action.done, False)
         
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested"})
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': True})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_board_panel"))
         action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
         
-    def test_do_action_entity_and_new(self):
-        entity = mommy.make(models.Entity)
-        action = mommy.make(models.Action, done=False, entity=entity)
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
+    def test_undo_action(self):
+        action = mommy.make(models.Action, done=True)
+        response = self.client.get(reverse('crm_do_action', args=[action.id]))
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, reverse("crm_add_action_for_entity", args=[action.entity.id]))
-        action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.detail, "tested")
         self.assertEqual(action.done, True)
         
-    def test_do_action_contact_and_new(self):
-        contact = mommy.make(models.Contact)
-        action = mommy.make(models.Action, done=False, contact=contact)
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, reverse("crm_add_action_for_contact", args=[action.contact.id]))
-        action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.detail, "tested")
-        self.assertEqual(action.done, True)
-        
-    def test_do_action_contact_and_new(self):
-        action = mommy.make(models.Action, done=False)
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'detail': "tested", 'done_and_new': True})
+        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': False})
         self.assertEqual(200, response.status_code)
         self.assertContains(response, reverse("crm_board_panel"))
         action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.detail, "tested")
-        self.assertEqual(action.done, True)
+        self.assertEqual(action.done, False)
+        
+    def test_view_action_warning_not_in_charge(self):
+        user = mommy.make(User, is_active=True, is_staff=True, last_name="L", first_name="F")
+        action = mommy.make(models.Action, done=True, in_charge=user)
+        response = self.client.get(reverse('crm_do_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, "warning")
+        
         
 class GroupTest(BaseTestCase):
     
@@ -671,7 +2189,7 @@ class GroupTest(BaseTestCase):
         gr1 = models.Group.objects.get(id=gr1.id)
         self.assertEqual(1, gr1.contacts.count())
         
-    def test_remove_entity_form_group(self):
+    def test_remove_entity_from_group(self):
         
         contact = mommy.make(models.Contact)
         gr1 = mommy.make(models.Group, name="GROUP1")
@@ -680,7 +2198,7 @@ class GroupTest(BaseTestCase):
         
         url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
         
-        data = {'confirm': "1"}
+        data = {'confirm': True}
         
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
@@ -709,7 +2227,7 @@ class GroupTest(BaseTestCase):
         self.assertEqual(0, gr1.entities.count())
     
         
-    def test_cancel_remove_entity_form_group(self):
+    def test_cancel_remove_entity_from_group(self):
         
         contact = mommy.make(models.Contact)
         gr1 = mommy.make(models.Group, name="GROUP1")
@@ -718,7 +2236,7 @@ class GroupTest(BaseTestCase):
         
         url = reverse('crm_remove_entity_from_group', args=[gr1.id, contact.entity.id])
         
-        data = {}
+        data = {'confirm': False}
         
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
@@ -1008,7 +2526,7 @@ class SingleContactTest(BaseTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         self.assertEqual(models.Contact.objects.count(), 1)
@@ -1016,6 +2534,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(john_doe.lastname, "Doe")
         self.assertEqual(john_doe.firstname, "John")
         self.assertEqual(john_doe.entity.is_single_contact, True)
+        self.assertEqual(john_doe.entity.name, u"doe john")
         
     def test_add_single_contact_existing_city(self):
         url = reverse('crm_add_single_contact')
@@ -1028,7 +2547,7 @@ class SingleContactTest(BaseTestCase):
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         
@@ -1051,7 +2570,7 @@ class SingleContactTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         
         self.assertEqual(models.Contact.objects.count(), 1)
@@ -1073,7 +2592,7 @@ class SingleContactTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         self.assertEqual(models.Contact.objects.count(), 0)
@@ -1090,7 +2609,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Contact.objects.count(), 0)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         self.assertEqual(len(response.redirect_chain), 0)
         
@@ -1502,7 +3021,9 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_new_document_edit(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
         self.assertEqual(200, response.status_code)
@@ -1512,7 +3033,9 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_new_document_view(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
         self.assertEqual(200, response.status_code)
@@ -1522,7 +3045,9 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_no_document_view(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
         self.assertEqual(404, response.status_code)
@@ -1537,7 +3062,9 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_no_document_edit(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
         self.assertEqual(404, response.status_code)
@@ -1552,14 +3079,18 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_no_document_pdf(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
         self.assertEqual(404, response.status_code)
         
     def test_no_type_view(self):
         c = mommy.make(models.Contact)
-        a = mommy.make(models.Action, type=None, contact=c)
+        a = mommy.make(models.Action, type=None)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
         self.assertEqual(404, response.status_code)
@@ -1581,7 +3112,9 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_view_document_view(self):
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         #Create
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
@@ -1610,7 +3143,9 @@ class ActionDocumentTestCase(BaseTestCase):
         self.client.logout()
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
         self.assertEqual(403, response.status_code)
@@ -1631,7 +3166,9 @@ class ActionDocumentTestCase(BaseTestCase):
         
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        a = mommy.make(models.Action, type=at, contact=c)
+        a = mommy.make(models.Action, type=at)
+        a.contacts.add(c)
+        a.save()
         
         response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
         self.assertEqual(403, response.status_code)
@@ -1681,19 +3218,20 @@ class EditContactTestCase(BaseTestCase):
             'firstname': 'Paul',
             'city': models.City.objects.get(name="Paris").id,
         }
-        response = self.client.post(url, data, follow=True)
+        response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         next_url = reverse('crm_view_contact', args=[c.id])
-        self._check_redirect_url(response, next_url)
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
         
         c = models.Contact.objects.get(id=c.id)
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
         
-    def test_edit_contact_unknwonn_city(self):
+    def test_edit_contact_unknown_city(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
@@ -1702,19 +3240,20 @@ class EditContactTestCase(BaseTestCase):
             'city': "ImagineCity",
             'zip_code': "42999",
         }
-        response = self.client.post(url, data, follow=True)
+        response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
         next_url = reverse('crm_view_contact', args=[c.id])
-        self._check_redirect_url(response, next_url)
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
         
         c = models.Contact.objects.get(id=c.id)
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.name, data['city'])
         
-    def test_edit_contact_unknwonn_city_no_zipcode(self):
+    def test_edit_contact_unknown_city_no_zipcode(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
@@ -1724,7 +3263,7 @@ class EditContactTestCase(BaseTestCase):
         }
         response = self.client.post(url, data, follow=True)
         self.assertEqual(200, response.status_code)
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         self.assertEqual(len(response.redirect_chain), 0)
         
@@ -1763,7 +3302,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(url, data={'contact2': contact2.id, 'relationship_type': relation_type.id})
         self.assertEqual(200, response.status_code)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(list(errors), [])
         
         #refresh
@@ -1788,7 +3327,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(url, data={'contact2': contact1.id, 'relationship_type': -relation_type.id})
         self.assertEqual(200, response.status_code)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(list(errors), [])
         
         #refresh
@@ -1810,7 +3349,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(url, data={'contact2': '', 'relationship_type': relation_type.id})
         self.assertEqual(200, response.status_code)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
@@ -1827,7 +3366,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(url, data={'contact2': contact2.id, 'relationship_type': ''})
         self.assertEqual(200, response.status_code)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
@@ -1844,7 +3383,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.post(url, data={'contact2': "AAAA", 'relationship_type': 'ZZZZZ'})
         self.assertEqual(200, response.status_code)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 2)
         
         self.assertEqual(0, models.Relationship.objects.filter(contact1=contact1, contact2=contact2).count())
@@ -1905,7 +3444,7 @@ class RelationshipTest(BaseTestCase):
         response = self.client.get(reverse("crm_view_contact", args=[luke.id]))
         soup = BS4(response.content)
         
-        self.assertEqual(len(soup.select("table.contact-relationships tr")), 5)# 4 + title 
+        self.assertEqual(len(soup.select("table tr.relationship")), 4)# 4 + title 
         self.assertEqual(len(soup.select(".add-relation")), 1) # add button is enabled
         
         self.assertContains(response, anakin.fullname)
@@ -2155,7 +3694,7 @@ class ChangeContactEntityTest(BaseTestCase):
         
     def test_make_single_contact_entity(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname=u"John")
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
         data= {
@@ -2167,6 +3706,8 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertEqual(contact.entity.is_single_contact, True)
         entity = models.Entity.objects.get(id=entity.id)
         self.assertNotEqual(contact.entity.id, entity.id)
+        self.assertEqual(contact.entity.name, u"{0} {1}".format(contact.lastname, contact.firstname).lower())
+        
     
     def test_change_to_new_entity(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
@@ -2223,7 +3764,7 @@ class ChangeContactEntityTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         contact = models.Contact.objects.get(id=contact.id)
@@ -2241,7 +3782,7 @@ class ChangeContactEntityTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         contact = models.Contact.objects.get(id=contact.id)
@@ -2260,7 +3801,7 @@ class ChangeContactEntityTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         contact = models.Contact.objects.get(id=contact.id)
@@ -2278,10 +3819,381 @@ class ChangeContactEntityTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         
-        errors = BS4(response.content).select('.errorlist')
+        errors = BS4(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity, entity)
     
+class ActionArchiveTest(BaseTestCase):
+   
+    def test_view_monthly_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=31))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=31))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+    def test_view_weekly_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=7))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=7))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_week', args=[n.year, n.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+
+    def test_view_daily_action(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now()+timedelta(days=1))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now()-timedelta(days=1))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_day', args=[n.year, n.month, n.day])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
     
+    def test_view_monthly_action_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(User, first_name="Jack", is_staff=True)
+        w = mommy.make(User, first_name="William", is_staff=True)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), in_charge=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), in_charge=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u{0},u{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"u{0}".format(y.id) for y in [u, v]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_filter(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(y.id) for y in [u, v]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_none(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t0"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(["t0"], [x["value"] for x in soup.select("select option[selected=selected]")])
+        
+    def test_view_monthly_action_type_none_and_defined(self):
+        u = mommy.make(models.ActionType)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=u)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t0,t{0}".format(u.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t0"] +[u"t{0}".format(y.id) for y in [u,]],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_filter_invalid(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=abc"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 404)
+    
+    def test_view_monthly_action_filter_invalid_user(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u2"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_filter_invalid_type(self):
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=t2"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_monthly_action_type_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime.now(), type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime.now(), type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+        
+        n = datetime.now()
+        url = reverse('crm_actions_of_month', args=[n.year, n.month])+"?filter=u{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(v.id)] + [u"u{0}".format(u.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_not_planned_action(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=None, type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=None, type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now(), in_charge=u, type=v)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_not_planned')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+    def test_view_not_planned_action_type_in_charge_filter(self):
+        u = mommy.make(User, first_name="Joe", is_staff=True)
+        v = mommy.make(models.ActionType)
+        w = mommy.make(models.ActionType)
+        
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=u, type=v)
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=u)
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=None, type=v)
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=None, type=w)
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now(), in_charge=u, type=v)
+        
+        n = datetime.now()
+        url = reverse('crm_actions_not_planned')+"?filter=u{0},t{1}".format(u.id, v.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+        soup = BS4(response.content)
+        self.assertEqual(
+            [u"t{0}".format(v.id)] + [u"u{0}".format(u.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        
+class ViewContactsTest(BaseTestCase):
+   
+    def test_view_contacts(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        e2 = mommy.make(models.Entity, is_single_contact=True)
+        c2 = e2.default_contact
+        c2.lastname = "#Contact{0}#".format(c2.id)
+        c2.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        
+    def test_view_entities_actions(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        a1 = mommy.make(models.Action, subject="#Action1#", done=True, done_date=datetime.now())
+        a1.entities.add(e1)
+        a1.save()
+        
+        a2 = mommy.make(models.Action, subject="#Action2#", done=True, done_date=datetime.now()-timedelta(days=1))
+        a2.entities.add(e1)
+        a2.save()
+        
+        a3 = mommy.make(models.Action, subject="#Action3#", done=False, planned_date=datetime.now())
+        a3.entities.add(e1)
+        a3.save()
+        
+        a4 = mommy.make(models.Action, subject="#Action4#", done=False, planned_date=datetime.now()+timedelta(days=1))
+        a4.entities.add(e1)
+        a4.save()
+        
+        a5 = mommy.make(models.Action, subject="#Action5#", done=False)
+        a5.entities.add(e1)
+        a5.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        
+    def test_view_contact_actions(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+        
+        a1 = mommy.make(models.Action, subject="#Action1#", done=True, done_date=datetime.now())
+        a1.contacts.add(c1)
+        a1.save()
+        
+        a2 = mommy.make(models.Action, subject="#Action2#", done=True, done_date=datetime.now()-timedelta(days=1))
+        a2.contacts.add(c1)
+        a2.save()
+        
+        a3 = mommy.make(models.Action, subject="#Action3#", done=False, planned_date=datetime.now())
+        a3.contacts.add(c1)
+        a3.save()
+        
+        a4 = mommy.make(models.Action, subject="#Action4#", done=False, planned_date=datetime.now()+timedelta(days=1))
+        a4.contacts.add(c1)
+        a4.save()
+        
+        a5 = mommy.make(models.Action, subject="#Action5#", done=False)
+        a5.contacts.add(c1)
+        a5.save()
+        
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertContains(response, a1.subject)
+        self.assertNotContains(response, a2.subject)
+        self.assertContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        

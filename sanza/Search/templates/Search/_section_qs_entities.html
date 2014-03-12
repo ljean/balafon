@@ -1,12 +1,10 @@
-{% extends "sanza/_section.html" %}
-{% load i18n sanza_utils %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n sanza_utils %}
 
-{% block section_title %}{{ name.capitalize }}{% endblock %}
+{% block section_title %}{% trans "Entities" %}{% endblock %}
   
 {% block section_data %}
-<table>
-  <tr><th>{% trans "Name" %}</th><th>{% trans "Contacts" %}</th><th>{% trans "City" %}</th>
-  </tr>
+<table class="table table-striped">
   {% for e in entities %}
   <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>

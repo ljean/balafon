@@ -1,0 +1,59 @@
+{% extends "sanza/bs_base.html" %}
+{% load i18n sanza_utils %}
+
+{% block extra_head %}
+{{block.super}}
+<script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}chosen/chosen.jquery.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css" type="text/css" />
+<script>
+    $(function() {
+        $("select.filter").change(function() {
+            var values = $(this).val();
+            window.location = "{% block this_url %}{% endblock%}?filter="+values;
+            return false;
+        });
+        
+        $(".action-archive-filter a.btn").each(function(idx, elt) {
+            var href = $(elt).attr("href");
+            if (("" ===  href) || (href.charAt(0)==="?")) {
+                $(elt).hide();
+            }
+        });
+    })
+</script>
+{% endblock %}
+
+{% block document_content %}
+<div class="action-archive-filter">
+<a class="btn pull-left btn-default" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+</a>
+
+<h2 class="inline-block">
+    {% block this_title %}{% endblock%}
+</h2>
+
+<select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans "Filter by" %}">
+    {% if action_types %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "Action types" %}">
+        <option value="t0" {% if no_type_selected %}selected="selected"{% endif %}>{% trans "No type" %}</option>
+    {% for at in action_types %}
+        <option value="t{{at.id}}" {% if at.selected %}selected="selected"{% endif %}>{{at.name}}</option>
+    {% endfor %}
+    </optgroup>
+    {% endif %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "In charge" %}">
+    {% for u in in_charge %}
+        <option value="u{{u.id}}" {% if u.selected %}selected="selected"{% endif %}>{{u.username}}</option>
+    {% endfor %}
+    </optgroup>
+</select>
+
+<a class="btn btn-default pull-right" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+</a>
+</div>
+
+{% include "Crm/_section_actions.html" with actions=object_list %}
+
+{% endblock %}

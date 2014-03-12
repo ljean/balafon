@@ -1,0 +1,6 @@
+{% load i18n %}
+
+<span class="cursor-pointer favorite-icon {%if status %}in-fav{% else %}out-fav{% endif %}">
+    <span class="glyphicon glyphicon-star{%if not status %}-empty{% endif %}"></span>
+    <form style="display:none" action="{{post_url}}">{% csrf_token %}{{ form.as_p }}</form>
+</span>

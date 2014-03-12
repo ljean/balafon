@@ -1,0 +1,10 @@
+{% extends "Crm/action_archive_base.html" %}
+{% load i18n %}
+
+{% block prev_url %}{% endblock %}
+
+{% block this_url %}{% url "crm_actions_not_planned" %}{% endblock %}
+
+{% block next_url %}{% endblock %}
+
+{% block this_title %}{% trans "Not planned actions" %}{% endblock %}

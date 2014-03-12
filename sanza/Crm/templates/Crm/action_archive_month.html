@@ -1,0 +1,11 @@
+{% extends "Crm/action_archive_base.html" %}
+{% load i18n %}
+
+{% block prev_url %}{% url "crm_actions_of_month" previous_month.year previous_month.month %}{% endblock %}
+
+{% block this_url %}{% url "crm_actions_of_month" month.year month.month %}{% endblock %}
+
+{% block next_url %}{% url "crm_actions_of_month" next_month.year next_month.month %}{% endblock %}
+
+{% block this_title %}{{month|date:"F Y"}}{% endblock %}
+

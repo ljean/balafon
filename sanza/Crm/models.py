@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
 from django.core.urlresolvers import reverse
@@ -164,6 +165,10 @@ class Entity(TimeStampedModel):
             c = self.default_contact
             c.main_contact = True
             c.save()
+        if self.is_single_contact:
+            c = self.default_contact
+            self.name = u"{0} {1}".format(c.lastname, c.firstname).lower()
+            super(Entity, self).save() #don't put *args, *kwargs -> it may cause integrity error
     
     def __unicode__(self):
         return self.name
@@ -171,14 +176,14 @@ class Entity(TimeStampedModel):
     def get_safe_logo(self):
         if self.logo:
             w, h = self.logo.width, self.logo.height
-            fmt = "128" if w>h else "x128"
+            fmt = "64" if w>h else "x64"
             return sorl_thumbnail.backend.get_thumbnail(self.logo.file, fmt, crop='center').url
         else:
             return self.default_logo()
     
     def default_logo(self):
         if self.type and self.type.logo:
-            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "128x128", crop='center')
+            file = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "64x64", crop='center')
             return file.url
         
         if self.is_single_contact:
@@ -192,23 +197,26 @@ class Entity(TimeStampedModel):
         if self.logo:
             w, h = self.logo.width, self.logo.height
             if w > h:
-                w, h = 128, h*128/w
-                return mark_safe('style="margin-top: {0}px"'.format((128-h)/2))
+                w, h = 64, h*64/w
+                return mark_safe('style="margin: {0}px 0"'.format((64-h)/2))
             else:
-                w, h = w*128/h, h
-                return mark_safe('style="margin-left: {0}px"'.format((128-w)/2))
+                w, h = w*64/h, h
+                return mark_safe('style="margin-left: 0 {0}px"'.format((64-w)/2))
                 
     def get_absolute_url(self):
         return reverse('crm_view_entity', args=[self.id])
 
     def get_full_address(self):
+        return u' '.join(self.get_address_fields())
+        
+    def get_address_fields(self):
         if self.city:
-            fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            fields = [self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])]
             country = self.city.get_foreign_country()
             if country:
                 fields.append(country.name)
-            return u' '.join([f for f in fields if f])
-        return u''
+            return [f for f in fields if f]
+        return []
     
     def get_country(self):
         return self.city.get_country() if self.city else None
@@ -223,17 +231,22 @@ class Entity(TimeStampedModel):
         return self.get_full_address()
     
     def main_contacts(self):
-        return [c for c in self.contact_set.filter(main_contact=True).order_by("lastname", "firstname")]
+        return [c for c in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")]
     
     def last_action(self):
         try:
-            return Action.objects.filter(contact__entity=self, done_date__isnull=False).order_by("-done_date")[0]
+            return Action.objects.filter(
+                Q(contacts__entity=self) | Q(entities=self), done=True,
+                done_date__isnull=False).order_by("-done_date")[0]
         except IndexError:
             return None
         
     def next_action(self):
         try:
-            return Action.objects.filter(contact__entity=self, planned_date__isnull=False, done_date__isnull=True).order_by("-planned_date")[0]
+            return Action.objects.filter(
+                Q(contacts__entity=self) | Q(entities=self), done=False,
+                planned_date__isnull=False,
+                done_date__isnull=True).order_by("planned_date")[0]
         except IndexError:
             return None
         
@@ -419,11 +432,12 @@ class Contact(TimeStampedModel):
         if self.photo:
             w, h = self.photo.width, self.photo.height
             if w > h:
-                w, h = 128, h*128/w
-                return mark_safe('style="margin-top: {0}px"'.format((128-h)/2))
+                w, h = 64, h*64/w
+                return mark_safe('style="margin: {0}px 0"'.format((64-h)/2))
             else:
-                w, h = w*128/h, h
-                return mark_safe('style="margin-left: {0}px"'.format((128-w)/2))
+                w, h = w*64/h, h
+                return mark_safe('style="margin: 0 {0}px"'.format((64-w)/2))
+        
     
     def default_logo(self):
         if self.entity.is_single_contact:
@@ -434,17 +448,21 @@ class Contact(TimeStampedModel):
     
     def photo_thumbnail(self):
         w, h = self.photo.width, self.photo.height
-        fmt = "128" if w>h else "x128"
+        fmt = "64" if w>h else "x64"
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, fmt, crop='center')
 
     def get_full_address(self):
+        return u' '.join(self.get_address_fields())
+    
+    def get_address_fields(self):
         if self.city:
-            fields = [self.address, self.address2, self.address3, self.zip_code, self.city.name, self.cedex]
+            fields = [self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])]
             country = self.city.get_foreign_country()
             if country:
                 fields.append(country.name)
-            return u' '.join([f for f in fields if f])
-        return self.entity.get_full_address()
+            return [f for f in fields if f]
+        return self.entity.get_address_fields() 
+    
     
     def get_country(self):
         if self.city:
@@ -521,8 +539,8 @@ class Contact(TimeStampedModel):
         return [x for x in (self.phone, self.mobile) if x]
     
     def get_roles(self):
-        has_left = [__(u'has left')] if self.has_left else []
-        return has_left + [x.name for x in self.role.all()]
+        #has_left = [__(u'has left')] if self.has_left else []
+        return [x.name for x in self.role.all()]
     
     def has_entity(self):
         try:
@@ -540,7 +558,7 @@ class Contact(TimeStampedModel):
             
     def __unicode__(self):
         if self.entity.is_single_contact:
-            return self.lastname
+            return u"{0} {1}".format(self.lastname, self.firstname)
         return u"{0} {1} ({2})".format(self.lastname, self.firstname, self.entity.name)
             
     @property
@@ -574,7 +592,11 @@ class Contact(TimeStampedModel):
             name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ln, self.email)
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(Contact, self).save()
-
+        
+        if self.entity.is_single_contact:
+            #force the entity name for ordering
+            self.entity.save()
+            
     class Meta:
         verbose_name = _(u'contact')
         verbose_name_plural = _(u'contacts')
@@ -590,6 +612,10 @@ class Group(TimeStampedModel):
 
     def __unicode__(self):
         return self.name
+    
+    @property
+    def all_contacts(self):
+        return Contact.objects.filter(Q(id__in=self.contacts.all()) | Q(entity__id__in=self.entities.all()))
 
     def save(self, *args, **kwargs):
         self.name = self.name.strip()
@@ -640,7 +666,7 @@ class Opportunity(TimeStampedModel):
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
     #----------------
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'),
+    display_on_board = models.BooleanField(verbose_name=_(u'display on board', default=False),
         default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
     
     def get_start_date(self):
@@ -715,15 +741,17 @@ class Action(TimeStampedModel):
         (PRIORITY_MEDIUM, _(u'medium priority')),
         (PRIORITY_HIGH, _(u'high priority')),
     )
+    
+    class Meta:
+        verbose_name = _(u'action')
+        verbose_name_plural = _(u'actions')
 
-    entity = models.ForeignKey(Entity, blank=True, default=None, null=True)
     subject = models.CharField(_(u'subject'), max_length=200, blank=True, default="")
     planned_date = models.DateTimeField(_(u'planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
     detail = models.TextField(_(u'detail'), blank=True, default='')
     priority = models.IntegerField(_(u'priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
     opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
-    contact = models.ForeignKey(Contact, blank=True, default=None, null=True, verbose_name=_(u'contact'))
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
     in_charge = models.ForeignKey(User, verbose_name=_(u'in charge'), blank=True, null=True, default=None,
@@ -733,6 +761,8 @@ class Action(TimeStampedModel):
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     number = models.IntegerField(_(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.'))
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
+    contacts = models.ManyToManyField(Contact, blank=True, default=None, null=True, verbose_name=_(u'contacts'))
+    entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)

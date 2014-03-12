@@ -1,16 +1,9 @@
-{% extends "sanza/base.html" %}
-{% load i18n pagination_tags %}{% load url from future %}
+{% extends "sanza/bs_base.html" %}
+{% load i18n pagination_tags %}
 
 
-{% block document_title %}
-{% trans "List of searchs" %}
-{% endblock %}
 {% block document_content %}
-<ul>
-{% autopaginate searches 25 %}
-{% for search in searches %}
-  <li><a href="{% url "search" search.id %}">{{search.name}}</a></li>  
-{% endfor %}
-</ul>
-{% paginate %}
+
+{% include "Search/_section_saved_searches.html" %}
+  
 {% endblock %}

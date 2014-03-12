@@ -25,6 +25,7 @@ from sanza.utils import logger, log_error
 from sanza.utils import now_rounded
 import os.path
 from django.core.servers.basehttp import FileWrapper
+from sanza.Crm.forms import ConfirmForm
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -42,13 +43,17 @@ def delete_emailing(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     
     if request.method == 'POST':
-        if 'confirm' in request.POST:
-            emailing.delete()
-        return HttpResponseRedirect(reverse('emailing_newsletter_list'))
-
+        form = ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                emailing.delete()
+            return HttpResponseRedirect(reverse('emailing_newsletter_list'))
+    else:
+        form = ConfirmForm()
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u"Are you sure to delete '{0.newsletter.subject}' {1}?").format(
                 emailing, emailing.get_status_display()),
             'action_url': reverse("emailing_delete", args=[emailing_id]),
@@ -134,19 +139,24 @@ def confirm_send_mail(request, emailing_id):
 def cancel_send_mail(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     if request.method == "POST":
-        if 'confirm' in request.POST:
-            if emailing.status in (models.Emailing.STATUS_SCHEDULED, ):
-                emailing.status = models.Emailing.STATUS_EDITING
-                emailing.scheduling_dt = None
-                emailing.save()
-                messages.add_message(request, messages.SUCCESS, _(u"The sending has been cancelled"))
-            else:
-                messages.add_message(request, messages.ERROR, _(u"The sending can't be cancelled"))
+        form = ConfirmForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["confirm"]:
+                if emailing.status in (models.Emailing.STATUS_SCHEDULED, ):
+                    emailing.status = models.Emailing.STATUS_EDITING
+                    emailing.scheduling_dt = None
+                    emailing.save()
+                    messages.add_message(request, messages.SUCCESS, _(u"The sending has been cancelled"))
+                else:
+                    messages.add_message(request, messages.ERROR, _(u"The sending can't be cancelled"))
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
-    
+    else:
+        form = ConfirmForm()
+        
     return render_to_response(
         'sanza/confirmation_dialog.html',
         {
+            'form': form,
             'message': _(u'Cancel the sending?'),
             'action_url': reverse("emailing_cancel_send_mail", args=[emailing_id]),
         },
@@ -162,10 +172,12 @@ def view_link(request, link_uuid, contact_uuid):
         #create action
         link_action, _is_new = ActionType.objects.get_or_create(name=_(u'Link'))
         action = Action.objects.create(
-            entity = contact.entity, subject=link.url, planned_date=now_rounded(),
-            type=link_action, detail='', contact=contact, done=True, display_on_board=False,
+            subject=link.url, planned_date=now_rounded(),
+            type=link_action, detail='', done=True, display_on_board=False,
             done_date=now_rounded()
         )
+        action.contacts.add(contact)
+        action.save()
         
     except Contact.DoesNotExist:
         pass
@@ -186,15 +198,14 @@ def unregister_contact(request, emailing_id, contact_uuid):
                 contact.accept_newsletter = False
                 contact.save()
                 
-                #create action
-                entity = contact.entity
-                
                 emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
                 action = Action.objects.create(
-                    entity=entity , subject=_(u'{0} has unregister').format(contact),
+                    subject=_(u'{0} has unregister').format(contact),
                     planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
-                    contact=contact, done=True, display_on_board=False, done_date=now_rounded()
+                    done=True, display_on_board=False, done_date=now_rounded()
                 )
+                action.contacts.add(contact)
+                action.save()
                 unregister = True
                 return render_to_response(
                     'Emailing/public/unregister_done.html',
@@ -327,8 +338,10 @@ class SubscribeView(View):
                 fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
                 action = Action.objects.create(
                     subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
-                    type = fix_action, detail=detail, contact=contact, display_on_board=True,
+                    type = fix_action, detail=detail, display_on_board=True,
                 )
+                action.contacts.add(contact)
+                action.save()
                 
                 return HttpResponseRedirect(self.get_error_url(contact))
         

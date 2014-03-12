@@ -1,0 +1,31 @@
+{% load i18n thumbnail sanza_utils %}
+
+<div class="custom-field-list">
+  <div class="custom-field-list-header">
+    <span class="custom-field-list-title">{% trans "Fields" %}</span>
+    {% if contact %}
+      <a class="btn btn-xs pull-right colorbox-form" href="{% url "crm_edit_custom_fields" "contact" contact.id %}">
+        <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
+      </a>
+    {% else %}
+      <a class="btn btn-xs pull-right colorbox-form" href="{% url "crm_edit_custom_fields" "entity" entity.id %}">
+        <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
+      </a>
+      {% endif %}    
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="data-groups">
+      {% for f in custom_fields %}
+        {% with instance|custom_field:f.name as cfv %}
+        {% if cfv %}
+        <span class="custom-field">
+          <span class="custom-field-label">{{f.label}}:</span><span class="custom-field-value">{{cfv}}</span>
+        </span>
+        {% endif %}
+        {% endwith %}
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

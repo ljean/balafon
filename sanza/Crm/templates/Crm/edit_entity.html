@@ -1,39 +1,24 @@
 {% extends "sanza/tab_form.html" %}
-{% load i18n %}{% load url from future %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {% include "sanza/_calendar.html" with field="relationship_date" yearRange="c-100:c" %}
+{% endblock %}
+
+{% block title %}{% if entity %}{% trans "Edit entity" %}{% else %}{% trans "Create entity" %}{% endif %}{% endblock %}
+
+{% block form_url %}{% if entity.id %}{% url "crm_edit_entity" entity.id %}{% else %}{% url "crm_create_entity" entity_type_id %}{% endif %}{% endblock %}
 
 {% block doc_header %}
   {% if entity.id %}
-  <div class="entity_logo">
-    <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
-  </div>
-  <h2>{% blocktrans %}Edit '{{entity}}'{% endblocktrans %}</h2>
+  <h2>{{entity}}</h2>
   {% else %}
-  <h2>
-    <div class="entity_logo">
-      <img src="{{STATIC_URL}}img/entity.png"/>
-    </div>
-    {% if SANZA_NO_ENTITY_TYPE %}
-      {% trans "New entity" %}
-    {% else %}
-      {% if entity.type.is_male %}
-        {% trans "NewMale" %} {{entity.type}}
-      {% else %}
-        {% trans "NewFemale" %} {{entity.type}}
-      {% endif %}
-    {% endif %}
-  </h2>
+  <h2>{% trans "Create entity" %}</h2>
   {% endif %}
 {% endblock %}
 
-{% block form_buttons %}
-  <input type="submit" value="{% trans "Save"%}" />
-  {% if entity.id %}
-    <a href="{% url "crm_view_entity" entity.id%}">{% trans "Cancel" %}</a>
-  {% else %}
-    <a href="{% url "crm_board_panel" %}">{% trans "Cancel" %}</a>
-  {% endif %}
-{% endblock %}
-
-{% block doc_footer %}
-  {% include "sanza/_calendar.html" with field="relationship_date" %}
+{% block popup_buttons %}
+  <input class="btn btn-md btn-primary" type="submit" value="{% trans "Save"%}" />
+  <a class="btn btn-md btn-default cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}

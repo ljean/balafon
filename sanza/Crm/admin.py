@@ -72,9 +72,9 @@ class OpportunityAdmin(admin.ModelAdmin):
 admin.site.register(models.Opportunity, OpportunityAdmin)
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ['subject', 'contact']
-    search_fields = ['subject', 'contact']
-    raw_id_admin = ('contact',)
+    list_display = ['subject']
+    search_fields = ['subject']
+    #raw_id_admin = ('contact', )
 admin.site.register(models.Action, ActionAdmin)
 
 class CustomFieldAdmin(admin.ModelAdmin):

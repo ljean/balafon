@@ -19,13 +19,32 @@ urlpatterns = patterns('',
     (r'^crm-search/', include('sanza.Search.urls')),
     (r'^emailing/', include('sanza.Emailing.urls')),
     #url(r'^accounts/profile/$', 'sanza.Crm.views.view_board_panel'),
-    (r'^accounts/', include('django.contrib.auth.urls')),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
-    url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
-    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage")
+    #url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
+    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage"),
+    url(r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$', 'sanza.views.auto_save_data', name="auto_save_data"),
 )
 
+if 'sanza.Apis' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'', include('sanza.Apis.urls')),
+    )
+    
+if 'sanza.Profile' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^accounts/', include('sanza.Profile.urls')),
+    )
+
+urlpatterns += patterns('',
+    (r'^accounts/', include('django.contrib.auth.urls')),
+)
+
+if 'sanza.Users' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^users/', include('sanza.Users.urls')),
+    )
+    
 if 'jhouston' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'^jhouston/', include('jhouston.urls')),

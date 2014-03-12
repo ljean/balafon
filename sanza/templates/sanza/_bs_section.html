@@ -1,0 +1,39 @@
+{% load i18n %}
+<div class="row section">
+  <div class="col-md-12 section-content">
+    {% block column_section_data %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-header {% block section_header_extra_class %}{% endblock %}"> 
+          <div class="row">
+            <div class="col-md-11">
+              <div class="section-title">{% block section_title %}{% endblock %}</div>
+            </div>
+            <div class="col-md-1">
+              <div class="section-buttons pull-right">
+                <div class="section-favorite text-center">
+                  {% block section_favorite %}{% endblock %}
+                </div>
+                <div class="dropdown btn-group pull-right">
+                    <a class="btn btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+                      {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span>{% endblock %}
+                      <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu text-right">
+                        {% block section_buttons %}{% endblock %}
+                    </ul>
+                </div>
+                {% block section_buttons_extra %}{% endblock %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row"><div class="col-md-12 section-data">
+      {% block section_data %}
+      {% endblock %}
+    </div></div>
+    {% endblock %}
+  </div>
+</div>

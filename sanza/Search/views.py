@@ -26,6 +26,7 @@ from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from wkhtmltopdf.views import PDFTemplateView
 from sanza.Crm import settings as crm_settings
+from sanza.utils import HttpResponseRedirectMailtoAllowed
 
 #@transaction.commit_manually
 def filter_icontains_unaccent(qs, field, text):
@@ -47,7 +48,7 @@ def quick_search(request):
             qs = Entity.objects.filter(is_single_contact=False)
             entities_by_name = filter_icontains_unaccent(qs, 'name', text)    
             
-            qs = Contact.objects.filter(has_left=False)
+            qs = Contact.objects.all()#.filter(has_left=False)
             contacts_by_name = filter_icontains_unaccent(qs, 'lastname', text)
             
             for e in entities_by_name:
@@ -67,33 +68,34 @@ def quick_search(request):
             contacts_by_email = Contact.objects.filter(
                 Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
             
-            #cities_by_name = []
-            #for city in City.objects.filter(name__icontains=text):
-            #    contacts_and_entities = list(city.contact_set.all()) + list(city.entity_set.all())
-            #    if contacts_and_entities:
-            #        setattr(city, 'contacts_and_entities', contacts_and_entities)
-            #        cities_by_name.append(city)
-            #
+            cities_by_name = []
+            for city in City.objects.filter(name__icontains=text):
+                entities_count, contacts_count = city.contact_set.count(), city.entity_set.count()
+                if entities_count + contacts_count:
+                    cities_by_name.append((city, entities_count, contacts_count))
+            
             contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
             contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
             
-            #entities_title = _(u'Entities')
-            contacts_title = _(u'Contacts')
-            groups_title = _(u'Groups')
-            #cities_title = _(u'Contacts and entities by city')
-            phones_title = _(u'Contacts by phone number')
-            emails_by_email = _(u'Contacts by email')
-            
+            context_dict = {
+                'contacts_by_phone': contacts_by_phone,
+                'cities_by_name': cities_by_name,
+                'text': text,
+                'contacts_by_email': contacts_by_email,
+                'contacts': contacts,
+                'groups_by_name': groups_by_name,
+            }
+                
             return render_to_response(
                 'Search/quicksearch_results.html',
-                locals(),
+                context_dict,
                 context_instance=RequestContext(request)
             )
     else:
         raise Http404
       
 @user_passes_test(can_access)
-def search(request, search_id=0, group_id=0, opportunity_id=0):
+def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
     entities = []
     search=None
@@ -102,7 +104,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0):
     data = None
     contacts_count = 0
     has_empty_entities = False
-    group = opportunity = None
+    group = opportunity = city = None
     
     if request.method == "POST":
         data = request.POST
@@ -112,6 +114,9 @@ def search(request, search_id=0, group_id=0, opportunity_id=0):
     elif opportunity_id:
         opportunity = get_object_or_404(Opportunity, id=opportunity_id)
         data = {"gr0-_-opportunity-_-0": opportunity_id}
+    elif city_id:
+        city = get_object_or_404(City, id=city_id)
+        data = {"gr0-_-city-_-0": city_id}
             
     if data:
         search_form = forms.SearchForm(data)
@@ -132,10 +137,41 @@ def search(request, search_id=0, group_id=0, opportunity_id=0):
             'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count, 'entities_count': entities_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
+            'city': city,
         },
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+def search_name(request, search_id=0):
+    if request.method == "POST":
+        form = forms.SearchNameForm(request.POST)
+        if form.is_valid():
+            save_url = reverse("search_save", args=[search_id])
+            script = u'''
+                $("input[name=name]").val("{0}")
+                $("form.search-form").attr('action', "{1}");
+                $("form.search-form").submit();
+                $("form.search-form").attr('action', '');
+                $.colorbox.close();
+            '''.format(form.cleaned_data["name"], save_url)
+            return HttpResponse(u"<script>{0}</script>".format(script))
+    else:
+        initial = {}
+        if search_id:
+            search = get_object_or_404(models.Search, id=search_id)
+            initial = {'name': search.name}
+        form = forms.SearchNameForm(initial=initial)
     
+    return render_to_response(
+        'Search/search_name.html',
+        {
+            'form': form,
+            'search_id': search_id,
+        },
+        context_instance=RequestContext(request)
+    )
+
 @user_passes_test(can_access)
 def save_search(request, search_id=0):
     if search_id:
@@ -160,15 +196,12 @@ def get_field(request, name):
         form_class = forms.get_field_form(name)
         t = Template('{{form.as_it_is}}')
         c = Context({'form': form_class(block, count)})
-        return HttpResponse(json.dumps({'form': t.render(c)}), mimetype="application/json")
+        return HttpResponse(json.dumps({'form': t.render(c)}), content_type="application/json")
     except KeyError:
         raise Http404
     except Exception, msg:
         logger.exception("get_field")
         raise
-    
-class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
-    allowed_schemes = ['http', 'https', 'ftp', 'mailto']
 
 @user_passes_test(can_access)
 def mailto_contacts(request, bcc):
@@ -183,7 +216,7 @@ def mailto_contacts(request, bcc):
                     if getattr(settings, 'SANZA_MAILTO_LIMIT_AS_TEXT', False):
                         #conf49 : La poste required only ' ' as separator
                         #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
-                        return HttpResponse(', '.join(emails), mimetype='text/plain')
+                        return HttpResponse(', '.join(emails), content_type='text/plain')
                     else:
                         index_from, email_groups = 0, []
                         nb_emails = len(emails)
@@ -206,7 +239,7 @@ def mailto_contacts(request, bcc):
                     mailto += ','.join(emails)
                     return HttpResponseRedirectMailtoAllowed(mailto)
             else:
-                return HttpResponse(_(u'Mailto: Error, no emails defined'), mimetype='text/plain')
+                return HttpResponse(_(u'Mailto: Error, no emails defined'), content_type='text/plain')
     raise Http404
 
 @user_passes_test(can_access)
@@ -315,7 +348,7 @@ def export_contacts_as_excel(request):
                     if f:
                         ws.write(i+1, j, unicode(f), style)
 
-            response = HttpResponse(mimetype='application/vnd.ms-excel')
+            response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('sanza')
             wb.save(response)
             return response

@@ -1,51 +1,41 @@
-{% extends "sanza/_section.html" %}
-{% load i18n pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n pagination_tags favorite_tags %}
 
 {% block section_title %}
   {% trans "Opportunities" %}
-  {% if all_opportunities %}
-  <span class="day-selector">
-    <a href="{% url "crm_all_opportunities_by" "date" %}" class="{% if ordering == "date" %}selected{% endif %}">{% trans "By date" %}</a>
-    <a href="{% url "crm_all_opportunities_by" "name" %}" class="{% if ordering == "name" %}selected{% endif %}">{% trans "By name" %}</a>
-    <a href="{% url "crm_all_opportunities_by" "type" %}" class="{% if ordering == "type" %}selected{% endif %}">{% trans "By type" %}</a>
-    <a href="{% url "crm_all_opportunities_by" "status" %}" class="{% if ordering == "status" %}selected{% endif %}">{% trans "By status" %}</a>
-  </span>
-  {% endif %}
 {% endblock %}
   
 {% block section_data %}
 {% if opportunities %}
 {% if all_opportunities %}{% autopaginate opportunities 25 %}{% endif %}
-<table id="entity_actions">
+<table class="table table-striped">
   <tr>
+    <th></th>
     <th>{% trans "Name" %}</th>
-    <th>{% trans "Type" %}</th>
-    <th>{% trans "Status" %}</th>
+    <th>&nbsp;</th>
     <th>{% trans "Actions" %}</th>
     <th>{% trans "Date" %}</th>
     <th></th>
-    <th></th>
-    <th></th>
   </tr>
   {% for o in opportunities %}
-  <tr class="{% if o.ended%}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td>{{o.name}}</td>
-    <td>{{o.type|default:"&nbsp;"}}</td>
-    <td>{{o.status}}</td>
-    <td>{{o.action_set.count}}</td>
-    <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
-   
-    <td class="note-icon{% if o.detail %} has-note{% endif %}">
-      {% if o.detail %}
-        <div class="action-note" style="display: none">
-          {{ o.detail|linebreaksbr }}
-        </div>
-      {% endif %}
+  <tr class="{% if o.ended %}old-opportunity{% endif %} {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td>
+      {% favorite_item object=o %}
     </td>
    
-    <td title="{% trans "Show on board" %}" class="bookmark-icon{% if o.display_on_board %} bookmarked{% endif %}" rel="{% url "crm_toggle_opportunity_bookmark" o.id %}"></td>
-   
-   <td class="ico-col" title="{% trans "View" %}"><a href="{% url "crm_view_opportunity" o.id %}"><img src="{{STATIC_URL}}img/info-ico.png"></a></td>
+    <td><a href="{% url "crm_view_opportunity" o.id %}"><span class="glyphicon glyphicon-tag"></span> {{o.name}}</a></td>
+    
+    <td><span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" o.id %}" contenteditable="true">
+      {{o.detail|linebreaksbr}}
+    </span></td>
+    <td>{{o.action_set.count}}</td>
+    <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
+    
+    <td>
+      <a class="colorbox-form" href="{% url "crm_delete_opportunity" o.id %}">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </td>
   </tr>
   {% endfor %}
 </table>
@@ -53,8 +43,8 @@
 {% endif %}
 {% endblock %}
 
-{% block section_action %}
+{% block section_buttons %}
   {% if not entity and not contact %}
-  <a href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a>
+  <li><a class="colorbox-form" href="{% url "crm_add_opportunity" %}">{% trans "Add" %}</a></li>
   {% endif %}
 {% endblock %}

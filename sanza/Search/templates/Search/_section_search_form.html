@@ -1,5 +1,5 @@
-{% extends "sanza/_section.html" %}
-{% load i18n %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n %}
 
 {% block section_title %}{% trans "Search criteria" %}{% endblock %}
 {% block section_data %}
@@ -14,8 +14,14 @@
   </div>
 </div>
 
-<form class="search-form" action="{% url "search" %}" method="post">{% csrf_token %}
+<form role="form" class="form-horizontal search-form" action="{% url "search" %}" method="post">{% csrf_token %}
+  <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
+    <span class="glyphicon glyphicon-search"></span>
+    {% trans "Search" %}
+  </a>
+  <div class="cur-form">
   {{search_form.as_html|safe}}
+  </div>
   <div class="form">
   </div>
 </form>
@@ -25,6 +31,8 @@
     var block_count = {{search_form.block_count|default:0}};
     var field_count = 0;
     
+    $(".cur-form select").chosen({width: "50%"});
+    
     var add_block = function(no_remove) {
       var gr = $(".form").append($(".search-block-template").html());
       var new_name = "gr"+block_count;
@@ -33,11 +41,12 @@
       if (no_remove) {
         gr.find('.remove-block').remove();
       }
+      gr.find("select").chosen({width: "50%"});
       return new_name;
     }
     
     $(".remove-field").live('click', function() {
-      $(this).parent().remove();
+      $(this).closest(".field-form").remove();
       return false;
     });
     
@@ -98,6 +107,7 @@
             field_count += 1;
             $(this).parent().find(".fields").append(data.form);
             //$(this).parent().find("select[name='field_choice']").val('').trigger('change');
+            $(this).parent().find(".fields").find(".chosen-select").chosen();
           }
         });
       }
@@ -110,6 +120,7 @@
       return false;
     })
     
+    /*
     $("#save-button").click(function() {
       if ($("input[name=name]").parent().is(":visible")) {
         $("form.search-form").attr('action', $(this).attr('href'));
@@ -120,6 +131,7 @@
       }
       return false;
     })
+    */
     
     $('.datepicker').live('click', function() {
       $(this).datepicker({
@@ -150,8 +162,9 @@
 
 {% endblock %}
 
-{% block section_action %}
-<a href="" id="search-button">{% trans "Search" %}</a>
-<a href="{% url "search_save" search.id %}" id="save-button">{% trans "Save" %}</a>
-<a href="{% url "search_list" %}">{% trans "Open" %}</a>
+{% block section_buttons %}
+{% comment %}
+<li><a href="{% url "search_save" search.id %}" id="save-button">{% trans "Save" %}</a></li>
+{% endcomment %}
+<li><a href="{% url "search_name" search.id %}" class="colorbox-form">{% trans "Save" %}</a></li>
 {% endblock %}

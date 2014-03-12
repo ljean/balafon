@@ -1,22 +1,18 @@
-{% extends "sanza/base.html" %}
+{% extends "sanza/bs_base.html" %}
 {% load i18n %}
 
 {% block document_content %}
   
-{% include "Crm/_contact_info.html" %}
+{% include "Crm/_section_contact_info.html" %}
 
-{% with contact.get_custom_fields as custom_fields %}
-{% if custom_fields %}
-    {% include "Crm/_section_custom_fields.html" with instance=contact  model="contact" %}
-{% endif %}
-{% endwith %}
-
-{% include "Crm/_section_contact_group.html" %}
+{% include "Crm/_section_same_as.html" %}
 
 {% include "Crm/_section_actions_by_set.html" %}
 
+{% comment %}
 {% include "Crm/_section_opportunities.html" %}
+{% endcomment %}
 
-{% include "Crm/_section_same_as.html" %}
+
 
 {% endblock %}

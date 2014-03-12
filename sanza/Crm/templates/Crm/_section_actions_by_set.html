@@ -1,7 +1,45 @@
-{% load i18n sanza_utils pagination_tags %}{% load url from future %}
+{% extends "sanza/_bs_section.html" %}
+{% load i18n sanza_utils pagination_tags %}
 
-{% include "Crm/_actions_table_script.html" %}
+{% block section_title %}
+  {% trans "Actions" %}
+{% endblock %}
+  
+{% block section_data %}
+  {% for set_id, set_title, actions, total_count in actions_by_set %}
+    <div class="row"><div class="col-md-12">
+    {% if set_title %}
+      <div class="section-action-set-title">
+      {{ set_title }}
+      </div>
+    {% endif %}
+    {% if total_count > actions.count %}
+        <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
+          <span class="glyphicon glyphicon-warning-sign"></span>
+          {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
+          <a class="btn btn-default btn-xs" href="{% if contact %}{% url "crm_view_contact_actions" contact.id set_id %}{% else %}{% url "crm_view_entity_actions" entity.id set_id %}{% endif %}">
+            {% trans "View all" %}
+          </a>
+        </div>
+      {% endif %}
+    {% include "Crm/_actions_table.html" %}
+    </div></div>
+  {% endfor %}
+{% endblock %}
 
-{% for set_id, set_title, actions in actions_by_set %}
-  {% include "Crm/_section_actions_of_set.html" %}
-{% endfor %}
+{% block section_buttons %}
+  {% if contact %}
+    <li><a class="colorbox-form" href="{% url "crm_create_action" 0 contact.id %}">{% trans "Add action" %}</a></li>
+  {% else %}
+    {% if entity %}
+      <li><a class="colorbox-form" href="{% url "crm_create_action" entity.id 0 %}">{% trans "Add action" %}</a></li>
+    {% else %}
+      {% if opportunity %}
+        <li><a class="colorbox-form" href="{% url "crm_create_action" 0 0 %}?opportunity={{opportunity.id}}">{% trans "Add action" %}</a></li>
+      {% else %}
+        <li><a class="colorbox-form" href="{% url "crm_create_action" 0 0 %}">{% trans "Add action" %}</a></li>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
