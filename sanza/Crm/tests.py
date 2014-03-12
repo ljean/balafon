@@ -1656,6 +1656,25 @@ class ActionTest(BaseTestCase):
         self.assertEqual(action1.contacts.all()[0], c2)
         self.assertEqual(action1.entities.count(), 1)
         self.assertEqual(action1.entities.all()[0], entity)
+    
+    def test_view_remove_entity_from_action(self):
+        entity = mommy.make(models.Entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.contacts.add(c1)
+        action1.contacts.add(c2)
+        action1.entities.add(entity)
+        action1.save()
+        
+        url = reverse('crm_remove_entity_from_action', args=[action1.id, entity.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response.content, entity.name)
+        self.assertNotContains(response.content, entity.default_contact.lastname)
+        
+        action1 = models.Action.objects.get(id=action1.id)
+        self.assertEqual(action1.contacts.count(), 0)
+        self.assertEqual(action1.entities.count(), 1)
         
     def test_remove_entity_from_action(self):
         entity = mommy.make(models.Entity)
@@ -1674,6 +1693,27 @@ class ActionTest(BaseTestCase):
         action1 = models.Action.objects.get(id=action1.id)
         self.assertEqual(action1.contacts.count(), 2)
         self.assertEqual(action1.entities.count(), 0)
+        
+    def test_remove_entity_from_action2(self):
+        entity1 = mommy.make(models.Entity)
+        c2 = mommy.make(models.Contact, entity=entity1)
+        entity2 = mommy.make(models.Entity)
+        entity3 = mommy.make(models.Entity)
+        
+        action1 = mommy.make(models.Action, subject="should be only once", archived=False)
+        action1.entities.add(entity1)
+        action1.entities.add(entity2)
+        action1.entities.add(entity3)
+        action1.save()
+        
+        url = reverse('crm_remove_entity_from_action', args=[action1.id, entity2.id])
+        response = self.client.post(url, data={'confirm': 1})
+        self.assertEqual(response.status_code, 200)
+        action1 = models.Action.objects.get(id=action1.id)
+        self.assertEqual(action1.contacts.count(), 0)
+        self.assertEqual(action1.entities.count(), 2)
+        self.assertEqual(sorted(list(action1.entities.all())), sorted([entity1, entity3]))
+        
         
     def test_view_remove_entity_from_action(self):
         entity = mommy.make(models.Entity)

@@ -1464,7 +1464,7 @@ def add_entity_to_action(request, action_id):
 @popup_redirect
 def remove_entity_from_action(request, action_id, entity_id):
     action = get_object_or_404(models.Action, id=action_id)
-    entity = get_object_or_404(models.Contact, id=entity_id)
+    entity = get_object_or_404(models.Entity, id=entity_id)
     if request.method == 'POST':
         form = forms.ConfirmForm(request.POST)
         if form.is_valid():
