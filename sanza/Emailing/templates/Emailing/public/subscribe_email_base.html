@@ -40,7 +40,9 @@
 {% block content %}
   {{ block.super }}
   <form method="post" action="{% url "emailing_email_subscribe_newsletter" %}">{% csrf_token %}
-    {{form.as_p}}
+    {% block customize_form %}
+      {{form.as_p}}
+    {% endblock %}  
     <input style="display: none;" type="submit" value="{% trans "Ok" %}">
   </form>
 {% endblock %}
