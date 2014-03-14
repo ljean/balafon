@@ -112,7 +112,7 @@ class NewNewsletterForm(forms.Form):
 class EmailSubscribeForm(forms.ModelForm):
     email = forms.EmailField(
         required= True, label="",   
-        widget=forms.TextInput(attrs={'placeholder': _(u'subscribe to our newsletter? Please enter your email.'), 'size': '80'})
+        widget=forms.TextInput(attrs={'placeholder': _(u'Email'), 'size': '80'})
     )
     
     class Meta:
