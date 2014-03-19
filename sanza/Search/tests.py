@@ -2340,25 +2340,21 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, contact5.lastname)
         
         self.assertNotContains(response, contact7.lastname)
-        
+    
     def test_search_no_action_in_progress_contacts_and_entities(self):
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=contact1.entity, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=contact1.entity, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
         
-        contact2 = mommy.make(models.Contact, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
         
-        contact4 = mommy.make(models.Contact, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
         
-        contact5 = mommy.make(models.Contact, lastname=u"RSTU", main_contact=True, has_left=False)
-        
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
-        
-        contact1.entity.default_contact.delete()
-        contact2.entity.default_contact.delete()
-        contact4.entity.default_contact.delete()
-        contact5.entity.default_contact.delete()
-        contact7.entity.default_contact.delete()
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
         
         action = mommy.make(models.Action, done=False)
         action.contacts.add(contact1)
@@ -2366,14 +2362,19 @@ class ActionSearchTest(BaseTestCase):
         action.save()
         
         action = mommy.make(models.Action, done=False)
-        action.entities.add(contact2.entity)
+        action.entities.add(entity2)
         action.save()
         
         action = mommy.make(models.Action, done=True)
         action.contacts.add(contact5)
-        action.entities.add(contact4.entity)
+        action.entities.add(entity3)
         action.save()
         
+        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        
+        for c in (contact1, contact2, contact4, contact5, contact7):
+            c.entity.default_contact.delete()
+            
         url = reverse('search')
         
         data = {"gr0-_-action-_-0": 0}
@@ -2381,17 +2382,157 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
+        self.assertContains(response, entity1.name)
         self.assertNotContains(response, contact1.lastname)
         self.assertNotContains(response, contact3.lastname)
-        self.assertNotContains(response, contact6.lastname)
+        self.assertContains(response, contact6.lastname)
         
+        self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
         
+        self.assertContains(response, entity3.name)
         self.assertContains(response, contact4.lastname)
         
+        self.assertContains(response, entity4.name)
         self.assertContains(response, contact5.lastname)
         
         self.assertContains(response, contact7.lastname)
+        
+    #def test_search_no_action_in_progress_contacts_and_entities(self):
+    #    contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+    #    
+    #    contact1.entity.default_contact.delete()
+    #    
+    #    url = reverse('search')
+    #    
+    #    data = {"gr0-_-action-_-0": 0}
+    #    
+    #    response = self.client.post(url, data=data)
+    #    self.assertEqual(200, response.status_code)
+    #    
+    #    soup = BeautifulSoup4(response.content)
+    #    self.assertEqual(1, len(soup.select('.field-error')))
+    
+    def test_search_has_action(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        
+        action = mommy.make(models.Action, done=False)
+        action.contacts.add(contact1)
+        action.contacts.add(contact3)
+        action.save()
+        
+        action = mommy.make(models.Action, done=False)
+        action.entities.add(entity2)
+        action.save()
+        
+        action = mommy.make(models.Action, done=True)
+        action.contacts.add(contact5)
+        action.entities.add(entity3)
+        action.save()
+        
+        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        
+        for c in (contact1, contact2, contact4, contact5, contact7):
+            c.entity.default_contact.delete()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_action-_-0": 1}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertNotContains(response, contact6.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+        
+        self.assertContains(response, entity4.name)
+        self.assertContains(response, contact5.lastname)
+        
+        self.assertNotContains(response, contact7.lastname)
+    
+    def test_search_no_action(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        
+        action = mommy.make(models.Action, done=False)
+        action.contacts.add(contact1)
+        action.contacts.add(contact3)
+        action.save()
+        
+        action = mommy.make(models.Action, done=False)
+        action.entities.add(entity2)
+        action.save()
+        
+        action = mommy.make(models.Action, done=True)
+        action.contacts.add(contact5)
+        action.entities.add(entity3)
+        action.save()
+        
+        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        
+        for c in (contact1, contact2, contact4, contact5, contact7):
+            c.entity.default_contact.delete()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_action-_-0": 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertContains(response, contact6.lastname)
+        
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+        
+        self.assertNotContains(response, entity4.name)
+        self.assertNotContains(response, contact5.lastname)
+        
+        self.assertContains(response, contact7.lastname)
+    
         
     def test_search_action_by_done_date_contacts_and_entities(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")

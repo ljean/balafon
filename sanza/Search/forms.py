@@ -233,47 +233,32 @@ class SearchForm(forms.Form):
         keys.sort()
         contacts = set([])
         post_processors = []
+        global_post_processors = []
+        
         for key in keys:
-            q_objs = []
-            exclude_q_objs = []
-            if 'secondary_contact' in [f._name for f in self._forms[key]]:
-                filter_lookup = {}
-            else:
-                filter_lookup = {'main_contact': True}
-            exclude_lookup = {}
+            
+            contacts_set = Contact.objects.all()
+            
+            if not ('secondary_contact' in [f._name for f in self._forms[key]]):
+                contacts_set = contacts_set.filter(main_contact=True)
+            
             for form in self._forms[key]:
-                lookup = form.get_lookup()
-                if lookup:
-                    if type(lookup) is dict:
-                        filter_lookup.update(lookup)
-                    elif type(lookup) is list:
-                        q_objs.extend(lookup)
-                    else:
-                        q_objs.append(lookup)
-
-                if hasattr(form, 'get_exclude_lookup'):
-                    xcl_lkp = form.get_exclude_lookup()
-                    if xcl_lkp:
-                        if type(xcl_lkp) is dict:
-                            exclude_lookup.update(xcl_lkp)
-                        elif type(xcl_lkp) is list:
-                            exclude_q_objs.extend(xcl_lkp)
-                        else:
-                            exclude_q_objs.append(xcl_lkp)
+                contacts_set = form.get_queryset(contacts_set)
                 
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
+                    
+                if hasattr(form, 'global_post_process'):
+                    post_processors.append(form.global_post_process)
 
-            contacts_set = Contact.objects.filter(**filter_lookup)
-            for q_obj in q_objs:
-                contacts_set = contacts_set.filter(q_obj)
-            if exclude_lookup:
-                contacts_set = contacts_set.exclude(**exclude_lookup)
-            for q_obj in exclude_q_objs:
-                contacts_set = contacts_set.exclude(q_obj)
-            contacts = contacts.union(set(contacts_set))
             for pp in post_processors:
-                contacts = pp(contacts)
+                contacts_set = pp(contacts_set)
+                
+            contacts = contacts.union(set(contacts_set))
+        
+        for gpp in global_post_processors:
+            contacts = gpp(contacts)
+        
         return list(contacts)
     
     def _get_filter_func(self):
@@ -384,6 +369,28 @@ class SearchFieldForm(BsForm):
     def as_it_is(self):
         t = get_template("Search/_search_field_form.html")
         return t.render(Context({"form": self}))
+    
+    def get_queryset(self, qs):
+        if hasattr(self, 'get_lookup'):
+            lookup = self.get_lookup()
+            if lookup:
+                if type(lookup) is dict:
+                    qs = qs.filter(**lookup)
+                elif type(lookup) is list:
+                    qs = qs.filter(*lookup)
+                else:
+                    qs = qs.filter(lookup)
+                    
+        if hasattr(self, 'get_exclude_lookup'):
+            lookup = self.get_exclude_lookup()
+            if lookup:
+                if type(lookup) is dict:
+                    qs = qs.exclude(**lookup)
+                elif type(lookup) is list:
+                    qs = qs.exclude(*lookup)
+                else:
+                    qs = qs.exclude(lookup)
+        return qs
         
 class TwoDatesForm(SearchFieldForm):
     
