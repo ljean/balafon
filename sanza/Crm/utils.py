@@ -5,6 +5,7 @@ from sanza.Crm import models
 from django.utils.translation import ugettext as _
 from sanza.Crm import settings as crm_settings
 from sanza.utils import logger
+from sanza.Crm.settings import get_default_country as get_default_country_name
 
 #@transaction.commit_manually
 def filter_icontains_unaccent(qs, field, text):
@@ -175,3 +176,15 @@ def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):
             )]
             
     return actions_by_set
+
+def get_default_country():
+    cn = get_default_country_name()
+    try:
+        default_country = models.Zone.objects.get(name=cn, parent__isnull=True, type__type="country")
+    except models.Zone.DoesNotExist:
+        try:
+            zt = models.ZoneType.objects.get(type="country")
+        except models.ZoneType.DoesNotExist:
+            zt = models.ZoneType.objects.create(type="country", name=u"Country")
+        default_country = models.Zone.objects.create(name=cn, parent=None, type=zt)
+    return default_country

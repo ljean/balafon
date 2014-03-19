@@ -136,6 +136,7 @@ class SearchForm(forms.Form):
         self._forms = {}
         self._instance = instance
         self._save = save
+        self.contacts_display = False
         if instance: self.fields['name'].initial = instance.name
         if not data and instance:
             data = {}
@@ -152,7 +153,9 @@ class SearchForm(forms.Form):
                     if not self._forms.has_key(gr):
                         self._forms[gr] = []
                     form_class = get_field_form(field)
-                    self._forms[gr].append(form_class(gr, fid, {field: value}))
+                    form = form_class(gr, fid, {field: value})
+                    self.contacts_display = self.contacts_display or form._contacts_display
+                    self._forms[gr].append(form)
                 except ValueError:
                     pass
                 except Exception, msg:
@@ -232,24 +235,25 @@ class SearchForm(forms.Form):
         keys = self._forms.keys()
         keys.sort()
         contacts = set([])
-        post_processors = []
         global_post_processors = []
+        self.contains_refuse_newsletter = False
         
         for key in keys:
-            
+            post_processors = []
             contacts_set = Contact.objects.all()
             
             if not ('secondary_contact' in [f._name for f in self._forms[key]]):
                 contacts_set = contacts_set.filter(main_contact=True)
             
             for form in self._forms[key]:
+                
                 contacts_set = form.get_queryset(contacts_set)
                 
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
                     
                 if hasattr(form, 'global_post_process'):
-                    post_processors.append(form.global_post_process)
+                    global_post_processors.append(form.global_post_process)
 
             for pp in post_processors:
                 contacts_set = pp(contacts_set)
@@ -259,6 +263,11 @@ class SearchForm(forms.Form):
         for gpp in global_post_processors:
             contacts = gpp(contacts)
         
+        for c in contacts:
+            if not c.accept_newsletter:
+                self.contains_refuse_newsletter = True
+                break
+                
         return list(contacts)
     
     def _get_filter_func(self):
@@ -268,7 +277,6 @@ class SearchForm(forms.Form):
         return lambda c: c and (not c.has_left)
 
     def get_contacts_by_entity(self):
-        self.contains_refuse_newsletter = False
         contacts = self._get_contacts()
         contacts_count = 0
         entities = {}
@@ -281,8 +289,6 @@ class SearchForm(forms.Form):
                 entities[entity.id] = (entity, [])
                 empty_entities[entity.id] = entity
             if pass_filter:
-                if not contact.accept_newsletter:
-                    self.contains_refuse_newsletter = True
                 entities[entity.id][1].append(contact)
                 entities[entity.id][1].sort(key=lambda c: c.lastname.lower())
                 empty_entities.pop(entity.id, None)
@@ -340,6 +346,8 @@ class SearchForm(forms.Form):
         return html
 
 class SearchFieldForm(BsForm):
+    _contacts_display = False
+    
     def __init__(self, block, count, data=None, *args, **kwargs):
         self._block = block
         self._count = count

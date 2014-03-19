@@ -10,6 +10,7 @@ from sanza.Crm.settings import get_default_country
 from django.contrib.auth.models import User
 from django.db.models import Q, Count
 from sanza.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
+from sanza.Crm.utils import get_default_country
 
 class EntityNameSearchForm(SearchFieldForm):
     _name = 'entity_name'
@@ -784,3 +785,54 @@ class EntityWithCustomField(SearchFieldForm):
         cf = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_ENTITY)
         return Q(entity__entitycustomfieldvalue__custom_field=cf)
     
+class SortContacts(SearchFieldForm):
+    _name = 'sort'
+    _label = _(u'Sort contacts')
+    _contacts_display = True
+    
+    def __init__(self, *args, **kwargs):
+        super(SortContacts, self).__init__(*args, **kwargs)
+        choices = (
+            ('name', _(u'Name')),
+            ('entity', _(u'Entity')),
+            ('contact', _(u'Contact')),
+            ('zipcode', _(u'Zipcode')),
+        ) 
+        field = forms.CharField(label=self._label, widget=forms.Select(choices=choices))
+        self._add_field(field)
+        self.default_country = get_default_country()
+    
+    def _sort_by_name(self, c):
+        x = u"{0}".format(c.lastname, c.firstname) if c.entity.is_single_contact else c.entity.name
+        return x.upper()
+    
+    def _sort_by_contact(self, c):
+        x = u"{0} {1}".format(c.lastname, c.firstname)
+        return x.upper()
+    
+    def _sort_by_entity(self, c):
+        x = u"B" if c.entity.is_single_contact else u"A"
+        y = self._sort_by_name(c)
+        return u"".join((x, y))
+    
+    def _sort_by_zipcode(self, c):
+        country = c.get_country()
+        x = c.get_zip_code or u'?'
+        city = c.get_city
+        if not city:
+            v = w = y = "?"
+        else:
+            v = u"A" if ((not country) or self.default_country.id == country.id) else u"B"
+            w = country.name if country else self.default_country.name
+            y = city.name
+        z = self._sort_by_name(c)
+        x = u"".join((v, w, x, y, z))
+        print x
+        return x
+    
+    def get_queryset(self, qs):
+        return qs
+    
+    def global_post_process(self, contacts):
+        callback = getattr(self, '_sort_by_{0}'.format(self._value), None)
+        return sorted(contacts, key=callback)

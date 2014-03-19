@@ -8,7 +8,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
-from sanza.Crm.settings import get_default_country, NO_ENTITY_TYPE
+from sanza.Crm.settings import NO_ENTITY_TYPE
+from sanza.Crm.utils import get_default_country
 from datetime import datetime, date
 from form_utils.forms import BetterModelForm, BetterForm
 from djaloha.widgets import AlohaInput
@@ -145,16 +146,7 @@ class _CityBasedForm(object):
             except KeyError:
                 pass
         if not self.country_id:
-            cn = get_default_country()
-            try:
-                default_country = models.Zone.objects.get(name=cn, parent__isnull=True)
-            except models.Zone.DoesNotExist:
-                try:
-                    zt = models.ZoneType.objects.get(type="country")
-                except models.ZoneType.DoesNotExist:
-                    zt = models.ZoneType.objects.create(type="country", name=u"Country")
-                default_country = models.Zone.objects.create(name=cn, parent=None, type=zt)
-            self.country_id = default_country.id
+            self.country_id = get_default_country()
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         
@@ -168,10 +160,9 @@ class _CityBasedForm(object):
     
     def _get_country(self, id):
         if id:
-            return models.Zone.objects.get(id=id, parent__isnull=True)
+            return models.Zone.objects.get(id=id, parent__isnull=True, type__name="country")
         else:
-            cn = get_default_country()
-            return models.Zone.objects.get(name=cn, parent__isnull=True)
+            return get_default_country()
         
     def clean_city(self):
         city = self.cleaned_data['city']
@@ -194,7 +185,7 @@ class _CityBasedForm(object):
                 except (ValueError, TypeError):
                     country_id = self.country_id
                 country = self._get_country(country_id)
-                default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
+                default_country = get_default_country()
                 if country != default_country:
                     city, _is_new = models.City.objects.get_or_create(name=city, parent=country)
                 else:

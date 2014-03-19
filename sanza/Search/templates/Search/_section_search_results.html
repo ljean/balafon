@@ -9,54 +9,79 @@
 {% endblock %}
   
 {% block section_data %}
-{% if entities %}
+{% if results %}
   {% if has_empty_entities %}
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
-  {% autopaginate entities nb_entities_by_page %}
+  {% autopaginate results nb_results_by_page %}
   <table class="table table-bordered font-small">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
-  {% for e in entities %}
-    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      {% if not e.single_contact %}
-        <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
-        {% if e.is_empty %}
-          <td class="empty-entity">
-            {% trans "No contacts !!" %}
-          </td>
-        {% else %}
+  
+  {% if contacts_display %}
+    <!-- ut: contacts_display -->
+    {% for c in results %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        <td{% if not c.entity.single_contact %} colspan=2{%endif%}>
+          <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+          {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+          {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+        </td>
+        {% if not c.entity.single_contact %}
+          <td>
+            <a href="{{c.entity.get_absolute_url}}">{{c.entity.name}}</a>
           <td>
         {% endif %}
-      {% else %}
-        <td colspan=2>
-      {% endif %}
-        
-      {% with e.search_contacts as contacts %}
-      {% if contacts %}
-        <table class="table contact-table table-striped font-small">
-        {% for c in contacts %}
-            <tr>
-            <td>
-              <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
-              {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
-              {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+        <td>
+          <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+            <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+            <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    {% for e in results %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        {% if not e.single_contact %}
+          <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
+          {% if e.is_empty %}
+            <td class="empty-entity">
+              {% trans "No contacts !!" %}
             </td>
+          {% else %}
             <td>
-            <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
-              <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
-              <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
-            </a>
-            </td>
-            </tr>
-        {% endfor %}
-        </table>
-      {% else %}
-        &nbsp;
-      {% endif %}
-      {% endwith %}
-      </td>
-    </tr>
-  {% endfor %}
+          {% endif %}
+        {% else %}
+          <td colspan=2>
+        {% endif %}
+          
+        {% with e.search_contacts as contacts %}
+        {% if contacts %}
+          <table class="table contact-table table-striped font-small">
+          {% for c in contacts %}
+              <tr>
+              <td>
+                <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+                {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+                {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+              </td>
+              <td>
+              <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+                <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+                <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+              </a>
+              </td>
+              </tr>
+          {% endfor %}
+          </table>
+        {% else %}
+          &nbsp;
+        {% endif %}
+        {% endwith %}
+        </td>
+      </tr>
+    {% endfor %}
+  {% endif %}
   </table>
   {% paginate %}
   <script>

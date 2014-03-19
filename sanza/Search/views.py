@@ -97,7 +97,7 @@ def quick_search(request):
 @user_passes_test(can_access)
 def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
-    entities = []
+    results = []
     search=None
     field_choice_form = forms.FieldChoiceForm()
     contains_refuse_newsletter = False
@@ -105,6 +105,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     contacts_count = 0
     has_empty_entities = False
     group = opportunity = city = None
+    contacts_display = False
     
     if request.method == "POST":
         data = request.POST
@@ -121,23 +122,31 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     if data:
         search_form = forms.SearchForm(data)
         if search_form.is_valid():
-            entities, contacts_count, has_empty_entities = search_form.get_contacts_by_entity()
-            contains_refuse_newsletter = search_form.contains_refuse_newsletter
-            if not entities:
+            contacts_display = search_form.contacts_display
+            
+            if not contacts_display:
+                results, contacts_count, has_empty_entities = search_form.get_contacts_by_entity()
+                contains_refuse_newsletter = search_form.contains_refuse_newsletter
+            else:
+                results = search_form.get_contacts()
+                contacts_count, has_empty_entities = len(results), False
+                contains_refuse_newsletter = search_form.contains_refuse_newsletter
+            
+            if not results:
                 message = _(u'Sorry, no results found')
     else:
         search = get_object_or_404(models.Search, id=search_id) if search_id else None
         search_form = forms.SearchForm(instance=search)
     
-    entities_count = len(entities)
+    entities_count = 0 if contacts_display else len(results)
     return render_to_response(
         'Search/search.html',
         {
-            'request': request, 'entities': entities, 'nb_entities_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
+            'request': request, 'results': results, 'nb_results_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
             'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
             'search_form': search_form, 'search': search, 'contacts_count': contacts_count, 'entities_count': entities_count,
             'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
-            'city': city,
+            'city': city, 'contacts_display': contacts_display,
         },
         context_instance=RequestContext(request)
     )

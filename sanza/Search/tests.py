@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 from django.utils.unittest.case import SkipTest
 from sanza.Crm import settings as crm_settings
 from unittest import skipIf
+from sanza.Crm.utils import get_default_country
 
 def get_form_errors(response):
     soup = BeautifulSoup4(response.content)
@@ -594,7 +595,55 @@ class GroupSearchTest(BaseTestCase):
         
         self.assertContains(response, entity2.name)
         self.assertContains(response, contact2.lastname)
+        
+    def test_search_groups_absurde(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make(models.Group, name=u"my group")
+        group1.entities.add(entity1)
+        group1.entities.add(entity2)
+        group1.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-not_in_group-_-1": group1.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
     
+    def test_search_groups_absurde2(self):
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        
+        group1 = mommy.make(models.Group, name=u"my group")
+        group1.entities.add(entity1)
+        group1.entities.add(entity2)
+        group1.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-not_in_group-_-0": group1.id, "gr0-_-group-_-1": group1.id}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        
         
     def test_search_entity(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
@@ -1457,6 +1506,40 @@ class SameAsTest(BaseTestCase):
         url = reverse('search')
         
         data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_as-_-1": '0'}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        #print response
+        self.assertNotContains(response, contact1.email)
+        self.assertContains(response, contact2.email)
+        
+    def test_search_same_as_not_allowed3(self):
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False)
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.default_contact.delete()
+        contact1.entity.save()
+        
+        contact2 = mommy.make(models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False)
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.default_contact.delete()
+        contact2.entity.save()
+        
+        group1 = mommy.make(models.Group, name="GROUP1")
+        group1.entities.add(contact1.entity)
+        group1.save()
+        
+        group2 = mommy.make(models.Group, name="GROUP2")
+        group2.entities.add(contact2.entity)
+        group2.save()
+        
+        contact1.same_as = models.SameAs.objects.create(main_contact=contact2)
+        contact1.save()
+        contact2.same_as = contact1.same_as
+        contact2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-group-_-0": group1.id, "gr0-_-no_same_as-_-1": '0', "gr1-_-group-_-0": group2.id, }
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -3096,3 +3179,170 @@ class ActionSearchTest(BaseTestCase):
         
         self.assertNotContains(response, contact7.lastname)
         
+class SortTest(BaseTestCase):
+    
+    def _make_contact(self, lastname, firstname, entity=""):
+        contact1 = mommy.make(models.Contact, lastname=lastname, firstname=firstname, main_contact=True, has_left=False)
+        contact1.entity.name = entity or u"????"
+        contact1.entity.is_single_contact = not bool(entity)
+        contact1.entity.default_contact.delete()
+        contact1.entity.save()
+        return contact1
+    
+    def _contacts(self):
+        c1 = self._make_contact(u'Martin', u'Georges', u'apple')
+        c2 = self._make_contact(u'Dupond', u'Pierre', u'Abcdef')
+        c3 = self._make_contact(u'Martin', u'Alain', u'Petitmou')
+        c4 = self._make_contact(u'Bernard', u'Jacques', u'')
+        c5 = self._make_contact(u'Xylo', u'Henri', u'Balafon')
+        c6 = self._make_contact(u'Poulet', u'Andre', u'Maitre Coq')
+        return c1, c2, c3, c4, c5, c6
+    
+    def _groups(self, c1, c2, c3, c4, c5, c6):
+        group1 = mommy.make(models.Group, name="GROUP1")
+        for c in (c1, c2, c3,):
+            group1.contacts.add(c)
+        group1.save()
+        
+        group2 = mommy.make(models.Group, name="GROUP2")
+        for c in (c4, c5, c6,):
+            group2.contacts.add(c)
+        group2.save()
+        
+        return group1, group2
+    
+    def _post_and_check(self, data, expected_order):
+        url = reverse('search')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        content = unicode(response.content.decode("iso-8859-15"))
+        
+        self.assertContains(response, u"<!-- ut: contacts_display -->")
+        
+        for c in expected_order:
+            self.assertContains(response, c.firstname)
+        pos = [content.find(c.firstname) for c in expected_order]
+        self.assertEqual(pos, sorted(pos))
+    
+    
+    def test_sort_by_name(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        expected_order = (c2, c1, c5, c4, c6, c3)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'name',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
+        
+        
+    def test_sort_by_entity(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        expected_order = (c2, c1, c5, c6, c3, c4)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'entity',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
+
+    def test_sort_by_contact(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        expected_order = (c4, c2, c3, c1, c6, c5)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'contact',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
+        
+    def test_sort_by_zipcode(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        
+        country1 = get_default_country()
+        country2 = mommy.make(models.Zone, name="ABC", type=country1.type)
+        country3 = mommy.make(models.Zone, name="DEF", type=country1.type)
+        
+        city1 = mommy.make(models.City, parent=country1, name="Ville1")
+        city2 = mommy.make(models.City, parent=country1, name="City2")
+        city3 = mommy.make(models.City, parent=country2, name="City3")
+        city4 = mommy.make(models.City, parent=country3, name="Ville4")
+        
+        c1.zip_code = "42100"
+        c1.city = city1
+        c1.save()
+        
+        c2.entity.zip_code = "42100"
+        c2.entity.city = city2
+        c2.entity.save()
+        
+        c3.entity.zip_code = "42000"
+        c3.entity.city = city2
+        c3.entity.save()
+        
+        c4.zip_code = ""
+        c4.city = city3
+        c4.save()
+        
+        c5.zip_code = "42000"
+        c5.city = city2
+        c5.save()
+        
+        c6.zip_code = "42100"
+        c6.city = city4
+        c6.save()
+        
+        
+        
+        expected_order = (c5, c3, c2, c1, c4, c6)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'zipcode',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
+
+    def test_sort_by_zipcode2(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        
+        country1 = get_default_country()
+        country2 = mommy.make(models.Zone, name="ABC", type=country1.type)
+        country3 = mommy.make(models.Zone, name="DEF", type=country1.type)
+        
+        city1 = mommy.make(models.City, parent=country1, name="Ville1")
+        city2 = mommy.make(models.City, parent=None, name="City2")
+        city3 = mommy.make(models.City, parent=country2, name="City3")
+        city4 = mommy.make(models.City, parent=country3, name="Ville4")
+        
+        c1.zip_code = "42100"
+        c1.city = city1
+        c1.save()
+        
+        c3.entity.zip_code = "01000"
+        c3.entity.city = city2
+        c3.entity.save()
+        
+        c4.zip_code = ""
+        c4.city = city3
+        c4.save()
+        
+        c5.zip_code = "42000"
+        c5.city = city2
+        c5.save()
+        
+        c6.zip_code = "42100"
+        c6.city = city4
+        c6.save()
+        
+        expected_order = (c3, c5, c1, c6, c4, c2)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'zipcode',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
