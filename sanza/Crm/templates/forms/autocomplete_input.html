@@ -12,7 +12,7 @@ $(function() {
     $.ajax({
         url: "{% block get_value_url %}{% endblock %}",
         success: function(data){
-            $('input[name={{name}}_visible]').val(data.name);
+            $('input[name={{name}}_visible]').attr('value', data.name);
         }
     });
 	{% endif %}
@@ -39,13 +39,16 @@ $(function() {
                 id = ui.item.value;
             }
             $("input[name={{name}}]").val(id);
+			$("input[name={{name}}_visible]").attr('value', ui.item.value);
         }
     });
     $("input[name={{name}}_visible]").change(function() {
+		var value = $(this).val();
 		$.ajax({
-			url: "{% block get_id_url %}{% endblock %}?name="+escape($(this).val()),
+			url: "{% block get_id_url %}{% endblock %}?name="+escape(value),
 			success: function(data){
 				$('input[name={{name}}]').val(data.id);
+				$("input[name={{name}}_visible]").attr('value', value);
 			}
 		});
     });
