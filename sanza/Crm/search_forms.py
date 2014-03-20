@@ -126,8 +126,16 @@ class ZoneSearchForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(ZoneSearchForm, self).__init__(*args, **kwargs)
         qs = models.Zone.objects.filter(type__type=self._name).order_by('code', 'name') 
-        field = forms.ModelChoiceField(qs, label=self._label)
+        field = forms.ModelChoiceField(qs, label=self._label, widget=self._get_widget())
         self._add_field(field)
+        
+    def _get_widget(self):
+        return forms.Select(attrs={
+            'class': "chosen-select",
+            'data-placeholder': self._label,
+            'style': "width: 100%", 
+        })
+
         
 class DepartmentSearchForm(ZoneSearchForm):
     _name = 'department'
@@ -798,7 +806,16 @@ class SortContacts(SearchFieldForm):
             ('contact', _(u'Contact')),
             ('zipcode', _(u'Zipcode')),
         ) 
-        field = forms.CharField(label=self._label, widget=forms.Select(choices=choices))
+        field = forms.CharField(
+            label=self._label,
+            widget=forms.Select(
+                choices=choices,
+                attrs={
+                    'class': "chosen-select",
+                    'style': "width: 100%",
+                }
+            )
+        )
         self._add_field(field)
         self.default_country = get_default_country()
     

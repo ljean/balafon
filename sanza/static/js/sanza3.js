@@ -4,7 +4,7 @@ $(function() {
     });
     
     try {
-        $(".chosen-select").chosen({disable_search: false, width: "50%"});
+        $(".chosen-select").chosen({disable_search: false});//, width: "50%"});
     } catch(e) {
 
     }

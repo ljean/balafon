@@ -31,7 +31,7 @@
     var block_count = {{search_form.block_count|default:0}};
     var field_count = 0;
     
-    $(".cur-form select").chosen({width: "50%"});
+    $(".cur-form select[name='field_choice']").chosen({width: "50%"});
     
     var add_block = function(no_remove) {
       var gr = $(".form").append($(".search-block-template").html());
