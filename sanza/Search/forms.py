@@ -449,7 +449,12 @@ class SearchActionBaseForm:
 
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
-        return Contact.objects.filter(id__in=ids)
+        contacts = Contact.objects.filter(id__in=ids)
+        contact_by_ids = {unicode(c.id): c for c in contacts}
+        ordered_contacts = []
+        for cid in ids:
+            ordered_contacts.append(contact_by_ids[cid])
+        return ordered_contacts
 
 
 class SearchActionForm(forms.Form, SearchActionBaseForm):

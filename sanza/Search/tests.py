@@ -3315,6 +3315,47 @@ class SortTest(BaseTestCase):
         country3 = mommy.make(models.Zone, name="DEF", type=country1.type)
         
         city1 = mommy.make(models.City, parent=country1, name="Ville1")
+        city2 = mommy.make(models.City, parent=country1, name="City2")
+        city3 = mommy.make(models.City, parent=country2, name="City3")
+        city4 = mommy.make(models.City, parent=country3, name="Ville4")
+        
+        c1.zip_code = "42100"
+        c1.city = city1
+        c1.save()
+        
+        c3.entity.zip_code = "01000"
+        c3.entity.city = city2
+        c3.entity.save()
+        
+        c4.zip_code = ""
+        c4.city = city3
+        c4.save()
+        
+        c5.zip_code = "42000"
+        c5.city = city1
+        c5.save()
+        
+        c6.zip_code = "42100"
+        c6.city = city4
+        c6.save()
+        
+        expected_order = (c3, c5, c1, c4, c6, c2)
+        data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-sort-_-1": 'zipcode',
+            "gr1-_-group-_-0": group2.id,
+        }
+        self._post_and_check(data, expected_order)
+
+    def test_sort_by_zipcode3(self):
+        c1, c2, c3, c4, c5, c6 = self._contacts()
+        group1, group2 = self._groups(c1, c2, c3, c4, c5, c6)
+        
+        country1 = get_default_country()
+        country2 = mommy.make(models.Zone, name="ABC", type=country1.type)
+        country3 = mommy.make(models.Zone, name="DEF", type=country1.type)
+        
+        city1 = mommy.make(models.City, parent=country1, name="Ville1")
         city2 = mommy.make(models.City, parent=None, name="City2")
         city3 = mommy.make(models.City, parent=country2, name="City3")
         city4 = mommy.make(models.City, parent=country3, name="Ville4")
@@ -3332,14 +3373,14 @@ class SortTest(BaseTestCase):
         c4.save()
         
         c5.zip_code = "42000"
-        c5.city = city2
+        c5.city = city1
         c5.save()
         
         c6.zip_code = "42100"
         c6.city = city4
         c6.save()
         
-        expected_order = (c3, c5, c1, c6, c4, c2)
+        expected_order = (c3, c5, c1, c4, c6, c2)
         data = {
             "gr0-_-group-_-0": group1.id,
             "gr0-_-sort-_-1": 'zipcode',

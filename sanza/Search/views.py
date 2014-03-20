@@ -311,7 +311,9 @@ def export_contacts_as_excel(request):
         search_form = forms.SearchForm(request.POST)
         if search_form.is_valid():
             contacts = search_form.get_contacts()
-            contacts.sort(key=lambda x: u"{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
+            if not search_form.contacts_display:
+                #if the form alread has a sort criteria: don't sort again
+                contacts.sort(key=lambda x: u"{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
             
             #create the excel document
             wb = xlwt.Workbook()
@@ -541,7 +543,6 @@ def export_to_pdf(request):
                 if form.is_valid():
                     template_name = form.cleaned_data['template']
                     contacts = form.get_contacts()
-                    
                     context = {
                         "contacts": contacts,
                         "search_dict": json.loads(form.cleaned_data['search_dict']),
@@ -569,7 +570,6 @@ def export_to_pdf(request):
                 search_form = forms.SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
-                    
                     search_dict = json.dumps(search_form.serialize())
                     form = PdfTemplateForm(initial={'contacts': contacts, 'search_dict': search_dict})
                     return render_to_response(

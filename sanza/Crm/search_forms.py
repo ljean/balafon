@@ -813,22 +813,22 @@ class SortContacts(SearchFieldForm):
     def _sort_by_entity(self, c):
         x = u"B" if c.entity.is_single_contact else u"A"
         y = self._sort_by_name(c)
-        return u"".join((x, y))
+        z = u"{0}".format(c.lastname, c.firstname) if not c.entity.is_single_contact else u""
+        return (x, y, z)
     
     def _sort_by_zipcode(self, c):
         country = c.get_country()
         x = c.get_zip_code or u'?'
         city = c.get_city
         if not city:
-            v = w = y = "?"
+            v = "C"
+            w = y = "?"
         else:
             v = u"A" if ((not country) or self.default_country.id == country.id) else u"B"
             w = country.name if country else self.default_country.name
             y = city.name
         z = self._sort_by_name(c)
-        x = u"".join((v, w, x, y, z))
-        print x
-        return x
+        return (v, w, x, y, z)
     
     def get_queryset(self, qs):
         return qs

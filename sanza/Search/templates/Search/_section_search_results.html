@@ -3,7 +3,6 @@
 
 {% block section_title %}
   <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
-  {% if entities_count > 1 %}{{entities_count}} {% trans "entities" %}{% else %}{{entities_count}} {% trans "entity" %}{% endif %} -
   {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
   
 {% endblock %}
@@ -14,22 +13,21 @@
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
   {% autopaginate results nb_results_by_page %}
-  <table class="table table-bordered font-small">
+  <table class="table table-bordered contact-table font-small">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
-  
   {% if contacts_display %}
     <!-- ut: contacts_display -->
     {% for c in results %}
       <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-        <td{% if not c.entity.single_contact %} colspan=2{%endif%}>
+        <td{% if c.entity.is_single_contact %} colspan=2{%endif%}>
           <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
           {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
           {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
         </td>
-        {% if not c.entity.single_contact %}
+        {% if not c.entity.is_single_contact %}
           <td>
             <a href="{{c.entity.get_absolute_url}}">{{c.entity.name}}</a>
-          <td>
+          </td>
         {% endif %}
         <td>
           <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
@@ -159,7 +157,7 @@
 
 {% block section_buttons %}
   
-{% if entities %}
+{% if results %}
 <li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a></li>
 <li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a></li>
 <li><a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a></li>
