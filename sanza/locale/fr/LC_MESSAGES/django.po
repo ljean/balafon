@@ -2892,7 +2892,7 @@ msgstr ""
 
 #: templates/403.html:5
 msgid "Permission Denied"
-msgstr "Permission réfusée"
+msgstr "Permission refusée"
 
 #: templates/403.html:7
 msgid "You are not allowed to see this page"
