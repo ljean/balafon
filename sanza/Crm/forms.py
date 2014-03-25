@@ -146,7 +146,7 @@ class _CityBasedForm(object):
             except KeyError:
                 pass
         if not self.country_id:
-            self.country_id = get_default_country()
+            self.country_id = get_default_country().id
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         
@@ -158,9 +158,9 @@ class _CityBasedForm(object):
         except:
             pass
     
-    def _get_country(self, id):
-        if id:
-            return models.Zone.objects.get(id=id, parent__isnull=True, type__name="country")
+    def _get_country(self, country_id):
+        if country_id:
+            return models.Zone.objects.get(id=country_id, parent__isnull=True, type__type="country")
         else:
             return get_default_country()
         
@@ -184,6 +184,7 @@ class _CityBasedForm(object):
                     country_id = int(self.cleaned_data.get('country')) or self.country_id
                 except (ValueError, TypeError):
                     country_id = self.country_id
+                    
                 country = self._get_country(country_id)
                 default_country = get_default_country()
                 if country != default_country:

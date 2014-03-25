@@ -18,7 +18,8 @@ from cStringIO import StringIO
 import sys
 from datetime import datetime, timedelta
 import logging
-  
+from coop_cms.settings import is_perm_middleware_installed
+
 class BaseTestCase(TestCase):
     
     def setUp(self):
@@ -3179,6 +3180,14 @@ class ActionDocumentTestCase(BaseTestCase):
     #    response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
     #    self.assertEqual(200, response.status_code)
         
+    def _check_anonymous_not_allowed(self, response, url):
+        if is_perm_middleware_installed():
+            self.assertEqual(302, response.status_code)
+            auth_url = reverse("auth_login")
+            self.assertRedirects(response, auth_url+'?next='+url)
+        else:
+            self.assertEqual(403, response.status_code)
+            
     def test_anonymous_document_view(self):
         self.client.logout()
         c = mommy.make(models.Contact)
@@ -3187,22 +3196,25 @@ class ActionDocumentTestCase(BaseTestCase):
         a.contacts.add(c)
         a.save()
         
-        response = self.client.get(reverse('crm_edit_action_document', args=[a.id]))
-        self.assertEqual(403, response.status_code)
+        url = reverse('crm_edit_action_document', args=[a.id])
+        response = self.client.get(url)
+        self._check_anonymous_not_allowed(response, url)
         
-        response = self.client.get(reverse('crm_view_action_document', args=[a.id]))
-        self.assertEqual(403, response.status_code)
+        url = reverse('crm_view_action_document', args=[a.id])
+        response = self.client.get(url)
+        self._check_anonymous_not_allowed(response, url)
         
-        response = self.client.get(reverse('crm_pdf_action_document', args=[a.id]))
-        self.assertEqual(403, response.status_code)
+        url = reverse('crm_pdf_action_document', args=[a.id])
+        response = self.client.get(url)
+        self._check_anonymous_not_allowed(response, url)
         
     def test_not_staff_document_view(self):
         self.client.logout()
         
-        user = User.objects.create(username="titi", is_staff=False)
+        user = User.objects.create(username="titi", is_staff=False, is_active=True)
         user.set_password("abc")
         user.save()
-        self.client.login(usernname="titi", password="abc")
+        self.client.login(username="titi", password="abc")
         
         c = mommy.make(models.Contact)
         at = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
