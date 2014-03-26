@@ -16,6 +16,24 @@ from djaloha.widgets import AlohaInput
 from django.utils import timezone
 from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm, BootstrapableMixin
 
+class BetterBsForm(BetterForm, BootstrapableMixin):
+    class Media:
+        css = {
+            'all': ('chosen/chosen.css',)
+        }
+        js = (
+            'chosen/chosen.jquery.js',
+        )
+        
+    def __init__(self, *args, **kwargs):
+        super(BetterBsForm, self).__init__(*args, **kwargs)
+        self._bs_patch_field_class()
+        for field in self.fields.values():
+            if field.widget.__class__.__name__ == forms.Select().__class__.__name__:
+                klass = field.widget.attrs.get("class", "") 
+                if not "chosen-select" in klass:
+                    field.widget.attrs["class"] = klass + " chosen-select"
+
 class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
     class Media:
         css = {
@@ -207,13 +225,13 @@ class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
         super(ModelFormWithCity, self).__init__(*args, **kwargs)
         self._post_init(*args, **kwargs)
         
-class FormWithCity(BetterForm, _CityBasedForm):
+class FormWithCity(BetterBsForm, _CityBasedForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     zip_code = forms.CharField(required=False, label=_(u'zip code'))
     city = forms.CharField(required = False, label=_(u'City'))
     
     def __init__(self, *args, **kwargs):
-        super(BetterForm, self).__init__(*args, **kwargs)
+        super(FormWithCity, self).__init__(*args, **kwargs)
         self._post_init(*args, **kwargs)
     
 class EntityForm(ModelFormWithCity):
