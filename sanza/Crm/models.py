@@ -596,6 +596,7 @@ class Contact(TimeStampedModel):
         if not self.uuid:
             ln = unicodedata.normalize('NFKD', unicode(self.fullname)).encode("utf8",'ignore')
             name = u'{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ln, self.email)
+            name = unicodedata.normalize('NFKD', unicode(name)).encode("utf8",'ignore')
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(Contact, self).save()
         

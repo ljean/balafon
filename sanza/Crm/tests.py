@@ -3283,6 +3283,45 @@ class EditContactTestCase(BaseTestCase):
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
         
+    def test_edit_contact_utf(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pepe@mémé.fr"
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.email, data['email'])
+    
+    def test_edit_contact_utf2(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pépé@mémé.fr"
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertNotEqual(c.lastname, data['lastname'])
+        self.assertNotEqual(c.firstname, data['firstname'])
+        self.assertNotEqual(c.email, data['email'])
+        
     def test_edit_contact_unknown_city(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
