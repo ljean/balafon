@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from sanza.Crm import models
 from django.core.exceptions import ValidationError
 from datetime import date, timedelta
-from sanza.Crm.settings import get_default_country
+#from sanza.Crm.settings import get_default_country
 from django.contrib.auth.models import User
 from django.db.models import Q, Count
 from sanza.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
@@ -94,38 +94,59 @@ class ContactByModifiedDate(TwoDatesForm):
         dt2 += timedelta(1)
         return {'modified__gte': dt1, 'modified__lt': dt2, }
 
-class CitySearchForm(SearchFieldForm):
-    _name = 'city'
-    _label = _(u'City')
+class BaseCitySearchForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
-        super(CitySearchForm, self).__init__(*args, **kwargs)
+        super(BaseCitySearchForm, self).__init__(*args, **kwargs)
         qs = models.City.objects.order_by('name') 
         field = forms.ModelChoiceField(qs, label=self._label,
             widget = CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         )
         self._add_field(field)
-        
-    def get_lookup(self):
-        return Q(entity__city__id=self._value) | Q(city__id=self._value)
+
+class CitySearchForm(BaseCitySearchForm):
+    _name = 'city'
+    _label = _(u'City')
     
-class ZipCodeSearchForm(SearchFieldForm):
-    _name = 'zip_code'
-    _label = _(u'zip code')
+    def get_lookup(self):
+        return Q(city__id=self._value) | (Q(city__isnull=True) & Q(entity__city__id=self._value))
+    
+class EntityCitySearchForm(BaseCitySearchForm):
+    _name = 'entity_city'
+    _label = _(u'Entity city')
+
+    def get_lookup(self):
+        return Q(entity__city__id=self._value)
+
+class BaseZipCodeSearchForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
-        super(ZipCodeSearchForm, self).__init__(*args, **kwargs)
+        super(BaseZipCodeSearchForm, self).__init__(*args, **kwargs)
         field = forms.CharField(label=self._label,
             widget=forms.TextInput(attrs={'placeholder': _(u'Enter the beginning of the zip code')}))
         self._add_field(field)
-        
+    
+class ZipCodeSearchForm(BaseZipCodeSearchForm):
+    _name = 'zip_code'
+    _label = _(u'zip code')
+    
     def get_lookup(self):
-        return Q(entity__zip_code__istartswith=self._value) | Q(zip_code__istartswith=self._value)
+        return Q(zip_code__istartswith=self._value) | (Q(zip_code="") & Q(entity__zip_code__istartswith=self._value))
+
+
+class EntityZipCodeSearchForm(BaseZipCodeSearchForm):
+    _name = 'entity_zip_code'
+    _label = _(u'Entity zip code')
+            
+    def get_lookup(self):
+        return Q(entity__zip_code__istartswith=self._value)
         
 class ZoneSearchForm(SearchFieldForm):
+    
     def __init__(self, *args, **kwargs):
         super(ZoneSearchForm, self).__init__(*args, **kwargs)
-        qs = models.Zone.objects.filter(type__type=self._name).order_by('code', 'name') 
+        type_name = self._name.replace("entity_", "")
+        qs = models.Zone.objects.filter(type__type=type_name).order_by('code', 'name') 
         field = forms.ModelChoiceField(qs, label=self._label, widget=self._get_widget())
         self._add_field(field)
         
@@ -135,34 +156,70 @@ class ZoneSearchForm(SearchFieldForm):
             'data-placeholder': self._label,
             'style': "width: 100%", 
         })
-
-        
+    
 class DepartmentSearchForm(ZoneSearchForm):
     _name = 'department'
     _label = _(u'Department')
         
     def get_lookup(self):
-        return Q(entity__city__parent__id=self._value) | Q(city__parent__id=self._value)
+        q1 = Q(city__parent__id=self._value) & Q(city__parent__type__type="department")
+        q2 = Q(city__isnull=True) & Q(entity__city__parent__id=self._value) & Q(entity__city__parent__type__type="department")
+        
+        return q1 | q2
+
+class EntityDepartmentSearchForm(ZoneSearchForm):
+    _name = 'entity_department'
+    _label = _(u'Entity Department')
+        
+    def get_queryset(self, qs):
+        return qs.filter(self.get_lookup()).filter(entity__city__parent__type__type="department")
+        
+    def get_lookup(self):
+        return Q(entity__city__parent__id=self._value)
         
 class RegionSearchForm(ZoneSearchForm):
     _name = 'region'
     _label = _(u'Region')
         
     def get_lookup(self):
-        return Q(entity__city__parent__parent__id=self._value) | Q(city__parent__parent__id=self._value)
+        q1 = Q(city__parent__parent__id=self._value) & Q(city__parent__parent__type__type="region")
+        q2 = Q(city__isnull=True) & Q(entity__city__parent__parent__id=self._value) & Q(entity__city__parent__parent__type__type="region")
+        return q1 | q2
+
+class EntityRegionSearchForm(ZoneSearchForm):
+    _name = 'entity_region'
+    _label = _(u'Entity Region')
+    
+    def get_queryset(self, qs):
+        return qs.filter(self.get_lookup()).filter(entity__city__parent__parent__type__type="region")
+        
+    def get_lookup(self):
+        return Q(entity__city__parent__parent__id=self._value)
         
 class CountrySearchForm(ZoneSearchForm):
     _name = 'country'
     _label = _(u'Country')
         
     def get_lookup(self):
-        default_country_name = get_default_country()
-        default_country = models.Zone.objects.get(name=default_country_name, type__type=self._name)
+        default_country = get_default_country()
         if int(self._value) == default_country.id:
-            return Q(entity__city__parent__type__type='department') | Q(city__parent__type__type='department')
+            return Q(city__parent__type__type='department') | (Q(city__isnull=True) & Q(entity__city__parent__type__type='department'))
         else:
-            return Q(entity__city__parent__id=self._value) | Q(city__parent__id=self._value)
+            return Q(city__parent__id=self._value) | (Q(city__isnull=True) & Q(entity__city__parent__id=self._value))
         
+class EntityCountrySearchForm(ZoneSearchForm):
+    _name = 'entity_country'
+    _label = _(u'Entity Country')
+        
+    def get_lookup(self):
+        default_country = get_default_country()
+        
+        if int(self._value) == default_country.id:
+            return Q(entity__city__parent__type__type='department')
+        else:
+            return Q(entity__city__parent__id=self._value, entity__city__parent__type__type="country")
+   
+
 class HasZipCodeForm(YesNoSearchFieldForm):
     _name = 'has_zip'
     _label = _(u'Has zip code?')

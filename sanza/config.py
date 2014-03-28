@@ -16,10 +16,15 @@ SEARCH_FORMS = [
         _(u'Location'),
         [
             search_forms.CitySearchForm,
+            search_forms.EntityCitySearchForm,
             search_forms.DepartmentSearchForm,
+            search_forms.EntityDepartmentSearchForm,
             search_forms.RegionSearchForm,
+            search_forms.EntityRegionSearchForm,
             search_forms.CountrySearchForm,
+            search_forms.EntityCountrySearchForm,
             search_forms.ZipCodeSearchForm,
+            search_forms.EntityZipCodeSearchForm,
             search_forms.HasZipCodeForm,
         ],
     ),(
