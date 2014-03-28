@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-20 10:03+0100\n"
+"POT-Creation-Date: 2014-03-28 15:04+0100\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.5\n"
 
-#: config.py:9 Crm/search_forms.py:297
+#: config.py:9 Crm/search_forms.py:364
 #: Search/templates/Search/_section_qs_groups.html:4
 msgid "Group"
 msgstr "Groupe"
@@ -26,13 +26,13 @@ msgstr "Groupe"
 msgid "Location"
 msgstr "Lieu"
 
-#: config.py:26 Crm/forms.py:395 Crm/models.py:830 Crm/search_forms.py:797
+#: config.py:31 Crm/forms.py:414 Crm/models.py:831 Crm/search_forms.py:864
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Search/views.py:331
 #: templates/sanza/_bs_navigation.html:33 templates/sanza/_navigation.html:27
 msgid "Entity"
 msgstr "Entité"
 
-#: config.py:39 Crm/templates/Crm/_section_all_entities.html:12
+#: config.py:44 Crm/templates/Crm/_section_all_entities.html:12
 #: Crm/templates/Crm/_section_contacts.html:4
 #: Crm/templates/Crm/_section_entities.html:12
 #: Emailing/templates/Emailing/_section_contacts.html:7
@@ -42,29 +42,29 @@ msgstr "Entité"
 msgid "Contacts"
 msgstr "Contacts"
 
-#: config.py:68 Crm/views.py:1016 Crm/templates/Crm/_section_actions.html:11
+#: config.py:73 Crm/views.py:1016 Crm/templates/Crm/_section_actions.html:11
 #: Crm/templates/Crm/_section_actions_by_set.html:5
 #: Crm/templates/Crm/_section_opportunities.html:16
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:15
 msgid "Actions"
 msgstr "Actions"
 
-#: config.py:82 Crm/templates/Crm/_section_opportunities.html:5
+#: config.py:87 Crm/templates/Crm/_section_opportunities.html:5
 #: templates/sanza/_bs_navigation.html:24 templates/sanza/_navigation.html:18
 msgid "Opportunities"
 msgstr "Dossiers"
 
-#: config.py:99 Emailing/utils.py:73
+#: config.py:104 Emailing/utils.py:73
 #: Emailing/templates/Emailing/view_emailing.html:3
 msgid "Emailing"
 msgstr "Emailing"
 
-#: config.py:105 templates/sanza/_bs_navigation.html:66
+#: config.py:110 templates/sanza/_bs_navigation.html:66
 #: templates/sanza/_navigation.html:45
 msgid "Admin"
 msgstr "Admin"
 
-#: config.py:118 Crm/forms.py:273
+#: config.py:123 Crm/forms.py:292
 msgid "Options"
 msgstr "Options"
 
@@ -72,42 +72,42 @@ msgstr "Options"
 msgid "Pdf"
 msgstr "Pdf"
 
-#: Crm/forms.py:38 Crm/forms.py:53
+#: Crm/forms.py:56 Crm/forms.py:71
 msgid "Group name"
 msgstr "Nom du groupe"
 
-#: Crm/forms.py:39 Crm/forms.py:54
+#: Crm/forms.py:57 Crm/forms.py:72
 msgid "start typing name and choose if exists"
 msgstr "tapez des lettres du nom du groupe s'il existe ou un nouveau nom"
 
-#: Crm/forms.py:49
+#: Crm/forms.py:67
 msgid "The entity already belong to group {0}"
 msgstr "L'entité appartient déjà au groupe {0}"
 
-#: Crm/forms.py:64
+#: Crm/forms.py:82
 msgid "The contact already belong to group {0}"
 msgstr "Le contact appartient déjà au groupe {0}"
 
-#: Crm/forms.py:74
+#: Crm/forms.py:92
 msgid "Enter a description for your group"
 msgstr "Entrez une description pour le groupe"
 
-#: Crm/forms.py:80
+#: Crm/forms.py:98
 msgid "Enter a name for your group"
 msgstr "Entrez un nom pour le groupe"
 
-#: Crm/forms.py:112
+#: Crm/forms.py:130
 msgid "A group with this name already exists"
 msgstr "Un groupe avec ce nom existe déjà"
 
-#: Crm/forms.py:124 Crm/models.py:293 Crm/models.py:775
+#: Crm/forms.py:142 Crm/models.py:293 Crm/models.py:776
 #: Crm/templates/Crm/_section_my_groups.html:16
 #: Search/templates/Search/_section_qs_cities.html:13
 #: Search/templates/Search/_section_qs_groups.html:12
 msgid "entities"
 msgstr "entités"
 
-#: Crm/forms.py:130 Crm/models.py:608 Crm/models.py:774
+#: Crm/forms.py:148 Crm/models.py:609 Crm/models.py:775
 #: Crm/templates/Crm/_section_my_groups.html:17
 #: Search/templates/Search/_section_qs_cities.html:18
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -115,27 +115,27 @@ msgstr "entités"
 msgid "contacts"
 msgstr "contacts"
 
-#: Crm/forms.py:151 Crm/forms.py:221 Crm/forms.py:258 Crm/search_forms.py:105
+#: Crm/forms.py:169 Crm/forms.py:240 Crm/forms.py:277 Crm/search_forms.py:103
 #: Emailing/forms.py:143 Profile/forms.py:16
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
-#: Crm/forms.py:193
+#: Crm/forms.py:212
 msgid "You must enter a valid zip code for selecting a new city"
 msgstr ""
 "Veuillez entrer un code postal valide ou au minimum le numéro de département"
 
-#: Crm/forms.py:203 Crm/forms.py:210 Crm/search_forms.py:148
+#: Crm/forms.py:222 Crm/forms.py:229 Crm/search_forms.py:201
 #: Search/views.py:330
 msgid "Country"
 msgstr "Pays"
 
-#: Crm/forms.py:211 Crm/models.py:151 Crm/models.py:391
-#: Crm/search_forms.py:114 Emailing/forms.py:164 Profile/models.py:23
+#: Crm/forms.py:230 Crm/models.py:151 Crm/models.py:391
+#: Crm/search_forms.py:131 Emailing/forms.py:164 Profile/models.py:23
 msgid "zip code"
 msgstr "code postal"
 
-#: Crm/forms.py:212 Crm/forms.py:220 Crm/forms.py:257 Crm/search_forms.py:99
+#: Crm/forms.py:231 Crm/forms.py:239 Crm/forms.py:276 Crm/search_forms.py:109
 #: Crm/templates/Crm/_section_all_entities.html:13
 #: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:142
 #: Profile/forms.py:15 Search/templates/Search/_section_qs_cities.html:4
@@ -143,193 +143,193 @@ msgstr "code postal"
 msgid "City"
 msgstr "Ville"
 
-#: Crm/forms.py:234 Crm/forms.py:270 Crm/models.py:23 Crm/search_forms.py:796
+#: Crm/forms.py:253 Crm/forms.py:289 Crm/models.py:23 Crm/search_forms.py:863
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:14 Profile/forms.py:36
-#: Search/forms.py:583
+#: Search/forms.py:586
 msgid "Name"
 msgstr "Nom"
 
-#: Crm/forms.py:235
+#: Crm/forms.py:254
 msgid "Enity details"
 msgstr "Détails"
 
-#: Crm/forms.py:236 Crm/forms.py:272 Profile/forms.py:38
+#: Crm/forms.py:255 Crm/forms.py:291 Profile/forms.py:38
 msgid "Address"
 msgstr "Adresse"
 
-#: Crm/forms.py:237
+#: Crm/forms.py:256
 msgid "Logo"
 msgstr "Logo"
 
-#: Crm/forms.py:251 Crm/forms.py:297
+#: Crm/forms.py:270 Crm/forms.py:316
 msgid "The file name is too long"
 msgstr "Le nom du fichier est trop long"
 
-#: Crm/forms.py:265
+#: Crm/forms.py:284
 msgid "enter notes about the contact"
 msgstr "Ajouter une note sur ce contact"
 
-#: Crm/forms.py:267
+#: Crm/forms.py:286
 msgid "Select roles"
 msgstr "Sélectionnez les rôles de ce contact"
 
-#: Crm/forms.py:271
+#: Crm/forms.py:290
 msgid "Contact details"
 msgstr "Détails du contact"
 
-#: Crm/forms.py:274
+#: Crm/forms.py:293
 msgid "Photo"
 msgstr "Photo"
 
-#: Crm/forms.py:279
+#: Crm/forms.py:298
 msgid "Select the roles played by the contact in his entity"
 msgstr "Choisissez les rôles joués par le contact au sein de l'entité"
 
-#: Crm/forms.py:312 Crm/models.py:760 Search/forms.py:515
+#: Crm/forms.py:331 Crm/models.py:761 Search/forms.py:518
 msgid "planned date"
 msgstr "date prévue"
 
-#: Crm/forms.py:313 Search/forms.py:516
+#: Crm/forms.py:332 Search/forms.py:519
 msgid "planned time"
 msgstr "heure prévue"
 
-#: Crm/forms.py:320 Crm/forms.py:376
+#: Crm/forms.py:339 Crm/forms.py:395
 msgid "Summary"
 msgstr "Résumé"
 
-#: Crm/forms.py:321 Crm/templates/Crm/_section_entity_info.html:66
+#: Crm/forms.py:340 Crm/templates/Crm/_section_entity_info.html:66
 msgid "Type"
 msgstr "Type"
 
-#: Crm/forms.py:322
+#: Crm/forms.py:341
 msgid "Details"
 msgstr "Détails"
 
-#: Crm/forms.py:338 Crm/forms.py:382
+#: Crm/forms.py:357 Crm/forms.py:401
 msgid "enter details"
 msgstr "plus de détails"
 
-#: Crm/forms.py:356
+#: Crm/forms.py:375
 msgid "This status can't not be used for this action type"
 msgstr "Cet état ne peut pas être utilisé pour ce type d'action"
 
-#: Crm/forms.py:359
+#: Crm/forms.py:378
 msgid "Please select a type before defining the status"
 msgstr "Veuillez sélectionner un type avant de choisir l'état"
 
-#: Crm/forms.py:400
+#: Crm/forms.py:419
 msgid "Enter the name of an entity"
 msgstr "Entrez le nom d'une entité"
 
-#: Crm/forms.py:407
+#: Crm/forms.py:426
 msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
-#: Crm/forms.py:416 Crm/forms.py:420 Crm/forms.py:446 Crm/forms.py:476
-#: Crm/forms.py:492 Crm/models.py:831 Crm/search_forms.py:798
+#: Crm/forms.py:435 Crm/forms.py:439 Crm/forms.py:465 Crm/forms.py:495
+#: Crm/forms.py:511 Crm/models.py:832 Crm/search_forms.py:865
 #: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:317
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:3
 msgid "Contact"
 msgstr "Contact"
 
-#: Crm/forms.py:419 Crm/forms.py:491
+#: Crm/forms.py:438 Crm/forms.py:510
 msgid "Enter the name of a contact"
 msgstr "Entrez le nom d'un contact"
 
-#: Crm/forms.py:427
+#: Crm/forms.py:446
 msgid "The contact does'nt exist"
 msgstr "Le contact n'existe pas"
 
-#: Crm/forms.py:435
+#: Crm/forms.py:454
 msgid "Enter the name of a opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: Crm/forms.py:436 Crm/search_forms.py:576
+#: Crm/forms.py:455 Crm/search_forms.py:643
 msgid "Opportunity"
 msgstr "Dossier"
 
-#: Crm/forms.py:443
+#: Crm/forms.py:462
 msgid "The opportunity does'nt exist"
 msgstr "Le dossier n'existe pas"
 
-#: Crm/forms.py:468
+#: Crm/forms.py:487
 msgid "Invalid contact"
 msgstr "Contact invalide"
 
-#: Crm/forms.py:471 Crm/forms.py:514
+#: Crm/forms.py:490 Crm/forms.py:533
 msgid "Contact does not exist"
 msgstr "Le contact n'existe pas"
 
-#: Crm/forms.py:475 Crm/models.py:324 Crm/models.py:331
+#: Crm/forms.py:494 Crm/models.py:324 Crm/models.py:331
 msgid "relationship type"
 msgstr "type de relation"
 
-#: Crm/forms.py:503 Crm/forms.py:512 Crm/forms.py:696
+#: Crm/forms.py:522 Crm/forms.py:531 Crm/forms.py:715
 msgid "Invalid data"
 msgstr "Données invalide"
 
-#: Crm/forms.py:505
+#: Crm/forms.py:524
 msgid "Relationship type does not exist"
 msgstr "Le type de relation n'existe pas"
 
-#: Crm/forms.py:612
+#: Crm/forms.py:631
 msgid "The created entities will be added to the selected groups"
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés"
 
-#: Crm/forms.py:620
+#: Crm/forms.py:639
 msgid "Invalid separator {0}"
 msgstr "Séparateur invalide {0}"
 
-#: Crm/forms.py:625
+#: Crm/forms.py:644
 msgid "Default department"
 msgstr "Département par défaut"
 
-#: Crm/forms.py:627
+#: Crm/forms.py:646
 msgid "The city in red will be created with this department as parent"
 msgstr "Les villes en rouge seront crées avec ce département comme parent"
 
-#: Crm/forms.py:636
+#: Crm/forms.py:655
 msgid "Please enter a valid code"
 msgstr "Veuillez entrer un code valide"
 
-#: Crm/forms.py:657
+#: Crm/forms.py:676
 msgid "Reassign to an existing entity"
 msgstr "Réaffecter à une entité existante"
 
-#: Crm/forms.py:658
+#: Crm/forms.py:677
 msgid "Create a new entity"
 msgstr "Créer une nouvelle entité"
 
-#: Crm/forms.py:659
+#: Crm/forms.py:678
 msgid "Switch to single contact"
 msgstr "Basculer en contact 'particulier'"
 
-#: Crm/forms.py:660
+#: Crm/forms.py:679
 msgid "Switch to entity contact"
 msgstr "Basculer en contact d'une entité"
 
-#: Crm/forms.py:663
+#: Crm/forms.py:682
 msgid "What to do?"
 msgstr "Que voulez-vous faire?"
 
-#: Crm/forms.py:664
+#: Crm/forms.py:683
 msgid "Which one?"
 msgstr "Quelle entité?"
 
-#: Crm/forms.py:665
+#: Crm/forms.py:684
 msgid "Enter the name of the entity"
 msgstr "Entrez le nom d'une entité"
 
-#: Crm/forms.py:690
+#: Crm/forms.py:709
 msgid "Please select one of this options"
 msgstr "Veuillez sélectionner une des options"
 
-#: Crm/forms.py:694
+#: Crm/forms.py:713
 msgid "Invalid value"
 msgstr "Données invalide"
 
-#: Crm/forms.py:708
+#: Crm/forms.py:727
 msgid "Please select an existing entity"
 msgstr "Veuillez sélectionner une entité existante"
 
@@ -353,7 +353,7 @@ msgstr "ordre"
 msgid "logo"
 msgstr "logo"
 
-#: Crm/models.py:45 Crm/models.py:616 Crm/models.py:722
+#: Crm/models.py:45 Crm/models.py:617 Crm/models.py:723
 msgid "Subscribe form"
 msgstr "Affiché sur le formulaire d'inscription"
 
@@ -361,7 +361,7 @@ msgstr "Affiché sur le formulaire d'inscription"
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:52 Crm/models.py:909 Profile/models.py:22
+#: Crm/models.py:52 Crm/models.py:910 Profile/models.py:22
 msgid "entity type"
 msgstr "type d'entité"
 
@@ -393,7 +393,7 @@ msgstr "zone"
 msgid "zones"
 msgstr "zones"
 
-#: Crm/models.py:103 Crm/models.py:633
+#: Crm/models.py:103 Crm/models.py:634
 msgid "group"
 msgstr "groupe"
 
@@ -405,12 +405,12 @@ msgstr "ville"
 msgid "cities"
 msgstr "villes"
 
-#: Crm/models.py:135 Crm/models.py:317 Crm/models.py:612 Crm/models.py:663
-#: Crm/models.py:834 Crm/models.py:904 Search/models.py:12 Search/models.py:25
+#: Crm/models.py:135 Crm/models.py:317 Crm/models.py:613 Crm/models.py:664
+#: Crm/models.py:835 Crm/models.py:905 Search/models.py:12 Search/models.py:25
 msgid "name"
 msgstr "nom"
 
-#: Crm/models.py:136 Crm/models.py:613
+#: Crm/models.py:136 Crm/models.py:614
 msgid "description"
 msgstr "description"
 
@@ -610,281 +610,281 @@ msgstr "{1}{0.firstname} {0.lastname}"
 msgid "{1}{0.firstname} {0.lastname}"
 msgstr "{1}{0.firstname} {0.lastname}"
 
-#: Crm/models.py:607 Search/templates/Search/_section_qs_cities.html:17
+#: Crm/models.py:608 Search/templates/Search/_section_qs_cities.html:17
 #: Search/templates/Search/_section_search_results.html:6
 msgid "contact"
 msgstr "contact"
 
-#: Crm/models.py:617
+#: Crm/models.py:618
 msgid "This group will be proposed on the public subscribe form"
 msgstr "Ce groupe sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:634 Crm/models.py:911
+#: Crm/models.py:635 Crm/models.py:912
 msgid "groups"
 msgstr "groupes"
 
-#: Crm/models.py:640 Crm/models.py:641
+#: Crm/models.py:641 Crm/models.py:642
 msgid "opportunity status"
 msgstr "Etats d'un dossier"
 
-#: Crm/models.py:646
+#: Crm/models.py:647
 msgid "opportunity type"
 msgstr "type de dossier"
 
-#: Crm/models.py:647
+#: Crm/models.py:648
 msgid "opportunity types"
 msgstr "types de dossier"
 
-#: Crm/models.py:655
+#: Crm/models.py:656
 msgid "low"
 msgstr "basse"
 
-#: Crm/models.py:656
+#: Crm/models.py:657
 msgid "medium"
 msgstr "moyenne"
 
-#: Crm/models.py:657
+#: Crm/models.py:658
 msgid "high"
 msgstr "haute"
 
-#: Crm/models.py:666 Crm/models.py:762
+#: Crm/models.py:667 Crm/models.py:763
 msgid "detail"
 msgstr "détail"
 
-#: Crm/models.py:668
+#: Crm/models.py:669
 msgid "probability"
 msgstr "probabilité"
 
-#: Crm/models.py:670 Crm/models.py:771
+#: Crm/models.py:671 Crm/models.py:772
 msgid "amount"
 msgstr "montant"
 
-#: Crm/models.py:672
+#: Crm/models.py:673
 msgid "closed"
 msgstr "fermé"
 
-#: Crm/models.py:674
+#: Crm/models.py:675
 msgid "starting date"
 msgstr "date de début"
 
-#: Crm/models.py:675
+#: Crm/models.py:676
 msgid "closing date"
 msgstr "date de fin"
 
-#: Crm/models.py:677 Crm/models.py:769
+#: Crm/models.py:678 Crm/models.py:770
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: Crm/models.py:702 Crm/models.py:764
+#: Crm/models.py:703 Crm/models.py:765
 msgid "opportunity"
 msgstr "dossier"
 
-#: Crm/models.py:703
+#: Crm/models.py:704
 msgid "opportunities"
 msgstr "dossiers"
 
-#: Crm/models.py:706 Crm/models.py:713 Crm/models.py:838
+#: Crm/models.py:707 Crm/models.py:714 Crm/models.py:839
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
-#: Crm/models.py:708 Crm/models.py:724
+#: Crm/models.py:709 Crm/models.py:725
 msgid "action set"
 msgstr "famille d'actions"
 
-#: Crm/models.py:709
+#: Crm/models.py:710
 msgid "action sets"
 msgstr "familles d'actions"
 
-#: Crm/models.py:715 Crm/models.py:716
+#: Crm/models.py:716 Crm/models.py:717
 msgid "action status"
 msgstr "etat d'une action"
 
-#: Crm/models.py:723
+#: Crm/models.py:724
 msgid "This action type will be proposed on the public subscribe form"
 msgstr "Ce type d'action sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:725
+#: Crm/models.py:726
 msgid "last number"
 msgstr "dernier numéro"
 
-#: Crm/models.py:726
+#: Crm/models.py:727
 msgid "generate number automatically"
 msgstr "génère automatiquement le numéro"
 
-#: Crm/models.py:727
+#: Crm/models.py:728
 msgid "document template"
 msgstr "Modèle de document"
 
-#: Crm/models.py:728
+#: Crm/models.py:729
 msgid "Action of this type will have a document with the given template"
 msgstr "Les actions de ce type auront un document basé sur ce modèle"
 
-#: Crm/models.py:730
+#: Crm/models.py:731
 msgid "Action of this type allow the given status"
 msgstr "Les actions de ce type acceptent ces états"
 
-#: Crm/models.py:732
+#: Crm/models.py:733
 msgid "Default status for actions of this type"
 msgstr "Etat par défaut pour les actions de ce type"
 
-#: Crm/models.py:734
+#: Crm/models.py:735
 msgid "is editable"
 msgstr "est éditable"
 
-#: Crm/models.py:735
+#: Crm/models.py:736
 msgid ""
 "If default_template is set, define if the template has a editable content"
 msgstr "Si un modèle est défini, indique si celui-ci a un contenu éditable"
 
-#: Crm/models.py:739
+#: Crm/models.py:740
 msgid "Status defined"
 msgstr "Etats définis"
 
-#: Crm/models.py:742
+#: Crm/models.py:743
 msgid "action type"
 msgstr "type d'action"
 
-#: Crm/models.py:743
+#: Crm/models.py:744
 msgid "action types"
 msgstr "types d'action"
 
-#: Crm/models.py:750
+#: Crm/models.py:751
 msgid "low priority"
 msgstr "priorité basse"
 
-#: Crm/models.py:751
+#: Crm/models.py:752
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: Crm/models.py:752
+#: Crm/models.py:753
 msgid "high priority"
 msgstr "priorité haute"
 
-#: Crm/models.py:756
+#: Crm/models.py:757
 msgid "action"
 msgstr "action"
 
-#: Crm/models.py:757
+#: Crm/models.py:758
 msgid "actions"
 msgstr "actions"
 
-#: Crm/models.py:759
+#: Crm/models.py:760
 msgid "subject"
 msgstr "sujet"
 
-#: Crm/models.py:763
+#: Crm/models.py:764
 msgid "priority"
 msgstr "priorité"
 
-#: Crm/models.py:765
+#: Crm/models.py:766
 msgid "done"
 msgstr "réalisé"
 
-#: Crm/models.py:766
+#: Crm/models.py:767
 msgid "done date"
 msgstr "date de réalisation"
 
-#: Crm/models.py:767
+#: Crm/models.py:768
 msgid "in charge"
 msgstr "en charge"
 
-#: Crm/models.py:770
+#: Crm/models.py:771
 msgid "archived"
 msgstr "archivé"
 
-#: Crm/models.py:772
+#: Crm/models.py:773
 msgid "number"
 msgstr "numéro"
 
-#: Crm/models.py:772
+#: Crm/models.py:773
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: Crm/models.py:801
+#: Crm/models.py:802
 msgid "content"
 msgstr "contenu"
 
-#: Crm/models.py:803 Search/forms.py:487
+#: Crm/models.py:804 Search/forms.py:490
 msgid "template"
 msgstr "Modèle"
 
-#: Crm/models.py:835
+#: Crm/models.py:836
 msgid "label"
 msgstr "libellé"
 
-#: Crm/models.py:836
+#: Crm/models.py:837
 msgid "model"
 msgstr "modèle"
 
-#: Crm/models.py:837
+#: Crm/models.py:838
 msgid "widget"
 msgstr "widget"
 
-#: Crm/models.py:839
+#: Crm/models.py:840
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: Crm/models.py:840
+#: Crm/models.py:841
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: Crm/models.py:843
+#: Crm/models.py:844
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: Crm/models.py:852 Crm/models.py:858
+#: Crm/models.py:853 Crm/models.py:859
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: Crm/models.py:853
+#: Crm/models.py:854
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:859 Search/models.py:37
+#: Crm/models.py:860 Search/models.py:37
 msgid "value"
 msgstr "valeur"
 
-#: Crm/models.py:862
+#: Crm/models.py:863
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: Crm/models.py:863
+#: Crm/models.py:864
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: Crm/models.py:870
+#: Crm/models.py:871
 msgid "entity custom field value"
 msgstr "cal"
 
-#: Crm/models.py:871
+#: Crm/models.py:872
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: Crm/models.py:880
+#: Crm/models.py:881
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: Crm/models.py:881
+#: Crm/models.py:882
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: Crm/models.py:895
+#: Crm/models.py:896
 msgid "Coma"
 msgstr "Virgule"
 
-#: Crm/models.py:896
+#: Crm/models.py:897
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: Crm/models.py:902
+#: Crm/models.py:903
 msgid "import file"
 msgstr "fichier d'import"
 
-#: Crm/models.py:903
+#: Crm/models.py:904
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: Crm/models.py:905
+#: Crm/models.py:906
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -892,29 +892,29 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:906
+#: Crm/models.py:907
 msgid "imported by"
 msgstr "importé par"
 
-#: Crm/models.py:910
+#: Crm/models.py:911
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: Crm/models.py:912
+#: Crm/models.py:913
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: Crm/models.py:913
+#: Crm/models.py:914
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: Crm/models.py:919
+#: Crm/models.py:920
 msgid "contact import"
 msgstr "import de contacts"
 
-#: Crm/models.py:920
+#: Crm/models.py:921
 msgid "contact imports"
 msgstr "imports de contacts"
 
@@ -962,107 +962,127 @@ msgstr "Entités par date de mise à jour"
 msgid "Contact by modified date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:119
+#: Crm/search_forms.py:116 Crm/templates/Crm/confirm_contacts_import.html:73
+msgid "Entity city"
+msgstr "Ville de l'entité"
+
+#: Crm/search_forms.py:126
 msgid "Enter the beginning of the zip code"
 msgstr "Entrez le début du code postal"
 
-#: Crm/search_forms.py:134
+#: Crm/search_forms.py:139
+msgid "Entity zip code"
+msgstr "Code postal de l'entité"
+
+#: Crm/search_forms.py:162
 msgid "Department"
 msgstr "Département"
 
-#: Crm/search_forms.py:141
+#: Crm/search_forms.py:172
+msgid "Entity Department"
+msgstr "Département de l'entité"
+
+#: Crm/search_forms.py:182
 msgid "Region"
 msgstr "Région"
 
-#: Crm/search_forms.py:160
-msgid "Has zip code?"
-msgstr "Dispose d'un code postal?"
+#: Crm/search_forms.py:191
+msgid "Entity Region"
+msgstr "Région de l'entité"
 
-#: Crm/search_forms.py:171
+#: Crm/search_forms.py:212
+msgid "Entity Country"
+msgstr "Pays de l'entité"
+
+#: Crm/search_forms.py:225
+msgid "Has city and zip code?"
+msgstr "Dispose d'un code postal et d'une ville?"
+
+#: Crm/search_forms.py:238
 msgid "Action in progress"
 msgstr "Action en cours"
 
-#: Crm/search_forms.py:188
+#: Crm/search_forms.py:255
 msgid "Has actions"
 msgstr "Actions effectuées?"
 
-#: Crm/search_forms.py:210
+#: Crm/search_forms.py:277
 msgid "Action by done date"
 msgstr "Action réalisée pendant la période"
 
-#: Crm/search_forms.py:222
+#: Crm/search_forms.py:289
 msgid "Action by planned date"
 msgstr "Action planifiée pendant la période"
 
-#: Crm/search_forms.py:233
+#: Crm/search_forms.py:300
 msgid "Action by user"
 msgstr "Action par nom de contact"
 
-#: Crm/search_forms.py:246
+#: Crm/search_forms.py:313
 msgid "Action with amount greater or equal to"
 msgstr "Action avec un montat supérieur ou égal à"
 
-#: Crm/search_forms.py:258
+#: Crm/search_forms.py:325
 msgid "Action with amount less than"
 msgstr "Action avec un montat inférieur à"
 
-#: Crm/search_forms.py:270
+#: Crm/search_forms.py:337
 msgid "Action by status"
 msgstr "Action par état"
 
-#: Crm/search_forms.py:284 Crm/templates/Crm/confirm_contacts_import.html:70
+#: Crm/search_forms.py:351 Crm/templates/Crm/confirm_contacts_import.html:70
 msgid "Entity type"
 msgstr "Type d'entité"
 
-#: Crm/search_forms.py:301 Crm/search_forms.py:346
+#: Crm/search_forms.py:368 Crm/search_forms.py:413
 msgid "Enter part of the group name"
 msgstr "Entrez une partie du nom du groupe"
 
-#: Crm/search_forms.py:324
+#: Crm/search_forms.py:391
 msgid "Group (dropdown list)"
 msgstr "Groupe (liste déroulante)"
 
-#: Crm/search_forms.py:329
+#: Crm/search_forms.py:396
 msgid "Group names"
 msgstr "Noms des groupes"
 
-#: Crm/search_forms.py:336
+#: Crm/search_forms.py:403
 msgid "Not in group"
 msgstr "N'appartient pas au groupe"
 
-#: Crm/search_forms.py:354
+#: Crm/search_forms.py:421
 msgid "Contact age"
 msgstr "Age du contact"
 
-#: Crm/search_forms.py:370 Profile/forms.py:65
+#: Crm/search_forms.py:437 Profile/forms.py:65
 msgid "Accept newsletter"
 msgstr "Accepte les newsletters"
 
-#: Crm/search_forms.py:377
+#: Crm/search_forms.py:444
 msgid "Accept third parties"
 msgstr "Accepte les offres partenaires"
 
-#: Crm/search_forms.py:384
+#: Crm/search_forms.py:451
 msgid "Secondary contact"
 msgstr "Contact secondaire"
 
-#: Crm/search_forms.py:388 Crm/search_forms.py:405
+#: Crm/search_forms.py:455 Crm/search_forms.py:472
 msgid "Include"
 msgstr "Inclure"
 
-#: Crm/search_forms.py:388 Crm/search_forms.py:405
+#: Crm/search_forms.py:455 Crm/search_forms.py:472
 msgid "Only"
 msgstr "Seulement"
 
-#: Crm/search_forms.py:401
+#: Crm/search_forms.py:468
 msgid "Contact has left"
 msgstr "Ce contact a quitté l'entité"
 
-#: Crm/search_forms.py:418
+#: Crm/search_forms.py:485
 msgid "Contact role"
 msgstr "Rôle du contact"
 
-#: Crm/search_forms.py:431 Crm/templates/Crm/_section_contacts.html:13
+#: Crm/search_forms.py:498 Crm/templates/Crm/_section_contacts.html:13
 #: Crm/templates/Crm/confirm_contacts_import.html:72 Emailing/forms.py:115
 #: Emailing/forms.py:163 Profile/forms.py:54
 #: Search/templates/Search/_section_qs_contacts.html:10
@@ -1070,120 +1090,120 @@ msgstr "Rôle du contact"
 msgid "Email"
 msgstr "Email"
 
-#: Crm/search_forms.py:436
+#: Crm/search_forms.py:503
 msgid "Enter a part of the email of a contact or an entity"
 msgstr "Entrez une partie de l'email du contact ou de l'entité"
 
-#: Crm/search_forms.py:444
+#: Crm/search_forms.py:511
 msgid "Contact has email"
 msgstr "Dispose d'un email"
 
-#: Crm/search_forms.py:455
+#: Crm/search_forms.py:522
 msgid "Contact has pesonal email"
 msgstr "Dispose d'un email personnel"
 
-#: Crm/search_forms.py:466
+#: Crm/search_forms.py:533
 msgid "Unknown contacts"
 msgstr "Contacts inconnus"
 
-#: Crm/search_forms.py:477
+#: Crm/search_forms.py:544
 msgid "Action type"
 msgstr "Type d'action"
 
-#: Crm/search_forms.py:490
+#: Crm/search_forms.py:557
 msgid "Action subject"
 msgstr "Sujet d'une action"
 
-#: Crm/search_forms.py:495
+#: Crm/search_forms.py:562
 msgid "enter a part of the name of the searched action"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:503
+#: Crm/search_forms.py:570
 msgid "Relationship date"
 msgstr "Date de mise en relation"
 
-#: Crm/search_forms.py:511
+#: Crm/search_forms.py:578
 msgid "Contact name"
 msgstr "Nom du contact"
 
-#: Crm/search_forms.py:516
+#: Crm/search_forms.py:583
 msgid "Enter a part of the name of the searched contact"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:537
+#: Crm/search_forms.py:604
 msgid "Contact firstname"
 msgstr "Prénom du contact"
 
-#: Crm/search_forms.py:542
+#: Crm/search_forms.py:609
 msgid "Enter a part of the firstname of the searched contact"
 msgstr "Entrez une partie du prénom recherché"
 
-#: Crm/search_forms.py:550
+#: Crm/search_forms.py:617
 msgid "Contact notes"
 msgstr "Notes d'un contact"
 
-#: Crm/search_forms.py:555
+#: Crm/search_forms.py:622
 msgid "Enter a part of a note of the searched contact"
 msgstr "Entrez une partie du texte à chercher dans les notes"
 
-#: Crm/search_forms.py:589
+#: Crm/search_forms.py:656
 msgid "Opportunity name"
 msgstr "Nom d'un dossier"
 
-#: Crm/search_forms.py:594
+#: Crm/search_forms.py:661
 msgid "enter a part of the name of the searched opportunity"
 msgstr "Entrez une partie du nom"
 
-#: Crm/search_forms.py:602
+#: Crm/search_forms.py:669
 msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
-#: Crm/search_forms.py:657 Crm/templates/Crm/confirm_contacts_import.html:44
+#: Crm/search_forms.py:724 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
 msgid "Import"
 msgstr "Import"
 
-#: Crm/search_forms.py:670
+#: Crm/search_forms.py:737
 msgid "Contacts by update date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:678
+#: Crm/search_forms.py:745
 msgid "Contacts by creation date"
 msgstr "Contacts par date de création"
 
-#: Crm/search_forms.py:686
+#: Crm/search_forms.py:753
 msgid "Entities by update date"
 msgstr "Entités par date de mise à jour"
 
-#: Crm/search_forms.py:694
+#: Crm/search_forms.py:761
 msgid "Entities by creation date"
 msgstr "Entités par date de création"
 
-#: Crm/search_forms.py:702
+#: Crm/search_forms.py:769
 msgid "Contacts and entities by change date"
 msgstr "Contacts et entités par date de création/modification"
 
-#: Crm/search_forms.py:712
+#: Crm/search_forms.py:779
 msgid "Relationship type"
 msgstr "type de relation"
 
-#: Crm/search_forms.py:743
+#: Crm/search_forms.py:810
 msgid "Relationship dates"
 msgstr "Date de relation"
 
-#: Crm/search_forms.py:756
+#: Crm/search_forms.py:823
 msgid "Contacts with custom field"
 msgstr "Contacts avec un champ personnalisé"
 
-#: Crm/search_forms.py:773
+#: Crm/search_forms.py:840
 msgid "Entities with custom field"
 msgstr "Entités avec champ personnalisé"
 
-#: Crm/search_forms.py:790
+#: Crm/search_forms.py:857
 msgid "Sort contacts"
 msgstr "Tri des contacts par"
 
-#: Crm/search_forms.py:799
+#: Crm/search_forms.py:866
 msgid "Zipcode"
 msgstr "Code postal"
 
@@ -1689,10 +1709,6 @@ msgstr "Nom"
 #: Profile/forms.py:58
 msgid "Firstname"
 msgstr "Prénom"
-
-#: Crm/templates/Crm/confirm_contacts_import.html:73
-msgid "Entity city"
-msgstr "Ville de l'entité"
 
 #: Crm/templates/Crm/confirm_contacts_import.html:73
 msgid "Contact city"
@@ -2514,36 +2530,36 @@ msgstr "Dupliquer"
 msgid "Two valid dates are required"
 msgstr "Deux dates valides sont requises"
 
-#: Search/forms.py:481
+#: Search/forms.py:484
 msgid "small labels"
 msgstr "Petites étiquettes"
 
-#: Search/forms.py:482
+#: Search/forms.py:485
 msgid "address strip"
 msgstr "Bande adresse"
 
-#: Search/forms.py:483
+#: Search/forms.py:486
 msgid "list of actions"
 msgstr "liste des actions"
 
-#: Search/forms.py:488
+#: Search/forms.py:491
 msgid "Select the type of document to generate"
 msgstr "Sélectionner le type de document à générer"
 
-#: Search/forms.py:534
+#: Search/forms.py:537
 msgid "Enter the name of an opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: Search/forms.py:550
+#: Search/forms.py:553
 msgid "Group on contact"
 msgstr "Groupe pour un contact"
 
-#: Search/forms.py:551
+#: Search/forms.py:554
 msgid "Define if the group is added on the contact itself or on his entity"
 msgstr ""
 "Définir si le groupe est ajouté sur le contact lui même ou sur son entité"
 
-#: Search/forms.py:573
+#: Search/forms.py:576
 msgid "Select groups"
 msgstr "Sélectionnez les groupes"
 
@@ -2575,7 +2591,7 @@ msgstr "champ de recherche"
 msgid "search fied"
 msgstr "champs de recherche"
 
-#: Search/tests.py:1273 Search/views.py:251
+#: Search/tests.py:1714 Search/views.py:251
 msgid "Mailto: Error, no emails defined"
 msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 
