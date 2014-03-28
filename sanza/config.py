@@ -25,7 +25,7 @@ SEARCH_FORMS = [
             search_forms.EntityCountrySearchForm,
             search_forms.ZipCodeSearchForm,
             search_forms.EntityZipCodeSearchForm,
-            search_forms.HasZipCodeForm,
+            search_forms.HasCityAndZipcodeForm,
         ],
     ),(
         _(u'Entity'),

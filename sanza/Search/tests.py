@@ -2052,60 +2052,214 @@ class SameAsTest(BaseTestCase):
     #    self.assertTrue(c1_found or c2_found)
     #    self.assertFalse(c1_found and c2_found)
         
-class HasZipTest(BaseTestCase):
+class HasAddressTest(BaseTestCase):
     
-    def test_has_zip(self):
+    def test_has_address_entity(self, has_address=True):
         
-        contact1 = mommy.make(models.Contact, zip_code="42424", lastname="AAAAAA")
-        contact2 = mommy.make(models.Contact, zip_code="", lastname="BBBBBBB")
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
         
-        contact3 = mommy.make(models.Contact, zip_code="", lastname="CCCCCCCC")
-        contact3.entity.zip_code = u'45454'
-        contact3.entity.save()
+        entity1 = mommy.make(models.Entity, city=city1, zip_code="44444")
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.save()
         
-        contact4 = mommy.make(models.Contact, zip_code="56565", lastname="DDDDDDDD")
-        contact4.entity.zip_code = u'45454'
-        contact4.entity.save()
+        contact5 = mommy.make(models.Contact, entity=entity1, lastname="QRST")
         
+        entity2 = mommy.make(models.Entity, city=city1, zip_code="")
+        contact2 = entity2.default_contact
+        contact2.lastname = "EFGH"
+        contact2.main_contact = True
+        contact2.has_left = False
+        contact2.save()
+        
+        entity3 = mommy.make(models.Entity, zip_code="44444")
+        contact3 = entity3.default_contact
+        contact3.lastname = "IJKL"
+        contact3.main_contact = True
+        contact3.has_left = False
+        contact3.save()
+        
+        entity4 = mommy.make(models.Entity)
+        contact4 = entity4.default_contact
+        contact4.lastname = "MNOP"
+        contact4.main_contact = True
+        contact4.has_left = False
+        contact4.save()
         
         url = reverse('search')
         
-        data = {"gr0-_-has_zip-_-0": 1}
+        data = {"gr0-_-has_city_and_zip-_-0": 1 if has_address else 0}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
         
-        self.assertContains(response, contact1.lastname)
-        self.assertNotContains(response, contact2.lastname)
-        self.assertContains(response, contact3.lastname)
-        self.assertContains(response, contact4.lastname)
+        if has_address:
+            self.assertContains(response, entity1.name)
+            self.assertContains(response, contact1.lastname)
+            self.assertContains(response, contact5.lastname)
+            
+            self.assertNotContains(response, entity2.name)
+            self.assertNotContains(response, contact2.lastname)
+            
+            self.assertNotContains(response, entity3.name)
+            self.assertNotContains(response, contact3.lastname)
         
-    def test_has_no_zip(self):
+            self.assertNotContains(response, entity4.name)
+            self.assertNotContains(response, contact4.lastname)
+        else:
+            self.assertNotContains(response, entity1.name)
+            self.assertNotContains(response, contact1.lastname)
+            self.assertNotContains(response, contact5.lastname)
+            
+            self.assertContains(response, entity2.name)
+            self.assertContains(response, contact2.lastname)
+            
+            self.assertContains(response, entity3.name)
+            self.assertContains(response, contact3.lastname)
         
-        contact1 = mommy.make(models.Contact, zip_code="42424", lastname="AAAAAA")
-        contact2 = mommy.make(models.Contact, zip_code="", lastname="BBBBBBB")
+            self.assertContains(response, entity4.name)
+            self.assertContains(response, contact4.lastname)
+    
+    def test_has_address_contact(self, has_address=True):
         
-        contact3 = mommy.make(models.Contact, zip_code="", lastname="CCCCCCCC")
-        contact3.entity.zip_code = u'45454'
-        contact3.entity.save()
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
         
-        contact4 = mommy.make(models.Contact, zip_code="56565", lastname="DDDDDDDD")
-        contact4.entity.zip_code = u'45454'
-        contact4.entity.save()
+        entity1 = mommy.make(models.Entity)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.city = city1
+        contact1.zip_code = "44444"
+        contact1.save()
         
+        contact5 = mommy.make(models.Contact, entity=entity1, lastname="QRST")
+        
+        entity2 = mommy.make(models.Entity)
+        contact2 = entity2.default_contact
+        contact2.lastname = "EFGH"
+        contact2.main_contact = True
+        contact2.has_left = False
+        contact2.city = city1
+        contact2.zip_code = ""
+        contact2.save()
+        
+        entity3 = mommy.make(models.Entity, zip_code="44444")
+        contact3 = entity3.default_contact
+        contact3.lastname = "IJKL"
+        contact3.main_contact = True
+        contact3.has_left = False
+        contact3.city = None
+        contact3.zip_code = "44444"
+        contact3.save()
+        
+        entity4 = mommy.make(models.Entity)
+        contact4 = entity4.default_contact
+        contact4.lastname = "MNOP"
+        contact4.main_contact = True
+        contact4.has_left = False
+        contact4.city = None
+        contact4.zip_code = ""
+        contact4.save()
         
         url = reverse('search')
         
-        data = {"gr0-_-has_zip-_-0": 0}
+        data = {"gr0-_-has_city_and_zip-_-0": 1 if has_address else 0}
         
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
         
-        self.assertNotContains(response, contact1.lastname)
-        self.assertContains(response, contact2.lastname)
-        self.assertNotContains(response, contact3.lastname)
-        self.assertNotContains(response, contact4.lastname)
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        if has_address:
+            self.assertContains(response, entity1.name)
+            self.assertContains(response, contact1.lastname)
+            self.assertNotContains(response, contact5.lastname)
+            
+            self.assertNotContains(response, entity2.name)
+            self.assertNotContains(response, contact2.lastname)
+            
+            self.assertNotContains(response, entity3.name)
+            self.assertNotContains(response, contact3.lastname)
+        
+            self.assertNotContains(response, entity4.name)
+            self.assertNotContains(response, contact4.lastname)
+        else:
+            self.assertContains(response, entity1.name)
+            self.assertNotContains(response, contact1.lastname)
+            self.assertContains(response, contact5.lastname)
+            
+            self.assertContains(response, entity2.name)
+            self.assertContains(response, contact2.lastname)
+            
+            self.assertContains(response, entity3.name)
+            self.assertContains(response, contact3.lastname)
+        
+            self.assertContains(response, entity4.name)
+            self.assertContains(response, contact4.lastname)
+    
+    def test_has_address_mix(self, has_address=True):
+        
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
+        
+        entity1 = mommy.make(models.Entity, city=city1)
+        contact1 = entity1.default_contact
+        contact1.lastname = "ABCD"
+        contact1.main_contact = True
+        contact1.has_left = False
+        contact1.city = None
+        contact1.zip_code = "44444"
+        contact1.save()
+        
+        entity2 = mommy.make(models.Entity, zip_code="44444")
+        contact2 = entity2.default_contact
+        contact2.lastname = "EFGH"
+        contact2.main_contact = True
+        contact2.has_left = False
+        contact2.city = city1
+        contact2.zip_code = ""
+        contact2.save()
+        
+        url = reverse('search')
+        
+        data = {"gr0-_-has_city_and_zip-_-0": 1 if has_address else 0}
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+        
+        if has_address:
+            self.assertNotContains(response, entity1.name)
+            self.assertNotContains(response, contact1.lastname)
+            
+            self.assertNotContains(response, entity2.name)
+            self.assertNotContains(response, contact2.lastname)
+        else:
+            self.assertContains(response, entity1.name)
+            self.assertContains(response, contact1.lastname)
+            
+            self.assertContains(response, entity2.name)
+            self.assertContains(response, contact2.lastname)
+    
+    def test_has_no_address_entity(self):
+        self.test_has_address_entity(False)
+        
+    def test_has_no_address_contact(self):
+        self.test_has_address_contact(False)
+        
+    def test_has_no_address_mix(self):
+        self.test_has_address_mix(False)
 
 class HasEntitySearchTest(BaseTestCase):
     
