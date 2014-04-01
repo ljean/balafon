@@ -1696,10 +1696,10 @@ class ActionTest(BaseTestCase):
         self.assertEqual(action1.entities.count(), 0)
         
     def test_remove_entity_from_action2(self):
-        entity1 = mommy.make(models.Entity)
+        entity1 = mommy.make(models.Entity, name="Corp1")
         c2 = mommy.make(models.Contact, entity=entity1)
-        entity2 = mommy.make(models.Entity)
-        entity3 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity, name="Corp2")
+        entity3 = mommy.make(models.Entity, name="Corp3")
         
         action1 = mommy.make(models.Action, subject="should be only once", archived=False)
         action1.entities.add(entity1)
@@ -3321,6 +3321,18 @@ class EditContactTestCase(BaseTestCase):
         self.assertNotEqual(c.lastname, data['lastname'])
         self.assertNotEqual(c.firstname, data['firstname'])
         self.assertNotEqual(c.email, data['email'])
+        
+    def test_create_contact_uuid(self):
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pepe@mémé.fr"
+        }
+        c = mommy.make(models.Contact, **data)
+        
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.email, data['email'])
         
     def test_edit_contact_unknown_city(self):
         c = mommy.make(models.Contact)
