@@ -12,6 +12,7 @@ from datetime import datetime, date, timedelta
 from model_mommy import mommy
 from sanza.Crm import models
 from sanza.Emailing.models import Emailing, MagicLink
+from sanza.Search.models import Search, SearchField, SearchGroup
 from coop_cms.models import Newsletter
 from django.core import management
 from django.core import mail
@@ -23,6 +24,7 @@ from django.utils.unittest.case import SkipTest
 from sanza.Crm import settings as crm_settings
 from unittest import skipIf
 from sanza.Crm.utils import get_default_country
+import json
 
 def get_form_errors(response):
     soup = BeautifulSoup4(response.content)
@@ -3773,6 +3775,211 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, contact5.lastname)
         
         self.assertNotContains(response, contact7.lastname)
+
+class SearchSaveTest(BaseTestCase):
+    
+    def test_view_name_existing_search(self):
+        search = mommy.make(Search, name="ABC")
+        
+        url = reverse("search_save", args=[search.id])
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(len(soup.select("#id_name")), 1)
+        self.assertEqual(soup.select("#id_name")[0]["value"], "ABC")
+        
+        self.assertEqual(len(soup.select("#id_search_id")), 1)
+        self.assertEqual(soup.select("#id_search_id")[0]["value"], unicode(search.id))
+        
+        
+    def test_view_name_new_search(self):
+        
+        url = reverse("search_save", args=[0])
+        
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(len(soup.select("#id_name")), 1)
+        self.assertEqual(len(soup.select("#id_search_id")), 1)
+        self.assertEqual(soup.select("#id_name")[0].get("value", ""), "")
+        
+        self.assertEqual(len(soup.select("#id_search_id")), 1)
+        self.assertEqual(soup.select("#id_search_id")[0]["value"], u"0")
+        
+    def test_save_search(self):
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        
+        search_data = {
+            "gr0-_-group-_-0": group1.id,
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("search", args=[search_1.id])
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url))
+        
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 1)
+        
+        search_group = search_1.searchgroup_set.all()[0]
+        self.assertEqual(search_group.name, u"gr0")
+        
+        self.assertEqual(search_group.searchfield_set.count(), 1)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"group")
+        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        
+    def test_save_search_several_groups(self):
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        group2 = mommy.make(models.Group)
+        group3 = mommy.make(models.Group)
+        
+        search_data = {
+            "gr0-_-group-_-0": group1.id,
+            "gr0-_-group-_-1": group2.id,
+            "gr1-_-group-_-0": group3.id,
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("search", args=[search_1.id])
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url))
+        
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 2)
+        
+        search_group = search_1.searchgroup_set.filter(name="gr0")[0]
+        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.searchfield_set.count(), 2)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"group")
+        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        search_field = search_group.searchfield_set.all()[1]
+        self.assertEqual(search_field.field, u"group")
+        self.assertEqual(search_field.value, u"{0}".format(group2.id))
+        
+        search_group = search_1.searchgroup_set.filter(name="gr1")[0]
+        self.assertEqual(search_group.name, u"gr1")
+        self.assertEqual(search_group.searchfield_set.count(), 1)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"group")
+        self.assertEqual(search_field.value, u"{0}".format(group3.id))
+        
+    def test_no_name(self):
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        
+        search_data = {
+            "gr0-_-group-_-0": group1.id,
+        }
+        data = {
+            'name': "",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(Search.objects.count(), 0)
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(len(soup.select(".field-error")), 1)
+        self.assertEqual(len(soup.select("#id_name .field-error")), 1)
+    
+    def test_already_existing_name(self):
+        mommy.make(Search, name="ABC")
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        
+        search_data = {
+            "gr0-_-group-_-0": group1.id,
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 0)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(len(soup.select(".field-error")), 1)
+        self.assertEqual(len(soup.select("#id_name .field-error")), 1)
+        
+        
+    def test_save_existing_search(self):
+        search = mommy.make(Search, name="ABC")
+        url = reverse("search_save", args=[search.id])
+        
+        group1 = mommy.make(models.Group)
+        
+        search_data = {
+            "gr0-_-group-_-0": group1.id,
+        }
+        data = {
+            'name': search.name,
+            'search_id': search.id,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("search", args=[search_1.id])
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url))
+        
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 1)
+        
+        search_group = search_1.searchgroup_set.all()[0]
+        self.assertEqual(search_group.name, u"gr0")
+        
+        self.assertEqual(search_group.searchfield_set.count(), 1)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"group")
+        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        
+        
+        
         
 class SortTest(BaseTestCase):
     

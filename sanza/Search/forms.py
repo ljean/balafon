@@ -22,6 +22,7 @@ from datetime import datetime
 from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
 from django.template.loader import get_template
 from django.template import Context
+import json
 
 def load_from_name(constant_full_name):
     x = constant_full_name.split('.')
@@ -583,4 +584,35 @@ class GroupForContactsForm(forms.Form):
         return Contact.objects.filter(id__in=ids)
 
 class SearchNameForm(forms.Form):
+    search_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     name = forms.CharField(required=True, label=_(u"Name"))
+    search_fields = forms.CharField(required=True, widget=forms.HiddenInput())
+    
+    def clean_name(self):
+        search_id = self.cleaned_data["search_id"]
+        
+        name = self.cleaned_data["name"]
+        if not name:
+            raise ValidationError(_(u"This field is required"))
+        
+        qs = models.Search.objects.filter(name=name)
+        if search_id:
+            qs = qs.exclude(id=search_id)
+        if qs.count()>0:
+            raise ValidationError(_(u"This name is already used"))
+        
+        if search_id:
+            search = models.Search.objects.get(id=search_id)
+            if search.name != name:
+                search.name = name
+                search.save()
+        else:
+            search = models.Search(name=name)        
+        return search
+    
+    def clean_search_fields(self):
+        search_fields = self.cleaned_data["search_fields"]
+        data = json.loads(search_fields)
+        for k in ('csrfmiddlewaretoken', 'excluded', 'name', 'field_choice'):
+            data.pop(k, None)
+        return data

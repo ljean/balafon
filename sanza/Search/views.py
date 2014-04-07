@@ -152,24 +152,34 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     )
 
 @user_passes_test(can_access)
-def search_name(request, search_id=0):
+@popup_redirect
+def save_search(request, search_id):
+    try:
+        search_id = int(search_id)
+        if search_id:
+            search = get_object_or_404(models.Search, id=search_id)
+        else:
+            search = models.Search()
+    except ValueError:
+        raise Http404
+    
     if request.method == "POST":
         form = forms.SearchNameForm(request.POST)
         if form.is_valid():
-            save_url = reverse("search_save", args=[search_id])
-            script = u'''
-                $("input[name=name]").val("{0}")
-                $("form.search-form").attr('action', "{1}");
-                $("form.search-form").submit();
-                $("form.search-form").attr('action', '');
-                $.colorbox.close();
-            '''.format(form.cleaned_data["name"], save_url)
-            return HttpResponse(u"<script>{0}</script>".format(script))
+            search = form.cleaned_data['name']
+            search_fields = form.cleaned_data['search_fields']
+            search_fields['name'] = search.name
+            search_form = forms.SearchForm(search_fields, instance=search, save=True)
+            if search_form.is_valid():
+                search_form.save_search()
+                return HttpResponseRedirect(reverse('search', args=[search.id])) 
     else:
         initial = {}
         if search_id:
             search = get_object_or_404(models.Search, id=search_id)
-            initial = {'name': search.name}
+            initial = {'name': search.name, 'search_id': search_id}
+        else:
+            initial = {'search_id': 0}
         form = forms.SearchNameForm(initial=initial)
     
     return render_to_response(
@@ -181,20 +191,6 @@ def search_name(request, search_id=0):
         context_instance=RequestContext(request)
     )
 
-@user_passes_test(can_access)
-def save_search(request, search_id=0):
-    if search_id:
-        search = get_object_or_404(models.Search, id=search_id)
-    else:
-        search = models.Search()
-    
-    if request.method == "POST":
-        search_form = forms.SearchForm(request.POST, instance=search, save=True)
-        if search_form.is_valid():
-            search_form.save_search()
-            return HttpResponseRedirect(reverse('search', args=[search.id]))    
-    return HttpResponseRedirect(reverse('search'))
-    
 @user_passes_test(can_access)
 def get_field(request, name):
     block = request.GET.get('block')

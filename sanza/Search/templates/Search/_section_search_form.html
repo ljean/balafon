@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<form role="form" class="form-horizontal search-form" action="{% url "search" %}" method="post">{% csrf_token %}
+<form role="form" id="search_form" class="form-horizontal search-form" action="{% url "search" %}" method="post">{% csrf_token %}
   <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
     <span class="glyphicon glyphicon-search"></span>
     {% trans "Search" %}
@@ -163,8 +163,5 @@
 {% endblock %}
 
 {% block section_buttons %}
-{% comment %}
-<li><a href="{% url "search_save" search.id %}" id="save-button">{% trans "Save" %}</a></li>
-{% endcomment %}
-<li><a href="{% url "search_name" search.id %}" class="colorbox-form">{% trans "Save" %}</a></li>
+<li><a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form">{% trans "Save" %}</a></li>
 {% endblock %}
