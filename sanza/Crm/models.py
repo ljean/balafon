@@ -18,6 +18,7 @@ from django.utils.html import mark_safe
 from sanza.utils import now_rounded
 from django.contrib.contenttypes.generic import GenericRelation
 from sanza.Users.models import Favorite
+from urlparse import urlparse
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -142,7 +143,7 @@ class Entity(TimeStampedModel):
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')
     fax = models.CharField(_('fax'), max_length=200, blank=True, default= u'')
     email = models.EmailField(_('email'), blank=True, default= u'')
-    website = models.URLField(_('web site'), blank=True, default='')
+    website = models.CharField(_('web site'), max_length=200, blank=True, default='')
     
     address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
     address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
@@ -161,6 +162,11 @@ class Entity(TimeStampedModel):
     favorites = GenericRelation(Favorite)
     
     def save(self, *args, **kwargs):
+        if self.website:
+            pr = urlparse(self.website)
+            if not pr.scheme:
+                self.website = u"http://"+self.website
+            
         super(Entity, self).save(*args, **kwargs)
         if self.contact_set.filter(has_left=False).count() == 0:
             Contact.objects.create(entity=self, main_contact=True, has_left=False)

@@ -137,6 +137,30 @@ class CreateEntityTest(BaseTestCase):
         self.assertEqual(e.name, "ABC")
         self.assertEqual(e.type, t)
         
+    def test_create_entity_url(self):
+        url = reverse('crm_create_entity', args=[0])
+        response = self.client.post(url, data={'name': "ABC", "website": "http://toto.fr/"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        e = models.Entity.objects.all()[0]
+        self.assertContains(response, 'colorbox')
+        self.assertContains(response,
+            reverse("crm_view_entity", args=[e.id]))
+        self.assertEqual(e.name, "ABC")
+        self.assertEqual(e.website, "http://toto.fr/")
+        
+    def test_create_entity_url_no_scheme(self):
+        url = reverse('crm_create_entity', args=[0])
+        response = self.client.post(url, data={'name': "ABC", "website": "toto.fr/"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Entity.objects.count(), 1)
+        e = models.Entity.objects.all()[0]
+        self.assertContains(response, 'colorbox')
+        self.assertContains(response,
+            reverse("crm_view_entity", args=[e.id]))
+        self.assertEqual(e.name, "ABC")
+        self.assertEqual(e.website, "http://toto.fr/")
+        
     def test_view_create_entity_unknown_type(self):
         t = mommy.make(models.EntityType)
         url = reverse('crm_create_entity', args=[2222])
@@ -153,7 +177,6 @@ class CreateEntityTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(models.Entity.objects.count(), 0)
         
-        
     def test_view_create_entity_invalid_type(self):
         t = mommy.make(models.EntityType)
         url = reverse('crm_create_entity', args=[2222]).replace("2222", "aaa")
@@ -169,6 +192,7 @@ class CreateEntityTest(BaseTestCase):
         response = self.client.post(url, data={'name': "ABC", "type": "aaaaa"})
         self.assertEqual(200, response.status_code)
         self.assertEqual(models.Entity.objects.count(), 0)
+    
 
 class OpportunityTest(BaseTestCase):
 
@@ -1215,8 +1239,10 @@ class EditActionTest(BaseTestCase):
 class BoardPanelTest(BaseTestCase):
     def test_view_board_panel(self):
         response = self.client.get(reverse("crm_board_panel"))
-        self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver{0}".format(reverse('users_favorites_list')))
+        
+        self.assertRedirects(response, reverse('users_favorites_list'))
+        #self.assertEqual(302, response.status_code)
+        #self.assertEqual(response['Location'], "http://testserver{0}".format(reverse('users_favorites_list')))
         
 class ActionTest(BaseTestCase):
     def test_view_add_contact_to_action(self):
@@ -1713,7 +1739,11 @@ class ActionTest(BaseTestCase):
         action1 = models.Action.objects.get(id=action1.id)
         self.assertEqual(action1.contacts.count(), 0)
         self.assertEqual(action1.entities.count(), 2)
-        self.assertEqual(sorted(list(action1.entities.all())), sorted([entity1, entity3]))
+        sort_key = lambda x: x.id
+        self.assertEqual(
+            sorted(list(action1.entities.all()), key=sort_key),
+            sorted([entity1, entity3], key=sort_key)
+        )
         
         
     def test_view_remove_entity_from_action(self):

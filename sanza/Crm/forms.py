@@ -255,7 +255,7 @@ class EntityForm(ModelFormWithCity):
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
-        
+    
     def clean_logo(self):
         logo = self.cleaned_data["logo"]
         instance = self.instance

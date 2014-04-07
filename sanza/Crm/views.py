@@ -1299,24 +1299,7 @@ def delete_opportunity(request, opportunity_id):
 
 @user_passes_test(can_access)
 def view_board_panel(request):
-    #dt_filter = [Q(planned_date__lte=until_date) | Q(planned_date__isnull=True)]
-    
     return HttpResponseRedirect(reverse("users_favorites_list"))
-    
-    actions = models.Action.objects.filter(archived=False, display_on_board=True).order_by(
-        "planned_date", "priority")
-    
-    opportunities = models.Opportunity.objects.filter(display_on_board=True, ended=False).order_by("status__ordering")
-    partial = True
-    
-    default_my_actions = True
-    
-    request.session["redirect_url"] = reverse('crm_board_panel')
-    return render_to_response(
-        'Crm/board_panel.html',
-        locals(),
-        context_instance=RequestContext(request)
-    )
 
 @user_passes_test(can_access)
 def view_all_actions(request):
