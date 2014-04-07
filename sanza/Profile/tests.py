@@ -11,7 +11,8 @@ from django.core.urlresolvers import reverse
 from datetime import datetime
 from model_mommy import mommy
 from sanza.Crm import models
-from sanza.Profile.models import CategoryPermission
+if "sanza.Profile" in settings.INSTALLED_APPS:
+    from sanza.Profile.models import CategoryPermission
 from django.core import mail
 from django.conf import settings
 from coop_cms.settings import get_article_class
@@ -45,6 +46,7 @@ class BaseTestCase(TestCase):
         self.client.login(username="toto", password="abc")
 
     
+@skipIf(not ("sanza.Profile" in settings.INSTALLED_APPS), "registration not installed")
 class IfProfilePermTemplateTagsTest(BaseTestCase):
     
     def _request(self):
@@ -299,6 +301,7 @@ class IfProfilePermTemplateTagsTest(BaseTestCase):
             self.assertEqual(getattr(article, "slug_"+lang), "test_"+lang)
     
 
+@skipIf(not ("sanza.Profile" in settings.INSTALLED_APPS), "registration not installed")
 class DownloadTestCase(BaseTestCase):
     
     def test_download_private_permission(self):
@@ -447,6 +450,7 @@ class DownloadTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 403)
         
 
+@skipIf(not ("sanza.Profile" in settings.INSTALLED_APPS), "registration not installed")
 class ProfileBackendTest(TestCase):
     
     def setUp(self):
@@ -529,6 +533,7 @@ class ProfileBackendTest(TestCase):
         self.assertEqual(notif_email.cc, [])
         self.assertTrue(notif_email.body.find(user.email)>0)
        
+@skipIf(not ("sanza.Profile" in settings.INSTALLED_APPS), "registration not installed")
 class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")

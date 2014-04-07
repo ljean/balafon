@@ -6,6 +6,7 @@ from django.db.models import signals
 from sanza.Crm.models import Contact, Group, City, EntityType
 from django.utils.translation import ugettext, ugettext_lazy as _
 from coop_cms.models import ArticleCategory
+from django.conf import settings
 
 class ContactProfile(models.Model):
     
@@ -44,7 +45,8 @@ def create_profile(sender, instance, signal, created, **kwargs):
     if create_profile:
         ContactProfile(user=instance).save()
 
-signals.post_save.connect(create_profile, sender=User)
+if "sanza.Profile" in settings.INSTALLED_APPS:
+    signals.post_save.connect(create_profile, sender=User)
 
 
 class CategoryPermission(models.Model):
