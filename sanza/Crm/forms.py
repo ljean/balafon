@@ -331,12 +331,16 @@ class ActionForm(BetterBsModelForm):
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
     
+    end_date = forms.DateField(label=_(u"end date"), required=False, widget=forms.TextInput())
+    end_time = forms.TimeField(label=_(u"end time"), required=False)
+    
     class Meta:
         model = models.Action
         fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
-            'amount', 'number', 'planned_date', 'opportunity')
+            'amount', 'number', 'planned_date', 'end_date', 'end_time', 'end_datetime', 'opportunity')
         fieldsets = [
-            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
+            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
+                'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
             ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
             ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
@@ -355,16 +359,21 @@ class ActionForm(BetterBsModelForm):
         
         self.fields['opportunity'].widget = forms.HiddenInput()    
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
-        self.fields['planned_date'].widget = forms.HiddenInput()
-        dt = self.instance.planned_date if self.instance else self.fields['planned_date'].initial
+        
+        self._init_dt_field("planned_date", "date", "time")
+        self._init_dt_field("end_datetime", "end_date", "end_time")
+        
+    def _init_dt_field(self, dt_field, date_field, time_field):
+        self.fields[dt_field].widget = forms.HiddenInput()
+        dt = getattr(self.instance, dt_field) if self.instance else self.fields[dt_field].initial
         if dt:
-            self.fields["date"].initial = dt.date()
+            self.fields[date_field].initial = dt.date()
             if settings.USE_TZ:
                 utc_dt = dt.replace(tzinfo=timezone.utc)
                 loc_dt = utc_dt.astimezone(timezone.get_current_timezone())
-                self.fields["time"].initial = loc_dt.time()
+                self.fields[time_field].initial = loc_dt.time()
             else:
-                self.fields["time"].initial = dt.time()
+                self.fields[time_field].initial = dt.time()
         
     def clean_status(self):
         t = self.cleaned_data['type']
@@ -379,11 +388,53 @@ class ActionForm(BetterBsModelForm):
         return s
     
     def clean_planned_date(self):
-        d = self.cleaned_data["date"]
+        d = self.cleaned_data.get("date", None)
         t = self.cleaned_data.get("time", None)
         if d:
             dt = datetime.combine(d, t or datetime.min.time())
             return dt
+        return None
+    
+    def clean_time(self):
+        d = self.cleaned_data.get("date", None)
+        t = self.cleaned_data.get("time", None)
+        if t and not d:
+            raise ValidationError(_(u"You must set a date"))
+        return t
+    
+    def clean_end_date(self):
+        d1 = self.cleaned_data.get("date", None)
+        d2 = self.cleaned_data.get("end_date", None)
+        if d2:
+            start_dt = self.cleaned_data["planned_date"]
+            if not start_dt:
+                raise ValidationError(_(u"The planned date is not defined"))
+            if d1 > d2:
+                raise ValidationError(_(u"The end date must be after the planned date"))
+        return d2
+            
+    def clean_end_time(self):
+        d1 = self.cleaned_data.get("date", None)
+        d2 = self.cleaned_data.get("end_date", None)
+        t1 = self.cleaned_data.get("time", None)
+        t2 = self.cleaned_data.get("end_time", None)
+        if t2:
+            if t2 and not d2:
+                raise ValidationError(_(u"You must set a end date"))
+                
+            if d1==d2 and (t1 or datetime.min.time())>=t2:
+                raise ValidationError(_(u"The end time must be after the planned time"))
+        elif t1:
+            if d1==d2 and t1>=datetime.min.time():
+                raise ValidationError(_(u"The end time must be set"))
+        return t2
+    
+    def clean_end_datetime(self):
+        d = self.cleaned_data.get("end_date", None)
+        t = self.cleaned_data.get("end_time", None)
+        dt = None
+        if d:
+            return datetime.combine(d, t or datetime.min.time())
         return None
     
 class OpportunityForm(BetterBsModelForm):

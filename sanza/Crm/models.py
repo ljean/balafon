@@ -725,7 +725,6 @@ class ActionStatus(NamedElement):
 
 
 class ActionType(NamedElement):
-    
     subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This action type will be proposed on the public subscribe form'))
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_(u"action set"))
@@ -781,7 +780,8 @@ class Action(TimeStampedModel):
     contacts = models.ManyToManyField(Contact, blank=True, default=None, null=True, verbose_name=_(u'contacts'))
     entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
     favorites = GenericRelation(Favorite)
-
+    end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
+    
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
     

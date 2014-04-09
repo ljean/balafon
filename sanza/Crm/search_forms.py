@@ -290,6 +290,21 @@ class ActionByPlannedDate(TwoDatesForm):
     
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
+        
+        l1 = Q(action__end_datetime__isnull=True) & Q(action__planned_date__gte=dt1) & Q(action__planned_date__lte=dt2)
+        l2 = Q(action__end_datetime__isnull=False) & Q(action__planned_date__lte=dt2) & Q(action__end_datetime__gte=dt1)
+        
+        l3 = Q(entity__action__end_datetime__isnull=True) & Q(entity__action__planned_date__gte=dt1) & Q(entity__action__planned_date__lte=dt2)
+        l4 = Q(entity__action__end_datetime__isnull=False) & Q(entity__action__planned_date__lte=dt2) & Q(entity__action__end_datetime__gte=dt1)
+        
+        return (l1 | l2 | l3 | l4)
+    
+class ActionByStartDate(TwoDatesForm):
+    _name = 'action_by_start_date'
+    _label = _(u'Action by start date')
+    
+    def get_lookup(self):
+        dt1, dt2 = self._get_dates()
         return (
             (Q(action__planned_date__gte=dt1) & Q(action__planned_date__lte= dt2)) |
             (Q(entity__action__planned_date__gte=dt1) & Q(entity__action__planned_date__lte= dt2))
