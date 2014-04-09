@@ -2113,6 +2113,18 @@ class ActionArchiveView(object):
         context["action_types"] = ats
         context["in_charge"] = in_charge
         return context
+    
+    def get_dated_queryset(self, **lookup_kwargs):
+        date_field = self.get_date_field()
+        
+        dt1 = since = lookup_kwargs['%s__gte' % date_field]
+        dt2 = until = lookup_kwargs['%s__lt' % date_field]
+        
+        l1 = Q(end_datetime__isnull=True) & Q(planned_date__gte=dt1) & Q(planned_date__lt=dt2)
+        l2 = Q(end_datetime__isnull=False) & Q(planned_date__lt=dt2) & Q(end_datetime__gte=dt1)
+        
+        qs = self.get_queryset()
+        return qs.filter(l1 | l2)
         
     def get(self, *args, **kwargs):
         self.request.session["redirect_url"] = self.request.path

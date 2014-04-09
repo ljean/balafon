@@ -4352,6 +4352,29 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
         
+    def test_view_monthly_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 29), end_datetime=datetime(2014, 5, 2))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 4, 2))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 3, 30))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 5, 1), end_datetime=datetime(2014, 5, 2))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 8))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 5, 2))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 29))
+        
+        url = reverse('crm_actions_of_month', args=[2014, 4])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
+        
+        
     def test_view_weekly_action(self):
         a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
         a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
@@ -4368,6 +4391,28 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a3.subject)
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
+        
+    def test_view_weekly_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 15))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 4, 1), end_datetime=datetime(2014, 4, 9))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 4, 1), end_datetime=datetime(2014, 4, 2))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 4, 15), end_datetime=datetime(2014, 4, 16))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 8))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 5, 2))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 9))
+        
+        url = reverse('crm_actions_of_week', args=[2014, 14])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
 
     def test_view_daily_action(self):
         a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
@@ -4385,6 +4430,28 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a3.subject)
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
+        
+    def test_view_daily_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 9))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 4, 8), end_datetime=datetime(2014, 4, 12))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 4, 8), end_datetime=datetime(2014, 4, 8))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 4, 10), end_datetime=datetime(2014, 4, 10))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 9))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 10))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 9))
+        
+        url = reverse('crm_actions_of_day', args=[2014, 4, 9])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
     
     def test_view_monthly_action_in_charge_filter(self):
         u = mommy.make(User, first_name="Joe", is_staff=True)
