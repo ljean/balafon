@@ -4,6 +4,7 @@
 {% block extra_head %}
   {{block.super}}
   {% include "sanza/_calendar.html" with field="date" yearRange="c:c+2" %}
+  {% include "sanza/_calendar.html" with field="end_date" yearRange="c:c+2" %}
 <script>
   $(function() {
     var dont_change_status = true;
