@@ -52,6 +52,9 @@ body {
 .table-cell {
   display: table-row;
 }
+.btn.group-tag {
+  margin-bottom: 2px;
+}
 .group-tag a {
   color: #fff;
 }
