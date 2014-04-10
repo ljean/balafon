@@ -4071,10 +4071,12 @@ class SearchSaveTest(BaseTestCase):
         search_group = search_1.searchgroup_set.filter(name="gr0")[0]
         self.assertEqual(search_group.name, u"gr0")
         self.assertEqual(search_group.searchfield_set.count(), 2)
-        search_field = search_group.searchfield_set.all()[0]
+        
+        search_fields = search_group.searchfield_set.all().order_by("value")
+        search_field = search_fields[0]
         self.assertEqual(search_field.field, u"group")
         self.assertEqual(search_field.value, u"{0}".format(group1.id))
-        search_field = search_group.searchfield_set.all()[1]
+        search_field = search_fields[1]
         self.assertEqual(search_field.field, u"group")
         self.assertEqual(search_field.value, u"{0}".format(group2.id))
         
