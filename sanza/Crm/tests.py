@@ -3655,13 +3655,55 @@ class EditGroupTestCase(BaseTestCase):
         self.assertEqual(g.name, data['name'])
         self.assertEqual(g.description, data['description'])
         
-class EditContactTestCase(BaseTestCase):
+class EditContactAndEntityTestCase(BaseTestCase):
     fixtures = ['zones.json',]
     
     def _check_redirect_url(self, response, next_url):
         redirect_url = response.redirect_chain[-1][0]
         self.assertEqual(redirect_url, "http://testserver"+next_url)
     
+    def test_view_edit_entity(self):
+        e = mommy.make(models.Entity, is_single_contact=False)
+        response = self.client.get(reverse('crm_edit_entity', args=[e.id]))
+        self.assertEqual(200, response.status_code)
+        
+    def test_edit_entity(self):
+        e = mommy.make(models.Entity, is_single_contact=False)
+        url = reverse('crm_edit_entity', args=[e.id])
+        data = {
+            'name': 'Dupond SA',
+            'city': models.City.objects.get(name="Paris").id,
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_entity', args=[e.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        e = models.Entity.objects.get(id=e.id)
+        self.assertEqual(e.name, data['name'])
+        self.assertEqual(e.city.id, data['city'])
+        
+    def test_edit_entity_keep_notes(self):
+        e = mommy.make(models.Entity, is_single_contact=False, notes="Toto")
+        url = reverse('crm_edit_entity', args=[e.id])
+        data = {
+            'name': 'Dupond SA',
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_entity', args=[e.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        e = models.Entity.objects.get(id=e.id)
+        self.assertEqual(e.name, data['name'])
+        self.assertEqual(e.notes, u'Toto')
+        
     def test_view_edit_contact(self):
         c = mommy.make(models.Contact)
         response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
@@ -3687,6 +3729,24 @@ class EditContactTestCase(BaseTestCase):
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
+    
+    def test_edit_contact_keep_note(self):
+        c = mommy.make(models.Contact, notes="Toto")
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.notes, "Toto")
+        
         
     def test_edit_contact_utf(self):
         c = mommy.make(models.Contact)

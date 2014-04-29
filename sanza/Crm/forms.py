@@ -248,7 +248,7 @@ class EntityForm(ModelFormWithCity):
         
     class Meta:
         model = models.Entity
-        exclude = ('imported_by', 'is_single_contact')
+        exclude = ('imported_by', 'is_single_contact', 'notes')
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
             ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Enity details')}),
@@ -279,7 +279,7 @@ class ContactForm(ModelFormWithCity):
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname')
+        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname', 'notes')
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
             'role': forms.SelectMultiple(attrs={
