@@ -3,11 +3,14 @@ from django.http import HttpResponseRedirect
 from datetime import datetime
 import logging
 logger = logging.getLogger("sanza_crm")
+from django.http import Http404
 
 def log_error(view_func):
     def wrapper(request, *args, **kwargs):
         try:
             return view_func(request, *args, **kwargs)
+        except Http404:
+            raise
         except:
             logger.exception("exception")
             raise

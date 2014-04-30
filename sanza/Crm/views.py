@@ -504,9 +504,11 @@ def get_entities(request):
 @user_passes_test(can_access)
 @log_error
 def get_entity_id(request):
-    name = request.GET.get('name')
-    e = get_object_or_404(models.Entity, name=name)
-    return HttpResponse(json.dumps({'id': e.id}), 'application/json')
+    name = request.GET.get('name', '')
+    if name:
+        e = get_object_or_404(models.Entity, name=name)
+        return HttpResponse(json.dumps({'id': e.id}), 'application/json')
+    raise Http404
 
 @user_passes_test(can_access)
 def get_contact_name(request, contact_id):
