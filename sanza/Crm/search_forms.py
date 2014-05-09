@@ -218,7 +218,22 @@ class EntityCountrySearchForm(ZoneSearchForm):
             return Q(entity__city__parent__type__type='department')
         else:
             return Q(entity__city__parent__id=self._value, entity__city__parent__type__type="country")
-   
+
+class ZoneGroupSearchForm(ZoneSearchForm):
+    _name = 'zone_group'
+    _label = _(u'Zone Group')
+        
+    def get_lookup(self):
+        q1 = Q(city__groups__id=self._value)
+        q2 = Q(city__isnull=True) & Q(entity__city__groups__id=self._value)
+        return q1 | q2
+    
+class EntityZoneGroupSearchForm(ZoneSearchForm):
+    _name = 'entity_zone_group'
+    _label = _(u'Entity Zone Group')
+        
+    def get_lookup(self):
+        return Q(entity__city__groups__id=self._value)
 
 class HasCityAndZipcodeForm(YesNoSearchFieldForm):
     _name = 'has_city_and_zip'
@@ -396,6 +411,60 @@ class GroupSearchFormDropdownWidget(GroupSearchForm):
             'data-placeholder': _(u'Group names'),
             'style': "width: 100%", 
         })
+
+class AllGroupMemberSearchForm(SearchFieldForm):
+    _name = 'all_groups'
+    _label = _(u'Members of all groups')
+    multi_values = True
+    
+    def __init__(self, *args, **kwargs):
+        print args, kwargs
+        super(AllGroupMemberSearchForm, self).__init__(*args, **kwargs)
+        qs = models.Group.objects.all()
+        try:
+            qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+        except:
+            qs = qs.order_by('name')
+        kwargs = {}
+        widget = self._get_widget()
+        if widget:
+            kwargs['widget'] = widget
+        field = forms.MultipleChoiceField(choices=[(x.id, unicode(x)) for x in qs.all()], label=self._label, **kwargs)
+        self._add_field(field)
+        
+    def _get_widget(self):
+        return forms.SelectMultiple(attrs={
+            'class': "chosen-select",
+            'data-placeholder': _(u'Select Group names'),
+            'style': "width: 100%", 
+        })
+    
+    def get_queryset(self, qs):
+        if type(self._value)==list:
+            values = self._value
+        else:
+            values = [self._value]
+        
+        for group_id in values:
+            group_qs = ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
+            qs = qs.filter(group_qs)    
+        return qs
+
+    
+    #def get_lookup(self):
+    #    qs = None
+    #    if type(self._value)==list:
+    #        values = self._value
+    #    else:
+    #        values = [self._value]
+    #    for group_id in values:
+    #        #TODO: Fix : Probleme VIP+Institution sur contact indiv
+    #        group_qs = ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
+    #        if qs:
+    #            qs = qs & group_qs
+    #        else:
+    #            qs = group_qs    
+    #    return qs
 
 
 class NotInGroupSearchForm(SearchFieldForm):

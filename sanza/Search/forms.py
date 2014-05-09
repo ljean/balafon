@@ -146,7 +146,12 @@ class SearchForm(forms.Form):
                     key = '-_-'.join((gr.name, f.field, str(len(data))))
                     data[key] = f.value
         if data:
-            for key, value in data.items():
+            for key in data:
+                value = data.getlist(key)
+                print key, value
+                if len(value)==1:
+                    value = data.get(key)
+            #for key, value in data.items():
                 try:
                     #extract search fields
                     gr, field, fid = key.split('-_-')
@@ -348,13 +353,18 @@ class SearchForm(forms.Form):
 
 class SearchFieldForm(BsForm):
     _contacts_display = False
+    multi_values = False
     
     def __init__(self, block, count, data=None, *args, **kwargs):
         self._block = block
         self._count = count
         form_data = None
         if data:
-            self._value = data[self._name]
+            if self.multi_values:
+                val = data[self._name]
+                self._value = val if type(val) is list else [val]
+            else:
+                self._value = data[self._name]
             form_data = {self._get_field_name(): self._value}
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         

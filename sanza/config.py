@@ -11,6 +11,7 @@ SEARCH_FORMS = [
             search_forms.GroupSearchForm,
             search_forms.GroupSearchFormDropdownWidget,
             search_forms.NotInGroupSearchForm,
+            search_forms.AllGroupMemberSearchForm,
         ],
     ),(
         _(u'Location'),
@@ -26,6 +27,8 @@ SEARCH_FORMS = [
             search_forms.ZipCodeSearchForm,
             search_forms.EntityZipCodeSearchForm,
             search_forms.HasCityAndZipcodeForm,
+            search_forms.ZoneGroupSearchForm if models.ZoneType.objects.filter(type="zone_group").count() else None,
+            search_forms.EntityZoneGroupSearchForm if models.ZoneType.objects.filter(type="zone_group").count() else None,
         ],
     ),(
         _(u'Entity'),
