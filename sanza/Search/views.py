@@ -106,7 +106,6 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     has_empty_entities = False
     group = opportunity = city = None
     contacts_display = False
-    
     if request.method == "POST":
         data = request.POST
     elif group_id:

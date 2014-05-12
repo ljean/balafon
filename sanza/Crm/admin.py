@@ -57,7 +57,8 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'parent']
     search_fields = ['name']
     ordering = ['name']
-    list_filer = ['parent']
+    list_filer = ['parent',]
+    raw_id_fields = ('groups',)
 admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):

@@ -11,6 +11,9 @@ SEARCH_FORMS = [
             search_forms.GroupSearchForm,
             search_forms.GroupSearchFormDropdownWidget,
             search_forms.NotInGroupSearchForm,
+            search_forms.GroupsMemberOfAllSearchForm,
+            search_forms.GroupsMemberOfAnySearchForm,
+            search_forms.GroupsMemberOfNoneSearchForm,
         ],
     ),(
         _(u'Location'),
@@ -26,6 +29,8 @@ SEARCH_FORMS = [
             search_forms.ZipCodeSearchForm,
             search_forms.EntityZipCodeSearchForm,
             search_forms.HasCityAndZipcodeForm,
+            search_forms.ZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
+            search_forms.EntityZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
         ],
     ),(
         _(u'Entity'),
