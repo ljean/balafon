@@ -1235,6 +1235,381 @@ class EditActionTest(BaseTestCase):
         
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "not tested")
+        
+    def test_edit_action_planned_date(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_planned_date_time(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:25", 'planned_date': "", 'end_date': "", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 12, 25))
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_planned_time(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "", 'time': "12:25", 'planned_date': "", 'end_date': "", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        errors = BS4(response.content).select('#id_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_date(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-10", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
+        self.assertEqual(action.end_datetime, datetime(2014, 4, 10, 0, 0))
+        
+    def test_edit_action_start_and_end_same_date(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
+        self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 0, 0))
+        
+    def test_edit_action_start_and_end_same_date_different_time(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "14:00", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "16:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 14, 0))
+        self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 16, 0))
+        
+    def test_edit_action_start_and_end_same_date_different_time2(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "16:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
+        self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 16, 0))
+        
+    def test_edit_action_start_and_end_same_date_different_time3(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "16:30", 'planned_date': "", 'end_date': "2014-04-10", 'end_time': "10:15", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "BBB")
+        
+        self.assertEqual(action.planned_date, datetime(2014, 4, 9, 16, 30))
+        self.assertEqual(action.end_datetime, datetime(2014, 4, 10, 10, 15))
+        
+    def test_edit_action_start_not_set_and_end_date(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        errors = BS4(response.content).select('#id_end_date .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_before(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-08", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        errors = BS4(response.content).select('#id_end_date .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+    
+    def test_edit_action_start_and_end_before_time(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        errors = BS4(response.content).select('#id_end_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_before_time2(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "11:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        errors = BS4(response.content).select('#id_end_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_not_set_time(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "", 'end_time': "12:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        
+        errors = BS4(response.content).select('#id_end_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_not_invalid1(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "AAAA", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "13:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('#id_date .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+    
+    def test_edit_action_start_and_end_not_invalid2(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "AA", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "13:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('#id_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+    
+    def test_edit_action_start_and_end_not_invalid3(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "AAA", 'end_time': "13:00", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('#id_end_date .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        
+    def test_edit_action_start_and_end_not_invalid4(self):
+        action = mommy.make(models.Action, subject="AAA")
+    
+        data = {
+            'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "AA", 'end_datetime': "",
+            'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""}
+        
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        
+        errors = BS4(response.content).select('#id_end_time .field-error')
+        self.assertEqual(len(errors), 1)
+        
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "AAA")
+        
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+    
+    def test_view_action_start_and_end_datetime(self):
+        action = mommy.make(models.Action, subject="AAA",
+            planned_date=datetime(2014, 4, 9, 12, 15), end_datetime=datetime(2014, 4, 10, 9, 30))
+    
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        
+        self.assertEqual(soup.select("#id_date")[0]["value"], "2014-04-09")
+        self.assertEqual(soup.select("#id_time")[0]["value"], "12:15:00")
+        
+        self.assertEqual(soup.select("#id_end_date")[0]["value"], "2014-04-10")
+        self.assertEqual(soup.select("#id_end_time")[0]["value"], "09:30:00")
 
 class BoardPanelTest(BaseTestCase):
     def test_view_board_panel(self):
@@ -3280,13 +3655,55 @@ class EditGroupTestCase(BaseTestCase):
         self.assertEqual(g.name, data['name'])
         self.assertEqual(g.description, data['description'])
         
-class EditContactTestCase(BaseTestCase):
+class EditContactAndEntityTestCase(BaseTestCase):
     fixtures = ['zones.json',]
     
     def _check_redirect_url(self, response, next_url):
         redirect_url = response.redirect_chain[-1][0]
         self.assertEqual(redirect_url, "http://testserver"+next_url)
     
+    def test_view_edit_entity(self):
+        e = mommy.make(models.Entity, is_single_contact=False)
+        response = self.client.get(reverse('crm_edit_entity', args=[e.id]))
+        self.assertEqual(200, response.status_code)
+        
+    def test_edit_entity(self):
+        e = mommy.make(models.Entity, is_single_contact=False)
+        url = reverse('crm_edit_entity', args=[e.id])
+        data = {
+            'name': 'Dupond SA',
+            'city': models.City.objects.get(name="Paris").id,
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_entity', args=[e.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        e = models.Entity.objects.get(id=e.id)
+        self.assertEqual(e.name, data['name'])
+        self.assertEqual(e.city.id, data['city'])
+        
+    def test_edit_entity_keep_notes(self):
+        e = mommy.make(models.Entity, is_single_contact=False, notes="Toto")
+        url = reverse('crm_edit_entity', args=[e.id])
+        data = {
+            'name': 'Dupond SA',
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_entity', args=[e.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        e = models.Entity.objects.get(id=e.id)
+        self.assertEqual(e.name, data['name'])
+        self.assertEqual(e.notes, u'Toto')
+        
     def test_view_edit_contact(self):
         c = mommy.make(models.Contact)
         response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
@@ -3312,6 +3729,24 @@ class EditContactTestCase(BaseTestCase):
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
+    
+    def test_edit_contact_keep_note(self):
+        c = mommy.make(models.Contact, notes="Toto")
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.notes, "Toto")
+        
         
     def test_edit_contact_utf(self):
         c = mommy.make(models.Contact)
@@ -3977,6 +4412,29 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
         
+    def test_view_monthly_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 29), end_datetime=datetime(2014, 5, 2))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 4, 2))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 3, 30))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 5, 1), end_datetime=datetime(2014, 5, 2))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 8))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 5, 2))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 29))
+        
+        url = reverse('crm_actions_of_month', args=[2014, 4])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
+        
+        
     def test_view_weekly_action(self):
         a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
         a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now())
@@ -3993,6 +4451,28 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a3.subject)
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
+        
+    def test_view_weekly_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 15))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 4, 1), end_datetime=datetime(2014, 4, 9))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 4, 1), end_datetime=datetime(2014, 4, 2))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 4, 15), end_datetime=datetime(2014, 4, 16))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 8))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 3, 29), end_datetime=datetime(2014, 5, 2))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 9))
+        
+        url = reverse('crm_actions_of_week', args=[2014, 14])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
 
     def test_view_daily_action(self):
         a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now())
@@ -4010,6 +4490,28 @@ class ActionArchiveTest(BaseTestCase):
         self.assertNotContains(response, a3.subject)
         self.assertNotContains(response, a4.subject)
         self.assertNotContains(response, a5.subject)
+        
+    def test_view_daily_action_end_dt(self):
+        a1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 9))
+        a2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime(2014, 4, 8), end_datetime=datetime(2014, 4, 12))
+        a3 = mommy.make(models.Action, subject="#ACT3#", planned_date=datetime(2014, 4, 8), end_datetime=datetime(2014, 4, 8))
+        a4 = mommy.make(models.Action, subject="#ACT4#", planned_date=datetime(2014, 4, 10), end_datetime=datetime(2014, 4, 10))
+        a5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
+        a6 = mommy.make(models.Action, subject="#ACT6#", planned_date=datetime(2014, 4, 2), end_datetime=datetime(2014, 4, 9))
+        a7 = mommy.make(models.Action, subject="#ACT7#", planned_date=datetime(2014, 4, 9), end_datetime=datetime(2014, 4, 10))
+        a8 = mommy.make(models.Action, subject="#ACT8#", planned_date=datetime(2014, 4, 9))
+        
+        url = reverse('crm_actions_of_day', args=[2014, 4, 9])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a1.subject)
+        self.assertContains(response, a2.subject)
+        self.assertNotContains(response, a3.subject)
+        self.assertNotContains(response, a4.subject)
+        self.assertNotContains(response, a5.subject)
+        self.assertContains(response, a6.subject)
+        self.assertContains(response, a7.subject)
+        self.assertContains(response, a8.subject)
     
     def test_view_monthly_action_in_charge_filter(self):
         u = mommy.make(User, first_name="Joe", is_staff=True)

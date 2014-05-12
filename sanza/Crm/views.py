@@ -504,9 +504,11 @@ def get_entities(request):
 @user_passes_test(can_access)
 @log_error
 def get_entity_id(request):
-    name = request.GET.get('name')
-    e = get_object_or_404(models.Entity, name=name)
-    return HttpResponse(json.dumps({'id': e.id}), 'application/json')
+    name = request.GET.get('name', '')
+    if name:
+        e = get_object_or_404(models.Entity, name=name)
+        return HttpResponse(json.dumps({'id': e.id}), 'application/json')
+    raise Http404
 
 @user_passes_test(can_access)
 def get_contact_name(request, contact_id):
@@ -2113,6 +2115,18 @@ class ActionArchiveView(object):
         context["action_types"] = ats
         context["in_charge"] = in_charge
         return context
+    
+    def get_dated_queryset(self, **lookup_kwargs):
+        date_field = self.get_date_field()
+        
+        dt1 = since = lookup_kwargs['%s__gte' % date_field]
+        dt2 = until = lookup_kwargs['%s__lt' % date_field]
+        
+        l1 = Q(end_datetime__isnull=True) & Q(planned_date__gte=dt1) & Q(planned_date__lt=dt2)
+        l2 = Q(end_datetime__isnull=False) & Q(planned_date__lt=dt2) & Q(end_datetime__gte=dt1)
+        
+        qs = self.get_queryset()
+        return qs.filter(l1 | l2)
         
     def get(self, *args, **kwargs):
         self.request.session["redirect_url"] = self.request.path

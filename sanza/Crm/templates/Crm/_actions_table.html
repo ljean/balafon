@@ -19,7 +19,11 @@
           
           <div class="label label-date {{a|get_action_date_label}}">
             {% if a.planned_date %}
-              {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}}
+              {% if a.end_datetime %}
+                {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}} - {{a.end_datetime|date:'d/m/Y H:i'|cut_null_hour}}
+              {% else %}
+                {{a.planned_date|date:'d/m/Y H:i'|cut_null_hour}}
+              {% endif %}
             {% else %}
               {% trans "Not planned" %}
             {% endif %}

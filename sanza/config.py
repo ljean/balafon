@@ -82,6 +82,7 @@ SEARCH_FORMS = [
             search_forms.ActionInProgressForm,
             search_forms.ActionByDoneDate,
             search_forms.ActionByPlannedDate,
+            search_forms.ActionByStartDate,
             search_forms.ActionByUser,
             search_forms.ActionStatus,
             search_forms.ActionLtAmount,

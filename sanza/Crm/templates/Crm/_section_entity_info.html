@@ -23,19 +23,19 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <span title="{% trans "Address" %}" class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+        <span title="{% trans "Email" %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
+        <span title="{% trans "Phone" %}" class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
+        <span title="{% trans "Web Site" %}" class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
       </td></tr>
       <tr><td>
-        <span class="glyphicon glyphicon-print"></span> {{entity.fax}}
+        <span title="{% trans "Fax" %}" class="glyphicon glyphicon-print"></span> {{entity.fax}}
       </td></tr>
     </table>
   </div>

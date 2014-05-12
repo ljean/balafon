@@ -67,8 +67,8 @@ class EntityAdmin(admin.ModelAdmin):
 admin.site.register(models.Entity, EntityAdmin)
 
 class OpportunityAdmin(admin.ModelAdmin):
-    list_display = ['name', 'entity', 'ended', 'display_on_board']
-    search_fields = ['name', 'entity']
+    list_display = ['name', ]#'entity', 'ended', 'display_on_board']
+    search_fields = ['name', ]#'entity']
     raw_id_admin = ('entity',)
 admin.site.register(models.Opportunity, OpportunityAdmin)
 
