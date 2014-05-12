@@ -35,6 +35,7 @@ class SearchField(models.Model):
     search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'))
     field = models.CharField(_('field'), max_length=100)
     value = models.CharField(_('value'), max_length=200)
+    is_list = models.BooleanField(default=False)
     
     def __unicode__(self):
         return u'{0} {1}'.format(self.search_group, self.field)

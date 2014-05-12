@@ -144,7 +144,10 @@ class SearchForm(forms.Form):
             for gr in instance.searchgroup_set.all():
                 for f in gr.searchfield_set.all():
                     key = '-_-'.join((gr.name, f.field, str(len(data))))
-                    data[key] = f.value
+                    if f.is_list:
+                        data[key] = self._str_to_list(f.value)
+                    else:
+                        data[key] = f.value
         if data:
             for key in data:
                 if hasattr(data, 'getlist'):
@@ -173,6 +176,29 @@ class SearchForm(forms.Form):
     
     def block_count(self):
         return len(self._forms)
+    
+    def _str_to_list(self, str_value):
+        def _split_unicode(x):
+            x0 = x
+            try:
+                if x[:2] in ("u'", 'u"'):
+                    x = x[2:]
+                elif x[0] in ("'", '"'):
+                    x = x[1:]
+                
+                if x[-1] in ("'", '"'):
+                    x = x[:-1]
+            except IndexError:
+                return x0
+            return x
+            
+        if str_value[0] == '[' and str_value[-1] == ']':
+            values = str_value[1:-1] #remove [ and ]
+            values = values.split(", ") # get things separated by ', '
+            values = [x for x in values]
+            values =  [_split_unicode(x) for x in values]
+            return values
+        return []
     
     def serialize(self):
         data = {}
@@ -216,6 +242,9 @@ class SearchForm(forms.Form):
             gr = models.SearchGroup.objects.create(name=key, search=self._instance)
             for form in self._forms[key]:
                 field = models.SearchField.objects.create(search_group=gr, field=form._name, value=form._value)
+                if form.multi_values:
+                    field.is_list = True
+                    field.save()
         return self._instance
     
     def clean_excluded(self):

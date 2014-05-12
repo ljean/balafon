@@ -4592,6 +4592,197 @@ class SearchSaveTest(BaseTestCase):
         search_field = search_group.searchfield_set.all()[0]
         self.assertEqual(search_field.field, u"group")
         self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        self.assertEqual(search_field.is_list, False)
+    
+    def test_view_search(self):
+        
+        group1 = mommy.make(models.Group)
+        
+        search = mommy.make(Search)
+        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
+        search_field = mommy.make(
+            SearchField, field='group', value=unicode(group1.id), is_list=False, search_group=search_group)
+        
+        url = reverse("search", args=[search.id])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup4(response.content)
+        
+        self.assertEqual(soup.select("input[name=gr0-_-group-_-0]")[0]["value"], unicode(group1.id))
+        
+    
+    def test_view_multi_search(self):
+        
+        group1 = mommy.make(models.Group, name="AAA")
+        group2 = mommy.make(models.Group, name="BBB")
+        group3 = mommy.make(models.Group, name="ABB")
+        
+        search = mommy.make(Search)
+        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
+        value = u"[u'{0}, u'{1}']".format(group1.id, group2.id)
+        search_field = mommy.make(
+            SearchField, field='all_groups', value=value, is_list=True, search_group=search_group)
+        
+        url = reverse("search", args=[search.id])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup4(response.content)
+        
+        nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
+        self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
+        
+        selected_nodes = soup.select("select[name=gr0-_-all_groups-_-0] option[selected=selected]")
+        self.assertEqual([int(n["value"]) for n in selected_nodes], [group1.id, group2.id])
+        
+    def test_view_multi_search_only_1(self):
+        
+        group1 = mommy.make(models.Group, name="AAA")
+        group2 = mommy.make(models.Group, name="BBB")
+        group3 = mommy.make(models.Group, name="ABB")
+        
+        search = mommy.make(Search)
+        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
+        value = u"[u'{0}']".format(group1.id)
+        search_field = mommy.make(
+            SearchField, field='all_groups', value=value, is_list=True, search_group=search_group)
+        
+        url = reverse("search", args=[search.id])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup4(response.content)
+        
+        nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
+        self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
+        
+        selected_nodes = soup.select("select[name=gr0-_-all_groups-_-0] option[selected=selected]")
+        self.assertEqual([int(n["value"]) for n in selected_nodes], [group1.id])
+        
+    def test_view_multi_search_none(self):
+        
+        group1 = mommy.make(models.Group, name="AAA")
+        group2 = mommy.make(models.Group, name="BBB")
+        group3 = mommy.make(models.Group, name="ABB")
+        
+        search = mommy.make(Search)
+        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
+        value = u"[]"
+        search_field = mommy.make(
+            SearchField, field='all_groups', value=value, is_list=True, search_group=search_group)
+        
+        url = reverse("search", args=[search.id])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup4(response.content)
+        
+        nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
+        self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
+        
+        selected_nodes = soup.select("select[name=gr0-_-all_groups-_-0] option[selected=selected]")
+        self.assertEqual(selected_nodes, [])
+    
+    def test_save_search_multi_values(self):
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        group2 = mommy.make(models.Group)
+        
+        groups = [group1.id, group2.id]
+        search_data = {
+            "gr0-_-all_groups-_-0": [unicode(x) for x in groups],
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("search", args=[search_1.id])
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url))
+        
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 1)
+        
+        search_group = search_1.searchgroup_set.all()[0]
+        self.assertEqual(search_group.name, u"gr0")
+        
+        self.assertEqual(search_group.searchfield_set.count(), 1)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"all_groups")
+        self.assertEqual(search_field.value, u"[u'{0}', u'{1}']".format(*groups))
+        self.assertEqual(search_field.is_list, True)
+    
+    def test_save_search_multi_values_only_1(self):
+        url = reverse("search_save", args=[0])
+        
+        group1 = mommy.make(models.Group)
+        group2 = mommy.make(models.Group)
+        
+        groups = [group1.id]
+        search_data = {
+            "gr0-_-all_groups-_-0": [unicode(x) for x in groups],
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 1)
+        search_1 = Search.objects.all()[0]
+        
+        self.assertEqual(response.status_code, 200)
+        next_url = reverse("search", args=[search_1.id])
+        self.assertEqual(response.content,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url))
+        
+        self.assertEqual(search_1.name, data["name"])
+        self.assertEqual(search_1.searchgroup_set.count(), 1)
+        
+        search_group = search_1.searchgroup_set.all()[0]
+        self.assertEqual(search_group.name, u"gr0")
+        
+        self.assertEqual(search_group.searchfield_set.count(), 1)
+        search_field = search_group.searchfield_set.all()[0]
+        self.assertEqual(search_field.field, u"all_groups")
+        self.assertEqual(search_field.value, u"[u'{0}']".format(group1.id))
+        self.assertEqual(search_field.is_list, True)
+    
+    def test_save_search_multi_values_none(self):
+        url = reverse("search_save", args=[0])
+        
+        search_data = {
+            "gr0-_-all_groups-_-0": '',
+        }
+        data = {
+            'name': "ABC",
+            'search_id': 0,
+            "search_fields": json.dumps(search_data),
+        }
+        
+        response = self.client.post(url, data=data)
+        
+        self.assertEqual(Search.objects.count(), 0)
+        
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(1, len(soup.select('.field-error')))
         
     def test_save_search_several_groups(self):
         url = reverse("search_save", args=[0])
