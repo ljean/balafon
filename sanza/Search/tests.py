@@ -445,6 +445,59 @@ class CitySearchTest(BaseTestCase):
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
         
+    def _test_search_multi_zones(self, cities=None, data=None, entity_search=False):
+        city1, city2 = cities
+        
+        city3 = mommy.make(models.City, name="BlablaPark")
+        
+        entity1 = mommy.make(models.Entity, city=city1 if entity_search else None)
+        contact1a = entity1.default_contact
+        contact1a.lastname = "ABCD"
+        contact1a.main_contact = True
+        contact1a.has_left = False
+        contact1a.city = city1
+        contact1a.save()
+        
+        contact1b = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        
+        entity2 = mommy.make(models.Entity, city=city2 if entity_search else None)
+        contact2 = entity2.default_contact
+        contact2.lastname = "DEFG"
+        contact2.main_contact = True
+        contact2.has_left = False
+        contact2.city = None if entity_search else city2
+        contact2.save()
+        
+        entity3 = mommy.make(models.Entity)
+        contact3 = entity3.default_contact
+        contact3.lastname = "MNOP"
+        contact3.main_contact = True
+        contact3.has_left = False
+        contact3.city = city3
+        contact3.save()
+        
+        url = reverse('search')
+        
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual([], soup.select('.field-error'))
+        
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1a.lastname)
+        if entity_search:
+            self.assertContains(response, contact1b.lastname)
+        else:
+            self.assertNotContains(response, contact1b.lastname)
+        
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+        
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact3.lastname)
+    
+        
     def test_search_entity_city(self, cities=None, data=None):
         if cities:
             city1, city2 = cities
@@ -486,6 +539,7 @@ class CitySearchTest(BaseTestCase):
         
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
+    
        
     def _get_departements_data(self, form_name="department"): 
         default_country = get_default_country()
@@ -503,6 +557,18 @@ class CitySearchTest(BaseTestCase):
         
         return (city1, city2), data
     
+    def test_search_multi_departements(self):
+        cities, data = self._get_departements_data()
+        (city1, city2) = cities
+        data = {"gr0-_-department-_-0": [city1.parent.id, city2.parent.id]}
+        self._test_search_multi_zones(cities, data)
+        
+    def test_search_multi_departements_entity(self):
+        cities, data = self._get_departements_data()
+        (city1, city2) = cities
+        data = {"gr0-_-entity_department-_-0": [city1.parent.id, city2.parent.id]}
+        self._test_search_multi_zones(cities, data, True)
+        
     def test_search_departement(self):
         self.test_search_city(*self._get_departements_data())
         
@@ -535,6 +601,12 @@ class CitySearchTest(BaseTestCase):
     def test_search_region(self):
         self.test_search_city(*self._get_regions_data())
         
+    def test_search_multi_regions(self):
+        cities, data = self._get_regions_data()
+        (city1, city2) = cities
+        data = {"gr0-_-region-_-0": [city1.parent.parent.id, city2.parent.parent.id]}
+        self._test_search_multi_zones(cities, data)
+        
     def test_search_region_entity(self):
         self.test_search_city_entity(*self._get_regions_data())
     
@@ -563,6 +635,12 @@ class CitySearchTest(BaseTestCase):
     def test_search_country_entity(self):
         self.test_search_city_entity(*self._get_countries_data())
     
+    def test_search_multi_country(self):
+        cities, data = self._get_countries_data()
+        (city1, city2) = cities
+        data = {"gr0-_-country-_-0": [city1.parent.id, city2.parent.id]}
+        self._test_search_multi_zones(cities, data)
+        
     def test_search_country_entity_contact_mix(self):
         self.test_search_city_entity_contact_mix(*self._get_countries_data())
     

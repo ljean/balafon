@@ -141,25 +141,62 @@ class EntityZipCodeSearchForm(BaseZipCodeSearchForm):
     def get_lookup(self):
         return Q(entity__zip_code__istartswith=self._value)
         
-class ZoneSearchForm(SearchFieldForm):
+#class ZoneSearchForm(SearchFieldForm):
+#    
+#    def __init__(self, *args, **kwargs):
+#        super(ZoneSearchForm, self).__init__(*args, **kwargs)
+#        type_name = self._name.replace("entity_", "")
+#        qs = models.Zone.objects.filter(type__type=type_name).order_by('code', 'name') 
+#        field = forms.ModelChoiceField(qs, label=self._label, widget=self._get_widget())
+#        self._add_field(field)
+#        
+#    def _get_widget(self):
+#        return forms.Select(attrs={
+#            'class': "chosen-select",
+#            'data-placeholder': self._label,
+#            'style': "width: 100%", 
+#        })
     
+class ZoneSearchForm(SearchFieldForm):
+    multi_values = True
+
     def __init__(self, *args, **kwargs):
         super(ZoneSearchForm, self).__init__(*args, **kwargs)
         type_name = self._name.replace("entity_", "")
         qs = models.Zone.objects.filter(type__type=type_name).order_by('code', 'name') 
-        field = forms.ModelChoiceField(qs, label=self._label, widget=self._get_widget())
+        kwargs = kwargs or {}
+        kwargs.setdefault('required', True)
+        widget = self._get_widget()
+        if widget:
+            kwargs['widget'] = widget
+        field = forms.MultipleChoiceField(
+            choices=[(x.id, unicode(x)) for x in qs.all()], label=self._label, **kwargs)
         self._add_field(field)
         
+    def get_values(self):
+        if type(self._value)==list:
+            values = self._value
+        else:
+            values = [self._value]
+        return values
+    
     def _get_widget(self):
-        return forms.Select(attrs={
+        return forms.SelectMultiple(attrs={
             'class': "chosen-select",
             'data-placeholder': self._label,
             'style': "width: 100%", 
         })
     
+    def get_queryset(self, qs):
+        group_qs = Q(id=0)
+        for zone_id in self.get_values():
+            self._value = zone_id
+            group_qs = group_qs | self.get_lookup()
+        return qs.filter(group_qs)
+    
 class DepartmentSearchForm(ZoneSearchForm):
     _name = 'department'
-    _label = _(u'Department')
+    _label = _(u'Departments')
         
     def get_lookup(self):
         q1 = Q(city__parent__id=self._value) & Q(city__parent__type__type="department")
@@ -169,17 +206,19 @@ class DepartmentSearchForm(ZoneSearchForm):
 
 class EntityDepartmentSearchForm(ZoneSearchForm):
     _name = 'entity_department'
-    _label = _(u'Entity Department')
+    _label = _(u'Entity Departments')
         
     def get_queryset(self, qs):
-        return qs.filter(self.get_lookup()).filter(entity__city__parent__type__type="department")
+        qs = super(EntityDepartmentSearchForm, self).get_queryset(qs)
+        return qs.filter(entity__city__parent__type__type="department")
+        #return qs.filter(self.get_lookup()).filter(entity__city__parent__type__type="department")
         
     def get_lookup(self):
         return Q(entity__city__parent__id=self._value)
         
 class RegionSearchForm(ZoneSearchForm):
     _name = 'region'
-    _label = _(u'Region')
+    _label = _(u'Regions')
         
     def get_lookup(self):
         q1 = Q(city__parent__parent__id=self._value) & Q(city__parent__parent__type__type="region")
@@ -188,17 +227,19 @@ class RegionSearchForm(ZoneSearchForm):
 
 class EntityRegionSearchForm(ZoneSearchForm):
     _name = 'entity_region'
-    _label = _(u'Entity Region')
+    _label = _(u'Entity Regions')
     
     def get_queryset(self, qs):
-        return qs.filter(self.get_lookup()).filter(entity__city__parent__parent__type__type="region")
+        qs = super(EntityRegionSearchForm, self).get_queryset(qs)
+        return qs.filter(entity__city__parent__type__type="department")
+        #return qs.filter(self.get_lookup()).filter(entity__city__parent__parent__type__type="region")
         
     def get_lookup(self):
         return Q(entity__city__parent__parent__id=self._value)
         
 class CountrySearchForm(ZoneSearchForm):
     _name = 'country'
-    _label = _(u'Country')
+    _label = _(u'Countries')
         
     def get_lookup(self):
         default_country = get_default_country()
@@ -209,7 +250,7 @@ class CountrySearchForm(ZoneSearchForm):
         
 class EntityCountrySearchForm(ZoneSearchForm):
     _name = 'entity_country'
-    _label = _(u'Entity Country')
+    _label = _(u'Entity Countries')
         
     def get_lookup(self):
         default_country = get_default_country()
@@ -221,7 +262,7 @@ class EntityCountrySearchForm(ZoneSearchForm):
 
 class ZoneGroupSearchForm(ZoneSearchForm):
     _name = 'zone_group'
-    _label = _(u'Zone Group')
+    _label = _(u'Zone Groups')
         
     def get_lookup(self):
         q1 = Q(city__groups__id=self._value)
@@ -230,7 +271,7 @@ class ZoneGroupSearchForm(ZoneSearchForm):
     
 class EntityZoneGroupSearchForm(ZoneSearchForm):
     _name = 'entity_zone_group'
-    _label = _(u'Entity Zone Group')
+    _label = _(u'Entity Zone Groups')
         
     def get_lookup(self):
         return Q(entity__city__groups__id=self._value)
