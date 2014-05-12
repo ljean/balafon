@@ -143,8 +143,9 @@ class SearchForm(forms.Form):
             data = {}
             for gr in instance.searchgroup_set.all():
                 for f in gr.searchfield_set.all():
-                    key = '-_-'.join((gr.name, f.field, str(len(data))))
+                    key = '-_-'.join((gr.name, f.field, str(f.count or len(data))))
                     if f.is_list:
+                        #data[key] = json.loads(f.value) # doesn't work :(
                         data[key] = self._str_to_list(f.value)
                     else:
                         data[key] = f.value
@@ -159,7 +160,7 @@ class SearchForm(forms.Form):
                 try:
                     #extract search fields
                     gr, field, fid = key.split('-_-')
-                    int(fid) #will raise an except for city visible field --> ignore this field
+                    fid = int(fid) #will raise an except for city visible field --> ignore this field
                     if not self._forms.has_key(gr):
                         self._forms[gr] = []
                     form_class = get_field_form(field)
@@ -176,6 +177,9 @@ class SearchForm(forms.Form):
     
     def block_count(self):
         return len(self._forms)
+    
+    def field_count(self):
+        return sum([len(f) for f in self._forms])
     
     def _str_to_list(self, str_value):
         def _split_unicode(x):
@@ -241,7 +245,8 @@ class SearchForm(forms.Form):
         for key in keys:
             gr = models.SearchGroup.objects.create(name=key, search=self._instance)
             for form in self._forms[key]:
-                field = models.SearchField.objects.create(search_group=gr, field=form._name, value=form._value)
+                field = models.SearchField.objects.create(
+                    search_group=gr, field=form._name, value=form._value, count=form._count)
                 if form.multi_values:
                     field.is_list = True
                     field.save()
@@ -399,7 +404,7 @@ class SearchFieldForm(BsForm):
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         
     def _get_field_name(self):
-        return self._block+'-_-'+self._name+'-_-'+self._count
+        return self._block+'-_-'+self._name+'-_-'+unicode(self._count)
         
     def _add_field(self, field):
         field.required = True

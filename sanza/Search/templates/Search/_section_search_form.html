@@ -29,7 +29,7 @@
 <script>
   $(function() {
     var block_count = {{search_form.block_count|default:0}};
-    var field_count = 0;
+    var field_count = {{search_form.field_count|default:0}};
     
     $(".cur-form select[name='field_choice']").chosen({width: "50%"});
     
