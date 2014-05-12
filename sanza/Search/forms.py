@@ -147,11 +147,12 @@ class SearchForm(forms.Form):
                     data[key] = f.value
         if data:
             for key in data:
-                value = data.getlist(key)
-                print key, value
-                if len(value)==1:
+                if hasattr(data, 'getlist'):
+                    value = data.getlist(key)
+                    if len(value)==1:
+                        value = data.get(key)
+                else:
                     value = data.get(key)
-            #for key, value in data.items():
                 try:
                     #extract search fields
                     gr, field, fid = key.split('-_-')

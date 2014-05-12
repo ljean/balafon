@@ -412,40 +412,45 @@ class GroupSearchFormDropdownWidget(GroupSearchForm):
             'style': "width: 100%", 
         })
 
-class AllGroupMemberSearchForm(SearchFieldForm):
-    _name = 'all_groups'
-    _label = _(u'Members of all groups')
+class MultiGroupSearchForm(SearchFieldForm):
     multi_values = True
-    
+
     def __init__(self, *args, **kwargs):
-        print args, kwargs
-        super(AllGroupMemberSearchForm, self).__init__(*args, **kwargs)
+        super(MultiGroupSearchForm, self).__init__(*args, **kwargs)
         qs = models.Group.objects.all()
         try:
             qs = qs.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
         except:
             qs = qs.order_by('name')
-        kwargs = {}
+        kwargs = kwargs or {}
+        kwargs.setdefault('required', True)
         widget = self._get_widget()
         if widget:
             kwargs['widget'] = widget
-        field = forms.MultipleChoiceField(choices=[(x.id, unicode(x)) for x in qs.all()], label=self._label, **kwargs)
+        field = forms.MultipleChoiceField(
+            choices=[(x.id, unicode(x)) for x in qs.all()], label=self._label, **kwargs)
         self._add_field(field)
         
+    def get_values(self):
+        if type(self._value)==list:
+            values = self._value
+        else:
+            values = [self._value]
+        return values
+    
     def _get_widget(self):
         return forms.SelectMultiple(attrs={
             'class': "chosen-select",
             'data-placeholder': _(u'Select Group names'),
             'style': "width: 100%", 
         })
+
+class GroupsMemberOfAllSearchForm(MultiGroupSearchForm):
+    _name = 'all_groups'
+    _label = _(u'Members of all groups')
     
     def get_queryset(self, qs):
-        if type(self._value)==list:
-            values = self._value
-        else:
-            values = [self._value]
-        
-        for group_id in values:
+        for group_id in self.get_values():
             group_qs = ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
             qs = qs.filter(group_qs)    
         return qs
@@ -465,6 +470,31 @@ class AllGroupMemberSearchForm(SearchFieldForm):
     #        else:
     #            qs = group_qs    
     #    return qs
+
+
+class GroupsMemberOfAnySearchForm(MultiGroupSearchForm):
+    _name = 'any_groups'
+    _label = _(u'Members of at least one group')
+    multi_values = True
+    
+    def get_queryset(self, qs):
+        
+        group_qs = Q(id=0)
+        for group_id in self.get_values():
+            group_qs = group_qs | ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
+        qs = qs.filter(group_qs)    
+        return qs
+    
+class GroupsMemberOfNoneSearchForm(MultiGroupSearchForm):
+    _name = 'none_groups'
+    _label = _(u'Member of none of these groups')
+    multi_values = True
+    
+    def get_queryset(self, qs):
+        for group_id in self.get_values():
+            group_qs = ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
+            qs = qs.exclude(group_qs)       
+        return qs
 
 
 class NotInGroupSearchForm(SearchFieldForm):

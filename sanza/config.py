@@ -11,7 +11,9 @@ SEARCH_FORMS = [
             search_forms.GroupSearchForm,
             search_forms.GroupSearchFormDropdownWidget,
             search_forms.NotInGroupSearchForm,
-            search_forms.AllGroupMemberSearchForm,
+            search_forms.GroupsMemberOfAllSearchForm,
+            search_forms.GroupsMemberOfAnySearchForm,
+            search_forms.GroupsMemberOfNoneSearchForm,
         ],
     ),(
         _(u'Location'),
