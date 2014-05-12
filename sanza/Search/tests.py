@@ -597,7 +597,42 @@ class CitySearchTest(BaseTestCase):
     def test_search_entity_country2(self):
         self.test_search_entity_city(*self._get_countries_mix_data("entity_country"))
         
+    def _get_zonegroup_data(self, form_name="zone_group"): 
+        default_country = get_default_country()
         
+        rt = mommy.make(models.ZoneType, type="region")
+        r1 = mommy.make(models.Zone, parent=default_country, type=rt)
+        r2 = mommy.make(models.Zone, parent=default_country, type=rt)
+        dt = mommy.make(models.ZoneType, type="department")
+        d1 = mommy.make(models.Zone, parent=r1, type=dt)
+        d2 = mommy.make(models.Zone, parent=r2, type=dt)
+        
+        country = models.Zone
+        city1 = mommy.make(models.City, name="ZooPark", parent=d1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=d2)
+        
+        zg = mommy.make(models.ZoneType, type="zone_group")
+        z = mommy.make(models.Zone, parent=None, type=zg)
+        
+        city1.groups.add(z)
+        city1.save()
+        
+        data = {"gr0-_-{0}-_-0".format(form_name): z.id}
+        
+        return (city1, city2), data
+    
+    @skipIf(not crm_settings.ZONE_GROUP_SEARCH, "ZONE_GROUP_SEARCH disabled")
+    def test_search_zonegroup(self):
+        self.test_search_city(*self._get_zonegroup_data())
+        
+    @skipIf(not crm_settings.ZONE_GROUP_SEARCH, "ZONE_GROUP_SEARCH disabled")
+    def test_search_zonegroup_entity(self):
+        self.test_search_city_entity(*self._get_zonegroup_data())
+    
+    @skipIf(not crm_settings.ZONE_GROUP_SEARCH, "ZONE_GROUP_SEARCH disabled")
+    def test_search_zonegroup_entity_contact_mix(self):
+        self.test_search_city_entity_contact_mix(*self._get_zonegroup_data())
+    
 class EmailSearchTest(BaseTestCase):
     
     def test_search_email(self):
@@ -2704,6 +2739,7 @@ class HasAddressTest(BaseTestCase):
         
     def test_has_no_address_mix(self):
         self.test_has_address_mix(False)
+
 
 class HasEntitySearchTest(BaseTestCase):
     

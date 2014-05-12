@@ -29,8 +29,8 @@ SEARCH_FORMS = [
             search_forms.ZipCodeSearchForm,
             search_forms.EntityZipCodeSearchForm,
             search_forms.HasCityAndZipcodeForm,
-            search_forms.ZoneGroupSearchForm if models.ZoneType.objects.filter(type="zone_group").count() else None,
-            search_forms.EntityZoneGroupSearchForm if models.ZoneType.objects.filter(type="zone_group").count() else None,
+            search_forms.ZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
+            search_forms.EntityZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
         ],
     ),(
         _(u'Entity'),
