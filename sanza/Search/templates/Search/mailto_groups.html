@@ -5,13 +5,18 @@
 {{block.super}}
 <style>
   .email-group {
-    margin: 15px 0;
     padding: 5px 0;
     background: #eee;
   }
   
   .email-group:hover {
     background: #ccc;
+  }
+  
+  .warning {
+    padding: 10px;
+    background: #fc6;
+    font-weight: bold;
   }
   
   .email-group.checked, .email-group.checked:hover {
@@ -22,7 +27,21 @@
     text-decoration: none;
   }
   
+  .clipboard-block {
+    margin: 15px 0;
+    width: 100%;
+  }
   
+  .copy-to-clipboard {
+    font-size: 0.8em;
+    width: 100%;
+    text-align: right;
+    display: block;
+  }
+  
+  .clipboard-block .clipboard-value {
+    text-align: left;
+  }
   
 </style>
 <script>
@@ -31,6 +50,22 @@
       $(this).parent().addClass("checked");
       return true; //propagate event
     })
+    
+    var replace_all = function(strVal, subStr, replaceWith) {
+      while (strVal.indexOf(subStr) != -1) {
+        strVal = strVal.replace(subStr, replaceWith);
+      }
+      return strVal;
+    };
+    
+    $("a.copy-to-clipboard").click(function() {
+      var text = $(this).closest('.clipboard-block').find('.clipboard-value').text();
+      var sep = $(".clipboard-separators").val().replace('\\n', '\n');
+      text = text.trim();
+      text = replace_all(text, "##", sep);
+      window.prompt("{% trans "Copy to clipboard: Ctrl+C, Enter" %}", text);
+      return false;
+    })
   })
 </script>
 {% endblock %}
@@ -38,19 +73,47 @@
 {% block document_title %}
 {% trans "Mailto" %} {% if bcc %}{% trans "BCC" %}{% endif %}
 {% endblock %}
+
 {% block document_content %}
-<div>
+<div class="pull-right" style="padding: 5px; border: solid 1px #888; color: #888; margin-top: -50px;">
+  {% trans "Clipboard separator"%}
+  <select class="clipboard-separators" style="display: inline-block;">
+    <option value=",">{% trans "Coma" %}</option>
+    <option value=" ">{% trans "Space" %}</option>
+  </select>
+</div>
+
+<div class="warning">
+  <div class=row>
+    <div class="col-md-1" style="text-align: center;">
+      <span class="glyphicon glyphicon-exclamation-sign" style="font-size: 2.7em;"></span>
+    </div>
+    <div class="col-md-11">
   {% blocktrans %}
   If the number of email address exceeds {{nb_limit}}, there is a risk that your mail is considered as spam.
   You may be blocked.<br />
   Sanza recommends to send your message in several emails. Click on the links below for sending to each groups.
   {% endblocktrans %}
+    </div>
+  </div>
 </div>
+  
+  
+<div class="clipboard-block">
+  <a href="" class="copy-to-clipboard">{% trans "Copy all to clipboard" %}</a>
+  <div class="clipboard-value" style="display: none;">
+    {% for emails in email_groups %}{{emails|join:"##"}}{% if not forloop.last %}##{% endif %}{% endfor %}
+  </div>
+</div>
+
 {% for emails in email_groups %}
+<div class="clipboard-block">
+  <a href="" class="copy-to-clipboard">{% trans "Copy to clipboard" %}</a>
   <div class="email-group">
-    <a class="check-on-click" href="mailto:{%if bcc %}?bcc={%endif%}{{emails|join:","}}">
+    <a class="clipboard-value check-on-click" href="mailto:{%if bcc %}?bcc={%endif%}{{emails|join:","}}">
       {{emails|join:" "}}
     </a>
   </div>  
+</div>
 {% endfor %}
 {% endblock %}
