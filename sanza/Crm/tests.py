@@ -4246,8 +4246,11 @@ class ChangeContactEntityTest(BaseTestCase):
         )
         
     def test_change_contact_entity(self):
+        city1 = mommy.make(models.City)
+        
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity,
+            address="Abc", zip_code="42000", city=city1, phone="007")
         entity2 = mommy.make(models.Entity, is_single_contact=False)
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
@@ -4260,9 +4263,18 @@ class ChangeContactEntityTest(BaseTestCase):
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity, entity2)
         
+        self.assertEqual(contact.address, "Abc")
+        self.assertEqual(contact.zip_code, "42000")
+        self.assertEqual(contact.city, city1)
+        self.assertEqual(contact.phone, "007")
+        
+        
     def test_make_single_contact_entity(self):
+        city1 = mommy.make(models.City)
+        
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname=u"John")
+        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname=u"John",
+            address="Abc", zip_code="42000", city=city1, phone="007")
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
         data= {
@@ -4276,10 +4288,18 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertNotEqual(contact.entity.id, entity.id)
         self.assertEqual(contact.entity.name, u"{0} {1}".format(contact.lastname, contact.firstname).lower())
         
+        self.assertEqual(contact.address, "Abc")
+        self.assertEqual(contact.zip_code, "42000")
+        self.assertEqual(contact.city, city1)
+        self.assertEqual(contact.phone, "007")
+        
     
     def test_change_to_new_entity(self):
+        city1 = mommy.make(models.City)
+        
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity,
+            address="Abc", zip_code="42000", city=city1, phone="007")
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
         data= {
@@ -4290,10 +4310,18 @@ class ChangeContactEntityTest(BaseTestCase):
         contact = models.Contact.objects.get(id=contact.id)
         self.assertNotEqual(contact.entity, entity)
         self.assertNotEqual(contact.entity.contact_set.count(), 1)
+        
+        self.assertEqual(contact.address, "Abc")
+        self.assertEqual(contact.zip_code, "42000")
+        self.assertEqual(contact.city, city1)
+        self.assertEqual(contact.phone, "007")
     
     def test_change_single_to_existing_entity(self):
+        city1 = mommy.make(models.City)
+        
         entity = mommy.make(models.Entity, is_single_contact=True)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity,
+            address="Abc", zip_code="42000", city=city1, phone="007")
         entity2 = mommy.make(models.Entity, is_single_contact=False)
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
@@ -4306,10 +4334,18 @@ class ChangeContactEntityTest(BaseTestCase):
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity.is_single_contact, False)
         self.assertEqual(contact.entity, entity2)
+        
+        self.assertEqual(contact.address, "Abc")
+        self.assertEqual(contact.zip_code, "42000")
+        self.assertEqual(contact.city, city1)
+        self.assertEqual(contact.phone, "007")
     
     def test_change_single_to_contact_entity(self):
+        city1 = mommy.make(models.City)
+        
         entity = mommy.make(models.Entity, is_single_contact=True)
-        contact = mommy.make(models.Contact, entity=entity)
+        contact = mommy.make(models.Contact, entity=entity,
+            address="Abc", zip_code="42000", city=city1, phone="007")
         
         url = reverse('crm_change_contact_entity', args=[contact.id])
         data= {
@@ -4319,6 +4355,11 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.entity.is_single_contact, False)
+        
+        self.assertEqual(contact.address, "Abc")
+        self.assertEqual(contact.zip_code, "42000")
+        self.assertEqual(contact.city, city1)
+        self.assertEqual(contact.phone, "007")
     
     def test_change_contact_entity_no_value(self):
         entity = mommy.make(models.Entity, is_single_contact=False)
