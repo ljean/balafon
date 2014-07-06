@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-12 11:19+0200\n"
+"POT-Creation-Date: 2014-06-27 11:32+0200\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgstr "Ville"
 #: Crm/forms.py:253 Crm/forms.py:289 Crm/models.py:24 Crm/search_forms.py:1018
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:14 Profile/forms.py:36
-#: Search/forms.py:599
+#: Search/forms.py:633
 msgid "Name"
 msgstr "Nom"
 
@@ -187,11 +187,11 @@ msgstr "Photo"
 msgid "Select the roles played by the contact in his entity"
 msgstr "Choisissez les rôles joués par le contact au sein de l'entité"
 
-#: Crm/forms.py:331 Crm/models.py:766 Search/forms.py:530
+#: Crm/forms.py:331 Crm/models.py:766 Search/forms.py:564
 msgid "planned date"
 msgstr "date prévue"
 
-#: Crm/forms.py:332 Search/forms.py:531
+#: Crm/forms.py:332 Search/forms.py:565
 msgid "planned time"
 msgstr "heure prévue"
 
@@ -229,11 +229,11 @@ msgstr "Veuillez sélectionner un type avant de choisir l'état"
 
 #: Crm/forms.py:402
 msgid "You must set a date"
-msgstr ""
+msgstr "Vous devez définir une date"
 
 #: Crm/forms.py:411
 msgid "The planned date is not defined"
-msgstr ""
+msgstr "La date prévue n'a pas été définie"
 
 #: Crm/forms.py:413
 msgid "The end date must be after the planned date"
@@ -241,11 +241,11 @@ msgstr "La date de fin doit être postérieure à la date de début"
 
 #: Crm/forms.py:423
 msgid "You must set a end date"
-msgstr ""
+msgstr "Vosu devez définir une date de fin"
 
 #: Crm/forms.py:426
 msgid "The end time must be after the planned time"
-msgstr ""
+msgstr "La date de fin doit être postérieure à a date prévue"
 
 #: Crm/forms.py:429
 msgid "The end time must be set"
@@ -837,7 +837,7 @@ msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 msgid "content"
 msgstr "contenu"
 
-#: Crm/models.py:810 Search/forms.py:502
+#: Crm/models.py:810 Search/forms.py:536
 msgid "template"
 msgstr "Modèle"
 
@@ -901,7 +901,7 @@ msgstr "valeur d'un champ personnalisé pour un contact"
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: Crm/models.py:902
+#: Crm/models.py:902 Search/templates/Search/mailto_groups.html:108
 msgid "Coma"
 msgstr "Virgule"
 
@@ -1818,13 +1818,13 @@ msgstr "Vous n'êtes pas en charge de cette action. Etes-vous sûr de continuer?
 
 #: Crm/templates/Crm/do_action.html:20
 #: Emailing/templates/Emailing/public/unregister_confirm.html:11
-#: Search/forms.py:442
+#: Search/forms.py:476
 msgid "No"
 msgstr "Non"
 
 #: Crm/templates/Crm/do_action.html:21
 #: Emailing/templates/Emailing/public/unregister_confirm.html:10
-#: Search/forms.py:442
+#: Search/forms.py:476
 msgid "Yes"
 msgstr "Oui"
 
@@ -2023,7 +2023,7 @@ msgstr "Message depuis le site Internet"
 msgid "3rd parties"
 msgstr "offres partenaires"
 
-#: Emailing/forms.py:344 Search/forms.py:607
+#: Emailing/forms.py:344 Search/forms.py:641
 msgid "This field is required"
 msgstr "Ce champ est requis"
 
@@ -2588,64 +2588,64 @@ msgstr "Veuillez sélectionner un des critères ci-dessous"
 msgid "Enter a name and click save."
 msgstr "Entrez un nom et cliquez sur Enregistrer"
 
-#: Search/forms.py:341
+#: Search/forms.py:375
 msgid "Add filter"
 msgstr "Ajouter un filtre"
 
-#: Search/forms.py:341
+#: Search/forms.py:375
 msgid "Add block"
 msgstr "Ajouter un bloc"
 
-#: Search/forms.py:341
+#: Search/forms.py:375
 msgid "Clear"
 msgstr "Effacer"
 
-#: Search/forms.py:341 Search/templates/Search/_search_field_form.html:24
+#: Search/forms.py:375 Search/templates/Search/_search_field_form.html:24
 msgid "Remove"
 msgstr "Supprimer"
 
-#: Search/forms.py:341
+#: Search/forms.py:375
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: Search/forms.py:433
+#: Search/forms.py:467
 msgid "Two valid dates are required"
 msgstr "Deux dates valides sont requises"
 
-#: Search/forms.py:496
+#: Search/forms.py:530
 msgid "small labels"
 msgstr "Petites étiquettes"
 
-#: Search/forms.py:497
+#: Search/forms.py:531
 msgid "address strip"
 msgstr "Bande adresse"
 
-#: Search/forms.py:498
+#: Search/forms.py:532
 msgid "list of actions"
 msgstr "liste des actions"
 
-#: Search/forms.py:503
+#: Search/forms.py:537
 msgid "Select the type of document to generate"
 msgstr "Sélectionner le type de document à générer"
 
-#: Search/forms.py:549
+#: Search/forms.py:583
 msgid "Enter the name of an opportunity"
 msgstr "Entrez le nom d'un dossier"
 
-#: Search/forms.py:565
+#: Search/forms.py:599
 msgid "Group on contact"
 msgstr "Groupe pour un contact"
 
-#: Search/forms.py:566
+#: Search/forms.py:600
 msgid "Define if the group is added on the contact itself or on his entity"
 msgstr ""
 "Définir si le groupe est ajouté sur le contact lui même ou sur son entité"
 
-#: Search/forms.py:588
+#: Search/forms.py:622
 msgid "Select groups"
 msgstr "Sélectionnez les groupes"
 
-#: Search/forms.py:613
+#: Search/forms.py:647
 msgid "This name is already used"
 msgstr "Ce champ est déjà utilisé"
 
@@ -2669,11 +2669,11 @@ msgstr "groupes de recherches"
 msgid "field"
 msgstr "champ"
 
-#: Search/models.py:43
+#: Search/models.py:45
 msgid "search field"
 msgstr "champ de recherche"
 
-#: Search/models.py:44
+#: Search/models.py:46
 msgid "search fied"
 msgstr "champs de recherche"
 
@@ -2855,15 +2855,27 @@ msgstr "Exporter en PDF"
 msgid "Generate"
 msgstr "Générer"
 
-#: Search/templates/Search/mailto_groups.html:39
+#: Search/templates/Search/mailto_groups.html:101
 msgid "Mailto"
 msgstr "Mail à"
 
-#: Search/templates/Search/mailto_groups.html:39
+#: Search/templates/Search/mailto_groups.html:101
 msgid "BCC"
 msgstr "BCC"
 
-#: Search/templates/Search/mailto_groups.html:43
+#: Search/templates/Search/mailto_groups.html:106
+msgid "Clipboard separator"
+msgstr "Séparateur pour la copie dans le presse-papier"
+
+#: Search/templates/Search/mailto_groups.html:109
+msgid "Space"
+msgstr "Espace"
+
+#: Search/templates/Search/mailto_groups.html:110
+msgid "Line"
+msgstr "Ligne"
+
+#: Search/templates/Search/mailto_groups.html:120
 #, python-format
 msgid ""
 "\n"
@@ -2881,6 +2893,22 @@ msgstr ""
 "  Sanza recommende d'envoyer l'email en plusieurs envois. Cliquer sur les "
 "liens ci-dessous pour l'envoyer à chaque groupe de destinataires.\n"
 "  "
+
+#: Search/templates/Search/mailto_groups.html:131
+msgid "Copy all to clipboard"
+msgstr "Tout copier dans le presse-papier"
+
+#: Search/templates/Search/mailto_groups.html:136
+msgid "Copy to clipboard: Ctrl+C"
+msgstr "Copier dans le presse-papier: Ctrl+C"
+
+#: Search/templates/Search/mailto_groups.html:137
+msgid "Close"
+msgstr "Fermer"
+
+#: Search/templates/Search/mailto_groups.html:147
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse-papier"
 
 #: Search/templates/Search/new_emailing.html:19
 msgid "New emailing"
@@ -3147,7 +3175,7 @@ msgstr "Particulier"
 
 #: templates/sanza/_bs_navigation.html:45
 msgid "Planning"
-msgstr ""
+msgstr "Planning"
 
 #: templates/sanza/_bs_navigation.html:47
 msgid "Monthly actions"
@@ -3597,9 +3625,6 @@ msgstr "Le formulaire n'est pas valide"
 
 #~ msgid "Activity sector"
 #~ msgstr "Secteur d'activité"
-
-#~ msgid "Closed"
-#~ msgstr "Fermé"
 
 #~ msgid "visible on simple form"
 #~ msgstr "Visible sur le formulaire simplifié"

@@ -234,7 +234,7 @@ def mailto_contacts(request, bcc):
                             index_from = index_to
                         return render_to_response(
                             'Search/mailto_groups.html',
-                            {'bcc': int(bcc), 'email_groups': email_groups, 'nb_limt': nb_limit},
+                            {'bcc': int(bcc), 'email_groups': email_groups, 'nb_limit': nb_limit},
                             context_instance=RequestContext(request)
                         )
                 else:
