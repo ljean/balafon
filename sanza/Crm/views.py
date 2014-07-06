@@ -113,8 +113,9 @@ def add_contact_to_group(request, contact_id):
             if form.is_valid():
                 name = form.cleaned_data["group_name"]
                 group, is_new = models.Group.objects.get_or_create(name=name)
-                group.contacts.add(contact)
-                group.save()
+                if not (contact in group.contacts.all()):
+                    group.contacts.add(contact)
+                    group.save()
                 next_url = reverse('crm_view_contact', args=[contact_id])
                 return HttpResponseRedirect(next_url)
         else:
