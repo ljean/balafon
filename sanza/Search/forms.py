@@ -567,8 +567,8 @@ class ActionForContactsForm(forms.ModelForm):
     
     class Meta:
         model = Action
-        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'detail', 'display_on_board',
-            'priority', 'planned_date', 'contacts', 'opportunity')
+        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'detail',
+            'planned_date', 'contacts', 'opportunity')
         
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')

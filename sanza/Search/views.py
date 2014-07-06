@@ -375,11 +375,9 @@ def create_action_for_contacts(request):
                     #create actions
                     kwargs = dict(form.cleaned_data)
                     for k in ('date', 'time', 'contacts'): del kwargs[k]
-                    action = Action.objects.create(
-                        entity = contact.entity,
-                        contact = contact,
-                        **kwargs
-                    )
+                    action = Action.objects.create(**kwargs)
+                    action.contacts.add(contact)
+                    action.save()
                 messages.add_message(request, messages.SUCCESS, _(u"{0} actions have been created".format(len(contacts))))
                 return HttpResponseRedirect(reverse('crm_board_panel'))
             else:
