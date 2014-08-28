@@ -14,7 +14,7 @@ if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
     raise Exception(u"Invalid setting : SANZA_NOTIFY_SUBSCRIPTIONS has been replaced by SANZA_NOTIFICATION_EMAIL")
 
 urlpatterns = patterns('',
-    url(r'^crm/$', 'sanza.Crm.views.view_board_panel', name="sanza_homepage"),
+    url(r'^crm/$', 'sanza.Users.views.user_homepage', name="sanza_homepage"),
     (r'^crm/', include('sanza.Crm.urls')),
     (r'^crm-search/', include('sanza.Search.urls')),
     (r'^emailing/', include('sanza.Emailing.urls')),
@@ -52,7 +52,7 @@ if 'jhouston' in settings.INSTALLED_APPS:
 
 if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
     urlpatterns += patterns('',
-        url(r'^$', 'sanza.Crm.views.view_board_panel', name='homepage'),
+        url(r'^$', 'sanza.Users.views.user_homepage', name='homepage'),
     )
 
 if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):

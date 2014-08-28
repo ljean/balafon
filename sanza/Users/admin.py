@@ -14,3 +14,8 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_display = ["__unicode__", "user", "content_type", "object_id"]
     list_filter  = ["user", "content_type"]
 admin.site.register(models.Favorite, FavoriteAdmin)
+
+
+class UserHomepageAdmin(admin.ModelAdmin):
+    list_display = ["user", "url"]
+admin.site.register(models.UserHomepage, UserHomepageAdmin)

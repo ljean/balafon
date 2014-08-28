@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup as BS4
 from datetime import datetime, timedelta
 from StringIO import StringIO
 import sys
-from sanza.Users.models import UserPreferences, Favorite
+from sanza.Users.models import UserPreferences, Favorite, UserHomepage
 from django.contrib.contenttypes.models import ContentType
 from django.template import Template, Context
 from sanza.Crm.models import Action, ActionType
@@ -459,3 +459,53 @@ class DeleteFavoriteTestCase(BaseTestCase):
         
             self.assertEqual(0, Favorite.objects.count())
 
+
+class UserHomepageTestCase(BaseTestCase):
+    
+    def test_set_homepage_none(self):
+        self.assertEqual(0, UserHomepage.objects.count())
+        hp_url = "http://toto.fr/toto"
+        
+        url = reverse('users_make_homepage')
+        
+        response = self.client.post(url, data={'url': hp_url})
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(1, UserHomepage.objects.count())
+        hp = UserHomepage.objects.all()[0]
+        
+        self.assertEqual(hp.user, self.user)
+        self.assertEqual(hp.url, hp_url)
+        
+
+    def test_set_homepage_existing(self):
+        hp = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+        self.assertEqual(1, UserHomepage.objects.count())
+        hp_url = "http://toto.fr/toto"
+        
+        url = reverse('users_make_homepage')
+        
+        response = self.client.post(url, data={'url': hp_url})
+        self.assertEqual(200, response.status_code)
+        
+        self.assertEqual(1, UserHomepage.objects.count())
+        hp = UserHomepage.objects.all()[0]
+        
+        self.assertEqual(hp.user, self.user)
+        self.assertEqual(hp.url, hp_url)
+        
+    def test_view_hompeage(self):
+        hp = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+        
+        response = self.client.get(reverse("sanza_homepage"))
+        
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], hp.url)
+        
+    def test_view_hompeage_not_set(self):
+        response = self.client.get(reverse("sanza_homepage"))
+        
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], "http://testserver"+reverse("crm_board_panel"))
+        
+    

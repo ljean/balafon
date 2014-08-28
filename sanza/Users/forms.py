@@ -38,3 +38,8 @@ class UpdateFavoriteForm(forms.Form):
                 'content_type': ContentType.objects.get_for_model(instance.__class__).id,
             }
         super(UpdateFavoriteForm, self).__init__(*args, **kwargs)
+        
+class UrlForm(forms.Form):
+    url = forms.URLField(required=True)
+    
+    

@@ -29,3 +29,15 @@ class Favorite(models.Model):
         
     def __unicode__(self):
         return u"{0} - {1}".format(self.user, self.content_object)
+
+class UserHomepage(models.Model):
+    user = models.OneToOneField(User, verbose_name=_("user"))
+    url = models.URLField(verbose_name=_("URL"))
+    
+    class Meta:
+        verbose_name = _(u'User homepage')
+        verbose_name_plural = _(u'User homepages')
+        
+    def __unicode__(self):
+        return u"{0} - {1}".format(self.user, self.url)
+    

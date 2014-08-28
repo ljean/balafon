@@ -577,3 +577,15 @@ table.with-odd-even tr.even td {
 .contacts-table td.extra-data {
   font-size: 0.8em;
 }
+.make-homepage {
+  color: #fff;
+  margin-top: 25px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.make-homepage.success {
+  color: #6b6;
+}
+.make-homepage.error {
+  color: #c33;
+}

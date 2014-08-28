@@ -19,56 +19,128 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "View" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{% url "users_favorites_list" %}">{% trans "Favorites" %}</a></li>
-            <li><a href="{% url "crm_view_entities_list" %}">{% trans "Contacts" %}</a></li>
-            <li><a href="{% url "crm_all_opportunities" %}">{% trans "Opportunities" %}</a></li>
-            <li><a href="{% url "crm_see_my_groups" %}">{% trans "Groups" %}</a></li>
-            <li><a href="{% url "emailing_newsletter_list" %}">{% trans "Mailings" %}</a></li>
+            <li>
+              <a href="{% url "users_favorites_list" %}">
+                <span class="glyphicon glyphicon-star"></span>
+                {% trans "Favorites" %}
+              </a>
+            </li>
+            <li>
+              <a href="{% url "crm_view_entities_list" %}">
+                <span class="glyphicon glyphicon-user"></span>
+              {% trans "Contacts" %}
+              </a>
+            </li>
+            <li>
+              <a href="{% url "crm_all_opportunities" %}">
+                <span class="glyphicon glyphicon-tag"></span>
+                {% trans "Opportunities" %}
+              </a>
+            </li>
+            <li>
+              <a href="{% url "crm_see_my_groups" %}">
+                <span class="glyphicon glyphicon-asterisk"></span>
+                {% trans "Groups" %}
+              </a>
+            </li>
+            <li>
+              <a href="{% url "emailing_newsletter_list" %}">
+                <span class="glyphicon glyphicon-send"></span>
+                {% trans "Mailings" %}
+              </a>
+            </li>
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Add" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
           {% if SANZA_NO_ENTITY_TYPE %}
-              <li><a class="colorbox-form" href="{% url "crm_create_entity" 0 %}">{% trans "Entity" %}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_create_entity" 0 %}">
+                <span class="glyphicon glyphicon-tower"></span>
+                {% trans "Entity" %}
+              </a></li>
           {% else %}
           {% for entity_type in SANZA_ENTITY_TYPES %}
-              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">{{entity_type.name}}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">{
+                <span class="glyphicon glyphicon-tower"></span>
+                {entity_type.name}}
+              </a></li>
           {% endfor %}
           {% endif %}
           {% if SANZA_ALLOW_SINGLE_CONTACT %}
-              <li><a class="colorbox-form" href="{% url "crm_add_single_contact" %}">{% trans "Single contact" %}</a></li>
+              <li><a class="colorbox-form" href="{% url "crm_add_single_contact" %}">
+                <span class="glyphicon glyphicon-user"></span>
+                {% trans "Single contact" %}
+              </a></li>
           {% endif %}
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{% url "crm_actions_of_month" NOW.year NOW.month %}">{% trans "Monthly actions" %}</a></li>
-            <li><a href="{% url "crm_actions_of_week" NOW.year NOW|date:"W" %}">{% trans "Weekly actions" %}</a></li>
-            <li><a href="{% url "crm_actions_of_day" NOW.year NOW.month NOW.day %}">{% trans "Daily actions" %}</a></li>
-            <li><a href="{% url "crm_actions_not_planned" %}">{% trans "Not planned actions" %}</a></li>
+            <li><a href="{% url "crm_actions_of_month" NOW.year NOW.month %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Monthly actions" %}
+            </a></li>
+            <li><a href="{% url "crm_actions_of_week" NOW.year NOW|date:"W" %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Weekly actions" %}
+            </a></li>
+            <li><a href="{% url "crm_actions_of_day" NOW.year NOW.month NOW.day %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Daily actions" %}
+            </a></li>
+            <li><a href="{% url "crm_actions_not_planned" %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Not planned actions" %}
+            </a></li>
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{% url "search" %}">{% trans "New search" %}</a></li>
-            <li><a href="{% url "search_list" %}">{% trans "Saved searches" %}</a></li>
+            <li><a href="{% url "search" %}">
+              <span class="glyphicon glyphicon-search"></span>
+              {% trans "New search" %}
+            </a></li>
+            <li><a href="{% url "search_list" %}">
+              <span class="glyphicon glyphicon-search"></span>
+              {% trans "Saved searches" %}
+            </a></li>
           </ul>
         </li>
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
             <ul class="dropdown-menu">
-                {%if SANZA_SITE_URL %}<li><a href="{{ SANZA_SITE_URL }}">{% trans "Back to site" %}</a></li>{% endif %}
-                <li><a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a></li>
-                <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
-                {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">{% trans "Contacts import" %}</a></li>{% endif %}
+                {%if SANZA_SITE_URL %}<li><a href="{{ SANZA_SITE_URL }}">
+                  <span class="glyphicon glyphicon-home"></span>
+                  {% trans "Back to site" %}
+                </a></li>{% endif %}
+                <li><a href="{% url "django.contrib.auth.views.logout" %}">
+                  <span class="glyphicon glyphicon-off"></span>
+                  {% trans "Logout" %}
+                </a></li>
+                <li><a href="{% url "django.contrib.auth.views.password_change" %}">
+                  <span class="glyphicon glyphicon-cog"></span>
+                  {% trans "Password" %}
+                </a></li>
+                {%if user.is_staff %}
+                  <li><a href="{% url "admin:index" %}">
+                  <span class="glyphicon glyphicon-cog"></span>
+                  {% trans "Admin" %}
+                  </a></li>{% endif %}
+                {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">
+                  <span class="glyphicon glyphicon-import"></span>
+                  {% trans "Contacts import" %}
+                </a></li>{% endif %}
             </ul>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        <li>
+          <span rel="{% url "users_make_homepage" %}"
+            class="glyphicon glyphicon-home make-homepage" title="{% trans "Make this homepage" %}"></span>
+        </li>
         <li class="quick-search-form">
             <form method="POST" action="{% url "quick_search" %}">{% csrf_token %}{{quick_search_form.text}}</form>
         </li>

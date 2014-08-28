@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import get_template
@@ -89,3 +89,30 @@ def list_favorites(request):
         context,
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+def user_homepage(request):
+    try:
+        homepage = models.UserHomepage.objects.get(user=request.user)
+        return HttpResponseRedirect(homepage.url)
+    except models.UserHomepage.DoesNotExist:
+        return HttpResponseRedirect(reverse('crm_board_panel'))
+    
+@user_passes_test(can_access)
+def make_homepage(request):
+    if request.method == "POST":
+        data = {"ok": False, "message": _(u"An error occured")}
+        form = forms.UrlForm(request.POST)
+        if form.is_valid():
+            try:
+                homepage = models.UserHomepage.objects.get(user=request.user)
+                homepage.url = form.cleaned_data["url"]
+                homepage.save()
+            except models.UserHomepage.DoesNotExist:
+                homepage = models.UserHomepage.objects.create(user=request.user, url=form.cleaned_data["url"])
+            data["ok"] = True
+        #else:
+        #    data["message"] = unicode(form.errors)
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    raise Http404
+
