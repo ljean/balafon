@@ -2,17 +2,30 @@
 {% load i18n pagination_tags favorite_tags sanza_utils %}
 
 {% block section_title %}
-  {%if partial %}{% trans "Latest entities" %}{% else %}{% trans "All entities" %}{%endif%}
+  {%if partial %}{% trans "Latest contacts" %}{% else %}{% trans "All contacts" %}{%endif%}
 {% endblock %}
   
 {% block section_data %}
   
 <script>
   $(function() {
-    
+    $(".letter-filter").click(function() {
+      var loc = window.location;
+      var url = loc.protocol + '//' + loc.host + loc.pathname;
+      window.location = url+"?filter="+$(this).attr('rel');
+      return false;
+    });
   })
 </script>
-  
+
+<div>
+{% for l in "*ABCDEFGHIJKLMNOPQRSTUVWXYZ~" %}
+  <span class="letter-filter btn btn-xs {% if letter_filter == l %}btn-primary{% else %}btn-default{% endif %}" rel="{{l}}">
+    {{l}}
+  </span>
+{% endfor %}
+</div>
+
 {% autopaginate entities 100 %}
 <table class="table with-odd-even contacts-table">
   <tr>

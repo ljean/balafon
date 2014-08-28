@@ -59,12 +59,24 @@ def view_entity(request, entity_id):
 
 @user_passes_test(can_access)
 def view_entities_list(request):
-    entities = list(models.Entity.objects.all())
+    letter_filter = request.GET.get("filter", "*")
+    
+    qs = models.Entity.objects.all()
+    if re.search("\w+", letter_filter):
+        #qs = qs.filter(name__istartswith=letter_filter)
+        qs = qs.extra(
+            where=[u"UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
+            params = [u"{0}%".format(letter_filter)]
+        )
+    elif letter_filter == "~":
+        qs = qs.filter(name__regex=r'^\W|^\d')
+    entities = list(qs)
+    
     #entities.sort(key=lambda x: x.default_contact.lastname.lower() if x.is_single_contact else x.name.lower())
     
     return render_to_response(
         'Crm/all_entities.html',
-        {'entities': entities},
+        {'entities': entities, "letter_filter": letter_filter},
         context_instance=RequestContext(request)
     )
 
