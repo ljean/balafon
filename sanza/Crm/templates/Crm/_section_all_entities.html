@@ -1,62 +1,94 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags favorite_tags %}
+{% load i18n pagination_tags favorite_tags sanza_utils %}
 
 {% block section_title %}
   {%if partial %}{% trans "Latest entities" %}{% else %}{% trans "All entities" %}{%endif%}
 {% endblock %}
   
 {% block section_data %}
+  
+<script>
+  $(function() {
+    
+  })
+</script>
+  
 {% autopaginate entities 100 %}
-<table class="table table-striped">
+<table class="table with-odd-even contacts-table">
   <tr>
     <th colspan="2">{% trans "Contacts" %}</th>
-    <th>{% trans "City" %}</th>
-    <th>{% trans "Last action" %}</th>
-    <th>{% trans "Next action" %}</th>
+    <th class="extra-data">
+      <span class="glyphicon glyphicon-envelope"></span>
+      <span class="text">{% trans "City" %}</span>
+    </th>
+    <th class="extra-data">
+      <span class="glyphicon glyphicon-earphone"></span>
+      <span class="text">{% trans "Phone" %}</span>
+    </th>
+    <th class="extra-data">
+      <span class="glyphicon glyphicon-send"></span>
+      <span class="text">{% trans "Email" %}</span>
+    </th>
   </tr>
-  {% for e in entities %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    
+  
+  {% for e in entities %}{% with counter=forloop.counter %}
     {% if e.is_single_contact %}
-      {% with e.single_contact as c %}
-      <td colspan="2">{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id%}">{{c.lastname|default:"?"}} {{c.firstname}}</a></td>
-      {% endwith %}
+      <tr class="{% if counter|divisibleby:2 %}even{% else %}odd{% endif %}"> 
+        {% with e.single_contact as c %}
+        <td colspan="2">
+          <span class="glyphicon glyphicon-user"></span>
+          <a href="{% url "crm_view_contact" c.id %}">{{c.lastname|default:"?"}} {{c.firstname}}</a>
+        </td>
+      
+        <td class="extra-data">{{c.city.get_friendly_name|default:"&nbsp;"}}</td>
+        <td class="extra-data">{{c.get_phones|join:", "|default:"&nbsp;"}}</td>
+        <td class="extra-data">
+          {% with em=c.get_email %}{% if em %}<a href="mailto:{{em}}">{{em}}</a>{% else %}&nbsp;{% endif %}{% endwith %}
+        </td>
+        
+        {% endwith %}
+      </tr>
     {% else %}
-      <td>{% favorite_item object=e %}<a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a></td>
-      <td>
-        {% if e.main_contacts %}
-        {% for c in e.main_contacts %}<a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>{% endfor %}
-        {% else %}
-          &nbsp;
-        {% endif %}
-      </td>
+      
+      {% if e.main_contacts %}
+        {% for c in e.main_contacts %}
+          <tr class="{% if counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+  
+            <td>
+              {% if forloop.counter0 == 0 %}
+                <span class="glyphicon glyphicon-tower"></span>
+                <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
+              {% else %}
+                &nbsp;
+              {% endif %}
+            </td>
+            
+            <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+            
+            <td class="extra-data">{{c.get_city.get_friendly_name|default:"&nbsp;"}}</td>
+            <td class="extra-data">{{c.get_phones|seq_to_br|default:"&nbsp;"}}</td>
+            <td class="extra-data">
+              {% with em=c.get_email %}{% if em %}<a href="mailto:{{em}}">{{em}}</a>{% else %}&nbsp;{% endif %}{% endwith %}
+            </td>
+          </tr>
+        {% endfor %}
+      {% else %}
+        <tr class="{% if counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+          <td>
+            <span class="glyphicon glyphicon-tower"></span>
+            <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
+          </td>
+          <td></td>
+          <td class="extra-data">{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
+          <td class="extra-data">{{e.get_phone|default:"&nbsp;"}}</td>
+          <td class="extra-data">
+            {% with em=e.get_email %}{% if em %}<a href="mailto:{{em}}">{{em}}</a>{% else %}&nbsp;{% endif %}{% endwith %}
+          </td>
+        </tr>
+      {% endif %}
+      
     {% endif %}
-
-    <td>{{e.city.get_friendly_name|default:"&nbsp;"}}</td>
-    
-    <td>
-      {% with e.last_action as action %}
-      {% if action %}
-        <span class="action-dt-label">{% trans "Done the" %}</span>
-        <span class="action-dt-value">{{action.done_date|date:"d F Y"}}</span> {{action.subject}}
-      {% else %}
-        &nbsp;
-      {% endif %}
-      {% endwith %}
-    </td>
-    
-    <td>
-      {% with e.next_action as action %}
-      {% if action %}
-        <span class="action-dt-label">{% trans "Planned the" %}</span>
-        <span class="action-dt-value">{{action.planned_date|date:"d F Y"}}</span> {{action.subject}}
-      {% else %}
-        &nbsp;
-      {% endif %}
-      {% endwith %}
-    </td>
-  </tr>
-  {% endfor %}
+  {% endwith %}{% endfor %}
 </table>
 {% paginate %}
 {% endblock %}

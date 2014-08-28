@@ -564,3 +564,16 @@ ul.fielderror li {
   font-size: 0.8em;
   color: #c00;
 }
+table.with-odd-even tr.odd td {
+  background: #eee;
+}
+table.with-odd-even tr.even td {
+  background: #fff;
+}
+.contacts-table th {
+  background: #888;
+}
+.contacts-table th.extra-data,
+.contacts-table td.extra-data {
+  font-size: 0.8em;
+}
