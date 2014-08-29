@@ -61,9 +61,9 @@
               </a></li>
           {% else %}
           {% for entity_type in SANZA_ENTITY_TYPES %}
-              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">{
+              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">
                 <span class="glyphicon glyphicon-tower"></span>
-                {entity_type.name}}
+                {{ entity_type.name }}
               </a></li>
           {% endfor %}
           {% endif %}

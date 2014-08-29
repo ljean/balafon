@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import date, timedelta
 import json, re
 from colorbox.decorators import popup_redirect
-from sanza.Crm.settings import get_default_country
+from sanza.Crm.settings import get_default_country, is_unaccent_filter_supported
 from django.conf import settings
 import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city, check_city_exists, get_in_charge_users
@@ -63,11 +63,13 @@ def view_entities_list(request):
     
     qs = models.Entity.objects.all()
     if re.search("\w+", letter_filter):
-        #qs = qs.filter(name__istartswith=letter_filter)
-        qs = qs.extra(
-            where=[u"UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
-            params = [u"{0}%".format(letter_filter)]
-        )
+        if is_unaccent_filter_supported():
+            qs = qs.extra(
+                where=[u"UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
+                params = [u"{0}%".format(letter_filter)]
+            )
+        else:
+            qs = qs.filter(name__istartswith=letter_filter)
     elif letter_filter == "~":
         qs = qs.filter(name__regex=r'^\W|^\d')
     entities = list(qs)
