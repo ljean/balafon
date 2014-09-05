@@ -615,6 +615,23 @@ class Contact(TimeStampedModel):
         verbose_name_plural = _(u'contacts')
         ordering = ('lastname', 'firstname')
     
+class SubscriptionType(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    
+    def __unicode__(self):
+        return self.name
+    
+class Subscription(models.Model):
+    
+    subscription_type = models.ForeignKey(SubscriptionType)
+    contact = models.ForeignKey(Contact)
+    
+    accept_subscription = models.BooleanField(_(u"accept subscription"), default=False,
+        help_text = _(u'Keep this checked if you want to receive our newsletter.'))
+    
+    subscription_date = models.DateTimeField(blank=True, default=None, null=True)
+    unsubscription_date = models.DateTimeField(blank=True, default=None, null=True)
+    
 class Group(TimeStampedModel):
     name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
     description = models.CharField(_(u'description'), max_length=200, blank=True, default="")

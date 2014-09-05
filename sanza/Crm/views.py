@@ -587,9 +587,21 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
     
     if request.method == 'POST':
         form = forms.ContactForm(request.POST, request.FILES, instance=contact)
-        
         if form.is_valid():
             contact = form.save()
+            for st in models.SubscriptionType.objects.all():
+                field_name = "subscription_{0}".format(st.id)
+                accept_subscription = form.cleaned_data[field_name]
+                try:
+                    s = models.Subscription.objects.get(contact=contact, subscription_type=st)
+                    if s.accept_subscription != accept_subscription:
+                        s.accept_subscription = accept_subscription
+                        s.save()
+                except models.Subscription.DoesNotExist:
+                    if accept_subscription:
+                        s = models.Subscription.objects.create(
+                            contact=contact, subscription_type=st, accept_subscription=True)
+            
             if go_to_entity:
                 return HttpResponseRedirect(reverse('crm_view_entity', args=[contact.entity.id]))
             else:

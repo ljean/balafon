@@ -3709,6 +3709,29 @@ class EditContactAndEntityTestCase(BaseTestCase):
         response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
         self.assertEqual(200, response.status_code)
         
+    def test_view_edit_contact_subscriptions(self):
+        c = mommy.make(models.Contact)
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        st3 = mommy.make(models.SubscriptionType)
+        
+        s1 = models.Subscription.objects.create(subscription_type=st1, contact=c, accept_subscription=True)
+        s2 = models.Subscription.objects.create(subscription_type=st2, contact=c, accept_subscription=False)
+        
+        response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        
+        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        
+        self.assertEqual(1, len(soup.select(f1)))
+        self.assertEqual(1, len(soup.select(f2)))
+        self.assertEqual(1, len(soup.select(f3)))
+        
+        soup.select(f1)[0]["checked"] # Should not raise any error
+        self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
+        self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
+        
     def test_edit_contact(self):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
@@ -3729,6 +3752,66 @@ class EditContactAndEntityTestCase(BaseTestCase):
         self.assertEqual(c.lastname, data['lastname'])
         self.assertEqual(c.firstname, data['firstname'])
         self.assertEqual(c.city.id, data['city'])
+        
+    def test_edit_contact_subscription_not_set(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            'subscription_{0}'.format(st1.id): True,
+            'subscription_{0}'.format(st2.id): False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.id, data['city'])
+        self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
+        self.assertEqual(models.Subscription.objects.filter(subscription_type=st2, contact=c).count(), 0)
+    
+    def test_edit_contact_subscription_set(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        
+        c = mommy.make(models.Contact)
+        
+        s1 = models.Subscription.objects.create(subscription_type=st1, contact=c, accept_subscription=False)
+        s2 = models.Subscription.objects.create(subscription_type=st2, contact=c, accept_subscription=False)
+        
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            'subscription_{0}'.format(st1.id): True,
+            'subscription_{0}'.format(st2.id): False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+        
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.id, data['city'])
+        self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
+        self.assertEqual(models.Subscription.objects.get(subscription_type=st2, contact=c).accept_subscription, False)
     
     def test_edit_contact_keep_note(self):
         c = mommy.make(models.Contact, notes="Toto")

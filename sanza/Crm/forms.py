@@ -289,11 +289,19 @@ class ContactForm(ModelFormWithCity):
             ('name', {'fields': ['gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'], 'legend': _(u'Name')}),
             ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact details')}),
             ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('relationship', {'fields': ['main_contact', 'email_verified', 'accept_newsletter', 'accept_3rdparty', 'accept_notifications', 'has_left'], 'legend': _(u'Options')}),
+            ('relationship', {'fields': ['main_contact', 'email_verified', 'has_left', 'accept_notifications'],
+                'legend': _(u'Options')}),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
     def __init__(self, *args, **kwargs):
+        #Configure the fieldset with dynamic fields
+        fieldset_fields = self.Meta.fieldsets[-2][1]["fields"]
+        for st in models.SubscriptionType.objects.all():
+            field_name = "subscription_{0}".format(st.id)
+            if not (field_name in fieldset_fields):
+                fieldset_fields.append(field_name)
+            
         super(ContactForm, self).__init__(*args, **kwargs)
         self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
         
@@ -301,6 +309,17 @@ class ContactForm(ModelFormWithCity):
             self.fields["accept_notifications"].widget = forms.HiddenInput()
         
         self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
+        
+        #create the dynamic fields
+        for st in models.SubscriptionType.objects.all():
+            field_name = "subscription_{0}".format(st.id)
+            field = self.fields[field_name] = forms.BooleanField(label=st.name, required=False)
+            if self.instance:
+                try:
+                    subscription = models.Subscription.objects.get(subscription_type=st, contact=self.instance)
+                    field.initial = subscription.accept_subscription
+                except models.Subscription.DoesNotExist:
+                    pass
 
     def clean_photo(self):
         photo = self.cleaned_data["photo"]

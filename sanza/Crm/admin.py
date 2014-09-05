@@ -35,10 +35,14 @@ class OpportunityStatusAdmin(admin.ModelAdmin):
     list_display = ['name', 'ordering']
 admin.site.register(models.OpportunityStatus, OpportunityStatusAdmin)
 
+class SubscriptionInline(admin.TabularInline):
+    model = models.Subscription
+
 class ContactAdmin(admin.ModelAdmin):
     list_display = ['lastname', 'firstname', 'entity']
     search_fields = ['lastname']
     raw_id_admin = ('entity',)
+    inlines = (SubscriptionInline,)
 admin.site.register(models.Contact, ContactAdmin)
 
 class GroupAdmin(admin.ModelAdmin):
@@ -46,7 +50,6 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_filter=['subscribe_form']
     list_editable=['subscribe_form']
-    
     filter_horizontal = ['entities', 'contacts']
 admin.site.register(models.Group, GroupAdmin)
 
@@ -105,3 +108,5 @@ admin.site.register(models.RelationshipType, RelationshipTypeAdmin)
 class RelationshipAdmin(admin.ModelAdmin):
     list_display = ['id', 'contact1', 'relationship_type', 'contact2']
 admin.site.register(models.Relationship, RelationshipAdmin)
+
+admin.site.register(models.SubscriptionType)
