@@ -387,6 +387,21 @@ class SubscribeTest(TestCase):
     def test_email_subscribe_newsletter(self):
         url = reverse("emailing_email_subscribe_newsletter")
         
+        site1 = Site.objects.get_current()
+        site2 = mommy.make(Site)
+        
+        st1 = mommy.make(models.SubscriptionType, name="abc")
+        st2 = mommy.make(models.SubscriptionType, name="def")
+        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st4 = mommy.make(models.SubscriptionType, name="jkl")
+        
+        st1.sites.add(site1, site2)
+        st1.save()
+        st2.sites.add(site1)
+        st2.save()
+        st3.sites.add(site2)
+        st3.save()
+        
         data = {
             'email': 'pdupond@apidev.fr',
         }
@@ -412,6 +427,16 @@ class SubscribeTest(TestCase):
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        
+        for subscription_type in (st1, st2):
+            subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(subscription.accept_subscription, True)
+            self.assertEqual(subscription.subscription_date.date(), date.today())
+            
+        for subscription_type in (st3, st4):
+            qs = models.Subscription.objects.filter(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(0, qs.count())
+        
         
     def test_email_subscribe_newsletter_no_email(self):
         url = reverse("emailing_email_subscribe_newsletter")
@@ -663,10 +688,59 @@ class SubscribeTest(TestCase):
             'captcha_1': captcha.response
         })
     
-    def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
+    def test_view_subscribe(self):
+        site1 = Site.objects.get_current()
+        site2 = mommy.make(Site)
         
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter")
-        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party")
+        st1 = mommy.make(models.SubscriptionType, name="#News#abc")
+        st2 = mommy.make(models.SubscriptionType, name="#News#def")
+        st3 = mommy.make(models.SubscriptionType, name="#News#ghi")
+        st4 = mommy.make(models.SubscriptionType, name="#News#jkl")
+        
+        st1.sites.add(site1, site2)
+        st1.save()
+        st2.sites.add(site1)
+        st2.save()
+        st3.sites.add(site2)
+        st3.save()
+        
+        url = reverse("emailing_subscribe_newsletter")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, st1.name)
+        self.assertContains(response, st2.name)
+        self.assertNotContains(response, st3.name)
+        self.assertNotContains(response, st4.name)
+    
+    def test_accept_newsletter_not_in_site(self):
+        site1 = Site.objects.get_current()
+        
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[])
+        
+        url = reverse("emailing_subscribe_newsletter")
+            
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'email': 'pdupond@apidev.fr',
+            'subscription_types': [newsletter_subscription.id],
+        }
+        
+        self._patch_with_captcha(url, data)
+        
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Subscription.objects.count(), 0)
+        self.assertEqual(len(mail.outbox), 0)
+    
+    
+    def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
+        site1 = Site.objects.get_current()
+        
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
         
         url = reverse("emailing_subscribe_newsletter")
         

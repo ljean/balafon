@@ -19,6 +19,7 @@ from sanza.utils import now_rounded
 from django.contrib.contenttypes.generic import GenericRelation
 from sanza.Users.models import Favorite
 from urlparse import urlparse
+from django.contrib.sites.models import Site
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -617,6 +618,7 @@ class Contact(TimeStampedModel):
     
 class SubscriptionType(models.Model):
     name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    sites = models.ManyToManyField(Site, blank=True, null=True)
     
     def __unicode__(self):
         return self.name

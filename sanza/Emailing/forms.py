@@ -26,6 +26,7 @@ from coop_cms.utils import dehtml
 from django.utils.timezone import now as dt_now
 from datetime import timedelta
 from sanza.Emailing.utils import create_subscription_action, send_notification_email
+from django.contrib.sites.models import Site
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -133,7 +134,15 @@ class EmailSubscribeForm(forms.ModelForm):
         #delete unknown contacts for the current entity
         contact.entity.contact_set.exclude(id=contact.id).delete()
         
-        create_subscription_action(contact, [_(u'newsletter')])
+        subscriptions = []
+        for st in SubscriptionType.objects.filter(sites=Site.objects.get_current()):
+            s, _ = Subscription.objects.get_or_create(contact=contact, subscription_type=st)
+            s.accept_subscription = True
+            s.subscription_date = datetime.now()
+            s.save()
+            subscriptions.append(st.name)
+        
+        create_subscription_action(contact, subscriptions)
         send_notification_email(request, contact, [], "")
                 
         return contact
@@ -189,7 +198,7 @@ class SubscribeForm(ModelFormWithCity):
         ]
         
         self.fields['subscription_types'].choices = [
-            (st.id, st.name) for st in SubscriptionType.objects.all()
+            (st.id, st.name) for st in SubscriptionType.objects.filter(sites=Site.objects.get_current())
         ]
     
     def clean_entity_type(self):
@@ -298,7 +307,7 @@ class SubscribeForm(ModelFormWithCity):
         contact.entity.save()
         
         subscriptions = []
-        for subscription_type in SubscriptionType.objects.all():
+        for subscription_type in SubscriptionType.objects.filter(sites=Site.objects.get_current()):
             subscription, _x = Subscription.objects.get_or_create(
                 contact=contact, subscription_type=subscription_type)
             if subscription_type in self.cleaned_data['subscription_types']:
