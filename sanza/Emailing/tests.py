@@ -8,7 +8,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.core.urlresolvers import reverse
-from datetime import datetime
+from datetime import datetime, date
 from model_mommy import mommy
 from sanza.Crm import models
 from sanza.Emailing.models import Emailing, MagicLink
@@ -664,15 +664,24 @@ class SubscribeTest(TestCase):
         })
     
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
+        
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter")
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party")
+        
         url = reverse("emailing_subscribe_newsletter")
         
+        subscription_types = []
+        if accept_newsletter:
+            subscription_types.append(newsletter_subscription.id)
+        if accept_3rdparty:
+            subscription_types.append(third_party_subscription.id)
+            
         data = {
             'entity_type': 0,
             'lastname': 'Dupond',
             'firstname': 'Pierre',
             'email': 'pdupond@apidev.fr',
-            'accept_newsletter': accept_newsletter,
-            'accept_3rdparty': accept_3rdparty,
+            'subscription_types': subscription_types,
         }
         
         self._patch_with_captcha(url, data)
@@ -688,8 +697,23 @@ class SubscribeTest(TestCase):
         
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
-        self.assertEqual(contact.accept_newsletter, data['accept_newsletter'])
-        self.assertEqual(contact.accept_3rdparty, data['accept_3rdparty'])
+        
+        subscription_newsletter = models.Subscription.objects.get(
+            contact=contact, subscription_type=newsletter_subscription)
+        self.assertEqual(subscription_newsletter.accept_subscription, accept_newsletter)
+        if accept_newsletter:
+            self.assertEqual(subscription_newsletter.subscription_date.date(), date.today())
+        else:
+            self.assertEqual(subscription_newsletter.subscription_date, None)
+        
+        subscription_3rdparty = models.Subscription.objects.get(
+            contact=contact, subscription_type=third_party_subscription)
+        self.assertEqual(subscription_3rdparty.accept_subscription, accept_3rdparty)
+        if accept_3rdparty:
+            self.assertEqual(subscription_3rdparty.subscription_date.date(), date.today())
+        else:
+            self.assertEqual(subscription_3rdparty.subscription_date, None)
+        
         self.assertEqual(contact.email_verified, False)
         
         self.assertEqual(len(mail.outbox), 2) #email verification

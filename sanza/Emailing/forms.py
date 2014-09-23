@@ -8,6 +8,7 @@ from coop_cms.models import Newsletter
 from django.core.exceptions import ValidationError
 from coop_cms.settings import get_newsletter_templates
 from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
+from sanza.Crm.models import SubscriptionType, Subscription
 from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm import settings as crm_settings
 from datetime import datetime
@@ -149,11 +150,11 @@ class SubscribeForm(ModelFormWithCity):
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
+    subscription_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     
     class Meta:
         model = Contact
-        fields=('gender', 'firstname', 'lastname',
-            'phone', 'mobile', 'email', 'accept_newsletter', 'accept_3rdparty', 'address',
+        fields=('gender', 'firstname', 'lastname', 'phone', 'mobile', 'email', 'address',
             'address2', 'address3', 'zip_code')
         widgets = {
             #'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
@@ -185,6 +186,10 @@ class SubscribeForm(ModelFormWithCity):
         
         self.fields['action_types'].choices = [
             (at.id, at.name) for at in ActionType.objects.filter(subscribe_form=True)
+        ]
+        
+        self.fields['subscription_types'].choices = [
+            (st.id, st.name) for st in SubscriptionType.objects.all()
         ]
     
     def clean_entity_type(self):
@@ -268,6 +273,13 @@ class SubscribeForm(ModelFormWithCity):
         except ActionType.DoesNotExist:
             raise ValidationError(_(u"Invalid action type"))
         return action_types
+    
+    def clean_subscription_types(self):
+        try:
+            subscription_types = [SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']]
+        except SubscriptionType.DoesNotExist:
+            raise ValidationError(_(u"Invalid subscription type"))
+        return subscription_types
         
     def save(self, request=None):
         contact = super(SubscribeForm, self).save(commit=False)
@@ -285,9 +297,20 @@ class SubscribeForm(ModelFormWithCity):
             contact.entity.group_set.add(g)
         contact.entity.save()
         
+        subscriptions = []
+        for subscription_type in SubscriptionType.objects.all():
+            subscription, _x = Subscription.objects.get_or_create(
+                contact=contact, subscription_type=subscription_type)
+            if subscription_type in self.cleaned_data['subscription_types']:
+                subscription.accept_subscription = True
+                subscription.subscription_date = datetime.now()
+                #This is added to the notification email
+                subscriptions.append(subscription_type.name)
+            else:
+                subscription.accept_subscription = False
+            subscription.save()
+        
         message = self.cleaned_data["message"]
-        accept_newsletter = self.cleaned_data["accept_newsletter"]
-        accept_3rdparty = self.cleaned_data["accept_3rdparty"]
         
         if message:
             at, _x = ActionType.objects.get_or_create(name=_(u"Message"))
@@ -300,12 +323,6 @@ class SubscribeForm(ModelFormWithCity):
             )
             action.contacts.add(contact)
             action.save()
-            
-        subscriptions = []
-        if accept_newsletter:
-            subscriptions += [_(u'newsletter')]
-        if accept_3rdparty:
-            subscriptions += [_(u'3rd parties')]
         
         if subscriptions:
             create_subscription_action(contact, subscriptions)
