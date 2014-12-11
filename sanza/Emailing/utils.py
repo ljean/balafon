@@ -21,6 +21,7 @@ from django.utils.safestring import mark_safe
 from coop_cms.settings import get_newsletter_context_callbacks
 from django.contrib import messages
 
+
 def format_context(text, data):
     # { and } need to be escaped for the format function
     text = text.replace('{', '{{').replace('}', '}}')
@@ -29,6 +30,7 @@ def format_context(text, data):
     text = text.replace('#!-', '{').replace('-!#', '}')
     
     return text.format(**data)
+
 
 def get_emailing_context(emailing, contact):
     data = dict(contact.__dict__)
@@ -67,7 +69,8 @@ def get_emailing_context(emailing, contact):
             context_dict.update(d)
     
     return context_dict
-    
+
+
 def send_newsletter(emailing, max_nb):
     #Create automatically an action type for logging one action by contact
     emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
@@ -101,7 +104,7 @@ def send_newsletter(emailing, max_nb):
             #create action
             action = Action.objects.create(
                 subject=context['title'], planned_date=emailing.scheduling_dt,
-                type = emailing_action_type, detail=text, done=True,
+                type=emailing_action_type, detail=text, done=True,
                 display_on_board=False, done_date=datetime.now()
             )
             action.contacts.add(contact)
@@ -114,18 +117,20 @@ def send_newsletter(emailing, max_nb):
     emailing.save()
     nb_sent = connection.send_messages(emails)
     return nb_sent or 0
- 
+
+
 def create_subscription_action(contact, subscriptions):
-    at, _x = ActionType.objects.get_or_create(name=_(u"Subscription"))
+    action_type = ActionType.objects.get_or_create(name=_(u"Subscription"))[0]
     action = Action.objects.create(
-        subject = _(u"Subscribe to {0}").format(u", ".join(subscriptions)),
-        type = at,
-        planned_date = datetime.now(),
-        display_on_board = False
+        subject=_(u"Subscribe to {0}").format(u", ".join(subscriptions)),
+        type=action_type,
+        planned_date=datetime.now(),
+        display_on_board=False
     )
     action.contacts.add(contact)
     action.save()
     return action
+
 
 def send_notification_email(request, contact, actions, message):
     #send an email
@@ -145,17 +150,23 @@ def send_notification_email(request, contact, actions, message):
         
         email = EmailMessage(
             _(u"Message from web site"), content, from_email,
-            [notification_email], headers = {'Reply-To': contact.email})
+            [notification_email], headers = {'Reply-To': contact.email}
+        )
         try:
             email.send()
             if request:
-                messages.add_message(request, messages.SUCCESS,
-                    _(u"The message have been sent"))
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    _(u"The message have been sent")
+                )
         except Exception, msg:
             if request:
-                messages.add_message(request, messages.ERROR,
-                    _(u"The message couldn't be send."))
-    
+                messages.add_message(
+                    request, messages.ERROR,
+                    _(u"The message couldn't be send.")
+                )
+
+
 def send_verification_email(contact):
     if contact.email:
         data = {
@@ -171,7 +182,8 @@ def send_verification_email(contact):
         
         email = EmailMessage(
             _(u'Verification of your email address'), content, from_email,
-            [contact.email])
+            [contact.email]
+        )
         email.send()
         return True
     return False
