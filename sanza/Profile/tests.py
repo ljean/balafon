@@ -503,8 +503,12 @@ class ProfileBackendTest(TestCase):
         contact = mommy.make(models.Contact, email=user.email)
         contact.entity.default_contact.delete()
         self._create_profile_and_check(user)
-        self.assertEqual(models.Contact.objects.count(), 1)
-        self.assertEqual(models.Action.objects.count(), 1)#account
+        print "*******************************"
+        for c in models.Contact.objects.all():
+            print c.email, c.entity.contact_set.count(), c.entity.id, c.id, c.lastname, c.firstname
+        print "*******************************"
+        self.assertEqual(models.Contact.objects.filter(email=user.email).count(), 1)
+        self.assertEqual(models.Action.objects.count(), 1)
 
     def test_create_sanza_contact_multiple_email(self):
         user = self._create_user()
@@ -518,8 +522,12 @@ class ProfileBackendTest(TestCase):
         self.assertEqual(contact.lastname, user.last_name)
         self.assertEqual(contact.firstname, user.first_name)
         
-        self.assertEqual(models.Contact.objects.count(), 3)
+        self.assertEqual(models.Contact.objects.filter(email=user.email).count(), 3)
         # warn duplicates + account creation
+        print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        for a in models.Action.objects.all():
+            print a.id, a.subject, a.contacts.all()
+        print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         self.assertEqual(models.Action.objects.count(), 2)
         for action in models.Action.objects.all():
             self.assertEqual(list(action.contacts.all()), [contact])

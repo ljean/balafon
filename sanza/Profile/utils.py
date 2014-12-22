@@ -42,8 +42,8 @@ def create_profile_contact(user):
                     rename_entity = True
 
             entity = Entity(
-                name = profile.entity_name if profile else user.username,
-                is_single_contact = (entity_type==None) and crm_settings.ALLOW_SINGLE_CONTACT,
+                name=profile.entity_name if profile else user.username,
+                is_single_contact=(entity_type == None) and crm_settings.ALLOW_SINGLE_CONTACT,
                 type = entity_type
             )
             
