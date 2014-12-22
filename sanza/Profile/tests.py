@@ -11,7 +11,6 @@ from unittest import skipIf
 
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.core.files import File
