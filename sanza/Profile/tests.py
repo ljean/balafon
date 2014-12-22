@@ -518,25 +518,10 @@ class ProfileBackendTest(TestCase):
         contact1.entity.contact_set.exclude(id=contact1.id).delete()
         contact2.entity.contact_set.exclude(id=contact2.id).delete()
 
-        print "!!!!!!!!!!!!!!!+++++++++++++++"
-        for c in models.Contact.objects.all():
-            print c.email, c.entity.contact_set.count(), c.entity.id, c.id, c.lastname, c.firstname
-        print "!!!!!!!!!!!!!!!+++++++++++++++"
-
         profile = create_profile_contact(user)
         contact = profile.contact
         self.assertEqual(contact.lastname, user.last_name)
         self.assertEqual(contact.firstname, user.first_name)
-
-        print "++++++++++++++++++++++++++++++"
-        for c in models.Contact.objects.all():
-            print c.email, c.entity.contact_set.count(), c.entity.id, c.id, c.lastname, c.firstname
-        print "++++++++++++++++++++++++++++++"
-
-        print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-        for a in models.Action.objects.all():
-            print a.id, a.subject, a.contacts.all()
-        print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
         self.assertEqual(models.Contact.objects.filter(email=user.email).count(), 3)
         # warn duplicates + account creation
