@@ -13,6 +13,7 @@ from django.utils.timezone import now as dt_now
 from django.utils.translation import ugettext as _
 
 from captcha.fields import CaptchaField
+
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
 from coop_cms.utils import dehtml
@@ -29,8 +30,8 @@ from sanza.Emailing.utils import create_subscription_action, send_notification_e
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
-    
-    
+
+
 class NewEmailingForm(forms.Form):
     newsletter = forms.IntegerField(label=_(u"Newsletter"))
     subject = forms.CharField(
@@ -186,17 +187,26 @@ class SubscribeForm(ModelFormWithCity):
 
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
-        
+
         self.fields['email'].required = True
         #self.fields['lastname'].required = True
         
         #Do not display (Mrs and M) gender on subscribe form
         self.fields['gender'].choices = self.fields['gender'].choices[:3]
-        
-        self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
+
+        entity_types_choices = []
+
+        if crm_settings.ALLOW_SINGLE_CONTACT:
+            entity_types_choices.append((0, _(u'Individual')))
+        else:
+            entity_types_choices.append((0, ''))
+
+        entity_types_choices.extend([
             (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
-        ]
-        
+        ])
+
+        self.fields['entity_type'].choices = entity_types_choices
+
         self.fields['groups'].choices = [
             (g.id, g.name) for g in Group.objects.filter(subscribe_form=True)
         ]
@@ -232,7 +242,7 @@ class SubscribeForm(ModelFormWithCity):
                 entity_type = EntityType.objects.get(id=et_id)
                 entity_name = u"{0} {1}".format(
                     self.cleaned_data['lastname'], self.cleaned_data['firstname'])
-                return Entity.objects.create(name=entity, type=entity_type)
+                return Entity.objects.create(name=entity_name, type=entity_type)
             
     def clean_entity(self):
         entity_type = self.cleaned_data.get('entity_type', None)
@@ -328,7 +338,7 @@ class SubscribeForm(ModelFormWithCity):
             subscription.save()
         
         message = self.cleaned_data["message"]
-        
+
         if message:
             action_type = ActionType.objects.get_or_create(name=_(u"Message"))[0]
             action = Action.objects.create(

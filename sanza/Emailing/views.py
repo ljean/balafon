@@ -134,6 +134,7 @@ def confirm_send_mail(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def cancel_send_mail(request, emailing_id):
@@ -283,6 +284,7 @@ def email_tracking(request, emailing_id, contact_uuid):
     response['Content-Length'] = os.path.getsize(file_name)
     return response
 
+
 class SubscribeView(View):
     template_name = 'Emailing/public/subscribe.html'
         
@@ -291,10 +293,10 @@ class SubscribeView(View):
             form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
             module_name, class_name = form_name.rsplit('.', 1)
             module = import_module(module_name)
-            SubscribeForm = getattr(module, class_name)
+            subscribe_form = getattr(module, class_name)
         except AttributeError:
-            SubscribeForm = forms.SubscribeForm
-        return SubscribeForm 
+            subscribe_form = forms.SubscribeForm
+        return subscribe_form
         
     def get_template(self):
         return self.template_name
@@ -315,8 +317,7 @@ class SubscribeView(View):
             context_dict,
             context_instance=RequestContext(self.request)
         )
-    
-    
+
     def get(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = form_class()
@@ -338,15 +339,17 @@ class SubscribeView(View):
                 fix_action, _is_new = ActionType.objects.get_or_create(name=_(u'Sanza'))
                 action = Action.objects.create(
                     subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
-                    type = fix_action, detail=detail, display_on_board=True,
+                    type=fix_action, detail=detail, display_on_board=True,
                 )
                 action.contacts.add(contact)
                 action.save()
                 
                 return HttpResponseRedirect(self.get_error_url(contact))
-        
+        else:
+            logger.warning(u'contact form : {0}'.format(form.errors))
         return self._display_form(form)
-    
+
+
 class EmailSubscribeView(SubscribeView):
     template_name = 'Emailing/public/subscribe_email.html'
     

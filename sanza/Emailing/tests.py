@@ -440,19 +440,18 @@ class SubscribeTest(TestCase):
         
     def test_email_subscribe_newsletter_no_email(self):
         url = reverse("emailing_email_subscribe_newsletter")
-        
+
         data = {
             'email': '',
         }
-        
+
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(200, response.status_code)
         soup = BS4(response.content)
         self.assertEqual(len(soup.select("ul.errorlist")), 1)
         self.assertEqual(models.Contact.objects.count(), 0)
-        
         self.assertEqual(len(mail.outbox), 0) #email verification
-        
+
     def test_email_subscribe_newsletter_invalid_email(self):
         url = reverse("emailing_email_subscribe_newsletter")
         
@@ -467,8 +466,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Contact.objects.count(), 0)
         
         self.assertEqual(len(mail.outbox), 0) #email verification
-        
-        
+
     def test_subscribe_newsletter_no_email(self):
         group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
         
@@ -478,14 +476,17 @@ class SubscribeTest(TestCase):
             'lastname': 'Dupond',
             'firstname': 'Pierre',
             'groups': str(group1.id),
+            'entity_type': 0,
+            'email': '',
         }
         self._patch_with_captcha(url, data)
         
         self.assertEqual(models.Contact.objects.count(), 0)
-        response = self.client.post(url, data=data, follow=False)
+        response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+        self.assertEqual(len(soup.select("ul.errorlist")), 1)
         self.assertEqual(models.Contact.objects.count(), 0)
-        
         self.assertEqual(len(mail.outbox), 0)
         
     def test_subscribe_newsletter_message(self):
