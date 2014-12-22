@@ -1,32 +1,31 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms as forms
-from sanza.Emailing import models
-from django.utils.translation import ugettext as _
+from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
+import re
+import urllib2
+
 from django.conf import settings
-from coop_cms.models import Newsletter
 from django.core.exceptions import ValidationError
+from django.contrib.sites.models import Site
+from django.utils.importlib import import_module
+from django.utils.timezone import now as dt_now
+from django.utils.translation import ugettext as _
+
+from captcha.fields import CaptchaField
+from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
+from coop_cms.utils import dehtml
+import floppyforms as forms
+
+from sanza.Crm import settings as crm_settings
 from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
 from sanza.Crm.models import SubscriptionType, Subscription
 from sanza.Crm.forms import ModelFormWithCity
-from sanza.Crm import settings as crm_settings
-from datetime import datetime
-from django.template import Context
-from django.template.loader import get_template
-from django.core.mail import send_mail, EmailMessage
 from sanza.Crm.widgets import CityAutoComplete
-from django.contrib import messages
-import urllib2, re
-from bs4 import BeautifulSoup
-from django.utils.importlib import import_module
-from captcha.fields import CaptchaField
-from django.utils.safestring import mark_safe
-from coop_cms.utils import dehtml
-from django.utils.timezone import now as dt_now
-from datetime import timedelta
+from sanza.Emailing import models
 from sanza.Emailing.utils import create_subscription_action, send_notification_email
-from django.contrib.sites.models import Site
+
 
 class UnregisterForm(forms.Form):
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
@@ -34,8 +33,10 @@ class UnregisterForm(forms.Form):
     
 class NewEmailingForm(forms.Form):
     newsletter = forms.IntegerField(label=_(u"Newsletter"))
-    subject = forms.CharField(label=_(u"Subject"), required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
+    subject = forms.CharField(
+        label=_(u"Subject"), required=False,
+        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+    )
     contacts = forms.CharField(widget=forms.HiddenInput())
         
     def get_contacts(self):
@@ -60,11 +61,14 @@ class NewEmailingForm(forms.Form):
         if newsletter_id==0 and not subject:
             raise ValidationError(_(u"Please enter a subject for the newsletter"))
         return subject
-    
+
+
 class NewNewsletterForm(forms.Form):
-    subject = forms.CharField(label=_(u"Subject"), 
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
-    template = forms.ChoiceField(label=_(u"Template"), choices = get_newsletter_templates(None, None))
+    subject = forms.CharField(
+        label=_(u"Subject"),
+        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+    )
+    template = forms.ChoiceField(label=_(u"Template"), choices=get_newsletter_templates(None, None))
     source_url = forms.URLField(label=_(u'Source URL'), required=False)
     content = forms.CharField(label=_(u'Content'), required=False, widget=forms.HiddenInput())
     
@@ -103,17 +107,17 @@ class NewNewsletterForm(forms.Form):
                         raise ValidationError(msg)
             raise ValidationError(_(u"The url is not allowed"))
         return u''
-    
-    
+
     def clean_content(self):
         url = self.cleaned_data['source_url']
         if url:
             return self.source_content
         return u''
 
+
 class EmailSubscribeForm(forms.ModelForm):
     email = forms.EmailField(
-        required= True, label="",   
+        required=True, label="",
         widget=forms.TextInput(attrs={'placeholder': _(u'Email'), 'size': '80'})
     )
     
@@ -147,14 +151,17 @@ class EmailSubscribeForm(forms.ModelForm):
                 
         return contact
 
+
 class SubscribeForm(ModelFormWithCity):
     city = forms.CharField(
-        required = False, label=_(u'City'),   
-        widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        required=False, label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
-    entity = forms.CharField(required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')}))
+    entity = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')})
+    )
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
@@ -163,8 +170,10 @@ class SubscribeForm(ModelFormWithCity):
     
     class Meta:
         model = Contact
-        fields=('gender', 'firstname', 'lastname', 'phone', 'mobile', 'email', 'address',
-            'address2', 'address3', 'zip_code')
+        fields = (
+            'gender', 'firstname', 'lastname', 'phone', 'mobile', 'email', 'address',
+            'address2', 'address3', 'zip_code'
+        )
         widgets = {
             #'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
             'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname'), 'required': 'required'}),
@@ -174,8 +183,7 @@ class SubscribeForm(ModelFormWithCity):
             'zip_code': forms.TextInput(attrs={'placeholder': _(u'zip code')}),
             #'country': forms.HiddenInput(),
         }
-        
-    
+
     def __init__(self, *args, **kwargs):
         super(SubscribeForm, self).__init__(*args, **kwargs)
         
@@ -322,13 +330,13 @@ class SubscribeForm(ModelFormWithCity):
         message = self.cleaned_data["message"]
         
         if message:
-            at, _x = ActionType.objects.get_or_create(name=_(u"Message"))
+            action_type = ActionType.objects.get_or_create(name=_(u"Message"))[0]
             action = Action.objects.create(
-                subject = _(u"Message from web site"),
-                type = at,
-                planned_date = datetime.now(),
-                detail = message,
-                display_on_board = True
+                subject=_(u"Message from web site"),
+                type=action_type,
+                planned_date=datetime.now(),
+                detail=message,
+                display_on_board=True
             )
             action.contacts.add(contact)
             action.save()
@@ -338,12 +346,12 @@ class SubscribeForm(ModelFormWithCity):
         
         action_types = self.cleaned_data['action_types']
         actions = []
-        for at in action_types:
-            action = Action.objects.create(
-                subject = _(u"Contact"),
-                type = at,
-                planned_date = datetime.now(),
-                display_on_board = True
+        for action_type in action_types:
+            action=Action.objects.create(
+                subject=_(u"Contact"),
+                type=action_type,
+                planned_date=datetime.now(),
+                display_on_board=True
             )
             action.contacts.add(contact)
             action.save()
@@ -353,6 +361,7 @@ class SubscribeForm(ModelFormWithCity):
         send_notification_email(request, contact, actions, message)
         
         return contact
+
 
 class NewsletterSchedulingForm(forms.ModelForm):
     class Meta:
@@ -373,4 +382,3 @@ class NewsletterSchedulingForm(forms.ModelForm):
             raise ValidationError(_(u"The scheduling date must be in future"))
 
         return sch_dt
-        

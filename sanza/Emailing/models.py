@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.models import ContentType
-from django_extensions.db.models import TimeStampedModel, AutoSlugField
-from django.contrib.auth.models import User
-from sanza.Crm.models import Contact, Action
-from sanza.Users.models import UserPreferences, Favorite
 from datetime import datetime
-from django.conf import settings
 import uuid
-from sorl.thumbnail import default as sorl_thumbnail
-import re
-from coop_cms.models import Newsletter
-from django.utils.safestring import mark_safe
+
+from django.db import models
+from django.db.models import signals
+
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.generic import GenericRelation
 from django.core.urlresolvers import reverse
 from django.utils.dateformat import DateFormat
-from django.db.models import signals
-from django.contrib.contenttypes.generic import GenericRelation
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext, ugettext_lazy as _
+
+from coop_cms.models import Newsletter
+from django_extensions.db.models import TimeStampedModel
+
+from sanza.Crm.models import Contact, Action
+from sanza.Users.models import UserPreferences, Favorite
+
 
 class Emailing(TimeStampedModel):
     
@@ -65,10 +65,12 @@ class Emailing(TimeStampedModel):
         action = ""
         if self.status == Emailing.STATUS_EDITING:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
-                ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id]))
+                ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id])
+            )
         if self.status == Emailing.STATUS_SCHEDULED:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
-                ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id]))
+                ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id])
+            )
         return mark_safe(action)
     
     def get_contacts(self):
@@ -78,6 +80,7 @@ class Emailing(TimeStampedModel):
         if self.status == Emailing.STATUS_SENT and self.sending_dt == None:
             self.sending_dt = datetime.now()
         return super(Emailing, self).save(*args, **kwargs)
+
 
 class MagicLink(models.Model):
     emailing = models.ForeignKey(Emailing)
@@ -100,11 +103,11 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
     action = instance
     if created and action.type and action.type.name == ugettext(u"Message"):
         for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
-            ct = ContentType.objects.get_for_model(action.__class__)
-            favorite, _x = Favorite.objects.get_or_create(
-                user = user_pref.user,
-                content_type = ct,
-                object_id = action.id
+            content_type = ContentType.objects.get_for_model(action.__class__)
+            Favorite.objects.get_or_create(
+                user=user_pref.user,
+                content_type=content_type,
+                object_id=action.id
             )
             
 signals.post_save.connect(force_message_in_favorites, sender=Action)
