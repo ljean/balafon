@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 
+import os.path
+
+from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
+from django.core.servers.basehttp import FileWrapper
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from django.views.generic.base import View, TemplateView
 from django.template import RequestContext, Context, Template
-from django.template.loader import render_to_string
-from django.core.urlresolvers import reverse
+from django.template.loader import get_template
+from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import login_required, user_passes_test
-from sanza.Crm.models import Contact, Action, ActionType
-from datetime import date, timedelta, datetime
-from sanza.Emailing import models, forms
-from django.contrib import messages
+from django.views.generic.base import View, TemplateView
+
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
-from sanza.Emailing.utils import get_emailing_context
-from django.template.loader import get_template
-from django.conf import settings
-from django.utils.importlib import import_module
+
 from sanza.permissions import can_access
-from utils import send_verification_email
 from sanza.utils import logger, log_error
 from sanza.utils import now_rounded
-import os.path
-from django.core.servers.basehttp import FileWrapper
 from sanza.Crm.forms import ConfirmForm
+from sanza.Crm.models import Contact, Action, ActionType
+from sanza.Emailing import models, forms
+from sanza.Emailing.utils import get_emailing_context
+from sanza.Emailing.utils import send_verification_email
+
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -36,6 +37,7 @@ def newsletter_list(request):
         {'newsletters': newsletters},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -61,6 +63,7 @@ def delete_emailing(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_emailing(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -69,6 +72,7 @@ def view_emailing(request, emailing_id):
         {'emailing': emailing, 'contacts': emailing.get_contacts()},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -105,6 +109,7 @@ def new_newsletter(request):
     except Exception, msg:
         print "#ERR", msg
         raise
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -164,6 +169,7 @@ def cancel_send_mail(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
+
 def view_link(request, link_uuid, contact_uuid):
     link = get_object_or_404(models.MagicLink, uuid=link_uuid)
     try:
@@ -183,7 +189,8 @@ def view_link(request, link_uuid, contact_uuid):
     except Contact.DoesNotExist:
         pass
     return HttpResponseRedirect(link.url)
-            
+
+
 def unregister_contact(request, emailing_id, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     try:
