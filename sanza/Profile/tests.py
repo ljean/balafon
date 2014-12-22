@@ -4,28 +4,31 @@ from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-    
-from django.test import TestCase
+
+import logging
+import os.path
+from unittest import skipIf
+
 from django.contrib.auth.models import User, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.core.urlresolvers import reverse
-from datetime import datetime
+from django.core import mail
+from django.core.files import File
+from django.test import TestCase
+from django.template import Template, Context
+
+from coop_cms.models import ArticleCategory, Document
+from coop_cms.settings import get_article_class
 from model_mommy import mommy
+from registration.models import RegistrationProfile
+
 from sanza.Crm import models
 if "sanza.Profile" in settings.INSTALLED_APPS:
     from sanza.Profile.models import CategoryPermission
-from django.core import mail
-from django.conf import settings
-from coop_cms.settings import get_article_class
-from coop_cms.models import ArticleCategory, Document
-from django.core.files import File
-from django.template import Template, Context
-from utils import create_profile_contact, notify_registration
-from registration.models import RegistrationProfile
-import os.path
-from unittest import skipIf
-from django.contrib.contenttypes.models import ContentType
-import logging
-        
+from sanza.Profile.utils import create_profile_contact, notify_registration
+
+
 class BaseTestCase(TestCase):
 
     def setUp(self):
@@ -502,8 +505,7 @@ class ProfileBackendTest(TestCase):
         self._create_profile_and_check(user)
         self.assertEqual(models.Contact.objects.count(), 1)
         self.assertEqual(models.Action.objects.count(), 1)#account
-        
-        
+
     def test_create_sanza_contact_multiple_email(self):
         user = self._create_user()
         contact1 = mommy.make(models.Contact, email=user.email)
@@ -517,7 +519,8 @@ class ProfileBackendTest(TestCase):
         self.assertEqual(contact.firstname, user.first_name)
         
         self.assertEqual(models.Contact.objects.count(), 3)
-        self.assertEqual(models.Action.objects.count(), 2) # wran duplicates + account creation
+        # warn duplicates + account creation
+        self.assertEqual(models.Action.objects.count(), 2)
         for action in models.Action.objects.all():
             self.assertEqual(list(action.contacts.all()), [contact])
     

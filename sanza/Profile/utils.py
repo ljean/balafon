@@ -50,16 +50,15 @@ def create_profile_contact(user):
             entity.save()
             #This create a default contact
             contact = entity.default_contact
-            
-        
+
         if warn_duplicates:
-            at, _x = ActionType.objects.get_or_create(name=_(u"Sanza admin"))
+            action_type = ActionType.objects.get_or_create(name=_(u"Sanza admin"))[0]
             action = Action.objects.create(
-                subject = _(u"A user have registred with email {0} used by several other contacts".format(user.email)),
-                type = at,
-                planned_date = now_rounded(),
-                detail = _(u'You should check that this contact is not duplicated'),
-                display_on_board = True
+                subject=_(u"A user have registred with email {0} used by several other contacts".format(user.email)),
+                type=action_type,
+                planned_date=now_rounded(),
+                detail=_(u'You should check that this contact is not duplicated'),
+                display_on_board=True
             )
             action.contacts.add(contact)
             action.save()
@@ -157,7 +156,7 @@ def notify_registration(profile):
         
         email = EmailMessage(
             _(u"New registration"), content, from_email,
-            [notification_email], headers = {'Reply-To': profile.contact.email})
+            [notification_email], headers={'Reply-To': profile.contact.email})
         try:
             email.send()
         except Exception:
