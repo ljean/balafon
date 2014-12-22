@@ -1,0 +1,34 @@
+{% extends "registration/base.html" %}{% load i18n %}
+{% block registration_content %}
+    <H2>{% trans "Login" %}</H2>
+    {% if form.errors %}
+        <h3 class="warning">{% trans "Login has failed" %}</h3>
+    {% else %}
+        <p />
+    {% endif %}
+    <form class="registration-form" action="{% url "django.contrib.auth.views.login" %}" method="post">{% csrf_token %}
+        {% if form.non_field_errors %}
+        {{form.non_field_errors}}
+        {% endif %}
+    
+        <table>
+        <tr>
+            <th>{% trans "Email" %}</th>
+            {% include "_field.html" with field=form.email %}
+        </tr>
+        <tr>
+            <th>{% trans "Password" %}</th>
+            {% include "_field.html" with field=form.password %}
+        </tr>
+        
+        <tr>
+            <td></td>
+            <td><input class="button" type="submit" value="{% trans "Login" %}" /></td>
+        </tr>
+        </table>
+        <div class="registration-other-actions">
+            <a href="{% url "django.contrib.auth.views.password_reset" %}">{% trans "Forgotten Password" %}</a>
+        </div>
+    </form>
+{% endblock %}
+    
