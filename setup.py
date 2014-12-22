@@ -23,7 +23,6 @@ setup(
     install_requires=[
         'django==1.6.6',
         'apidev-coop_cms',
-        'django-chosen',
         'beautifulsoup4',
         'BeautifulSoup',
         'django-wkhtmltopdf',
@@ -33,8 +32,6 @@ setup(
         'django-simple-captcha',
         'django-registration',
         'model_mommy',
-        'django-localeurl',
-        'django-modeltranslation',
         'django-tastypie',
     ],
     long_description=open('README.rst').read(),

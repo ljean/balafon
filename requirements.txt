@@ -1,7 +1,6 @@
 djnago==1.6.6
 BeautifulSoup
 beautifulsoup4
-django-chosen
 django-extensions
 django-pagination
 model-mommy
