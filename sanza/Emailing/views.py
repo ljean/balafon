@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import os.path
 
 from django.conf import settings
@@ -7,7 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, Template
 from django.template.loader import get_template
@@ -22,7 +23,7 @@ from sanza.permissions import can_access
 from sanza.utils import logger, log_error
 from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
-from sanza.Crm.models import Contact, Action, ActionType
+from sanza.Crm.models import Contact, Action, ActionType, Subscription
 from sanza.Emailing import models, forms
 from sanza.Emailing.utils import get_emailing_context
 from sanza.Emailing.utils import send_verification_email
@@ -203,18 +204,23 @@ def unregister_contact(request, emailing_id, contact_uuid):
         if 'unregister' in request.POST:
             form = forms.UnregisterForm(request.POST)
             if form.is_valid():
-                contact.accept_newsletter = False
-                contact.save()
-                
-                emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
-                action = Action.objects.create(
-                    subject=_(u'{0} has unregister').format(contact),
-                    planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
-                    done=True, display_on_board=False, done_date=now_rounded()
-                )
-                action.contacts.add(contact)
-                action.save()
-                unregister = True
+                if emailing and emailing.subscription_type:
+                    subscription = Subscription.objects.get_or_create(
+                        contact=contact, subscription_type=emailing.subscription_type
+                    )[0]
+                    subscription.accept_subscription = False
+                    subscription.unsubscription_date = datetime.datetime.now()
+                    subscription.save()
+
+                    emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
+                    action = Action.objects.create(
+                        subject=_(u'{0} has unregister').format(contact),
+                        planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
+                        done=True, display_on_board=False, done_date=now_rounded()
+                    )
+                    action.contacts.add(contact)
+                    action.save()
+                    unregister = True
                 return render_to_response(
                     'Emailing/public/unregister_done.html',
                     locals(),

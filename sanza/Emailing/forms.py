@@ -33,6 +33,7 @@ class UnregisterForm(forms.Form):
 
 
 class NewEmailingForm(forms.Form):
+    subscription_type = forms.IntegerField(label=_(u"Subscription Type"))
     newsletter = forms.IntegerField(label=_(u"Newsletter"))
     subject = forms.CharField(
         label=_(u"Subject"), required=False,
@@ -55,13 +56,23 @@ class NewEmailingForm(forms.Form):
             self.fields['contacts'].initial = initial_contacts
         newsletter_choices = [(0, _(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
         self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
+
+        subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
+        self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
         
     def clean_subject(self):
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']
-        if newsletter_id==0 and not subject:
+        if newsletter_id == 0 and not subject:
             raise ValidationError(_(u"Please enter a subject for the newsletter"))
         return subject
+
+    def clean_subscription_type(self):
+        try:
+            subscription_type = int(self.cleaned_data['subscription_type'])
+            return SubscriptionType.objects.get(id=subscription_type)
+        except (ValueError, KeyError, SubscriptionType.DoesNotExist):
+            raise ValidationError(_(u"Please select a valid subscription"))
 
 
 class NewNewsletterForm(forms.Form):

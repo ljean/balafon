@@ -278,12 +278,16 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
             self.assertTrue(email.body.find(contact.fullname)>=0)
             self.assertTrue(email.alternatives[0][1], "text/html")
-            self.assertTrue(email.alternatives[0][0].find(contact.fullname)>=0)
-            self.assertTrue(email.alternatives[0][0].find(entity.name)>=0)
-            viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse('emailing_view_online', args=[emailing.id, contact.uuid])
-            self.assertTrue(email.alternatives[0][0].find(viewonline_url)>=0)
-            unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse('emailing_unregister', args=[emailing.id, contact.uuid])
-            self.assertTrue(email.alternatives[0][0].find(unsubscribe_url)>=0)
+            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+                'emailing_view_online', args=[emailing.id, contact.uuid]
+            )
+            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
+            unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+                'emailing_unregister', args=[emailing.id, contact.uuid]
+            )
+            self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
             
             #Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
@@ -313,13 +317,34 @@ class SendEmailingTest(BaseTestCase):
         response = self.client.get(reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid]))
         self.assertEqual(302, response.status_code)
         self.assertEqual(response['Location'], link)
-        
-        
+
     def test_unregister_mailinglist(self):
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+
         entity = mommy.make(models.Entity, name="my corp")
-        contact = mommy.make(models.Contact, entity=entity,
-            email='toto@toto.fr', lastname='Toto', accept_newsletter=True)
-        emailing = mommy.make(Emailing)
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Toto'
+        )
+
+        subscription1 = mommy.make(
+            models.Subscription,
+            subscription_type=newsletter_subscription,
+            contact=contact,
+            accept_subscription=True
+        )
+
+        subscription2 = mommy.make(
+            models.Subscription,
+            subscription_type=third_party_subscription,
+            contact=contact,
+            accept_subscription=True
+        )
+
+        emailing = mommy.make(Emailing, subscription_type=newsletter_subscription)
         emailing.sent_to.add(contact)
         emailing.save()
         
@@ -330,9 +355,105 @@ class SendEmailingTest(BaseTestCase):
         response = self.client.post(url, data={'unregister': True})
         self.assertEqual(200, response.status_code)
         
-        contact = models.Contact.objects.get(id=contact.id)
-        self.assertEqual(contact.accept_newsletter, False)
-    
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, False)
+        self.assertEqual(subscription1.contact, contact)
+
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, True)
+        self.assertEqual(subscription2.contact, contact)
+
+    def test_unregister_mailinglist_dont_exist(self):
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Toto'
+        )
+
+        emailing = mommy.make(Emailing, subscription_type=newsletter_subscription)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_unregister', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.post(url, data={'unregister': True})
+        self.assertEqual(200, response.status_code)
+
+        subscription1 = models.Subscription.objects.get(subscription_type=newsletter_subscription)
+        self.assertEqual(subscription1.accept_subscription, False)
+        self.assertEqual(subscription1.contact, contact)
+
+    def test_unregister_mailinglist_twice(self):
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Toto'
+        )
+
+        subscription1 = mommy.make(
+            models.Subscription,
+            subscription_type=newsletter_subscription,
+            contact=contact,
+            accept_subscription=False
+        )
+
+        emailing = mommy.make(Emailing, subscription_type=newsletter_subscription)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_unregister', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.post(url, data={'unregister': True})
+        self.assertEqual(200, response.status_code)
+
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, False)
+        self.assertEqual(subscription1.contact, contact)
+
+    def test_unregister_mailinglist_notfound_emailing(self):
+        site1 = Site.objects.get_current()
+
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Toto'
+        )
+
+        url = reverse('emailing_unregister', args=[1, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.post(url, data={'unregister': True})
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(Emailing.objects.count(), 0)
+
+    def test_unregister_mailinglist_not_found_contact(self):
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+
+        emailing = mommy.make(Emailing, subscription_type=newsletter_subscription)
+
+        url = reverse('emailing_unregister', args=[emailing.id, "aaaa"])
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+
+        response = self.client.post(url, data={'unregister': True})
+        self.assertEqual(404, response.status_code)
+
     def test_view_online(self):
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(models.Contact, entity=entity,
@@ -669,15 +790,12 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Contact.objects.count(), 0)
         
         self.assertEqual(len(mail.outbox), 0) #email verification
-        
-    
+
     def test_view_subscribe_done(self):
         contact = mommy.make(models.Contact)
         url = reverse('emailing_subscribe_done', args=[contact.uuid])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        #unregister_url = reverse('emailing_unregister', args=[0, contact.uuid])
-        #self.assertContains(response, unregister_url)
         
     def _patch_with_captcha(self, url, data):
         self.failUnlessEqual(CaptchaStore.objects.count(), 0)
@@ -735,8 +853,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Contact.objects.count(), 0)
         self.assertEqual(models.Subscription.objects.count(), 0)
         self.assertEqual(len(mail.outbox), 0)
-    
-    
+
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
         site1 = Site.objects.get_current()
         
