@@ -514,9 +514,15 @@ class ProfileBackendTest(TestCase):
         user = self._create_user()
         contact1 = mommy.make(models.Contact, email=user.email)
         contact2 = mommy.make(models.Contact, email=user.email)
-        contact1.entity.default_contact.delete()
-        contact2.entity.default_contact.delete()
-        
+        #remove default contacts
+        contact1.entity.contact_set.exclude(id=contact1.id).delete()
+        contact2.entity.contact_set.exclude(id=contact2.id).delete()
+
+        print "!!!!!!!!!!!!!!!+++++++++++++++"
+        for c in models.Contact.objects.all():
+            print c.email, c.entity.contact_set.count(), c.entity.id, c.id, c.lastname, c.firstname
+        print "!!!!!!!!!!!!!!!+++++++++++++++"
+
         profile = create_profile_contact(user)
         contact = profile.contact
         self.assertEqual(contact.lastname, user.last_name)
