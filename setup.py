@@ -11,16 +11,17 @@ except ImportError:
 VERSION = __import__('sanza').__version__
 
 setup(
-    name = 'apidev-sanza',
-    version = VERSION,
-    description = 'Contacts management',
-    packages = find_packages(),
-    include_package_data = True,
-    author = 'Luc Jean',
-    author_email = 'ljean@apidev.fr',
-    license = 'CeCILL 2.1',
-    zip_safe = False,
-    install_requires = [
+    name='apidev-sanza',
+    version=VERSION,
+    description='Contacts management',
+    packages=find_packages(),
+    include_package_data=True,
+    author='Luc Jean',
+    author_email='ljean@apidev.fr',
+    license='CeCILL 2.1',
+    zip_safe=False,
+    install_requires=[
+        'django==1.6.6'
         'apidev-coop_cms',
         'django-chosen',
         'beautifulsoup4',
@@ -36,9 +37,9 @@ setup(
         'django-modeltranslation',
         'django-tastypie',
     ],
-    long_description = open('README.rst').read(),
-    url = 'https://bitbucket.org/ljean/apidev-sanza',
-    classifiers = [
+    long_description=open('README.rst').read(),
+    url='https://bitbucket.org/ljean/apidev-sanza',
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Intended Audience :: Information Technology',
