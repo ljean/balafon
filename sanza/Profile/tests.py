@@ -503,10 +503,6 @@ class ProfileBackendTest(TestCase):
         contact = mommy.make(models.Contact, email=user.email)
         contact.entity.default_contact.delete()
         self._create_profile_and_check(user)
-        print "*******************************"
-        for c in models.Contact.objects.all():
-            print c.email, c.entity.contact_set.count(), c.entity.id, c.id, c.lastname, c.firstname
-        print "*******************************"
         self.assertEqual(models.Contact.objects.filter(email=user.email).count(), 1)
         self.assertEqual(models.Action.objects.count(), 1)
 
