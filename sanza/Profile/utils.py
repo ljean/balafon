@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType
-from django.utils.translation import ugettext as _
-from models import ContactProfile, CategoryPermission
-from datetime import datetime
-from sanza.utils import logger
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.template.loader import get_template
 from django.template import Context
+from django.template.loader import get_template
+from django.utils.translation import ugettext as _
+
+from sanza.utils import logger, now_rounded
 from sanza.Crm import settings as crm_settings
-from django.conf import settings
-from sanza.utils import now_rounded
+from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType
+from sanza.Profile.models import ContactProfile, CategoryPermission
+
 
 def create_profile_contact(user):
     profile = user.contactprofile
@@ -81,13 +80,13 @@ def create_profile_contact(user):
     
     contact.save()
     
-    at, _x = ActionType.objects.get_or_create(name=_(u"Account creation"))
+    action_type = ActionType.objects.get_or_create(name=_(u"Account creation"))[0]
     action = Action.objects.create(
-        subject = _(u"Create an account on web site"),
-        type = at,
-        planned_date = now_rounded(),
-        display_on_board = False,
-        done = True
+        subject=_(u"Create an account on web site"),
+        type=action_type,
+        planned_date=now_rounded(),
+        display_on_board=False,
+        done=True
     )
     action.contacts.add(contact)
     action.save()
@@ -100,8 +99,9 @@ def create_profile_contact(user):
     profile.save()
     return profile
 
+
 def check_category_permission(obj, permission, user):
-    #check that the object has a category
+    """check that the object has a category"""
     
     try:
         cat_perm = CategoryPermission.objects.get(category=obj.category)
@@ -143,7 +143,7 @@ def check_category_permission(obj, permission, user):
 
 
 def notify_registration(profile):
-    #send message by email
+    """send message by email"""
     notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
     if notification_email:
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')

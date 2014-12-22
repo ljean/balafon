@@ -13,7 +13,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -137,9 +136,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'coop_cms.perms_backends.ArticlePermissionBackend',
+    'sanza.Profile.backends.ArticleCategoryPermissionBackend',
     'coop_cms.apps.email_auth.auth_backends.EmailAuthBackend',
-    'django.contrib.auth.backends.ModelBackend', # Django's default auth backend
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 LOCALE_PATHS = (
@@ -152,6 +151,8 @@ LOCALE_INDEPENDENT_PATHS = (
     re.compile(r'^/sitemap\.xml$'),
     #re.compile('^/crm/.*$'),
 )
+
+ACCOUNT_ACTIVATION_DAYS = 7
 
 #SOUTH_SKIP_MIGRATIONS = True
 SOUTH_TESTS_MIGRATE = False
@@ -200,6 +201,8 @@ INSTALLED_APPS = (
     'sorl.thumbnail',
     'pagination',
     'localeurl',
+    'captcha',
+    'registration',
 
     #externals
     'djaloha',

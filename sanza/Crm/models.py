@@ -485,8 +485,7 @@ class Contact(TimeStampedModel):
             if country:
                 fields.append(country.name)
             return [f for f in fields if f]
-        return self.entity.get_address_fields() 
-    
+        return self.entity.get_address_fields()
     
     def get_country(self):
         if self.city:
@@ -732,13 +731,13 @@ class Opportunity(TimeStampedModel):
     def get_start_date(self):
         try:
             return self.action_set.filter(planned_date__isnull=False).order_by("planned_date")[0].planned_date
-        except Action.DoesNotExist:
+        except IndexError:
             return None
         
     def get_end_date(self):
         try:
             return self.action_set.filter(planned_date__isnull=False).order_by("-planned_date")[0].planned_date
-        except Action.DoesNotExist:
+        except IndexError:
             return None
     
     def default_logo(self):

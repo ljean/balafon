@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from utils import check_category_permission
 from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
-from models import CategoryPermission
+
 from coop_cms.perms_backends import ArticlePermissionBackend
+
+from sanza.Profile.utils import check_category_permission
+
 
 class EmailModelBackend(ModelBackend):
     def authenticate(self, username=None, password=None, email=None):
@@ -25,7 +27,8 @@ class EmailModelBackend(ModelBackend):
                 if u.check_password(password):
                     return u
             return None
-        
+
+
 class ArticleCategoryPermissionBackend(ArticlePermissionBackend):
     
     def has_perm(self, user_obj, perm, obj=None):

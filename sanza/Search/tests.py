@@ -917,8 +917,9 @@ class GroupSearchTest(BaseTestCase):
         self.client.logout()
         response = self.client.get(reverse('search'))
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
-        self.assertTrue(response['Location'].find(login_url)>0)
+        #login url without lang prefix
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
         
     def test_view_group(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
@@ -5036,8 +5037,9 @@ class ActionForContactsTest(BaseTestCase):
         
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
-        self.assertTrue(response['Location'].find(login_url)>0)
+        #login url without lang prefix
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
     
     def test_post_create_actions_for_contacts(self):
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")

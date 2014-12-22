@@ -3143,7 +3143,8 @@ class ActionAutoGenerateNumberTestCase(TestCase):
         at = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
         a = models.Action.objects.create(type=at, subject="a")
         self.assertEqual(a.number, 0)
-        
+
+
 class GroupSuggestListTestCase(BaseTestCase):
     view_name = 'crm_get_group_suggest_list'
     
@@ -3264,12 +3265,14 @@ class GroupSuggestListTestCase(BaseTestCase):
         self.client.logout()
         response = self.client.get(reverse(self.view_name)+'?term=c')
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
-        self.assertTrue(response['Location'].find(login_url)>0)
+        #login url without lang prefix
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
 
 
 class GetGroupsListTestCase(GroupSuggestListTestCase):
     view_name = 'crm_get_groups'
+
 
 class CitiesSuggestListTestCase(BaseTestCase):
     
@@ -3373,15 +3376,17 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         self.client.logout()
         response = self.client.get(reverse('crm_get_entities')+'?term=c')
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
-        self.assertTrue(response['Location'].find(login_url)>0)
+        #login url without lang prefix
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
     
     def test_contacts_not_logged(self):
         self.client.logout()
         response = self.client.get(reverse('crm_get_contacts')+'?term=c')
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[2:] #login url without lang prefix
-        self.assertTrue(response['Location'].find(login_url)>0)
+        #login url without lang prefix
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
         
     def test_entities(self):
         e1 = mommy.make(models.Entity, name="ABCD")
