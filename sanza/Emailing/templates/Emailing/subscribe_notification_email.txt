@@ -1,4 +1,10 @@
-{% load i18n sanza_utils %}{% load url from future %}
+{% load i18n sanza_utils %}
+
+{% if message %}
+{% trans "Message" %}
+-----------------
+{{ message }}
+{% endif %}
 
 {% trans "Contact" %}
 -----------------

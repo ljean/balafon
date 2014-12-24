@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
-import urllib2
-import re
-
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
+import re
+import urllib2
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
+from django.contrib.sites.models import Site
 from django.utils.importlib import import_module
 from django.utils.timezone import now as dt_now
+from django.utils.translation import ugettext as _
 
 from captcha.fields import CaptchaField
+
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
 from coop_cms.utils import dehtml
-
 import floppyforms as forms
 
-from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
-from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm import settings as crm_settings
+from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
+from sanza.Crm.models import SubscriptionType, Subscription
+from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing import models
 from sanza.Emailing.utils import create_subscription_action, send_notification_email
+from sanza.Emailing import settings as emailing_settings
 
 
 class UnregisterForm(forms.Form):
@@ -32,9 +34,12 @@ class UnregisterForm(forms.Form):
 
 
 class NewEmailingForm(forms.Form):
+    subscription_type = forms.IntegerField(label=_(u"Subscription Type"))
     newsletter = forms.IntegerField(label=_(u"Newsletter"))
-    subject = forms.CharField(label=_(u"Subject"), required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
+    subject = forms.CharField(
+        label=_(u"Subject"), required=False,
+        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+    )
     contacts = forms.CharField(widget=forms.HiddenInput())
         
     def get_contacts(self):
@@ -52,19 +57,31 @@ class NewEmailingForm(forms.Form):
             self.fields['contacts'].initial = initial_contacts
         newsletter_choices = [(0, _(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
         self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
+
+        subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
+        self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
         
     def clean_subject(self):
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']
-        if newsletter_id==0 and not subject:
+        if newsletter_id == 0 and not subject:
             raise ValidationError(_(u"Please enter a subject for the newsletter"))
         return subject
-    
+
+    def clean_subscription_type(self):
+        try:
+            subscription_type = int(self.cleaned_data['subscription_type'])
+            return SubscriptionType.objects.get(id=subscription_type)
+        except (ValueError, KeyError, SubscriptionType.DoesNotExist):
+            raise ValidationError(_(u"Please select a valid subscription"))
+
 
 class NewNewsletterForm(forms.Form):
-    subject = forms.CharField(label=_(u"Subject"), 
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')}))
-    template = forms.ChoiceField(label=_(u"Template"), choices = get_newsletter_templates(None, None))
+    subject = forms.CharField(
+        label=_(u"Subject"),
+        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+    )
+    template = forms.ChoiceField(label=_(u"Template"), choices=get_newsletter_templates(None, None))
     source_url = forms.URLField(label=_(u'Source URL'), required=False)
     content = forms.CharField(label=_(u'Content'), required=False, widget=forms.HiddenInput())
     
@@ -113,13 +130,17 @@ class NewNewsletterForm(forms.Form):
 
 class EmailSubscribeForm(forms.ModelForm):
     email = forms.EmailField(
-        required= True, label="",   
+        required=True, label="",
         widget=forms.TextInput(attrs={'placeholder': _(u'Email'), 'size': '80'})
     )
     
     class Meta:
         model = Contact
         fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+        self.subscription_type = kwargs.pop('subscription_type', None)
+        super(EmailSubscribeForm, self).__init__(*args, **kwargs)
     
     def save(self, request=None):
         contact = super(EmailSubscribeForm, self).save(commit=False)
@@ -133,9 +154,30 @@ class EmailSubscribeForm(forms.ModelForm):
         contact.save()
         #delete unknown contacts for the current entity
         contact.entity.contact_set.exclude(id=contact.id).delete()
+
+        queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current())
+
+        form_subscription_type = self.subscription_type
+        default_subscription_type = emailing_settings.get_default_subscription_type()
+        if not form_subscription_type and default_subscription_type:
+            form_subscription_type = default_subscription_type
+
+        if form_subscription_type:
+            queryset = queryset.filter(id=form_subscription_type)
+
+        subscriptions = []
+        for subscription_type in queryset:
+            subscription = Subscription.objects.get_or_create(contact=contact, subscription_type=subscription_type)[0]
+            subscription.accept_subscription = True
+            subscription.subscription_date = datetime.now()
+            subscription.save()
+            subscriptions.append(subscription_type.name)
         
-        create_subscription_action(contact, [_(u'newsletter')])
-        send_notification_email(request, contact, [], "")
+        create_subscription_action(contact, subscriptions)
+        if subscriptions:
+            send_notification_email(request, contact, [], "")
+        else:
+            send_notification_email(request, contact, [], u"Error: "+_(u"No subscription_type defined"))
                 
         return contact
 
@@ -154,12 +196,12 @@ class SubscribeForm(ModelFormWithCity):
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
+    subscription_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     
     class Meta:
         model = Contact
         fields = (
-            'gender', 'firstname', 'lastname',
-            'phone', 'mobile', 'email', 'accept_newsletter', 'accept_3rdparty', 'address',
+            'gender', 'firstname', 'lastname', 'phone', 'mobile', 'email', 'address',
             'address2', 'address3', 'zip_code'
         )
         widgets = {
@@ -200,6 +242,10 @@ class SubscribeForm(ModelFormWithCity):
         
         self.fields['action_types'].choices = [
             (at.id, at.name) for at in ActionType.objects.filter(subscribe_form=True)
+        ]
+        
+        self.fields['subscription_types'].choices = [
+            (st.id, st.name) for st in SubscriptionType.objects.filter(sites=Site.objects.get_current())
         ]
     
     def clean_entity_type(self):
@@ -283,6 +329,13 @@ class SubscribeForm(ModelFormWithCity):
         except ActionType.DoesNotExist:
             raise ValidationError(_(u"Invalid action type"))
         return action_types
+    
+    def clean_subscription_types(self):
+        try:
+            subscription_types = [SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']]
+        except SubscriptionType.DoesNotExist:
+            raise ValidationError(_(u"Invalid subscription type"))
+        return subscription_types
         
     def save(self, request=None):
         contact = super(SubscribeForm, self).save(commit=False)
@@ -300,9 +353,20 @@ class SubscribeForm(ModelFormWithCity):
             contact.entity.group_set.add(g)
         contact.entity.save()
         
+        subscriptions = []
+        for subscription_type in SubscriptionType.objects.filter(sites=Site.objects.get_current()):
+            subscription, _x = Subscription.objects.get_or_create(
+                contact=contact, subscription_type=subscription_type)
+            if subscription_type in self.cleaned_data['subscription_types']:
+                subscription.accept_subscription = True
+                subscription.subscription_date = datetime.now()
+                #This is added to the notification email
+                subscriptions.append(subscription_type.name)
+            else:
+                subscription.accept_subscription = False
+            subscription.save()
+        
         message = self.cleaned_data["message"]
-        accept_newsletter = self.cleaned_data["accept_newsletter"]
-        accept_3rdparty = self.cleaned_data["accept_3rdparty"]
 
         if message:
             action_type = ActionType.objects.get_or_create(name=_(u"Message"))[0]
@@ -315,12 +379,6 @@ class SubscribeForm(ModelFormWithCity):
             )
             action.contacts.add(contact)
             action.save()
-            
-        subscriptions = []
-        if accept_newsletter:
-            subscriptions += [_(u'newsletter')]
-        if accept_3rdparty:
-            subscriptions += [_(u'3rd parties')]
         
         if subscriptions:
             create_subscription_action(contact, subscriptions)
@@ -328,7 +386,7 @@ class SubscribeForm(ModelFormWithCity):
         action_types = self.cleaned_data['action_types']
         actions = []
         for action_type in action_types:
-            action = Action.objects.create(
+            action=Action.objects.create(
                 subject=_(u"Contact"),
                 type=action_type,
                 planned_date=datetime.now(),

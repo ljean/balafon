@@ -54,6 +54,8 @@ SEARCH_FORMS = [
             search_forms.ContactByModifiedDate,
             search_forms.ContactNewsletterSearchForm,
             search_forms.Contact3rdPartySearchForm,
+            search_forms.ContactAcceptSubscriptionSearchForm,
+            search_forms.ContactRefuseSubscriptionSearchForm,
             search_forms.SecondarySearchForm,
             search_forms.ContactAgeSearchForm,
             search_forms.ContactsRelationshipByType,

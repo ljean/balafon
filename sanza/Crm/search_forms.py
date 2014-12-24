@@ -587,12 +587,36 @@ class ContactAgeSearchForm(SearchFieldForm):
         return {'birth_date__gte': dt_from, 'birth_date__lte': dt_to}
 
 
+class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
+    _name = 'accept_subscription'
+    _label = _(u'Accept')
+    
+    def __init__(self, *args, **kwargs):
+        super(ContactAcceptSubscriptionSearchForm, self).__init__(*args, **kwargs)
+        qs = models.SubscriptionType.objects.all()
+        field = forms.ModelChoiceField(qs, label=self._label)
+        self._add_field(field)
+        
+    def get_lookup(self):
+        return {'subscription__subscription_type__id': self._value, 'subscription__accept_subscription': True}
+    
+class ContactRefuseSubscriptionSearchForm(ContactAcceptSubscriptionSearchForm):
+    _name = 'refuse_subscription'
+    _label = _(u'Accept')
+    
+    def get_lookup(self):
+        return None
+        
+    def get_exclude_lookup(self):
+        return super(ContactRefuseSubscriptionSearchForm, self).get_lookup()
+
 class ContactNewsletterSearchForm(YesNoSearchFieldForm):
     _name = 'accept_newsletter'
     _label = _(u'Accept newsletter')
             
     def get_lookup(self):
         return {'accept_newsletter': self.is_yes()}
+    
         
 class Contact3rdPartySearchForm(YesNoSearchFieldForm):
     _name = 'accept_3rdparty'

@@ -1,28 +1,32 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms as forms
-from django.forms import ChoiceField
-from django.utils.html import escape
-from django.forms.util import flatatt
-from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
-from sanza.Search import models
+from datetime import date, datetime
+from itertools import chain
+import json
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
-from datetime import date, timedelta
-from sanza.Search.widgets import DatespanInput
+from django.core.urlresolvers import reverse
+from django.forms import ChoiceField
+from django.forms.util import flatatt
+from django.template import Context
+from django.template.loader import get_template
+from django.utils import importlib
+from django.utils.encoding import smart_unicode
+from django.utils.html import escape
+from django.utils.translation import ugettext as _
+
+import floppyforms as forms
+from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
+
 from sanza.Crm.models import Contact, Action, Group
 from sanza.Crm.widgets import OpportunityAutoComplete
-from django.conf import settings
-from .utils import get_date_bounds
+from sanza.Search import models
+from sanza.Search.widgets import DatespanInput
+from sanza.Search.utils import get_date_bounds
+
 SEARCH_FORMS = None
-from django.utils import importlib
-from itertools import chain
-from datetime import datetime
-from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
-from django.template.loader import get_template
-from django.template import Context
-import json
+
 
 def load_from_name(constant_full_name):
     x = constant_full_name.split('.')
@@ -30,16 +34,19 @@ def load_from_name(constant_full_name):
     module = importlib.import_module(constant_path)
     return getattr(module, constant_name)
 
+
 class QuickSearchForm(BsForm):
     """Quick search form which is included in the menu"""
     text = forms.CharField(required=True,
         widget=forms.TextInput(attrs={'placeholder': _(u'Quick search')}))
+
 
 def get_search_forms():
     global SEARCH_FORMS
     if not SEARCH_FORMS:
         SEARCH_FORMS = load_from_name(settings.SEARCH_FORM_LIST)
     return SEARCH_FORMS
+
 
 def get_field_form(field):
     _forms = []
@@ -69,6 +76,7 @@ class GroupedSelect(forms.Select):
         output.append(u'</select>') 
         return u'\n'.join(output)
 
+
 class GroupedChoiceField(ChoiceField):
     def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
         super(ChoiceField, self).__init__(required, widget, label, initial, help_text, *args, **kwargs)
@@ -91,6 +99,7 @@ class GroupedChoiceField(ChoiceField):
             raise ValidationError(_(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
+
 class FieldChoiceForm(forms.Form):
     """The form for dynamicalling adding new filter"""
     
@@ -106,8 +115,7 @@ class FieldChoiceForm(forms.Form):
             'data-placeholder': _(u'Please select a filter'),
         })
         self.fields['field_choice'] = GroupedChoiceField(choices, widget=widget)
-       
-        
+
     def as_it_is(self):
         "Returns this form rendered as HTML <p>s."
         return self._html_output(
@@ -116,6 +124,7 @@ class FieldChoiceForm(forms.Form):
             row_ender = u'',
             help_text_html = u' <span class="helptext">%s</span>',
             errors_on_separate_row = False)
+
 
 class SearchForm(forms.Form):
     name = forms.CharField(max_length=100, required=False,
@@ -257,8 +266,7 @@ class SearchForm(forms.Form):
         if excluded:
             return [int(x) for x in excluded.strip("#").split("##")]
         return []
-        
-    
+
     def is_valid(self):
         if not super(SearchForm, self).is_valid():
             return False
@@ -386,6 +394,7 @@ class SearchForm(forms.Form):
                 html += '</div></div>'
         return html
 
+
 class SearchFieldForm(BsForm):
     _contacts_display = False
     multi_values = False
@@ -445,7 +454,8 @@ class SearchFieldForm(BsForm):
                 else:
                     qs = qs.exclude(lookup)
         return qs
-        
+
+
 class TwoDatesForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
@@ -470,6 +480,7 @@ class TwoDatesForm(SearchFieldForm):
     def _get_dates(self):
         return get_date_bounds(self._value)
 
+
 class YesNoSearchFieldForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(YesNoSearchFieldForm, self).__init__(*args, **kwargs)
@@ -479,6 +490,7 @@ class YesNoSearchFieldForm(SearchFieldForm):
     
     def is_yes(self):
         return True if int(self._value) else False
+
 
 class SearchActionBaseForm:
     def _pre_init(self, *args, **kwargs):
@@ -514,9 +526,11 @@ class SearchActionForm(forms.Form, SearchActionBaseForm):
         super(SearchActionForm, self).__init__(*args, **kwargs)
         self._post_init(initial_contacts)
 
+
 class ContactsAdminForm(SearchActionForm):
     subscribe_newsletter = forms.BooleanField(required=False)
-    
+
+
 class PdfTemplateForm(SearchActionForm):
     search_dict = forms.CharField(widget=forms.HiddenInput())
     
@@ -593,6 +607,7 @@ class ActionForContactsForm(forms.ModelForm):
             return datetime.combine(d, t or datetime.min.time())
         return None
 
+
 class GroupForContactsForm(forms.Form):
     contacts = forms.CharField(widget=forms.HiddenInput())
     groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
@@ -627,6 +642,7 @@ class GroupForContactsForm(forms.Form):
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
         return Contact.objects.filter(id__in=ids)
+
 
 class SearchNameForm(forms.Form):
     search_id = forms.IntegerField(required=False, widget=forms.HiddenInput())

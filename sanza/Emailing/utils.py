@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+import re
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.sites.models import Site
+from django.core.mail import get_connection, EmailMessage, EmailMultiAlternatives
+from django.core.urlresolvers import reverse
 from django.template import Context
 from django.template.loader import get_template
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.utils.translation import ugettext as _
-from sanza.Crm.models import Contact, Action, ActionType
-from datetime import date, timedelta, datetime
-from sanza.Emailing.models import MagicLink, Emailing
-from django.core.mail import get_connection, EmailMultiAlternatives
-import re
-from coop_cms.models import Newsletter
-from coop_cms.html2text import html2text
-from datetime import date
-from coop_cms.utils import make_links_absolute
 from django.utils import translation
-from django.contrib.sites.models import Site
-from django.core.mail import EmailMessage
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
+
+from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
-from django.contrib import messages
+from coop_cms.utils import dehtml
+from coop_cms.utils import make_links_absolute
+
+from sanza.Crm.models import Contact, Action, ActionType
+from sanza.Emailing.models import MagicLink, Emailing
 
 
 def format_context(text, data):
@@ -95,7 +96,7 @@ def send_newsletter(emailing, max_nb):
             html_text = t.render(context)
             html_text = make_links_absolute(html_text, emailing.newsletter)
             
-            text = html2text(html_text)
+            text = dehtml(html_text)
             headers = {'Reply-To': settings.COOP_CMS_REPLY_TO}
             email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()], headers=headers)
             email.attach_alternative(html_text, "text/html")
@@ -133,7 +134,8 @@ def create_subscription_action(contact, subscriptions):
 
 
 def send_notification_email(request, contact, actions, message):
-    #send an email
+    """send an email to admin for information about new subscription"""
+
     notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
     if notification_email:
         data = {
@@ -150,7 +152,7 @@ def send_notification_email(request, contact, actions, message):
         
         email = EmailMessage(
             _(u"Message from web site"), content, from_email,
-            [notification_email], headers = {'Reply-To': contact.email}
+            [notification_email], headers={'Reply-To': contact.email}
         )
         try:
             email.send()
@@ -168,6 +170,8 @@ def send_notification_email(request, contact, actions, message):
 
 
 def send_verification_email(contact):
+    """send an email to subscriber for checking his email"""
+
     if contact.email:
         data = {
             'contact': contact,
@@ -181,7 +185,9 @@ def send_verification_email(contact):
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
         email = EmailMessage(
-            _(u'Verification of your email address'), content, from_email,
+            _(u'Verification of your email address'),
+            content,
+            from_email,
             [contact.email]
         )
         email.send()

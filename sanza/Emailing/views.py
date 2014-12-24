@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.views.generic.base import View, TemplateView
-from django.template import RequestContext, Context, Template
-from django.template.loader import render_to_string
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
-from django.core.exceptions import PermissionDenied
-from django.contrib.auth.decorators import login_required, user_passes_test
-from sanza.Crm.models import Contact, Action, ActionType
-from datetime import date, timedelta, datetime
-from sanza.Emailing import models, forms
+import datetime
+import os.path
+
+from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
+from django.core.servers.basehttp import FileWrapper
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext, Context, Template
+from django.template.loader import get_template
+from django.utils.importlib import import_module
+from django.utils.translation import ugettext as _
+from django.views.generic.base import View, TemplateView
+
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
-from sanza.Emailing.utils import get_emailing_context
-from django.template.loader import get_template
-from django.conf import settings
-from django.utils.importlib import import_module
+
 from sanza.permissions import can_access
-from utils import send_verification_email
 from sanza.utils import logger, log_error
 from sanza.utils import now_rounded
-import os.path
-from django.core.servers.basehttp import FileWrapper
 from sanza.Crm.forms import ConfirmForm
+from sanza.Crm.models import Contact, Action, ActionType, Subscription
+from sanza.Emailing import models, forms
+from sanza.Emailing.utils import get_emailing_context
+from sanza.Emailing.utils import send_verification_email
+
 
 @user_passes_test(can_access)
 def newsletter_list(request):
@@ -36,6 +38,7 @@ def newsletter_list(request):
         {'newsletters': newsletters},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -61,6 +64,7 @@ def delete_emailing(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_emailing(request, emailing_id):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -69,6 +73,7 @@ def view_emailing(request, emailing_id):
         {'emailing': emailing, 'contacts': emailing.get_contacts()},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -105,6 +110,7 @@ def new_newsletter(request):
     except Exception, msg:
         print "#ERR", msg
         raise
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -164,6 +170,7 @@ def cancel_send_mail(request, emailing_id):
         context_instance=RequestContext(request)
     )
 
+
 def view_link(request, link_uuid, contact_uuid):
     link = get_object_or_404(models.MagicLink, uuid=link_uuid)
     try:
@@ -183,7 +190,8 @@ def view_link(request, link_uuid, contact_uuid):
     except Contact.DoesNotExist:
         pass
     return HttpResponseRedirect(link.url)
-            
+
+
 def unregister_contact(request, emailing_id, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     try:
@@ -196,18 +204,23 @@ def unregister_contact(request, emailing_id, contact_uuid):
         if 'unregister' in request.POST:
             form = forms.UnregisterForm(request.POST)
             if form.is_valid():
-                contact.accept_newsletter = False
-                contact.save()
-                
-                emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
-                action = Action.objects.create(
-                    subject=_(u'{0} has unregister').format(contact),
-                    planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
-                    done=True, display_on_board=False, done_date=now_rounded()
-                )
-                action.contacts.add(contact)
-                action.save()
-                unregister = True
+                if emailing and emailing.subscription_type:
+                    subscription = Subscription.objects.get_or_create(
+                        contact=contact, subscription_type=emailing.subscription_type
+                    )[0]
+                    subscription.accept_subscription = False
+                    subscription.unsubscription_date = datetime.datetime.now()
+                    subscription.save()
+
+                    emailing_action, _is_new = ActionType.objects.get_or_create(name=_(u'Unregister'))
+                    action = Action.objects.create(
+                        subject=_(u'{0} has unregister').format(contact),
+                        planned_date=now_rounded(), type = emailing_action, detail=form.cleaned_data['reason'],
+                        done=True, display_on_board=False, done_date=now_rounded()
+                    )
+                    action.contacts.add(contact)
+                    action.save()
+                    unregister = True
                 return render_to_response(
                     'Emailing/public/unregister_done.html',
                     locals(),
@@ -231,12 +244,14 @@ def unregister_contact(request, emailing_id, contact_uuid):
         context_instance=RequestContext(request)
     )
 
+
 def view_emailing_online(request, emailing_id, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     context = Context(get_emailing_context(emailing, contact))
     t = get_template(emailing.newsletter.get_template_name())
     return HttpResponse(t.render(context))
+
 
 def subscribe_done(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
@@ -247,7 +262,8 @@ def subscribe_done(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
-    
+
+
 def subscribe_error(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     my_company = settings.SANZA_MY_COMPANY
@@ -257,6 +273,7 @@ def subscribe_error(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 def email_verification(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
@@ -270,6 +287,7 @@ def email_verification(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 def email_tracking(request, emailing_id, contact_uuid):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -322,16 +340,20 @@ class SubscribeView(View):
         form_class = self.get_form_class()
         form = form_class()
         return self._display_form(form)
-        
+
+    def get_form_kwargs(self):
+        return {}
+
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
-        form = form_class(request.POST, request.FILES)
+
+        form = form_class(request.POST, request.FILES, **self.get_form_kwargs())
         if form.is_valid():
             contact = form.save(request)
             try:
                 send_verification_email(contact)
                 return HttpResponseRedirect(self.get_success_url(contact))
-            except:
+            except Exception:
                 logger.exception('send_verification_email')
                 
                 #create action
@@ -351,6 +373,7 @@ class SubscribeView(View):
 
 
 class EmailSubscribeView(SubscribeView):
+    """Just a email field for newsletter subscription"""
     template_name = 'Emailing/public/subscribe_email.html'
     
     def get_success_url(self, contact):
@@ -358,12 +381,19 @@ class EmailSubscribeView(SubscribeView):
     
     def get_error_url(self, contact):
         return reverse('emailing_subscribe_email_error')
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(EmailSubscribeView, self).get_form_kwargs(*args, **kwargs)
+        form_kwargs['subscription_type'] = self.kwargs.get('subscription_type', None)
+        return form_kwargs
     
     def get_form_class(self):
         return forms.EmailSubscribeForm
-    
+
+
 class EmailSubscribeDoneView(TemplateView):
     template_name = 'Emailing/public/subscribe_email_done.html'
-    
+
+
 class EmailSubscribeErrorView(TemplateView):
     template_name = 'Emailing/public/subscribe_email_error.html'

@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
 
+import uuid
+import unicodedata
+from urlparse import urlparse
+
 from django.db import models
 from django.db.models import Q
+from django.conf import settings as project_settings
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
-from django.core.urlresolvers import reverse
-from django.conf import settings as project_settings
-from datetime import datetime, date
-import uuid, unicodedata
-from sanza.Crm import settings
-from django.contrib.sites.models import Site
+
+from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
-from django_extensions.db.models import TimeStampedModel, AutoSlugField
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.utils.html import mark_safe
+
+from sanza.Crm import settings
 from sanza.utils import now_rounded
-from django.contrib.contenttypes.generic import GenericRelation
 from sanza.Users.models import Favorite
-from urlparse import urlparse
+
 
 class NamedElement(models.Model):
     name = models.CharField(_(u'Name'), max_length=200)
@@ -43,11 +46,13 @@ class EntityType(NamedElement):
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
     order = models.IntegerField(_(u'order'), default=0)
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
-    subscribe_form = models.BooleanField(default=True, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This type will be proposed on the public subscribe form'))
+    subscribe_form = models.BooleanField(
+        default=True, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This type will be proposed on the public subscribe form')
+    )
     
     def is_male(self):
-        return (self.gender == EntityType.GENDER_MALE)
+        return self.gender == EntityType.GENDER_MALE
     
     class Meta:
         verbose_name = _(u'entity type')
@@ -80,6 +85,7 @@ class BaseZone(NamedElement):
     class Meta:
         abstract = True
 
+
 class Zone(BaseZone):
     type = models.ForeignKey(ZoneType)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
@@ -99,9 +105,11 @@ class Zone(BaseZone):
         verbose_name_plural = _(u'zones')
         ordering = ['name']
 
+
 class City(BaseZone):
-    groups = models.ManyToManyField(Zone, blank=True, null=True,
-        verbose_name=_(u'group'), related_name='city_groups_set')
+    groups = models.ManyToManyField(
+        Zone, blank=True, null=True, verbose_name=_(u'group'), related_name='city_groups_set'
+    )
 
     class Meta:
         verbose_name = _(u'city')
@@ -131,6 +139,7 @@ class City(BaseZone):
 
 def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
+
 
 class Entity(TimeStampedModel):
     name = models.CharField(_('name'), max_length=200, db_index=True)
@@ -256,7 +265,8 @@ class Entity(TimeStampedModel):
             return Action.objects.filter(
                 Q(contacts__entity=self) | Q(entities=self), done=False,
                 planned_date__isnull=False,
-                done_date__isnull=True).order_by("planned_date")[0]
+                done_date__isnull=True
+            ).order_by("planned_date")[0]
         except IndexError:
             return None
         
@@ -299,14 +309,17 @@ class Entity(TimeStampedModel):
         verbose_name_plural = _(u'entities')
         ordering = ('name',)
 
+
 class EntityRole(NamedElement):
 
     class Meta:
         verbose_name = _(u'entity role')
         verbose_name_plural = _(u'entity roles')    
 
+
 def get_contact_photo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
+
 
 class SameAs(models.Model):
     
@@ -318,6 +331,7 @@ class SameAs(models.Model):
     class Meta:
         verbose_name = _(u'same as')
         verbose_name_plural = _(u'sames as')
+
 
 class RelationshipType(models.Model):
     name = models.CharField(max_length=100, blank=False, verbose_name=_(u"name"))
@@ -432,8 +446,7 @@ class Contact(TimeStampedModel):
     
     def can_add_relation(self, ):
         return RelationshipType.objects.count()>0
-    
-    
+
     def get_safe_photo(self):
         if self.photo:
             return self.photo_thumbnail().url
@@ -449,8 +462,7 @@ class Contact(TimeStampedModel):
             else:
                 w, h = w*64/h, h
                 return mark_safe('style="margin: 0 {0}px"'.format((64-w)/2))
-        
-    
+
     def default_logo(self):
         if self.entity.is_single_contact:
             logo = "img/single-contact.png"
@@ -473,8 +485,7 @@ class Contact(TimeStampedModel):
             if country:
                 fields.append(country.name)
             return [f for f in fields if f]
-        return self.entity.get_address_fields() 
-    
+        return self.entity.get_address_fields()
     
     def get_country(self):
         if self.city:
@@ -614,14 +625,39 @@ class Contact(TimeStampedModel):
         verbose_name = _(u'contact')
         verbose_name_plural = _(u'contacts')
         ordering = ('lastname', 'firstname')
+
+
+class SubscriptionType(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    sites = models.ManyToManyField(Site, blank=True, null=True)
     
+    def __unicode__(self):
+        return self.name
+
+
+class Subscription(models.Model):
+    
+    subscription_type = models.ForeignKey(SubscriptionType)
+    contact = models.ForeignKey(Contact)
+    
+    accept_subscription = models.BooleanField(
+        _(u"accept subscription"), default=False,
+        help_text=_(u'Keep this checked if you want to receive our newsletter.')
+    )
+    
+    subscription_date = models.DateTimeField(blank=True, default=None, null=True)
+    unsubscription_date = models.DateTimeField(blank=True, default=None, null=True)
+
+
 class Group(TimeStampedModel):
     name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
     description = models.CharField(_(u'description'), max_length=200, blank=True, default="")
     entities = models.ManyToManyField(Entity, blank=True, null=True)
     contacts = models.ManyToManyField(Contact, blank=True, null=True)
-    subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This group will be proposed on the public subscribe form'))
+    subscribe_form = models.BooleanField(
+        default=False, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This group will be proposed on the public subscribe form')
+    )
     
     favorites = GenericRelation(Favorite)
 
@@ -639,7 +675,8 @@ class Group(TimeStampedModel):
     class Meta:
         verbose_name = _(u'group')
         verbose_name_plural = _(u'groups')
-        
+
+
 class OpportunityStatus(NamedElement):
     ordering = models.IntegerField(default=0)
     
@@ -647,11 +684,13 @@ class OpportunityStatus(NamedElement):
         verbose_name = _(u'opportunity status')
         verbose_name_plural = _(u'opportunity status')
 
+
 class OpportunityType(NamedElement):
     
     class Meta:
         verbose_name = _(u'opportunity type')
         verbose_name_plural = _(u'opportunity types')
+
 
 class Opportunity(TimeStampedModel):
     
@@ -672,8 +711,9 @@ class Opportunity(TimeStampedModel):
     type = models.ForeignKey(OpportunityType, blank=True, null=True, default=None)
     detail = models.TextField(_('detail'), blank=True, default='')
     #TO BE REMOVED---
-    probability = models.IntegerField(_('probability'), default=PROBABILITY_MEDIUM,
-        choices=PROBABILITY_CHOICES)
+    probability = models.IntegerField(
+        _('probability'), default=PROBABILITY_MEDIUM, choices=PROBABILITY_CHOICES
+    )
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
     #----------------
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
@@ -681,21 +721,23 @@ class Opportunity(TimeStampedModel):
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
     #----------------
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board', default=False),
-        default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True)
+    display_on_board = models.BooleanField(
+        verbose_name=_(u'display on board', default=False),
+        default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT, db_index=True
+    )
     
     favorites = GenericRelation(Favorite)
     
     def get_start_date(self):
         try:
             return self.action_set.filter(planned_date__isnull=False).order_by("planned_date")[0].planned_date
-        except:
+        except IndexError:
             return None
         
     def get_end_date(self):
         try:
             return self.action_set.filter(planned_date__isnull=False).order_by("-planned_date")[0].planned_date
-        except:
+        except IndexError:
             return None
     
     def default_logo(self):
@@ -709,15 +751,19 @@ class Opportunity(TimeStampedModel):
         verbose_name = _(u'opportunity')
         verbose_name_plural = _(u'opportunities')
 
+
 class ActionSet(NamedElement):
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+
     class Meta:
         verbose_name = _(u'action set')
         verbose_name_plural = _(u'action sets')
         ordering = ['ordering']
 
+
 class ActionStatus(NamedElement):
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+
     class Meta:
         verbose_name = _(u'action status')
         verbose_name_plural = _(u'action status')
@@ -725,20 +771,30 @@ class ActionStatus(NamedElement):
 
 
 class ActionType(NamedElement):
-    subscribe_form = models.BooleanField(default=False, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This action type will be proposed on the public subscribe form'))
+    subscribe_form = models.BooleanField(
+        default=False, verbose_name=_(u'Subscribe form'),
+        help_text=_(u'This action type will be proposed on the public subscribe form')
+    )
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_(u"action set"))
     last_number = models.IntegerField(_(u'last number'), default=0)
     number_auto_generated = models.BooleanField(_(u'generate number automatically'), default=False)
-    default_template = models.CharField(_(u'document template'), max_length=200, blank=True, default="",
-        help_text=_(u'Action of this type will have a document with the given template'))
-    allowed_status = models.ManyToManyField(ActionStatus, blank=True, default=None, null=True,
-        help_text=_(u'Action of this type allow the given status'))
-    default_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True,
+    default_template = models.CharField(
+        _(u'document template'), max_length=200, blank=True, default="",
+        help_text=_(u'Action of this type will have a document with the given template')
+    )
+    allowed_status = models.ManyToManyField(
+        ActionStatus, blank=True, default=None, null=True,
+        help_text=_(u'Action of this type allow the given status')
+    )
+    default_status = models.ForeignKey(
+        ActionStatus, blank=True, default=None, null=True,
         help_text=_(u'Default status for actions of this type'),
-        related_name='type_default_status_set')
-    is_editable = models.BooleanField(_(u'is editable'), default=True,
-        help_text=_(u'If default_template is set, define if the template has a editable content'))
+        related_name='type_default_status_set'
+    )
+    is_editable = models.BooleanField(
+        _(u'is editable'), default=True,
+        help_text=_(u'If default_template is set, define if the template has a editable content')
+    )
 
     def status_defined(self):
         return self.allowed_status.count()>0
@@ -747,6 +803,7 @@ class ActionType(NamedElement):
     class Meta:
         verbose_name = _(u'action type')
         verbose_name_plural = _(u'action types')
+
 
 class Action(TimeStampedModel):
     PRIORITY_LOW = 1
@@ -803,7 +860,8 @@ class Action(TimeStampedModel):
             self.type.save()
             
         return super(Action, self).save(*args, **kwargs)
-        
+
+
 class ActionDocument(models.Model):
     content = models.TextField(_(u'content'), blank=True, default="")
     action = models.OneToOneField(Action)
@@ -869,7 +927,8 @@ class CustomFieldValue(models.Model):
         verbose_name = _(u'custom field value')
         verbose_name_plural = _(u'custom field values')
         abstract = True
-        
+
+
 class EntityCustomFieldValue(CustomFieldValue):
     entity = models.ForeignKey(Entity)
     
@@ -879,7 +938,8 @@ class EntityCustomFieldValue(CustomFieldValue):
 
     def __unicode__(self):
         return u'{0} {1}'.format(self.entity, self.custom_field)
-    
+
+
 class ContactCustomFieldValue(CustomFieldValue):
     contact = models.ForeignKey(Contact)
     
@@ -889,7 +949,8 @@ class ContactCustomFieldValue(CustomFieldValue):
 
     def __unicode__(self):
         return u'{0} {1}'.format(self.contact, self.custom_field)
-    
+
+
 class ContactsImport(TimeStampedModel):
     
     ENCODINGS = (
@@ -899,25 +960,35 @@ class ContactsImport(TimeStampedModel):
     )
     
     SEPARATORS = (
-         (',', _(u'Coma')),
-         (';', _(u'Semi-colon')),
+        (',', _(u'Coma')),
+        (';', _(u'Semi-colon')),
     )
     
     def _get_import_dir(self, filename):
         return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
-    import_file = models.FileField(_(u'import file'), upload_to=_get_import_dir,
-        help_text=_(u'CSV file following the import contacts format.'))
-    name = models.CharField(max_length=100, verbose_name=_(u'name'), blank=True, default=u'',
-        help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.'))
+    import_file = models.FileField(
+        _(u'import file'), upload_to=_get_import_dir,
+        help_text=_(u'CSV file following the import contacts format.')
+    )
+    name = models.CharField(
+        max_length=100, verbose_name=_(u'name'), blank=True, default=u'',
+        help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.')
+    )
     imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
     encoding = models.CharField(max_length=50, default='utf-8', choices=ENCODINGS)
     separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
-    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None,
-        help_text=_(u'All created entities will get this type. Ignored if the entity already exist.'))
-    groups = models.ManyToManyField(Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
-        help_text=_(u'The created entities will be added to the selected groups.'))
-    entity_name_from_email = models.BooleanField(verbose_name=_(u'generate entity name from email address'), default=True)
+    entity_type = models.ForeignKey(
+        EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None,
+        help_text=_(u'All created entities will get this type. Ignored if the entity already exist.')
+    )
+    groups = models.ManyToManyField(
+        Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
+        help_text=_(u'The created entities will be added to the selected groups.')
+    )
+    entity_name_from_email = models.BooleanField(
+        verbose_name=_(u'generate entity name from email address'), default=True
+    )
 
     def __unicode__(self):
         return self.name

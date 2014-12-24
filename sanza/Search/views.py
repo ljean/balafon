@@ -269,10 +269,12 @@ def create_emailing(request):
                         newsletter = Newsletter.objects.get(id=newsletter_id)
                     else:
                         newsletter = Newsletter.objects.create(subject=form.cleaned_data['subject'])
-                    
+
+                    subscription_type = form.cleaned_data['subscription_type']
+
                     contacts = form.get_contacts()
-                    
-                    emailing = Emailing.objects.create(newsletter=newsletter)
+
+                    emailing = Emailing.objects.create(newsletter=newsletter, subscription_type=subscription_type)
                     for c in contacts:
                         emailing.send_to.add(c)
                     emailing.save()

@@ -1,7 +1,7 @@
 {% load i18n %}{% load url from future %}
 <td{% if colspan %} colspan={{colspan}}{% endif %}>
   {% if field.errors %}
-  <ul class="fielderror">
+  <ul class="fielderror errorlist">
       {% for err in field.errors %}
           <li>{{err}}</li>
       {% endfor %}
