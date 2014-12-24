@@ -35,7 +35,7 @@ class Emailing(TimeStampedModel):
         (STATUS_SENT, _(u'Sent')),
     )
 
-    subscription_type = models.ForeignKey(SubscriptionType, blank=True, default=None, null=True)
+    subscription_type = models.ForeignKey(SubscriptionType)
     newsletter = models.ForeignKey(Newsletter) 
     send_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_to_be_received")
     sent_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_received")
