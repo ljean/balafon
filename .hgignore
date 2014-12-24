@@ -1,3 +1,5 @@
 glob:*.pyc
 glob:sanza.egg-info/*
 glob:apidev_sanza.egg-info/*
+glob:sanza/ci/drone_project/ci_local_settings.py
+glob:*.sqlite3

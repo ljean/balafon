@@ -244,12 +244,14 @@ def unregister_contact(request, emailing_id, contact_uuid):
         context_instance=RequestContext(request)
     )
 
+
 def view_emailing_online(request, emailing_id, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     context = Context(get_emailing_context(emailing, contact))
     t = get_template(emailing.newsletter.get_template_name())
     return HttpResponse(t.render(context))
+
 
 def subscribe_done(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
@@ -260,7 +262,8 @@ def subscribe_done(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
-    
+
+
 def subscribe_error(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     my_company = settings.SANZA_MY_COMPANY
@@ -270,6 +273,7 @@ def subscribe_error(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 def email_verification(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
@@ -283,6 +287,7 @@ def email_verification(request, contact_uuid):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 def email_tracking(request, emailing_id, contact_uuid):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
@@ -364,6 +369,7 @@ class SubscribeView(View):
 
 
 class EmailSubscribeView(SubscribeView):
+    """Just a email field for newsletter subscription"""
     template_name = 'Emailing/public/subscribe_email.html'
     
     def get_success_url(self, contact):
@@ -374,9 +380,11 @@ class EmailSubscribeView(SubscribeView):
     
     def get_form_class(self):
         return forms.EmailSubscribeForm
-    
+
+
 class EmailSubscribeDoneView(TemplateView):
     template_name = 'Emailing/public/subscribe_email_done.html'
-    
+
+
 class EmailSubscribeErrorView(TemplateView):
     template_name = 'Emailing/public/subscribe_email_error.html'

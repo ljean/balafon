@@ -264,3 +264,7 @@ LOGGING = {
     }
 }
 
+try:
+    from ci_local_settings import *
+except ImportError:
+    pass
