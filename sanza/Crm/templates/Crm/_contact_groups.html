@@ -29,11 +29,13 @@
         {% endfor %}
 
         {% for s in contact.subscription_set.all %}
+          {% if s.accept_subscription %}
           <span class="group-tag btn btn-xs btn-danger">
             {% spaceless %}
             <span class="glyphicon glyphicon-send"></span> {{s.subscription_type.name}}
             {% endspaceless %}
           </span>
+          {% endif %}
         {% endfor %}
       </div>
     </div>
