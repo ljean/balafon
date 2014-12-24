@@ -26,6 +26,7 @@ from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing import models
 from sanza.Emailing.utils import create_subscription_action, send_notification_email
+from sanza.Emailing import settings as emailing_settings
 
 
 class UnregisterForm(forms.Form):
@@ -136,6 +137,10 @@ class EmailSubscribeForm(forms.ModelForm):
     class Meta:
         model = Contact
         fields = ('email',)
+
+    def __init__(self, *args, **kwargs):
+        self.subscription_type = kwargs.pop('subscription_type', None)
+        super(EmailSubscribeForm, self).__init__(*args, **kwargs)
     
     def save(self, request=None):
         contact = super(EmailSubscribeForm, self).save(commit=False)
@@ -149,17 +154,30 @@ class EmailSubscribeForm(forms.ModelForm):
         contact.save()
         #delete unknown contacts for the current entity
         contact.entity.contact_set.exclude(id=contact.id).delete()
-        
+
+        queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current())
+
+        form_subscription_type = self.subscription_type
+        default_subscription_type = emailing_settings.get_default_subscription_type()
+        if not form_subscription_type and default_subscription_type:
+            form_subscription_type = default_subscription_type
+
+        if form_subscription_type:
+            queryset = queryset.filter(id=form_subscription_type)
+
         subscriptions = []
-        for st in SubscriptionType.objects.filter(sites=Site.objects.get_current()):
-            s, _ = Subscription.objects.get_or_create(contact=contact, subscription_type=st)
-            s.accept_subscription = True
-            s.subscription_date = datetime.now()
-            s.save()
-            subscriptions.append(st.name)
+        for subscription_type in queryset:
+            subscription = Subscription.objects.get_or_create(contact=contact, subscription_type=subscription_type)[0]
+            subscription.accept_subscription = True
+            subscription.subscription_date = datetime.now()
+            subscription.save()
+            subscriptions.append(subscription_type.name)
         
         create_subscription_action(contact, subscriptions)
-        send_notification_email(request, contact, [], "")
+        if subscriptions:
+            send_notification_email(request, contact, [], "")
+        else:
+            send_notification_email(request, contact, [], u"Error: "+_(u"No subscription_type defined"))
                 
         return contact
 

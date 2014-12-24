@@ -340,16 +340,20 @@ class SubscribeView(View):
         form_class = self.get_form_class()
         form = form_class()
         return self._display_form(form)
-        
+
+    def get_form_kwargs(self):
+        return {}
+
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
-        form = form_class(request.POST, request.FILES)
+
+        form = form_class(request.POST, request.FILES, **self.get_form_kwargs())
         if form.is_valid():
             contact = form.save(request)
             try:
                 send_verification_email(contact)
                 return HttpResponseRedirect(self.get_success_url(contact))
-            except:
+            except Exception:
                 logger.exception('send_verification_email')
                 
                 #create action
@@ -377,6 +381,11 @@ class EmailSubscribeView(SubscribeView):
     
     def get_error_url(self, contact):
         return reverse('emailing_subscribe_email_error')
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(EmailSubscribeView, self).get_form_kwargs(*args, **kwargs)
+        form_kwargs['subscription_type'] = self.kwargs.get('subscription_type', None)
+        return form_kwargs
     
     def get_form_class(self):
         return forms.EmailSubscribeForm

@@ -134,7 +134,8 @@ def create_subscription_action(contact, subscriptions):
 
 
 def send_notification_email(request, contact, actions, message):
-    #send an email
+    """send an email to admin for information about new subscription"""
+
     notification_email = getattr(settings, 'SANZA_NOTIFICATION_EMAIL', '')
     if notification_email:
         data = {
@@ -151,7 +152,7 @@ def send_notification_email(request, contact, actions, message):
         
         email = EmailMessage(
             _(u"Message from web site"), content, from_email,
-            [notification_email], headers = {'Reply-To': contact.email}
+            [notification_email], headers={'Reply-To': contact.email}
         )
         try:
             email.send()
@@ -169,6 +170,8 @@ def send_notification_email(request, contact, actions, message):
 
 
 def send_verification_email(contact):
+    """send an email to subscriber for checking his email"""
+
     if contact.email:
         data = {
             'contact': contact,
@@ -182,7 +185,9 @@ def send_verification_email(contact):
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
         email = EmailMessage(
-            _(u'Verification of your email address'), content, from_email,
+            _(u'Verification of your email address'),
+            content,
+            from_email,
             [contact.email]
         )
         email.send()
