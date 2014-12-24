@@ -27,6 +27,14 @@
             {% endspaceless %}
           </span>
         {% endfor %}
+
+        {% for s in contact.subscription_set.all %}
+          <span class="group-tag btn btn-xs btn-danger">
+            {% spaceless %}
+            <span class="glyphicon glyphicon-send"></span> {{s.subscription_type.name}}
+            {% endspaceless %}
+          </span>
+        {% endfor %}
       </div>
     </div>
   </div>
