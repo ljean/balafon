@@ -3304,6 +3304,12 @@ class CitiesSuggestListTestCase(BaseTestCase):
         self.assertEqual(200, response.status_code)
         self.assertContains(response, city.id)
         self.assertNotContains(response, city2.id)
+
+    def test_get_city_id_unicode(self):
+        response = self.client.get(reverse('crm_get_city_id')+"?name=Mérignac")
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+        self.assertEqual(data["id"], u"Mérignac")
         
     def test_get_city_id_case_insensitive_twice(self):
         city = mommy.make(models.City, name="abcd", parent=self.parent)

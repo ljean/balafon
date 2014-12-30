@@ -45,7 +45,7 @@ $(function() {
     $("input[name={{name}}_visible]").change(function() {
 		var value = $(this).val();
         $.ajax({
-			url: "{% block get_id_url %}{% endblock %}?name="+escape(value),
+			url: "{% block get_id_url %}{% endblock %}?name="+value,
 			success: function(data){
 		        if (data.id) {
                     $('input[name={{name}}]').val(data.id);

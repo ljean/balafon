@@ -452,7 +452,7 @@ def get_city_name(request, city):
 @user_passes_test(can_access)
 @log_error
 def get_city_id(request):
-    name = request.GET.get('name')
+    name = (request.GET.get('name'))
     country_id = int(request.GET.get('country', 0))
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
     if country_id == 0 or country_id == default_country.id:
@@ -460,7 +460,7 @@ def get_city_id(request):
     else:
         cities = models.City.objects.filter(name__iexact=name, parent__id=country_id)
     if cities.count() != 1:
-        city_id = 0
+        city_id = name
     else:
         city_id = cities[0].id
     return HttpResponse(json.dumps({'id': city_id}), 'application/json')
