@@ -2031,7 +2031,7 @@ class ActionDocumentPdfView(PDFTemplateView):
         return ""
     
     def render_to_response(self, context, **response_kwargs):
-        action = get_object_or_404(models.Action, pk = self.kwargs['pk'])
+        action = get_object_or_404(models.Action, pk=self.kwargs['pk'])
         try:
             doc = action.actiondocument
         except models.ActionDocument.DoesNotExist:
@@ -2041,7 +2041,11 @@ class ActionDocumentPdfView(PDFTemplateView):
         context['to_pdf'] = True
         context['object'] = doc
         self.template_name = doc.template
-        pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', {}).get(self.template_name, {})
+        pdf_options_dict = getattr(settings, 'SANZA_PDF_OPTIONS', None)
+        if pdf_options_dict is None:
+            pdf_options = {'margin-top': 0, 'margin-bottom': 0, 'margin-right': 0, 'margin-left': 0, }
+        else:
+            pdf_options = pdf_options_dict.get(self.template_name, {})
         if self.cmd_options:
             self.cmd_options.update(pdf_options)
         else:
