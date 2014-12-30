@@ -25,6 +25,7 @@
       $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').hide().text()+'</span>');
       
     });
+
     parent.$.colorbox.resize({width: "60%"});
     $(".tabbar .tab").live('click', function() {
       var item = $(this).attr('rel');
@@ -32,7 +33,7 @@
       $(this).addClass("selected");
       $("fieldset").hide();
       $("fieldset."+item).show();
-      parent.$.colorbox.resize(/*{width:x, height:y}*/);
+      parent.$.colorbox.resize();
     })
     if (error_index>0) {
       $(".tabbar .tab[rel=item"+error_index+"]").click();  

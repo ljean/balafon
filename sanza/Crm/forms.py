@@ -341,7 +341,7 @@ class ContactForm(ModelFormWithCity):
         super(ContactForm, self).__init__(*args, **kwargs)
 
         if self.instance and self.instance.entity and self.instance.entity.is_single_contact:
-            self.fields['has_left'] = forms.HiddenInput()
+             self.fields['has_left'].widget = forms.HiddenInput()
 
         self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
         
