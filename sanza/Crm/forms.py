@@ -202,7 +202,6 @@ class _CityBasedForm(object):
         
     def clean_city(self):
         city = self.cleaned_data['city']
-        print "******", city, "*****"
         if isinstance(city, models.City):
             return city
         else:
@@ -338,8 +337,12 @@ class ContactForm(ModelFormWithCity):
             field_name = "subscription_{0}".format(st.id)
             if not (field_name in fieldset_fields):
                 fieldset_fields.append(field_name)
-            
+
         super(ContactForm, self).__init__(*args, **kwargs)
+
+        if self.instance and self.instance.entity and self.instance.entity.is_single_contact:
+            self.fields['has_left'] = forms.HiddenInput()
+
         self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
         
         if not 'sanza.Profile' in settings.INSTALLED_APPS:
@@ -371,6 +374,27 @@ class ContactForm(ModelFormWithCity):
         if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
             raise ValidationError(ugettext(u"The file name is too long"))
         return photo
+
+    def save(self, *args, **kwargs):
+        contact = super(ContactForm, self).save(*args, **kwargs)
+        for subscription_type in models.SubscriptionType.objects.all():
+            field_name = "subscription_{0}".format(subscription_type.id)
+            accept_subscription = self.cleaned_data[field_name]
+            try:
+                subscription = models.Subscription.objects.get(
+                    contact=contact, subscription_type=subscription_type
+                )
+                if subscription.accept_subscription != accept_subscription:
+                    subscription.accept_subscription = accept_subscription
+                    subscription.save()
+            except models.Subscription.DoesNotExist:
+                if accept_subscription:
+                    models.Subscription.objects.create(
+                        contact=contact,
+                        subscription_type=subscription_type,
+                        accept_subscription=True
+                    )
+        return contact
 
 
 class EntityTypeForm(forms.ModelForm):
