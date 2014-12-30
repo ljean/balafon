@@ -364,7 +364,8 @@ def see_my_groups(request):
 @popup_redirect
 def edit_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
-    entity.save() #update last access
+    #update last access
+    entity.save()
     if request.method == "POST":
         form = forms.EntityForm(request.POST, request.FILES, instance=entity)
         if form.is_valid():
@@ -458,8 +459,8 @@ def get_city_id(request):
         cities = models.City.objects.filter(name__iexact=name).exclude(parent__code='')
     else:
         cities = models.City.objects.filter(name__iexact=name, parent__id=country_id)
-    if cities.count()!=1:
-        city_id = name
+    if cities.count() != 1:
+        city_id = 0
     else:
         city_id = cities[0].id
     return HttpResponse(json.dumps({'id': city_id}), 'application/json')

@@ -132,8 +132,10 @@ class City(BaseZone):
 
     def get_friendly_name(self):
         if self.parent:
-            return u'{0} ({1})'.format(self.name,
-                self.parent.code if self.parent.code else self.parent.name[:2])
+            return u'{0} ({1})'.format(
+                self.name,
+                self.parent.code if self.parent.code else self.parent.name[:2]
+            )
         return self.name
     
 

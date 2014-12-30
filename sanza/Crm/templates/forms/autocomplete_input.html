@@ -44,11 +44,15 @@ $(function() {
     });
     $("input[name={{name}}_visible]").change(function() {
 		var value = $(this).val();
-		$.ajax({
+        $.ajax({
 			url: "{% block get_id_url %}{% endblock %}?name="+escape(value),
 			success: function(data){
-				$('input[name={{name}}]').val(data.id);
-				$("input[name={{name}}_visible]").attr('value', value);
+		        if (data.id) {
+                    $('input[name={{name}}]').val(data.id);
+                } else {
+                    $('input[name={{name}}]').val(value);
+                }
+            	$("input[name={{name}}_visible]").attr('value', value);
 			}
 		});
     });

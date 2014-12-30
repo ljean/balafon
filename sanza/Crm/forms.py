@@ -183,13 +183,15 @@ class _CityBasedForm(object):
             self.country_id = get_default_country().id
             
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
-        
-        self.fields['country'].choices = [(0, '')]+[(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
+
+        zones_choices = [(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
+        self.fields['country'].choices = [(0, '')] + zones_choices
+
         try:
             city = getattr(kwargs.get('instance'), 'city', 0)
             if city:
                 self.fields['country'].initial = self._get_city_parent(city).id    
-        except:
+        except models.City.DoesNotExist:
             pass
     
     def _get_country(self, country_id):
@@ -200,6 +202,7 @@ class _CityBasedForm(object):
         
     def clean_city(self):
         city = self.cleaned_data['city']
+        print "******", city, "*****"
         if isinstance(city, models.City):
             return city
         else:
@@ -207,8 +210,8 @@ class _CityBasedForm(object):
                 if not city:
                     return None
                 try:
-                    id = int(city)
-                    return models.City.objects.get(id=id)
+                    city_id = int(city)
+                    return models.City.objects.get(id=city_id)
                 except (ValueError, TypeError):
                     pass
 
@@ -222,12 +225,12 @@ class _CityBasedForm(object):
                 country = self._get_country(country_id)
                 default_country = get_default_country()
                 if country != default_country:
-                    city, _is_new = models.City.objects.get_or_create(name=city, parent=country)
+                    city = models.City.objects.get_or_create(name=city, parent=country)[0]
                 else:
-                    if len(zip_code)<2:
+                    if len(zip_code) < 2:
                         raise ValidationError(ugettext(u'You must enter a valid zip code for selecting a new city'))
                     dep = models.Zone.objects.get(code=zip_code[:2])
-                    city, _is_new = models.City.objects.get_or_create(name=city, parent=dep)
+                    city = models.City.objects.get_or_create(name=city, parent=dep)[0]
                 return city
             except ValidationError:
                 raise
