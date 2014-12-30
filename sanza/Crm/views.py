@@ -1,34 +1,37 @@
 # -*- coding: utf-8 -*-
 
+from datetime import date, datetime
+import json
+import os.path
+import re
+
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.messages import api as user_message
+from django.db.models import Q, Max
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context, TemplateDoesNotExist
-from django.core.urlresolvers import reverse
+from django.template.defaultfilters import slugify
+from django.template.loader import find_template
 from django.utils.translation import ugettext as _
-from django.core.exceptions import PermissionDenied
-from django.db.models import Q, Max
-from sanza.Crm import models, forms
-from .utils import get_actions_by_set
-from django.contrib.auth.decorators import login_required, user_passes_test
-from datetime import date, timedelta
-import json, re
+from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
+from django.views.generic import ListView
+
 from colorbox.decorators import popup_redirect
+from coop_cms.generic_views import EditableObjectView
+from wkhtmltopdf.views import PDFTemplateView
+
+from sanza.Crm import models, forms
+from sanza.Crm import settings as crm_settings
+from sanza.Crm.utils import get_actions_by_set
 from sanza.Crm.settings import get_default_country, is_unaccent_filter_supported
-from django.conf import settings
-import os.path
 from sanza.Crm.utils import unicode_csv_reader, resolve_city, check_city_exists, get_in_charge_users
 from sanza.permissions import can_access
 from sanza.utils import logger, log_error
-from coop_cms.generic_views import EditableObjectView
-from django.contrib.messages import api as user_message
-from wkhtmltopdf.views import PDFTemplateView
-from django.template.defaultfilters import slugify
-from django.template.loader import find_template
-from sanza.Crm import settings as crm_settings
-from datetime import datetime
-from sanza.utils import HttpResponseRedirectMailtoAllowed
-from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
-from django.views.generic import ListView
+
 
 @user_passes_test(can_access)
 def view_entity(request, entity_id):
@@ -36,8 +39,9 @@ def view_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
     contacts = entity.contact_set.all().order_by("has_left", "-main_contact", "lastname", "firstname")
     
-    actions = models.Action.objects.filter(Q(entities=entity) | Q(contacts__entity=entity),
-        Q(archived=False)).distinct().order_by("planned_date", "priority")
+    actions = models.Action.objects.filter(
+        Q(entities=entity) | Q(contacts__entity=entity), Q(archived=False)
+    ).distinct().order_by("planned_date", "priority")
     
     actions_by_set = get_actions_by_set(actions, 5)    
     
@@ -57,6 +61,7 @@ def view_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_entities_list(request):
     letter_filter = request.GET.get("filter", "*")
@@ -66,21 +71,20 @@ def view_entities_list(request):
         if is_unaccent_filter_supported():
             qs = qs.extra(
                 where=[u"UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
-                params = [u"{0}%".format(letter_filter)]
+                params=[u"{0}%".format(letter_filter)]
             )
         else:
             qs = qs.filter(name__istartswith=letter_filter)
     elif letter_filter == "~":
         qs = qs.filter(name__regex=r'^\W|^\d')
     entities = list(qs)
-    
-    #entities.sort(key=lambda x: x.default_contact.lastname.lower() if x.is_single_contact else x.name.lower())
-    
+
     return render_to_response(
         'Crm/all_entities.html',
         {'entities': entities, "letter_filter": letter_filter},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -96,10 +100,6 @@ def add_entity_to_group(request, entity_id):
             group.entities.add(entity)
             group.save()
             next_url = reverse('crm_view_entity', args=[entity_id])
-            #if is_new:
-            #    request.session["next_url"] = next_url
-            #    return HttpResponseRedirect(reverse('crm_edit_group', args=[group.id]))
-            #else:
             return HttpResponseRedirect(next_url)
     else:
         form = forms.AddEntityToGroupForm(entity)
@@ -115,6 +115,7 @@ def add_entity_to_group(request, entity_id):
         context_dict,
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -138,7 +139,6 @@ def add_contact_to_group(request, contact_id):
         context_dict = {
             'contact': contact,
             'form': form,
-            #'request': request,
         }
     
         return render_to_response(
@@ -149,7 +149,8 @@ def add_contact_to_group(request, contact_id):
     except Exception, msg:
         print "#ERR", msg
         raise
-    
+
+
 @user_passes_test(can_access)
 @popup_redirect
 def change_contact_entity(request, contact_id):
@@ -190,7 +191,8 @@ def get_group_suggest_list(request):
         return HttpResponse(json.dumps(suggestions), content_type='application/json')
     except Exception, msg:
         print '###', msg
-        
+
+
 @user_passes_test(can_access)
 @popup_redirect
 def remove_entity_from_group(request, group_id, entity_id):
@@ -213,6 +215,7 @@ def remove_entity_from_group(request, group_id, entity_id):
         },
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -240,17 +243,8 @@ def remove_contact_from_group(request, group_id, contact_id):
     except Exception, msg:
         print "#ERR", msg
         raise
-    
-#@login_required
-#def get_group_members(request, group_id):
-#    group = get_object_or_404(models.Group, id=group_id)
-#    group.save() #update last access
-#    return render_to_response(
-#        'Crm/group_members.html',
-#        {'group': group, 'entities': group.entities.all().order_by('name')},
-#        context_instance=RequestContext(request)
-#    )
-    
+
+
 @user_passes_test(can_access)
 def edit_group(request, group_id):
     group = get_object_or_404(models.Group, id=group_id)
@@ -276,6 +270,7 @@ def edit_group(request, group_id):
         context_dict,
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -322,6 +317,7 @@ def add_group(request):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def get_action_status(request):
     try:
@@ -363,6 +359,7 @@ def see_my_groups(request):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def edit_entity(request, entity_id):
@@ -381,6 +378,7 @@ def edit_entity(request, entity_id):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -414,6 +412,7 @@ def create_entity(request, entity_type_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def delete_entity(request, entity_id):
@@ -438,15 +437,17 @@ def delete_entity(request, entity_id):
         context_instance=RequestContext(request)
     )
 
-#@user_passes_test(can_access)
+
 def get_city_name(request, city):
+    #Anybody can accesss (public contact form of a website)
     try:
         city_id = int(city)
         city = models.City.objects.get(id=city_id)
         return HttpResponse(json.dumps({'name': city.name}), 'application/json')
     except ValueError:
         return HttpResponse(json.dumps({'name': city}), 'application/json')
-    
+
+
 @user_passes_test(can_access)
 @log_error
 def get_city_id(request):
@@ -463,19 +464,20 @@ def get_city_id(request):
         city_id = cities[0].id
     return HttpResponse(json.dumps({'id': city_id}), 'application/json')
 
-#subscribe form : no login required
-#@user_passes_test(can_access)
+
 def get_cities(request):
+    #subscribe form : no login required
     term = request.GET.get('term')
     country_id = int(request.GET.get('country', 0))
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
     if country_id == 0 or country_id == default_country.id:
-        cities = [{'id': x.id, 'name': x.name}
-            for x in models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]]
+        cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]
+        cities = [{'id': x.id, 'name': x.name} for x in cities_queryset]
     else:
-        cities = [{'id': x.id, 'name': x.name}
-            for x in models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]]
+        cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]
+        cities = [{'id': x.id, 'name': x.name} for x in cities_queryset]
     return HttpResponse(json.dumps(cities), 'application/json')
+
 
 @user_passes_test(can_access)
 @log_error
@@ -486,13 +488,15 @@ def get_opportunity_name(request, opp_id):
     except (models.Opportunity.DoesNotExist, ValueError):
         return HttpResponse(json.dumps({'name': opp_id}), 'application/json')
 
+
 @user_passes_test(can_access)
 @log_error
 def get_opportunities(request):
     term = request.GET.get('term')
-    opps = [{'id': x.id, 'name': u'{0}'.format(x.name)}
-        for x in models.Opportunity.objects.filter(ended=False, name__icontains=term)]
-    return HttpResponse(json.dumps(opps), 'application/json')
+    queryset = models.Opportunity.objects.filter(ended=False, name__icontains=term)
+    opportunities = [{'id': x.id, 'name': u'{0}'.format(x.name)} for x in queryset]
+    return HttpResponse(json.dumps(opportunities), 'application/json')
+
 
 @user_passes_test(can_access)
 @log_error
@@ -500,6 +504,7 @@ def get_opportunity_id(request):
     name = request.GET.get('name')
     opportunity = get_object_or_404(models.Opportunity, name=name)
     return HttpResponse(json.dumps({'id': opportunity.id}), 'application/json')
+
 
 @user_passes_test(can_access)
 def get_entity_name(request, entity_id):
@@ -509,12 +514,14 @@ def get_entity_name(request, entity_id):
     except models.Entity.DoesNotExist:
         return HttpResponse(json.dumps({'name': entity_id}), 'application/json')
 
+
 @user_passes_test(can_access)
 def get_entities(request):
     term = request.GET.get('term')
     entities = [{'id': x.id, 'name': x.name}
         for x in models.Entity.objects.filter(name__icontains=term)]
     return HttpResponse(json.dumps(entities), 'application/json')
+
 
 @user_passes_test(can_access)
 @log_error
@@ -525,6 +532,7 @@ def get_entity_id(request):
         return HttpResponse(json.dumps({'id': e.id}), 'application/json')
     raise Http404
 
+
 @user_passes_test(can_access)
 def get_contact_name(request, contact_id):
     try:
@@ -532,6 +540,7 @@ def get_contact_name(request, contact_id):
         return HttpResponse(json.dumps({'name': contact.get_name_and_entity()}), 'application/json')
     except models.Contact.DoesNotExist:
         return HttpResponse(json.dumps({'name': contact_id}), 'application/json')
+
 
 def get_contacts_from_term(term):
     terms = [t.strip('()') for t in term.split(' ')]
@@ -545,16 +554,19 @@ def get_contacts_from_term(term):
         if not x:
             contact_set = set()
             break
-        if i==0:
+        if i == 0:
             contact_set = set(x)
         else:
             contact_set = contact_set.intersection(x)
         
     if not contact_set:
         for term in terms:
-            contacts += list(models.Contact.objects.filter(
-                    Q(firstname__icontains=term) | Q(lastname__icontains=term) | Q(entity__name__icontains=term, entity__is_single_contact=False)
-                ))
+            queryset = models.Contact.objects.filter(
+                Q(firstname__icontains=term) |
+                Q(lastname__icontains=term) |
+                Q(entity__name__icontains=term, entity__is_single_contact=False)
+            )
+            contacts += list(queryset)
         
     contacts = list(contact_set or set(contacts))
     contacts = [{'id': x.id, 'name': x.get_name_and_entity()} for x in contacts]
@@ -567,9 +579,10 @@ def get_contacts_from_term(term):
 def get_contact_id(request):
     name = request.GET.get('name')
     contacts = get_contacts_from_term(name)
-    if len(contacts)!=1:
+    if len(contacts) != 1:
         raise Http404
     return HttpResponse(json.dumps({'id': contacts[0]['id']}), 'application/json')
+
 
 @user_passes_test(can_access)
 @log_error
@@ -577,6 +590,7 @@ def get_contacts(request):
     term = request.GET.get('term')
     contacts = get_contacts_from_term(term)
     return HttpResponse(json.dumps(contacts), 'application/json')
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -619,35 +633,31 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
-    same_as = None
+    same_as_contact = None
     
     actions = contact.action_set.filter(archived=False)
     actions_by_set = get_actions_by_set(actions, 5)    
     
-    #opportunities = list(set([a.opportunity for a in actions if a.opportunity]))
-    #opportunities.sort(key=lambda x: x.status.ordering if x.status else 0)
-    #opportunities.reverse()
-    
     request.session["redirect_url"] = reverse('crm_view_contact', args=[contact_id])
     
     if contact.same_as:
-        same_as = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
+        same_as_contact = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
     
     return render_to_response(
         'Crm/view_contact.html',
         {
             'contact': contact,
-            #'actions': actions,
             'actions_by_set': actions_by_set,
-            #'opportunities': opportunities,
-            'same_as': same_as,
+            'same_as': same_as_contact,
             'entity': contact.entity
         },
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 def view_all_contact_actions(request, contact_id, action_set_id):
@@ -672,6 +682,7 @@ def view_all_contact_actions(request, contact_id, action_set_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_all_entity_actions(request, entity_id, action_set_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -695,6 +706,7 @@ def view_all_entity_actions(request, entity_id, action_set_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_relationship(request, contact_id):
@@ -712,6 +724,7 @@ def add_relationship(request, contact_id):
         {'contact': contact1, 'form': form},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -760,6 +773,7 @@ def delete_relationship(request, contact_id, relationship_id):
             context_instance=RequestContext(request)
         )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def same_as(request, contact_id):
@@ -793,6 +807,7 @@ def same_as(request, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def remove_same_as(request, current_contact_id, contact_id):
@@ -811,7 +826,8 @@ def remove_same_as(request, current_contact_id, contact_id):
                     for c in same_as.contact_set.all():
                         c.same_as = None
                         c.save()
-                    same_as = models.SameAs.objects.get(id=same_as.id) # refresh
+                    # refresh
+                    same_as = models.SameAs.objects.get(id=same_as.id)
                     same_as.delete()
                 else:
                     if same_as.main_contact == contact:
@@ -826,8 +842,10 @@ def remove_same_as(request, current_contact_id, contact_id):
     else:
         form = forms.ConfirmForm()
     confirm_message = _(u'Are you sure that "{0}" and "{1}" are not identical?').format(contact, current_contact)
-    if same_as.contact_set.count()>2 and same_as.main_contact == contact:
-        confirm_message += _(u"\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(contact, current_contact)
+    if same_as.contact_set.count() > 2 and same_as.main_contact == contact:
+        confirm_message += _(u"\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(
+            contact, current_contact
+        )
         
     return render_to_response(
         'sanza/confirmation_dialog.html',
@@ -838,7 +856,8 @@ def remove_same_as(request, current_contact_id, contact_id):
         },
         context_instance=RequestContext(request)
     )
-    
+
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_contact(request, entity_id):
@@ -869,6 +888,7 @@ def add_contact(request, entity_id):
         },
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -910,6 +930,7 @@ def add_single_contact(request):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def delete_contact(request, contact_id):
@@ -942,6 +963,7 @@ def delete_contact(request, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def add_action_for_entity(request, entity_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -951,29 +973,7 @@ def add_action_for_entity(request, entity_id):
         'Crm/add_action.html',
         choices=entity.contact_set.filter(has_left=False)
     )
-    #entity = get_object_or_404(models.Entity, id=entity_id)
-    #
-    #if request.method == 'POST':
-    #    action = models.Action(entity=entity)
-    #    form = forms.ActionForm(request.POST, instance=action, entity=entity)
-    #    if form.is_valid():
-    #        form.save()
-    #        next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
-    #        return HttpResponseRedirect(next_url)
-    #    action = None
-    #else:
-    #    form = forms.ActionForm(entity=entity)
-    #
-    #context = {
-    #    'form': form,
-    #    'entity': entity,
-    #}
-    #
-    #return render_to_response(
-    #    'Crm/edit_action.html',
-    #    context,
-    #    context_instance=RequestContext(request)
-    #)
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1008,6 +1008,7 @@ def add_action_for_contact(request, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_entity_actions(request, entity_id, set_id):
     entity = get_object_or_404(models.Entity, id=entity_id)
@@ -1031,6 +1032,7 @@ def view_entity_actions(request, entity_id, set_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_contact_actions(request, contact_id, set_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
@@ -1052,6 +1054,7 @@ def view_contact_actions(request, contact_id, set_id):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1107,6 +1110,7 @@ def create_action(request, entity_id, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def edit_action(request, action_id):
@@ -1132,6 +1136,7 @@ def edit_action(request, action_id):
         context,
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1166,26 +1171,6 @@ def delete_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
-#@user_passes_test(can_access)
-#def add_opportunity_for_entity(request, entity_id):
-#    entity = get_object_or_404(models.Entity, id=entity_id)
-#    
-#    if request.method == 'POST':
-#        opportunity = models.Opportunity(entity=entity)
-#        form = forms.OpportunityForm(request.POST, instance=opportunity)
-#        if form.is_valid():
-#            form.save()
-#            next_url = request.session.get('redirect_url') or reverse('crm_view_entity', args=[entity.id])    
-#            return HttpResponseRedirect(next_url)
-#        opportunity = None
-#    else:
-#        form = forms.OpportunityForm()
-#    
-#    return render_to_response(
-#        'Crm/edit_opportunity.html',
-#        locals(),
-#        context_instance=RequestContext(request)
-#    )
 
 @user_passes_test(can_access)
 def view_entity_opportunities(request, entity_id):
@@ -1198,6 +1183,7 @@ def view_entity_opportunities(request, entity_id):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 def view_all_opportunities(request, ordering=None):
@@ -1225,6 +1211,7 @@ def view_all_opportunities(request, ordering=None):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def edit_opportunity(request, opportunity_id):
@@ -1245,6 +1232,7 @@ def edit_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
@@ -1259,17 +1247,12 @@ def view_opportunity(request, opportunity_id):
     contacts = list(set(contacts))
     contacts.sort(key=lambda x: x.lastname.lower())
     
-    #contacts = list(set([a.contact for a in actions if a.contact]))
-    #contacts.sort(key=lambda x: x.lastname.lower())
-    #
-    
     request.session["redirect_url"] = reverse('crm_view_opportunity', args=[opportunity.id])
     
     context = {
         'opportunity': opportunity,
         'actions_by_set': actions_by_set,
         'contacts': contacts,
-        #'mailto': True
     }
         
     return render_to_response(
@@ -1278,29 +1261,12 @@ def view_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
-#@user_passes_test(can_access)
-#def mailto_opportunity_contacts(request, opportunity_id):
-#    """Open the mail client in order to send email to contacts"""
-#    opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-#    actions = opportunity.action_set.all()
-#    emails = []
-#    for action in actions:
-#        emails += [c.get_email for c in action.contacts.all() if c.get_email]
-#        for e in action.entities.all():
-#            emails += [c.get_email for c in e.contact_set.all() if c.get_email]
-#    emails = set(emails)
-#    if len(emails)>25:
-#        return HttpResponse(' '.join(emails), content_type='text/plain')
-#    else:
-#        mailto = u'mailto:'+','.join(emails)
-#        return HttpResponseRedirectMailtoAllowed(mailto)
 
 @user_passes_test(can_access)
 @popup_redirect
 def delete_opportunity(request, opportunity_id):
     opportunity = get_object_or_404(models.Opportunity, id=opportunity_id)
-    #entity = get_object_or_404(models.Entity, id=opportunity.entity.id)
-    
+
     if request.method == 'POST':
         form = forms.ConfirmForm(request.POST)
         if form.is_valid():
@@ -1326,9 +1292,11 @@ def delete_opportunity(request, opportunity_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def view_board_panel(request):
     return HttpResponseRedirect(reverse("users_favorites_list"))
+
 
 @user_passes_test(can_access)
 def view_all_actions(request):
@@ -1344,6 +1312,7 @@ def view_all_actions(request):
         locals(),
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1363,6 +1332,7 @@ def do_action(request, action_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def select_entity_and_redirect(request, view_name, template_name):
     if request.method == 'POST':
@@ -1380,6 +1350,7 @@ def select_entity_and_redirect(request, view_name, template_name):
         {'form': form},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 def select_contact_and_redirect(request, view_name, template_name, choices=None):
@@ -1404,6 +1375,7 @@ def select_contact_and_redirect(request, view_name, template_name, choices=None)
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_contact_to_action(request, action_id):
@@ -1424,6 +1396,7 @@ def add_contact_to_action(request, action_id):
         {'form': form, 'action': action},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1451,6 +1424,7 @@ def remove_contact_from_action(request, action_id, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_entity_to_action(request, action_id):
@@ -1471,6 +1445,7 @@ def add_entity_to_action(request, action_id):
         {'form': form, 'action': action},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1498,6 +1473,7 @@ def remove_entity_from_action(request, action_id, entity_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_action_to_opportunity(request, action_id):
@@ -1520,6 +1496,7 @@ def add_action_to_opportunity(request, action_id):
         {'action': action, 'form': form},
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1545,21 +1522,14 @@ def remove_action_from_opportunity(request, action_id, opportunity_id):
         'sanza/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you want to remove the action {0} from opportunity {1}?').format(action.subject, opportunity.name),
+            'message': _(u'Do you want to remove the action {0} from opportunity {1}?').format(
+                action.subject, opportunity.name
+            ),
             'action_url': reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity.id]),
         },
         context_instance=RequestContext(request)
     )
 
-
-#@user_passes_test(can_access)
-#@popup_redirect
-#def add_opportunity(request):
-#    return select_entity_and_redirect(
-#        request,
-#        'crm_add_opportunity_for_entity',
-#        'Crm/add_opportunity.html'
-#    )
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -1593,6 +1563,7 @@ def add_action(request):
         'Crm/add_action.html',
     )
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def edit_custom_fields(request, model_name, instance_id):
@@ -1619,7 +1590,8 @@ def edit_custom_fields(request, model_name, instance_id):
         {'form': form, 'instance': instance, 'model_name': model_name},
         context_instance=RequestContext(request)
     )
-    
+
+
 @user_passes_test(can_access)
 def new_contacts_import(request):
     if request.method == 'POST':
@@ -1640,14 +1612,17 @@ def new_contacts_import(request):
         {'form': form},
         context_instance=RequestContext(request)
     )
-    
+
+
 def read_contacts(reader, fields, extract_from_email):
     contacts = []
     entity_dict = {}
     role_dict = {}
     groups_dict = {}
     for k, row in enumerate(reader):
-        if k==0: continue #remove the header row
+        if k == 0:
+            #remove the header row
+            continue
         c = {}
         for i, field in enumerate(fields):
             try:
@@ -1662,6 +1637,7 @@ def read_contacts(reader, fields, extract_from_email):
                         c[field] = models.Contact.GENDER_COUPLE
                     else:
                         c[field] = models.Contact.GENDER_FEMALE
+
             #Copy value of entity fields with _ rather than . for using it in template
             if field.find('.')>0:
                 c[field.replace('.', '_')] = c[field]
@@ -1685,15 +1661,11 @@ def read_contacts(reader, fields, extract_from_email):
                 if res:
                     name, entity, ext = res.groups(0)
                     #email = u'{0}@{1}.{2}'.format(name, entity, ext)
-                email_providers = ('free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
-                    'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live')
-                #if entity in email_providers:
-                #    entity = name
-            #if not entity:
-            #    entity = u'{0} {1}'.format(c['lastname'], c['firstname']).upper()
+                email_providers = (
+                    'free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
+                    'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live'
+                )
             c['entity'] = entity
-        #else:
-        #    name = c['entity']
         if not (c['lastname'] or c['firstname']):
             try:
                 c['firstname'], c['lastname'] = [x.capitalize() for x in name.split('.')]
@@ -1743,14 +1715,9 @@ def read_contacts(reader, fields, extract_from_email):
         contacts.append(c)
     total_contacts = k
     return contacts, total_contacts
-    
+
+
 def get_imports_fields():
-    #fields = ['entity', 'gender', 'firstname', 'lastname', 'email', 'entity.phone',
-    #    'phone', 'entity.fax', 'mobile', 'entity.address', 'entity.address2', 'entity.address3',
-    #    'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
-    #    'address3', 'city', 'cedex', 'zip_code', 'country', 'job', 'entity.website',
-    #    'notes', 'role', 'entity.email', 'groups', 'entity.notes', 'entity.description',
-    #]
     fields = [
         'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job',
         'notes', 'role', 
@@ -1779,7 +1746,8 @@ def get_imports_fields():
             custom_fields.append(None)
     
     return fields, custom_fields
-    
+
+
 @user_passes_test(can_access)
 def contacts_import_template(request):
     fields, custom_fields = get_imports_fields()
@@ -1876,7 +1844,9 @@ def confirm_contacts_import(request, import_id):
                     if c['city']:
                         contact.city = resolve_city(c['city'], c['zip_code'], c['country'], default_department)
                     if c['entity.city']:
-                        contact.entity.city = resolve_city(c['entity.city'], c['entity.zip_code'], c['entity.country'], default_department)
+                        contact.entity.city = resolve_city(
+                            c['entity.city'], c['entity.zip_code'], c['entity.country'], default_department
+                        )
                     if c['role']:
                         for role_exists, role in zip(c['role_exists'], c['role']):
                             if role_exists:
@@ -1908,7 +1878,9 @@ def confirm_contacts_import(request, import_id):
                         value = c[name]
                         if cf and value:
                             if cf.model == models.CustomField.MODEL_ENTITY and is_first_for_entity:
-                                cfv, _x = models.EntityCustomFieldValue.objects.get_or_create(custom_field=cf, entity=contact.entity)
+                                cfv, _x = models.EntityCustomFieldValue.objects.get_or_create(
+                                    custom_field=cf, entity=contact.entity
+                                )
                                 cfv.value = value
                                 cfv.save()
 
@@ -1934,6 +1906,7 @@ def confirm_contacts_import(request, import_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def get_group_name(request, gr_id):
     try:
@@ -1942,12 +1915,14 @@ def get_group_name(request, gr_id):
     except models.Group.DoesNotExist:
         return HttpResponse(json.dumps({'name': gr_id}), 'application/json')
 
+
 @user_passes_test(can_access)
 def get_groups(request):
     term = request.GET.get('term')
-    groups = [{'id': x.id, 'name': x.name}
-        for x in models.Group.objects.filter(name__icontains=term)[:10]]
+    queryset = models.Group.objects.filter(name__icontains=term)[:10]
+    groups = [{'id': x.id, 'name': x.name} for x in queryset]
     return HttpResponse(json.dumps(groups), 'application/json')
+
 
 @user_passes_test(can_access)
 @log_error
@@ -1959,25 +1934,29 @@ def get_group_id(request):
         gr = get_object_or_404(models.Group, name=name)
     return HttpResponse(json.dumps({'id': gr.id}), 'application/json')
 
+
 def _toggle_object_bookmark(request, object_model, object_id):
     try:
         if request.is_ajax() and request.method == "POST":
-            object = get_object_or_404(object_model, id=object_id)
-            object.display_on_board = not object.display_on_board
-            object.save()
-            data = {'bookmarked': object.display_on_board}
+            obj = get_object_or_404(object_model, id=object_id)
+            obj.display_on_board = not obj.display_on_board
+            obj.save()
+            data = {'bookmarked': obj.display_on_board}
             return HttpResponse(json.dumps(data), 'application/json')
         raise Http404
     except:
         logger.exception("_toggle_object_bookmarked")
 
+
 @user_passes_test(can_access)
 def toggle_action_bookmark(request, action_id):
     return _toggle_object_bookmark(request, models.Action, action_id)
-    
+
+
 @user_passes_test(can_access)
 def toggle_opportunity_bookmark(request, opportunity_id):
     return _toggle_object_bookmark(request, models.Opportunity, opportunity_id)
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -2006,6 +1985,7 @@ def make_main_contact(request, current_contact_id, contact_id):
         context_instance=RequestContext(request)
     )
 
+
 class ActionDocumentDetailView(EditableObjectView):
     model = models.ActionDocument
     edit_mode = False
@@ -2021,7 +2001,9 @@ class ActionDocumentDetailView(EditableObjectView):
             if not action.type:
                 warning_text = _(u"The action has no type set: Unable to create the corresponding document")
             elif not action.type.default_template:
-                warning_text = _(u"The action type has no document template defined: Unable to create the corresponding document")
+                warning_text = _(
+                    u"The action type has no document template defined: Unable to create the corresponding document"
+                )
             if warning_text:
                 logger.warning(warning_text)
                 user_message.warning(self.request, warning_text)
@@ -2031,9 +2013,11 @@ class ActionDocumentDetailView(EditableObjectView):
     
     def get_template(self):
         return self.object.template
-    
+
+
 class ActionDocumentEditView(ActionDocumentDetailView):
     edit_mode = True
+
 
 class ActionDocumentPdfView(PDFTemplateView):
     
@@ -2077,6 +2061,7 @@ class ActionDocumentPdfView(PDFTemplateView):
         self.footer_template = self.find_template("footer", action.type)
         self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
         return super(ActionDocumentPdfView, self).render_to_response(context, **response_kwargs)
+
 
 class ActionArchiveView(object):
     
@@ -2174,15 +2159,16 @@ class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
     week_format = "%U"
     allow_future = True
     allow_empty = True
-    
+
+
 class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
     queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
     allow_future = True
     allow_empty = True
     month_format ='%m'
-    
+
+
 class NotPlannedActionArchiveView(ActionArchiveView, ListView):
     queryset = models.Action.objects.filter(planned_date=None).order_by("priority")
     template_name = "Crm/action_archive_not_planned.html"
-    

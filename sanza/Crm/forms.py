@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms as forms
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext, ugettext_lazy as _
-from django.contrib.admin.widgets import FilteredSelectMultiple
+from datetime import datetime
+
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from django.utils.translation import ugettext, ugettext_lazy as _
+
+import floppyforms as forms
+from form_utils.forms import BetterModelForm, BetterForm
+
+from coop_cms.bs_forms import ModelForm as BsModelForm, BootstrapableMixin
+from coop_cms.forms import AlohaEditableModelForm
+
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
 from sanza.Crm.settings import NO_ENTITY_TYPE
 from sanza.Crm.utils import get_default_country
-from datetime import datetime, date
-from form_utils.forms import BetterModelForm, BetterForm
-from djaloha.widgets import AlohaInput
-from django.utils import timezone
-from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm, BootstrapableMixin
+
 
 class BetterBsForm(BetterForm, BootstrapableMixin):
+
     class Media:
         css = {
             'all': ('chosen/chosen.css',)
@@ -34,7 +39,9 @@ class BetterBsForm(BetterForm, BootstrapableMixin):
                 if not "chosen-select" in klass:
                     field.widget.attrs["class"] = klass + " chosen-select"
 
+
 class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
+
     class Media:
         css = {
             'all': ('chosen/chosen.css',)
@@ -48,12 +55,15 @@ class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
         self._bs_patch_field_class()
         for field in self.fields.values():
             if field.widget.__class__.__name__ == forms.Select().__class__.__name__:
-                klass = field.widget.attrs.get("class", "") 
-                if not "chosen-select" in klass:
-                    field.widget.attrs["class"] = klass + " chosen-select"
+                css_class = field.widget.attrs.get("class", "")
+                if not "chosen-select" in css_class:
+                    field.widget.attrs["class"] = css_class + " chosen-select"
+
 
 class AddEntityToGroupForm(forms.Form):
-    group_name = forms.CharField(label=_(u"Group name"),
+
+    group_name = forms.CharField(
+        label=_(u"Group name"),
         widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
     )
     
@@ -66,8 +76,10 @@ class AddEntityToGroupForm(forms.Form):
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
             raise ValidationError(ugettext(u"The entity already belong to group {0}").format(name))
         return name
-    
+
+
 class AddContactToGroupForm(forms.Form):
+
     group_name = forms.CharField(label=_(u"Group name"),
         widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
     )
@@ -82,7 +94,9 @@ class AddContactToGroupForm(forms.Form):
             raise ValidationError(ugettext(u"The contact already belong to group {0}").format(name))
         return name
 
+
 class EditGroupForm(BsModelForm):
+
     class Meta:
         model = models.Group
         fields = ('name', 'description', 'subscribe_form', 'entities', 'contacts')
@@ -148,7 +162,9 @@ class EditGroupForm(BsModelForm):
             widget=FilteredSelectMultiple(_(u"contacts"), False)
         )
 
+
 class _CityBasedForm(object):
+
     def _get_city_parent(self, city):
         parent = city.parent
         while parent:
@@ -218,6 +234,7 @@ class _CityBasedForm(object):
             except Exception, msg:
                 raise ValidationError(msg)
 
+
 class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
@@ -225,6 +242,7 @@ class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
         super(ModelFormWithCity, self).__init__(*args, **kwargs)
         self._post_init(*args, **kwargs)
         
+
 class FormWithCity(BetterBsForm, _CityBasedForm):
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     zip_code = forms.CharField(required=False, label=_(u'zip code'))
@@ -234,10 +252,12 @@ class FormWithCity(BetterBsForm, _CityBasedForm):
         super(FormWithCity, self).__init__(*args, **kwargs)
         self._post_init(*args, **kwargs)
     
+
 class EntityForm(ModelFormWithCity):
     city = forms.CharField(
-        required = False, label=_(u'City'),   
-        widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        required=False,
+        label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
     
     def __init__(self, *args, **kwargs):
@@ -251,8 +271,11 @@ class EntityForm(ModelFormWithCity):
         exclude = ('imported_by', 'is_single_contact', 'notes')
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Enity details')}),
-            ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
+            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Entity details')}),
+            ('address', {
+                'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+                'legend': _(u'Address')
+            }),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
     
@@ -273,24 +296,35 @@ class EntityForm(ModelFormWithCity):
 
 class ContactForm(ModelFormWithCity):
     city = forms.CharField(
-        required = False, label=_(u'City'),   
-        widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        required=False,
+        label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
     
     class Meta:
         model = models.Contact
-        exclude=('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname', 'notes')
+        exclude = ('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname', 'notes')
         widgets = {
-            'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols':'72'}),
+            'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
             'role': forms.SelectMultiple(attrs={
                 'class': 'chosen-select', 'data-placeholder': _(u'Select roles'), 'style': "width: 100%;"}),
         }
         fieldsets = [
-            ('name', {'fields': ['gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'], 'legend': _(u'Name')}),
+            ('name', {
+                'fields': [
+                    'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'
+                ],
+                'legend': _(u'Name')
+            }),
             ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact details')}),
-            ('address', {'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'], 'legend': _(u'Address')}),
-            ('relationship', {'fields': ['main_contact', 'email_verified', 'has_left', 'accept_notifications'],
-                'legend': _(u'Options')}),
+            ('address', {
+                'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+                'legend': _(u'Address')
+            }),
+            ('relationship', {
+                'fields': ['main_contact', 'email_verified', 'has_left', 'accept_notifications'],
+                'legend': _(u'Options')
+            }),
             ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
         ]
         
@@ -341,10 +375,12 @@ class EntityTypeForm(forms.ModelForm):
     class Meta:
         model = models.EntityType
 
+
 class EntityRoleForm(forms.ModelForm):
     
     class Meta:
         model = models.EntityRole
+
 
 class ActionForm(BetterBsModelForm):
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
@@ -355,11 +391,18 @@ class ActionForm(BetterBsModelForm):
     
     class Meta:
         model = models.Action
-        fields = ('type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
-            'amount', 'number', 'planned_date', 'end_date', 'end_time', 'end_datetime', 'opportunity')
+        fields = (
+            'type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
+            'amount', 'number', 'planned_date', 'end_date', 'end_time', 'end_datetime', 'opportunity'
+        )
         fieldsets = [
-            ('summary', {'fields': ['subject', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
-                'in_charge', 'opportunity'], 'legend': _(u'Summary')}),
+            ('summary', {
+                'fields': [
+                    'subject', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
+                    'in_charge', 'opportunity'
+                ],
+                'legend': _(u'Summary')
+            }),
             ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
             ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
@@ -371,11 +414,9 @@ class ActionForm(BetterBsModelForm):
         
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             default_status = instance.type.default_status
-            #choices = [] if default_status else [('', "---------")]
             choices = [('', "---------")] # let javascript disable the blank value if default_status
             self.fields['status'].choices = choices + [(s.id, s.name) for s in instance.type.allowed_status.all()]
-            #self.fields['status'].initial = default_status.id if default_status else None
-        
+
         self.fields['opportunity'].widget = forms.HiddenInput()    
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
         
@@ -455,30 +496,33 @@ class ActionForm(BetterBsModelForm):
         if d:
             return datetime.combine(d, t or datetime.min.time())
         return None
-    
+
+
 class OpportunityForm(BetterBsModelForm):
     class Meta:
         model = models.Opportunity
-        fields=('name', 'detail')
+        fields = ('name', 'detail')
         
         fieldsets = [
-                ('name', {'fields': ['name', 'detail'], 'legend': _(u'Summary')}),
-                #('address', {'fields': ['display_on_board', 'ended'], 'legend': _(u'Show')}),
-            ]
+            ('name', {'fields': ['name', 'detail'], 'legend': _(u'Summary')}),
+        ]
 
     def __init__(self, *args, **kwargs):
         super(OpportunityForm, self).__init__(*args, **kwargs)
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
-        
+
+
 class OpportunityStatusForm(forms.ModelForm):
     
     class Meta:
         model = models.OpportunityStatus
 
+
 class ActionTypeForm(forms.ModelForm):
     
     class Meta:
         model = models.ActionType
+
 
 class SelectEntityForm(forms.Form):
     entity = forms.CharField(label=_(u"Entity"))
@@ -494,6 +538,7 @@ class SelectEntityForm(forms.Form):
             return models.Entity.objects.get(id=entity_id)
         except (ValueError, models.Entity.DoesNotExist):
             raise ValidationError(ugettext(u"The entity does'nt exist"))
+
 
 class SelectContactForm(forms.Form):
     
@@ -514,7 +559,8 @@ class SelectContactForm(forms.Form):
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
             raise ValidationError(ugettext(u"The contact does'nt exist"))
-        
+
+
 class SelectOpportunityForm(forms.Form):
     
     def __init__(self, *args, **kwargs):
@@ -530,7 +576,8 @@ class SelectOpportunityForm(forms.Form):
             return models.Opportunity.objects.get(id=opportunity_id)
         except (ValueError, models.Opportunity.DoesNotExist):
             raise ValidationError(ugettext(u"The opportunity does'nt exist"))
-        
+
+
 class SameAsForm(forms.Form):
     contact = forms.IntegerField(label=_(u"Contact"))
     
@@ -611,9 +658,9 @@ class AddRelationshipForm(forms.Form):
             contact2 = self.cleaned_data["contact2"]
         
         rt = self.cleaned_data["relationship_type"]
-        return models.Relationship.objects.create(
-                contact1=contact1, contact2=contact2, relationship_type=rt)    
-        
+        return models.Relationship.objects.create(contact1=contact1, contact2=contact2, relationship_type=rt)
+
+
 class ActionDoneForm(forms.ModelForm):
     
     class Meta:
@@ -628,7 +675,8 @@ class ActionDoneForm(forms.ModelForm):
         inst.done = not inst.done
         kwargs['instance'] = inst
         super(ActionDoneForm, self).__init__(*args, **kwargs)    
-    
+
+
 class CustomFieldForm(forms.Form):
     
     def __init__(self, instance, *args, **kwargs):
@@ -652,6 +700,7 @@ class CustomFieldForm(forms.Form):
             cfv.save()
         return self._instance
 
+
 class EntityCustomFieldForm(CustomFieldForm):
         
     def _get_model_type(self):
@@ -661,18 +710,23 @@ class EntityCustomFieldForm(CustomFieldForm):
     def model():
         return models.Entity
     
-    def _create_custom_field_value(self, cf):
-        cfv, _new = models.EntityCustomFieldValue.objects.get_or_create(entity = self._instance, custom_field = cf)
-        return cfv
-            
+    def _create_custom_field_value(self, custom_field):
+        custom_field_value = models.EntityCustomFieldValue.objects.get_or_create(
+            entity=self._instance, custom_field=custom_field
+        )[0]
+        return custom_field_value
+
+
 class ContactCustomFieldForm(CustomFieldForm):
     
     def _get_model_type(self):
         return models.CustomField.MODEL_CONTACT
     
-    def _create_custom_field_value(self, cf):
-        cfv, _new = models.ContactCustomFieldValue.objects.get_or_create(contact = self._instance, custom_field = cf)
-        return cfv
+    def _create_custom_field_value(self, custom_field):
+        custom_field_value = models.ContactCustomFieldValue.objects.get_or_create(
+            contact=self._instance, custom_field=custom_field
+        )[0]
+        return custom_field_value
     
     @staticmethod
     def model():
@@ -702,8 +756,7 @@ class ContactsImportForm(BsModelForm):
             #'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
-        
-        
+
     def clean_separator(self):
         if len(self.cleaned_data["separator"]) != 1:
             raise ValidationError(ugettext(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
@@ -728,13 +781,13 @@ class ContactsImportConfirmForm(ContactsImportForm):
             return None
         
 
-from coop_cms.forms import AlohaEditableModelForm
 class ActionDocumentForm(AlohaEditableModelForm):
     
     class Meta:
         model = models.ActionDocument
         fields = ('content',)
-        
+
+
 class ChangeContactEntityForm(forms.Form):
     OPTION_ADD_TO_EXISTING_ENTITY = 1
     OPTION_CREATE_NEW_ENTITY = 2
@@ -826,9 +879,9 @@ class ChangeContactEntityForm(forms.Form):
         
     def change_entity(self):
         option = self.cleaned_data["option"]
-        meth = self.meth_map[option]
-        meth()
-        
+        method = self.meth_map[option]
+        method()
+
+
 class ConfirmForm(forms.Form):
     confirm = forms.BooleanField(initial=True, widget=forms.HiddenInput(), required=False)
-    
