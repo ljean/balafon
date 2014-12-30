@@ -545,8 +545,11 @@ def export_to_pdf(request):
                     
                     context = form.patch_context(context)
                     
-                    pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', {})
-                    cmd_options = pdf_options.get(template_name, {})
+                    pdf_options = getattr(settings, 'SANZA_PDF_OPTIONS', None)
+                    if pdf_options is None:
+                        cmd_options = {'margin-top': 0, 'margin-bottom': 0, 'margin-right': 0, 'margin-left': 0, }
+                    else:
+                        cmd_options = pdf_options.get(template_name, {})
                     
                     pdf_view = PDFTemplateView(
                         filename='sanza.pdf',
