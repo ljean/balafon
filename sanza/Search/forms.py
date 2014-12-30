@@ -17,7 +17,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 import floppyforms as forms
-from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
+from coop_cms.bs_forms import Form as BsForm
 
 from sanza.Crm.models import Contact, Action, Group
 from sanza.Crm.widgets import OpportunityAutoComplete
@@ -541,10 +541,10 @@ class PdfTemplateForm(SearchActionForm):
             choices = settings.SANZA_PDF_TEMPLATES
         else:
             choices = SANZA_PDF_TEMPLATES = (
-                ('pdf/labels_24.html', gettext(u'etiquettes 24')),
-                ('pdf/labels_21.html', gettext(u'etiquettes 21')),
-                ('pdf/labels_16.html', gettext(u'etiquettes 16')),
-                ('pdf/address_strip.html', gettext(u'bande adresse')),
+                ('pdf/labels_24.html', _(u'etiquettes 24')),
+                ('pdf/labels_21.html', _(u'etiquettes 21')),
+                ('pdf/labels_16.html', _(u'etiquettes 16')),
+                ('pdf/address_strip.html', _(u'bande adresse')),
             )
         
         self.fields['template'] = ChoiceField(

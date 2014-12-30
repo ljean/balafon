@@ -3306,7 +3306,7 @@ class CitiesSuggestListTestCase(BaseTestCase):
         self.assertNotContains(response, city2.id)
 
     def test_get_city_id_unicode(self):
-        response = self.client.get(reverse('crm_get_city_id')+"?name=Mérignac")
+        response = self.client.get(u"{0}?name=Mérignac".format(reverse('crm_get_city_id')))
         self.assertEqual(200, response.status_code)
         data = json.loads(response.content)
         self.assertEqual(data["id"], u"Mérignac")

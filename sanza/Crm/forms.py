@@ -340,7 +340,6 @@ class ContactForm(ModelFormWithCity):
 
         super(ContactForm, self).__init__(*args, **kwargs)
 
-
         try:
             if self.instance and self.instance.entity and self.instance.entity.is_single_contact:
                  self.fields['has_left'].widget = forms.HiddenInput()
