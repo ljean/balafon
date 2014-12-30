@@ -540,10 +540,11 @@ class PdfTemplateForm(SearchActionForm):
         if getattr(settings, 'SANZA_PDF_TEMPLATES', None):
             choices = settings.SANZA_PDF_TEMPLATES
         else:
-            choices = (
-                ('pdf/small_labels.html', _(u'small labels')),
-                ('pdf/address_strip.html', _(u'address strip')),
-                ('pdf/list_of_actions.html', _(u'list of actions')),
+            choices = SANZA_PDF_TEMPLATES = (
+                ('pdf/labels_24.html', gettext(u'etiquettes 24')),
+                ('pdf/labels_21.html', gettext(u'etiquettes 21')),
+                ('pdf/labels_16.html', gettext(u'etiquettes 16')),
+                ('pdf/address_strip.html', gettext(u'bande adresse')),
             )
         
         self.fields['template'] = ChoiceField(
