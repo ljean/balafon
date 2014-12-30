@@ -543,6 +543,7 @@ class PdfTemplateForm(SearchActionForm):
             choices = SANZA_PDF_TEMPLATES = (
                 ('pdf/labels_24.html', _(u'etiquettes 24')),
                 ('pdf/labels_21.html', _(u'etiquettes 21')),
+                ('pdf/agipa_21.html', _(u'Agipa 21')),
                 ('pdf/labels_16.html', _(u'etiquettes 16')),
                 ('pdf/address_strip.html', _(u'bande adresse')),
             )
