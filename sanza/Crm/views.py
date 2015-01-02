@@ -881,6 +881,7 @@ def add_contact(request, entity_id):
 
 @user_passes_test(can_access)
 @popup_redirect
+@log_error
 def add_single_contact(request):
     if request.method == 'POST':
         contact = models.Contact()
@@ -901,6 +902,8 @@ def add_single_contact(request):
             
             default_contact.delete()
             contact.save() # change name of the entity
+
+            contact_form.save_contact_subscriptions(contact)
             
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
         else:

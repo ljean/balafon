@@ -3668,7 +3668,7 @@ class EditGroupTestCase(BaseTestCase):
 
 
 class EditContactAndEntityTestCase(BaseTestCase):
-    fixtures = ['zones.json',]
+    fixtures = ['zones.json', ]
     
     def _check_redirect_url(self, response, next_url):
         redirect_url = response.redirect_chain[-1][0]
@@ -3766,6 +3766,28 @@ class EditContactAndEntityTestCase(BaseTestCase):
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
 
+    def test_view_add_single_contact_subscriptions(self):
+        entity = mommy.make(models.Entity)
+
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        st3 = mommy.make(models.SubscriptionType)
+
+        response = self.client.get(reverse('crm_add_single_contact'))
+        self.assertEqual(200, response.status_code)
+        soup = BS4(response.content)
+
+        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+
+        self.assertEqual(1, len(soup.select(f1)))
+        self.assertEqual(1, len(soup.select(f2)))
+        self.assertEqual(1, len(soup.select(f3)))
+
+        #Is not checked
+        self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
+        self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
+        self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
+
     def test_add_contact_subscription_set(self):
         entity = mommy.make(models.Entity)
 
@@ -3789,6 +3811,29 @@ class EditContactAndEntityTestCase(BaseTestCase):
         self.assertContains(response, next_url)
 
         c = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'], entity=entity)
+        self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
+        self.assertEqual(models.Subscription.objects.filter(subscription_type=st2, contact=c).count(), 0)
+
+    def test_add_single_contact_subscription_set(self):
+
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        c = mommy.make(models.Contact)
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'subscription_{0}'.format(st1.id): True,
+            'subscription_{0}'.format(st2.id): False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BS4(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        self.assertContains(response, "<script>")
+
+        c = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'], entity__is_single_contact=True)
         self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
         self.assertEqual(models.Subscription.objects.filter(subscription_type=st2, contact=c).count(), 0)
 

@@ -378,8 +378,7 @@ class ContactForm(ModelFormWithCity):
             raise ValidationError(ugettext(u"The file name is too long"))
         return photo
 
-    def save(self, *args, **kwargs):
-        contact = super(ContactForm, self).save(*args, **kwargs)
+    def save_contact_subscriptions(self, contact):
         for subscription_type in models.SubscriptionType.objects.all():
             field_name = "subscription_{0}".format(subscription_type.id)
             accept_subscription = self.cleaned_data[field_name]
@@ -397,6 +396,11 @@ class ContactForm(ModelFormWithCity):
                         subscription_type=subscription_type,
                         accept_subscription=True
                     )
+
+    def save(self, *args, **kwargs):
+        contact = super(ContactForm, self).save(*args, **kwargs)
+        if kwargs.get('commit', True):
+            self.save_contact_subscriptions(contact)
         return contact
 
 
