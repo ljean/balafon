@@ -370,34 +370,60 @@ class SubscribeTest(TestCase):
 
     def test_verify_email(self):
         self.client.logout()
-        contact = mommy.make(models.Contact, email='toto@apidev.fr',
-            accept_newsletter=True, accept_3rdparty=True, email_verified=False)
+
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
+
+        subscription1 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=newsletter_subscription, accept_subscription=True
+        )
+        subscription2 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=third_party_subscription, accept_subscription=True
+        )
 
         url = reverse('emailing_email_verification', args=[contact.uuid])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.email_verified, True)
-        self.assertEqual(contact.accept_newsletter, True)
-        self.assertEqual(contact.accept_3rdparty, True)
+
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, True)
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, True)
 
     def test_verify_email_no_newsletter(self):
         self.client.logout()
-        contact = mommy.make(models.Contact, email='toto@apidev.fr',
-            accept_newsletter=False, accept_3rdparty=False, email_verified=False)
+
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
+
+        subscription1 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=newsletter_subscription, accept_subscription=False
+        )
+        subscription2 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=third_party_subscription, accept_subscription=False
+        )
 
         url = reverse('emailing_email_verification', args=[contact.uuid])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.email_verified, True)
-        self.assertEqual(contact.accept_newsletter, False)
-        self.assertEqual(contact.accept_3rdparty, False)
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, False)
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, False)
 
     def test_verify_email_strange_uuid(self):
         self.client.logout()
-        contact = mommy.make(models.Contact, email='toto@apidev.fr',
-            accept_newsletter=False, accept_3rdparty=False, email_verified=False)
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
 
         url = reverse('emailing_email_verification', args=['abcd'])
         response = self.client.get(url)

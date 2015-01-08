@@ -392,12 +392,11 @@ class Contact(TimeStampedModel):
     job = models.CharField(_(u"job"), max_length=200, blank=True, default=u"")
     
     main_contact = models.BooleanField(_("main contact"), default=True, db_index=True)
-    accept_newsletter = models.BooleanField(_("accept newsletter"), default=False, db_index=True,
-        help_text = _(u'Keep this checked if you want to receive our newsletter.'))
-    accept_3rdparty = models.BooleanField(_("accept third parties"), default=False,
-        help_text = _(u'Receive emails from some of our partners.'))
-    accept_notifications = models.BooleanField(_("accept notifications"), default=True,
-        help_text = _(u'We may have to notify you some events (e.g. a new message).'))
+    accept_notifications = models.BooleanField(
+        _("accept notifications"),
+        default=True,
+        help_text = _(u'We may have to notify you some events (e.g. a new message).')
+    )
     email_verified = models.BooleanField(_("email verified"), default=False)
     
     phone = models.CharField(_('phone'), max_length=200, blank=True, default= u'')

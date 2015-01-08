@@ -182,7 +182,47 @@ class EmailSubscribeForm(forms.ModelForm):
         return contact
 
 
-class SubscribeForm(ModelFormWithCity):
+class SubscriptionTypeFormMixin(object):
+
+    def _add_subscription_types_field(self):
+        self.fields['subscription_types'] = forms.MultipleChoiceField(
+            widget=forms.CheckboxSelectMultiple(),
+            label='',
+            required=False,
+            choices=[(st.id, st.name) for st in self.get_queryset()]
+        )
+
+    def get_queryset(self):
+        return SubscriptionType.objects.filter(sites=Site.objects.get_current())
+
+    def clean_subscription_types(self):
+        try:
+            subscription_types = [SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']]
+        except SubscriptionType.DoesNotExist:
+            raise ValidationError(_(u"Invalid subscription type"))
+        return subscription_types
+
+    def _save_subscription_types(self, contact):
+        subscriptions = []
+        for subscription_type in self.get_queryset():
+
+            subscription = Subscription.objects.get_or_create(
+                contact=contact,
+                subscription_type=subscription_type
+            )[0]
+
+            if subscription_type in self.cleaned_data['subscription_types']:
+                subscription.accept_subscription = True
+                subscription.subscription_date = datetime.now()
+                #This is added to the notification email
+                subscriptions.append(subscription_type.name)
+            else:
+                subscription.accept_subscription = False
+            subscription.save()
+        return subscriptions
+
+
+class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     city = forms.CharField(
         required=False, label=_(u'City'),
         widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
@@ -196,8 +236,7 @@ class SubscribeForm(ModelFormWithCity):
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
-    subscription_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
-    
+
     class Meta:
         model = Contact
         fields = (
@@ -244,9 +283,7 @@ class SubscribeForm(ModelFormWithCity):
             (at.id, at.name) for at in ActionType.objects.filter(subscribe_form=True)
         ]
         
-        self.fields['subscription_types'].choices = [
-            (st.id, st.name) for st in SubscriptionType.objects.filter(sites=Site.objects.get_current())
-        ]
+        self._add_subscription_types_field()
     
     def clean_entity_type(self):
         try:
@@ -329,14 +366,7 @@ class SubscribeForm(ModelFormWithCity):
         except ActionType.DoesNotExist:
             raise ValidationError(_(u"Invalid action type"))
         return action_types
-    
-    def clean_subscription_types(self):
-        try:
-            subscription_types = [SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']]
-        except SubscriptionType.DoesNotExist:
-            raise ValidationError(_(u"Invalid subscription type"))
-        return subscription_types
-        
+
     def save(self, request=None):
         contact = super(SubscribeForm, self).save(commit=False)
         contact.entity = self.get_entity()
@@ -353,18 +383,7 @@ class SubscribeForm(ModelFormWithCity):
             contact.entity.group_set.add(g)
         contact.entity.save()
         
-        subscriptions = []
-        for subscription_type in SubscriptionType.objects.filter(sites=Site.objects.get_current()):
-            subscription, _x = Subscription.objects.get_or_create(
-                contact=contact, subscription_type=subscription_type)
-            if subscription_type in self.cleaned_data['subscription_types']:
-                subscription.accept_subscription = True
-                subscription.subscription_date = datetime.now()
-                #This is added to the notification email
-                subscriptions.append(subscription_type.name)
-            else:
-                subscription.accept_subscription = False
-            subscription.save()
+        subscriptions = self._save_subscription_types(contact)
         
         message = self.cleaned_data["message"]
 
@@ -386,7 +405,7 @@ class SubscribeForm(ModelFormWithCity):
         action_types = self.cleaned_data['action_types']
         actions = []
         for action_type in action_types:
-            action=Action.objects.create(
+            action = Action.objects.create(
                 subject=_(u"Contact"),
                 type=action_type,
                 planned_date=datetime.now(),

@@ -169,7 +169,7 @@ COOP_CMS_NEWSLETTER_TEMPLATES = (
 COOP_CMS_ARTICLE_TEMPLATES = (
     ('standard.html', u'Standard'),
 )
-COOP_CMS_FROM_EMAIL = u'""'
+COOP_CMS_FROM_EMAIL = u'"ljean@apidev.fr"'
 COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>',)# 'luc.jean@gmail.com')
 COOP_CMS_SITE_PREFIX = ''
 COOP_CMS_REPLY_TO = 'ljean@apidev.fr'
@@ -219,7 +219,6 @@ INSTALLED_APPS = (
     'sanza.Emailing',
     'sanza.Profile',
     'sanza.Users',
-
 
     'django.contrib.admin',
     'django.contrib.admindocs',

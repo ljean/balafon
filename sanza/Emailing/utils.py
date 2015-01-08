@@ -19,8 +19,8 @@ from coop_cms.settings import get_newsletter_context_callbacks
 from coop_cms.utils import dehtml
 from coop_cms.utils import make_links_absolute
 
-from sanza.Crm.models import Contact, Action, ActionType
-from sanza.Emailing.models import MagicLink, Emailing
+from sanza.Crm.models import Action, ActionType, Subscription, SubscriptionType
+from sanza.Emailing.models import MagicLink
 
 
 def format_context(text, data):
@@ -193,3 +193,25 @@ def send_verification_email(contact):
         email.send()
         return True
     return False
+
+
+def save_subscriptions(contact, subscription_types):
+    """"""
+    subscriptions = []
+    queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current())
+    for subscription_type in queryset:
+
+        subscription = Subscription.objects.get_or_create(
+            contact=contact,
+            subscription_type=subscription_type
+        )[0]
+
+        if subscription_type in subscription_types:
+            subscription.accept_subscription = True
+            subscription.subscription_date = datetime.now()
+            #This is added to the notification email
+            subscriptions.append(subscription_type.name)
+        else:
+            subscription.accept_subscription = False
+        subscription.save()
+    return subscriptions

@@ -5,6 +5,7 @@ from itertools import chain
 import json
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.forms import ChoiceField
@@ -19,7 +20,7 @@ from django.utils.translation import ugettext as _
 import floppyforms as forms
 from coop_cms.bs_forms import Form as BsForm
 
-from sanza.Crm.models import Contact, Action, Group
+from sanza.Crm.models import Contact, Action, Group, Subscription, SubscriptionType
 from sanza.Crm.widgets import OpportunityAutoComplete
 from sanza.Search import models
 from sanza.Search.widgets import DatespanInput
@@ -311,11 +312,19 @@ class SearchForm(forms.Form):
         
         for gpp in global_post_processors:
             contacts = gpp(contacts)
-        
-        for c in contacts:
-            if not c.accept_newsletter:
-                self.contains_refuse_newsletter = True
-                break
+
+        #Just for compatibility
+        queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current(), name=u'Newsletter')
+        if queryset.count():
+            for contact in contacts:
+                for subscription_type in queryset:
+                    try:
+                        if not contact.subscription_set.get(subcription_type=subscription_type).accept_subscription:
+                            self.contains_refuse_newsletter = True
+                            break
+                    except Subscription.DoesNotExist:
+                        self.contains_refuse_newsletter = True
+                        break
                 
         return list(contacts)
     

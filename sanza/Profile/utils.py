@@ -9,6 +9,8 @@ from django.utils.translation import ugettext as _
 from sanza.utils import logger, now_rounded
 from sanza.Crm import settings as crm_settings
 from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType
+from sanza.Emailing.models import SubscriptionType
+from sanza.Emailing.utils import save_subscriptions
 from sanza.Profile.models import ContactProfile, CategoryPermission
 
 
@@ -67,8 +69,6 @@ def create_profile_contact(user):
     contact.lastname = contact.lastname or user.last_name
     contact.firstname = contact.firstname or user.first_name
     contact.email = user.email
-    contact.accept_newsletter = profile.accept_newsletter
-    contact.accept_3rdparty = profile.accept_3rdparty
     contact.email_verified = True
     if not contact.lastname:
         contact.lastname = user.email.split("@")[0]
@@ -78,7 +78,20 @@ def create_profile_contact(user):
         contact.zip_code = profile.zip_code
     
     contact.save()
-    
+
+    try:
+        ids = [int(s) for s in profile.subscriptions_ids.split(",")]
+    except ValueError:
+        ids = []
+
+    subscription_types = []
+    for subscription_type_id in ids:
+        try:
+            subscription_types.append(SubscriptionType.objects.get(id=subscription_type_id))
+        except SubscriptionType.DoesNotExist:
+            pass
+    save_subscriptions(contact, subscription_types)
+
     action_type = ActionType.objects.get_or_create(name=_(u"Account creation"))[0]
     action = Action.objects.create(
         subject=_(u"Create an account on web site"),
@@ -149,7 +162,7 @@ def notify_registration(profile):
         
         data = {
             'contact': profile.contact,
-            'site': settings.COOP_CMS_SITE_PREFIX,
+            'site': getattr(settings, 'COOP_CMS_SITE_PREFIX', None),
         }
         t = get_template('Profile/registration_notification_email.txt')
         content = t.render(Context(data))

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from sanza.Crm import search_forms, models, forms
+
 from django.utils.translation import ugettext as _
+
 from sanza.Crm import settings
+from sanza.Crm import search_forms
 from sanza.Emailing import search_forms as emailing_search_forms
 
 SEARCH_FORMS = [
@@ -52,8 +54,6 @@ SEARCH_FORMS = [
             search_forms.ContactFirstnameSearchForm,
             search_forms.ContactRoleSearchForm,
             search_forms.ContactByModifiedDate,
-            search_forms.ContactNewsletterSearchForm,
-            search_forms.Contact3rdPartySearchForm,
             search_forms.ContactAcceptSubscriptionSearchForm,
             search_forms.ContactRefuseSubscriptionSearchForm,
             search_forms.SecondarySearchForm,
@@ -64,17 +64,6 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
-            #search_forms.ContactNotesForm,
-            
-            #search_forms.ContactOpportunityStatusSearchForm,
-            #search_forms.ContactOpportunityNameSearchForm,
-            #search_forms.ContactNoOpportunityWithNameSearchForm,
-            #search_forms.ContactOpportunityByEndDate,
-            #search_forms.ContactOpportunityByStartDate,
-            #search_forms.ContactNoOpportunityBetween,
-            #search_forms.ContactOpportunityTypeSearchForm,
-            #search_forms.ContactNoOpportunityOfTypeSearchForm,
-            #search_forms.ContactOpportunityInProgressForm,
         ],
     ),(
         _(u'Actions'),
@@ -94,19 +83,8 @@ SEARCH_FORMS = [
     ),(
         _(u'Opportunities'),
         [
-            #search_forms.OpportunityStatusSearchForm,
             search_forms.OpportunitySearchForm,
-            #search_forms.NotInOpportunitySearchForm,
-            #search_forms.OpportunityInProgressForm,
             search_forms.OpportunityNameSearchForm,
-            #search_forms.OpportunityBetween,
-            #search_forms.OpportunityByStartDate,
-            #search_forms.OpportunityByEndDate,
-            #search_forms.OpportunityTypeSearchForm,
-            #search_forms.OpportunityReminderForm,
-            #search_forms.NoOpportunityWithNameSearchForm,
-            #search_forms.NoOpportunityOfTypeSearchForm,
-            #search_forms.NoOpportunityBetween,
         ],
     ),(
         _(u'Emailing'),

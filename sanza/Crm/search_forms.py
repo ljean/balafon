@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms as forms
-from sanza.Search.forms import SearchFieldForm, TwoDatesForm, YesNoSearchFieldForm
-from django.utils.translation import ugettext as _
-from sanza.Crm import models
-from django.core.exceptions import ValidationError
 from datetime import date, timedelta
-#from sanza.Crm.settings import get_default_country
-from django.contrib.auth.models import User
+
 from django.db.models import Q, Count
-from sanza.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
+from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
+
+import floppyforms as forms
+
+from sanza.Crm import models
 from sanza.Crm.utils import get_default_country
+from sanza.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
+from sanza.Search.forms import SearchFieldForm, TwoDatesForm, YesNoSearchFieldForm
+
 
 class EntityNameSearchForm(SearchFieldForm):
     _name = 'entity_name'
@@ -18,25 +20,33 @@ class EntityNameSearchForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(EntityNameSearchForm, self).__init__(*args, **kwargs)
-        field = forms.CharField(label=self._label,
-            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the name of the searched entities')}))
+        field = forms.CharField(
+            label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the name of the searched entities')})
+        )
         self._add_field(field)
         
     def get_lookup(self):
         return {'entity__name__icontains': self._value}
     
+
 class EntityDescriptionForm(SearchFieldForm):
     _name = 'entity_description'
     _label = _(u'Entity description')
     
     def __init__(self, *args, **kwargs):
         super(EntityDescriptionForm, self).__init__(*args, **kwargs)
-        field = forms.CharField(label=self._label,
-            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the description of the searched entities')}))
+        field = forms.CharField(
+            label=self._label,
+            widget=forms.TextInput(
+                attrs={'placeholder': _(u'Enter a part of the description of the searched entities')}
+            )
+        )
         self._add_field(field)
         
     def get_lookup(self):
         return {'entity__description__icontains': self._value}
+
 
 class EntityNotesForm(SearchFieldForm):
     _name = 'entity_notes'
@@ -44,21 +54,28 @@ class EntityNotesForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(EntityNotesForm, self).__init__(*args, **kwargs)
-        field = forms.CharField(label=self._label,
-            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the notes of the searched entities')}))
+        field = forms.CharField(
+            label=self._label,
+            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the notes of the searched entities')})
+        )
         self._add_field(field)
         
     def get_lookup(self):
         return {'entity__notes__icontains': self._value}
-    
+
+
 class EntityNameStartsWithSearchForm(SearchFieldForm):
     _name = 'entity_name_sw'
     _label = _(u'Entity name starts with')
     
     def __init__(self, *args, **kwargs):
         super(EntityNameStartsWithSearchForm, self).__init__(*args, **kwargs)
-        field = forms.CharField(label=self._label,
-            widget=forms.TextInput(attrs={'placeholder': _(u'Enter the beginning of the name of the searched entities')}))
+        field = forms.CharField(
+            label=self._label,
+            widget=forms.TextInput(
+                attrs={'placeholder': _(u'Enter the beginning of the name of the searched entities')}
+            )
+        )
         self._add_field(field)
         
     def get_lookup(self):
@@ -76,6 +93,7 @@ class HasEntityForm(YesNoSearchFieldForm):
         else:
             return no_entity
 
+
 class EntityByModifiedDate(TwoDatesForm):
     _name = 'entity_by_modified_date'
     _label = _(u'Entity by modified date')
@@ -84,6 +102,7 @@ class EntityByModifiedDate(TwoDatesForm):
         dt1, dt2 = self._get_dates()
         dt2 += timedelta(1)
         return Q(entity__is_single_contact=False, entity__modified__gte=dt1, entity__modified__lt=dt2)
+
 
 class ContactByModifiedDate(TwoDatesForm):
     _name = 'contact_by_modified_date'
@@ -94,15 +113,19 @@ class ContactByModifiedDate(TwoDatesForm):
         dt2 += timedelta(1)
         return {'modified__gte': dt1, 'modified__lt': dt2, }
 
+
 class BaseCitySearchForm(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(BaseCitySearchForm, self).__init__(*args, **kwargs)
         qs = models.City.objects.order_by('name') 
-        field = forms.ModelChoiceField(qs, label=self._label,
-            widget = CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        field = forms.ModelChoiceField(
+            qs,
+            label=self._label,
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
         )
         self._add_field(field)
+
 
 class CitySearchForm(BaseCitySearchForm):
     _name = 'city'
@@ -111,12 +134,14 @@ class CitySearchForm(BaseCitySearchForm):
     def get_lookup(self):
         return Q(city__id=self._value) | (Q(city__isnull=True) & Q(entity__city__id=self._value))
     
+
 class EntityCitySearchForm(BaseCitySearchForm):
     _name = 'entity_city'
     _label = _(u'Entity city')
 
     def get_lookup(self):
         return Q(entity__city__id=self._value)
+
 
 class BaseZipCodeSearchForm(SearchFieldForm):
     
@@ -126,6 +151,7 @@ class BaseZipCodeSearchForm(SearchFieldForm):
             widget=forms.TextInput(attrs={'placeholder': _(u'Enter the beginning of the zip code')}))
         self._add_field(field)
     
+
 class ZipCodeSearchForm(BaseZipCodeSearchForm):
     _name = 'zip_code'
     _label = _(u'zip code')
@@ -141,22 +167,7 @@ class EntityZipCodeSearchForm(BaseZipCodeSearchForm):
     def get_lookup(self):
         return Q(entity__zip_code__istartswith=self._value)
         
-#class ZoneSearchForm(SearchFieldForm):
-#    
-#    def __init__(self, *args, **kwargs):
-#        super(ZoneSearchForm, self).__init__(*args, **kwargs)
-#        type_name = self._name.replace("entity_", "")
-#        qs = models.Zone.objects.filter(type__type=type_name).order_by('code', 'name') 
-#        field = forms.ModelChoiceField(qs, label=self._label, widget=self._get_widget())
-#        self._add_field(field)
-#        
-#    def _get_widget(self):
-#        return forms.Select(attrs={
-#            'class': "chosen-select",
-#            'data-placeholder': self._label,
-#            'style': "width: 100%", 
-#        })
-    
+
 class ZoneSearchForm(SearchFieldForm):
     multi_values = True
 
@@ -174,7 +185,7 @@ class ZoneSearchForm(SearchFieldForm):
         self._add_field(field)
         
     def get_values(self):
-        if type(self._value)==list:
+        if type(self._value) == list:
             values = self._value
         else:
             values = [self._value]
@@ -193,16 +204,25 @@ class ZoneSearchForm(SearchFieldForm):
             self._value = zone_id
             group_qs = group_qs | self.get_lookup()
         return qs.filter(group_qs)
-    
+
+
 class DepartmentSearchForm(ZoneSearchForm):
     _name = 'department'
     _label = _(u'Departments')
         
     def get_lookup(self):
         q1 = Q(city__parent__id=self._value) & Q(city__parent__type__type="department")
-        q2 = Q(city__isnull=True) & Q(entity__city__parent__id=self._value) & Q(entity__city__parent__type__type="department")
+
+        q2 = Q(
+            city__isnull=True
+        ) & Q(
+            entity__city__parent__id=self._value
+        ) & Q(
+            entity__city__parent__type__type="department"
+        )
         
         return q1 | q2
+
 
 class EntityDepartmentSearchForm(ZoneSearchForm):
     _name = 'entity_department'
@@ -211,19 +231,28 @@ class EntityDepartmentSearchForm(ZoneSearchForm):
     def get_queryset(self, qs):
         qs = super(EntityDepartmentSearchForm, self).get_queryset(qs)
         return qs.filter(entity__city__parent__type__type="department")
-        #return qs.filter(self.get_lookup()).filter(entity__city__parent__type__type="department")
-        
+
     def get_lookup(self):
         return Q(entity__city__parent__id=self._value)
         
+
 class RegionSearchForm(ZoneSearchForm):
     _name = 'region'
     _label = _(u'Regions')
         
     def get_lookup(self):
         q1 = Q(city__parent__parent__id=self._value) & Q(city__parent__parent__type__type="region")
-        q2 = Q(city__isnull=True) & Q(entity__city__parent__parent__id=self._value) & Q(entity__city__parent__parent__type__type="region")
+
+        q2 = Q(
+            city__isnull=True
+        ) & Q(
+            entity__city__parent__parent__id=self._value
+        ) & Q(
+            entity__city__parent__parent__type__type="region"
+        )
+
         return q1 | q2
+
 
 class EntityRegionSearchForm(ZoneSearchForm):
     _name = 'entity_region'
@@ -232,11 +261,11 @@ class EntityRegionSearchForm(ZoneSearchForm):
     def get_queryset(self, qs):
         qs = super(EntityRegionSearchForm, self).get_queryset(qs)
         return qs.filter(entity__city__parent__type__type="department")
-        #return qs.filter(self.get_lookup()).filter(entity__city__parent__parent__type__type="region")
-        
+
     def get_lookup(self):
         return Q(entity__city__parent__parent__id=self._value)
-        
+
+
 class CountrySearchForm(ZoneSearchForm):
     _name = 'country'
     _label = _(u'Countries')
@@ -244,10 +273,15 @@ class CountrySearchForm(ZoneSearchForm):
     def get_lookup(self):
         default_country = get_default_country()
         if int(self._value) == default_country.id:
-            return Q(city__parent__type__type='department') | (Q(city__isnull=True) & Q(entity__city__parent__type__type='department'))
+            return Q(
+                city__parent__type__type='department'
+            ) | (Q(
+                city__isnull=True
+            ) & Q(entity__city__parent__type__type='department'))
         else:
             return Q(city__parent__id=self._value) | (Q(city__isnull=True) & Q(entity__city__parent__id=self._value))
-        
+
+
 class EntityCountrySearchForm(ZoneSearchForm):
     _name = 'entity_country'
     _label = _(u'Entity Countries')
@@ -260,6 +294,7 @@ class EntityCountrySearchForm(ZoneSearchForm):
         else:
             return Q(entity__city__parent__id=self._value, entity__city__parent__type__type="country")
 
+
 class ZoneGroupSearchForm(ZoneSearchForm):
     _name = 'zone_group'
     _label = _(u'Zone Groups')
@@ -269,12 +304,14 @@ class ZoneGroupSearchForm(ZoneSearchForm):
         q2 = Q(city__isnull=True) & Q(entity__city__groups__id=self._value)
         return q1 | q2
     
+
 class EntityZoneGroupSearchForm(ZoneSearchForm):
     _name = 'entity_zone_group'
     _label = _(u'Entity Zone Groups')
         
     def get_lookup(self):
         return Q(entity__city__groups__id=self._value)
+
 
 class HasCityAndZipcodeForm(YesNoSearchFieldForm):
     _name = 'has_city_and_zip'
@@ -289,22 +326,18 @@ class HasCityAndZipcodeForm(YesNoSearchFieldForm):
         else:
             return ~has_address
             
+
 class ActionInProgressForm(YesNoSearchFieldForm):
     _name = 'action'
     _label = _(u'Action in progress')
     
-    #def __init__(self, *args, **kwargs):
-    #    super(ActionInProgressForm, self).__init__(*args, **kwargs)
-    #    choices = ((1, _('Yes')),)
-    #    field = forms.ChoiceField(choices=choices, label=self._label)
-    #    self._add_field(field)
-        
     def get_queryset(self, qs):
         qobjs = Q(entity__action__done=False) | Q(action__done=False)
         if self.is_yes():
             return qs.filter(qobjs)
         else:
             return qs.exclude(qobjs)
+
 
 class HasAction(YesNoSearchFieldForm):
     _name = 'has_action'
@@ -328,6 +361,7 @@ class HasAction(YesNoSearchFieldForm):
 #        else:
 #            return (Q(entity__action__done=True) | Q(action__done=True))
         
+
 class ActionByDoneDate(TwoDatesForm):
     _name = 'action_by_done_date'
     _label = _(u'Action by done date')
@@ -347,14 +381,44 @@ class ActionByPlannedDate(TwoDatesForm):
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
         
-        l1 = Q(action__end_datetime__isnull=True) & Q(action__planned_date__gte=dt1) & Q(action__planned_date__lte=dt2)
-        l2 = Q(action__end_datetime__isnull=False) & Q(action__planned_date__lte=dt2) & Q(action__end_datetime__gte=dt1)
+        start_after_end_before = Q(
+            action__end_datetime__isnull=True
+        ) & Q(
+            action__planned_date__gte=dt1
+        ) & Q(
+            action__planned_date__lte=dt2
+        )
+
+        start_before_end_after = Q(
+            action__end_datetime__isnull=False
+        ) & Q(
+            action__planned_date__lte=dt2
+        ) & Q(
+            action__end_datetime__gte=dt1
+        )
         
-        l3 = Q(entity__action__end_datetime__isnull=True) & Q(entity__action__planned_date__gte=dt1) & Q(entity__action__planned_date__lte=dt2)
-        l4 = Q(entity__action__end_datetime__isnull=False) & Q(entity__action__planned_date__lte=dt2) & Q(entity__action__end_datetime__gte=dt1)
+        entity_start_after_end_before = Q(
+            entity__action__end_datetime__isnull=True
+        ) & Q(
+            entity__action__planned_date__gte=dt1
+        ) & Q(
+            entity__action__planned_date__lte=dt2
+        )
+
+        entity_start_before_end_after = Q(
+            entity__action__end_datetime__isnull=False
+        ) & Q(
+            entity__action__planned_date__lte=dt2
+        ) & Q(
+            entity__action__end_datetime__gte=dt1
+        )
         
-        return (l1 | l2 | l3 | l4)
-    
+        return (
+            start_after_end_before | start_before_end_after |
+            entity_start_after_end_before | entity_start_before_end_after
+        )
+
+
 class ActionByStartDate(TwoDatesForm):
     _name = 'action_by_start_date'
     _label = _(u'Action by start date')
@@ -363,8 +427,9 @@ class ActionByStartDate(TwoDatesForm):
         dt1, dt2 = self._get_dates()
         return (
             (Q(action__planned_date__gte=dt1) & Q(action__planned_date__lte= dt2)) |
-            (Q(entity__action__planned_date__gte=dt1) & Q(entity__action__planned_date__lte= dt2))
+            (Q(entity__action__planned_date__gte=dt1) & Q(entity__action__planned_date__lte=dt2))
         )
+
 
 class ActionByUser(SearchFieldForm):
     _name = 'action_by_user'
@@ -377,7 +442,8 @@ class ActionByUser(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return (Q(action__in_charge=self._value) | Q(entity__action__in_charge=self._value))
+        return Q(action__in_charge=self._value) | Q(entity__action__in_charge=self._value)
+
 
 class ActionGteAmount(SearchFieldForm):
     _name = 'action_gte_amount'
@@ -389,7 +455,8 @@ class ActionGteAmount(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return (Q(action__amount__gte=self._value) | Q(entity__action__amount__gte=self._value))
+        return Q(action__amount__gte=self._value) | Q(entity__action__amount__gte=self._value)
+
 
 class ActionLtAmount(SearchFieldForm):
     _name = 'action_lt_amount'
@@ -401,8 +468,9 @@ class ActionLtAmount(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return (Q(action__amount__lt=self._value) | Q(entity__action__amount__lt=self._value))
-    
+        return Q(action__amount__lt=self._value) | Q(entity__action__amount__lt=self._value)
+
+
 class ActionStatus(SearchFieldForm):
     _name = 'action_status'
     _label = _(u'Action by status')
@@ -414,7 +482,7 @@ class ActionStatus(SearchFieldForm):
         self._add_field(field)
         
     def get_lookup(self):
-        return (Q(action__status=self._value) | Q(entity__action__status=self._value))
+        return Q(action__status=self._value) | Q(entity__action__status=self._value)
 
 
 class TypeSearchForm(SearchFieldForm):
@@ -430,6 +498,7 @@ class TypeSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'entity__type__id': self._value}
 
+
 class GroupSearchForm(SearchFieldForm):
     _name = 'group'
     _label = _(u'Group')
@@ -438,8 +507,7 @@ class GroupSearchForm(SearchFieldForm):
         return GroupAutoComplete(attrs={
             'placeholder': _(u'Enter part of the group name'), 'size': '80',
         })
-    
-    
+
     def __init__(self, *args, **kwargs):
         super(GroupSearchForm, self).__init__(*args, **kwargs)
         qs = models.Group.objects.all()
@@ -457,6 +525,7 @@ class GroupSearchForm(SearchFieldForm):
     def get_lookup(self):
         return Q(entity__group__id=self._value) | Q(group__id=self._value)
 
+
 class GroupSearchFormDropdownWidget(GroupSearchForm):
     _name = 'group_dropdown'
     _label = _(u'Group (dropdown list)')
@@ -467,6 +536,7 @@ class GroupSearchFormDropdownWidget(GroupSearchForm):
             'data-placeholder': _(u'Group names'),
             'style': "width: 100%", 
         })
+
 
 class MultiGroupSearchForm(SearchFieldForm):
     multi_values = True
@@ -501,6 +571,7 @@ class MultiGroupSearchForm(SearchFieldForm):
             'style': "width: 100%", 
         })
 
+
 class GroupsMemberOfAllSearchForm(MultiGroupSearchForm):
     _name = 'all_groups'
     _label = _(u'Members of all groups')
@@ -511,7 +582,6 @@ class GroupsMemberOfAllSearchForm(MultiGroupSearchForm):
             qs = qs.filter(group_qs)    
         return qs
 
-    
     #def get_lookup(self):
     #    qs = None
     #    if type(self._value)==list:
@@ -540,7 +610,8 @@ class GroupsMemberOfAnySearchForm(MultiGroupSearchForm):
             group_qs = group_qs | ((Q(entity__isnull=False) & Q(entity__group__id=group_id)) | Q(group__id=group_id))
         qs = qs.filter(group_qs)    
         return qs
-    
+
+
 class GroupsMemberOfNoneSearchForm(MultiGroupSearchForm):
     _name = 'none_groups'
     _label = _(u'Member of none of these groups')
@@ -571,6 +642,7 @@ class NotInGroupSearchForm(SearchFieldForm):
     def get_lookup(self):
         return [~Q(entity__group__id=self._value), ~Q(group__id=self._value)]
 
+
 class ContactAgeSearchForm(SearchFieldForm):
     _name = 'contact_age'
     _label = _(u'Contact age')
@@ -599,7 +671,8 @@ class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'subscription__subscription_type__id': self._value, 'subscription__accept_subscription': True}
-    
+
+
 class ContactRefuseSubscriptionSearchForm(ContactAcceptSubscriptionSearchForm):
     _name = 'refuse_subscription'
     _label = _(u'Accept')
@@ -610,20 +683,6 @@ class ContactRefuseSubscriptionSearchForm(ContactAcceptSubscriptionSearchForm):
     def get_exclude_lookup(self):
         return super(ContactRefuseSubscriptionSearchForm, self).get_lookup()
 
-class ContactNewsletterSearchForm(YesNoSearchFieldForm):
-    _name = 'accept_newsletter'
-    _label = _(u'Accept newsletter')
-            
-    def get_lookup(self):
-        return {'accept_newsletter': self.is_yes()}
-    
-        
-class Contact3rdPartySearchForm(YesNoSearchFieldForm):
-    _name = 'accept_3rdparty'
-    _label = _(u'Accept third parties')
-            
-    def get_lookup(self):
-        return {'accept_3rdparty': self.is_yes()}
 
 class SecondarySearchForm(SearchFieldForm):
     _name = 'secondary_contact'
@@ -642,6 +701,7 @@ class SecondarySearchForm(SearchFieldForm):
         elif value == 0:
             return {'main_contact': False}
 
+
 class ContactHasLeft(SearchFieldForm):
     _name = 'contact_has_left'
     _label = _(u'Contact has left')
@@ -659,6 +719,7 @@ class ContactHasLeft(SearchFieldForm):
         elif value == 0:
             return {'has_left': True}
 
+
 class ContactRoleSearchForm(SearchFieldForm):
     _name = 'contact_role'
     _label = _(u'Contact role')
@@ -671,6 +732,7 @@ class ContactRoleSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return {'role': self._value}
+
 
 class EmailSearchForm(SearchFieldForm):
     _name = 'contact_entity_email'
@@ -685,6 +747,7 @@ class EmailSearchForm(SearchFieldForm):
     def get_lookup(self):
         return Q(entity__email__icontains=self._value) | Q(email__icontains=self._value)
 
+
 class ContactHasEmail(YesNoSearchFieldForm):
     _name = 'contact_has_email'
     _label = _(u'Contact has email')
@@ -695,6 +758,7 @@ class ContactHasEmail(YesNoSearchFieldForm):
             return ~has_no_email
         else:
             return has_no_email
+
 
 class ContactHasPersonalEmail(YesNoSearchFieldForm):
     _name = 'contact_has_personal_email'
@@ -707,6 +771,7 @@ class ContactHasPersonalEmail(YesNoSearchFieldForm):
         else:
             return has_no_email
 
+
 class UnknownContact(YesNoSearchFieldForm):
     _name = 'unknown_contact'
     _label = _(u'Unknown contacts')
@@ -717,6 +782,7 @@ class UnknownContact(YesNoSearchFieldForm):
             return unknown_contact
         else:
             return ~unknown_contact
+
 
 class ActionTypeSearchForm(SearchFieldForm):
     _name = 'action_type'
@@ -731,6 +797,7 @@ class ActionTypeSearchForm(SearchFieldForm):
     def get_lookup(self):
         return Q(entity__action__type=self._value) | Q(action__type=self._value)
 
+
 class ActionNameSearchForm(SearchFieldForm):
     _name = 'action_name'
     _label = _(u'Action subject')
@@ -744,6 +811,7 @@ class ActionNameSearchForm(SearchFieldForm):
     def get_lookup(self):
         return Q(entity__action__subject__icontains=self._value) | Q(action__subject__icontains=self._value)
 
+
 class RelationshipDateForm(TwoDatesForm):
     _name = 'relationship_date'
     _label = _(u'Relationship date')
@@ -751,7 +819,8 @@ class RelationshipDateForm(TwoDatesForm):
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
         return {'entity__relationship_date__gte': dt1, 'entity__relationship_date__lte': dt2}
-        
+
+
 class ContactNameSearchForm(SearchFieldForm):
     _name = 'contact_name'
     _label = _(u'Contact name')
@@ -765,19 +834,7 @@ class ContactNameSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'lastname__icontains': self._value}
     
-#class ContactNotesForm(SearchFieldForm):
-#    _name = 'contact_notes'
-#    _label = _(u'Contact notes')
-#    
-#    def __init__(self, *args, **kwargs):
-#        super(ContactNotesForm, self).__init__(*args, **kwargs)
-#        field = forms.CharField(label=self._label,
-#            widget=forms.TextInput(attrs={'placeholder': _(u'Enter a part of the notes of the searched contacts')}))
-#        self._add_field(field)
-#        
-#    def get_lookup(self):
-#        return {'notes__icontains': self._value}
-    
+
 class ContactFirstnameSearchForm(SearchFieldForm):
     _name = 'contact_firstname'
     _label = _(u'Contact firstname')
@@ -791,6 +848,7 @@ class ContactFirstnameSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'firstname__icontains': self._value}
     
+
 class ContactNotesSearchForm(SearchFieldForm):
     _name = 'contact_notes'
     _label = _(u'Contact notes')
@@ -804,19 +862,7 @@ class ContactNotesSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'notes__icontains': self._value}
 
-#class OpportunityStatusSearchForm(SearchFieldForm):
-#    _name = 'opportunity_status'
-#    _label = _(u'Opportunity status')
-#    
-#    def __init__(self, *args, **kwargs):
-#        super(OpportunityStatusSearchForm, self).__init__(*args, **kwargs)
-#        qs = models.OpportunityStatus.objects.all()
-#        field = forms.ModelChoiceField(qs, label=self._label)
-#        self._add_field(field)
-#        
-#    def get_lookup(self):
-#        return {'action__opportunity__status': self._value}
-        
+
 class OpportunitySearchForm(SearchFieldForm):
     _name = 'opportunity'
     _label = _(u'Opportunity')
@@ -830,6 +876,7 @@ class OpportunitySearchForm(SearchFieldForm):
     def get_lookup(self):
         return Q(action__opportunity__id=self._value) | Q(entity__action__opportunity__id=self._value)
         
+
 class OpportunityNameSearchForm(SearchFieldForm):
     _name = 'opportunity_name'
     _label = _(u'Opportunity name')
@@ -842,6 +889,7 @@ class OpportunityNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         return Q(action__opportunity__name__icontains=self._value) | Q(entity__action__opportunity__name__icontains=self._value)
+
 
 class NoSameAsForm(YesNoSearchFieldForm):
     _name = 'no_same_as'
@@ -868,35 +916,6 @@ class NoSameAsForm(YesNoSearchFieldForm):
                     filtered_contacts.append(c)
             return filtered_contacts
 
-#class OpportunityReminderForm(SearchFieldForm):
-#    _name = 'opp_reminder'
-#    _label = _(u'Opportunity reminder')
-#    
-#    def __init__(self, *args, **kwargs):
-#        super(OpportunityReminderForm, self).__init__(*args, **kwargs)
-#        field = forms.CharField(
-#            label=self._label, initial='{0}'.format(date.today()),
-#            widget=forms.TextInput(attrs={"class": "datepicker"})
-#        )
-#        self._add_field(field)
-#
-#    def _get_date(self):
-#        if self._value.find('-')>=0:
-#            d = [int(x) for x in self._value.split('-')]
-#        else:
-#            d = [int(x) for x in self._value.split('/')]
-#            d.reverse()
-#        return date(*d)
-#    
-#    def get_exclude_lookup(self):
-#        d = self._get_date()
-#        return {'entity__opportunity__start_date__gte': d}
-#        
-#    def get_lookup(self):
-#        d = self._get_date()
-#        return {'entity__opportunity__start_date__lte': d,
-#                'entity__opportunity__end_date__gte': d, }
-        
 
 class ContactsImportSearchForm(SearchFieldForm):
     _name = 'contact_import'
@@ -911,6 +930,7 @@ class ContactsImportSearchForm(SearchFieldForm):
     def get_lookup(self):
         return {'imported_by': self._value}
 
+
 class ContactsByUpdateDate(TwoDatesForm):
     _name = 'contacts_by_update_date'
     _label = _(u'Contacts by update date')
@@ -919,6 +939,7 @@ class ContactsByUpdateDate(TwoDatesForm):
         dt1, dt2 = self._get_dates()
         return Q(modified__gte=dt1, modified__lte=dt2)
     
+
 class ContactsByCreationDate(TwoDatesForm):
     _name = 'contacts_by_creation_date'
     _label = _(u'Contacts by creation date')
@@ -926,7 +947,8 @@ class ContactsByCreationDate(TwoDatesForm):
     def get_lookup(self):
         dt1, dt2 = self._get_dates()
         return Q(created__gte=dt1, created__lte=dt2)
-    
+
+
 class EntitiesByUpdateDate(TwoDatesForm):
     _name = 'entities_by_update_date'
     _label = _(u'Entities by update date')
@@ -935,6 +957,7 @@ class EntitiesByUpdateDate(TwoDatesForm):
         dt1, dt2 = self._get_dates()
         return Q(entity__modified__gte=dt1, entity__modified__lte=dt2)
     
+
 class EntitiesByCreationDate(TwoDatesForm):
     _name = 'entities_by_creation_date'
     _label = _(u'Entities by creation date')
@@ -943,6 +966,7 @@ class EntitiesByCreationDate(TwoDatesForm):
         dt1, dt2 = self._get_dates()
         return Q(entity__created__gte=dt1, entity__created__lte=dt2)
     
+
 class ContactsAndEntitiesByChangeDate(TwoDatesForm):
     _name = 'contacts_and_entities_by_change_date'
     _label = _(u'Contacts and entities by change date')
@@ -953,6 +977,7 @@ class ContactsAndEntitiesByChangeDate(TwoDatesForm):
             Q(entity__modified__gte=dt1, entity__modified__lte=dt2) | \
             Q(entity__created__gte=dt1, entity__created__lte=dt2)
         
+
 class ContactsRelationshipByType(SearchFieldForm):
     _name = 'contacts_by_relationship_type'
     _label = _(u'Relationship type')
@@ -984,6 +1009,7 @@ class ContactsRelationshipByType(SearchFieldForm):
         relationship_ids = list(set(relationship_ids))  
         return Q(id__in=(relationship_ids))
     
+
 class ContactsRelationshipByDate(TwoDatesForm):
     _name = 'contacts_by_relationship_dates'
     _label = _(u'Relationship dates')
@@ -997,6 +1023,7 @@ class ContactsRelationshipByDate(TwoDatesForm):
         relationship_ids = list(set(relationship_ids))  
         return Q(id__in=(relationship_ids))
     
+
 class ContactWithCustomField(SearchFieldForm):
     _name = 'contact_with_custom_field'
     _label = _(u'Contacts with custom field')
@@ -1013,6 +1040,7 @@ class ContactWithCustomField(SearchFieldForm):
         value = int(self._value)
         cf = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_CONTACT)
         return Q(contactcustomfieldvalue__custom_field=cf)
+
 
 class EntityWithCustomField(SearchFieldForm):
     _name = 'entity_with_custom_field'
@@ -1031,6 +1059,7 @@ class EntityWithCustomField(SearchFieldForm):
         cf = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_ENTITY)
         return Q(entity__entitycustomfieldvalue__custom_field=cf)
     
+
 class SortContacts(SearchFieldForm):
     _name = 'sort'
     _label = _(u'Sort contacts')

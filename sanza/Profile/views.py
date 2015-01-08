@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail, EmailMessage
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from forms import ProfileForm, MessageForm
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from sanza.Crm.models import Action, ActionType
-from datetime import datetime
-from django.core.mail import send_mail, EmailMessage
 from django.template.loader import get_template
-from models import ContactProfile
-from sanza.utils import now_rounded
+from django.utils.translation import ugettext as _
+
 from registration.backends.default.views import RegistrationView, ActivationView
-from forms import UserRegistrationForm
-from utils import create_profile_contact, notify_registration
+
+from sanza.Crm.models import Action, ActionType
+from sanza.Profile.forms import ProfileForm, MessageForm, UserRegistrationForm
+from sanza.Profile.models import ContactProfile
+from sanza.Profile.utils import create_profile_contact, notify_registration
+from sanza.utils import now_rounded
+
 
 @login_required 
 def edit_profile(request):
@@ -43,7 +44,8 @@ def edit_profile(request):
         },
         context_instance=RequestContext(request)
     )
-    
+
+
 @login_required 
 def post_message(request):
     profile = request.user.get_profile()
@@ -101,6 +103,7 @@ def post_message(request):
         context_instance=RequestContext(request)
     )
 
+
 class AcceptNewsletterRegistrationView(RegistrationView):
     
     def get_form_class(self, request):
@@ -109,11 +112,7 @@ class AcceptNewsletterRegistrationView(RegistrationView):
     def register(self, request, **kwargs):
         kwargs["username"] = kwargs["email"][:30]
         user = super(AcceptNewsletterRegistrationView, self).register(request, **kwargs)
-        
-        #Store if 
-        user.contactprofile.accept_newsletter = kwargs.get('accept_newsletter', False)
-        user.contactprofile.accept_3rdparty = kwargs.get('accept_3rdparty', False)
-        
+
         user.first_name = kwargs.get('firstname', "")
         user.last_name = kwargs.get('lastname', "")
         user.contactprofile.entity_type = kwargs.get('entity_type', None)
@@ -121,13 +120,20 @@ class AcceptNewsletterRegistrationView(RegistrationView):
         user.contactprofile.city = kwargs.get('city', None)
         user.contactprofile.zip_code = kwargs.get('zip_code', None)
         user.contactprofile.gender = kwargs.get('gender', 0) or 0
-        
+
         user.save()
         user.contactprofile.save()
-        
+
+        subscription_types = kwargs.get('subscription_types', None)
+
+        user.contactprofile.subscriptions_ids = u",".join([str(s.id) for s in subscription_types])
+        user.contactprofile.save()
+
         return user
 
+
 class AcceptNewsletterActivationView(ActivationView):
+
     def activate(self, request, *args, **kwargs):
         activated_user = super(AcceptNewsletterActivationView, self).activate(request, *args, **kwargs)
         #The account has been activated: We can create the corresponding contact in Sanza
