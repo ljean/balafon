@@ -635,6 +635,10 @@ class SubscriptionType(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        verbose_name = _(u'Subscription type')
+        verbose_name_plural = _(u'Subscription types')
+
 
 class Subscription(models.Model):
     
