@@ -1,4 +1,4 @@
-djnago==1.6.6
+djnago==1.6.10
 BeautifulSoup
 beautifulsoup4
 django-extensions
