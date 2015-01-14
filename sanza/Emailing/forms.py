@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
 from django.utils.importlib import import_module
 from django.utils.timezone import now as dt_now
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as __, ugettext_lazy as _
 
 from captcha.fields import CaptchaField
 
@@ -55,7 +55,7 @@ class NewEmailingForm(forms.Form):
         super(NewEmailingForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
-        newsletter_choices = [(0, _(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
+        newsletter_choices = [(0, __(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
         self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
 
         subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
@@ -65,7 +65,7 @@ class NewEmailingForm(forms.Form):
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']
         if newsletter_id == 0 and not subject:
-            raise ValidationError(_(u"Please enter a subject for the newsletter"))
+            raise ValidationError(__(u"Please enter a subject for the newsletter"))
         return subject
 
     def clean_subscription_type(self):
@@ -73,7 +73,7 @@ class NewEmailingForm(forms.Form):
             subscription_type = int(self.cleaned_data['subscription_type'])
             return SubscriptionType.objects.get(id=subscription_type)
         except (ValueError, KeyError, SubscriptionType.DoesNotExist):
-            raise ValidationError(_(u"Please select a valid subscription"))
+            raise ValidationError(__(u"Please select a valid subscription"))
 
 
 class NewNewsletterForm(forms.Form):
@@ -118,7 +118,7 @@ class NewNewsletterForm(forms.Form):
                         return url
                     except Exception, msg:
                         raise ValidationError(msg)
-            raise ValidationError(_(u"The url is not allowed"))
+            raise ValidationError(__(u"The url is not allowed"))
         return u''
 
     def clean_content(self):
@@ -177,7 +177,7 @@ class EmailSubscribeForm(forms.ModelForm):
         if subscriptions:
             send_notification_email(request, contact, [], "")
         else:
-            send_notification_email(request, contact, [], u"Error: "+_(u"No subscription_type defined"))
+            send_notification_email(request, contact, [], u"Error: "+__(u"No subscription_type defined"))
                 
         return contact
 
@@ -197,7 +197,9 @@ class SubscriptionTypeFormMixin(object):
 
     def clean_subscription_types(self):
         try:
-            subscription_types = [SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']]
+            subscription_types = [
+                SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']
+            ]
         except SubscriptionType.DoesNotExist:
             raise ValidationError(_(u"Invalid subscription type"))
         return subscription_types
@@ -292,7 +294,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
                 return EntityType.objects.get(id=entity_type)
             return None
         except (ValueError, EntityType.DoesNotExist):
-            raise ValidationError(_(u"Invalid entity type"))
+            raise ValidationError(__(u"Invalid entity type"))
         
     def get_entity(self):
         entity_type = self.cleaned_data.get('entity_type', None)
@@ -315,7 +317,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         entity = self._dehtmled_field("entity")
         if entity_type:
             if not entity:
-                raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
+                raise ValidationError(__(u"{0}: Please enter a name".format(entity_type)))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
             entity = u' '.join([x for x in data if x]).strip().upper()
@@ -350,21 +352,21 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     def clean_message(self):
         message = self._dehtmled_field("message", allow_spaces=True)
         if len(message) > 10000:
-            raise ValidationError(_(u"Your message is too long"))
+            raise ValidationError(__(u"Your message is too long"))
         return message
     
     def clean_groups(self):
         try:
             groups = [Group.objects.get(id=group_id) for group_id in self.cleaned_data['groups']]
         except Group.DoesNotExist:
-            raise ValidationError(_(u"Invalid group"))
+            raise ValidationError(__(u"Invalid group"))
         return groups
     
     def clean_action_types(self):
         try:
             action_types = [ActionType.objects.get(id=at_id) for at_id in self.cleaned_data['action_types']]
         except ActionType.DoesNotExist:
-            raise ValidationError(_(u"Invalid action type"))
+            raise ValidationError(__(u"Invalid action type"))
         return action_types
 
     def save(self, request=None):
@@ -388,9 +390,9 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         message = self.cleaned_data["message"]
 
         if message:
-            action_type = ActionType.objects.get_or_create(name=_(u"Message"))[0]
+            action_type = ActionType.objects.get_or_create(name=__(u"Message"))[0]
             action = Action.objects.create(
-                subject=_(u"Message from web site"),
+                subject=__(u"Message from web site"),
                 type=action_type,
                 planned_date=datetime.now(),
                 detail=message,
@@ -406,7 +408,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         actions = []
         for action_type in action_types:
             action = Action.objects.create(
-                subject=_(u"Contact"),
+                subject=__(u"Contact"),
                 type=action_type,
                 planned_date=datetime.now(),
                 display_on_board=True
@@ -434,9 +436,9 @@ class NewsletterSchedulingForm(forms.ModelForm):
         sch_dt = self.cleaned_data['scheduling_dt']
 
         if not sch_dt:
-            raise ValidationError(_(u"This field is required"))
+            raise ValidationError(__(u"This field is required"))
 
         if sch_dt < dt_now():
-            raise ValidationError(_(u"The scheduling date must be in future"))
+            raise ValidationError(__(u"The scheduling date must be in future"))
 
         return sch_dt
