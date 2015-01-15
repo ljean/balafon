@@ -319,7 +319,7 @@ class SearchForm(forms.Form):
             for contact in contacts:
                 for subscription_type in queryset:
                     try:
-                        if not contact.subscription_set.get(subcription_type=subscription_type).accept_subscription:
+                        if not contact.subscription_set.get(subscription_type=subscription_type).accept_subscription:
                             self.contains_refuse_newsletter = True
                             break
                     except Subscription.DoesNotExist:
