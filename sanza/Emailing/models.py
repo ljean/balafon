@@ -112,3 +112,6 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
             )
             
 signals.post_save.connect(force_message_in_favorites, sender=Action)
+
+if 'djrill' in settings.INSTALLED_APPS:
+    import sanza.Emailing.backends.mandrill

@@ -8,9 +8,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext, Context, Template
+from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
@@ -20,7 +20,7 @@ from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
 
 from sanza.permissions import can_access
-from sanza.utils import logger, log_error
+from sanza.utils import logger
 from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
@@ -397,3 +397,4 @@ class EmailSubscribeDoneView(TemplateView):
 
 class EmailSubscribeErrorView(TemplateView):
     template_name = 'Emailing/public/subscribe_email_error.html'
+

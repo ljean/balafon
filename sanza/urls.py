@@ -26,6 +26,11 @@ urlpatterns = patterns('',
     url(r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$', 'sanza.views.auto_save_data', name="auto_save_data"),
 )
 
+if 'djrill' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^mandrill/', include('djrill.urls')),
+    )
+
 if 'captcha' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'^captcha/', include('captcha.urls')),

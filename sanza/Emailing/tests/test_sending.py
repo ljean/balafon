@@ -9,7 +9,7 @@ from django.core import management
 from django.core import mail
 from django.core.urlresolvers import reverse
 
-from coop_cms import tests as coop_cms_tests
+from coop_cms.tests import test_newsletter as coop_cms_tests
 from coop_cms.models import Newsletter
 from model_mommy import mommy
 

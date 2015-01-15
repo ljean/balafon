@@ -19,7 +19,7 @@ from coop_cms.settings import get_newsletter_context_callbacks
 from coop_cms.utils import dehtml
 from coop_cms.utils import make_links_absolute
 
-from sanza.Crm.models import Action, ActionType, Subscription, SubscriptionType
+from sanza.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
 from sanza.Emailing.models import MagicLink
 
 
@@ -215,3 +215,37 @@ def save_subscriptions(contact, subscription_types):
             subscription.accept_subscription = False
         subscription.save()
     return subscriptions
+
+
+def on_bounce(email, description, permanent):
+    """can be called to signal soft or hard bounce"""
+    action_type = ActionType.objects.get_or_create(name="hard_bounce" if permanent else "soft_bounce")[0]
+
+    contacts = Contact.objects.filter(email=email)
+    entities = Entity.objects.filter(email=email)
+
+    action = Action.objects.create(
+        subject=u"{0}: {1}".format(
+            email, _(u"Permanent Email Error") if permanent else _(u"Email Error")
+        ),
+        detail=description,
+        planned_date=datetime.now(),
+        type=action_type,
+    )
+
+    action.contacts = contacts
+    action.entities = entities
+    action.save()
+
+    #Unsubscribe emails for permanent errors
+    if permanent:
+        all_contacts = list(contacts)
+        for entity in entities:
+            #for entities with the given email: Add the contacts with no email (by default the entity email is used)
+            all_contacts.extend(entity.contact_set.filter(email=""))
+
+        for contact in all_contacts:
+            for subscription in contact.subscription_set.all():
+                subscription.accept_subscription = False
+                subscription.unsubscription_date = datetime.now()
+                subscription.save()
