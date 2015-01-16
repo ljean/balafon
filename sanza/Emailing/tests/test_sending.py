@@ -87,10 +87,10 @@ class SendEmailingTest(BaseTestCase):
         contacts.sort(key=lambda c: c.get_email)
 
         for email, contact in zip(outbox, contacts):
-            viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+            viewonline_url = emailing.get_domain_url_prefix() + reverse(
                 'emailing_view_online', args=[emailing.id, contact.uuid]
             )
-            unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+            unsubscribe_url = emailing.get_domain_url_prefix() + reverse(
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
 
@@ -102,9 +102,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
-                '<{0}{1}>, <mailto:{2}?subject=unsubscribe>'.format(
-                    emailing.get_domain_url_prefix(), unsubscribe_url, email.from_email
-                )
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
             )
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
@@ -183,10 +181,10 @@ class SendEmailingTest(BaseTestCase):
         contacts.sort(key=lambda c: c.get_email)
 
         for email, contact in zip(outbox, contacts):
-            viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+            viewonline_url = emailing.get_domain_url_prefix() + reverse(
                 'emailing_view_online', args=[emailing.id, contact.uuid]
             )
-            unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+            unsubscribe_url = emailing.get_domain_url_prefix() + reverse(
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
 
@@ -198,9 +196,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
-                '<{0}{1}>, <mailto:{2}?subject=unsubscribe>'.format(
-                    emailing.get_domain_url_prefix(), unsubscribe_url, settings.COOP_CMS_REPLY_TO
-                )
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, settings.COOP_CMS_REPLY_TO)
             )
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
