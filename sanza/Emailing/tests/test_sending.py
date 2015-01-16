@@ -53,13 +53,21 @@ class SendEmailingTest(BaseTestCase):
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
 
+        site = Site.objects.get_current()
+        site.domain = "toto.fr"
+        site.save()
+
         emailing = mommy.make(
             Emailing,
-            newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
-            scheduling_dt=datetime.now(), sending_dt=None
+            newsletter=newsletter,
+            status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(),
+            sending_dt=None,
+            subscription_type=mommy.make(models.SubscriptionType, site=site)
         )
-        for c in contacts:
-            emailing.send_to.add(c)
+
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         management.call_command('emailing_scheduler', verbosity=0, interactive=False)
@@ -94,18 +102,21 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
-                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
+                '<{0}{1}>, <mailto:{2}?subject=unsubscribe>'.format(
+                    emailing.get_domain_url_prefix(), unsubscribe_url, email.from_email
+                )
             )
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
+
             self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
             #Check mailto links are not magic
-            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr") > 0)
             #Check mailto links are not magic
-            self.assertTrue(email.alternatives[0][0].find("#art1")>0)
+            self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
             self.assertTrue(MagicLink.objects.count()>0)
@@ -138,13 +149,21 @@ class SendEmailingTest(BaseTestCase):
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
 
+        site = Site.objects.get_current()
+        site.domain = "toto.fr"
+        site.save()
+
         emailing = mommy.make(
             Emailing,
-            newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
-            scheduling_dt=datetime.now(), sending_dt=None
+            newsletter=newsletter,
+            status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(),
+            sending_dt=None,
+            subscription_type=mommy.make(models.SubscriptionType, site=site)
         )
-        for c in contacts:
-            emailing.send_to.add(c)
+
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         management.call_command('emailing_scheduler', verbosity=0, interactive=False)
@@ -179,7 +198,9 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
-                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, settings.COOP_CMS_REPLY_TO)
+                '<{0}{1}>, <mailto:{2}?subject=unsubscribe>'.format(
+                    emailing.get_domain_url_prefix(), unsubscribe_url, settings.COOP_CMS_REPLY_TO
+                )
             )
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
@@ -189,13 +210,13 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
 
             #Check mailto links are not magic
-            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr") > 0)
 
             #Check mailto links are not magic
-            self.assertTrue(email.alternatives[0][0].find("#art1")>0)
+            self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
-            self.assertTrue(MagicLink.objects.count()>0)
+            self.assertTrue(MagicLink.objects.count() > 0)
 
             #check an action has been created
             c = models.Contact.objects.get(id=contact.id)
@@ -220,8 +241,8 @@ class SendEmailingTest(BaseTestCase):
     def test_unregister_mailinglist(self):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
-        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
 
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(
@@ -265,7 +286,7 @@ class SendEmailingTest(BaseTestCase):
     def test_unregister_mailinglist_dont_exist(self):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
 
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(
@@ -291,7 +312,7 @@ class SendEmailingTest(BaseTestCase):
     def test_unregister_mailinglist_twice(self):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
 
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(
@@ -342,7 +363,7 @@ class SendEmailingTest(BaseTestCase):
     def test_unregister_mailinglist_not_found_contact(self):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
 
         emailing = mommy.make(Emailing, subscription_type=newsletter_subscription)
 

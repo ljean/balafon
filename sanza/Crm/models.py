@@ -630,7 +630,7 @@ class Contact(TimeStampedModel):
 
 class SubscriptionType(models.Model):
     name = models.CharField(max_length=100, verbose_name=_(u"name"))
-    sites = models.ManyToManyField(Site, blank=True, null=True)
+    site = models.ForeignKey(Site, blank=True, null=True)
 
     def __unicode__(self):
         return self.name

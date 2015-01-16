@@ -48,7 +48,7 @@ def get_emailing_context(emailing, contact):
     links = re.findall('href="(?P<url>.+?)"', html_content)
     
     for link in links:
-        if (not link.lower().startswith('mailto:')) and (link[0]!="#"): #mailto and internal links are not magic
+        if (not link.lower().startswith('mailto:')) and (link[0] != "#"): #mailto and internal links are not magic
             magic_link, _is_new = MagicLink.objects.get_or_create(emailing=emailing, url=link)
             magic_url = newsletter.get_site_prefix()+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
             html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
@@ -58,10 +58,16 @@ def get_emailing_context(emailing, contact):
     newsletter.content = html_content
     
     context_dict = {
-        'title': newsletter.subject, 'newsletter': newsletter, 'by_email': True,
-        'MEDIA_URL': settings.MEDIA_URL, 'STATIC_URL': settings.STATIC_URL,
-        'SITE_PREFIX': settings.COOP_CMS_SITE_PREFIX, 'my_company': settings.SANZA_MY_COMPANY,
-        'unregister_url': unregister_url, 'contact': contact, 'emailing': emailing,
+        'title': newsletter.subject,
+        'newsletter': newsletter,
+        'by_email': True,
+        'MEDIA_URL': settings.MEDIA_URL,
+        'STATIC_URL': settings.STATIC_URL,
+        'SITE_PREFIX': emailing.get_domain_url_prefix(),
+        'my_company': settings.SANZA_MY_COMPANY,
+        'unregister_url': unregister_url,
+        'contact': contact,
+        'emailing': emailing,
     }
     
     for callback in get_newsletter_context_callbacks():
@@ -77,7 +83,9 @@ def send_newsletter(emailing, max_nb):
     emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
 
     #Clean the urls
-    emailing.newsletter.content = make_links_absolute(emailing.newsletter.content, emailing.newsletter)
+    emailing.newsletter.content = make_links_absolute(
+        emailing.newsletter.content, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
+    )
     
     connection = get_connection()
     from_email = settings.COOP_CMS_FROM_EMAIL
@@ -94,10 +102,14 @@ def send_newsletter(emailing, max_nb):
             lang = settings.LANGUAGE_CODE[:2]
             translation.activate(lang)
             html_text = t.render(context)
-            html_text = make_links_absolute(html_text, emailing.newsletter)
+            html_text = make_links_absolute(
+                html_text, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
+            )
             
             text = dehtml(html_text)
-            list_unsubscribe_url = reverse("emailing_unregister", args=[emailing.id, contact.uuid])
+            list_unsubscribe_url = emailing.get_domain_url_prefix() + reverse(
+                "emailing_unregister", args=[emailing.id, contact.uuid]
+            )
             list_unsubscribe_email = getattr(settings, 'COOP_CMS_REPLY_TO', '') or from_email
             headers = {
                 "List-Unsubscribe": u"<{0}>, <mailto:{1}?subject=unsubscribe>".format(

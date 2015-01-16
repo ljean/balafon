@@ -73,6 +73,12 @@ class Emailing(TimeStampedModel):
                 ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id])
             )
         return mark_safe(action)
+
+    def get_domain_url_prefix(self):
+        if self.subscription_type.site:
+            domain_protocol = getattr(settings, "SANZA_DOMAIN_PROTOCOL", "http://")
+            return domain_protocol + self.subscription_type.site.domain
+        return ""
     
     def get_contacts(self):
         return list(self.send_to.all()) + list(self.sent_to.all())

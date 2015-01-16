@@ -42,17 +42,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
         
-        st1 = mommy.make(models.SubscriptionType, name="abc")
-        st2 = mommy.make(models.SubscriptionType, name="def")
-        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="jkl")
-        
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
         
         data = {
             'email': 'pdupond@apidev.fr',
@@ -129,17 +122,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="abc")
-        st2 = mommy.make(models.SubscriptionType, name="def")
-        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="jkl")
-
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
 
         settings.SANZA_DEFAULT_SUBSCRIPTION_TYPE = st1.id
 
@@ -186,17 +172,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="abc")
-        st2 = mommy.make(models.SubscriptionType, name="def")
-        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="jkl")
-
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
 
         url = reverse("emailing_email_subscribe_subscription", args=[st1.id])
 
@@ -243,17 +222,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="abc")
-        st2 = mommy.make(models.SubscriptionType, name="def")
-        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="jkl")
-
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
 
         settings.SANZA_DEFAULT_SUBSCRIPTION_TYPE = st1.id
         url = reverse("emailing_email_subscribe_subscription", args=[st2.id])
@@ -301,17 +273,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="abc")
-        st2 = mommy.make(models.SubscriptionType, name="def")
-        st3 = mommy.make(models.SubscriptionType, name="ghi")
+        st1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="jkl")
-
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
 
         settings.SANZA_DEFAULT_SUBSCRIPTION_TYPE = st1.id
         url = reverse("emailing_email_subscribe_subscription", args=[st3.id])

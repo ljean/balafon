@@ -155,7 +155,7 @@ class EmailSubscribeForm(forms.ModelForm):
         #delete unknown contacts for the current entity
         contact.entity.contact_set.exclude(id=contact.id).delete()
 
-        queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current())
+        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
 
         form_subscription_type = self.subscription_type
         default_subscription_type = emailing_settings.get_default_subscription_type()
@@ -193,7 +193,7 @@ class SubscriptionTypeFormMixin(object):
         )
 
     def get_queryset(self):
-        return SubscriptionType.objects.filter(sites=Site.objects.get_current())
+        return SubscriptionType.objects.filter(site=Site.objects.get_current())
 
     def clean_subscription_types(self):
         try:

@@ -251,17 +251,10 @@ class SubscribeTest(TestCase):
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="#News#abc")
-        st2 = mommy.make(models.SubscriptionType, name="#News#def")
-        st3 = mommy.make(models.SubscriptionType, name="#News#ghi")
+        st1 = mommy.make(models.SubscriptionType, name="#News#abc", site=site1)
+        st2 = mommy.make(models.SubscriptionType, name="#News#def", site=site1)
+        st3 = mommy.make(models.SubscriptionType, name="#News#ghi", site=site2)
         st4 = mommy.make(models.SubscriptionType, name="#News#jkl")
-
-        st1.sites.add(site1, site2)
-        st1.save()
-        st2.sites.add(site1)
-        st2.save()
-        st3.sites.add(site2)
-        st3.save()
 
         url = reverse("emailing_subscribe_newsletter")
         response = self.client.get(url)
@@ -274,7 +267,7 @@ class SubscribeTest(TestCase):
     def test_accept_newsletter_not_in_site(self):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=None)
 
         url = reverse("emailing_subscribe_newsletter")
 
@@ -297,8 +290,8 @@ class SubscribeTest(TestCase):
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
-        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
 
         url = reverse("emailing_subscribe_newsletter")
 
@@ -373,8 +366,8 @@ class SubscribeTest(TestCase):
 
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
-        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
         contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
 
         subscription1 = mommy.make(
@@ -400,8 +393,8 @@ class SubscribeTest(TestCase):
 
         site1 = Site.objects.get_current()
 
-        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", sites=[site1])
-        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", sites=[site1])
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
         contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
 
         subscription1 = mommy.make(
