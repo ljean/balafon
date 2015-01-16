@@ -612,10 +612,10 @@ class Contact(TimeStampedModel):
 
         super(Contact, self).save(*args, **kwargs)
         if not self.uuid:
-            ln = unicodedata.normalize('NFKD', unicode(self.fullname)).encode("ascii",'ignore')
+            ln = unicodedata.normalize('NFKD', unicode(self.fullname)).encode("ascii", 'ignore')
             name = u'{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ln, self.email)
-            name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii",'ignore')
-            self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
+            name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
+            self.uuid = unicode(uuid.uuid5(uuid.NAMESPACE_URL, name))
             return super(Contact, self).save()
         
         if self.entity.is_single_contact:

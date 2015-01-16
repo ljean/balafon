@@ -283,6 +283,9 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(subscription2.accept_subscription, True)
         self.assertEqual(subscription2.contact, contact)
 
+        self.assertEqual(emailing.unsub.count(), 1)
+        self.assertEqual(list(emailing.unsub.all()), [contact])
+
     def test_unregister_mailinglist_dont_exist(self):
         site1 = Site.objects.get_current()
 
@@ -308,6 +311,8 @@ class SendEmailingTest(BaseTestCase):
         subscription1 = models.Subscription.objects.get(subscription_type=newsletter_subscription)
         self.assertEqual(subscription1.accept_subscription, False)
         self.assertEqual(subscription1.contact, contact)
+        self.assertEqual(emailing.unsub.count(), 1)
+        self.assertEqual(list(emailing.unsub.all()), [contact])
 
     def test_unregister_mailinglist_twice(self):
         site1 = Site.objects.get_current()
@@ -342,6 +347,9 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(subscription1.accept_subscription, False)
         self.assertEqual(subscription1.contact, contact)
 
+        self.assertEqual(emailing.unsub.count(), 1)
+        self.assertEqual(list(emailing.unsub.all()), [contact])
+
     def test_unregister_mailinglist_notfound_emailing(self):
         site1 = Site.objects.get_current()
 
@@ -373,6 +381,8 @@ class SendEmailingTest(BaseTestCase):
 
         response = self.client.post(url, data={'unregister': True})
         self.assertEqual(404, response.status_code)
+
+        self.assertEqual(emailing.unsub.count(), 0)
 
     def test_view_online(self):
         entity = mommy.make(models.Entity, name="my corp")

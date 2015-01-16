@@ -221,6 +221,10 @@ def unregister_contact(request, emailing_id, contact_uuid):
                     action.contacts.add(contact)
                     action.save()
                     unregister = True
+
+                    emailing.unsub.add(contact)
+                    emailing.save()
+
                 return render_to_response(
                     'Emailing/public/unregister_done.html',
                     locals(),

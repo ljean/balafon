@@ -20,7 +20,8 @@ from coop_cms.utils import dehtml
 from coop_cms.utils import make_links_absolute
 
 from sanza.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
-from sanza.Emailing.models import MagicLink
+from sanza.Emailing.models import Emailing, MagicLink
+from sanza.Emailing.settings import is_mandrill_used
 
 
 def format_context(text, data):
@@ -127,6 +128,8 @@ def send_newsletter(emailing, max_nb):
                 headers=headers
             )
             email.attach_alternative(html_text, "text/html")
+            if is_mandrill_used():
+                email.tags = [unicode(emailing.id), contact.uuid]
             emails.append(email)
             
             #create action
@@ -244,18 +247,17 @@ def save_subscriptions(contact, subscription_types):
     return subscriptions
 
 
-def on_bounce(email, description, permanent):
+def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_id):
     """can be called to signal soft or hard bounce"""
-    action_type = ActionType.objects.get_or_create(name="hard_bounce" if permanent else "soft_bounce")[0]
+    action_type = ActionType.objects.get_or_create(name="bounce")[0]
 
     contacts = Contact.objects.filter(email=email)
     entities = Entity.objects.filter(email=email)
 
+    subject = u"{0} - {1}".format(email, u"{0}: {1}".format(event_type, description))
+
     action = Action.objects.create(
-        subject=u"{0}: {1}".format(
-            email, _(u"Permanent Email Error") if permanent else _(u"Email Error")
-        ),
-        detail=description,
+        subject=subject[:200],
         planned_date=datetime.now(),
         type=action_type,
     )
@@ -276,3 +278,19 @@ def on_bounce(email, description, permanent):
                 subscription.accept_subscription = False
                 subscription.unsubscription_date = datetime.now()
                 subscription.save()
+
+    #Update emailing statistics
+    if contact_uuid and emailing_id:
+        try:
+            contact = Contact.objects.get(uuid=contact_uuid)
+        except Contact.DoesNotExist:
+            contact = None
+
+        try:
+            emailing = Emailing.objects.get(id=emailing_id)
+        except Emailing.DoesNotExist:
+            emailing = None
+
+        if contact and emailing and hasattr(emailing, event_type):
+            getattr(emailing, event_type).add(contact)
+            emailing.save()

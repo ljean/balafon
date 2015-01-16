@@ -26,28 +26,39 @@ class EmailingManagementTestCase(BaseTestCase):
     def test_view_newsletters_list(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact, entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize()
+            ) for name in names
+        ]
 
         newsletter1 = mommy.make(Newsletter, subject='newsletter1')
         newsletter2 = mommy.make(Newsletter, subject='newsletter2')
 
-        emailing1 = mommy.make(Emailing,
+        emailing1 = mommy.make(
+            Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SCHEDULED,
-            scheduling_dt = self.now(), sending_dt = None)
-        for c in contacts:
-            emailing1.send_to.add(c)
+            scheduling_dt=self.now(), sending_dt=None
+        )
+        for contact in contacts:
+            emailing1.send_to.add(contact)
         emailing1.save()
 
-        emailing2 = mommy.make(Emailing,
+        emailing2 = mommy.make(
+            Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENDING,
-            scheduling_dt = self.now(), sending_dt = None)
+            scheduling_dt=self.now(), sending_dt=None
+        )
         emailing2.send_to.add(contacts[0])
         emailing2.save()
 
-        emailing3 = mommy.make(Emailing,
+        emailing3 = mommy.make(
+            Emailing,
             newsletter=newsletter1, status=Emailing.STATUS_SENT,
-            scheduling_dt = self.now(), sending_dt = self.now())
+            scheduling_dt=self.now(), sending_dt=self.now()
+        )
         emailing3.send_to.add(contacts[-1])
         emailing3.save()
 
@@ -64,14 +75,23 @@ class EmailingManagementTestCase(BaseTestCase):
     def test_emailing_next_action(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize()
+            ) for name in names
+        ]
 
-        emailing = mommy.make(Emailing,
+        emailing = mommy.make(
+            Emailing,
             status=Emailing.STATUS_EDITING,
-            scheduling_dt = self.now(), sending_dt = None)
-        for c in contacts:
-            emailing.send_to.add(c)
+            scheduling_dt=self.now(),
+            sending_dt=None
+        )
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         next_url = reverse('emailing_confirm_send_mail', args=[emailing.id])
@@ -93,22 +113,30 @@ class EmailingManagementTestCase(BaseTestCase):
     def test_view_magic_link(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize()
+            ) for name in names
+        ]
 
-        emailing = mommy.make(Emailing,
+        emailing = mommy.make(
+            Emailing,
             status=Emailing.STATUS_SENT,
-            scheduling_dt = self.now(), sending_dt = self.now())
-        for c in contacts:
-            emailing.send_to.add(c)
+            scheduling_dt=self.now(), sending_dt=self.now()
+        )
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         emailing2 = mommy.make(Emailing)
 
         google = "http://www.google.fr"
         google_link = MagicLink.objects.create(emailing=emailing, url=google)
-        for c in contacts:
-            google_link.visitors.add(c)
+        for contact in contacts:
+            google_link.visitors.add(contact)
         google_link.save()
 
         toto = "http://www.toto.fr"
@@ -131,12 +159,18 @@ class EmailingManagementTestCase(BaseTestCase):
     def test_confirm_sending(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize()
+            ) for name in names
+        ]
 
         emailing = mommy.make(Emailing, status=Emailing.STATUS_EDITING)
-        for c in contacts:
-            emailing.send_to.add(c)
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         next_url = reverse('emailing_confirm_send_mail', args=[emailing.id])
@@ -165,12 +199,18 @@ class EmailingManagementTestCase(BaseTestCase):
     def test_cancel_sending(self):
         entity = mommy.make(models.Entity, name="my corp")
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize()
+            ) for name in names
+        ]
 
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SCHEDULED, scheduling_dt=self.now())
-        for c in contacts:
-            emailing.send_to.add(c)
+        for contact in contacts:
+            emailing.send_to.add(contact)
         emailing.save()
 
         next_url = reverse('emailing_cancel_send_mail', args=[emailing.id])

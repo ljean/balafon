@@ -18,6 +18,7 @@ from coop_cms.models import Newsletter
 from django_extensions.db.models import TimeStampedModel
 
 from sanza.Crm.models import Contact, Action, SubscriptionType
+from sanza.Emailing.settings import is_mandrill_used
 from sanza.Users.models import UserPreferences, Favorite
 
 
@@ -41,7 +42,13 @@ class Emailing(TimeStampedModel):
     sent_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_received")
     opened_emails = models.ManyToManyField(Contact, blank=True, related_name="emailing_opened")
     status = models.IntegerField(default=STATUS_EDITING, choices=STATUS_CHOICES)
-    
+
+    hard_bounce = models.ManyToManyField(Contact, blank=True, related_name="emailing_hard_bounce")
+    soft_bounce = models.ManyToManyField(Contact, blank=True, related_name="emailing_soft_bounce")
+    spam = models.ManyToManyField(Contact, blank=True, related_name="emailing_spam")
+    unsub = models.ManyToManyField(Contact, blank=True, related_name="emailing_unsub")
+    rejected = models.ManyToManyField(Contact, blank=True, related_name="emailing_rejected")
+
     scheduling_dt = models.DateTimeField(_(u"scheduling date"), blank=True, default=None, null=True)
     sending_dt = models.DateTimeField(_(u"sending date"), blank=True, default=None, null=True)
 
@@ -119,5 +126,5 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
             
 signals.post_save.connect(force_message_in_favorites, sender=Action)
 
-if 'djrill' in settings.INSTALLED_APPS:
+if is_mandrill_used():
     import sanza.Emailing.backends.mandrill

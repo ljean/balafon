@@ -9,6 +9,27 @@
 <table class="table table-striped">
 <tr><td>{% trans "Sendings" %}</td><td class="test-sendings">{{ emailing.sent_to.count }}</td></tr>
 <tr><td>{% trans "Openings" %}</td><td class="test-openings">{{ emailing.opened_emails.count }}</td></tr>
+
+{%  if emailing.unsub %}
+<tr><td>{% trans "Unsubcribe" %}</td><td class="test-unsubscribe">{{ emailing.unsub.count }}</td></tr>
+{% endif %}
+
+{%  if emailing.soft_bouce %}
+<tr><td>{% trans "Soft Bounce" %}</td><td class="test-soft-bounce">{{ emailing.soft_bounce.count }}</td></tr>
+{% endif %}
+
+{%  if emailing.hard_bouce %}
+<tr><td>{% trans "Hard Bouce" %}</td><td class="test-hard-bouce">{{ emailing.hard_bounce.count }}</td></tr>
+{% endif %}
+
+{%  if emailing.spam %}
+<tr><td>{% trans "Spam" %}</td><td class="test-spam">{{ emailing.spam.count }}</td></tr>
+{% endif %}
+
+{%  if emailing.rejected %}
+<tr><td>{% trans "rejected" %}</td><td class="test-rejected">{{ emailing.rejected.count }}</td></tr>
+{% endif %}
+
 {% for l in emailing.magiclink_set.all %}
     <tr><td><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></td><td>{{ l.visitors.count }}</td></tr>
 {% endfor %}
