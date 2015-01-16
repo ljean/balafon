@@ -6,32 +6,44 @@
 {% endblock %}
   
 {% block section_data %}
-<table class="table table-striped">
-<tr><td>{% trans "Sendings" %}</td><td class="test-sendings">{{ emailing.sent_to.count }}</td></tr>
-<tr><td>{% trans "Openings" %}</td><td class="test-openings">{{ emailing.opened_emails.count }}</td></tr>
+<div class="statistics">
+{% block sent_to %}
+    {% trans "Sendings" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.sent_to.all show_always=True hide_contacts=True %}
+{% endblock %}
 
-{%  if emailing.unsub %}
-<tr><td>{% trans "Unsubcribe" %}</td><td class="test-unsubscribe">{{ emailing.unsub.count }}</td></tr>
-{% endif %}
+{% block openings %}
+    {% trans "Openings" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.opened_emails.all show_always=True hide_contacts=True %}
+{% endblock %}
 
-{%  if emailing.soft_bouce %}
-<tr><td>{% trans "Soft Bounce" %}</td><td class="test-soft-bounce">{{ emailing.soft_bounce.count }}</td></tr>
-{% endif %}
+{% block unsub %}
+    {% trans "Unsubcribe" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.unsub.all show_always=True %}
+{% endblock %}
 
-{%  if emailing.hard_bouce %}
-<tr><td>{% trans "Hard Bouce" %}</td><td class="test-hard-bouce">{{ emailing.hard_bounce.count }}</td></tr>
-{% endif %}
+{% block soft_bounce %}
+    {% trans "Soft Bounce" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.soft_bounce.all %}
+{% endblock %}
 
-{%  if emailing.spam %}
-<tr><td>{% trans "Spam" %}</td><td class="test-spam">{{ emailing.spam.count }}</td></tr>
-{% endif %}
+{% block hard_bounce %}
+    {% trans "Hard Bounce" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.hard_bounce.all %}
+{% endblock %}
 
-{%  if emailing.rejected %}
-<tr><td>{% trans "rejected" %}</td><td class="test-rejected">{{ emailing.rejected.count }}</td></tr>
-{% endif %}
+{% block spam %}
+    {% trans "Spam" as label%}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.spam.all %}
+{% endblock %}
+
+{% block rejected %}
+    {% trans "Rejected" as label%}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.rejected.all %}
+{% endblock %}
 
 {% for l in emailing.magiclink_set.all %}
-    <tr><td><a href="{{ l.url }}" target="_blank">{{ l.url }}</a></td><td>{{ l.visitors.count }}</td></tr>
+    {% include "Emailing/_contact_list.html" with contacts=l.visitors.all label=l.url show_always=True %}
 {% endfor %}
-</table>
+</div>
 {% endblock %}

@@ -1,0 +1,26 @@
+{% load i18n %}
+{%  if show_always or contacts.count %}
+<div class="row">
+    <div class="col-md-2">
+        <div class="label-text">{{ label }}</div>
+    </div>
+    <div class="col-md-2">
+        <div class="contacts-count test-{{ label|lower }}">
+            {{ contacts.count }}
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="contacts-list">
+        {%  if contacts and not hide_contacts %}
+        {% for contact in contacts %}
+            <a href="{% url 'crm_view_contact' contact.id %}">{{ contact }}</a>
+            {%  if not forloop.last %}&nbsp; - &nbsp;{% endif %}
+        {% endfor %}
+        {% else %}
+            &nbsp;
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
