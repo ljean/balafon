@@ -28,54 +28,76 @@ class MandrillBounceTestCase(TestCase):
 
         url = reverse("djrill_webhook")+"?secret={0}".format(settings.DJRILL_WEBHOOK_SECRET)
 
-        msg = {
-            "email": contact.email,
-            "bounce_description": "Just an error"
-        }
-        post_data = [
+        mandrill_events = [
             {
-                'event': {
-                    "event_type": "soft_bounce",
-                    'msg': msg,
-                }
+                "event": "soft_bounce",
+                "_id": "01234567890123456789012345678901",
+                "msg": {
+                    "ts": 1421340778,
+                    "_id": "01234567890123456789012345678901",
+                    "state": "soft-bounced",
+                    "subject": "demo",
+                    "email": contact.email,
+                    "tags": [],
+                    "smtp_events": [],
+                    "resends": [],
+                    "_version": "UfoAzdddArJmfiXqHrxyDB",
+                    "diag": "",
+                    "bgtools_code": 21,
+                    "sender": "ljean@apidev.fr",
+                    "template": None,
+                    "bounce_description": "invalid_domain",
+                },
+                "ts":1421341522,
+            }, {
+                "event": "soft_bounce",
+                "_id": "01234567890123456789012345678902",
+                "msg": {
+                    "ts": 1421340778,
+                    "_id": "01234567890123456789012345678902",
+                    "state": "soft-bounced",
+                    "subject": "demo",
+                    "email": "unknonw@xyz.fr",
+                    "tags": [],
+                    "smtp_events": [],
+                    "resends": [],
+                    "_version": "UfoAzdddArJmfiXqHrxyDB",
+                    "diag": "",
+                    "bgtools_code": 21,
+                    "sender": "ljean@apidev.fr",
+                    "template": None,
+                    "bounce_description": "invalid_domain"
+                },
+                "ts": 1421341522
             },
-            {
-                'event': {
-                    "event_type": "soft_bounce",
-                    'msg': {
-                        "email": "unknonw@xyz.fr",
-                        "bounce_description": "No email for this one"
-                    },
-                }
-            }
         ]
 
-        json_content = json.dumps(post_data)
+        json_content = json.dumps(mandrill_events)
 
-        data = {
+        post_data = {
             "mandrill_events": json_content,
         }
 
         self.assertEqual(models.Action.objects.count(), 0)
 
-        response = self.client.post(url, data=data)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(200, response.status_code)
 
         self.assertEqual(models.Action.objects.count(), 2)
         action = models.Action.objects.all().order_by("id")[0]
-        self.assertEqual(action.detail, msg["bounce_description"])
+        self.assertEqual(action.detail, "invalid_domain")
         self.assertEqual(action.planned_date.date(), datetime.date.today())
-        self.assertEqual(action.type.name, post_data[0]["event"]["event_type"])
+        self.assertEqual(action.type.name, "soft_bounce")
         self.assertEqual(action.contacts.count(), 1)
         self.assertEqual(action.entities.count(), 0)
         contact = action.contacts.all()[0]
-        self.assertEqual(contact.email, msg["email"])
+        self.assertEqual(contact.email, "toto@toto.fr")
         self.assertEqual(contact.subscription_set.count(), 2)
         for subscription in contact.subscription_set.all():
             self.assertEqual(subscription.accept_subscription, True)
 
         action = models.Action.objects.all().order_by("id")[1]
-        self.assertEqual(action.type.name, post_data[0]["event"]["event_type"])
+        self.assertEqual(action.type.name, "soft_bounce")
         self.assertEqual(action.contacts.count(), 0)
         self.assertEqual(action.entities.count(), 0)
 
@@ -86,40 +108,53 @@ class MandrillBounceTestCase(TestCase):
 
         url = reverse("djrill_webhook")+"?secret={0}".format(settings.DJRILL_WEBHOOK_SECRET)
 
-        msg = {
-            "email": contact.email,
-            "bounce_description": "Just an error"
-        }
-        post_data = [{
-            'event': {
-                "event_type": "hard_bounce",
-                'msg': msg,
+        mandrill_events = [
+            {
+                "event": "hard_bounce",
+                "_id": "01234567890123456789012345678901",
+                "msg": {
+                    "ts": 1421340778,
+                    "_id": "01234567890123456789012345678901",
+                    "state": "hard-bounced",
+                    "subject": "demo",
+                    "email": contact.email,
+                    "tags": [],
+                    "smtp_events": [],
+                    "resends": [],
+                    "_version": "UfoAzdddArJmfiXqHrxyDB",
+                    "diag": "",
+                    "bgtools_code": 21,
+                    "sender": "ljean@apidev.fr",
+                    "template": None,
+                    "bounce_description": "invalid_domain",
+                },
+                "ts":1421341522,
             }
-        }]
+        ]
 
-        json_content = json.dumps(post_data)
+        json_content = json.dumps(mandrill_events)
 
-        data = {
+        post_data = {
             "mandrill_events": json_content,
         }
 
         self.assertEqual(models.Action.objects.count(), 0)
 
-        response = self.client.post(url, data=data)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(200, response.status_code)
 
         self.assertEqual(models.Action.objects.count(), 1)
         action = models.Action.objects.all()[0]
-        self.assertEqual(action.detail, msg["bounce_description"])
+        self.assertEqual(action.detail,  "invalid_domain")
         self.assertEqual(action.planned_date.date(), datetime.date.today())
-        self.assertEqual(action.type.name, post_data[0]["event"]["event_type"])
+        self.assertEqual(action.type.name, "hard_bounce")
 
         self.assertEqual(action.contacts.count(), 1)
 
         self.assertEqual(action.entities.count(), 0)
 
         contact = action.contacts.all()[0]
-        self.assertEqual(contact.email, msg["email"])
+        self.assertEqual(contact.email, "toto@toto.fr")
         self.assertEqual(contact.subscription_set.count(), 2)
         for subscription in contact.subscription_set.all():
             self.assertEqual(subscription.accept_subscription, False)

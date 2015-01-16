@@ -18,8 +18,7 @@ def handle_bounce(sender, event_type, data, **kwargs):
     #Avoid import error
     on_bounce = import_module("sanza.Emailing.utils", ".").on_bounce
 
-    event_type = data["event"]["event_type"]
-    msg = data["event"]["msg"]
+    msg = data["msg"]
     if event_type == 'hard_bounce' or event_type == 'soft_bounce':
 
         email = msg['email']
