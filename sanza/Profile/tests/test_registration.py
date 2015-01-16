@@ -23,10 +23,10 @@ class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_register(self):
-        sites = [Site.objects.get_current()]
-        subscription_type1 = mommy.make(models.SubscriptionType, sites=sites)
-        subscription_type2 = mommy.make(models.SubscriptionType, sites=sites)
-        subscription_type3 = mommy.make(models.SubscriptionType, sites=sites)
+        site = Site.objects.get_current()
+        subscription_type1 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type2 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type3 = mommy.make(models.SubscriptionType, site=site)
         subscription_type4 = mommy.make(models.SubscriptionType)
 
         url = reverse('registration_register')
@@ -85,9 +85,9 @@ class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_register_no_subscription(self):
-        sites = [Site.objects.get_current()]
+        site = Site.objects.get_current()
 
-        subscription_type1 = mommy.make(models.SubscriptionType, sites=sites)
+        subscription_type1 = mommy.make(models.SubscriptionType, site=site)
 
         url = reverse('registration_register')
         data = {
@@ -127,10 +127,10 @@ class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_register_one_subscription(self):
-        sites = [Site.objects.get_current()]
+        site = Site.objects.get_current()
 
-        subscription_type1 = mommy.make(models.SubscriptionType, sites=sites)
-        subscription_type2 = mommy.make(models.SubscriptionType, sites=sites)
+        subscription_type1 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type2 = mommy.make(models.SubscriptionType, site=site)
 
         url = reverse('registration_register')
         data = {
@@ -175,10 +175,10 @@ class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_activate_invalid_subscription(self):
-        sites = [Site.objects.get_current()]
+        site = Site.objects.get_current()
 
-        subscription_type1 = mommy.make(models.SubscriptionType, sites=sites)
-        subscription_type2 = mommy.make(models.SubscriptionType, sites=sites)
+        subscription_type1 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type2 = mommy.make(models.SubscriptionType, site=site)
 
         url = reverse('registration_register')
         data = {

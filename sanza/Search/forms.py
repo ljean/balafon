@@ -314,7 +314,7 @@ class SearchForm(forms.Form):
             contacts = gpp(contacts)
 
         #Just for compatibility
-        queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current(), name=u'Newsletter')
+        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name=u'Newsletter')
         if queryset.count():
             for contact in contacts:
                 for subscription_type in queryset:

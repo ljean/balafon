@@ -225,7 +225,7 @@ def send_verification_email(contact):
 def save_subscriptions(contact, subscription_types):
     """"""
     subscriptions = []
-    queryset = SubscriptionType.objects.filter(sites=Site.objects.get_current())
+    queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
     for subscription_type in queryset:
 
         subscription = Subscription.objects.get_or_create(
