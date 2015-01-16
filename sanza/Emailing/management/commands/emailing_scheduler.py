@@ -5,6 +5,7 @@ from sanza.Emailing.models import Emailing
 from sanza.Emailing.utils import send_newsletter
 from datetime import datetime
 
+
 class Command(BaseCommand):
     help = u"send all emailing marked ready for sending"
 
@@ -12,7 +13,7 @@ class Command(BaseCommand):
         #look for emailing to be sent
         verbose = options.get('verbosity', 0)
         
-        max_nb = args[0] if len(args)>0 else 20
+        max_nb = args[0] if len(args) > 0 else 20
         emailings = Emailing.objects.filter(
             status__in=(Emailing.STATUS_SCHEDULED, Emailing.STATUS_SENDING),
             scheduling_dt__lte=datetime.now()
@@ -37,5 +38,3 @@ class Command(BaseCommand):
                 
             if total_sent > max_nb:
                 break #stop sending if we reached the allowed number
-        
-        

@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core import management
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from coop_cms.tests import test_newsletter as coop_cms_tests
 from coop_cms.models import Newsletter
@@ -29,24 +30,34 @@ class SendEmailingTest(BaseTestCase):
         site.domain = settings.COOP_CMS_SITE_PREFIX
         site.save()
 
+    @override_settings(COOP_CMS_REPLY_TO="")
     def test_send_newsletter(self):
 
         entity = mommy.make(models.Entity, name="my corp")
 
         names = ['alpha', 'beta', 'gamma']
-        contacts = [mommy.make(models.Contact, entity=entity,
-            email=name+'@toto.fr', lastname=name.capitalize()) for name in names]
+        contacts = [
+            mommy.make(
+                models.Contact, entity=entity,
+                email=name+'@toto.fr', lastname=name.capitalize()
+            ) for name in names
+        ]
+
+        content = '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a>'
+        content += '<a href="mailto:me@me.fr">mailme</a><a href="#art1">internal link</a></p>'
 
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a><a href="mailto:me@me.fr">mailme</a><a href="#art1">internal link</a></p>',
+            'content': content,
             'template': 'test/newsletter_contact.html'
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
 
-        emailing = mommy.make(Emailing,
+        emailing = mommy.make(
+            Emailing,
             newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
-            scheduling_dt = datetime.now(), sending_dt = None)
+            scheduling_dt=datetime.now(), sending_dt=None
+        )
         for c in contacts:
             emailing.send_to.add(c)
         emailing.save()
@@ -68,23 +79,113 @@ class SendEmailingTest(BaseTestCase):
         contacts.sort(key=lambda c: c.get_email)
 
         for email, contact in zip(outbox, contacts):
-            self.assertEqual(email.to, [contact.get_email_address()])
-            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
-            self.assertEqual(email.subject, newsletter_data['subject'])
-            self.assertTrue(email.body.find(entity.name)>=0)
-            #print email.body
-            self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
-            self.assertTrue(email.body.find(contact.fullname)>=0)
-            self.assertTrue(email.alternatives[0][1], "text/html")
-            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
-            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
             viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse(
                 'emailing_view_online', args=[emailing.id, contact.uuid]
             )
-            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse(
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
+
+            self.assertEqual(email.to, [contact.get_email_address()])
+            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
+            self.assertEqual(email.subject, newsletter_data['subject'])
+            self.assertTrue(email.body.find(entity.name) >= 0)
+            #print email.body
+            self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
+            self.assertEqual(
+                email.extra_headers['List-Unsubscribe'],
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
+            )
+            self.assertTrue(email.body.find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][1], "text/html")
+            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr")>0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("#art1")>0)
+
+            #check magic links
+            self.assertTrue(MagicLink.objects.count()>0)
+
+            #check an action has been created
+            c = models.Contact.objects.get(id=contact.id)
+            self.assertEqual(c.action_set.count(), 1)
+            self.assertEqual(c.action_set.all()[0].subject, email.subject)
+
+    @override_settings(COOP_CMS_REPLY_TO="reply_to@toto.fr")
+    def test_send_newsletter_reply_to(self):
+
+        entity = mommy.make(models.Entity, name="my corp")
+
+        names = ['alpha', 'beta', 'gamma']
+        contacts = [
+            mommy.make(
+                models.Contact, entity=entity,
+                email=name+'@toto.fr', lastname=name.capitalize()
+            ) for name in names
+        ]
+
+        content = '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a>'
+        content += '<a href="mailto:me@me.fr">mailme</a><a href="#art1">internal link</a></p>'
+
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': content,
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+
+        emailing = mommy.make(
+            Emailing,
+            newsletter=newsletter, status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(), sending_dt=None
+        )
+        for c in contacts:
+            emailing.send_to.add(c)
+        emailing.save()
+
+        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+
+        emailing = Emailing.objects.get(id=emailing.id)
+
+        #check emailing status
+        self.assertEqual(emailing.status, Emailing.STATUS_SENT)
+        self.assertNotEqual(emailing.sending_dt, None)
+        self.assertEqual(emailing.send_to.count(), 0)
+        self.assertEqual(emailing.sent_to.count(), len(contacts))
+
+        self.assertEqual(len(mail.outbox), len(contacts))
+
+        outbox = list(mail.outbox)
+        outbox.sort(key=lambda e: e.to)
+        contacts.sort(key=lambda c: c.get_email)
+
+        for email, contact in zip(outbox, contacts):
+            viewonline_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+                'emailing_view_online', args=[emailing.id, contact.uuid]
+            )
+            unsubscribe_url = settings.COOP_CMS_SITE_PREFIX + reverse(
+                'emailing_unregister', args=[emailing.id, contact.uuid]
+            )
+
+            self.assertEqual(email.to, [contact.get_email_address()])
+            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
+            self.assertEqual(email.subject, newsletter_data['subject'])
+            self.assertTrue(email.body.find(entity.name) >= 0)
+            #print email.body
+            self.assertEqual(email.extra_headers['Reply-To'], settings.COOP_CMS_REPLY_TO)
+            self.assertEqual(
+                email.extra_headers['List-Unsubscribe'],
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, settings.COOP_CMS_REPLY_TO)
+            )
+            self.assertTrue(email.body.find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][1], "text/html")
+            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
 
             #Check mailto links are not magic
@@ -103,8 +204,8 @@ class SendEmailingTest(BaseTestCase):
 
     def test_view_magic_link(self):
         entity = mommy.make(models.Entity, name="my corp")
-        contact = mommy.make(models.Contact, entity=entity,
-            email='toto@toto.fr', lastname='Toto')
+        contact = mommy.make(
+            models.Contact, entity=entity, email='toto@toto.fr', lastname='Toto')
         emailing = mommy.make(Emailing)
         emailing.sent_to.add(contact)
         emailing.save()

@@ -97,8 +97,23 @@ def send_newsletter(emailing, max_nb):
             html_text = make_links_absolute(html_text, emailing.newsletter)
             
             text = dehtml(html_text)
-            headers = {'Reply-To': settings.COOP_CMS_REPLY_TO}
-            email = EmailMultiAlternatives(emailing.newsletter.subject, text, from_email, [contact.get_email_address()], headers=headers)
+            list_unsubscribe_url = reverse("emailing_unregister", args=[emailing.id, contact.uuid])
+            list_unsubscribe_email = getattr(settings, 'COOP_CMS_REPLY_TO', '') or from_email
+            headers = {
+                "List-Unsubscribe": u"<{0}>, <mailto:{1}?subject=unsubscribe>".format(
+                    list_unsubscribe_url, list_unsubscribe_email
+                )
+            }
+
+            if getattr(settings, 'COOP_CMS_REPLY_TO', None):
+                headers['Reply-To'] = settings.COOP_CMS_REPLY_TO
+            email = EmailMultiAlternatives(
+                emailing.newsletter.subject,
+                text,
+                from_email,
+                [contact.get_email_address()],
+                headers=headers
+            )
             email.attach_alternative(html_text, "text/html")
             emails.append(email)
             
