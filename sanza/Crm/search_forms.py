@@ -661,7 +661,7 @@ class ContactAgeSearchForm(SearchFieldForm):
 
 class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
     _name = 'accept_subscription'
-    _label = _(u'Accept')
+    _label = _(u'Accept subscription to')
     
     def __init__(self, *args, **kwargs):
         super(ContactAcceptSubscriptionSearchForm, self).__init__(*args, **kwargs)
@@ -675,7 +675,7 @@ class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
 
 class ContactRefuseSubscriptionSearchForm(ContactAcceptSubscriptionSearchForm):
     _name = 'refuse_subscription'
-    _label = _(u'Accept')
+    _label = _(u'Refuse subscription to')
     
     def get_lookup(self):
         return None
