@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import *
-from django.conf import settings
 import sys
+
+from django.conf import settings
 
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
+
+from django.conf.urls import url, patterns, include
 
 from django.contrib import admin
 admin.autodiscover()

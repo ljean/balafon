@@ -4,32 +4,27 @@ from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-    
-from django.test import TestCase
-from django.contrib.auth.models import User, Group, Permission, AnonymousUser
-from django.core.urlresolvers import reverse
-from datetime import datetime
-from model_mommy import mommy
-from sanza.Crm import models
-from django.core import management
-from django.core import mail
-from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth.models import User
-from bs4 import BeautifulSoup as BS4
+
 from datetime import datetime, timedelta
-from StringIO import StringIO
-import sys
-from sanza.Users.models import UserPreferences, Favorite, UserHomepage
-from django.contrib.contenttypes.models import ContentType
-from django.template import Template, Context
-from sanza.Crm.models import Action, ActionType
-from sanza.Emailing.models import Emailing
-from sanza.Search.models import Search
 import json
 import logging
-from django.utils.translation import ugettext
+from StringIO import StringIO
+import sys
 
+from django.contrib.auth.models import User, Group, AnonymousUser
+from django.contrib.contenttypes.models import ContentType
+from django.core import mail, management
+from django.core.urlresolvers import reverse
+from django.template import Template, Context
+from django.test import TestCase
+from django.utils import timezone
+
+from model_mommy import mommy
+
+from sanza.Crm import models
+from sanza.Emailing.models import Emailing
+from sanza.Search.models import Search
+from sanza.Users.models import UserPreferences, Favorite, UserHomepage
 
 
 class BaseTestCase(TestCase):
@@ -442,8 +437,10 @@ class ListFavoritesTestCase(BaseTestCase):
 class DeleteFavoriteTestCase(BaseTestCase):
     
     def test_favorite_deleted_after_action_deleted(self):
-        the_models = (models.Action, models.Entity, models.Contact, models.Group, models.Opportunity,
-            Emailing, Search)
+        the_models = (
+            models.Action, models.Entity, models.Contact, models.Group, models.Opportunity,
+            Emailing, Search
+        )
         
         for model_class in the_models:
             obj = mommy.make(model_class)
@@ -464,48 +461,54 @@ class UserHomepageTestCase(BaseTestCase):
     
     def test_set_homepage_none(self):
         self.assertEqual(0, UserHomepage.objects.count())
-        hp_url = "http://toto.fr/toto"
+        homepage_url = "http://toto.fr/toto"
         
         url = reverse('users_make_homepage')
         
-        response = self.client.post(url, data={'url': hp_url})
+        response = self.client.post(url, data={'url': homepage_url})
         self.assertEqual(200, response.status_code)
         
         self.assertEqual(1, UserHomepage.objects.count())
-        hp = UserHomepage.objects.all()[0]
+        homepage = UserHomepage.objects.all()[0]
         
-        self.assertEqual(hp.user, self.user)
-        self.assertEqual(hp.url, hp_url)
-        
+        self.assertEqual(homepage.user, self.user)
+        self.assertEqual(homepage.url, homepage_url)
 
     def test_set_homepage_existing(self):
-        hp = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+        mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
         self.assertEqual(1, UserHomepage.objects.count())
-        hp_url = "http://toto.fr/toto"
+        homepage_url = "http://toto.fr/toto"
         
         url = reverse('users_make_homepage')
         
-        response = self.client.post(url, data={'url': hp_url})
+        response = self.client.post(url, data={'url': homepage_url})
         self.assertEqual(200, response.status_code)
         
         self.assertEqual(1, UserHomepage.objects.count())
-        hp = UserHomepage.objects.all()[0]
+        homepage = UserHomepage.objects.all()[0]
         
-        self.assertEqual(hp.user, self.user)
-        self.assertEqual(hp.url, hp_url)
+        self.assertEqual(homepage.user, self.user)
+        self.assertEqual(homepage.url, homepage_url)
         
-    def test_view_hompeage(self):
-        hp = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+    def test_view_homepage(self):
+        homepage = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
         
         response = self.client.get(reverse("sanza_homepage"))
         
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], hp.url)
+        self.assertEqual(response['Location'], homepage.url)
+
+    def test_view_homepage_redirect_loop(self):
+        url = reverse("sanza_homepage")
+        homepage = mommy.make(UserHomepage, user=self.user, url=url)
+
+        response = self.client.get(url)
+
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], "http://testserver"+reverse("crm_board_panel"))
         
-    def test_view_hompeage_not_set(self):
+    def test_view_homepage_not_set(self):
         response = self.client.get(reverse("sanza_homepage"))
         
         self.assertEqual(302, response.status_code)
         self.assertEqual(response['Location'], "http://testserver"+reverse("crm_board_panel"))
-        
-    
