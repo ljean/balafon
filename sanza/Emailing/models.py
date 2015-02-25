@@ -53,6 +53,7 @@ class Emailing(TimeStampedModel):
     sending_dt = models.DateTimeField(_(u"sending date"), blank=True, default=None, null=True)
 
     favorites = GenericRelation(Favorite)
+    from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"From email"))
 
     def __unicode__(self):
         return self.newsletter.subject
