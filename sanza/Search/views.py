@@ -277,6 +277,9 @@ def create_emailing(request):
                     emailing = Emailing.objects.create(newsletter=newsletter, subscription_type=subscription_type)
                     for c in contacts:
                         emailing.send_to.add(c)
+
+                    emailing.from_email = form.cleaned_data['from_email']
+
                     emailing.save()
                     
                     return HttpResponseRedirect(newsletter.get_absolute_url())

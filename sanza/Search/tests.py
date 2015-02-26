@@ -4,27 +4,27 @@ from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-    
-from django.test import TestCase
-from django.contrib.auth.models import User, Permission
-from django.core.urlresolvers import reverse
-from datetime import datetime, date, timedelta
-from model_mommy import mommy
-from sanza.Crm import models
-from sanza.Emailing.models import Emailing, MagicLink
-from sanza.Search.models import Search, SearchField, SearchGroup
-from coop_cms.models import Newsletter
-from django.core import management
-from django.core import mail
-from django.conf import settings
-#from BeautifulSoup import BeautifulSoup
+
 from bs4 import BeautifulSoup as BeautifulSoup4
-from django.utils.translation import ugettext as _
-from django.utils.unittest.case import SkipTest
-from sanza.Crm import settings as crm_settings
-from unittest import skipIf
-from sanza.Crm.utils import get_default_country
+from datetime import datetime, date, timedelta
 import json
+from unittest import skipIf
+
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
+
+from coop_cms.models import Newsletter
+from model_mommy import mommy
+
+from sanza.Crm import models
+from sanza.Crm import settings as crm_settings
+from sanza.Crm.utils import get_default_country
+from sanza.Emailing.models import Emailing
+from sanza.Search.models import Search, SearchField, SearchGroup
+
 
 def get_form_errors(response):
     soup = BeautifulSoup4(response.content)
@@ -5296,8 +5296,57 @@ class SortTest(BaseTestCase):
         }
         self._post_and_check(data, expected_order)
 
-
+@override_settings(SANZA_EMAILING_SENDER_CHOICES=None)
 class CreateEmailingTest(BaseTestCase):
+    """Test newsletter creation"""
+
+    def test_view_new_emailing(self):
+        """test view form when SANZA_EMAILING_SENDER_CHOICES is not set"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        mommy.make(Newsletter)
+        mommy.make(models.SubscriptionType)
+
+        data = {
+            'contacts': [contact1.id]
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+
+        node = soup.select("#id_from_email")[0]
+        self.assertEqual("hidden", node["type"])
+
+    def test_view_new_emailing_from_email(self):
+        """test view form when SANZA_EMAILING_SENDER_CHOICES is set"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        settings.SANZA_EMAILING_SENDER_CHOICES = (
+            ('toto@toto.fr', 'Toto',),
+            ('titi@titi.com', 'Titi'),
+        )
+
+        mommy.make(Newsletter)
+        mommy.make(models.SubscriptionType)
+
+        data = {
+            'contacts': [contact1.id]
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+
+        nodes = soup.select("#id_from_email option")
+        self.assertEqual(2, len(nodes))
+        self.assertEqual(settings.SANZA_EMAILING_SENDER_CHOICES[0][0], nodes[0]["value"])
+        self.assertEqual(settings.SANZA_EMAILING_SENDER_CHOICES[0][1], nodes[0].text)
+        self.assertEqual(settings.SANZA_EMAILING_SENDER_CHOICES[1][0], nodes[1]["value"])
+        self.assertEqual(settings.SANZA_EMAILING_SENDER_CHOICES[1][1], nodes[1].text)
+
 
     def test_create_emailing(self):
         contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -5313,6 +5362,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'from_email': '',
         }
 
         url = reverse('search_emailing')
@@ -5328,6 +5378,49 @@ class CreateEmailingTest(BaseTestCase):
 
         self.assertEqual(emailing.subscription_type, subscription_type)
         self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual(emailing.from_email, "")
+        self.assertEqual(0, emailing.sent_to.count())
+        self.assertEqual(2, emailing.send_to.count())
+        self.assertTrue(contact1 in emailing.send_to.all())
+        self.assertTrue(contact2 in emailing.send_to.all())
+        self.assertFalse(contact3 in emailing.send_to.all())
+
+    def test_create_emailing_from_email(self):
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+
+        settings.SANZA_EMAILING_SENDER_CHOICES = (
+            ('Toto', 'toto@toto.fr'),
+            ('Titi', 'titi@titi.com'),
+        )
+
+        newsletter = mommy.make(Newsletter)
+        subscription_type = mommy.make(models.SubscriptionType)
+
+        data = {
+            'create_emailing': True,
+            'subject': u"",
+            'subscription_type': subscription_type.id,
+            'newsletter': newsletter.id,
+            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            "from_email": "toto@toto.fr"
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
+            response.content
+        )
+
+        self.assertEqual(Emailing.objects.count(), 1)
+        emailing = Emailing.objects.all()[0]
+
+        self.assertEqual(emailing.subscription_type, subscription_type)
+        self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual(emailing.from_email, "toto@toto.fr")
         self.assertEqual(0, emailing.sent_to.count())
         self.assertEqual(2, emailing.send_to.count())
         self.assertTrue(contact1 in emailing.send_to.all())
@@ -5347,6 +5440,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': subscription_type.id,
             'newsletter': 0,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'from_email': '',
         }
 
         url = reverse('search_emailing')
@@ -5384,6 +5478,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': 0,
             'newsletter': 0,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'from_email': '',
         }
 
         url = reverse('search_emailing')
