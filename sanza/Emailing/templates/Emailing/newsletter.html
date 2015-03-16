@@ -2,11 +2,11 @@
 {% load i18n emailing_utils %}
 
 {% block email_only_header %}
-<div class="top-header email-only">
+<div class="top-header email-only" {% include "Emailing/_linkbar_style.html" %}>
     {% if contact and emailing %}
     <div class="item">
     {% trans "If you can't view this email, " %}
-    <a style="color: #fff;" href="{% url "emailing_view_online" emailing.id contact.uuid %}">
+    <a {% include "Emailing/_linkbar_link_style.html" %} href="{% url "emailing_view_online" emailing.id contact.uuid %}">
         {% trans "read the online version" %}
     </a>
     </div>
@@ -15,7 +15,9 @@
         You receive this email because you subscribe to our mailing list. {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
-        <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
+        <a {% include "Emailing/_linkbar_link_style.html" %} href="{% url "emailing_unregister" emailing.id contact.uuid %}">
+            {% trans "this link" %}
+        </a>
     </div>
     {% endif %}
 </div>
@@ -23,13 +25,15 @@
 
 {% block email_only_footer %}
     {% if contact and emailing %}
-<div class="bottom-footer email-only">
+<div class="bottom-footer email-only" {% include "Emailing/_linkbar_style.html" %}>
     <div class="item">
         {% blocktrans %}
         You receive this email because you subscribe to our mailing list. {{my_company}}.
         You can unsubscribe by clicking 
         {% endblocktrans %}
-        <a style="color: #fff;" href="{% url "emailing_unregister" emailing.id contact.uuid %}">{% trans "this link" %}</a>
+        <a {% include "Emailing/_linkbar_link_style.html" %} href="{% url "emailing_unregister" emailing.id contact.uuid %}">
+            {% trans "this link" %}
+        </a>
     </div>
     {% endif %}
 {% endblock %}

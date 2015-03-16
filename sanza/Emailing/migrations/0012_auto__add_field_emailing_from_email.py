@@ -8,15 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Emailing.lang'
-        db.add_column(u'Emailing_emailing', 'lang',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=5, blank=True),
+        # Adding field 'Emailing.from_email'
+        db.add_column(u'Emailing_emailing', 'from_email',
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=100, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'Emailing.lang'
-        db.delete_column(u'Emailing_emailing', 'lang')
+        # Deleting field 'Emailing.from_email'
+        db.delete_column(u'Emailing_emailing', 'from_email')
 
 
     models = {
@@ -167,9 +167,9 @@ class Migration(SchemaMigration):
         u'Emailing.emailing': {
             'Meta': {'object_name': 'Emailing'},
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
+            'from_email': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
             'hard_bounce': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'emailing_hard_bounce'", 'blank': 'True', 'to': u"orm['Crm.Contact']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lang': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '5', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'newsletter': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['coop_cms.Newsletter']"}),
             'opened_emails': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'emailing_opened'", 'blank': 'True', 'to': u"orm['Crm.Contact']"}),

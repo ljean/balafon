@@ -172,6 +172,7 @@ def cancel_send_mail(request, emailing_id):
 
 
 def view_link(request, link_uuid, contact_uuid):
+    """view magic link"""
     link = get_object_or_404(models.MagicLink, uuid=link_uuid)
     try:
         contact = Contact.objects.get(uuid=contact_uuid)
@@ -193,6 +194,8 @@ def view_link(request, link_uuid, contact_uuid):
 
 
 def unregister_contact(request, emailing_id, contact_uuid):
+    """contact unregistrer from emailing list"""
+
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     try:
         emailing = models.Emailing.objects.get(id=emailing_id)

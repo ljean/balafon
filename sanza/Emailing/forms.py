@@ -34,6 +34,8 @@ class UnregisterForm(forms.Form):
 
 
 class NewEmailingForm(forms.Form):
+    """Form for creating a new emailing"""
+
     subscription_type = forms.IntegerField(label=_(u"Subscription Type"))
     newsletter = forms.IntegerField(label=_(u"Newsletter"))
     subject = forms.CharField(
@@ -46,7 +48,8 @@ class NewEmailingForm(forms.Form):
         label=_(u"Language"),
         widget=forms.Select(choices=[('', _(u'Default'))] + list(settings.LANGUAGES))
     )
-        
+    from_email = forms.CharField(required=False, label=_(u"Sent from"))
+
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
         return models.Contact.objects.filter(id__in=ids)
@@ -54,7 +57,7 @@ class NewEmailingForm(forms.Form):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')
         initial_contacts = ''
-        if initial and initial.has_key('contacts'):
+        if initial and 'contacts' in initial:
             initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
             initial.pop('contacts')
         super(NewEmailingForm, self).__init__(*args, **kwargs)
@@ -67,7 +70,12 @@ class NewEmailingForm(forms.Form):
         self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
         if len(settings.LANGUAGES) < 2:
             self.fields['lang'].widget = forms.HiddenInput()
-        
+
+        if getattr(settings, 'SANZA_EMAILING_SENDER_CHOICES', None):
+            self.fields['from_email'].widget = forms.Select(choices=settings.SANZA_EMAILING_SENDER_CHOICES)
+        else:
+            self.fields['from_email'].widget = forms.HiddenInput()
+
     def clean_subject(self):
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']

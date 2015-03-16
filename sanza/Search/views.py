@@ -300,6 +300,9 @@ def create_emailing(request):
                     )
                     for c in contacts:
                         emailing.send_to.add(c)
+
+                    emailing.from_email = form.cleaned_data['from_email']
+
                     emailing.save()
                     
                     return HttpResponseRedirect(newsletter.get_absolute_url())

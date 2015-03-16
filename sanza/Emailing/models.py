@@ -62,6 +62,7 @@ class Emailing(TimeStampedModel):
         blank=True,
         choices=[('', _(u'Default'))] + list(settings.LANGUAGES)
     )
+    from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"From email"))
 
     def __unicode__(self):
         return self.newsletter.subject

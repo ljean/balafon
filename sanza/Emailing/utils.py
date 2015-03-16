@@ -81,6 +81,8 @@ def get_emailing_context(emailing, contact):
 
 
 def send_newsletter(emailing, max_nb):
+    """send newsletter"""
+
     #Create automatically an action type for logging one action by contact
     emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
 
@@ -90,7 +92,7 @@ def send_newsletter(emailing, max_nb):
     )
     
     connection = get_connection()
-    from_email = settings.COOP_CMS_FROM_EMAIL
+    from_email = emailing.from_email or settings.COOP_CMS_FROM_EMAIL
     emails = []
     
     contacts = list(emailing.send_to.all()[:max_nb])

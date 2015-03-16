@@ -1,15 +1,13 @@
 {% extends "sanza/popup_form.html" %}
-{% load i18n %}{% load url from future %}
+{% load i18n %}
 {% block extra_head %}
 <script>
 $(document).bind('cbox_complete', function(){
     $("#id_newsletter").change(function() {
        var newsletter_id = parseInt($(this).attr('value'), 10);
        if (newsletter_id != 0) {
-           //$("#id_subject").val($("#id_subject option[value='"+newsletter_id+"']").text())
            $("#id_subject").attr('disabled', true);
        } else {
-            //$("#id_subject").val("")
             $("#id_subject").removeAttr('disabled');
        }
     });
