@@ -41,6 +41,11 @@ class NewEmailingForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
     )
     contacts = forms.CharField(widget=forms.HiddenInput())
+    lang = forms.CharField(
+        required=False,
+        label=_(u"Language"),
+        widget=forms.Select(choices=[('', _(u'Default'))] + list(settings.LANGUAGES))
+    )
         
     def get_contacts(self):
         ids = self.cleaned_data["contacts"].split(";")
@@ -60,6 +65,8 @@ class NewEmailingForm(forms.Form):
 
         subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
         self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
+        if len(settings.LANGUAGES) < 2:
+            self.fields['lang'].widget = forms.HiddenInput()
         
     def clean_subject(self):
         newsletter_id = int(self.cleaned_data['newsletter'])

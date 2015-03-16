@@ -27,10 +27,10 @@ from sanza.Emailing.settings import is_mandrill_used
 def format_context(text, data):
     # { and } need to be escaped for the format function
     text = text.replace('{', '{{').replace('}', '}}')
-    
+
     # #!- and -!# are turned into { and }
     text = text.replace('#!-', '{').replace('-!#', '}')
-    
+
     return text.format(**data)
 
 
@@ -43,8 +43,9 @@ def get_emailing_context(emailing, contact):
     newsletter.__dict__ = dict(emailing.newsletter.__dict__)
     
     newsletter.subject = format_context(newsletter.subject, data)
+
     html_content = format_context(newsletter.content, data)
-    
+
     #magic links
     links = re.findall('href="(?P<url>.+?)"', html_content)
     
@@ -57,7 +58,7 @@ def get_emailing_context(emailing, contact):
     unregister_url = newsletter.get_site_prefix()+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
     
     newsletter.content = html_content
-    
+
     context_dict = {
         'title': newsletter.subject,
         'newsletter': newsletter,
@@ -92,16 +93,16 @@ def send_newsletter(emailing, max_nb):
     from_email = settings.COOP_CMS_FROM_EMAIL
     emails = []
     
-    nb_contacts = emailing.send_to.count()
-        
     contacts = list(emailing.send_to.all()[:max_nb])
     for contact in contacts:
         
         if contact.get_email:
+            lang = emailing.lang or settings.LANGUAGE_CODE[:2]
+            translation.activate(lang)
+
             context = Context(get_emailing_context(emailing, contact))
             t = get_template(emailing.newsletter.get_template_name())
-            lang = settings.LANGUAGE_CODE[:2]
-            translation.activate(lang)
+
             html_text = t.render(context)
             html_text = make_links_absolute(
                 html_text, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()

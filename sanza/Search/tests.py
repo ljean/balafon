@@ -4,33 +4,34 @@ from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
-    
-from django.test import TestCase
-from django.contrib.auth.models import User, Permission
-from django.core.urlresolvers import reverse
-from datetime import datetime, date, timedelta
-from model_mommy import mommy
-from sanza.Crm import models
-from sanza.Emailing.models import Emailing, MagicLink
-from sanza.Search.models import Search, SearchField, SearchGroup
-from coop_cms.models import Newsletter
-from django.core import management
-from django.core import mail
-from django.conf import settings
-#from BeautifulSoup import BeautifulSoup
+
 from bs4 import BeautifulSoup as BeautifulSoup4
-from django.utils.translation import ugettext as _
-from django.utils.unittest.case import SkipTest
-from sanza.Crm import settings as crm_settings
-from unittest import skipIf
-from sanza.Crm.utils import get_default_country
+from datetime import datetime, date, timedelta
 import json
+from unittest import skipIf
+
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.utils.translation import ugettext as _
+from django.test.utils import override_settings
+
+from coop_cms.models import Newsletter
+from model_mommy import mommy
+
+from sanza.Crm import settings as crm_settings
+from sanza.Crm import models
+from sanza.Emailing.models import Emailing
+from sanza.Search.models import Search, SearchField, SearchGroup
+from sanza.Crm.utils import get_default_country
+
 
 def get_form_errors(response):
     soup = BeautifulSoup4(response.content)
     #errors = soup.findAll('ul', {'class':'errorlist'})
     errors = soup.select('.field-error .label')
     return errors
+
 
 class BaseTestCase(TestCase):
 
@@ -43,6 +44,7 @@ class BaseTestCase(TestCase):
 
     def _login(self):
         rc = self.client.login(username="toto", password="abc")
+
 
 class CitySearchTest(BaseTestCase):
     
@@ -5313,6 +5315,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'lang': '',
         }
 
         url = reverse('search_emailing')
@@ -5328,6 +5331,7 @@ class CreateEmailingTest(BaseTestCase):
 
         self.assertEqual(emailing.subscription_type, subscription_type)
         self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual('', emailing.lang)
         self.assertEqual(0, emailing.sent_to.count())
         self.assertEqual(2, emailing.send_to.count())
         self.assertTrue(contact1 in emailing.send_to.all())
@@ -5347,6 +5351,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': subscription_type.id,
             'newsletter': 0,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'lang': '',
         }
 
         url = reverse('search_emailing')
@@ -5367,6 +5372,7 @@ class CreateEmailingTest(BaseTestCase):
         self.assertEqual(emailing.subscription_type, subscription_type)
         self.assertEqual(emailing.newsletter, newsletter)
         self.assertEqual(emailing.newsletter.subject, data["subject"])
+        self.assertEqual('', emailing.lang)
         self.assertEqual(0, emailing.sent_to.count())
         self.assertEqual(2, emailing.send_to.count())
         self.assertTrue(contact1 in emailing.send_to.all())
@@ -5384,6 +5390,7 @@ class CreateEmailingTest(BaseTestCase):
             'subscription_type': 0,
             'newsletter': 0,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'lang': '',
         }
 
         url = reverse('search_emailing')
@@ -5392,3 +5399,83 @@ class CreateEmailingTest(BaseTestCase):
 
         self.assertEqual(Newsletter.objects.count(), 0)
         self.assertEqual(Emailing.objects.count(), 0)
+
+    @skipIf(len(settings.LANGUAGES) < 2, "LANGUAGES less than 2")
+    def test_create_emailing_language(self):
+        subscription_type = mommy.make(models.SubscriptionType)
+
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+
+        data = {
+            'create_emailing': True,
+            'subject': u"Test",
+            'subscription_type': subscription_type.id,
+            'newsletter': 0,
+            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'lang': settings.LANGUAGES[1][0],
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(Newsletter.objects.count(), 1)
+        newsletter = Newsletter.objects.all()[0]
+
+        self.assertEqual(
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
+            response.content
+        )
+
+        self.assertEqual(Emailing.objects.count(), 1)
+        emailing = Emailing.objects.all()[0]
+
+        self.assertEqual(emailing.subscription_type, subscription_type)
+        self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual(emailing.newsletter.subject, data["subject"])
+        self.assertEqual(settings.LANGUAGES[1][0], emailing.lang)
+        self.assertEqual(0, emailing.sent_to.count())
+        self.assertEqual(2, emailing.send_to.count())
+        self.assertTrue(contact1 in emailing.send_to.all())
+        self.assertTrue(contact2 in emailing.send_to.all())
+        self.assertFalse(contact3 in emailing.send_to.all())
+
+    @override_settings(LANGUAGES=[('fr', 'Francais'), ('en', 'English')])
+    def test_view_new_emailing_language(self):
+        subscription_type = mommy.make(models.SubscriptionType)
+
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        data = {
+            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(1, len(soup.select("select#id_lang")))
+
+    @override_settings(LANGUAGES=[('fr', 'Francais')])
+    def test_view_new_emailing_language_hidden(self):
+        subscription_type = mommy.make(models.SubscriptionType)
+
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        data = {
+            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select("select#id_lang")))
+        self.assertEqual(1, len(soup.select("#id_lang")))
+        self.assertEqual("hidden", soup.select("#id_lang")[0]["type"])

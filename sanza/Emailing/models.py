@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""models"""
 
 from datetime import datetime
 import uuid
@@ -23,6 +24,7 @@ from sanza.Users.models import UserPreferences, Favorite
 
 
 class Emailing(TimeStampedModel):
+    """configuration on an emailing"""
     
     STATUS_EDITING = 1
     STATUS_SCHEDULED = 2
@@ -53,6 +55,13 @@ class Emailing(TimeStampedModel):
     sending_dt = models.DateTimeField(_(u"sending date"), blank=True, default=None, null=True)
 
     favorites = GenericRelation(Favorite)
+    lang = models.CharField(
+        _(u"language"),
+        max_length=5,
+        default="",
+        blank=True,
+        choices=[('', _(u'Default'))] + list(settings.LANGUAGES)
+    )
 
     def __unicode__(self):
         return self.newsletter.subject

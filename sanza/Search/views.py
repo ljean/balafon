@@ -1,42 +1,47 @@
 # -*- coding: utf-8 -*-
+"""search views and actions"""
 
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from sanza.Search.forms import QuickSearchForm
-from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity, City, CustomField
-from django.shortcuts import render_to_response
-from django.template import RequestContext, Context, Template
-from sanza.Search import forms, models
 import json
-from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404
-from datetime import datetime
-from sanza.Emailing.models import Emailing
 import xlwt
-from django.contrib.auth.decorators import login_required, user_passes_test
-from colorbox.decorators import popup_redirect, popup_close
-from coop_cms.models import Newsletter
-from sanza.Emailing.forms import NewEmailingForm
-from sanza.Search.forms import PdfTemplateForm, ActionForContactsForm, GroupForContactsForm
+
+from django.db.models import Q
 from django.contrib import messages
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
-from sanza.permissions import can_access
-from sanza.utils import logger, log_error
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import user_passes_test
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext, Context, Template
+from django.utils.translation import ugettext as _
+
+from colorbox.decorators import popup_redirect, popup_close
+from coop_cms.models import Newsletter
 from wkhtmltopdf.views import PDFTemplateView
+
+from sanza.permissions import can_access
+from sanza.utils import logger, log_error, HttpResponseRedirectMailtoAllowed
+from sanza.Crm.models import Entity, Contact, Group, Action, Opportunity, City, CustomField
 from sanza.Crm import settings as crm_settings
-from sanza.utils import HttpResponseRedirectMailtoAllowed
+from sanza.Emailing.models import Emailing
+from sanza.Emailing.forms import NewEmailingForm
+from sanza.Search.models import Search
+from sanza.Search.forms import (
+    ActionForContactsForm, FieldChoiceForm, GroupForContactsForm, QuickSearchForm, PdfTemplateForm, SearchForm,
+    SearchNameForm, get_field_form, ContactsAdminForm
+)
+
 
 #@transaction.commit_manually
 def filter_icontains_unaccent(qs, field, text):
     if crm_settings.is_unaccent_filter_supported():
         qs = qs.extra(
             where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
-            params = [u"%{0}%".format(text)]
+            params=[u"%{0}%".format(text)]
         )
         return list(qs)    
     return list(qs.filter(**{field+"__icontains": text}))
+
 
 @user_passes_test(can_access)
 def quick_search(request):
@@ -93,19 +98,21 @@ def quick_search(request):
             )
     else:
         raise Http404
-      
+
+
 @user_passes_test(can_access)
 def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
     results = []
-    search=None
-    field_choice_form = forms.FieldChoiceForm()
+    search = None
+    field_choice_form = FieldChoiceForm()
     contains_refuse_newsletter = False
     data = None
     contacts_count = 0
     has_empty_entities = False
     group = opportunity = city = None
     contacts_display = False
+
     if request.method == "POST":
         data = request.POST
     elif group_id:
@@ -119,7 +126,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
         data = {"gr0-_-city-_-0": city_id}
             
     if data:
-        search_form = forms.SearchForm(data)
+        search_form = SearchForm(data)
         if search_form.is_valid():
             contacts_display = search_form.contacts_display
             
@@ -134,21 +141,32 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             if not results:
                 message = _(u'Sorry, no results found')
     else:
-        search = get_object_or_404(models.Search, id=search_id) if search_id else None
-        search_form = forms.SearchForm(instance=search)
+        search = get_object_or_404(Search, id=search_id) if search_id else None
+        search_form = SearchForm(instance=search)
     
     entities_count = 0 if contacts_display else len(results)
     return render_to_response(
         'Search/search.html',
         {
-            'request': request, 'results': results, 'nb_results_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
-            'field_choice_form': field_choice_form, 'message': message, 'has_empty_entities': has_empty_entities,
-            'search_form': search_form, 'search': search, 'contacts_count': contacts_count, 'entities_count': entities_count,
-            'contains_refuse_newsletter': contains_refuse_newsletter, 'group': group, 'opportunity': opportunity,
-            'city': city, 'contacts_display': contacts_display,
+            'request': request,
+            'results': results,
+            'nb_results_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
+            'field_choice_form': field_choice_form,
+            'message': message,
+            'has_empty_entities': has_empty_entities,
+            'search_form': search_form,
+            'search': search,
+            'contacts_count': contacts_count,
+            'entities_count': entities_count,
+            'contains_refuse_newsletter': contains_refuse_newsletter,
+            'group': group,
+            'opportunity': opportunity,
+            'city': city,
+            'contacts_display': contacts_display,
         },
         context_instance=RequestContext(request)
     )
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -156,30 +174,27 @@ def save_search(request, search_id):
     try:
         search_id = int(search_id)
         if search_id:
-            search = get_object_or_404(models.Search, id=search_id)
-        else:
-            search = models.Search()
+            get_object_or_404(Search, id=search_id)
     except ValueError:
         raise Http404
     
     if request.method == "POST":
-        form = forms.SearchNameForm(request.POST)
+        form = SearchNameForm(request.POST)
         if form.is_valid():
-            search = form.cleaned_data['name']
+            search_obj = form.cleaned_data['name']
             search_fields = form.cleaned_data['search_fields']
-            search_fields['name'] = search.name
-            search_form = forms.SearchForm(search_fields, instance=search, save=True)
+            search_fields['name'] = search_obj.name
+            search_form = SearchForm(search_fields, instance=search_obj, save=True)
             if search_form.is_valid():
                 search_form.save_search()
-                return HttpResponseRedirect(reverse('search', args=[search.id])) 
+                return HttpResponseRedirect(reverse('search', args=[search_obj.id]))
     else:
-        initial = {}
         if search_id:
-            search = get_object_or_404(models.Search, id=search_id)
-            initial = {'name': search.name, 'search_id': search_id}
+            search_obj = get_object_or_404(Search, id=search_id)
+            initial = {'name': search_obj.name, 'search_id': search_id}
         else:
             initial = {'search_id': 0}
-        form = forms.SearchNameForm(initial=initial)
+        form = SearchNameForm(initial=initial)
     
     return render_to_response(
         'Search/search_name.html',
@@ -190,6 +205,7 @@ def save_search(request, search_id):
         context_instance=RequestContext(request)
     )
 
+
 @user_passes_test(can_access)
 def get_field(request, name):
     block = request.GET.get('block')
@@ -197,7 +213,7 @@ def get_field(request, name):
     if not (block and count):
         raise Http404
     try:
-        form_class = forms.get_field_form(name)
+        form_class = get_field_form(name)
         t = Template('{{form.as_it_is}}')
         c = Context({'form': form_class(block, count)})
         return HttpResponse(json.dumps({'form': t.render(c)}), content_type="application/json")
@@ -207,12 +223,13 @@ def get_field(request, name):
         logger.exception("get_field")
         raise
 
+
 @user_passes_test(can_access)
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
         nb_limit = getattr(settings, 'SANZA_MAILTO_LIMIT', 25)
-        search_form = forms.SearchForm(request.POST)
+        search_form = SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
             if emails:
@@ -246,15 +263,17 @@ def mailto_contacts(request, bcc):
                 return HttpResponse(_(u'Mailto: Error, no emails defined'), content_type='text/plain')
     raise Http404
 
+
 @user_passes_test(can_access)
 def view_search_list(request):
-    searches = models.Search.objects.all()#.order_by("-created")
+    searches = Search.objects.all()#.order_by("-created")
     return render_to_response(
         'Search/search_list.html',
         locals(),
         context_instance=RequestContext(request)
     )
-    
+
+
 @user_passes_test(can_access)
 @popup_redirect
 def create_emailing(request):
@@ -274,7 +293,11 @@ def create_emailing(request):
 
                     contacts = form.get_contacts()
 
-                    emailing = Emailing.objects.create(newsletter=newsletter, subscription_type=subscription_type)
+                    emailing = Emailing.objects.create(
+                        newsletter=newsletter,
+                        subscription_type=subscription_type,
+                        lang=form.cleaned_data['lang']
+                    )
                     for c in contacts:
                         emailing.send_to.add(c)
                     emailing.save()
@@ -287,7 +310,7 @@ def create_emailing(request):
                         context_instance=RequestContext(request)
                     )
             else:
-                search_form = forms.SearchForm(request.POST)
+                search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     form = NewEmailingForm(initial={'contacts': contacts})
@@ -300,12 +323,12 @@ def create_emailing(request):
         logger.exception("create_emailing")
         raise
     raise Http404
-    
+
+
 @user_passes_test(can_access)
 def export_contacts_as_excel(request):
-    search_form = forms.SearchForm(request.POST)
     if request.method == "POST":
-        search_form = forms.SearchForm(request.POST)
+        search_form = SearchForm(request.POST)
         if search_form.is_valid():
             contacts = search_form.get_contacts()
             if not search_form.contacts_display:
@@ -361,13 +384,13 @@ def export_contacts_as_excel(request):
             wb.save(response)
             return response
         else:
-            logger.error(unicode(form.errors))
+            logger.error(unicode(search_form.errors))
     raise Http404
+
 
 @user_passes_test(can_access)
 @popup_redirect
 def create_action_for_contacts(request):
-    search_form = forms.SearchForm(request.POST)
     if request.method == "POST":
         if "create_actions" in request.POST:
             form = ActionForContactsForm(request.POST)
@@ -380,7 +403,11 @@ def create_action_for_contacts(request):
                     action = Action.objects.create(**kwargs)
                     action.contacts.add(contact)
                     action.save()
-                messages.add_message(request, messages.SUCCESS, _(u"{0} actions have been created".format(len(contacts))))
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    _(u"{0} actions have been created".format(len(contacts)))
+                )
                 return HttpResponseRedirect(reverse('crm_board_panel'))
             else:
                 return render_to_response(
@@ -389,7 +416,7 @@ def create_action_for_contacts(request):
                     context_instance=RequestContext(request)
                 )
         else:
-            search_form = forms.SearchForm(request.POST)
+            search_form = SearchForm(request.POST)
             if search_form.is_valid():
                 contacts = search_form.get_contacts()
                 if contacts:
@@ -410,11 +437,11 @@ def create_action_for_contacts(request):
                     )
     raise Http404
 
+
 @user_passes_test(can_access)
 @popup_redirect
 def add_contacts_to_group(request):
     try:
-        search_form = forms.SearchForm(request.POST)
         if request.method == "POST":
             if "add_to_group" in request.POST:
                 form = GroupForContactsForm(request.POST)
@@ -443,7 +470,7 @@ def add_contacts_to_group(request):
                         context_instance=RequestContext(request)
                     )
             else:
-                search_form = forms.SearchForm(request.POST)
+                search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     if contacts:
@@ -467,6 +494,7 @@ def add_contacts_to_group(request):
         raise
     raise Http404
 
+
 @user_passes_test(can_access)
 @popup_close
 def contacts_admin(request):
@@ -475,10 +503,9 @@ def contacts_admin(request):
         raise PermissionDenied
     
     try:
-        search_form = forms.SearchForm(request.POST)
         if request.method == "POST":
             if "contacts_admin" in request.POST:
-                form = forms.ContactsAdminForm(request.POST)
+                form = ContactsAdminForm(request.POST)
                 if form.is_valid():
                     nb_contacts = 0
                     contacts = form.get_contacts()
@@ -502,11 +529,11 @@ def contacts_admin(request):
                         context_instance=RequestContext(request)
                     )
             else:
-                search_form = forms.SearchForm(request.POST)
+                search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     if contacts:
-                        form = forms.ContactsAdminForm(initial={'contacts': contacts})
+                        form = ContactsAdminForm(initial={'contacts': contacts})
                         return render_to_response(
                             'Search/contacts_admin_form.html',
                             {'form': form},
@@ -525,6 +552,7 @@ def contacts_admin(request):
         logger.exception("contacts_admin")
         raise
     raise Http404
+
 
 @user_passes_test(can_access)
 @popup_redirect
@@ -565,7 +593,7 @@ def export_to_pdf(request):
                         context_instance=RequestContext(request)
                     )
             else:
-                search_form = forms.SearchForm(request.POST)
+                search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     search_dict = json.dumps(search_form.serialize())
