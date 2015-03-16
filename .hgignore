@@ -1,4 +1,5 @@
 glob:*.pyc
+glob:*.DS_Store
 glob:sanza.egg-info/*
 glob:apidev_sanza.egg-info/*
 glob:sanza/ci/drone_project/ci_local_settings.py
