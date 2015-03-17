@@ -7,8 +7,13 @@
   
 {% block section_data %}
 <div class="statistics">
+{% block send_to %}
+    {% trans "To be send" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.send_to.all show_always=True hide_contacts=True %}
+{% endblock %}
+
 {% block sent_to %}
-    {% trans "Sendings" as label %}
+    {% trans "Sent" as label %}
     {% include "Emailing/_contact_list.html" with contacts=emailing.sent_to.all show_always=True hide_contacts=True %}
 {% endblock %}
 

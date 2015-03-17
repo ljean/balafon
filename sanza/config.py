@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""configure the sanza search form"""
 
 from django.utils.translation import ugettext as _
 
@@ -17,7 +18,7 @@ SEARCH_FORMS = [
             search_forms.GroupsMemberOfAnySearchForm,
             search_forms.GroupsMemberOfNoneSearchForm,
         ],
-    ),(
+    ), (
         _(u'Location'),
         [
             search_forms.CitySearchForm,
@@ -34,7 +35,7 @@ SEARCH_FORMS = [
             search_forms.ZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
             search_forms.EntityZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
         ],
-    ),(
+    ), (
         _(u'Entity'),
         [
             search_forms.EntityNameSearchForm,
@@ -46,8 +47,8 @@ SEARCH_FORMS = [
             search_forms.EntityWithCustomField,
             search_forms.EntityDescriptionForm,
             search_forms.EntityNotesForm,
-         ],
-    ),(
+        ],
+    ), (
         _(u'Contacts'),
         [
             search_forms.ContactNameSearchForm,
@@ -65,7 +66,7 @@ SEARCH_FORMS = [
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
         ],
-    ),(
+    ), (
         _(u'Actions'),
         [
             search_forms.ActionNameSearchForm,
@@ -80,19 +81,22 @@ SEARCH_FORMS = [
             search_forms.ActionGteAmount,
             search_forms.HasAction,
         ],
-    ),(
+    ), (
         _(u'Opportunities'),
         [
             search_forms.OpportunitySearchForm,
             search_forms.OpportunityNameSearchForm,
         ],
-    ),(
+    ), (
         _(u'Emailing'),
         [
+            emailing_search_forms.EmailingContactsSearchForm,
             emailing_search_forms.EmailingSentSearchForm,
             emailing_search_forms.EmailingOpenedSearchForm,
+            emailing_search_forms.EmailingSendToSearchForm,
+            emailing_search_forms.EmailingBounceSearchForm,
         ],
-    ),(
+    ), (
         _(u'Admin'),
         [
             search_forms.ContactsImportSearchForm,
@@ -105,7 +109,7 @@ SEARCH_FORMS = [
             search_forms.EntitiesByCreationDate,
             search_forms.EntitiesByUpdateDate,
         ],
-    ),(
+    ), (
         _(u'Options'),
         [
             search_forms.NoSameAsForm,

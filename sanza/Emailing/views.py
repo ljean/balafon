@@ -476,7 +476,7 @@ class EmailingUpdateView(UpdateView):
     model = models.Emailing
 
     def get_success_url(self):
-        """redirectto this on success"""
+        """redirect to this on success"""
         return reverse('emailing_view', args=[self.kwargs['pk']])
 
     @method_decorator(user_passes_test(can_access))

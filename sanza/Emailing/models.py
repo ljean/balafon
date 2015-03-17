@@ -66,19 +66,29 @@ class Emailing(TimeStampedModel):
     from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"From email"))
 
     def __unicode__(self):
-        return self.newsletter.subject
+        return u"{0} - {1}".format(self.newsletter.subject, self.get_info(extra=True))
 
     class Meta:
         verbose_name = _(u'emailing')
         verbose_name_plural = _(u'emailings')
 
-    def get_info(self):
+    def get_info(self, extra=False):
         """returns info about the status in order to diplsay it on emailing page"""
         text = self.get_status_display()
+        if self.status == Emailing.STATUS_EDITING:
+            text = _("{0} - {1}").format(text, DateFormat(self.created).format(" d F Y H:i"))
+            if extra:
+                text += _(u" - {0} recipients").format(self.send_to.count())
         if self.status == Emailing.STATUS_SCHEDULED:
-            return _("{0} on {1}").format(text, DateFormat(self.scheduling_dt).format(" d F Y H:i"))
+            text = _("{0} - {1}").format(text, DateFormat(self.scheduling_dt).format(" d F Y H:i"))
+            if extra:
+                total = self.send_to.count() + self.sent_to.count()
+                text += _(u" - {0}/{1} sent").format(self.sent_to.count(), total)
         elif self.status == Emailing.STATUS_SENT:
-            return _("{0} on {1}").format(text, DateFormat(self.sending_dt).format(" d F Y H:i"))
+            text = _("{0} - {1}").format(text, DateFormat(self.sending_dt).format(" d F Y H:i"))
+            if extra:
+                text += _(u" - {0} sent").format(self.sent_to.count())
+
         return text
         
     def next_action(self):
