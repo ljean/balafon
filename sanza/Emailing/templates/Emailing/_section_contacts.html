@@ -22,14 +22,14 @@
       <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>
     </td>
     <td>
-      <a href="{% url "crm_view_entity" c.entity.id %}">{{c.entity.name}}</a>
+      <a href="{% url 'crm_view_entity' c.entity.id %}">{{c.entity.name}}</a>
     </td>
     <td>
       {{ c.get_roles|seq_to_dash|default:'' }}
     </td>
     {% endif %}
     <td>
-     {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+     {{c.get_email}}
     </td>
   </tr>
   {% endfor %}
