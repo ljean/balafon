@@ -322,20 +322,23 @@ class BounceTestCase(TestCase):
 
     def test_hard_bounce_several_contacts(self):
         """hard bounce for several contacts"""
+
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         mommy.make(models.Subscription, contact=contact, accept_subscription=True)
         mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
-        contact = mommy.make(models.Contact, email=contact.email)
-        subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        entity = mommy.make(models.Entity, email=contact.email)
+        default_contact = entity.default_contact
+        subscription1 = mommy.make(models.Subscription, contact=default_contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=default_contact, accept_subscription=True)
+
+        emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
         self.assertEqual(models.Action.objects.count(), 0)
-        emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
         email = contact.email
         description = "Just an error"
-        on_bounce("hard_bounce", email, description, True, contact, emailing.id)
+        on_bounce("hard_bounce", email, description, True, contact.uuid, emailing.id)
 
         self.assertEqual(models.Action.objects.count(), 1)
         action = models.Action.objects.all()[0]
@@ -343,14 +346,20 @@ class BounceTestCase(TestCase):
         self.assertEqual(action.planned_date.date(), datetime.date.today())
         self.assertEqual(action.type.name, "bounce")
 
-        self.assertEqual(action.contacts.count(), 2)
-        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 1)
 
-        for contact in action.contacts.all():
-            self.assertEqual(contact.email, email)
-            self.assertEqual(contact.subscription_set.count(), 2)
-            for subscription in contact.subscription_set.all():
-                self.assertEqual(subscription.accept_subscription, False)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.email, email)
+        self.assertEqual(contact.subscription_set.count(), 2)
+        for subscription in contact.subscription_set.all():
+            self.assertEqual(subscription.accept_subscription, False)
+
+        contact = models.Contact.objects.get(id=default_contact.id)
+        self.assertEqual(contact.email, "")
+        self.assertEqual(contact.subscription_set.count(), 2)
+        for subscription in contact.subscription_set.all():
+            self.assertEqual(subscription.accept_subscription, False)
 
         self.assertEqual(emailing.soft_bounce.count(), 0)
         self.assertEqual(emailing.hard_bounce.count(), 1)
