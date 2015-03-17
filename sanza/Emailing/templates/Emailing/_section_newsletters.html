@@ -9,6 +9,7 @@
   
   {% if newsletters %}
   {% autopaginate newsletters 10 %}
+  <div class="table-responsive">
   <table class="table table-striped">
     <tr>
       <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
@@ -16,22 +17,21 @@
   {% for nl in newsletters %}
     <tr>
       <td>
-        {{nl.subject}}
-        {% if nl.can_edit_newsletter %}
-          <a href="{% url "coop_cms_edit_newsletter" nl.id %}">{% trans "Edit" %}</a>
-        {% endif %}
-          <a href="{% url "coop_cms_view_newsletter" nl.id %}">{% trans "View" %}</a>
+        {% favorite_item object=nl %}
+        <a href="{% url 'coop_cms_view_newsletter' nl.id %}">{{nl.subject}}</a>
       </td>
       <td>
         {% if nl.emailing_set.count %}
-          <table>
           {% for e in nl.emailing_set.all %}
-            <tr><td>
-              {% favorite_item object=e %}{{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
-              <a href="{% url "emailing_view" e.id %}">{% trans "View" %}</a>
-            </td></tr>
+            <div class="row">
+                <div class="col-md-6">
+                    {% favorite_item object=e %}
+                    <a href="{% url 'emailing_view' e.id %}">
+                        {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+                    </a>
+                </div>
+            </div>
           {% endfor %}
-          </table>
         {% else %}
           &nbsp;
         {% endif %}
@@ -40,7 +40,9 @@
   </tr>
   {% endfor %}
   </table>
-  {% paginate %}
+  </div>
+
+    {% paginate %}
   {% else %}
     {% trans "No newsletters" %}
   {% endif %}

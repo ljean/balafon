@@ -19,6 +19,7 @@ from coop_cms.models import Newsletter
 from django_extensions.db.models import TimeStampedModel
 
 from sanza.Crm.models import Contact, Action, SubscriptionType
+from sanza.Crm.settings import get_language_choices
 from sanza.Emailing.settings import is_mandrill_used
 from sanza.Users.models import UserPreferences, Favorite
 
@@ -60,7 +61,7 @@ class Emailing(TimeStampedModel):
         max_length=5,
         default="",
         blank=True,
-        choices=[('', _(u'Default'))] + list(settings.LANGUAGES)
+        choices=get_language_choices()
     )
     from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"From email"))
 
@@ -70,8 +71,9 @@ class Emailing(TimeStampedModel):
     class Meta:
         verbose_name = _(u'emailing')
         verbose_name_plural = _(u'emailings')
-        
+
     def get_info(self):
+        """returns info about the status in order to diplsay it on emailing page"""
         text = self.get_status_display()
         if self.status == Emailing.STATUS_SCHEDULED:
             return _("{0} on {1}").format(text, DateFormat(self.scheduling_dt).format(" d F Y H:i"))
@@ -80,6 +82,7 @@ class Emailing(TimeStampedModel):
         return text
         
     def next_action(self):
+        """what to to next"""
         action = ""
         if self.status == Emailing.STATUS_EDITING:
             action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
@@ -92,21 +95,25 @@ class Emailing(TimeStampedModel):
         return mark_safe(action)
 
     def get_domain_url_prefix(self):
+        """domain url prefix"""
         if self.subscription_type.site:
             domain_protocol = getattr(settings, "SANZA_DOMAIN_PROTOCOL", "http://")
             return domain_protocol + self.subscription_type.site.domain
         return ""
     
     def get_contacts(self):
+        """full list of contacts"""
         return list(self.send_to.all()) + list(self.sent_to.all())
         
     def save(self, *args, **kwargs):
+        """save"""
         if self.status == Emailing.STATUS_SENT and self.sending_dt == None:
             self.sending_dt = datetime.now()
         return super(Emailing, self).save(*args, **kwargs)
 
 
 class MagicLink(models.Model):
+    """A trcking link"""
     emailing = models.ForeignKey(Emailing)
     url = models.URLField()
     visitors = models.ManyToManyField(Contact, blank=True)
@@ -116,6 +123,7 @@ class MagicLink(models.Model):
         return self.url
     
     def save(self, *args, **kwargs):
+        """save"""
         super(MagicLink, self).save(*args, **kwargs)
         if not self.uuid:
             name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
@@ -124,6 +132,7 @@ class MagicLink(models.Model):
 
 
 def force_message_in_favorites(sender, instance, signal, created, **kwargs):
+    """force an action to be in user favorites"""
     action = instance
     if created and action.type and action.type.name == ugettext(u"Message"):
         for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
@@ -137,4 +146,5 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
 signals.post_save.connect(force_message_in_favorites, sender=Action)
 
 if is_mandrill_used():
-    import sanza.Emailing.backends.mandrill
+    #Import the mandrill backend
+    import sanza.Emailing.backends.mandrill #pylint: disable=unused-import

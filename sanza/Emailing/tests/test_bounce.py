@@ -20,13 +20,16 @@ from sanza.Emailing.models import Emailing
 from sanza.Emailing.settings import is_mandrill_used
 from sanza.Emailing.utils import on_bounce
 
+
 @skipIf(not (is_mandrill_used()), "mandrill is not used")
 class MandrillBounceTestCase(TestCase):
+    """Test mandrill webhook"""
 
     def test_bounce(self):
+        """test bounce received"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
@@ -109,9 +112,10 @@ class MandrillBounceTestCase(TestCase):
         self.assertEqual(action.entities.count(), 0)
 
     def test_hard_bounce(self):
+        """test hard bounce received from mandrill"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
-        subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         url = reverse("djrill_webhook")+"?secret={0}".format(settings.DJRILL_WEBHOOK_SECRET)
 
@@ -152,7 +156,7 @@ class MandrillBounceTestCase(TestCase):
 
         self.assertEqual(models.Action.objects.count(), 1)
         action = models.Action.objects.all()[0]
-        self.assertEqual(action.subject,  "toto@toto.fr - hard_bounce: invalid_domain")
+        self.assertEqual(action.subject, "toto@toto.fr - hard_bounce: invalid_domain")
         self.assertEqual(action.planned_date.date(), datetime.date.today())
         self.assertEqual(action.type.name, "bounce")
 
@@ -168,12 +172,13 @@ class MandrillBounceTestCase(TestCase):
 
 
 class BounceTestCase(TestCase):
+    """test bounce behavior"""
 
     def test_soft_bounce(self):
-
+        """soft bounce: it should trace it but keep contact subscribed"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
@@ -205,10 +210,10 @@ class BounceTestCase(TestCase):
         self.assertEqual(emailing.rejected.count(), 0)
 
     def test_bounce_types(self):
-
+        """test different types of bounces"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
@@ -228,6 +233,7 @@ class BounceTestCase(TestCase):
         self.assertEqual(emailing.rejected.count(), 1)
 
     def test_bounce_long_description(self):
+        """test what happen if bounce description is too long"""
 
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
@@ -254,9 +260,10 @@ class BounceTestCase(TestCase):
         self.assertEqual(emailing.rejected.count(), 0)
 
     def test_hard_bounce(self):
+        """test hard bounce: trace it and unsubscribe"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
 
@@ -289,6 +296,7 @@ class BounceTestCase(TestCase):
         self.assertEqual(emailing.rejected.count(), 0)
 
     def test_hard_bounce_no_contact(self):
+        """test hard bounce and no contact is matching"""
         self.assertEqual(models.Action.objects.count(), 0)
 
         emailing = mommy.make(Emailing)
@@ -313,13 +321,14 @@ class BounceTestCase(TestCase):
         self.assertEqual(emailing.rejected.count(), 0)
 
     def test_hard_bounce_several_contacts(self):
+        """hard bounce for several contacts"""
         contact = mommy.make(models.Contact, email="toto@toto.fr")
-        subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         contact = mommy.make(models.Contact, email=contact.email)
         subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
+        mommy.make(models.Subscription, contact=contact, accept_subscription=True)
 
         self.assertEqual(models.Action.objects.count(), 0)
         emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
@@ -342,51 +351,6 @@ class BounceTestCase(TestCase):
             self.assertEqual(contact.subscription_set.count(), 2)
             for subscription in contact.subscription_set.all():
                 self.assertEqual(subscription.accept_subscription, False)
-
-        self.assertEqual(emailing.soft_bounce.count(), 0)
-        self.assertEqual(emailing.hard_bounce.count(), 1)
-        self.assertEqual(emailing.unsub.count(), 0)
-        self.assertEqual(emailing.spam.count(), 0)
-        self.assertEqual(emailing.rejected.count(), 0)
-
-    def test_hard_bounce_several_contacts(self):
-        contact = mommy.make(models.Contact, email="toto@toto.fr")
-        subscription1 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=contact, accept_subscription=True)
-
-        entity = mommy.make(models.Entity, email=contact.email)
-        default_contact = entity.default_contact
-        subscription1 = mommy.make(models.Subscription, contact=default_contact, accept_subscription=True)
-        subscription2 = mommy.make(models.Subscription, contact=default_contact, accept_subscription=True)
-
-        emailing = mommy.make(Emailing, subscription_type=subscription1.subscription_type)
-
-        self.assertEqual(models.Action.objects.count(), 0)
-
-        email = contact.email
-        description = "Just an error"
-        on_bounce("hard_bounce", email, description, True, contact.uuid, emailing.id)
-
-        self.assertEqual(models.Action.objects.count(), 1)
-        action = models.Action.objects.all()[0]
-        self.assertEqual(action.subject, "toto@toto.fr - hard_bounce: "+description)
-        self.assertEqual(action.planned_date.date(), datetime.date.today())
-        self.assertEqual(action.type.name, "bounce")
-
-        self.assertEqual(action.contacts.count(), 1)
-        self.assertEqual(action.entities.count(), 1)
-
-        contact = models.Contact.objects.get(id=contact.id)
-        self.assertEqual(contact.email, email)
-        self.assertEqual(contact.subscription_set.count(), 2)
-        for subscription in contact.subscription_set.all():
-            self.assertEqual(subscription.accept_subscription, False)
-
-        contact = models.Contact.objects.get(id=default_contact.id)
-        self.assertEqual(contact.email, "")
-        self.assertEqual(contact.subscription_set.count(), 2)
-        for subscription in contact.subscription_set.all():
-            self.assertEqual(subscription.accept_subscription, False)
 
         self.assertEqual(emailing.soft_bounce.count(), 0)
         self.assertEqual(emailing.hard_bounce.count(), 1)

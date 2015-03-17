@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""forms"""
 
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -20,9 +21,9 @@ from coop_cms.utils import dehtml
 import floppyforms as forms
 
 from sanza.Crm import settings as crm_settings
+from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
 from sanza.Crm.models import SubscriptionType, Subscription
-from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing import models
 from sanza.Emailing.utils import create_subscription_action, send_notification_email
@@ -30,7 +31,35 @@ from sanza.Emailing import settings as emailing_settings
 
 
 class UnregisterForm(forms.Form):
+    """User wants to unregister from emailing"""
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
+
+
+class UpdateEmailingForm(forms.ModelForm):
+    """form for editing an existing emailing"""
+
+    class Meta:
+        model = models.Emailing
+        fields = ('subscription_type', 'newsletter', 'lang', 'from_email', )
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateEmailingForm, self).__init__(*args, **kwargs)
+
+        subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
+        self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
+
+        newsletter_choices = [(n.id, n.subject) for n in Newsletter.objects.all()]
+        self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
+
+        if not getattr(settings, 'SANZA_EMAILING_SENDER_CHOICES', None):
+            self.fields["from_email"].widget = forms.HiddenInput()
+        else:
+            self.fields["from_email"].widget = forms.Select(choices=settings.SANZA_EMAILING_SENDER_CHOICES)
+
+        if not getattr(settings, 'LANGUAGES', None) or len(settings.LANGUAGES) < 2:
+            self.fields["lang"].widget = forms.HiddenInput()
+        else:
+            self.fields["lang"].widget = forms.Select(choices=crm_settings.get_language_choices())
 
 
 class NewEmailingForm(forms.Form):
@@ -50,10 +79,6 @@ class NewEmailingForm(forms.Form):
     )
     from_email = forms.CharField(required=False, label=_(u"Sent from"))
 
-    def get_contacts(self):
-        ids = self.cleaned_data["contacts"].split(";")
-        return models.Contact.objects.filter(id__in=ids)
-    
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')
         initial_contacts = ''
@@ -63,11 +88,13 @@ class NewEmailingForm(forms.Form):
         super(NewEmailingForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
+
         newsletter_choices = [(0, __(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
         self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
 
         subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
         self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
+
         if len(settings.LANGUAGES) < 2:
             self.fields['lang'].widget = forms.HiddenInput()
 
@@ -76,7 +103,13 @@ class NewEmailingForm(forms.Form):
         else:
             self.fields['from_email'].widget = forms.HiddenInput()
 
+    def get_contacts(self):
+        """get the list of contacts stored by ids"""
+        ids = self.cleaned_data["contacts"].split(";")
+        return models.Contact.objects.filter(id__in=ids)
+
     def clean_subject(self):
+        """subject validation"""
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']
         if newsletter_id == 0 and not subject:
@@ -84,6 +117,7 @@ class NewEmailingForm(forms.Form):
         return subject
 
     def clean_subscription_type(self):
+        """validation of subscription type. Return the subscription type object"""
         try:
             subscription_type = int(self.cleaned_data['subscription_type'])
             return SubscriptionType.objects.get(id=subscription_type)
@@ -92,6 +126,7 @@ class NewEmailingForm(forms.Form):
 
 
 class NewNewsletterForm(forms.Form):
+    """Create a new newsletter"""
     subject = forms.CharField(
         label=_(u"Subject"),
         widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
@@ -110,6 +145,10 @@ class NewNewsletterForm(forms.Form):
             self.fields['source_url'].widget = forms.HiddenInput()
     
     def clean_source_url(self):
+        """
+        clean source url: If an url is given download newsletter content from this source
+        It can be used for people using a different tool for writing their newsletter
+        """
         url = self.cleaned_data['source_url']
         if url:
             #Check in config if the url match with something allowed
@@ -137,6 +176,7 @@ class NewNewsletterForm(forms.Form):
         return u''
 
     def clean_content(self):
+        """content validation"""
         url = self.cleaned_data['source_url']
         if url:
             return self.source_content
@@ -144,6 +184,7 @@ class NewNewsletterForm(forms.Form):
 
 
 class EmailSubscribeForm(forms.ModelForm):
+    """Register to an emailing with just email address"""
     email = forms.EmailField(
         required=True, label="",
         widget=forms.TextInput(attrs={'placeholder': _(u'Email'), 'size': '80'})
@@ -158,6 +199,7 @@ class EmailSubscribeForm(forms.ModelForm):
         super(EmailSubscribeForm, self).__init__(*args, **kwargs)
     
     def save(self, request=None):
+        """save"""
         contact = super(EmailSubscribeForm, self).save(commit=False)
         
         if crm_settings.ALLOW_SINGLE_CONTACT:
@@ -198,8 +240,10 @@ class EmailSubscribeForm(forms.ModelForm):
 
 
 class SubscriptionTypeFormMixin(object):
+    """Base class requiring subscription type"""
 
     def _add_subscription_types_field(self):
+        """add the subscription_type field dynamically"""
         self.fields['subscription_types'] = forms.MultipleChoiceField(
             widget=forms.CheckboxSelectMultiple(),
             label='',
@@ -208,9 +252,11 @@ class SubscriptionTypeFormMixin(object):
         )
 
     def get_queryset(self):
+        """returns subscription_types"""
         return SubscriptionType.objects.filter(site=Site.objects.get_current())
 
     def clean_subscription_types(self):
+        """validation"""
         try:
             subscription_types = [
                 SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']
@@ -220,6 +266,7 @@ class SubscriptionTypeFormMixin(object):
         return subscription_types
 
     def _save_subscription_types(self, contact):
+        """save"""
         subscriptions = []
         for subscription_type in self.get_queryset():
 
@@ -240,6 +287,8 @@ class SubscriptionTypeFormMixin(object):
 
 
 class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
+    """Subscribe to emailing"""
+
     city = forms.CharField(
         required=False, label=_(u'City'),
         widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
@@ -261,13 +310,11 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             'address2', 'address3', 'zip_code'
         )
         widgets = {
-            #'notes': forms.Textarea(attrs={'placeholder': _(u'Comments'), 'cols':'90'}),
             'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname'), 'required': 'required'}),
             'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
             'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
             'email': forms.TextInput(attrs={'placeholder': _(u'Email'), 'required': 'required'}),
             'zip_code': forms.TextInput(attrs={'placeholder': _(u'zip code')}),
-            #'country': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -303,6 +350,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         self._add_subscription_types_field()
     
     def clean_entity_type(self):
+        """validation"""
         try:
             entity_type = int(self.cleaned_data['entity_type'])
             if entity_type:
@@ -312,6 +360,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             raise ValidationError(__(u"Invalid entity type"))
         
     def get_entity(self):
+        """get entity from form"""
         entity_type = self.cleaned_data.get('entity_type', None)
         entity = self.cleaned_data['entity']
         if entity_type:
@@ -328,6 +377,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
                 return Entity.objects.create(name=entity_name, type=entity_type)
             
     def clean_entity(self):
+        """validation"""
         entity_type = self.cleaned_data.get('entity_type', None)
         entity = self._dehtmled_field("entity")
         if entity_type:
@@ -340,37 +390,47 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return entity
          
     def _dehtmled_field(self, fieldname, **kwargs):
+        """html to text for a field content"""
         value = self.cleaned_data[fieldname]
         return dehtml(value, **kwargs)
         
     def clean_lastname(self):
+        """valiadate lastname"""
         return self._dehtmled_field("lastname")
     
     def clean_firstname(self):
+        """valiadate firstname"""
         return self._dehtmled_field("firstname")
     
     def clean_phone(self):
+        """valiadate phone"""
         return self._dehtmled_field("phone")
     
     def clean_mobile(self):
+        """valiadate mobile phone"""
         return self._dehtmled_field("mobile")
     
     def clean_address(self):
+        """valiadate address"""
         return self._dehtmled_field("address")
     
     def clean_address2(self):
+        """valiadate address line 2"""
         return self._dehtmled_field("address2")
     
     def clean_address3(self):
+        """valiadate address line 3"""
         return self._dehtmled_field("address3")
     
     def clean_message(self):
+        """valiadate message"""
         message = self._dehtmled_field("message", allow_spaces=True)
         if len(message) > 10000:
             raise ValidationError(__(u"Your message is too long"))
         return message
     
     def clean_groups(self):
+        """valiadate groups"""
         try:
             groups = [Group.objects.get(id=group_id) for group_id in self.cleaned_data['groups']]
         except Group.DoesNotExist:
@@ -378,6 +438,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return groups
     
     def clean_action_types(self):
+        """valiadate action types"""
         try:
             action_types = [ActionType.objects.get(id=at_id) for at_id in self.cleaned_data['action_types']]
         except ActionType.DoesNotExist:
@@ -385,6 +446,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return action_types
 
     def save(self, request=None):
+        """save"""
         contact = super(SubscribeForm, self).save(commit=False)
         contact.entity = self.get_entity()
         contact.city = self.cleaned_data['city']
@@ -396,8 +458,8 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         contact.entity.city = contact.city
         
         groups = self.cleaned_data['groups']
-        for g in groups:
-            contact.entity.group_set.add(g)
+        for group in groups:
+            contact.entity.group_set.add(group)
         contact.entity.save()
         
         subscriptions = self._save_subscription_types(contact)
@@ -439,6 +501,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
 
 class NewsletterSchedulingForm(forms.ModelForm):
+    """Define the newsletter sending date"""
     class Meta:
         model = models.Emailing
         fields = ('scheduling_dt',)
@@ -448,6 +511,7 @@ class NewsletterSchedulingForm(forms.ModelForm):
         super(NewsletterSchedulingForm, self).__init__(*args, **kwargs)
 
     def clean_scheduling_dt(self):
+        """validate datetime"""
         sch_dt = self.cleaned_data['scheduling_dt']
 
         if not sch_dt:

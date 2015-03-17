@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""utilities"""
 
 from datetime import datetime
 import re
@@ -24,7 +25,12 @@ from sanza.Emailing.models import Emailing, MagicLink
 from sanza.Emailing.settings import is_mandrill_used
 
 
+class EmailSendError(Exception):
+    """An exception raise when sending email failed"""
+    pass
+
 def format_context(text, data):
+    """replace custom templating by something compliant with python format function"""
     # { and } need to be escaped for the format function
     text = text.replace('{', '{{').replace('}', '}}')
 
@@ -35,6 +41,7 @@ def format_context(text, data):
 
 
 def get_emailing_context(emailing, contact):
+    """get context for emailing: user,...."""
     data = dict(contact.__dict__)
     data['fullname'] = contact.fullname
     
@@ -51,7 +58,7 @@ def get_emailing_context(emailing, contact):
     
     for link in links:
         if (not link.lower().startswith('mailto:')) and (link[0] != "#"): #mailto and internal links are not magic
-            magic_link, _is_new = MagicLink.objects.get_or_create(emailing=emailing, url=link)
+            magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
             magic_url = newsletter.get_site_prefix()+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
             html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
         
@@ -73,9 +80,9 @@ def get_emailing_context(emailing, contact):
     }
     
     for callback in get_newsletter_context_callbacks():
-        d = callback(newsletter)
-        if d:
-            context_dict.update(d)
+        dictionary = callback(newsletter)
+        if dictionary:
+            context_dict.update(dictionary)
     
     return context_dict
 
@@ -84,7 +91,7 @@ def send_newsletter(emailing, max_nb):
     """send newsletter"""
 
     #Create automatically an action type for logging one action by contact
-    emailing_action_type, _is_new = ActionType.objects.get_or_create(name=_(u'Emailing'))
+    emailing_action_type = ActionType.objects.get_or_create(name=_(u'Emailing'))[0]
 
     #Clean the urls
     emailing.newsletter.content = make_links_absolute(
@@ -103,9 +110,9 @@ def send_newsletter(emailing, max_nb):
             translation.activate(lang)
 
             context = Context(get_emailing_context(emailing, contact))
-            t = get_template(emailing.newsletter.get_template_name())
+            the_template = get_template(emailing.newsletter.get_template_name())
 
-            html_text = t.render(context)
+            html_text = the_template.render(context)
             html_text = make_links_absolute(
                 html_text, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
             )
@@ -154,6 +161,7 @@ def send_newsletter(emailing, max_nb):
 
 
 def create_subscription_action(contact, subscriptions):
+    """create action when subscribing to a list"""
     action_type = ActionType.objects.get_or_create(name=_(u"Subscription"))[0]
     action = Action.objects.create(
         subject=_(u"Subscribe to {0}").format(u", ".join(subscriptions)),
@@ -178,8 +186,8 @@ def send_notification_email(request, contact, actions, message):
             'message': mark_safe(message),
             'site': Site.objects.get_current(),
         }
-        t = get_template('Emailing/subscribe_notification_email.txt')
-        content = t.render(Context(data))
+        the_templatate = get_template('Emailing/subscribe_notification_email.txt')
+        content = the_templatate.render(Context(data))
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
@@ -187,15 +195,20 @@ def send_notification_email(request, contact, actions, message):
             _(u"Message from web site"), content, from_email,
             [notification_email], headers={'Reply-To': contact.email}
         )
+
+        success = True
         try:
             email.send()
-            if request:
+        except Exception: # pylint: disable=broad-except
+            success = False
+
+        if request:
+            if success:
                 messages.add_message(
                     request, messages.SUCCESS,
                     _(u"The message have been sent")
                 )
-        except Exception, msg:
-            if request:
+            else:
                 messages.add_message(
                     request, messages.ERROR,
                     _(u"The message couldn't be send.")
@@ -212,8 +225,8 @@ def send_verification_email(contact):
             'site': Site.objects.get_current(),
             'my_company': mark_safe(settings.SANZA_MY_COMPANY),
         }
-        t = get_template('Emailing/subscribe_verification_email.txt')
-        content = t.render(Context(data))
+        the_template = get_template('Emailing/subscribe_verification_email.txt')
+        content = the_template.render(Context(data))
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
@@ -223,13 +236,16 @@ def send_verification_email(contact):
             from_email,
             [contact.email]
         )
-        email.send()
+        try:
+            email.send()
+        except Exception, msg: # pylint: disable=broad-except
+            raise EmailSendError(unicode(msg))
         return True
     return False
 
 
 def save_subscriptions(contact, subscription_types):
-    """"""
+    """save aubscriptions"""
     subscriptions = []
     queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
     for subscription_type in queryset:

@@ -5,6 +5,11 @@ from . import views
 urlpatterns = patterns('sanza.Emailing.views',
     url(r'^newsletters/$', 'newsletter_list', name='emailing_newsletter_list'),
     url(r'^view-emailing/(?P<emailing_id>\d+)/$', 'view_emailing', name='emailing_view'),
+    url(
+        r'^update-emailing/(?P<pk>\d+)/$',
+        views.EmailingUpdateView.as_view(),
+        name='emailing_update_emailing'
+    ),
     url(r'^delete-emailing/(?P<emailing_id>\d+)/$', 'delete_emailing', name='emailing_delete'),
     url(r'^new-newsletter/$', 'new_newsletter', name='emailing_new_newsletter'),
     url(r'^confirm-send-mail/(?P<emailing_id>\d+)/$', 'confirm_send_mail', name='emailing_confirm_send_mail'),

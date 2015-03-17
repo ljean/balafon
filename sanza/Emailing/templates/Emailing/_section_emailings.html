@@ -2,26 +2,25 @@
 {% load i18n favorite_tags %}
 
 {% block section_title %}
-  {% trans "Emailings" %}
+  {% trans "Sendings" %}
 {% endblock %}
   
 {% block section_data %}
+  <div class="table-responsive">
   <table class="table table-striped">
-    <tr>
-      <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
-    </tr>
     {% for e in emailings %}
     <tr>
       <td>
         {% favorite_item object=e %} {{e.newsletter.subject}}
       </td>
       <td>
-        {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
-        <a href="{% url "emailing_view" e.id %}">{% trans "View" %}</a>
+
+        <a href="{% url "emailing_view" e.id %}">{{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})</a>
       </td>
     </tr>
     {% endfor %}
   </table>
+  </div>
 {% endblock %}
 
 {% block section_buttons %}
