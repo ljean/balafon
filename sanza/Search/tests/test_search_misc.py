@@ -197,7 +197,7 @@ class HasAddressTest(BaseTestCase):
         entity4, contact4 = self._make_contact("MNOP", None, "")
 
         response = self.client.post(
-            url=reverse('search'),
+            reverse('search'),
             data={"gr0-_-has_city_and_zip-_-0": 1 if has_address else 0}
         )
         self.assertEqual(200, response.status_code)
@@ -478,3 +478,41 @@ class ModifiedSearchTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         self.assertNotContains(response, contact1.lastname)
+
+
+class LanguageSearchTest(BaseTestCase):
+    """search by language"""
+
+    def test_contact_language(self):
+        """search language is set"""
+
+        contact1 = mommy.make(models.Contact, lastname="ABCD", favorite_language="")
+        contact2 = mommy.make(models.Contact, lastname="Azerty", favorite_language="fr")
+        contact3 = mommy.make(models.Contact, lastname="Qwerty", favorite_language="en")
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-contact_lang-_-0": 'fr'}
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+
+    def test_contact_no_language(self):
+        """search language is not set"""
+
+        contact1 = mommy.make(models.Contact, lastname="ABCD", favorite_language="")
+        contact2 = mommy.make(models.Contact, lastname="Azerty", favorite_language="fr")
+        contact3 = mommy.make(models.Contact, lastname="Qwerty", favorite_language="en")
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-contact_lang-_-0": ''}
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)

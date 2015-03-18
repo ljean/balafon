@@ -65,6 +65,7 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
+            search_forms.ContactLanguageSearchForm,
         ],
     ), (
         _(u'Actions'),

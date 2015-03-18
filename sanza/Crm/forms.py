@@ -296,7 +296,7 @@ class EntityForm(ModelFormWithCity):
         model = models.Entity
         fields = (
             'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax',
-            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country', 'logo'
+            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country', 'logo',
         )
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
@@ -338,8 +338,8 @@ class ContactForm(ModelFormWithCity):
         fields = (
             'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
             'email', 'phone', 'mobile', 'favorite_language',
-            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'
-            'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo'
+            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
+            'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
         )
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),

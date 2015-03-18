@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""forms"""
 
 from datetime import date, datetime
 from itertools import chain
@@ -8,7 +9,6 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.forms import ChoiceField
 from django.forms.util import flatatt
 from django.template import Context
 from django.template.loader import get_template
@@ -30,86 +30,116 @@ SEARCH_FORMS = None
 
 
 def load_from_name(constant_full_name):
-    x = constant_full_name.split('.')
-    constant_path, constant_name = '.'.join(x[:-1]), x[-1]
+    """load module dynamically"""
+    constant_full_path = constant_full_name.split('.')
+    constant_path, constant_name = '.'.join(constant_full_path[:-1]), constant_full_path[-1]
     module = importlib.import_module(constant_path)
     return getattr(module, constant_name)
 
 
 class QuickSearchForm(BsForm):
     """Quick search form which is included in the menu"""
-    text = forms.CharField(required=True,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Quick search')}))
+    text = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': _(u'Quick search')})
+    )
 
 
 def get_search_forms():
-    global SEARCH_FORMS
+    """cache the configured forms"""
+    global SEARCH_FORMS #pylint: disable=global-statement
     if not SEARCH_FORMS:
         SEARCH_FORMS = load_from_name(settings.SEARCH_FORM_LIST)
     return SEARCH_FORMS
 
 
 def get_field_form(field):
+    """get field form"""
     _forms = []
-    for (cat, fs) in get_search_forms():
-        _forms.extend(fs)
-    x = dict([(f._name, f) for f in _forms if f])
-    return x[field]
+    for cat_and_form in get_search_forms():
+        _forms.extend(cat_and_form[1])
+    field_dict = dict([(_form._name, _form) for _form in _forms if _form])
+    return field_dict[field]
 
 
-class GroupedSelect(forms.Select): 
-    def render(self, name, value, attrs=None, choices=()):
-        if value is None: value = '' 
+class GroupedSelect(forms.Select):
+    """Buld select with all forms"""
+    def render(self, name, value, attrs=None, choices=(), *args, **kwargs):
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select {0}>'.format(flatatt(final_attrs))] 
         str_value = smart_unicode(value)
         for group_label, group in self.choices: 
-            if group_label: # should belong to an optgroup
+            if group_label:
+                # should belong to an optgroup
                 group_label = smart_unicode(group_label) 
                 output.append(u'<optgroup label="%s">' % escape(group_label)) 
-            for k, v in group:
-                option_value = smart_unicode(k)
-                option_label = smart_unicode(v) 
-                selected_html = (option_value == str_value) and u' selected="selected"' or ''
-                output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(option_label))) 
+            for key, value in group:
+                #build option html
+                option_value = smart_unicode(key)
+                output.append(
+                    u'<option value="{0}"{1}>{2}</option>'.format(
+                        escape(option_value),
+                        (option_value == str_value) and u' selected="selected"' or '',
+                        escape(smart_unicode(value))
+                    )
+                )
             if group_label:
                 output.append(u'</optgroup>')
         output.append(u'</select>') 
         return u'\n'.join(output)
 
 
-class GroupedChoiceField(ChoiceField):
-    def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None, *args, **kwargs):
-        super(ChoiceField, self).__init__(required, widget, label, initial, help_text, *args, **kwargs)
+class GroupedChoiceField(forms.ChoiceField):
+    """GroupedChoiceField"""
+
+    def __init__(self, *args, **kwargs):
+        choices = kwargs.pop('choices', None) or ()
+
+        kwargs.setdefault('required', True)
+        kwargs.setdefault('widget', None)
+        kwargs.setdefault('label', None)
+        kwargs.setdefault('initial', None)
+        kwargs.setdefault('help_text', None)
+
+        super(GroupedChoiceField, self).__init__(*args, **kwargs)
         self.choices = choices
         
     def clean(self, value):
         """
         Validates that the input is in self.choices.
         """
-        value = super(forms.ChoiceField, self).clean(value)
+        value = super(GroupedChoiceField, self).clean(value)
         if value in (None, ''):
             value = u''
         value = forms.util.smart_unicode(value)
         if value == u'':
             return value
         valid_values = []
-        for group_label, group in self.choices:
-            valid_values += [str(k) for k, v in group]
+        for choice in self.choices:
+            group = choice[1]
+            valid_values += [str(key) for key, value in group]
         if value not in valid_values:
             raise ValidationError(_(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 
 class FieldChoiceForm(forms.Form):
-    """The form for dynamicalling adding new filter"""
+    """The form for dynamically adding new filter"""
     
     def __init__(self, *args, **kwargs):
         super(FieldChoiceForm, self).__init__(*args, **kwargs)
-        choices = [('', [('', '')])]#[('', [('', _(u'Please select a filter'))])]#1st line is just a label and can't be selected
-        for (cat, fs) in get_search_forms():
+        choices = [('', [('', '')])]
+        for (cat, form) in get_search_forms():
             choices.append(
-                (cat, [(reverse('search_get_field', args=[f._name]), f._label) for f in fs if f])
+                (
+                    cat,
+                    [
+                        (reverse('search_get_field', args=[getattr(field, '_name')]), getattr(field, '_label'))
+                        for field in form if field
+                    ]
+                )
             )
         widget = GroupedSelect(attrs={
             'class': 'form-control half-width',
@@ -118,106 +148,114 @@ class FieldChoiceForm(forms.Form):
         self.fields['field_choice'] = GroupedChoiceField(choices, widget=widget)
 
     def as_it_is(self):
-        "Returns this form rendered as HTML <p>s."
+        """Returns this form rendered as HTML <p>s."""
         return self._html_output(
-            normal_row = u'%(field)s<span>%(help_text)s</span>',
-            error_row = u'%s',
-            row_ender = u'',
-            help_text_html = u' <span class="helptext">%s</span>',
-            errors_on_separate_row = False)
+            normal_row=u'%(field)s<span>%(help_text)s</span>',
+            error_row=u'%s',
+            row_ender=u'',
+            help_text_html=u' <span class="helptext">%s</span>',
+            errors_on_separate_row=False
+        )
 
 
 class SearchForm(forms.Form):
-    name = forms.CharField(max_length=100, required=False,
-        help_text=_('Enter a name and click save.'))
-    
+    """Main search form"""
+    name = forms.CharField(required=False, help_text=_('Enter a name and click save.'))
+    excluded = forms.CharField(required=False, widget=forms.HiddenInput())
+
     class Media:
+        """media files"""
         css = {
             'all': ('chosen/chosen.css', 'chosen/chosen-bootstrap.css')
         }
         js = (
             'chosen/chosen.jquery.js',
         )
-    
-    excluded = forms.CharField(required=False, widget=forms.HiddenInput())
-    #subject = forms.CharField(max_length=1000, required=False, widget=forms.HiddenInput())
-    
+
     def __init__(self, data=None, instance=None, save=False, *args, **kwargs):
         super(SearchForm, self).__init__(data=data, *args, **kwargs)
         self._forms = {}
         self._instance = instance
         self._save = save
         self.contacts_display = False
-        if instance: self.fields['name'].initial = instance.name
+        self.contains_refuse_newsletter = False
+        if instance:
+            self.fields['name'].initial = instance.name
         if not data and instance:
             data = {}
-            for gr in instance.searchgroup_set.all():
-                for f in gr.searchfield_set.all():
-                    key = '-_-'.join((gr.name, f.field, str(f.count or len(data))))
-                    if f.is_list:
+            for group in instance.searchgroup_set.all():
+                for search_field in group.searchfield_set.all():
+                    key = '-_-'.join((group.name, search_field.field, str(search_field.count or len(data))))
+                    if search_field.is_list:
                         #data[key] = json.loads(f.value) # doesn't work :(
-                        data[key] = self._str_to_list(f.value)
+                        data[key] = self._str_to_list(search_field.value)
                     else:
-                        data[key] = f.value
+                        data[key] = search_field.value
         if data:
             for key in data:
                 if hasattr(data, 'getlist'):
                     value = data.getlist(key)
-                    if len(value)==1:
+                    if len(value) == 1:
                         value = data.get(key)
                 else:
                     value = data.get(key)
                 try:
                     #extract search fields
-                    gr, field, fid = key.split('-_-')
-                    fid = int(fid) #will raise an except for city visible field --> ignore this field
-                    if not self._forms.has_key(gr):
-                        self._forms[gr] = []
+                    group, field, fid = key.split('-_-')
+                    #will raise an except for city visible field --> ignore this field
+                    fid = int(fid)
+                    if group not in self._forms:
+                        self._forms[group] = []
                     form_class = get_field_form(field)
-                    form = form_class(gr, fid, {field: value})
+                    form = form_class(group, fid, {field: value})
                     self.contacts_display = self.contacts_display or form._contacts_display
-                    self._forms[gr].append(form)
+                    self._forms[group].append(form)
                 except ValueError:
                     pass
-                except Exception, msg:
-                    print "Oups", msg
             #sort forms of a group according to their id
-            for fs in self._forms.values(): 
-                fs.sort(key=lambda f: f._count)
+            for form in self._forms.values():
+                form.sort(key=lambda field_: field_._count)
     
     def block_count(self):
+        """number of block"""
         return len(self._forms)
     
     def field_count(self):
+        """number of fields"""
         return sum([len(f) for f in self._forms])
     
     def _str_to_list(self, str_value):
-        def _split_unicode(x):
-            x0 = x
+        """convert string to list"""
+        def _split_unicode(unicode_str):
+            """remove traiing ' " from string"""
+            unicode_str0 = unicode_str
             try:
-                if x[:2] in ("u'", 'u"'):
-                    x = x[2:]
-                elif x[0] in ("'", '"'):
-                    x = x[1:]
+                if unicode_str[:2] in ("u'", 'u"'):
+                    unicode_str = unicode_str[2:]
+                elif unicode_str[0] in ("'", '"'):
+                    unicode_str = unicode_str[1:]
                 
-                if x[-1] in ("'", '"'):
-                    x = x[:-1]
+                if unicode_str[-1] in ("'", '"'):
+                    unicode_str = unicode_str[:-1]
             except IndexError:
-                return x0
-            return x
+                return unicode_str0
+            return unicode_str
             
         if str_value[0] == '[' and str_value[-1] == ']':
-            values = str_value[1:-1] #remove [ and ]
-            values = values.split(", ") # get things separated by ', '
-            values = [x for x in values]
-            values =  [_split_unicode(x) for x in values]
+            #remove [ and ]
+            values = str_value[1:-1]
+            # get things separated by ', '
+            values = values.split(", ")
+            values = [value for value in values]
+            values = [_split_unicode(value) for value in values]
             return values
         return []
     
     def serialize(self):
+        """serialize the form for json"""
         data = {}
-        for group, forms in self._forms.items():
-            for form in forms:
+        for group, the_forms in self._forms.items():
+            for form in the_forms:
                 if group in data:
                     data[group] += [form.serialize()]
                 else:
@@ -225,13 +263,16 @@ class SearchForm(forms.Form):
         return data
     
     def clean_name(self):
+        """validate name"""
         name = self.cleaned_data['name']
+        if len(name) >= 100:
+            raise ValidationError(_(u"Too long"))
         if self._save:
             if name:
-                qs = models.Search.objects.filter(name=name)
+                queryset = models.Search.objects.filter(name=name)
                 if self._instance and self._instance.id:
-                    qs = qs.exclude(id=self._instance.id)
-                if qs.count()>0:
+                    queryset = queryset.exclude(id=self._instance.id)
+                if queryset.count() > 0:
                     raise ValidationError("This search name is already used")
             else:
                 if self._instance:
@@ -239,6 +280,7 @@ class SearchForm(forms.Form):
         return name
     
     def clean(self):
+        """validate form"""
         keys = self._forms.keys()
         keys.sort()
         cleaned_data = super(SearchForm, self).clean()
@@ -248,40 +290,42 @@ class SearchForm(forms.Form):
         return cleaned_data
     
     def save_search(self):
+        """save search"""
         self._instance.searchgroup_set.all().delete()
         self._instance.name = self.cleaned_data['name']
         self._instance.save()
         keys = self._forms.keys()
         for key in keys:
-            gr = models.SearchGroup.objects.create(name=key, search=self._instance)
+            group = models.SearchGroup.objects.create(name=key, search=self._instance)
             for form in self._forms[key]:
                 field = models.SearchField.objects.create(
-                    search_group=gr, field=form._name, value=form._value, count=form._count)
+                    search_group=group, field=form._name, value=form._value, count=form._count)
                 if form.multi_values:
                     field.is_list = True
                     field.save()
         return self._instance
     
     def clean_excluded(self):
+        """validate"""
         excluded = self.cleaned_data['excluded']
         if excluded:
             return [int(x) for x in excluded.strip("#").split("##")]
         return []
 
     def is_valid(self):
+        """is full form valid?"""
         if not super(SearchForm, self).is_valid():
             return False
         keys = self._forms.keys()
         keys.sort()
-        results = []
         for key in keys:
-            lookup = {}
             for form in self._forms[key]:
                 if not form.is_valid():
                     return False
         return True
     
     def _get_contacts(self):
+        """get contacts"""
         keys = self._forms.keys()
         keys.sort()
         contacts = set([])
@@ -292,7 +336,7 @@ class SearchForm(forms.Form):
             post_processors = []
             contacts_set = Contact.objects.all()
             
-            if not ('secondary_contact' in [f._name for f in self._forms[key]]):
+            if not ('secondary_contact' in [field._name for field in self._forms[key]]):
                 contacts_set = contacts_set.filter(main_contact=True)
             
             for form in self._forms[key]:
@@ -305,13 +349,13 @@ class SearchForm(forms.Form):
                 if hasattr(form, 'global_post_process'):
                     global_post_processors.append(form.global_post_process)
 
-            for pp in post_processors:
-                contacts_set = pp(contacts_set)
+            for post_processor in post_processors:
+                contacts_set = post_processor(contacts_set)
                 
             contacts = contacts.union(set(contacts_set))
         
-        for gpp in global_post_processors:
-            contacts = gpp(contacts)
+        for global_post_processor in global_post_processors:
+            contacts = global_post_processor(contacts)
 
         #Just for compatibility
         queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name=u'Newsletter')
@@ -329,12 +373,14 @@ class SearchForm(forms.Form):
         return list(contacts)
     
     def _get_filter_func(self):
-        form_names = [f._name for f in chain.from_iterable(self._forms.values())]
+        """filter function"""
+        form_names = [form._name for form in chain.from_iterable(self._forms.values())]
         if 'contact_has_left' in form_names:
-            return lambda c: c
-        return lambda c: c and (not c.has_left)
+            return lambda contact: contact
+        return lambda contact: contact and (not contact.has_left)
 
     def get_contacts_by_entity(self):
+        """get contacts by entities"""
         contacts = self._get_contacts()
         contacts_count = 0
         entities = {}
@@ -359,45 +405,57 @@ class SearchForm(forms.Form):
                 setattr(entity, 'is_empty', True)
             results.append(entity)
         results.sort(key=lambda x: x.name)
-        return results, contacts_count, (len(empty_entities)>0)
+        return results, contacts_count, len(empty_entities) > 0
     
     def get_contacts(self):
+        """get contacts"""
         filter_func = self._get_filter_func()
         contacts = self._get_contacts()
-        ids = self.cleaned_data['excluded']
-        return [c for c in contacts if (c.id not in ids and filter_func(c))]
+        contact_ids = self.cleaned_data['excluded']
+        return [contact for contact in contacts if contact.id not in contact_ids and filter_func(contact)]
         
     def get_contacts_emails(self):
+        """get contact emails"""
         filter_func = self._get_filter_func()
         contacts = self._get_contacts()
         excluded_ids = self.cleaned_data['excluded']
         emails = []
-        for c in contacts:
-            if c.get_email and (c.id not in excluded_ids) and filter_func(c):
-                if c.firstname or c.lastname:
-                    emails.append(u'"{1}" <{0}>'.format(c.get_email, c.fullname))    
+        for contact in contacts:
+            if contact.get_email and (contact.id not in excluded_ids) and filter_func(contact):
+                if contact.firstname or contact.lastname:
+                    emails.append(u'"{1}" <{0}>'.format(contact.get_email, contact.fullname))
                 else:
-                    emails.append(c.get_email)
+                    emails.append(contact.get_email)
         return emails
     
     def actions(self):
-        f = FieldChoiceForm()
-        return u"""
-            {0}
-            <a class="btn btn-xs btn-default btn-yellow add-field" href=""><span class="glyphicon glyphicon-filter"></span> {1}</a>
-            <a class="btn btn-xs btn-default add-block" href=""><span class="glyphicon glyphicon-th-list"></span> {2}</a>
-            <a class="btn btn-xs btn-default duplicate-block" href=""><span class="glyphicon glyphicon-share"></span> {5}</a>
-            <a class="btn btn-xs btn-danger clear-block" href=""><span class="glyphicon glyphicon-remove"></span> {3}</a>
-            <a class="btn btn-xs btn-danger remove-block" href=""><span class="glyphicon glyphicon-trash"></span> {4}</a>""".format(
-                f.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate'))
+        """allowed actions"""
+        form = FieldChoiceForm()
+        html_tpl = u"""{0}
+            <a class="btn btn-xs btn-default btn-yellow add-field" href="">
+            <span class="glyphicon glyphicon-filter"></span> {1}</a>
+            <a class="btn btn-xs btn-default add-block" href="">
+            <span class="glyphicon glyphicon-th-list"></span> {2}</a>
+            <a class="btn btn-xs btn-default duplicate-block" href="">
+            <span class="glyphicon glyphicon-share"></span> {5}</a>
+            <a class="btn btn-xs btn-danger clear-block" href="">
+            <span class="glyphicon glyphicon-remove"></span> {3}</a>
+            <a class="btn btn-xs btn-danger remove-block" href="">
+            <span class="glyphicon glyphicon-trash"></span> {4}</a>"""
+
+        return html_tpl.format(
+            form.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate')
+        )
     
     def as_html(self):
+        """as html"""
         keys = self._forms.keys()
         keys.sort()
         html = u'<div>{0}</div>'.format(self.as_p())
         if keys:
             for key in keys:
-                html += u'<div class="search-block" rel="{0}"><div class="actions">{1}</div><div class="fields">'.format(key, self.actions())
+                html_tpl = u'<div class="search-block" rel="{0}"><div class="actions">{1}</div><div class="fields">'
+                html += html_tpl.format(key, self.actions())
                 for form in self._forms[key]:
                     html += form.as_it_is()
                 html += '</div></div>'
@@ -405,6 +463,7 @@ class SearchForm(forms.Form):
 
 
 class SearchFieldForm(BsForm):
+    """Base class for search forms"""
     _contacts_display = False
     multi_values = False
     
@@ -422,9 +481,11 @@ class SearchFieldForm(BsForm):
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         
     def _get_field_name(self):
+        """return field name"""
         return self._block+'-_-'+self._name+'-_-'+unicode(self._count)
         
     def _add_field(self, field):
+        """adda field"""
         field.required = True
         if not field.widget.attrs.get('class', None):
             field.widget.attrs['class'] = "form-control"
@@ -433,39 +494,50 @@ class SearchFieldForm(BsForm):
         self.fields[self._get_field_name()] = field
         
     def clean(self):
+        """return cleaned data"""
         return {self._get_field_name(): self._value}
         
     def serialize(self):
+        """serialize"""
         return {self._name: self._value}
         
     def as_it_is(self):
-        t = get_template("Search/_search_field_form.html")
-        return t.render(Context({"form": self}))
+        """return form html without any wrapper tag"""
+        template = get_template("Search/_search_field_form.html")
+        return template.render(Context({"form": self}))
     
-    def get_queryset(self, qs):
+    def get_queryset(self, queryset):
+        """
+        returns a queryset for filtering contacts corresponding to searches
+        it can be overriden in subclassses
+        A subclass may also define a get_lookup or get_exclude_lookup method for building the queryset more easily
+        (and for compatibility reasons)
+        """
         if hasattr(self, 'get_lookup'):
             lookup = self.get_lookup()
             if lookup:
                 if type(lookup) is dict:
-                    qs = qs.filter(**lookup)
+                    queryset = queryset.filter(**lookup)
                 elif type(lookup) is list:
-                    qs = qs.filter(*lookup)
+                    queryset = queryset.filter(*lookup)
                 else:
-                    qs = qs.filter(lookup)
+                    queryset = queryset.filter(lookup)
                     
         if hasattr(self, 'get_exclude_lookup'):
             lookup = self.get_exclude_lookup()
             if lookup:
                 if type(lookup) is dict:
-                    qs = qs.exclude(**lookup)
+                    queryset = queryset.exclude(**lookup)
                 elif type(lookup) is list:
-                    qs = qs.exclude(*lookup)
+                    queryset = queryset.exclude(*lookup)
                 else:
-                    qs = qs.exclude(lookup)
-        return qs
+                    queryset = queryset.exclude(lookup)
+
+        return queryset
 
 
 class TwoDatesForm(SearchFieldForm):
+    """Base class for any SerachForm providing a 'TwoDate' field"""
     
     def __init__(self, *args, **kwargs):
         super(TwoDatesForm, self).__init__(*args, **kwargs)
@@ -475,11 +547,13 @@ class TwoDatesForm(SearchFieldForm):
         self._add_field(field)
         
     def __getattr__(self, name):
+        """get attribute dynsamically"""
         if name == 'clean_'+self._get_field_name():
             return self._clean_field
         return super(TwoDatesForm, self).__getattr__(name)
     
     def _clean_field(self):
+        """validate"""
         try:
             self._get_dates()
         except ValueError:
@@ -487,10 +561,13 @@ class TwoDatesForm(SearchFieldForm):
         return self._value
     
     def _get_dates(self):
+        """return selected dates"""
         return get_date_bounds(self._value)
 
 
 class YesNoSearchFieldForm(SearchFieldForm):
+    """Base class for ny SearchForm providing a Yes/No field"""
+
     def __init__(self, *args, **kwargs):
         super(YesNoSearchFieldForm, self).__init__(*args, **kwargs)
         choices = ((1, _('Yes')), (0, _('No')),)
@@ -498,11 +575,17 @@ class YesNoSearchFieldForm(SearchFieldForm):
         self._add_field(field)
     
     def is_yes(self):
+        """Is yes selected?"""
         return True if int(self._value) else False
 
 
-class SearchActionBaseForm:
+class SearchActionBaseMixin(object):
+    """
+    Base class for any views which needs to get extra information for handling results
+    Example : Pdf, CreateActions...
+    """
     def _pre_init(self, *args, **kwargs):
+        """at the beginning of __init__"""
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and initial.has_key('contacts'):
@@ -511,23 +594,25 @@ class SearchActionBaseForm:
         return initial_contacts
         
     def _post_init(self, initial_contacts):
+        """at the end of __init__"""
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
 
     def get_contacts(self):
+        """get contacts"""
         ids = self.cleaned_data["contacts"].split(";")
         contacts = Contact.objects.filter(id__in=ids)
-        #contact_by_ids = {unicode(c.id): c for c in contacts}
         contact_by_ids = {}
-        for c in contacts:
-            contact_by_ids[unicode(c.id)] = c
+        for contact in contacts:
+            contact_by_ids[unicode(contact.id)] = contact
         ordered_contacts = []
-        for cid in ids:
-            ordered_contacts.append(contact_by_ids[cid])
+        for contact_id in ids:
+            ordered_contacts.append(contact_by_ids[contact_id])
         return ordered_contacts
 
 
-class SearchActionForm(forms.Form, SearchActionBaseForm):
+class SearchActionForm(forms.Form, SearchActionBaseMixin):
+    """Base class for any views which needs to get extra information for handling results"""
     contacts = forms.CharField(widget=forms.HiddenInput())
     
     def __init__(self, *args, **kwargs):
@@ -537,10 +622,12 @@ class SearchActionForm(forms.Form, SearchActionBaseForm):
 
 
 class ContactsAdminForm(SearchActionForm):
+    """This form is used for superuser forcing newsletter subscription"""
     subscribe_newsletter = forms.BooleanField(required=False)
 
 
 class PdfTemplateForm(SearchActionForm):
+    """Form for Pdf generation"""
     search_dict = forms.CharField(widget=forms.HiddenInput())
     
     def __init__(self, *args, **kwargs):
@@ -549,7 +636,7 @@ class PdfTemplateForm(SearchActionForm):
         if getattr(settings, 'SANZA_PDF_TEMPLATES', None):
             choices = settings.SANZA_PDF_TEMPLATES
         else:
-            choices = SANZA_PDF_TEMPLATES = (
+            choices = (
                 ('pdf/labels_24.html', _(u'etiquettes 24')),
                 ('pdf/labels_21.html', _(u'etiquettes 21')),
                 ('pdf/agipa_21.html', _(u'Agipa 21')),
@@ -557,8 +644,10 @@ class PdfTemplateForm(SearchActionForm):
                 ('pdf/address_strip.html', _(u'bande adresse')),
             )
         
-        self.fields['template'] = ChoiceField(
-            choices=choices, required=True, label=_(u'template'),
+        self.fields['template'] = forms.ChoiceField(
+            choices=choices,
+            required=True,
+            label=_(u'template'),
             help_text=_(u'Select the type of document to generate')
         )
         
@@ -568,64 +657,82 @@ class PdfTemplateForm(SearchActionForm):
                 self.fields[field_name] = forms.CharField(label=field_label, initial=initial_value)
        
     def patch_context(self, context):
+        """
+        add to data from external function in context
+        It can be used for example for adding blank labels in labels generation
+        """
         template = self.cleaned_data['template']
         extra_data = self._get_extra_data()
         context.update(extra_data)
         hooks = getattr(settings, 'SANZA_PDF_FORM_CONTEXT_HOOKS', {})
-        if hooks and hooks.has_key(template):
+        if hooks and template in hooks:
             context = hooks[template](template, context)
         return context
     
     def _get_extra_data(self):
-        #This extra_data comes from additional fields defined in SANZA_PDF_FORM_EXTRA_FIELDS settings
-        #These values are passed to the template
+        """
+        This extra_data comes from additional fields defined in SANZA_PDF_FORM_EXTRA_FIELDS settings
+        These values are passed to the template
+        """
         extra_data = dict(self.cleaned_data)
-        for f in ('template', 'contacts', 'search_dict'):
-            extra_data.pop(f)
+        for field in ('template', 'contacts', 'search_dict'):
+            extra_data.pop(field)
         return extra_data
         
         
 class ActionForContactsForm(forms.ModelForm):
+    """Create action for contacts"""
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
     contacts = forms.CharField(widget=forms.HiddenInput())
     
     class Meta:
+        """create form from model"""
         model = Action
-        fields = ('date', 'time', 'type', 'subject', 'in_charge', 'detail',
-            'planned_date', 'contacts', 'opportunity')
+        fields = (
+            'date', 'time', 'type', 'subject', 'in_charge', 'detail', 'planned_date', 'contacts', 'opportunity'
+        )
         
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')
         initial_contacts = ''
-        if initial and initial.has_key('contacts'):
+        if initial and 'contacts' in initial:
             initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
             initial.pop('contacts')
         super(ActionForContactsForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
         self.fields['opportunity'].widget = OpportunityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'})
+            attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'}
+        )
         
     def get_contacts(self):
-        ids = self.cleaned_data["contacts"].split(";")
-        return Contact.objects.filter(id__in=ids)
+        """return contacts"""
+        contact_ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=contact_ids)
         
     def clean_planned_date(self):
-        d = self.cleaned_data["date"]
-        t = self.cleaned_data.get("time", None)
-        if d:
-            return datetime.combine(d, t or datetime.min.time())
+        """validate planned date"""
+        the_date = self.cleaned_data["date"]
+        the_time = self.cleaned_data.get("time", None)
+        if the_date:
+            return datetime.combine(the_date, the_time or datetime.min.time())
         return None
 
 
 class GroupForContactsForm(forms.Form):
+    """Add contacts to group"""
     contacts = forms.CharField(widget=forms.HiddenInput())
     groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
-    on_contact = forms.BooleanField(label=_(u"Group on contact"), required=False, initial=True,
-        help_text=_(u"Define if the group is added on the contact itself or on his entity"))
+    on_contact = forms.BooleanField(
+        label=_(u"Group on contact"),
+        required=False,
+        initial=True,
+        help_text=_(u"Define if the group is added on the contact itself or on his entity")
+    )
     
     class Media:
+        """media files"""
         css = {
             'all': ('chosen/chosen.css',)
         }
@@ -636,8 +743,8 @@ class GroupForContactsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')
         initial_contacts = ''
-        if initial and initial.has_key('contacts'):
-            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+        if initial and 'contacts' in initial:
+            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         super(GroupForContactsForm, self).__init__(*args, **kwargs)
         if initial_contacts:
@@ -651,26 +758,29 @@ class GroupForContactsForm(forms.Form):
         self.fields['groups'].help_text = ''
 
     def get_contacts(self):
-        ids = self.cleaned_data["contacts"].split(";")
-        return Contact.objects.filter(id__in=ids)
+        """get contacts"""
+        contact_ids = self.cleaned_data["contacts"].split(";")
+        return Contact.objects.filter(id__in=contact_ids)
 
 
 class SearchNameForm(forms.Form):
+    """Save search form"""
     search_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     name = forms.CharField(required=True, label=_(u"Name"))
     search_fields = forms.CharField(required=True, widget=forms.HiddenInput())
     
     def clean_name(self):
+        """validate name"""
         search_id = self.cleaned_data["search_id"]
         
         name = self.cleaned_data["name"]
         if not name:
             raise ValidationError(_(u"This field is required"))
         
-        qs = models.Search.objects.filter(name=name)
+        queryset = models.Search.objects.filter(name=name)
         if search_id:
-            qs = qs.exclude(id=search_id)
-        if qs.count()>0:
+            queryset = queryset.exclude(id=search_id)
+        if queryset.count() > 0:
             raise ValidationError(_(u"This name is already used"))
         
         if search_id:
@@ -683,8 +793,9 @@ class SearchNameForm(forms.Form):
         return search
     
     def clean_search_fields(self):
+        """validate search fields"""
         search_fields = self.cleaned_data["search_fields"]
         data = json.loads(search_fields)
-        for k in ('csrfmiddlewaretoken', 'excluded', 'name', 'field_choice'):
-            data.pop(k, None)
+        for key in ('csrfmiddlewaretoken', 'excluded', 'name', 'field_choice'):
+            data.pop(key, None)
         return data
