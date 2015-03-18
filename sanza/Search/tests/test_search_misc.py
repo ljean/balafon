@@ -19,6 +19,56 @@ from sanza.Crm import settings as crm_settings
 from sanza.Search.tests import BaseTestCase
 
 
+class SearchTest(BaseTestCase):
+    """a few basic things"""
+
+    def test_view_search(self):
+        """test view search and field choice is populated"""
+        response = self.client.get(reverse('search'))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+        self.assertTrue(len(soup.select("#id_field_choice option")) > 0)
+
+    def test_view_anonymous(self):
+        """test view search as anonymous user"""
+        self.client.logout()
+        response = self.client.get(reverse('search'))
+        self.assertEqual(302, response.status_code)
+
+    def test_view_non_staff(self):
+        """test view search as anonymous user"""
+        self.user.is_staff = False
+        self.user.save()
+        response = self.client.get(reverse('search'))
+        self.assertEqual(302, response.status_code)
+
+    def test_search_contact(self):
+        """search by name"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.lastname)
+
+    def test_search_contact_anonymous(self):
+        """search as anonymous user"""
+        self.client.logout()
+        mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
+        self.assertEqual(302, response.status_code)
+
+    def test_search_contact_non_staff(self):
+        """search as anonymous user"""
+        self.user.is_staff = False
+        self.user.save()
+        mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
+        self.assertEqual(302, response.status_code)
+
+
 class SameAsTest(BaseTestCase):
     """Search same-as"""
 
@@ -172,6 +222,7 @@ class HasAddressTest(BaseTestCase):
     """test has address"""
 
     def _make_contact(self, name, city, zip_code):
+        """make a contact"""
         entity = mommy.make(models.Entity, city=city, zip_code=zip_code)
         contact = entity.default_contact
         contact.lastname = name
@@ -445,7 +496,7 @@ class ModifiedSearchTest(BaseTestCase):
 
         self.assertContains(response, contact1.lastname)
 
-    def test_entity_modified_today_no_single_contact(self):
+    def test_entity_modified_today2(self):
         """entity modified today no single contact"""
 
         contact1 = mommy.make(models.Contact, lastname="Azertuiop")

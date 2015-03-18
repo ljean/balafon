@@ -94,8 +94,7 @@ class GroupedSelect(forms.Select):
 class GroupedChoiceField(forms.ChoiceField):
     """GroupedChoiceField"""
 
-    def __init__(self, *args, **kwargs):
-        choices = kwargs.pop('choices', None) or ()
+    def __init__(self, choices=None, *args, **kwargs):
 
         kwargs.setdefault('required', True)
         kwargs.setdefault('widget', None)
@@ -104,7 +103,7 @@ class GroupedChoiceField(forms.ChoiceField):
         kwargs.setdefault('help_text', None)
 
         super(GroupedChoiceField, self).__init__(*args, **kwargs)
-        self.choices = choices
+        self.choices = choices or ()
         
     def clean(self, value):
         """
@@ -227,7 +226,7 @@ class SearchForm(forms.Form):
     def _str_to_list(self, str_value):
         """convert string to list"""
         def _split_unicode(unicode_str):
-            """remove traiing ' " from string"""
+            """remove trailing ' " from string"""
             unicode_str0 = unicode_str
             try:
                 if unicode_str[:2] in ("u'", 'u"'):

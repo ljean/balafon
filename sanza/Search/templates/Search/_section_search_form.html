@@ -14,7 +14,7 @@
   </div>
 </div>
 
-<form role="form" id="search_form" class="form-horizontal search-form" action="{% url "search" %}" method="post">{% csrf_token %}
+<form role="form" id="search_form" class="form-horizontal search-form" action="{% url 'search' %}" method="post">{% csrf_token %}
   <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
     <span class="glyphicon glyphicon-search"></span>
     {% trans "Search" %}
@@ -76,7 +76,7 @@
       return false;
     });
     
-    if (block_count===0) {
+    if (block_count === 0) {
       add_block(true);  
     } else {
       $(".form .actions").each(function() {
@@ -106,7 +106,6 @@
           success: function(data){
             field_count += 1;
             $(this).parent().find(".fields").append(data.form);
-            //$(this).parent().find("select[name='field_choice']").val('').trigger('change');
             $(this).parent().find(".fields").find(".chosen-select").chosen();
           }
         });
@@ -119,19 +118,6 @@
       $("form.search-form").submit();
       return false;
     })
-    
-    /*
-    $("#save-button").click(function() {
-      if ($("input[name=name]").parent().is(":visible")) {
-        $("form.search-form").attr('action', $(this).attr('href'));
-        $("form.search-form").submit();
-        $("form.search-form").attr('action', '');  
-      } else {
-        $("input[name=name]").parent().show();
-      }
-      return false;
-    })
-    */
     
     $('.datepicker').live('click', function() {
       $(this).datepicker({

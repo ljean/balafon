@@ -4,6 +4,9 @@ body {
   /* The html and body elements cannot have any padding or margin. */
 
 }
+.version {
+  font-size: 0.6em;
+}
 /*
 .navbar-default{
   background-color: @navbar_color;
