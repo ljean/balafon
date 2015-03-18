@@ -453,7 +453,9 @@ class EmailSubscribeView(SubscribeView):
         """get this kwargs for form constructor"""
         form_kwargs = super(EmailSubscribeView, self).get_form_kwargs(*args, **kwargs)
         form_kwargs['subscription_type'] = self.kwargs.get('subscription_type', None)
-        form_kwargs['favorite_language'] = get_language() if has_language_choices() else ''
+        form_kwargs['initial'] = {
+            'favorite_language': get_language() if has_language_choices() else '',
+        }
         return form_kwargs
     
     def get_form_class(self):

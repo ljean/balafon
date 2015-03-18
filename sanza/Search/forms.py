@@ -58,7 +58,7 @@ def get_field_form(field):
     _forms = []
     for cat_and_form in get_search_forms():
         _forms.extend(cat_and_form[1])
-    field_dict = dict([(_form._name, _form) for _form in _forms if _form])
+    field_dict = dict([(_form.name, _form) for _form in _forms if _form])
     return field_dict[field]
 
 
@@ -131,13 +131,13 @@ class FieldChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(FieldChoiceForm, self).__init__(*args, **kwargs)
         choices = [('', [('', '')])]
-        for (cat, form) in get_search_forms():
+        for (cat, forms_) in get_search_forms():
             choices.append(
                 (
                     cat,
                     [
-                        (reverse('search_get_field', args=[getattr(field, '_name')]), getattr(field, '_label'))
-                        for field in form if field
+                        (reverse('search_get_field', args=[form.name]), form.label)
+                        for form in forms_ if form
                     ]
                 )
             )
@@ -208,13 +208,13 @@ class SearchForm(forms.Form):
                         self._forms[group] = []
                     form_class = get_field_form(field)
                     form = form_class(group, fid, {field: value})
-                    self.contacts_display = self.contacts_display or form._contacts_display
+                    self.contacts_display = self.contacts_display or form.contacts_display
                     self._forms[group].append(form)
                 except ValueError:
                     pass
             #sort forms of a group according to their id
             for form in self._forms.values():
-                form.sort(key=lambda field_: field_._count)
+                form.sort(key=lambda field_: field_.count)
     
     def block_count(self):
         """number of block"""
@@ -299,7 +299,7 @@ class SearchForm(forms.Form):
             group = models.SearchGroup.objects.create(name=key, search=self._instance)
             for form in self._forms[key]:
                 field = models.SearchField.objects.create(
-                    search_group=group, field=form._name, value=form._value, count=form._count)
+                    search_group=group, field=form.name, value=form.value, count=form.count)
                 if form.multi_values:
                     field.is_list = True
                     field.save()
@@ -336,7 +336,7 @@ class SearchForm(forms.Form):
             post_processors = []
             contacts_set = Contact.objects.all()
             
-            if not ('secondary_contact' in [field._name for field in self._forms[key]]):
+            if not ('secondary_contact' in [form.name for form in self._forms[key]]):
                 contacts_set = contacts_set.filter(main_contact=True)
             
             for form in self._forms[key]:
@@ -374,7 +374,7 @@ class SearchForm(forms.Form):
     
     def _get_filter_func(self):
         """filter function"""
-        form_names = [form._name for form in chain.from_iterable(self._forms.values())]
+        form_names = [form.name for form in chain.from_iterable(self._forms.values())]
         if 'contact_has_left' in form_names:
             return lambda contact: contact
         return lambda contact: contact and (not contact.has_left)
@@ -464,25 +464,25 @@ class SearchForm(forms.Form):
 
 class SearchFieldForm(BsForm):
     """Base class for search forms"""
-    _contacts_display = False
+    contacts_display = False
     multi_values = False
     
     def __init__(self, block, count, data=None, *args, **kwargs):
-        self._block = block
-        self._count = count
+        self.block = block
+        self.count = count
         form_data = None
         if data:
             if self.multi_values:
-                val = data[self._name]
-                self._value = val if type(val) is list else [val]
+                val = data[self.name]
+                self.value = val if type(val) is list else [val]
             else:
-                self._value = data[self._name]
-            form_data = {self._get_field_name(): self._value}
+                self.value = data[self.name]
+            form_data = {self._get_field_name(): self.value}
         super(SearchFieldForm, self).__init__(form_data, *args, **kwargs)
         
     def _get_field_name(self):
         """return field name"""
-        return self._block+'-_-'+self._name+'-_-'+unicode(self._count)
+        return self.block+'-_-'+self.name+'-_-'+unicode(self.count)
         
     def _add_field(self, field):
         """adda field"""
@@ -495,11 +495,11 @@ class SearchFieldForm(BsForm):
         
     def clean(self):
         """return cleaned data"""
-        return {self._get_field_name(): self._value}
+        return {self._get_field_name(): self.value}
         
     def serialize(self):
         """serialize"""
-        return {self._name: self._value}
+        return {self.name: self.value}
         
     def as_it_is(self):
         """return form html without any wrapper tag"""
@@ -542,12 +542,13 @@ class TwoDatesForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(TwoDatesForm, self).__init__(*args, **kwargs)
         field = forms.CharField(
-            label=self._label, initial='{0} {0}'.format(date.today().strftime("%d/%m/%Y")),
-            widget=DatespanInput())
+            label=self.label, initial='{0} {0}'.format(date.today().strftime("%d/%m/%Y")),
+            widget=DatespanInput()
+        )
         self._add_field(field)
         
     def __getattr__(self, name):
-        """get attribute dynsamically"""
+        """get attribute dynamically"""
         if name == 'clean_'+self._get_field_name():
             return self._clean_field
         return super(TwoDatesForm, self).__getattr__(name)
@@ -558,11 +559,11 @@ class TwoDatesForm(SearchFieldForm):
             self._get_dates()
         except ValueError:
             raise ValidationError(_(u"Two valid dates are required"))
-        return self._value
+        return self.value
     
     def _get_dates(self):
         """return selected dates"""
-        return get_date_bounds(self._value)
+        return get_date_bounds(self.value)
 
 
 class YesNoSearchFieldForm(SearchFieldForm):
@@ -571,12 +572,12 @@ class YesNoSearchFieldForm(SearchFieldForm):
     def __init__(self, *args, **kwargs):
         super(YesNoSearchFieldForm, self).__init__(*args, **kwargs)
         choices = ((1, _('Yes')), (0, _('No')),)
-        field = forms.ChoiceField(choices=choices, label=self._label)
+        field = forms.ChoiceField(choices=choices, label=self.label)
         self._add_field(field)
     
     def is_yes(self):
         """Is yes selected?"""
-        return True if int(self._value) else False
+        return True if int(self.value) else False
 
 
 class SearchActionBaseMixin(object):
@@ -588,8 +589,8 @@ class SearchActionBaseMixin(object):
         """at the beginning of __init__"""
         initial = kwargs.get('initial')
         initial_contacts = ''
-        if initial and initial.has_key('contacts'):
-            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+        if initial and 'contacts' in initial:
+            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         return initial_contacts
         

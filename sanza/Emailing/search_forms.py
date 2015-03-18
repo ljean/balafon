@@ -23,21 +23,21 @@ class EmailingSearchForm(SearchFieldForm):
             queryset = queryset.filter(status__in=self.allowed_status)
         queryset = queryset.order_by("-created", "-id")
 
-        field = forms.ModelChoiceField(queryset, label=self._label, **kwargs)
+        field = forms.ModelChoiceField(queryset, label=self.label, **kwargs)
         self._add_field(field)
         
     def _get_emailing(self):
         """get list of emailings"""
         try:
-            return models.Emailing.objects.get(id=self._value)
+            return models.Emailing.objects.get(id=self.value)
         except models.Emailing.DoesNotExist:
             raise ValidationError(_(u"Unknown emailing"))
 
 
 class EmailingSentSearchForm(EmailingSearchForm):
     """Emailing sent to"""
-    _name = 'emailing_sent'
-    _label = _(u'Emailing sent')
+    name = 'emailing_sent'
+    label = _(u'Emailing sent')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
     
     def get_lookup(self):
@@ -48,8 +48,8 @@ class EmailingSentSearchForm(EmailingSearchForm):
 
 class EmailingOpenedSearchForm(EmailingSearchForm):
     """Emailing opened"""
-    _name = 'emailing_opened'
-    _label = _(u'Emailing opened')
+    name = 'emailing_opened'
+    label = _(u'Emailing opened')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
     
     def get_lookup(self):
@@ -60,8 +60,8 @@ class EmailingOpenedSearchForm(EmailingSearchForm):
 
 class EmailingSendToSearchForm(EmailingSearchForm):
     """Emailing send to"""
-    _name = 'emailing_send'
-    _label = _(u'Emailing send to')
+    name = 'emailing_send'
+    label = _(u'Emailing send to')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_EDITING, models.Emailing.STATUS_SCHEDULED]
 
     def get_lookup(self):
@@ -72,8 +72,8 @@ class EmailingSendToSearchForm(EmailingSearchForm):
 
 class EmailingBounceSearchForm(EmailingSearchForm):
     """Emailing bounce"""
-    _name = 'emailing_bounce'
-    _label = _(u'Emailing bounce')
+    name = 'emailing_bounce'
+    label = _(u'Emailing bounce')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
 
     def get_lookup(self):
@@ -89,8 +89,8 @@ class EmailingBounceSearchForm(EmailingSearchForm):
 
 class EmailingContactsSearchForm(EmailingSearchForm):
     """Emailing send to"""
-    _name = 'emailing_contacts'
-    _label = _(u'Emailing contacts')
+    name = 'emailing_contacts'
+    label = _(u'Emailing contacts')
 
     def get_lookup(self):
         """get all contacts for this emailing"""

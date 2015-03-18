@@ -104,7 +104,7 @@ def quick_search(request):
 def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
     results = []
-    search = None
+    search_obj = None
     field_choice_form = FieldChoiceForm()
     contains_refuse_newsletter = False
     data = None
@@ -141,8 +141,8 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             if not results:
                 message = _(u'Sorry, no results found')
     else:
-        search = get_object_or_404(Search, id=search_id) if search_id else None
-        search_form = SearchForm(instance=search)
+        search_obj = get_object_or_404(Search, id=search_id) if search_id else None
+        search_form = SearchForm(instance=search_obj)
     
     entities_count = 0 if contacts_display else len(results)
     return render_to_response(
@@ -155,7 +155,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             'message': message,
             'has_empty_entities': has_empty_entities,
             'search_form': search_form,
-            'search': search,
+            'search': search_obj,
             'contacts_count': contacts_count,
             'entities_count': entities_count,
             'contains_refuse_newsletter': contains_refuse_newsletter,
