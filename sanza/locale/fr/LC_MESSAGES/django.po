@@ -2075,7 +2075,7 @@ msgstr "A ouvert cet emailing"
 
 #: Emailing/search_forms.py:64
 msgid "Emailing send to"
-msgstr "Emailing envoyés à"
+msgstr "Envoi de l'emailing en cours pour"
 
 #: Emailing/search_forms.py:76
 msgid "Emailing bounce"
