@@ -474,6 +474,10 @@ class Contact(TimeStampedModel):
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
     favorites = GenericRelation(Favorite)
+
+    favorite_language = models.CharField(
+        _("favorite language"), max_length=10, default="", blank=True, choices=settings.get_language_choices()
+    )
     
     def get_relationships(self):
         """get all retlationships for this contact"""

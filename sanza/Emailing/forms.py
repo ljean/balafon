@@ -302,6 +302,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
     captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
+    favorite_language = forms.CharField(required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Contact
@@ -456,7 +457,9 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         
         #force also the city on the entity
         contact.entity.city = contact.city
-        
+
+        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
+
         groups = self.cleaned_data['groups']
         for group in groups:
             contact.entity.group_set.add(group)

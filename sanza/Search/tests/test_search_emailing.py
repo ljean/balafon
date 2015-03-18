@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """test search forms of the emailing module"""
 
-from bs4 import BeautifulSoup
-from datetime import datetime
-import json
-
 from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
+
+from bs4 import BeautifulSoup
+from datetime import datetime
+import json
 
 from django.core.urlresolvers import reverse
 
@@ -334,3 +334,22 @@ class EmailingSearchTest(BaseTestCase):
         self.assertContains(response, contact1.lastname)
         self.assertContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
+
+    def test_contact_by_emailing_error(self):
+        """check behavior if emailing id is wrong"""
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+
+        url = reverse('search')
+
+        data = {"gr0-_-emailing_opened-_-0": 333}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, obi.lastname)
+        self.assertNotContains(response, anakin.lastname)
+        self.assertNotContains(response, doe.lastname)
+
+        self.assertEqual(1, len(get_form_errors(response)))

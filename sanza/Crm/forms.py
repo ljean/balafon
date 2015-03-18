@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Crm forms"""
 
 from datetime import datetime
 
@@ -16,13 +17,15 @@ from coop_cms.forms import AlohaEditableModelForm
 
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete, EntityAutoComplete, OpportunityAutoComplete, ContactAutoComplete
-from sanza.Crm.settings import NO_ENTITY_TYPE
+from sanza.Crm.settings import NO_ENTITY_TYPE, get_language_choices, has_language_choices
 from sanza.Crm.utils import get_default_country
 
 
 class BetterBsForm(BetterForm, BootstrapableMixin):
+    """Base class inherit from Bootstrap and form-utils BetterForm"""
 
     class Media:
+        """Media files"""
         css = {
             'all': ('chosen/chosen.css',)
         }
@@ -41,8 +44,10 @@ class BetterBsForm(BetterForm, BootstrapableMixin):
 
 
 class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
+    """Base class inherit from Bootstrap and form-utils BetterModelForm"""
 
     class Media:
+        """Media files"""
         css = {
             'all': ('chosen/chosen.css',)
         }
@@ -61,7 +66,7 @@ class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
 
 
 class AddEntityToGroupForm(forms.Form):
-
+    """form for adding an entity to a group"""
     group_name = forms.CharField(
         label=_(u"Group name"),
         widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
@@ -72,6 +77,7 @@ class AddEntityToGroupForm(forms.Form):
         super(AddEntityToGroupForm, self).__init__(*args, **kwargs)
     
     def clean_group_name(self):
+        """"validation"""
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
             raise ValidationError(ugettext(u"The entity already belong to group {0}").format(name))
@@ -79,8 +85,9 @@ class AddEntityToGroupForm(forms.Form):
 
 
 class AddContactToGroupForm(forms.Form):
-
-    group_name = forms.CharField(label=_(u"Group name"),
+    """form for adding a contact to a group"""
+    group_name = forms.CharField(
+        label=_(u"Group name"),
         widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
     )
     
@@ -89,6 +96,7 @@ class AddContactToGroupForm(forms.Form):
         super(AddContactToGroupForm, self).__init__(*args, **kwargs)
     
     def clean_group_name(self):
+        """validation"""
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
             raise ValidationError(ugettext(u"The contact already belong to group {0}").format(name))
@@ -96,8 +104,10 @@ class AddContactToGroupForm(forms.Form):
 
 
 class EditGroupForm(BsModelForm):
+    """form for editing a group"""
 
     class Meta:
+        """Define the form from model"""
         model = models.Group
         fields = ('name', 'description', 'subscribe_form', 'entities', 'contacts')
         widgets = {
@@ -116,6 +126,7 @@ class EditGroupForm(BsModelForm):
         }
     
     class Media:
+        """Media files"""
         try:
             css = {
                 'all': (
@@ -138,17 +149,16 @@ class EditGroupForm(BsModelForm):
             )
         
     def clean_name(self):
+        """name validation"""
         name = self.cleaned_data['name']
         if self.instance and not self.instance.id:
-            if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count()>0:
+            if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count() > 0:
                 raise ValidationError(ugettext(u"A group with this name already exists"))
         return name
     
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance')
         super(EditGroupForm, self).__init__(*args, **kwargs)
-        
-        widget = forms.SelectMultiple(attrs={'class': "bootstrap-transfer"})
         
         self.fields['entities'] = forms.ModelMultipleChoiceField(
             required=False,
@@ -164,8 +174,13 @@ class EditGroupForm(BsModelForm):
 
 
 class _CityBasedForm(object):
+    """Base class for form with a City field"""
+
+    def __init__(self, *args, **kwargs):
+        self.country_id = 0
 
     def _get_city_parent(self, city):
+        """get city parent"""
         parent = city.parent
         while parent:
             country = parent
@@ -173,6 +188,7 @@ class _CityBasedForm(object):
         return country
     
     def _post_init(self, *args, **kwargs):
+        """must be called at the end of __init__ of the subclasses"""
         self.country_id = 0
         if len(args):
             try:
@@ -195,12 +211,14 @@ class _CityBasedForm(object):
             pass
     
     def _get_country(self, country_id):
+        """get the country"""
         if country_id:
             return models.Zone.objects.get(id=country_id, parent__isnull=True, type__type="country")
         else:
             return get_default_country()
         
     def clean_city(self):
+        """city validation"""
         city = self.cleaned_data['city']
         if isinstance(city, models.City):
             return city
@@ -238,6 +256,8 @@ class _CityBasedForm(object):
 
 
 class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
+    """ModelForm with city"""
+
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
     def __init__(self, *args, **kwargs):
@@ -246,9 +266,11 @@ class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
         
 
 class FormWithCity(BetterBsForm, _CityBasedForm):
+    """Form with city"""
+
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     zip_code = forms.CharField(required=False, label=_(u'zip code'))
-    city = forms.CharField(required = False, label=_(u'City'))
+    city = forms.CharField(required=False, label=_(u'City'))
     
     def __init__(self, *args, **kwargs):
         super(FormWithCity, self).__init__(*args, **kwargs)
@@ -256,6 +278,7 @@ class FormWithCity(BetterBsForm, _CityBasedForm):
     
 
 class EntityForm(ModelFormWithCity):
+    """Edit entity form"""
     city = forms.CharField(
         required=False,
         label=_(u'City'),
@@ -269,8 +292,12 @@ class EntityForm(ModelFormWithCity):
             self.fields["type"].widget = forms.HiddenInput()
         
     class Meta:
+        """form is defined from model"""
         model = models.Entity
-        exclude = ('imported_by', 'is_single_contact', 'notes')
+        fields = (
+            'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax',
+            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country', 'logo'
+        )
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
             ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Entity details')}),
@@ -282,6 +309,7 @@ class EntityForm(ModelFormWithCity):
         ]
     
     def clean_logo(self):
+        """logo validation"""
         logo = self.cleaned_data["logo"]
         instance = self.instance
         if not instance:
@@ -297,6 +325,7 @@ class EntityForm(ModelFormWithCity):
     
 
 class ContactForm(ModelFormWithCity):
+    """Edit contact form"""
     city = forms.CharField(
         required=False,
         label=_(u'City'),
@@ -304,8 +333,14 @@ class ContactForm(ModelFormWithCity):
     )
     
     class Meta:
+        """form is defined from model"""
         model = models.Contact
-        exclude = ('uuid', 'same_as', 'imported_by', 'entity', 'relationships', 'nickname', 'notes')
+        fields = (
+            'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
+            'email', 'phone', 'mobile', 'favorite_language',
+            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'
+            'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo'
+        )
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
             'role': forms.SelectMultiple(attrs={
@@ -318,7 +353,7 @@ class ContactForm(ModelFormWithCity):
                 ],
                 'legend': _(u'Name')
             }),
-            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Contact details')}),
+            ('web', {'fields': ['email', 'phone', 'mobile', 'favorite_language'], 'legend': _(u'Contact details')}),
             ('address', {
                 'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
                 'legend': _(u'Address')
@@ -333,16 +368,16 @@ class ContactForm(ModelFormWithCity):
     def __init__(self, *args, **kwargs):
         #Configure the fieldset with dynamic fields
         fieldset_fields = self.Meta.fieldsets[-2][1]["fields"]
-        for st in models.SubscriptionType.objects.all():
-            field_name = "subscription_{0}".format(st.id)
-            if not (field_name in fieldset_fields):
+        for subscription_type in models.SubscriptionType.objects.all():
+            field_name = "subscription_{0}".format(subscription_type.id)
+            if field_name not in fieldset_fields:
                 fieldset_fields.append(field_name)
 
         super(ContactForm, self).__init__(*args, **kwargs)
 
         try:
             if self.instance and self.instance.entity and self.instance.entity.is_single_contact:
-                 self.fields['has_left'].widget = forms.HiddenInput()
+                self.fields['has_left'].widget = forms.HiddenInput()
         except models.Entity.DoesNotExist:
             pass
 
@@ -354,17 +389,25 @@ class ContactForm(ModelFormWithCity):
         self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
         
         #create the dynamic fields
-        for st in models.SubscriptionType.objects.all():
-            field_name = "subscription_{0}".format(st.id)
-            field = self.fields[field_name] = forms.BooleanField(label=st.name, required=False)
+        for subscription_type in models.SubscriptionType.objects.all():
+            field_name = "subscription_{0}".format(subscription_type.id)
+            field = self.fields[field_name] = forms.BooleanField(label=subscription_type.name, required=False)
             if self.instance:
                 try:
-                    subscription = models.Subscription.objects.get(subscription_type=st, contact=self.instance)
+                    subscription = models.Subscription.objects.get(
+                        subscription_type=subscription_type, contact=self.instance
+                    )
                     field.initial = subscription.accept_subscription
                 except models.Subscription.DoesNotExist:
                     pass
 
+        if has_language_choices():
+            self.fields['favorite_language'].widget = forms.Select(choices=get_language_choices())
+        else:
+            self.fields['favorite_language'].widget = forms.HiddenInput()
+
     def clean_photo(self):
+        """photo validation"""
         photo = self.cleaned_data["photo"]
         instance = self.instance
         if not instance:
@@ -379,6 +422,7 @@ class ContactForm(ModelFormWithCity):
         return photo
 
     def save_contact_subscriptions(self, contact):
+        """save contact subscriptions"""
         for subscription_type in models.SubscriptionType.objects.all():
             field_name = "subscription_{0}".format(subscription_type.id)
             accept_subscription = self.cleaned_data[field_name]
@@ -398,6 +442,7 @@ class ContactForm(ModelFormWithCity):
                     )
 
     def save(self, *args, **kwargs):
+        """save"""
         contact = super(ContactForm, self).save(*args, **kwargs)
         if kwargs.get('commit', True):
             self.save_contact_subscriptions(contact)
@@ -405,18 +450,24 @@ class ContactForm(ModelFormWithCity):
 
 
 class EntityTypeForm(forms.ModelForm):
+    """form for EntityType"""
     
     class Meta:
+        """form from model"""
         model = models.EntityType
 
 
 class EntityRoleForm(forms.ModelForm):
+    """form for entity role"""
     
     class Meta:
+        """form from model"""
         model = models.EntityRole
 
 
 class ActionForm(BetterBsModelForm):
+    """Edit action form"""
+
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
     
@@ -424,6 +475,7 @@ class ActionForm(BetterBsModelForm):
     end_time = forms.TimeField(label=_(u"end time"), required=False)
     
     class Meta:
+        """form from model"""
         model = models.Action
         fields = (
             'type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
@@ -442,98 +494,109 @@ class ActionForm(BetterBsModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        entity = kwargs.pop('entity', None)
+        kwargs.pop('entity', None)
         instance = kwargs.get('instance', None)
         super(ActionForm, self).__init__(*args, **kwargs)
         
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
-            default_status = instance.type.default_status
-            choices = [('', "---------")] # let javascript disable the blank value if default_status
-            self.fields['status'].choices = choices + [(s.id, s.name) for s in instance.type.allowed_status.all()]
+            # let javascript disable the blank value if default_status
+            choices = [('', "---------")]
+            self.fields['status'].choices = choices + [
+                (status.id, status.name) for status in instance.type.allowed_status.all()
+            ]
 
         self.fields['opportunity'].widget = forms.HiddenInput()    
-        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
+        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols': '72'})
         
         self._init_dt_field("planned_date", "date", "time")
         self._init_dt_field("end_datetime", "end_date", "end_time")
         
     def _init_dt_field(self, dt_field, date_field, time_field):
+        """init datetime fields"""
         self.fields[dt_field].widget = forms.HiddenInput()
-        dt = getattr(self.instance, dt_field) if self.instance else self.fields[dt_field].initial
-        if dt:
-            self.fields[date_field].initial = dt.date()
+        the_datetime = getattr(self.instance, dt_field) if self.instance else self.fields[dt_field].initial
+        if the_datetime:
+            self.fields[date_field].initial = the_datetime.date()
             if settings.USE_TZ:
-                utc_dt = dt.replace(tzinfo=timezone.utc)
+                utc_dt = the_datetime.replace(tzinfo=timezone.utc)
                 loc_dt = utc_dt.astimezone(timezone.get_current_timezone())
                 self.fields[time_field].initial = loc_dt.time()
             else:
-                self.fields[time_field].initial = dt.time()
+                self.fields[time_field].initial = the_datetime.time()
         
     def clean_status(self):
-        t = self.cleaned_data['type']
-        s = self.cleaned_data['status']
-        if t:
-            allowed_status = ([] if t.default_status else [None]) + list(t.allowed_status.all())
-            if len(allowed_status) > 0 and not (s in allowed_status):
+        """status validation"""
+        type_of = self.cleaned_data['type']
+        status = self.cleaned_data['status']
+        if type_of:
+            allowed_status = ([] if type_of.default_status else [None]) + list(type_of.allowed_status.all())
+            if len(allowed_status) > 0 and status not in allowed_status:
                 raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         else:
-            if s:
+            if status:
                 raise ValidationError(ugettext(u"Please select a type before defining the status"))
-        return s
+        return status
     
     def clean_planned_date(self):
-        d = self.cleaned_data.get("date", None)
-        t = self.cleaned_data.get("time", None)
-        if d:
-            dt = datetime.combine(d, t or datetime.min.time())
-            return dt
+        """planned date validation"""
+        the_date = self.cleaned_data.get("date", None)
+        the_time = self.cleaned_data.get("time", None)
+        if the_date:
+            return datetime.combine(the_date, the_time or datetime.min.time())
         return None
     
     def clean_time(self):
-        d = self.cleaned_data.get("date", None)
-        t = self.cleaned_data.get("time", None)
-        if t and not d:
+        """time validation"""
+        the_date = self.cleaned_data.get("date", None)
+        the_time = self.cleaned_data.get("time", None)
+        if the_time and not the_date:
             raise ValidationError(_(u"You must set a date"))
-        return t
+        return the_time
     
     def clean_end_date(self):
-        d1 = self.cleaned_data.get("date", None)
-        d2 = self.cleaned_data.get("end_date", None)
-        if d2:
+        """end date valodation"""
+        date1 = self.cleaned_data.get("date", None)
+        date2 = self.cleaned_data.get("end_date", None)
+        if date2:
             start_dt = self.cleaned_data["planned_date"]
             if not start_dt:
                 raise ValidationError(_(u"The planned date is not defined"))
-            if d1 > d2:
+            if date1 > date2:
                 raise ValidationError(_(u"The end date must be after the planned date"))
-        return d2
+        return date2
             
     def clean_end_time(self):
-        d1 = self.cleaned_data.get("date", None)
-        d2 = self.cleaned_data.get("end_date", None)
-        t1 = self.cleaned_data.get("time", None)
-        t2 = self.cleaned_data.get("end_time", None)
-        if t2:
-            if t2 and not d2:
+        """end time validation"""
+        date1 = self.cleaned_data.get("date", None)
+        date2 = self.cleaned_data.get("end_date", None)
+        time1 = self.cleaned_data.get("time", None)
+        time2 = self.cleaned_data.get("end_time", None)
+
+        if time2:
+            if time2 and not date2:
                 raise ValidationError(_(u"You must set a end date"))
                 
-            if d1==d2 and (t1 or datetime.min.time())>=t2:
+            if date1 == date2 and (time1 or datetime.min.time()) >= time2:
                 raise ValidationError(_(u"The end time must be after the planned time"))
-        elif t1:
-            if d1==d2 and t1>=datetime.min.time():
+
+        elif time1:
+            if date1 == date2 and time1 >= datetime.min.time():
                 raise ValidationError(_(u"The end time must be set"))
-        return t2
+        return time2
     
     def clean_end_datetime(self):
-        d = self.cleaned_data.get("end_date", None)
-        t = self.cleaned_data.get("end_time", None)
-        dt = None
-        if d:
-            return datetime.combine(d, t or datetime.min.time())
+        """clean end datetime"""
+        end_date = self.cleaned_data.get("end_date", None)
+        end_time = self.cleaned_data.get("end_time", None)
+        if end_date:
+            return datetime.combine(end_date, end_time or datetime.min.time())
         return None
 
 
 class OpportunityForm(BetterBsModelForm):
+    """opportunity form"""
     class Meta:
+        """form from model"""
         model = models.Opportunity
         fields = ('name', 'detail')
         
@@ -547,18 +610,23 @@ class OpportunityForm(BetterBsModelForm):
 
 
 class OpportunityStatusForm(forms.ModelForm):
-    
+    """opportunity status form"""
+
     class Meta:
+        """form from model"""
         model = models.OpportunityStatus
 
 
 class ActionTypeForm(forms.ModelForm):
-    
+    """action type form"""
+
     class Meta:
+        """form from model"""
         model = models.ActionType
 
 
 class SelectEntityForm(forms.Form):
+    """Select an entity"""
     entity = forms.CharField(label=_(u"Entity"))
     
     def __init__(self, *args, **kwargs):
@@ -567,6 +635,7 @@ class SelectEntityForm(forms.Form):
             attrs={'placeholder': _(u'Enter the name of an entity'), 'size': '50', 'class': 'colorbox'})
 
     def clean_entity(self):
+        """entity validation"""
         try:
             entity_id = int(self.cleaned_data["entity"])
             return models.Entity.objects.get(id=entity_id)
@@ -575,7 +644,8 @@ class SelectEntityForm(forms.Form):
 
 
 class SelectContactForm(forms.Form):
-    
+    """Select a contact"""
+
     def __init__(self, *args, **kwargs):
         choices = kwargs.pop('choices', None)
         super(SelectContactForm, self).__init__(*args, **kwargs)
@@ -584,10 +654,12 @@ class SelectContactForm(forms.Form):
             self.fields["contact"] = forms.IntegerField(label=_(u"Contact"), widget=widget)
         else:
             widget = ContactAutoComplete(
-                attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'})
+                attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
+            )
             self.fields["contact"] = forms.CharField(label=_(u"Contact"), widget=widget)
     
     def clean_contact(self):
+        """validation"""
         try:
             contact_id = int(self.cleaned_data["contact"])
             return models.Contact.objects.get(id=contact_id)
@@ -596,15 +668,17 @@ class SelectContactForm(forms.Form):
 
 
 class SelectOpportunityForm(forms.Form):
-    
+    """Select opportunity"""
+
     def __init__(self, *args, **kwargs):
-        choices = kwargs.pop('choices', None)
+        kwargs.pop('choices', None)
         super(SelectOpportunityForm, self).__init__(*args, **kwargs)
         widget = OpportunityAutoComplete(
             attrs={'placeholder': _(u'Enter the name of a opportunity'), 'size': '50', 'class': 'colorbox'})
         self.fields["opportunity"] = forms.CharField(label=_(u"Opportunity"), widget=widget)
 
     def clean_opportunity(self):
+        """validation"""
         try:
             opportunity_id = int(self.cleaned_data["opportunity"])
             return models.Opportunity.objects.get(id=opportunity_id)
@@ -613,6 +687,7 @@ class SelectOpportunityForm(forms.Form):
 
 
 class SameAsForm(forms.Form):
+    """Define "same as" for two contacts"""
     contact = forms.IntegerField(label=_(u"Contact"))
     
     def __init__(self, contact, *args, **kwargs):
@@ -621,20 +696,23 @@ class SameAsForm(forms.Form):
             lastname__iexact=contact.lastname, firstname__iexact=contact.firstname,
         ).exclude(id=contact.id)
         if contact.same_as:
-            potential_contacts = potential_contacts.exclude(same_as=contact.same_as) # Do not propose again current SameAs
-        self._same_as = [(c.id, u"{0}".format(c)) for c in potential_contacts]
+            # Do not propose again current SameAs
+            potential_contacts = potential_contacts.exclude(same_as=contact.same_as)
+        self._same_as = [(same_as_contact.id, u"{0}".format(same_as_contact)) for same_as_contact in potential_contacts]
         if len(self._same_as):
             self.fields["contact"].widget = forms.Select(choices=self._same_as)
         else:
             self.fields["contact"].widget = forms.HiddenInput()    
     
     def has_choices(self):
+        """true if several contacts with same name"""
         return len(self._same_as)
         
     def clean_contact(self):
+        """validation"""
         contact_id = self.cleaned_data["contact"]
         try:
-            if contact_id not in [x[0] for x in self._same_as]:
+            if contact_id not in [same_as[0] for same_as in self._same_as]:
                 raise ValidationError(ugettext(u"Invalid contact"))
             return models.Contact.objects.get(id=contact_id)
         except models.Contact.DoesNotExist:
@@ -642,30 +720,34 @@ class SameAsForm(forms.Form):
         
         
 class AddRelationshipForm(forms.Form):
+    """form for adding relationships"""
     relationship_type = forms.IntegerField(label=_(u"relationship type"))
     contact2 = forms.CharField(label=_(u"Contact"))
     
     def __init__(self, contact1, *args, **kwargs):
         super(AddRelationshipForm, self).__init__(*args, **kwargs)
-        
+
+        self.reversed_relation = False
         self.contact1 = contact1
         
         relationship_types = []
-        for r in models.RelationshipType.objects.all():
-            relationship_types.append((r.id, r.name))
-            if r.reverse:
-                relationship_types.append((-r.id, r.reverse))
+        for relationship_type in models.RelationshipType.objects.all():
+            relationship_types.append((relationship_type.id, relationship_type.name))
+            if relationship_type.reverse:
+                relationship_types.append((-relationship_type.id, relationship_type.reverse))
         self.fields["relationship_type"].widget = forms.Select(choices=relationship_types) 
         
         widget = ContactAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'})
+            attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
+        )
         self.fields["contact2"] = forms.CharField(label=_(u"Contact"), widget=widget)
         
     def clean_relationship_type(self):
+        """validate relationship type"""
         try:
             self.reversed_relation = False
             relationship_type = int(self.cleaned_data["relationship_type"])
-            if relationship_type<0:
+            if relationship_type < 0:
                 self.reversed_relation = True
                 relationship_type = -relationship_type
             return models.RelationshipType.objects.get(id=relationship_type)
@@ -675,6 +757,7 @@ class AddRelationshipForm(forms.Form):
             raise ValidationError(ugettext(u"Relationship type does not exist"))
         
     def clean_contact2(self):
+        """clean the contacts in relation"""
         try:
             contact2 = int(self.cleaned_data["contact2"])
             return models.Contact.objects.get(id=contact2)
@@ -684,6 +767,7 @@ class AddRelationshipForm(forms.Form):
             raise ValidationError(ugettext(u"Contact does not exist"))
         
     def save(self):
+        """save"""
         if self.reversed_relation:
             contact1 = self.cleaned_data["contact2"]
             contact2 = self.contact1
@@ -691,13 +775,17 @@ class AddRelationshipForm(forms.Form):
             contact1 = self.contact1
             contact2 = self.cleaned_data["contact2"]
         
-        rt = self.cleaned_data["relationship_type"]
-        return models.Relationship.objects.create(contact1=contact1, contact2=contact2, relationship_type=rt)
+        relationship_type = self.cleaned_data["relationship_type"]
+        return models.Relationship.objects.create(
+            contact1=contact1, contact2=contact2, relationship_type=relationship_type
+        )
 
 
 class ActionDoneForm(forms.ModelForm):
-    
+    """form setting an action done"""
+
     class Meta:
+        """form from model"""
         model = models.Action
         fields = ['done']
         widgets = {
@@ -712,39 +800,47 @@ class ActionDoneForm(forms.ModelForm):
 
 
 class CustomFieldForm(forms.Form):
-    
+    """base form for custom fields"""
     def __init__(self, instance, *args, **kwargs):
         super(CustomFieldForm, self).__init__(*args, **kwargs)
         self._instance = instance
         model_type = self._get_model_type()
         custom_fields = models.CustomField.objects.filter(model=model_type)
-        for f in custom_fields:
-            self.fields[f.name] = forms.CharField(required=False, label=f.label)
-            if f.widget:
-                self.fields[f.name].widget.attrs = {'class': f.widget}
-            if len(args)==0: #No Post
-                self.fields[f.name].initial = getattr(instance, 'custom_field_'+f.name, '')
+        for field in custom_fields:
+            self.fields[field.name] = forms.CharField(required=False, label=field.label)
+
+            if field.widget:
+                self.fields[field.name].widget.attrs = {'class': field.widget}
+
+            #No Post
+            if len(args) == 0:
+                self.fields[field.name].initial = getattr(instance, 'custom_field_'+field.name, '')
                 
     def save(self, *args, **kwargs):
-        for f in self.fields:
+        """save"""
+        for field in self.fields:
             model_type = self._get_model_type()
-            cf = models.CustomField.objects.get(name = f, model=model_type)
-            cfv = self._create_custom_field_value(cf)
-            cfv.value = self.cleaned_data[f]
-            cfv.save()
+            custom_field = models.CustomField.objects.get(name=field, model=model_type)
+            custom_field_value = self._create_custom_field_value(custom_field)
+            custom_field_value.value = self.cleaned_data[field]
+            custom_field_value.save()
         return self._instance
 
 
 class EntityCustomFieldForm(CustomFieldForm):
+    """form for setting custom fields on an entity"""
         
     def _get_model_type(self):
+        """is entity"""
         return models.CustomField.MODEL_ENTITY
     
     @staticmethod
     def model():
+        """model"""
         return models.Entity
     
     def _create_custom_field_value(self, custom_field):
+        """save the value in database"""
         custom_field_value = models.EntityCustomFieldValue.objects.get_or_create(
             entity=self._instance, custom_field=custom_field
         )[0]
@@ -752,11 +848,14 @@ class EntityCustomFieldForm(CustomFieldForm):
 
 
 class ContactCustomFieldForm(CustomFieldForm):
+    """form for setting custom fields of a contact"""
     
     def _get_model_type(self):
+        """type -> contact"""
         return models.CustomField.MODEL_CONTACT
     
     def _create_custom_field_value(self, custom_field):
+        """save value in database"""
         custom_field_value = models.ContactCustomFieldValue.objects.get_or_create(
             contact=self._instance, custom_field=custom_field
         )[0]
@@ -764,16 +863,19 @@ class ContactCustomFieldForm(CustomFieldForm):
     
     @staticmethod
     def model():
+        """model"""
         return models.Contact
 
 
 class ContactsImportForm(BsModelForm):
-    
+    """form for importing data"""
     class Meta:
+        """form from model"""
         model = models.ContactsImport
-        exclude = ('imported_by', )
-        
+        fields = ('import_file', 'name', 'encoding', 'separator', 'entity_type', 'groups', 'entity_name_from_email', )
+
     class Media:
+        """media files"""
         css = {
             'all': ('chosen/chosen.css', 'chosen/chosen-bootstrap.css')
         }
@@ -787,25 +889,31 @@ class ContactsImportForm(BsModelForm):
         self.fields['groups'].widget.attrs = {
             'class': 'chosen-select form-control',
             'data-placeholder': _(u'The created entities will be added to the selected groups'),
-            #'style': "width:600px;"
         }
         self.fields['groups'].help_text = ''
 
     def clean_separator(self):
+        """validation"""
         if len(self.cleaned_data["separator"]) != 1:
             raise ValidationError(ugettext(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
         return self.cleaned_data["separator"]
         
         
 class ContactsImportConfirmForm(ContactsImportForm):
-    default_department = forms.ChoiceField(required=False, label=_(u'Default department'),
-        choices=([('', '')]+[(x.code, x.name) for x in models.Zone.objects.filter(type__type='department')]),
-        help_text=_(u'The city in red will be created with this department as parent'))
+    """confirm contact import"""
+    default_department = forms.ChoiceField(
+        required=False,
+        label=_(u'Default department'),
+        choices=([('', '')]+[(zone.code, zone.name) for zone in models.Zone.objects.filter(type__type='department')]),
+        help_text=_(u'The city in red will be created with this department as parent')
+    )
     
     class Meta(ContactsImportForm.Meta):
-        exclude = ('imported_by', 'import_file', 'name')
-    
+        """from model"""
+        fields = ('encoding', 'separator', 'entity_type', 'groups', 'entity_name_from_email', )
+
     def clean_default_department(self):
+        """validation"""
         code = self.cleaned_data['default_department']
         if code:
             if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
@@ -816,13 +924,14 @@ class ContactsImportConfirmForm(ContactsImportForm):
         
 
 class ActionDocumentForm(AlohaEditableModelForm):
-    
+    """Action document form"""
     class Meta:
         model = models.ActionDocument
         fields = ('content',)
 
 
 class ChangeContactEntityForm(forms.Form):
+    """Switch contact entity form"""
     OPTION_ADD_TO_EXISTING_ENTITY = 1
     OPTION_CREATE_NEW_ENTITY = 2
     OPTION_SWITCH_SINGLE_CONTACT = 3
@@ -835,20 +944,25 @@ class ChangeContactEntityForm(forms.Form):
         (OPTION_SWITCH_SINGLE_CONTACT, _(u"Switch to single contact")),
         (OPTION_SWITCH_ENTITY_CONTACT, _(u"Switch to entity contact")),
     )
-    
+
     option = forms.ChoiceField(label=_(u"What to do?"))
-    entity = forms.IntegerField(label=_(u"Which one?"), required=False, widget=EntityAutoComplete(
-        attrs={'placeholder': _(u'Enter the name of the entity'), 'size': '50', 'class': 'colorbox'}))
+    entity = forms.IntegerField(
+        label=_(u"Which one?"),
+        required=False,
+        widget=EntityAutoComplete(
+            attrs={'placeholder': _(u'Enter the name of the entity'), 'size': '50', 'class': 'colorbox'}
+        )
+    )
     
     def __init__(self, contact, *args, **kwargs):
         self.contact = contact
         super(ChangeContactEntityForm, self).__init__(*args, **kwargs)
+
         if contact.entity.is_single_contact:
-            choices = [c for c in self.OPTION_CHOICES
-                if not (c[0] in (self.OPTION_CREATE_NEW_ENTITY, self.OPTION_SWITCH_SINGLE_CONTACT)) ]
+            single_contact_choices = (self.OPTION_CREATE_NEW_ENTITY, self.OPTION_SWITCH_SINGLE_CONTACT)
+            choices = [choice for choice in self.OPTION_CHOICES if choice[0] not in single_contact_choices]
         else:
-            choices = [c for c in self.OPTION_CHOICES
-                if (c[0] != self.OPTION_SWITCH_ENTITY_CONTACT) ]
+            choices = [choice for choice in self.OPTION_CHOICES if choice[0] != self.OPTION_SWITCH_ENTITY_CONTACT]
     
         self.fields['option'].choices = choices
         
@@ -860,6 +974,7 @@ class ChangeContactEntityForm(forms.Form):
         }
         
     def clean_option(self):
+        """validation"""
         try:
             option = int(self.cleaned_data["option"])
             if option == 0:
@@ -873,6 +988,7 @@ class ChangeContactEntityForm(forms.Form):
         return option
         
     def clean_entity(self):
+        """validation"""
         option = self.cleaned_data.get("option", 0)
         if option != self.OPTION_ADD_TO_EXISTING_ENTITY:
             return None
@@ -884,19 +1000,21 @@ class ChangeContactEntityForm(forms.Form):
                 raise ValidationError(ugettext(u"Please select an existing entity"))
             
     def _add_to_existing_entity(self):
+        """add to exsiting entity"""
         old_entity = self.contact.entity
         self.contact.entity = self.cleaned_data["entity"]
         self.contact.save()
         old_entity.save()
     
     def _create_new_entity(self):
+        """create new entity"""
         old_entity = self.contact.entity
         self.contact.entity = models.Entity.objects.create()
         self.contact.save()
         old_entity.save()
-        #old_entity.default_contact.delete()
-    
+
     def _switch_single_contact(self):
+        """switch to single contact"""
         old_entity = self.contact.entity
         self.contact.entity = models.Entity.objects.create(
             is_single_contact=True,
@@ -908,14 +1026,17 @@ class ChangeContactEntityForm(forms.Form):
         old_entity.save()
         
     def _switch_entity_contact(self):
+        """switch to entity"""
         self.contact.entity.is_single_contact = False
         self.contact.entity.save()
         
     def change_entity(self):
+        """change entity: call the method corresponding to the choice"""
         option = self.cleaned_data["option"]
         method = self.meth_map[option]
         method()
 
 
 class ConfirmForm(forms.Form):
+    """Confirmation form"""
     confirm = forms.BooleanField(initial=True, widget=forms.HiddenInput(), required=False)

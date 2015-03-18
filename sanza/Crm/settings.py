@@ -43,3 +43,8 @@ def city_formatters():
 def get_language_choices():
     """returns list of languages"""
     return [('', _(u'Default'))] + list(project_settings.LANGUAGES)
+
+
+def has_language_choices():
+    """returns true if we should propose language choices"""
+    return len(project_settings.LANGUAGES) >= 2

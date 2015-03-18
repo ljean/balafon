@@ -64,20 +64,25 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span title="{% trans "Address" %}" class="glyphicon glyphicon-envelope"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <span title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Email" %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
+        <span title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
       </td></tr>
       <tr><td>
-        <span title="{% trans "Phone" %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
+        <span title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Mobile" %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
+        <span title="{% trans 'Mobile' %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Job" %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
+        <span title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
       </td></tr>
+      {% if contact.favorite_language %}
+      <tr><td>
+        <span title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span> {{contact.favorite_language}}
+      </td></tr>
+      {% endif %}
     </table>
   </div>
   
