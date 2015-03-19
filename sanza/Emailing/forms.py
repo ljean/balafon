@@ -458,14 +458,13 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         contact = super(SubscribeForm, self).save(commit=False)
         contact.entity = self.get_entity()
         contact.city = self.cleaned_data['city']
+        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
         contact.save()
         #delete unknown contacts for the current entity
         contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
         
         #force also the city on the entity
         contact.entity.city = contact.city
-
-        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
 
         groups = self.cleaned_data['groups']
         for group in groups:

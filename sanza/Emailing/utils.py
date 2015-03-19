@@ -189,6 +189,10 @@ def send_notification_email(request, contact, actions, message):
         }
         the_templatate = get_template('Emailing/subscribe_notification_email.txt')
         content = the_templatate.render(Context(data))
+
+        #remove empty lines and replace any line starting with ## by a line feed
+        lines = [line if line[:2] != "##" else "" for line in content.split("\n") if line]
+        content = u"\n".join(lines)
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         

@@ -517,6 +517,18 @@ class Contact(TimeStampedModel):
         """relationships enabled?"""
         return RelationshipType.objects.count() > 0
 
+    def get_same_as(self):
+        """get contacts marked as same as"""
+        if self.same_as:
+            return Contact.objects.filter(same_as=self.same_as).exclude(id=self.id)
+        return Contact.objects.none()
+
+    def get_same_email(self):
+        """get contacts with same email address"""
+        if self.email:
+            return Contact.objects.filter(Q(email=self.email) | Q(entity__email=self.email)).exclude(id=self.id)
+        return Contact.objects.none()
+
     def get_safe_photo(self):
         """photo or default one"""
         if self.photo:

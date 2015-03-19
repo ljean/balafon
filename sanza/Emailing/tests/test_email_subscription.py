@@ -358,3 +358,119 @@ class SubscribeTest(TestCase):
 
         queryset = models.Subscription.objects.filter(contact=contact)
         self.assertEqual(0, queryset.count())
+
+    def test_subscribe_existing_contact(self):
+        """subscribe again to mailing list"""
+        entity = mommy.make(models.Entity)
+        existing_contact = entity.default_contact
+        existing_contact.email = 'pdupond@apidev.fr'
+        existing_contact.save()
+
+        subscription_type1 = mommy.make(models.SubscriptionType, name="abc", site=Site.objects.get_current())
+        url = reverse("emailing_email_subscribe_subscription", args=[subscription_type1.id])
+
+        data = {
+            'email': existing_contact.email,
+        }
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 2)
+        self.assertEqual(models.Contact.objects.filter(email=existing_contact.email).count(), 2)
+
+        new_contact = models.Contact.objects.filter(email=existing_contact.email).exclude(id=existing_contact.id)[0]
+        self.assertEqual(new_contact.email_verified, False)
+
+        self.assertEqual(new_contact.get_same_as().count(), 0)
+        self.assertEqual(new_contact.get_same_email().count(), 1)
+
+        self.assertNotEqual(new_contact.uuid, '')
+        self.assertEqual(new_contact.favorite_language, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
+
+        queryset = models.Subscription.objects.filter(contact=new_contact, subscription_type=subscription_type1)
+        self.assertEqual(1, queryset.count())
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [new_contact.email])
+        url = reverse('emailing_email_verification', args=[new_contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        email_content = notification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(new_contact.fullname) > 0)
+        self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
+        self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)
+
+    def test_subscribe_several_existing_contact(self):
+        """subscribe again to mailing list"""
+        entity1 = mommy.make(models.Entity)
+        existing_contact1 = entity1.default_contact
+        existing_contact1.email = 'pdupond@apidev.fr'
+        existing_contact1.save()
+
+        entity2 = mommy.make(models.Entity, email=existing_contact1.email)
+        existing_contact2 = entity2.default_contact
+        existing_contact4 = mommy.make(models.Contact, entity=entity2)
+
+        entity3 = mommy.make(models.Entity)
+        existing_contact3 = entity3.default_contact
+        existing_contact3.email = existing_contact1.email
+        existing_contact3.save()
+
+        mommy.make(models.Contact, email="toto@somethingelse.fr")
+
+        subscription_type1 = mommy.make(models.SubscriptionType, name="abc", site=Site.objects.get_current())
+        url = reverse("emailing_email_subscribe_subscription", args=[subscription_type1.id])
+
+        data = {
+            'email': existing_contact1.email,
+        }
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.filter(email=existing_contact1.email).count(), 3)
+
+        existing_ids = [
+            contact.id for contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4)
+        ]
+        queryset = models.Contact.objects.filter(email=existing_contact1.email).exclude(id__in=existing_ids)
+        self.assertEqual(queryset.count(), 1)
+        new_contact = queryset[0]
+        self.assertEqual(new_contact.email_verified, False)
+
+        queryset = models.Subscription.objects.filter(contact=new_contact, subscription_type=subscription_type1)
+        self.assertEqual(1, queryset.count())
+
+        self.assertEqual(new_contact.get_same_as().count(), 0)
+        self.assertEqual(new_contact.get_same_email().count(), 4)
+        self.assertEqual(
+            sorted([contact.id for contact in new_contact.get_same_email()]),
+            sorted(existing_ids)
+        )
+
+        self.assertNotEqual(new_contact.uuid, '')
+        self.assertEqual(new_contact.favorite_language, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [new_contact.email])
+        url = reverse('emailing_email_verification', args=[new_contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        email_content = notification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(new_contact.fullname) > 0)
+        self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
+        for existing_contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4):
+            self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)

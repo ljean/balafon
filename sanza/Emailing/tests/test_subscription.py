@@ -164,6 +164,10 @@ class SubscribeTest(TestCase):
         contact = models.Contact.objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
+        self.assertEqual(contact.favorite_language, '')
+        self.assertEqual(contact.get_same_as().count(), 0)
+        self.assertEqual(contact.get_same_email().count(), 0)
+
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid])) >= 0)
 
         self.assertEqual(contact.lastname, data['lastname'])
@@ -181,6 +185,170 @@ class SubscribeTest(TestCase):
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('fr', 'French')))
+    def test_subscribe_newsletter_favorite_language(self):
+        """subscribe as an individual"""
+        url = reverse("emailing_subscribe_newsletter")
+
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'groups': [],
+            'email': 'pdupond@apidev.fr',
+            'favorite_language': 'fr',
+        }
+        self._patch_with_captcha(url, data)
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+
+        contact = models.Contact.objects.all()[0]
+
+        self.assertNotEqual(contact.uuid, '')
+        self.assertEqual(contact.favorite_language, 'fr')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid])) >= 0)
+
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email])
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+
+    def test_subscribe_existing_contact(self):
+        """subscribe again to mailing list"""
+        entity = mommy.make(models.Entity)
+        existing_contact = entity.default_contact
+        existing_contact.email = 'pdupond@apidev.fr'
+        existing_contact.save()
+
+        url = reverse("emailing_subscribe_newsletter")
+
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'groups': [],
+            'email': existing_contact.email,
+        }
+        self._patch_with_captcha(url, data)
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 2)
+        self.assertEqual(models.Contact.objects.filter(email=existing_contact.email).count(), 2)
+
+        new_contact = models.Contact.objects.filter(email=existing_contact.email).exclude(id=existing_contact.id)[0]
+        self.assertEqual(new_contact.email_verified, False)
+
+        self.assertEqual(new_contact.get_same_as().count(), 0)
+        self.assertEqual(new_contact.get_same_email().count(), 1)
+
+        self.assertNotEqual(new_contact.uuid, '')
+        self.assertEqual(new_contact.favorite_language, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[new_contact.uuid])) >= 0)
+
+        self.assertEqual(new_contact.lastname, data['lastname'])
+        self.assertEqual(new_contact.firstname, data['firstname'])
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [new_contact.email])
+        url = reverse('emailing_email_verification', args=[new_contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        email_content = notification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(new_contact.fullname) > 0)
+        self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
+        self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)
+
+    def test_subscribe_several_existing_contact(self):
+        """subscribe again to mailing list"""
+        entity1 = mommy.make(models.Entity)
+        existing_contact1 = entity1.default_contact
+        existing_contact1.email = 'pdupond@apidev.fr'
+        existing_contact1.save()
+
+        entity2 = mommy.make(models.Entity, email=existing_contact1.email)
+        existing_contact2 = entity2.default_contact
+        existing_contact4 = mommy.make(models.Contact, entity=entity2)
+
+        entity3 = mommy.make(models.Entity)
+        existing_contact3 = entity3.default_contact
+        existing_contact3.email = existing_contact1.email
+        existing_contact3.save()
+
+        mommy.make(models.Contact, email="toto@somethingelse.fr")
+
+        url = reverse("emailing_subscribe_newsletter")
+
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'groups': [],
+            'email': existing_contact1.email,
+        }
+        self._patch_with_captcha(url, data)
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.filter(email=existing_contact1.email).count(), 3)
+
+        existing_ids = [
+            contact.id for contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4)
+        ]
+        queryset = models.Contact.objects.filter(email=existing_contact1.email).exclude(id__in=existing_ids)
+        self.assertEqual(queryset.count(), 1)
+        new_contact = queryset[0]
+        self.assertEqual(new_contact.email_verified, False)
+
+        self.assertEqual(new_contact.get_same_as().count(), 0)
+        self.assertEqual(new_contact.get_same_email().count(), 4)
+        self.assertEqual(
+            sorted([contact.id for contact in new_contact.get_same_email()]),
+            sorted(existing_ids)
+        )
+
+        self.assertNotEqual(new_contact.uuid, '')
+        self.assertEqual(new_contact.favorite_language, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[new_contact.uuid])) >= 0)
+
+        self.assertEqual(new_contact.lastname, data['lastname'])
+        self.assertEqual(new_contact.firstname, data['firstname'])
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [new_contact.email])
+        url = reverse('emailing_email_verification', args=[new_contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
+        email_content = notification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(new_contact.fullname) > 0)
+        self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
+        for existing_contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4):
+            self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)
 
     def test_subscribe_newsletter_entity(self):
         """subscribe as a company member"""

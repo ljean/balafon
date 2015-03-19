@@ -3,6 +3,7 @@
 
 from datetime import datetime
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import ValidationError
@@ -692,9 +693,16 @@ class SameAsForm(forms.Form):
     
     def __init__(self, contact, *args, **kwargs):
         super(SameAsForm, self).__init__(*args, **kwargs)
-        potential_contacts = models.Contact.objects.filter(
-            lastname__iexact=contact.lastname, firstname__iexact=contact.firstname,
-        ).exclude(id=contact.id)
+        if contact.email:
+            potential_contacts = models.Contact.objects.filter(
+                Q(lastname__iexact=contact.lastname, firstname__iexact=contact.firstname) |
+                Q(email=contact.email) | Q(entity__email=contact.email),
+            )
+        else:
+            potential_contacts = models.Contact.objects.filter(
+                lastname__iexact=contact.lastname, firstname__iexact=contact.firstname
+            )
+        potential_contacts = potential_contacts.exclude(id=contact.id)
         if contact.same_as:
             # Do not propose again current SameAs
             potential_contacts = potential_contacts.exclude(same_as=contact.same_as)
