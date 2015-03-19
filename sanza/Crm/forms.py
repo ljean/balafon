@@ -344,8 +344,9 @@ class ContactForm(ModelFormWithCity):
         )
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
-            'role': forms.SelectMultiple(attrs={
-                'class': 'chosen-select', 'data-placeholder': _(u'Select roles'), 'style': "width: 100%;"}),
+            'role': forms.SelectMultiple(
+                attrs={'class': 'chosen-select', 'data-placeholder': _(u'Select roles'), 'style': "width: 100%;"}
+            ),
         }
         fieldsets = [
             ('name', {
@@ -403,7 +404,9 @@ class ContactForm(ModelFormWithCity):
                     pass
 
         if has_language_choices():
-            self.fields['favorite_language'].widget = forms.Select(choices=get_language_choices())
+            self.fields['favorite_language'].widget = forms.Select(
+                choices=get_language_choices(), attrs={'class': 'form-control'}
+            )
         else:
             self.fields['favorite_language'].widget = forms.HiddenInput()
 
