@@ -1088,8 +1088,8 @@ class ActionTest(BaseTestCase):
         url = reverse('crm_remove_entity_from_action', args=[action1.id, entity.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response.content, entity.name)
-        self.assertNotContains(response.content, entity.default_contact.lastname)
+        self.assertContains(response, entity.name)
+        self.assertNotContains(response, entity.default_contact.lastname)
 
         action1 = models.Action.objects.get(id=action1.id)
         self.assertEqual(action1.contacts.count(), 0)

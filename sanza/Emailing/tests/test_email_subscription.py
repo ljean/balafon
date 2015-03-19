@@ -15,7 +15,6 @@ from django.utils.translation import activate
 from model_mommy import mommy
 
 from sanza.Crm import models
-from sanza.Emailing.utils import get_language
 
 
 class SubscribeTest(TestCase):
@@ -52,7 +51,7 @@ class SubscribeTest(TestCase):
         soup = BeautifulSoup(response.content)
 
         self.assertEqual(1, len(soup.select("#id_favorite_language")))
-        self.assertEqual(get_language(), soup.select("#id_favorite_language")[0]["value"])
+        self.assertEqual('fr', soup.select("#id_favorite_language")[0]["value"])
 
     @override_settings(LANGUAGES=(('en', 'English'),))
     def test_view_subscription_no_language(self):
