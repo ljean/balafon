@@ -80,7 +80,8 @@
       </td></tr>
       {% if contact.favorite_language %}
       <tr><td>
-        <span title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span> {{contact.favorite_language}}
+        <span title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
+        {{contact.get_favorite_language_display}}
       </td></tr>
       {% endif %}
     </table>

@@ -9,28 +9,41 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.translation import activate
 
 from captcha.models import CaptchaStore
 from model_mommy import mommy
 
 from sanza.Crm import models
+from sanza.Emailing.utils import get_language
 
 
 class SubscribeTest(TestCase):
+    """Subscribe to newsletter"""
 
     def setUp(self):
+        """before each test"""
+        self._lang = settings.LANGUAGES[0][0]
+        activate(self._lang)
 
         if not getattr(settings, 'SANZA_ALLOW_SINGLE_CONTACT', True):
             settings.SANZA_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
 
-        default_country = mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
+        mommy.make(models.Zone, name=settings.SANZA_DEFAULT_COUNTRY, parent=None)
+
+    def tearDown(self):
+        """after each test"""
+        activate(self._lang)
 
     def test_view_subscribe_newsletter(self):
+        """view subscription page"""
         url = reverse("emailing_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
     def test_subscribe_newsletter_no_email(self):
+        """subscribe without setting an email"""
         group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
 
         url = reverse("emailing_subscribe_newsletter")
@@ -53,6 +66,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_subscribe_newsletter_message(self):
+        """subscribe with a message"""
         url = reverse("emailing_subscribe_newsletter")
 
         data = {
@@ -78,18 +92,20 @@ class SubscribeTest(TestCase):
         action = contact.action_set.all()[0]
         self.assertEqual(data["message"], action.detail)
 
-        self.assertEqual(len(mail.outbox), 2) #email verification
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
-        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
         email_content = verification_email.message().as_string().decode('utf-8')
-        self.assertTrue(email_content.find(url)>0) #email verification
+        self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
 
     def test_subscribe_newsletter_empty_message(self):
+        """subscribe with an empty message"""
         url = reverse("emailing_subscribe_newsletter")
 
         data = {
@@ -114,18 +130,20 @@ class SubscribeTest(TestCase):
 
         self.assertEqual(0, contact.action_set.count())
 
-        self.assertEqual(len(mail.outbox), 2) #email verification
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
-        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
         email_content = verification_email.message().as_string().decode('utf-8')
-        self.assertTrue(email_content.find(url)>0) #email verification
+        self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
 
     def test_subscribe_newsletter_no_entity(self):
+        """subscribe as an individual"""
         group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
 
         url = reverse("emailing_subscribe_newsletter")
@@ -146,24 +164,26 @@ class SubscribeTest(TestCase):
         contact = models.Contact.objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
-        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid]))>=0)
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid])) >= 0)
 
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [group1])
 
-        self.assertEqual(len(mail.outbox), 2) #email verification
+        #email verification
+        self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
-        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
         email_content = verification_email.message().as_string().decode('utf-8')
-        self.assertTrue(email_content.find(url)>0) #email verification
+        self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
 
     def test_subscribe_newsletter_entity(self):
+        """subscribe as a company member"""
         group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
         group2 = mommy.make(models.Group, name="DEF", subscribe_form=True)
 
@@ -189,25 +209,26 @@ class SubscribeTest(TestCase):
         contact = models.Contact.objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
-        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid]))>=0)
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid])) >= 0)
 
         self.assertEqual(contact.entity.name, data['entity'])
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
         self.assertEqual(list(contact.entity.group_set.all()), [group1, group2])
 
-        self.assertEqual(len(mail.outbox), 2) #email verification
+        self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
-        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
         email_content = verification_email.message().as_string().decode('utf-8')
-        self.assertTrue(email_content.find(url)>0) #email verification
+        self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
 
     def test_subscribe_newsletter_private_group(self):
+        """test we can not subscribe to a private group"""
         group1 = mommy.make(models.Group, name="ABC", subscribe_form=True)
         group2 = mommy.make(models.Group, name="DEF", subscribe_form=False)
 
@@ -229,15 +250,17 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Entity.objects.count(), 0)
         self.assertEqual(models.Contact.objects.count(), 0)
 
-        self.assertEqual(len(mail.outbox), 0) #email verification
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_view_subscribe_done(self):
+        """test subscribe done page"""
         contact = mommy.make(models.Contact)
         url = reverse('emailing_subscribe_done', args=[contact.uuid])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
     def _patch_with_captcha(self, url, data):
+        """path form data with captcha"""
         self.failUnlessEqual(CaptchaStore.objects.count(), 0)
         self.client.get(url)
         self.failUnlessEqual(CaptchaStore.objects.count(), 1)
@@ -247,26 +270,56 @@ class SubscribeTest(TestCase):
             'captcha_1': captcha.response
         })
 
-    def test_view_subscribe(self):
+    def test_view_subscribe_with_types(self):
+        """view subscribe page"""
         site1 = Site.objects.get_current()
         site2 = mommy.make(Site)
 
-        st1 = mommy.make(models.SubscriptionType, name="#News#abc", site=site1)
-        st2 = mommy.make(models.SubscriptionType, name="#News#def", site=site1)
-        st3 = mommy.make(models.SubscriptionType, name="#News#ghi", site=site2)
-        st4 = mommy.make(models.SubscriptionType, name="#News#jkl")
+        subscribe_type1 = mommy.make(models.SubscriptionType, name="#News#abc", site=site1)
+        subscribe_type2 = mommy.make(models.SubscriptionType, name="#News#def", site=site1)
+        subscribe_type3 = mommy.make(models.SubscriptionType, name="#News#ghi", site=site2)
+        subscribe_type4 = mommy.make(models.SubscriptionType, name="#News#jkl")
 
         url = reverse("emailing_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, st1.name)
-        self.assertContains(response, st2.name)
-        self.assertNotContains(response, st3.name)
-        self.assertNotContains(response, st4.name)
+        self.assertContains(response, subscribe_type1.name)
+        self.assertContains(response, subscribe_type2.name)
+        self.assertNotContains(response, subscribe_type3.name)
+        self.assertNotContains(response, subscribe_type4.name)
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('fr', 'French')))
+    def test_view_subscription_language(self):
+        """make sure the favorite_language is set correctly"""
+        activate('fr')
+
+        mommy.make(models.SubscriptionType)
+
+        url = reverse("emailing_subscribe_newsletter")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(1, len(soup.select("#id_favorite_language")))
+        self.assertEqual(get_language(), soup.select("#id_favorite_language")[0]["value"])
+
+    @override_settings(LANGUAGES=(('en', 'English'),))
+    def test_view_subscription_no_language(self):
+        """make sure the favorite_language is set correctly"""
+        mommy.make(models.SubscriptionType)
+
+        url = reverse("emailing_subscribe_newsletter")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(1, len(soup.select("#id_favorite_language")))
+        self.assertEqual('', soup.select("#id_favorite_language")[0].get("value", ""))
 
     def test_accept_newsletter_not_in_site(self):
-        site1 = Site.objects.get_current()
-
+        """if subscribtion is not set on the site, it should not be possible to subscribe"""
         newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=None)
 
         url = reverse("emailing_subscribe_newsletter")
@@ -288,6 +341,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
+        """subscribe and accept some subscribtions"""
         site1 = Site.objects.get_current()
 
         newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
@@ -318,7 +372,7 @@ class SubscribeTest(TestCase):
         contact = models.Contact.objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
-        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid]))>=0)
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_done', args=[contact.uuid])) >= 0)
 
         self.assertEqual(contact.lastname, data['lastname'])
         self.assertEqual(contact.firstname, data['firstname'])
@@ -341,27 +395,31 @@ class SubscribeTest(TestCase):
 
         self.assertEqual(contact.email_verified, False)
 
-        self.assertEqual(len(mail.outbox), 2) #email verification
+        self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
-        self.assertEqual(verification_email.to, [contact.email]) #email verification
+        self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
         email_content = verification_email.message().as_string().decode('utf-8')
-        self.assertTrue(email_content.find(url)>0) #email verification
+        self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.SANZA_NOTIFICATION_EMAIL])
 
     def test_refuse_newsletter(self):
+        """test refuse all newsletters"""
         self.test_accept_newsletter(accept_newsletter=False, accept_3rdparty=False)
 
     def test_refuse_newsletter_accept_3rdparty(self):
+        """test accept only third parties"""
         self.test_accept_newsletter(accept_newsletter=False, accept_3rdparty=True)
 
     def test_accept_newsletter_refuse_3rdparty(self):
+        """test accept only newsletter"""
         self.test_accept_newsletter(accept_newsletter=True, accept_3rdparty=False)
 
     def test_verify_email(self):
+        """test email verification"""
         self.client.logout()
 
         site1 = Site.objects.get_current()
@@ -389,6 +447,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(subscription2.accept_subscription, True)
 
     def test_verify_email_no_newsletter(self):
+        """test email verification ofr some who refuse subscriptions"""
         self.client.logout()
 
         site1 = Site.objects.get_current()
@@ -415,6 +474,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(subscription2.accept_subscription, False)
 
     def test_verify_email_strange_uuid(self):
+        """test accept verification with an invalid uuid should fail"""
         self.client.logout()
         contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
 
@@ -423,4 +483,3 @@ class SubscribeTest(TestCase):
         self.assertEqual(404, response.status_code)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.email_verified, False)
-

@@ -16,7 +16,7 @@ from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
 from django.utils.importlib import import_module
-from django.utils.translation import get_language, ugettext as _
+from django.utils.translation import ugettext as _
 from django.views.generic.base import View, TemplateView
 
 from colorbox.decorators import popup_redirect
@@ -27,7 +27,6 @@ from sanza.utils import logger
 from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
-from sanza.Crm.settings import has_language_choices
 from sanza.Emailing import models, forms
 from sanza.Emailing.utils import get_emailing_context
 from sanza.Emailing.utils import send_verification_email, EmailSendError
@@ -453,9 +452,6 @@ class EmailSubscribeView(SubscribeView):
         """get this kwargs for form constructor"""
         form_kwargs = super(EmailSubscribeView, self).get_form_kwargs(*args, **kwargs)
         form_kwargs['subscription_type'] = self.kwargs.get('subscription_type', None)
-        form_kwargs['initial'] = {
-            'favorite_language': get_language() if has_language_choices() else '',
-        }
         return form_kwargs
     
     def get_form_class(self):

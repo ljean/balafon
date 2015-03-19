@@ -463,6 +463,7 @@ class UpdateEmailingTestCase(BaseTestCase):
         self.assertEqual(emailing.newsletter, newsletter1)
         self.assertEqual(emailing.subscription_type, subscription_type1)
 
+
     @skipIf(len(settings.LANGUAGES) < 2, "not multi languages")
     def test_update_emailing_lang(self):
         """update an emailing: lang"""

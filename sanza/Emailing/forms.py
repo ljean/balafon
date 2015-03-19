@@ -22,12 +22,12 @@ import floppyforms as forms
 
 from sanza.Crm import settings as crm_settings
 from sanza.Crm.forms import ModelFormWithCity
-from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType
-from sanza.Crm.models import SubscriptionType, Subscription
+from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType, SubscriptionType, Subscription
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing import models
-from sanza.Emailing.utils import create_subscription_action, send_notification_email
+from sanza.Emailing.utils import create_subscription_action, send_notification_email, get_language
 from sanza.Emailing import settings as emailing_settings
+
 
 
 class UnregisterForm(forms.Form):
@@ -192,11 +192,15 @@ class EmailSubscribeForm(forms.ModelForm):
     
     class Meta:
         model = Contact
-        fields = ('email',)
+        fields = ('email', 'favorite_language')
 
     def __init__(self, *args, **kwargs):
         self.subscription_type = kwargs.pop('subscription_type', None)
         super(EmailSubscribeForm, self).__init__(*args, **kwargs)
+
+        self.fields['favorite_language'].widget = forms.HiddenInput()
+        if crm_settings.has_language_choices():
+            self.fields['favorite_language'].initial = get_language()
     
     def save(self, request=None):
         """save"""
@@ -349,6 +353,9 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         ]
         
         self._add_subscription_types_field()
+
+        if crm_settings.has_language_choices():
+            self.fields['favorite_language'].initial = get_language()
     
     def clean_entity_type(self):
         """validation"""

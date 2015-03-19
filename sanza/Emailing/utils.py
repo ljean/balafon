@@ -13,7 +13,7 @@ from django.template import Context
 from django.template.loader import get_template
 from django.utils import translation
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language as django_get_language, ugettext as _
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
@@ -28,6 +28,7 @@ from sanza.Emailing.settings import is_mandrill_used
 class EmailSendError(Exception):
     """An exception raise when sending email failed"""
     pass
+
 
 def format_context(text, data):
     """replace custom templating by something compliant with python format function"""
@@ -313,3 +314,9 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
         if contact and emailing and hasattr(emailing, event_type):
             getattr(emailing, event_type).add(contact)
             emailing.save()
+
+
+def get_language():
+    """wrap the django get_language and make sure: we return 2 chars"""
+    lang = django_get_language()
+    return lang[:2]
