@@ -1080,6 +1080,9 @@ class ActionTest(BaseTestCase):
     def test_view_remove_entity_from_action_no_contacts(self):
         """view remove entity fro action"""
         entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        contact.lastname = "AZERTY"
+        contact.save()
 
         action1 = mommy.make(models.Action, subject="should be only once", archived=False)
         action1.entities.add(entity)
