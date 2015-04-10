@@ -12,7 +12,7 @@ def filter_icontains_unaccent(qs, field, text):
     if crm_settings.is_unaccent_filter_supported():
         qs = qs.extra(
             where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
-            params = [u"%{0}%".format(text)]
+            params=[u"%{0}%".format(text)]
         )
         return qs    
     return qs.filter(**{field+"__icontains": text})
@@ -126,7 +126,7 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
     country = country.strip()
     city_name = format_city_name(city_name)
     default_country = get_default_country()
-    foreign_city = bool(country) and (country!=default_country)
+    foreign_city = bool(country) and (country != default_country)
     if foreign_city:
         zone_type = models.ZoneType.objects.get(type='country')
         qs = models.Zone.objects.filter(type=zone_type)
@@ -136,7 +136,7 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
             parent = models.Zone.objects.create(name=country.capitalize(), type=zone_type)
         else:
             parent = qs[0]
-            if country_count>1:
+            if country_count > 1:
                 logger.warning(u"{0} different zones for '{1}'".format(country_count, country))   
     else:
         code = zip_code[:2] or default_department

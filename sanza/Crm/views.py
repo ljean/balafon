@@ -1790,7 +1790,7 @@ def confirm_contacts_import(request, import_id):
                     if not c['entity.type']:
                         entity_type = contacts_import.entity_type
                     else:
-                        entity_type, _x =  models.EntityType.objects.get_or_create(name=c['entity.type'])
+                        entity_type, _x = models.EntityType.objects.get_or_create(name=c['entity.type'])
                             
                     if c['entity_exists']:
                         entity = models.Entity.objects.filter(name__iexact=c['entity'])[0]
