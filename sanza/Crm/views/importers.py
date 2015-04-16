@@ -393,52 +393,66 @@ def confirm_contacts_import(request, import_id):
     cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
 
     contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
-    if request.method == 'POST':
-        form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
+    try:
+        if request.method == 'POST':
+            form = forms.ContactsImportConfirmForm(request.POST, instance=contacts_import)
 
-        if form.is_valid():
+            if form.is_valid():
 
-            reader = unicode_csv_reader(
-                contacts_import.import_file, form.cleaned_data['encoding'], delimiter=form.cleaned_data['separator']
-            )
-            contacts, total_contacts = read_contacts(reader, fields, form.cleaned_data['entity_name_from_email'])
-            default_department = form.cleaned_data['default_department']
-            contacts_import = form.save()
+                reader = unicode_csv_reader(
+                    contacts_import.import_file, form.cleaned_data['encoding'], delimiter=form.cleaned_data['separator']
+                )
+                contacts, total_contacts = read_contacts(reader, fields, form.cleaned_data['entity_name_from_email'])
+                default_department = form.cleaned_data['default_department']
+                contacts_import = form.save()
 
-            complex_fields = (
-                'entity', 'city', 'entity.city', 'role', 'entity.groups',
-                'contacts.groups', 'country', 'entity.country', 'entity.type',
-            )
+                complex_fields = (
+                    'entity', 'city', 'entity.city', 'role', 'entity.groups',
+                    'contacts.groups', 'country', 'entity.country', 'entity.type',
+                )
 
-            if 'create_contacts' in request.POST:
-                #create entities
-                entity_dict = {}
-                for contact_data in contacts:
-                    contact, is_first_for_entity = _create_contact(contact_data, contacts_import, entity_dict)
-                    _set_contact_fields(contact, contact_data, fields, complex_fields, default_department)
-                    _set_custom_fields(contact, contact_data, cf_names, custom_fields, is_first_for_entity)
-                    _set_subscriptions(contact, contact_data)
-                return HttpResponseRedirect(reverse("sanza_homepage"))
+                if 'create_contacts' in request.POST:
+                    #create entities
+                    entity_dict = {}
+                    for contact_data in contacts:
+                        contact, is_first_for_entity = _create_contact(contact_data, contacts_import, entity_dict)
+                        _set_contact_fields(contact, contact_data, fields, complex_fields, default_department)
+                        _set_custom_fields(contact, contact_data, cf_names, custom_fields, is_first_for_entity)
+                        _set_subscriptions(contact, contact_data)
+                    return HttpResponseRedirect(reverse("sanza_homepage"))
+                else:
+                    form = forms.ContactsImportConfirmForm(instance=contacts_import)
             else:
-                form = forms.ContactsImportConfirmForm(instance=contacts_import)
-        else:
 
+                reader = unicode_csv_reader(
+                    contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator
+                )
+                contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
+        else:
+            form = forms.ContactsImportConfirmForm(instance=contacts_import)
             reader = unicode_csv_reader(
                 contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator
             )
             contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
-    else:
-        reader = unicode_csv_reader(
-            contacts_import.import_file, contacts_import.encoding, delimiter=contacts_import.separator
-        )
-        contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
-        form = forms.ContactsImportConfirmForm(instance=contacts_import)
 
-    return render_to_response(
-        'Crm/confirm_contacts_import.html',
-        {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
-        context_instance=RequestContext(request)
-    )
+        return render_to_response(
+            'Crm/confirm_contacts_import.html',
+            {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
+            context_instance=RequestContext(request)
+        )
+
+    except UnicodeDecodeError:
+        error(
+            request,
+            _(u"An error occurred while reading the csv file. You should check that the file encoding is correct.")
+        )
+    except Exception: #pylint: disable broad-except
+        error(
+            request,
+            _(u"An error occurred. You should check that the file is a valid csv file.")
+        )
+
+    return HttpResponseRedirect(reverse("crm_new_contacts_import"))
 
 
 @user_passes_test(can_access)
