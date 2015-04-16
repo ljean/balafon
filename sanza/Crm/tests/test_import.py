@@ -23,7 +23,7 @@ class ImportFileTest(BaseTestCase):
     fixtures = ["zones.json"]
 
     def _get_file(self, file_name):
-        """open a csv fiel for test"""
+        """open a csv file for test"""
         full_name = os.path.normpath(os.path.dirname(__file__) + '/import_files/' + file_name)
         return open(full_name, 'rb')
 
@@ -62,13 +62,13 @@ class ImportFileTest(BaseTestCase):
             self.assertEqual(302, response.status_code)
 
             self.assertEqual(models.ContactsImport.objects.count(), 1)
-            self.contact_import = models.ContactsImport.objects.all()[0]
+            self.contacts_import = models.ContactsImport.objects.all()[0]
 
             expected_name = os.path.basename(the_file.name)
             expected_name = os.path.splitext(expected_name)[0]
-            self.assertEqual(self.contact_import.name, expected_name)
+            self.assertEqual(self.contacts_import.name, expected_name)
 
-            next_url = reverse('crm_confirm_contacts_import', args=[self.contact_import.id])
+            next_url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
             self.assertRedirects(response, next_url)
 
     def test_create_contacts_import_with_name(self):
@@ -92,13 +92,13 @@ class ImportFileTest(BaseTestCase):
             self.assertEqual(302, response.status_code)
 
             self.assertEqual(models.ContactsImport.objects.count(), 1)
-            contact_import = models.ContactsImport.objects.all()[0]
-            self.assertEqual(contact_import.name, "test")
+            contacts_import = models.ContactsImport.objects.all()[0]
+            self.assertEqual(contacts_import.name, "test")
 
     def test_view_confirm_import(self):
         """view confirm contact"""
         self.test_create_contacts_import("contacts1.csv")
-        url = reverse('crm_confirm_contacts_import', args=[self.contact_import.id])
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content)
@@ -127,7 +127,7 @@ class ImportFileTest(BaseTestCase):
     def test_confirm_import(self):
         """view confirm contact"""
         self.test_create_contacts_import("contacts1.csv")
-        url = reverse('crm_confirm_contacts_import', args=[self.contact_import.id])
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
 
         data = {
             'import_file': '',
@@ -165,7 +165,7 @@ class ImportFileTest(BaseTestCase):
     def test_confirm_import_subscriptions(self):
         """view confirm contact"""
         self.test_create_contacts_import("contacts2.csv")
-        url = reverse('crm_confirm_contacts_import', args=[self.contact_import.id])
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
 
         subscription_types = (
             mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
@@ -207,6 +207,227 @@ class ImportFileTest(BaseTestCase):
                 subscription_type=subscription_type, contact=contact_fr
             ).all()[0]
             self.assertEqual(subscription.accept_subscription, True)
+
+    def test_confirm_import_anonymous(self):
+        """check no import if user is anonymous"""
+        self.test_create_contacts_import("contacts1.csv")
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
+
+        data = {
+            'import_file': '',
+            'name': '',
+            'encoding': 'utf-8',
+            'separator': ';',
+            'entity_type': '',
+            'groups': [],
+            'entity_name_from_email': False,
+            'default_department': '',
+            'create_contacts': 'yes'
+        }
+
+        self.client.logout()
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(0, models.Contact.objects.count())
+
+    def test_confirm_import_non_staff(self):
+        """check no import if user is anonymous"""
+        self.test_create_contacts_import("contacts1.csv")
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
+
+        data = {
+            'import_file': '',
+            'name': '',
+            'encoding': 'utf-8',
+            'separator': ';',
+            'entity_type': '',
+            'groups': [],
+            'entity_name_from_email': False,
+            'default_department': '',
+            'create_contacts': 'yes'
+        }
+
+        self.user.is_staff = False
+        self.user.save()
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(0, models.Contact.objects.count())
+
+
+class UnsubscribeImportFileTest(BaseTestCase):
+    """Import test"""
+    fixtures = ["zones.json"]
+
+    def _get_file(self, file_name):
+        """open a csv file for test"""
+        full_name = os.path.normpath(os.path.dirname(__file__) + '/import_files/' + file_name)
+        return open(full_name, 'rb')
+
+    def test_view_unsubscribe_contacts_import(self):
+        """view page"""
+        url = reverse("crm_unsubscribe_contacts_import")
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_unsubscribe(self):
+        """unsubscribe emails"""
+
+        subscription_types = (
+            mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
+        )
+
+        contacts_to_unsubscribe = [
+            mommy.make(models.Contact, email="contact1@toto.fr"),
+            mommy.make(models.Contact, email="contact2@toto.fr"),
+            #two contacts with same address
+            mommy.make(models.Contact, email="contact2@toto.fr"),
+        ]
+
+        contacts_already_unsubscribed = [
+            mommy.make(models.Contact, email="contact3@toto.fr"),
+        ]
+
+        contacts_without_subscription = [
+            mommy.make(models.Contact, email="contact3@toto.fr"),
+        ]
+
+        contacts_to_keep = [
+            mommy.make(models.Contact, email="contact5@toto.fr"),
+        ]
+
+        contacts_not_exiting = [
+            "contact6@toto.fr"
+        ]
+
+        for contact in contacts_to_unsubscribe + contacts_already_unsubscribed + contacts_to_keep:
+            for subscription_type in subscription_types:
+                mommy.make(
+                    models.Subscription,
+                    subscription_type=subscription_type,
+                    contact=contact,
+                    accept_subscription=(contact not in contacts_already_unsubscribed)
+                )
+
+        url = reverse("crm_unsubscribe_contacts_import")
+        with self._get_file("unsubscribe.csv") as the_file:
+            data = {
+                'input_file': the_file,
+            }
+            response = self.client.post(url, data=data)
+            self.assertEqual(302, response.status_code)
+
+            for contact in contacts_to_unsubscribe + contacts_already_unsubscribed + contacts_to_keep:
+                for subscription_type in subscription_types:
+                    subscription = models.Subscription.objects.get(
+                        subscription_type=subscription_type, contact=contact
+                    )
+                    self.assertEqual(
+                        subscription.accept_subscription, contact in contacts_to_keep
+                    )
+
+            for contact in contacts_without_subscription:
+                for subscription_type in subscription_types:
+                    self.assertEqual(
+                        models.Subscription.objects.filter(
+                            subscription_type=subscription_type, contact=contact
+                        ).count(),
+                        0
+                    )
+
+            for email in contacts_not_exiting:
+                self.assertEqual(0, models.Contact.objects.filter(email=email).count())
+
+    def test_unsubscribe_not_allowed(self):
+        """non staff"""
+
+        subscription_types = (
+            mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
+        )
+
+        contacts_to_unsubscribe = [
+            mommy.make(models.Contact, email="contact1@toto.fr"),
+            mommy.make(models.Contact, email="contact2@toto.fr"),
+        ]
+
+        for contact in contacts_to_unsubscribe:
+            for subscription_type in subscription_types:
+                mommy.make(
+                    models.Subscription,
+                    subscription_type=subscription_type,
+                    contact=contact,
+                    accept_subscription=True
+                )
+
+        self.user.is_staff = False
+        self.user.save()
+
+        url = reverse("crm_unsubscribe_contacts_import")
+        with self._get_file("unsubscribe.csv") as the_file:
+            data = {
+                'input_file': the_file,
+            }
+            response = self.client.post(url, data=data)
+            self.assertEqual(302, response.status_code)
+
+            for contact in contacts_to_unsubscribe:
+                for subscription_type in subscription_types:
+                    subscription = models.Subscription.objects.get(subscription_type=subscription_type, contact=contact)
+                    self.assertEqual(
+                        subscription.accept_subscription, True
+                    )
+
+    def test_unsubscribe_anonymous(self):
+        """not logged"""
+
+        subscription_types = (
+            mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
+        )
+
+        contacts_to_unsubscribe = [
+            mommy.make(models.Contact, email="contact1@toto.fr"),
+            mommy.make(models.Contact, email="contact2@toto.fr"),
+        ]
+
+        for contact in contacts_to_unsubscribe:
+            for subscription_type in subscription_types:
+                mommy.make(
+                    models.Subscription,
+                    subscription_type=subscription_type,
+                    contact=contact,
+                    accept_subscription=True
+                )
+
+        self.client.logout()
+
+        url = reverse("crm_unsubscribe_contacts_import")
+        with self._get_file("unsubscribe.csv") as the_file:
+            data = {
+                'input_file': the_file,
+            }
+            response = self.client.post(url, data=data)
+            self.assertEqual(302, response.status_code)
+
+            for contact in contacts_to_unsubscribe:
+                for subscription_type in subscription_types:
+                    subscription = models.Subscription.objects.get(subscription_type=subscription_type, contact=contact)
+                    self.assertEqual(
+                        subscription.accept_subscription, True
+                    )
+
+    def test_unsubscribe_invallid_file(self):
+        """invalid file"""
+
+        url = reverse("crm_unsubscribe_contacts_import")
+        data = {
+            'input_file': '',
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select("#id_input_file .label-danger")), 1)
+
 
 
 class ImportTemplateTest(BaseTestCase):

@@ -185,6 +185,7 @@ urlpatterns += patterns('sanza.Crm.views.importers',
     url(r'^contacts-import/new/$', 'new_contacts_import', name='crm_new_contacts_import'),
     url(r'^contacts-import/(?P<import_id>\d+)/$', 'confirm_contacts_import', name='crm_confirm_contacts_import'),
     url(r'^contacts-import/template.csv$', 'contacts_import_template', name='crm_contacts_import_template'),
+    url('^contacts-import/unsubscribe/', 'unsubscribe_contacts_import', name="crm_unsubscribe_contacts_import")
 )
 
 

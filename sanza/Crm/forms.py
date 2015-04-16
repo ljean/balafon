@@ -1051,3 +1051,8 @@ class ChangeContactEntityForm(forms.Form):
 class ConfirmForm(forms.Form):
     """Confirmation form"""
     confirm = forms.BooleanField(initial=True, widget=forms.HiddenInput(), required=False)
+
+
+class UnsubscribeContactsImportForm(forms.Form):
+    """A form for uploading a file"""
+    input_file = forms.FileField()

@@ -8,6 +8,7 @@ import re
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.messages import success, error
 from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
@@ -76,6 +77,10 @@ def _fill_contact_data(fields, row):
 def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
     """format properly name and entity"""
     name = u"< {0} >".format(_(u"Unknown"))
+    email_providers = (
+        'free', 'gmail', 'yahoo', 'yahoo.co', 'wanadoo', 'orange', 'sfr', 'laposte',
+        'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live', 'ymail',
+    )
     if not contact_data['entity']:
         entity = u''
         if extract_from_email:
@@ -84,10 +89,8 @@ def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
                 regex_value = res.groups(0)
                 name, entity = regex_value[0], regex_value[1]
                 #email = u'{0}@{1}.{2}'.format(name, entity, ext)
-            # email_providers = (
-            #     'free', 'gmail', 'yahoo', 'wanadoo', 'orange', 'sfr', 'laposte',
-            #     'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live'
-            # )
+                if entity in email_providers:
+                    entity = ""
         contact_data['entity'] = entity
     if not (contact_data['lastname'] or contact_data['firstname']):
         try:
@@ -434,5 +437,44 @@ def confirm_contacts_import(request, import_id):
     return render_to_response(
         'Crm/confirm_contacts_import.html',
         {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
+        context_instance=RequestContext(request)
+    )
+
+
+@user_passes_test(can_access)
+def unsubscribe_contacts_import(request):
+    """view"""
+    if request.method == 'POST':
+        form = forms.UnsubscribeContactsImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            input_file = request.FILES['input_file']
+
+            reader = unicode_csv_reader(input_file, "utf-8", delimiter=";")
+
+            contacts_count = 0
+            try:
+                for line in reader:
+                    email = line[0]
+                    contacts = models.Contact.objects.filter(email=email)
+                    for contact in contacts:
+                        for index_, subscription in enumerate(contact.subscription_set.all()):
+                            if index_ == 0:
+                                contacts_count += 1
+                            subscription.accept_subscription = False
+                            subscription.unsubscription_date = datetime.now()
+                            subscription.save()
+                success(request, _(u"{0} contacts have been unsubscribed").format(contacts_count))
+
+            except UnicodeDecodeError:
+                error(request, _(u"Unicode error while reading the file"))
+
+
+            return HttpResponseRedirect(reverse('sanza_homepage'))
+    else:
+        form = forms.UnsubscribeContactsImportForm()
+
+    return render_to_response(
+        'Crm/unsubscribe_contacts_import.html',
+        {'form': form},
         context_instance=RequestContext(request)
     )
