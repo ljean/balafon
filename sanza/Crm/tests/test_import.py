@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 
 from django.core.urlresolvers import reverse
 
+from model_mommy import mommy
+
 from sanza.Crm import models
 from sanza.Crm.tests import BaseTestCase
 
@@ -159,6 +161,52 @@ class ImportFileTest(BaseTestCase):
         self.assertEqual(contact.entity.group_set.count(), 2)
         self.assertEqual(contact.role.all()[0].name, "Boss")
         self.assertEqual(contact.favorite_language, "fr")
+
+    def test_confirm_import_subscriptions(self):
+        """view confirm contact"""
+        self.test_create_contacts_import("contacts2.csv")
+        url = reverse('crm_confirm_contacts_import', args=[self.contact_import.id])
+
+        subscription_types = (
+            mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
+        )
+
+        data = {
+            'import_file': '',
+            'name': '',
+            'encoding': 'utf-8',
+            'separator': ';',
+            'entity_type': '',
+            'groups': [],
+            'entity_name_from_email': False,
+            'default_department': '',
+            'create_contacts': 'yes'
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(2, models.Contact.objects.count())
+
+        contact_fr = models.Contact.objects.get(lastname="Oui")
+        self.assertEqual(contact_fr.favorite_language, "fr")
+
+        contact_en = models.Contact.objects.get(lastname="No")
+        self.assertEqual(contact_en.favorite_language, "en")
+
+        for subscription_type in subscription_types:
+            self.assertEqual(
+                0,
+                models.Subscription.objects.filter(subscription_type=subscription_type, contact=contact_en).count()
+            )
+
+            self.assertEqual(
+                1,
+                models.Subscription.objects.filter(subscription_type=subscription_type, contact=contact_fr).count()
+            )
+            subscription = models.Subscription.objects.filter(
+                subscription_type=subscription_type, contact=contact_fr
+            ).all()[0]
+            self.assertEqual(subscription.accept_subscription, True)
 
 
 class ImportTemplateTest(BaseTestCase):

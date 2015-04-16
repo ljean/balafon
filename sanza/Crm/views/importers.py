@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """import data from files"""
 
+from datetime import datetime
 import os.path
 import re
 
@@ -361,6 +362,25 @@ def _set_custom_fields(contact, contact_data, cf_names, custom_fields, is_first_
                 custom_field_value.save()
 
 
+def _set_subscriptions(contact, contact_data):
+    """set the contacts subscriptions (newsletters, ...)"""
+    for subscription_type in models.SubscriptionType.objects.all():
+
+        try:
+            #if the subscription exist : keep it as it is
+            models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
+
+        except models.Subscription.DoesNotExist:
+            #if it doesn't exist and that the accept_newsletter is True in file create it
+            if contact_data['accept_newsletter']:
+                models.Subscription.objects.create(
+                    contact=contact,
+                    subscription_type=subscription_type,
+                    accept_subscription=True,
+                    subscription_date=datetime.now()
+                )
+
+
 @user_passes_test(can_access)
 def confirm_contacts_import(request, import_id):
     """confirm contacts import: do it really"""
@@ -394,6 +414,7 @@ def confirm_contacts_import(request, import_id):
                     contact, is_first_for_entity = _create_contact(contact_data, contacts_import, entity_dict)
                     _set_contact_fields(contact, contact_data, fields, complex_fields, default_department)
                     _set_custom_fields(contact, contact_data, cf_names, custom_fields, is_first_for_entity)
+                    _set_subscriptions(contact, contact_data)
                 return HttpResponseRedirect(reverse("sanza_homepage"))
             else:
                 form = forms.ContactsImportConfirmForm(instance=contacts_import)
