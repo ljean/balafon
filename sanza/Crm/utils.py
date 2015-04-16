@@ -136,7 +136,7 @@ def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):
 
 def get_default_country():
     """get default country object"""
-    country_name = crm_settings.get_default_country_name()
+    country_name = crm_settings.get_default_country()
     try:
         default_country = models.Zone.objects.get(name=country_name, parent__isnull=True, type__type="country")
     except models.Zone.DoesNotExist:
