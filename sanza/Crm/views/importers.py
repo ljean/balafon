@@ -69,7 +69,7 @@ def _fill_contact_data(fields, row):
         if field.find("accept_") == 0:
             contact_data[field] = True if contact_data[field] else False
 
-        return contact_data
+    return contact_data
 
 
 def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
@@ -202,7 +202,7 @@ def get_imports_fields():
         'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
         'address', 'address2', 'address3', 'city', 'cedex', 'zip_code', 'country',
-        'entity.groups', 'groups',
+        'entity.groups', 'groups', 'favorite_language',
     ]
 
     #custom fields
@@ -269,7 +269,7 @@ def _create_contact(contact_data, contacts_import, entity_dict):
     if entity.is_single_contact:
         is_first_for_entity = True
     else:
-        is_first_for_entity = not entity_dict.has_key(entity.name)
+        is_first_for_entity = entity.name not in entity_dict
         entity_dict[entity.name] = True
 
     for group in contacts_import.groups.all():
@@ -286,6 +286,7 @@ def _create_contact(contact_data, contacts_import, entity_dict):
 
 def _set_contact_fields(contact, contact_data, fields, complex_fields, default_department):
     """set the contact fields"""
+
     for field_name in fields:
         if field_name in complex_fields:
             continue
