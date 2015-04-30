@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 """display actions in different planning views"""
 
+from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import Http404
 from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView
 
 from sanza.Crm import models
 from sanza.Crm.utils import get_in_charge_users
+from sanza.permissions import can_access
 
 
 class ActionArchiveView(object):
     """view"""
+
+    @method_decorator(user_passes_test(can_access))
+    def dispatch(self, *args, **kwargs):
+        return super(ActionArchiveView, self).dispatch(*args, **kwargs)
 
     def _get_selection(self, filter_value):
         """filtering"""

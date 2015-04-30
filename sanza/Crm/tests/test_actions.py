@@ -1519,7 +1519,6 @@ class DoActionTest(BaseTestCase):
         self.assertContains(response, "warning")
 
 
-
 class ActionAutoGenerateNumberTestCase(TestCase):
 
     def test_create_action_with_auto_generated_number(self):
