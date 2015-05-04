@@ -618,6 +618,7 @@ class SendEmailingTest(BaseTestCase):
         self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
         self.assertEqual(magic_link1.url, 'http://toto.fr')
 
+    @override_settings(SECRET_KEY=u"super-héros")
     def test_view_online_utf_links(self):
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(

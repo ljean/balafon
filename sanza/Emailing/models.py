@@ -137,8 +137,8 @@ class MagicLink(models.Model):
         """save"""
         super(MagicLink, self).save(*args, **kwargs)
         if not self.uuid:
-            safe_url = unicodedata.normalize('NFKD', unicode(self.url)).encode("ascii", 'ignore')
-            name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, safe_url)
+            name = u'{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
+            name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(MagicLink, self).save()
 

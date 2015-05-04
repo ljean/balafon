@@ -6,7 +6,9 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup
+
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from model_mommy import mommy
 
@@ -492,6 +494,7 @@ class EditContactAndEntityTestCase(BaseTestCase):
         self.assertNotEqual(c.firstname, data['firstname'])
         self.assertNotEqual(c.email, data['email'])
 
+    @override_settings(SECRET_KEY=u"super-héros")
     def test_create_contact_uuid(self):
         data = {
             'lastname': u'Mémé',
