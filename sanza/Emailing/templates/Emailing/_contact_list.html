@@ -2,7 +2,16 @@
 {%  if show_always or contacts.count %}
 <div class="row info-line">
     <div class="col-md-2">
+        {% if is_link %}
+        <div style="font-size: 9px" class="label-text">
+            <span class="glyphicon glyphicon-link"></span>
+            {{ label }}
+        </div>
+        {% else %}
         <div class="label-text">{{ label }}</div>
+        {% endif %}
+
+
     </div>
     <div class="col-md-2">
         <div class="contacts-count test-{{ label|lower }}">

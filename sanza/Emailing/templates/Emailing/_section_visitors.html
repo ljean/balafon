@@ -65,7 +65,7 @@
 {% endblock %}
 
 {% for l in emailing.magiclink_set.all %}
-    {% include "Emailing/_contact_list.html" with contacts=l.visitors.all label=l.url show_always=True %}
+    {% include "Emailing/_contact_list.html" with contacts=l.visitors.all label=l.url show_always=True hide_contacts=True is_link=True %}
 {% endfor %}
 </div>
 {% endblock %}
