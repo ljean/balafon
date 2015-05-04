@@ -54,16 +54,7 @@ def get_emailing_context(emailing, contact):
 
     html_content = format_context(newsletter.content, data)
 
-    #magic links
-    links = re.findall('href="(?P<url>.+?)"', html_content)
-    
-    for link in links:
-        if (not link.lower().startswith('mailto:')) and (link[0] != "#"): #mailto and internal links are not magic
-            magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
-            magic_url = newsletter.get_site_prefix()+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
-            html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
-        
-    unregister_url = newsletter.get_site_prefix()+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
+    unregister_url = newsletter.get_site_prefix() + reverse('emailing_unregister', args=[emailing.id, contact.uuid])
     
     newsletter.content = html_content
 
@@ -86,6 +77,25 @@ def get_emailing_context(emailing, contact):
             context_dict.update(dictionary)
     
     return context_dict
+
+
+def patch_emailing_html(html_text, emailing, contact):
+    """transform links into magic link"""
+    links = re.findall('href="(?P<url>.+?)"', html_text)
+
+    ignore_links = [
+        reverse("emailing_unregister", args=[emailing.id, contact.uuid]),
+        reverse("emailing_view_online", args=[emailing.id, contact.uuid])
+    ]
+    for link in links:
+        if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
+            #mailto, internal links, 'unregister' and 'view online' are not magic
+            magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
+            view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
+            magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
+            html_text = html_text.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
+
+    return html_text
 
 
 def send_newsletter(emailing, max_nb):
@@ -114,6 +124,9 @@ def send_newsletter(emailing, max_nb):
             the_template = get_template(emailing.newsletter.get_template_name())
 
             html_text = the_template.render(context)
+
+            html_text = patch_emailing_html(html_text, emailing, contact)
+
             html_text = make_links_absolute(
                 html_text, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
             )
@@ -131,6 +144,7 @@ def send_newsletter(emailing, max_nb):
 
             if getattr(settings, 'COOP_CMS_REPLY_TO', None):
                 headers['Reply-To'] = settings.COOP_CMS_REPLY_TO
+
             email = EmailMultiAlternatives(
                 emailing.newsletter.subject,
                 text,

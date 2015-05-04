@@ -589,8 +589,10 @@ class SendEmailingTest(BaseTestCase):
 
     def test_view_online(self):
         entity = mommy.make(models.Entity, name="my corp")
-        contact = mommy.make(models.Contact, entity=entity,
-            email='toto@toto.fr', lastname='Azerty', firstname='Albert')
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
@@ -606,9 +608,15 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, contact.fullname)
-        self.assertEqual(MagicLink.objects.count(), 1)
-        ml = MagicLink.objects.all()[0]
-        self.assertContains(response, reverse('emailing_view_link', args=[ml.uuid, contact.uuid]))
+        self.assertEqual(MagicLink.objects.count(), 2)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, '/this-link-without-prefix-in-template')
+
+        magic_link1 = MagicLink.objects.all()[1]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
+        self.assertEqual(magic_link1.url, 'http://toto.fr')
 
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
@@ -618,5 +626,5 @@ class NewsletterTest(coop_cms_tests.NewsletterTest):
         def extra_checker(e):
             site = Site.objects.get(id=settings.SITE_ID)
             url = "http://"+site.domain+"/this-link-without-prefix-in-template"
-            self.assertTrue(e.alternatives[0][0].find(url)>=0)
+            self.assertTrue(e.alternatives[0][0].find(url) >= 0)
         super(NewsletterTest, self).test_send_test_newsletter('test/newsletter_contact.html')

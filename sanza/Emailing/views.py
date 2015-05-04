@@ -29,7 +29,7 @@ from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
 from sanza.Emailing import models, forms
 from sanza.Emailing.utils import get_emailing_context
-from sanza.Emailing.utils import send_verification_email, EmailSendError
+from sanza.Emailing.utils import send_verification_email, EmailSendError, patch_emailing_html
 
 
 @user_passes_test(can_access)
@@ -289,7 +289,9 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     context = Context(get_emailing_context(emailing, contact))
     the_template = get_template(emailing.newsletter.get_template_name())
-    return HttpResponse(the_template.render(context))
+    html_text = the_template.render(context)
+    html_text = patch_emailing_html(html_text, emailing, contact)
+    return HttpResponse(html_text)
 
 
 def subscribe_done(request, contact_uuid):

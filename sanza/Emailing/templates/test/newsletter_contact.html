@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block newsletter %}
-    <a href="/this-link-without-prefix-in-template">This should be automatically prefixed</a>
+    <a href="/this-link-without-prefix-in-template">This should be automatically prefixed and magic linked</a>
     {% cms_edit newsletter %}{% autoescape off %}{% spaceless %}
         <div class="header">
         {% coop_piece_of_html "newsletter_header" %}
