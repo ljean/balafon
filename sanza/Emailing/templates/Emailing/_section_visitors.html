@@ -6,6 +6,23 @@
 {% endblock %}
   
 {% block section_data %}
+
+<style>
+    .info-line .hidden-contacts {
+        display: none;
+        font-size: 0.7em;
+    }
+
+    .info-line:hover .hidden-contacts {
+        display: block;
+    }
+
+    .info-line:hover {
+        border: solid 1px #F0DA2D;
+    }
+
+</style>
+
 <div class="statistics">
 {% block send_to %}
     {% trans "To be send" as label %}
