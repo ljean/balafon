@@ -618,6 +618,37 @@ class SendEmailingTest(BaseTestCase):
         self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
         self.assertEqual(magic_link1.url, 'http://toto.fr')
 
+    def test_view_online_utf_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr/à-bientôt">à bientôt</a></p>',
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact.fullname)
+        self.assertEqual(MagicLink.objects.count(), 2)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, '/this-link-without-prefix-in-template')
+
+        magic_link1 = MagicLink.objects.all()[1]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
+        self.assertEqual(magic_link1.url, u'http://toto.fr/à-bientôt')
+
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
     """test coop_cms newsletter"""

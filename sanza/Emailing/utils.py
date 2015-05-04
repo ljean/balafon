@@ -93,7 +93,7 @@ def patch_emailing_html(html_text, emailing, contact):
             magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
             view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
             magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
-            html_text = html_text.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
+            html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
 
     return html_text
 
