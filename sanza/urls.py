@@ -9,6 +9,8 @@ if 'localeurl' in settings.INSTALLED_APPS:
 
 from django.conf.urls import url, patterns, include
 
+from sanza.forms import BsAuthenticationForm
+
 from django.contrib import admin
 admin.autodiscover()
 
@@ -49,6 +51,11 @@ if 'sanza.Profile' in settings.INSTALLED_APPS:
     )
 
 urlpatterns += patterns('',
+    (
+        r'^accounts/login/?$',
+        'django.contrib.auth.views.login',
+        {'authentication_form': BsAuthenticationForm}
+    ),
     (r'^accounts/', include('django.contrib.auth.urls')),
 )
 

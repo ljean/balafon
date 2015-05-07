@@ -17,7 +17,9 @@
             {% if field.label %}<label class="control-label col-sm-3" for="{{ field.name }}">{{field.label}}</label>{% endif %}
             <div class="col-sm-9">
                 {{ field }}
-                {% if field.errors %}<div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>{% endif %}
+                {% if field.errors %}
+                <div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>
+                {% endif %}
                 {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
             </div>
         {% endif %}
