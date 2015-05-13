@@ -84,7 +84,7 @@
   {% paginate %}
   <script>
     $(function() {
-      $('a.exclude-contact').live('click', function() {
+      $(document).on('click', 'a.exclude-contact', function() {
         var val = $("input[name=excluded]").val();
         var cid = '#'+$(this).attr('rel')+'#';
         var parent = $(this).closest("tr");
@@ -135,7 +135,7 @@
         return false;
       });
       
-      $(".pagination a").live('click', function() {
+      $(document).on('click', ".pagination a", function() {
         $("form.search-form").attr('action', $(this).attr('href'));
         $("form.search-form").submit();
         $("form.search-form").attr('action', '');

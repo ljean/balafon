@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block extra_script %}
-<link type="text/css" href="{{ STATIC_URL }}css/chosen-bootstrap.css" rel="Stylesheet" />
+<link type="text/css" href="{{ STATIC_URL }}chosen/chosen-bootstrap.css" rel="Stylesheet" />
 <script>
   $(document).bind('cbox_complete', function(){
     $(document).unbind('cbox_complete');
@@ -27,7 +27,7 @@
     });
 
     parent.$.colorbox.resize({width: "60%"});
-    $(".tabbar .tab").live('click', function() {
+    $(document).on('click', ".tabbar .tab", function() {
       var item = $(this).attr('rel');
       $(this).siblings().removeClass("selected");
       $(this).addClass("selected");

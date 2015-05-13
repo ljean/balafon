@@ -60,7 +60,7 @@ $(function() {
         }
     });
     
-    $(".favorite-icon").live('click', function() {
+    $(document).on('click', ".favorite-icon", function() {
         var form = $(this).find('form');
         var elt = $(this);
         $.ajax({
