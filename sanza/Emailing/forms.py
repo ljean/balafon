@@ -59,7 +59,7 @@ class UpdateEmailingForm(forms.ModelForm):
             self.fields["lang"].widget = forms.HiddenInput()
         else:
             language_choices = crm_settings.get_language_choices(_(u"Favorite language of the contact"))
-            self.fields["lang"].widget = forms.Select(language_choices)
+            self.fields["lang"].widget = forms.Select(choices=language_choices)
 
 
 class NewEmailingForm(forms.Form):
