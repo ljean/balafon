@@ -12,7 +12,7 @@
       <div class="col-md-6">
           <div class="row">
               <div class="col-md-12">{% trans "Newsletter" %}:
-                  <a href="{% url 'coop_cms_view_newsletter' emailing.newsletter.id %}">
+                  <a href="{{emailing.newsletter.get_absolute_url }}">
                       {{ emailing.newsletter.subject }}
                   </a>
                   {% favorite_item object=emailing.newsletter %}

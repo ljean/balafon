@@ -18,7 +18,7 @@
     <tr>
       <td>
         {% favorite_item object=nl %}
-        <a href="{% url 'coop_cms_view_newsletter' nl.id %}">{{nl.subject}}</a>
+        <a href="{{ nl.get_absolute_url }}">{{nl.subject}}</a>
       </td>
       <td>
         {% if nl.emailing_set.count %}

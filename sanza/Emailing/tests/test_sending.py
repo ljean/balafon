@@ -14,6 +14,7 @@ from django.utils.translation import activate
 
 from coop_cms.tests import test_newsletter as coop_cms_tests
 from coop_cms.models import Newsletter
+from coop_cms.settings import is_localized, is_multilang
 from model_mommy import mommy
 
 from sanza.Crm import models
@@ -617,6 +618,33 @@ class SendEmailingTest(BaseTestCase):
         magic_link1 = MagicLink.objects.all()[1]
         self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
         self.assertEqual(magic_link1.url, 'http://toto.fr')
+
+    @skipIf(not is_localized() or not is_multilang(), "not localized")
+    def test_emailing_view_online_lang(self):
+        """test view emailing in other lang"""
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        #default_lang = settings.LANGUAGES[0][0]
+        other_lang = settings.LANGUAGES[1][0]
+
+        url = reverse('emailing_view_online_lang', args=[emailing.id, contact.uuid, other_lang])
+        response = self.client.get(url)
+        self.assertEqual(302, response.status_code)
+        next_url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])[3:]
+        self.assertEqual(response["Location"], "http://testserver/"+other_lang+next_url)
 
     @override_settings(SECRET_KEY=u"super-héros")
     def test_view_online_utf_links(self):

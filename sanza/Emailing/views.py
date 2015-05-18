@@ -21,6 +21,7 @@ from django.views.generic.base import View, TemplateView
 
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
+from coop_cms.utils import redirect_to_language
 
 from sanza.permissions import can_access
 from sanza.utils import logger
@@ -292,6 +293,12 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     html_text = the_template.render(context)
     html_text = patch_emailing_html(html_text, emailing, contact)
     return HttpResponse(html_text)
+
+
+def view_emailing_online_lang(request, emailing_id, contact_uuid, lang):
+    """view an emailing in a given lang"""
+    url = reverse("emailing_view_online", args=[emailing_id, contact_uuid])
+    return redirect_to_language(url, lang)
 
 
 def subscribe_done(request, contact_uuid):

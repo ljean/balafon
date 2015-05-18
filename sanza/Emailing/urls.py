@@ -49,6 +49,11 @@ urlpatterns = patterns('sanza.Emailing.views',
         name='emailing_view_online'
     ),
     url(
+        r'^view-online-lang/(?P<emailing_id>\d+)/(?P<contact_uuid>[\w\d-]+)/(?P<lang>\w+)/$',
+        'view_emailing_online_lang',
+        name='emailing_view_online_lang'
+    ),
+    url(
         r'^link/(?P<link_uuid>[\w\d-]+)/(?P<contact_uuid>[\w\d-]+)/$',
         'view_link',
         name='emailing_view_link'
