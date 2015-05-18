@@ -12,9 +12,10 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
-from coop_cms.tests import test_newsletter as coop_cms_tests
 from coop_cms.models import Newsletter
 from coop_cms.settings import is_localized, is_multilang
+from coop_cms.tests import test_newsletter as coop_cms_tests
+from coop_cms.utils import get_url_in_language
 from model_mommy import mommy
 
 from sanza.Crm import models
@@ -237,6 +238,127 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(c.action_set.count(), 1)
             self.assertEqual(c.action_set.all()[0].subject, email.subject)
 
+    @skipIf(len(settings.LANGUAGES) < 2, "LANGUAGES less than 2")
+    @override_settings(COOP_CMS_REPLY_TO="")
+    def test_send_newsletter_contact_language(self):
+        """test that we use the favorite language of the contact when sending him a newsletter"""
+
+        entity = mommy.make(models.Entity, name="my corp")
+
+        origin_lang = settings.LANGUAGES[0][0]
+        trans_lang = settings.LANGUAGES[1][0]
+
+        names = ['alpha', 'beta', 'gamma']
+        langs = ['', origin_lang, trans_lang]
+
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize(),
+                firstname=name,
+                favorite_language=lang
+            ) for (name, lang) in zip(names, langs)
+        ]
+
+        content = '<h2>Hello #!-fullname-!#!</h2><p>{0}Visit <a href="http://toto.{0}">{0}</a>'
+        content += '<a href="mailto:me@me.{0}">mailme</a><a href="#art1">internal link</a></p>'
+
+        newsletter_data = {
+            'subject_'+origin_lang: 'This is the {0} subject'.format(origin_lang),
+            'subject_'+trans_lang: 'This is the {0} subject'.format(trans_lang),
+            'content_'+origin_lang: content.format(origin_lang),
+            'content_'+trans_lang: content.format(trans_lang),
+            'template': 'test/newsletter_contact.html'
+        }
+
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+
+        site = Site.objects.get_current()
+        site.domain = "toto.fr"
+        site.save()
+
+        emailing = mommy.make(
+            Emailing,
+            newsletter=newsletter,
+            status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(),
+            sending_dt=None,
+            subscription_type=mommy.make(models.SubscriptionType, site=site),
+            lang=''
+        )
+
+        for contact in contacts:
+            emailing.send_to.add(contact)
+        emailing.save()
+
+        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+
+        emailing = Emailing.objects.get(id=emailing.id)
+
+        activate(origin_lang)
+
+        #check emailing status
+        self.assertEqual(emailing.status, Emailing.STATUS_SENT)
+        self.assertNotEqual(emailing.sending_dt, None)
+        self.assertEqual(emailing.send_to.count(), 0)
+        self.assertEqual(emailing.sent_to.count(), len(contacts))
+
+        self.assertEqual(len(mail.outbox), len(contacts))
+
+        outbox = list(mail.outbox)
+        outbox.sort(key=lambda email: email.to)
+        contacts.sort(key=lambda contact: contact.get_email)
+
+        activate(trans_lang)
+        for email, contact, lang in zip(outbox, contacts, langs):
+            viewonline_url = reverse(
+                'emailing_view_online', args=[emailing.id, contact.uuid]
+            )
+
+            unsubscribe_url = reverse(
+                'emailing_unregister', args=[emailing.id, contact.uuid]
+            )
+
+            contact_lang = lang or origin_lang
+            viewonline_url = get_url_in_language(viewonline_url, contact_lang)
+            unsubscribe_url = get_url_in_language(unsubscribe_url, contact_lang)
+
+            viewonline_url = emailing.get_domain_url_prefix() + viewonline_url
+            unsubscribe_url = emailing.get_domain_url_prefix() + unsubscribe_url
+
+            self.assertEqual(email.to, [contact.get_email_address()])
+            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
+
+            self.assertEqual(email.subject, newsletter_data['subject_'+contact_lang])
+            self.assertTrue(email.body.find(entity.name) >= 0)
+            #print email.body
+            self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
+            self.assertEqual(
+                email.extra_headers['List-Unsubscribe'],
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
+            )
+            self.assertTrue(email.body.find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][1], "text/html")
+
+            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(contact_lang)) > 0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
+
+            #check magic links
+            self.assertTrue(MagicLink.objects.count() > 0)
+
+            #check an action has been created
+            contact = models.Contact.objects.get(id=contact.id)
+            self.assertEqual(contact.action_set.count(), 1)
+            self.assertEqual(contact.action_set.all()[0].subject, email.subject)
+
     @override_settings(COOP_CMS_REPLY_TO="reply_to@toto.fr")
     def test_send_newsletter_reply_to(self):
 
@@ -294,12 +416,16 @@ class SendEmailingTest(BaseTestCase):
         contacts.sort(key=lambda c: c.get_email)
 
         for email, contact in zip(outbox, contacts):
-            viewonline_url = emailing.get_domain_url_prefix() + reverse(
+            viewonline_url = reverse(
                 'emailing_view_online', args=[emailing.id, contact.uuid]
             )
-            unsubscribe_url = emailing.get_domain_url_prefix() + reverse(
+
+            unsubscribe_url = reverse(
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
+
+            viewonline_url = emailing.get_domain_url_prefix() + viewonline_url
+            unsubscribe_url = emailing.get_domain_url_prefix() + unsubscribe_url
 
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)

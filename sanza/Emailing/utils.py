@@ -117,10 +117,12 @@ def send_newsletter(emailing, max_nb):
     for contact in contacts:
         
         if contact.get_email:
-            lang = emailing.lang or settings.LANGUAGE_CODE[:2]
+            lang = emailing.lang or contact.favorite_language or settings.LANGUAGE_CODE[:2]
             translation.activate(lang)
 
-            context = Context(get_emailing_context(emailing, contact))
+            emailing_context = get_emailing_context(emailing, contact)
+            emailing_context["LANGUAGE_CODE"] = lang
+            context = Context(emailing_context)
             the_template = get_template(emailing.newsletter.get_template_name())
 
             html_text = the_template.render(context)
