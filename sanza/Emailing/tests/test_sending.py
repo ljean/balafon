@@ -208,7 +208,7 @@ class SendEmailingTest(BaseTestCase):
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
 
-            view_en = reverse("emailing_view_online_lang", args=[emailing.id, contact.uuid, 'en'])
+            view_en_url = reverse("emailing_view_online_lang", args=[emailing.id, contact.uuid, 'en'])
 
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
@@ -228,7 +228,7 @@ class SendEmailingTest(BaseTestCase):
             #Check links are not magic
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
-            self.assertTrue(email.alternatives[0][0].find(view_en) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(view_en_url) >= 0)
             #Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(trans_lang)) > 0)
             #Check internal links are not magic
