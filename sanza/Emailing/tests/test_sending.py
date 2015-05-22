@@ -158,9 +158,9 @@ class SendEmailingTest(BaseTestCase):
         newsletter_data = {
             'subject_'+origin_lang: 'This is the {0} subject'.format(origin_lang),
             'subject_'+trans_lang: 'This is the {0} subject'.format(trans_lang),
-            'content_'+origin_lang: content.format(origin_lang),
+            'content_'+origin_lang: content.format(origin_lang, ),
             'content_'+trans_lang: content.format(trans_lang),
-            'template': 'test/newsletter_contact.html'
+            'template': 'test/newsletter_contact_lang.html'
         }
 
         newsletter = mommy.make(Newsletter, **newsletter_data)
@@ -208,6 +208,8 @@ class SendEmailingTest(BaseTestCase):
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
 
+            view_en = reverse("emailing_view_online_lang", args=[emailing.id, contact.uuid, 'en'])
+
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
             self.assertEqual(email.subject, newsletter_data['subject_'+trans_lang])
@@ -223,11 +225,13 @@ class SendEmailingTest(BaseTestCase):
 
             self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            #Check links are not magic
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(view_en) >= 0)
             #Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(trans_lang)) > 0)
-            #Check mailto links are not magic
+            #Check internal links are not magic
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
