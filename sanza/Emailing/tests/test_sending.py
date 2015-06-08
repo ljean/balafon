@@ -808,6 +808,37 @@ class SendEmailingTest(BaseTestCase):
         self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
         self.assertEqual(magic_link1.url, u'http://toto.fr/à-bientôt')
 
+    def test_view_long_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/{0}".format("abcde" * 100)[:499]
+        long_link = "http://toto.fr/{0}".format("abcde" * 100)  # >500 chars
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">long link</a> <a href="{1}">long link</a></p>'.format(
+                short_link, long_link),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(MagicLink.objects.count(), 1)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, short_link)
+
+        self.assertContains(response, long_link)
+
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
     """test coop_cms newsletter"""

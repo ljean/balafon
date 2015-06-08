@@ -126,7 +126,7 @@ class Emailing(TimeStampedModel):
 class MagicLink(models.Model):
     """A tracking link"""
     emailing = models.ForeignKey(Emailing)
-    url = models.URLField()
+    url = models.URLField(max_length=500)
     visitors = models.ManyToManyField(Contact, blank=True)
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     

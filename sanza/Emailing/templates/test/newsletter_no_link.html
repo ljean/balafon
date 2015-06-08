@@ -1,0 +1,26 @@
+{% extends "Emailing/newsletter.html" %}
+{% load i18n coop_edition %}
+
+  {% block style %}
+  <style>
+    body {
+        background: #abcdef;
+    }
+  </style>
+{% endblock %}
+
+{% block newsletter %}
+    {% cms_edit newsletter %}{% autoescape off %}{% spaceless %}
+        <div class="header">
+        {% coop_piece_of_html "newsletter_header" %}
+        </div>
+        
+        <div class="hello">{{contact.entity}}</div>
+        <div class="date">{% now "j F Y"%}</div>
+        
+        <div id="content">{{newsletter.content}}</div>
+        
+        {% include "coop_cms/_newsletter_articles.html" %}
+
+    {% endspaceless %}{% endautoescape %}{% end_cms_edit %}
+{% endblock %}

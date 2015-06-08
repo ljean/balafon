@@ -19,6 +19,7 @@ from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
 from coop_cms.utils import dehtml, make_links_absolute
 
+from sanza.utils import logger
 from sanza.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
 from sanza.Emailing.models import Emailing, MagicLink
 from sanza.Emailing.settings import is_mandrill_used
@@ -95,11 +96,15 @@ def patch_emailing_html(html_text, emailing, contact):
     for link in links:
         if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
             #mailto, internal links, 'unregister' and 'view online' are not magic
-            magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
-            view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
-            magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
-            html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
-
+            if len(link) < 500:
+                magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
+                view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
+                magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
+                html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
+            else:
+                logger.warning(
+                    "magic link size is greater than 500 ({0}) : {1}".format(len(link), link)
+                )
     return html_text
 
 
