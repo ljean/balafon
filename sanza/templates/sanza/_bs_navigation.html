@@ -142,11 +142,24 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <span rel="{% url "users_make_homepage" %}"
-            class="glyphicon glyphicon-home make-homepage" title="{% trans "Make this homepage" %}"></span>
+        {% if is_allowed_homepage %}
+          <span
+            rel="{% url 'users_make_homepage' %}"
+            class="glyphicon glyphicon-log-in make-homepage"
+            data-toggle="tooltip" data-placement="bottom"
+            title="{% trans 'Make this homepage' %}"
+          ></span>
+        {% else %}
+          <span
+            rel=""
+            class="glyphicon glyphicon-log-in make-homepage disabled"
+            data-toggle="tooltip" data-placement="bottom"
+            title="{% trans 'This page can not be set as homepage' %}"
+          ></span>
+        {% endif %}
         </li>
         <li class="quick-search-form">
-            <form method="POST" action="{% url "quick_search" %}">{% csrf_token %}{{quick_search_form.text}}</form>
+            <form method="POST" action="{% url 'quick_search' %}">{% csrf_token %}{{quick_search_form.text}}</form>
         </li>
       </ul>
     </div><!--/.nav-collapse -->

@@ -7,6 +7,7 @@
 @section_header_background: #444;
 @section_header_color_hover: #ddd;
 @note_background: #fec;
+@navigation_tooltip_color: #444;
 
 html,
 body {
@@ -747,6 +748,10 @@ table.with-odd-even tr.even td {
   color: #c33;
 }
 
+.make-homepage.disabled {
+    color: #888;
+}
+
 .statistics .row {
     margin: 0;
     padding: 0;
@@ -766,3 +771,9 @@ ul.coop-cms_user-messages {
 	top: 60px;
     z-index: 9999;
 }
+
+.nav .tooltip .tooltip-inner {
+    background-color: @navigation_tooltip_color;
+}
+
+.nav .tooltip .tooltip-arrow {border-bottom-color: @navigation_tooltip_color;}

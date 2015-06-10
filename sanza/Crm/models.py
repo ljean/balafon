@@ -697,8 +697,7 @@ class Contact(TimeStampedModel):
                 return u"< {0} >".format(__(u"Unknown"))
         
         if self.gender and self.lastname:
-            title = self.get_gender_display()
-            title += u' '
+            title = u'{0} '.format(self.get_gender_display())
         else:
             title = u''
         

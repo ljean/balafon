@@ -4,8 +4,12 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
 import logging
+import urlparse
 
+from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
+
+from sanza.settings import get_allowed_homepages
 
 logger = logging.getLogger("sanza_crm")
 
@@ -40,3 +44,15 @@ def get_form_errors(response):
     soup = BeautifulSoup(response.content)
     errors = soup.select('.field-error .label')
     return errors
+
+
+def is_allowed_homepage(url_string):
+    """return True is the current page can be set as homepage"""
+    url = urlparse.urlparse(url_string)
+    try:
+        resolved = resolve(url.path)
+    except Resolver404:
+        return False
+    if resolved.url_name in get_allowed_homepages():
+        return True
+    return False

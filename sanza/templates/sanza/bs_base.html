@@ -11,25 +11,29 @@
   {% block jquery_declaration %}
 	{{jhouston}}
     <link type="text/css" href="{{ STATIC_URL }}css/base/jquery-ui-1.9.2.css" rel="Stylesheet" />	
-    <link type="text/css" href="{{ STATIC_URL }}css/colorbox.css" rel="Stylesheet" />	
+    <link type="text/css" href="{{ STATIC_URL }}css/colorbox.css?v={{SANZA_VERSION}}" rel="Stylesheet" />
     <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/jquery-1.11.3.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.9.2.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ajax-csrf.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.colorbox-min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}js/colorbox.coop.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ajax-csrf.js?v={{SANZA_VERSION}}"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.colorbox-min.js?v={{SANZA_VERSION}}"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js?v={{SANZA_VERSION}}"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/colorbox.coop.js?v={{SANZA_VERSION}}"></script>
     <script type="text/javascript">
       $(function () {
         $("a.colorbox-form").colorboxify();
       });
     </script>
   {% endblock %}
-  <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/modernizr.js"></script>
+  <script type="text/javascript" charset="utf-8" src="{{ STATIC_URL }}js/modernizr.js?v={{SANZA_VERSION}}"></script>
   
-	{#-<script type="text/javascript" src="{% url "django.views.i18n.javascript_catalog" %}"></script>#}
-	
-    <script src="{{STATIC_URL}}bs/js/bootstrap.min.js"></script>
+	<script src="{{STATIC_URL}}bs/js/bootstrap.min.js?v={{SANZA_VERSION}}"></script>
 	<script src="{{STATIC_URL}}js/sanza3.js?v={{SANZA_VERSION}}"></script>
+
+    <script type="text/javascript">
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    })
+    </script>
 	
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="{{ STATIC_URL }}css/normalize.css" type="text/css" />

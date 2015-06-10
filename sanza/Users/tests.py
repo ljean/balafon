@@ -21,6 +21,7 @@ from django.utils import timezone
 
 from model_mommy import mommy
 
+from sanza.utils import is_allowed_homepage
 from sanza.Crm import models
 from sanza.Emailing.models import Emailing
 from sanza.Search.models import Search
@@ -461,7 +462,7 @@ class UserHomepageTestCase(BaseTestCase):
     
     def test_set_homepage_none(self):
         self.assertEqual(0, UserHomepage.objects.count())
-        homepage_url = "http://toto.fr/toto"
+        homepage_url = 'http://testserver' + reverse("crm_view_entities_list")
         
         url = reverse('users_make_homepage')
         
@@ -474,8 +475,9 @@ class UserHomepageTestCase(BaseTestCase):
         self.assertEqual(homepage.user, self.user)
         self.assertEqual(homepage.url, homepage_url)
 
-    def test_set_homepage_existing(self):
-        mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+    def test_set_homepage_invalid(self):
+        origin_url = 'http://testserver' + reverse('users_favorites_list')
+        mommy.make(UserHomepage, user=self.user, url=origin_url)
         self.assertEqual(1, UserHomepage.objects.count())
         homepage_url = "http://toto.fr/toto"
         
@@ -483,15 +485,47 @@ class UserHomepageTestCase(BaseTestCase):
         
         response = self.client.post(url, data={'url': homepage_url})
         self.assertEqual(200, response.status_code)
-        
+
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response_data["ok"], False)
+
         self.assertEqual(1, UserHomepage.objects.count())
         homepage = UserHomepage.objects.all()[0]
-        
+
+        self.assertEqual(homepage.user, self.user)
+        self.assertEqual(homepage.url, origin_url)
+
+    def test_set_homepage_valid(self):
+        origin_url = 'http://testserver' + reverse('users_favorites_list')
+        mommy.make(UserHomepage, user=self.user, url=origin_url)
+        self.assertEqual(1, UserHomepage.objects.count())
+        homepage_url = 'http://testserver' + reverse("crm_view_entities_list")
+
+        url = reverse('users_make_homepage')
+
+        response = self.client.post(url, data={'url': homepage_url})
+        self.assertEqual(200, response.status_code)
+
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response_data["ok"], True)
+
+        self.assertEqual(1, UserHomepage.objects.count())
+        homepage = UserHomepage.objects.all()[0]
+
         self.assertEqual(homepage.user, self.user)
         self.assertEqual(homepage.url, homepage_url)
-        
+
+    def test_is_allowed_homepage(self):
+        self.assertEqual(True, is_allowed_homepage(reverse("crm_view_entities_list")))
+        self.assertEqual(True, is_allowed_homepage(reverse("users_favorites_list")))
+        self.assertEqual(False, is_allowed_homepage(reverse("quick_search")))
+        self.assertEqual(True, is_allowed_homepage('http://testserver' + reverse("crm_view_entities_list")))
+
     def test_view_homepage(self):
-        homepage = mommy.make(UserHomepage, user=self.user, url="http://aa.fr/")
+        homepage_url = 'http://testserver' + reverse("crm_view_entities_list")
+        homepage = mommy.make(UserHomepage, user=self.user, url=homepage_url)
         
         response = self.client.get(reverse("sanza_homepage"))
         
@@ -499,16 +533,25 @@ class UserHomepageTestCase(BaseTestCase):
         self.assertEqual(response['Location'], homepage.url)
 
     def test_view_homepage_redirect_loop(self):
-        url = reverse("sanza_homepage")
-        homepage = mommy.make(UserHomepage, user=self.user, url=url)
+        url = 'http://testserver' + reverse("sanza_homepage")
+        mommy.make(UserHomepage, user=self.user, url=url)
 
         response = self.client.get(url)
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver"+reverse("crm_board_panel"))
+        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+
+    def test_view_homepage_redirect_invalid(self):
+        url = 'http://testserver' + reverse("quick_search")
+        mommy.make(UserHomepage, user=self.user, url=url)
+
+        response = self.client.get(reverse("sanza_homepage"))
+
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
         
     def test_view_homepage_not_set(self):
         response = self.client.get(reverse("sanza_homepage"))
         
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver"+reverse("crm_board_panel"))
+        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))

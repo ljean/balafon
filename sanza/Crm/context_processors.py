@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from sanza import VERSION
 from sanza.Crm.models import EntityType
 from sanza.Crm import settings as crm_settings
-
+from sanza.utils import is_allowed_homepage
 
 def crm(request):
     """add constant to context"""
@@ -30,4 +30,5 @@ def crm(request):
         'SANZA_MULTI_USER': getattr(settings, 'SANZA_MULTI_USER', True),
         'SANZA_EMAIL_LOGIN': ('sanza.Profile.backends.EmailModelBackend' in settings.AUTHENTICATION_BACKENDS),
         'NOW': datetime.now(),
+        'is_allowed_homepage': is_allowed_homepage(request.path),
     }

@@ -92,20 +92,22 @@ $(function() {
         var elt = $(this);
         var loc = window.location;
         var url = loc.protocol + '//' + loc.host + loc.pathname;
-        $.ajax({
-            type: "POST",
-            url: $(this).attr('rel'),
-            dataType: 'json',
-            data: {'url': url},
-            success: function(data) {
-                if (data.ok) {
-                    elt.addClass("success");
-                } else {
-                    elt.addClass("error");
-                    alert(data.message);
-                }
-            }
-        });
+        if ($(this).attr('rel')) {
+          $.ajax({
+              type: "POST",
+              url: $(this).attr('rel'),
+              dataType: 'json',
+              data: {'url': url},
+              success: function(data) {
+                  if (data.ok) {
+                      elt.addClass("success");
+                  } else {
+                      elt.addClass("error");
+                      alert(data.message);
+                  }
+              }
+          });
+        }
         return false;
     })
 })

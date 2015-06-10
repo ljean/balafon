@@ -592,6 +592,9 @@ table.with-odd-even tr.even td {
 .make-homepage.error {
   color: #c33;
 }
+.make-homepage.disabled {
+  color: #888;
+}
 .statistics .row {
   margin: 0;
   padding: 0;
@@ -607,4 +610,10 @@ table.with-odd-even tr.even td {
 ul.coop-cms_user-messages {
   top: 60px;
   z-index: 9999;
+}
+.nav .tooltip .tooltip-inner {
+  background-color: #444444;
+}
+.nav .tooltip .tooltip-arrow {
+  border-bottom-color: #444444;
 }
