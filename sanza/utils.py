@@ -9,6 +9,11 @@ import urlparse
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
 
+try:
+    from localeurl.utils import strip_path
+except ImportError:
+    strip_path = lambda x: ('', x)
+
 from sanza.settings import get_allowed_homepages
 
 logger = logging.getLogger("sanza_crm")
@@ -50,7 +55,9 @@ def is_allowed_homepage(url_string):
     """return True is the current page can be set as homepage"""
     url = urlparse.urlparse(url_string)
     try:
-        resolved = resolve(url.path)
+        #if localeurl is installed : remove the language prefix
+        safe_url = strip_path(url.path)[1]
+        resolved = resolve(safe_url)
     except Resolver404:
         return False
     if resolved.url_name in get_allowed_homepages():
