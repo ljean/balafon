@@ -4,7 +4,6 @@
 from datetime import date, timedelta
 
 from django.db.models import Q, Count
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 import floppyforms as forms
@@ -494,7 +493,7 @@ class ActionByUser(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(ActionByUser, self).__init__(*args, **kwargs)
-        choices = [(u.id, unicode(u)) for u in User.objects.all()]
+        choices = [(team_member.id, team_member.name) for team_member in models.TeamMember.objects.all()]
         field = forms.ChoiceField(choices=choices, label=self.label)
         self._add_field(field)
         

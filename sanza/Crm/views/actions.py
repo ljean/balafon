@@ -233,8 +233,12 @@ def create_action(request, entity_id, contact_id):
             return HttpResponseRedirect(next_url)
     else:
         initial = {}
-        if request.user.is_staff and request.user.first_name:
-            initial['in_charge'] = request.user
+        try:
+            team_member = models.TeamMember.objects.get(user=request.user)
+            initial['in_charge'] = team_member
+        except models.TeamMember.DoesNotExist:
+            pass
+
         try:
             opp_id = int(request.GET.get('opportunity', 0))
             initial['opportunity'] = models.Opportunity.objects.get(id=opp_id)

@@ -43,8 +43,10 @@
     </optgroup>
     {% endif %}
     <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "In charge" %}">
-    {% for u in in_charge %}
-        <option value="u{{u.id}}" {% if u.selected %}selected="selected"{% endif %}>{{u.username}}</option>
+    {% for team_member in in_charge %}
+        <option value="u{{team_member.id}}" {% if team_member.selected %}selected="selected"{% endif %}>
+            {{team_member.name}}
+        </option>
     {% endfor %}
     </optgroup>
 </select>

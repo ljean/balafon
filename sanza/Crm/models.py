@@ -930,6 +930,20 @@ class ActionType(NamedElement):
         verbose_name_plural = _(u'action types')
 
 
+class TeamMember(models.Model):
+    """A member of the team : can be in charge of actions"""
+    user = models.OneToOneField(User, default=None, blank=True, null=True, verbose_name=_(u"user"))
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    active = models.BooleanField(default=True, verbose_name=(_(u"active")))
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _(u'team member')
+        verbose_name_plural = _(u'team members')
+
+
 class Action(TimeStampedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
@@ -953,11 +967,7 @@ class Action(TimeStampedModel):
     opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
-    in_charge = models.ForeignKey(
-        User, verbose_name=_(u'in charge'),
-        blank=True, null=True, default=None,
-        limit_choices_to={'is_staff': True, 'first_name__regex': '.+'}
-    )
+    in_charge = models.ForeignKey(TeamMember, verbose_name=_(u'in charge'), blank=True, null=True, default=None)
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
     amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)

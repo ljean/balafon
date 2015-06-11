@@ -163,3 +163,5 @@ class RelationshipAdmin(admin.ModelAdmin):
 admin.site.register(models.Relationship, RelationshipAdmin)
 
 admin.site.register(models.SubscriptionType)
+
+admin.site.register(models.TeamMember)

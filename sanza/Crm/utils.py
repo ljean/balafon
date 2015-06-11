@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""utils"""
 
 import csv
 import codecs
@@ -10,7 +11,6 @@ from sanza.Crm import settings as crm_settings
 from sanza.utils import logger
 
 
-#@transaction.commit_manually
 def filter_icontains_unaccent(queryset, field, text):
     """use postgres unaccent"""
     if crm_settings.is_unaccent_filter_supported():
@@ -31,7 +31,7 @@ def get_users(self):
 
 def get_in_charge_users():
     """get sanza users"""
-    return User.objects.filter(is_staff=True).exclude(first_name="")
+    return models.TeamMember.objects.filter(active=True)
     
 
 def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
@@ -66,11 +66,11 @@ def format_city_name(city_name):
     city_name = city_name.strip()
     for formatter in crm_settings.city_formatters():
         if formatter[0] == "replace":
-            c1, c2 = formatter[1:]
-            city_name = city_name.replace(c1, c2)
+            sub_str, replace_str = formatter[1:]
+            city_name = city_name.replace(sub_str, replace_str)
         if formatter[0] == "capitalize_words":
             sep = formatter[1]
-            words = [w.capitalize() for w in city_name.split(sep) if w]
+            words = [word.capitalize() for word in city_name.split(sep) if word]
             city_name = sep.join(words)
     return city_name
 
@@ -91,12 +91,13 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
         else:
             parent = queryset[0]
             if country_count > 1:
-                logger.warning(u"{0} different zones for '{1}'".format(country_count, country))   
+                logger_message = u"{0} different zones for '{1}'".format(country_count, country)
+                logger.warning(logger_message)
     else:
         code = zip_code[:2] or default_department
         try:
             parent = models.Zone.objects.get(code=code)
-        except models.Zone.DoesNotExist, msg:
+        except models.Zone.DoesNotExist:
             parent = None
     
     queryset = models.City.objects.filter(parent=parent)
@@ -104,7 +105,8 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
     cities_count = queryset.count()
     if cities_count:
         if cities_count > 1:
-            logger.warning(u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent))
+            logger_message = u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent)
+            logger.warning(logger_message)
         return queryset[0]
     else:
         return models.City.objects.create(name=city_name, parent=parent)

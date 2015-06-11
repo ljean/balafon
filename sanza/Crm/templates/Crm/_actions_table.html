@@ -3,12 +3,12 @@
 {% for a in actions %}{% if a %}
   <div class="row">
     <div class="col-md-12">
-      <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != user and a.in_charge != None %}not-my-action{% endif %}">
+      <div class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if a.done %}done{% endif %} {% if a.planned_date|is_today %}due-today{% endif %} {% if a.in_charge != None and a.in_charge.user != user %}not-my-action{% endif %}">
         
         <div class="pull-right">
           
           {% if SANZA_MULTI_USER %}
-            <div class="label label-in-charge {% if user == a.in_charge %}me-in-charge{% endif %}">
+            <div class="label label-in-charge {% if user == a.in_charge.user %}me-in-charge{% endif %}">
             {% if a.in_charge %}
               {{a.in_charge}}
             {% else %}
