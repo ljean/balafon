@@ -478,6 +478,16 @@ class Contact(TimeStampedModel):
     favorite_language = models.CharField(
         _("favorite language"), max_length=10, default="", blank=True, choices=settings.get_language_choices()
     )
+
+    def get_view_url(self):
+        if self.entity.is_single_contact:
+            absolute_url = reverse('crm_view_entity', args=[self.entity.id])
+        else:
+            absolute_url = reverse('crm_view_contact', args=[self.id])
+        try:
+            return "//" + Site.objects.get_current().domain + absolute_url
+        except Site.objects.DoesNotExist:
+            return absolute_url
     
     def get_relationships(self):
         """get all retlationships for this contact"""
