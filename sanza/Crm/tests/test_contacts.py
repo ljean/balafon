@@ -7,6 +7,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
 
 from bs4 import BeautifulSoup
 
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -405,3 +406,27 @@ class ViewContactsTest(BaseTestCase):
         self.assertContains(response, c2.lastname)
         self.assertNotContains(response, e3.name)
         self.assertNotContains(response, c3.lastname)
+
+
+class ContactViewUrlTest(BaseTestCase):
+    """Test the get_view_url method of contact"""
+
+    def test_view_single_contact_url(self):
+        """test get_view_url for single_contact"""
+
+        site = Site.objects.get_current()
+        entity = mommy.make(models.Entity, type=None, is_single_contact=True)
+        self.assertEqual(
+            entity.default_contact.get_view_url(),
+            "//{0}{1}".format(site.domain, reverse('crm_view_entity', args=[entity.id]))
+        )
+
+    def test_view_entity_contact_url(self):
+        """test get_view_url for entity contacts"""
+
+        site = Site.objects.get_current()
+        entity = mommy.make(models.Entity, type=None, is_single_contact=False)
+        self.assertEqual(
+            entity.default_contact.get_view_url(),
+            "//{0}{1}".format(site.domain, reverse('crm_view_contact', args=[entity.default_contact.id]))
+        )
