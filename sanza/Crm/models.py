@@ -17,6 +17,7 @@ from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
 
+from coop_cms.utils import RequestManager, RequestNotFound
 from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
 
@@ -34,7 +35,27 @@ class NamedElement(models.Model):
     
     class Meta:
         abstract = True
-    
+
+
+class LastModifiedModel(TimeStampedModel):
+    """track the user who last modified an object"""
+
+    last_modified_by = models.ForeignKey(
+        User, default=None, blank=True, null=True, verbose_name=_(u"last modified by")
+    )
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        """save object : update the last_modified_by from request"""
+        try:
+            request = RequestManager().get_request()
+            self.last_modified_by = request.user
+        except (RequestNotFound, AttributeError):
+            pass
+        return super(LastModifiedModel, self).save(*args, **kwargs)
+
 
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
@@ -160,7 +181,7 @@ def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 
-class Entity(TimeStampedModel):
+class Entity(LastModifiedModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
@@ -410,7 +431,7 @@ class Relationship(TimeStampedModel):
         verbose_name_plural = _(u'relationships')
     
 
-class Contact(TimeStampedModel):
+class Contact(LastModifiedModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
     GENDER_MALE = 1
     GENDER_FEMALE = 2
@@ -954,7 +975,7 @@ class TeamMember(models.Model):
         verbose_name_plural = _(u'team members')
 
 
-class Action(TimeStampedModel):
+class Action(LastModifiedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
     PRIORITY_MEDIUM = 2

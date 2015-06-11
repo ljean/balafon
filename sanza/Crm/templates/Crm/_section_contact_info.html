@@ -114,7 +114,11 @@
       <tr><td colspan="2"><b>{% trans "This contact has left." %}</b></td></tr>
       {% endif %}
       <tr><td><b>{% trans "ADD_DT" %}</b> {{contact.created|date:"d/m/Y"}}</td></tr>
-      <tr><td><b>{% trans "UPD_DT" %}</b> {{contact.modified|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>
+          {% trans "UPD_DT" %}</b>
+          {{contact.modified|date:"d/m/Y"}}
+          {% if contact.last_modified_by %} {% trans "by" %} {{contact.last_modified_by}} {% endif %}
+      </td></tr>
     </table>
   </div>
 </div>  

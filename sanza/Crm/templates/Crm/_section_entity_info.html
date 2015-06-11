@@ -59,9 +59,14 @@
   
   <div class="col-md-1">
     <table class="table micro-table table-striped">
-      <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
+      {% if entity.relationship_date %}
+        <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
+      {% endif %}
       <tr><td><b>{% trans "ADD_DT" %}</b> {{entity.created|date:"d/m/Y"}}</td></tr>
-      <tr><td><b>{% trans "UPD_DT" %}</b> {{entity.modified|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "UPD_DT" %}</b>
+          {{entity.modified|date:"d/m/Y"}}
+          {% if entity.last_modified_by %} {% trans "by" %} {{entity.last_modified_by}} {% endif %}
+      </td></tr>
       {% if entity.type %}
       <tr><td><b>{% trans "Type" %}</b> {{entity.type}}</td></tr> 
       {% endif %}
