@@ -1,0 +1,37 @@
+{% spaceless %}
+<div class="action-contacts">
+
+  {% for c in action.contacts.all %}
+    <span class="label label-bigger label-primary">
+      <span class="glyphicon glyphicon-user"></span>
+      <a href="{% url 'crm_view_contact' c.id %}">{{ c.fullname }}</a>
+      {% if not c.entity.is_single_contact %}
+        <a href="{% url 'crm_view_entity' c.entity.id %}">({{ c.entity }})</a>
+      {% endif %}
+      <a href="{% url 'crm_remove_contact_from_action' action.id c.id %}" class="colorbox-form">
+          <span class="glyphicon glyphicon-remove"></span></a>
+    </span>&nbsp;
+  {% endfor %}
+
+  {% for e in action.entities.all %}
+    <span class="label label-bigger label-primary">
+      <span class="glyphicon glyphicon-tower"></span>
+      <a href="{% url 'crm_view_entity' e.id %}">{{ e }}</a>
+      <a href="{% url 'crm_remove_entity_from_action' action.id e.id %}" class="colorbox-form">
+          <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </span>&nbsp;
+  {% endfor %}
+
+  <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_add_contact_to_action' action.id %}">
+    <span class="glyphicon glyphicon-user"></span>
+    <span class="glyphicon glyphicon-plus"></span>
+  </a>&nbsp;
+
+  <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_add_entity_to_action' action.id %}">
+    <span class="glyphicon glyphicon-tower"></span>
+    <span class="glyphicon glyphicon-plus"></span>
+  </a>&nbsp;
+
+</div>
+{% endspaceless %}

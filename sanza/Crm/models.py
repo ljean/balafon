@@ -13,6 +13,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
@@ -22,7 +24,7 @@ from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
 
 from sanza.Crm import settings
-from sanza.utils import now_rounded
+from sanza.utils import now_rounded, logger
 from sanza.Users.models import Favorite
 
 
@@ -952,6 +954,10 @@ class ActionType(NamedElement):
         default=True,
         help_text=_(u'If default_template is set, define if the template has a editable content')
     )
+    action_template = models.CharField(
+        _(u'action template'), max_length=200, blank=True, default="",
+        help_text=_(u'Action of this type will be displayed using the given template')
+    )
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1023,6 +1029,17 @@ class Action(LastModifiedModel):
     def has_editable_document(self):
         """true if an editable doc is linked to this action"""
         return self.type and self.type.default_template and self.type.is_editable
+
+    def get_action_template(self):
+        if self.type and self.type.action_template:
+            try:
+                #Check if the template exists but return its name
+                get_template(self.type.action_template)
+                return self.type.action_template
+            except TemplateDoesNotExist:
+                message = u"get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
+                logger.warning(message)
+        return 'Crm/_action.html'
         
     def save(self, *args, **kwargs):
         """save"""

@@ -91,6 +91,20 @@ body {
 }
 .actions .row {
   overflow: hidden;
+  padding: 1px 0;
+}
+.actions .label {
+  font-size: 0.9em;
+}
+.actions .label-text {
+  color: #888;
+}
+.actions .label.label-default {
+  background: #ddd;
+  color: #000;
+}
+.actions .label.label-default a {
+  color: #000;
 }
 .label-in-charge {
   background: #888888;
@@ -105,6 +119,16 @@ body {
 }
 .label-in-charge.me-in-charge {
   background: #44aa44;
+}
+.label-bigger {
+  font-size: 1em;
+}
+.label-bigger .glyphicon-tower,
+.label-bigger .glyphicon-user {
+  margin-right: 5px;
+}
+.label-bigger .glyphicon {
+  font-size: 0.7em;
 }
 /*
 .actions .row.action .col-action {

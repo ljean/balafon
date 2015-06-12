@@ -1,0 +1,21 @@
+{% load i18n %}
+<span class="action-opprtunity">
+{% if action.opportunity %}
+  <span class="label label-default">
+    <span class="glyphicon glyphicon-tag"></span>
+    <span class="label-text">{% trans "Opportunity" %}: </span>
+    <a href="{% url 'crm_view_opportunity' action.opportunity.id %}">
+      {{action.opportunity.name}}
+    </a>
+    <a href="{% url 'crm_remove_action_from_opportunity' action.id action.opportunity.id %}"
+       class="colorbox-form">
+        <span class="glyphicon glyphicon-remove"></span>
+    </a>
+  </span>
+{% else %}
+  <a href="{% url 'crm_add_action_to_opportunity' action.id %}" class="btn btn-default btn-sm colorbox-form">
+      <span class="glyphicon glyphicon-tag"></span> {% trans "Opportunity" %}
+  </a>
+{% endif %}
+</span>
+
