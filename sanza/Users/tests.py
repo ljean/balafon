@@ -19,6 +19,7 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.utils import timezone
 
+from coop_cms.utils import RequestManager
 from model_mommy import mommy
 
 from sanza.utils import is_allowed_homepage
@@ -33,6 +34,7 @@ class BaseTestCase(TestCase):
     def setUp(self):
         """before each test"""
         logging.disable(logging.CRITICAL)
+        RequestManager().clean()
         self.user = User.objects.create(username="toto")
         self.user.set_password("abc")
         self.user.is_staff = True

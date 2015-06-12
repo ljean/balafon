@@ -35,3 +35,4 @@ def get_allowed_homepages():
         # Users
         'users_favorites_list',
     )
+

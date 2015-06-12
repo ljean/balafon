@@ -18,6 +18,7 @@ from model_mommy import mommy
 from sanza.Crm import models
 
 
+@override_settings(SANZA_SUBSCRIBE_ENABLED=True)
 class SubscribeTest(TestCase):
     """Subscribe to newsletter"""
 
@@ -650,3 +651,33 @@ class SubscribeTest(TestCase):
         self.assertEqual(404, response.status_code)
         contact = models.Contact.objects.get(id=contact.id)
         self.assertEqual(contact.email_verified, False)
+
+    @override_settings(SANZA_SUBSCRIBE_ENABLED=False)
+    def test_view_subscribe_disabled(self):
+        url = reverse("emailing_subscribe_newsletter")
+
+        response = self.client.get(url,)
+        self.assertEqual(404, response.status_code)
+
+        self.assertEqual(models.Contact.objects.count(), 0)
+
+    @override_settings(SANZA_SUBSCRIBE_ENABLED=False)
+    def test_subscribe_disabled(self):
+        url = reverse("emailing_subscribe_newsletter")
+
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'email': "pierre.dupond@mon-mail.fr",
+            'message': "",
+        }
+
+        self.assertEqual(models.Contact.objects.count(), 0)
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(404, response.status_code)
+
+        self.assertEqual(models.Contact.objects.count(), 0)
+
+        #email verification
+        self.assertEqual(len(mail.outbox), 0)

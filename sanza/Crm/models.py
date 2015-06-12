@@ -51,7 +51,9 @@ class LastModifiedModel(TimeStampedModel):
         """save object : update the last_modified_by from request"""
         try:
             request = RequestManager().get_request()
-            self.last_modified_by = request.user
+            if request.user.is_authenticated():
+                #object can be modified by anonymous user : subscription page for example, view magic-link ...
+                self.last_modified_by = request.user
         except (RequestNotFound, AttributeError):
             pass
         return super(LastModifiedModel, self).save(*args, **kwargs)
