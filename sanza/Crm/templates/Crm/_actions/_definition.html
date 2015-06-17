@@ -1,5 +1,10 @@
 {% load i18n sanza_utils %}
-{% if action.type %}<div class="label label-default">{{ action.type }}</div>{% endif %}
-{% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>{% endif %}
-{% if action.status %}<div class="label label-default">{{action.status}}</div>{% endif %}
-{% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>{% endif %}
+{% if action.type %}
+  <div class="label label-default">
+    {{ action.type }} {% if action.number %}{% trans "N°" %} {{action.number }} {% endif %}
+  </div>&nbsp;
+{% else %}
+  {% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
+{% endif %}
+{% if action.status %}<div class="label label-default">{{action.status}}</div>&nbsp;{% endif %}
+{% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}

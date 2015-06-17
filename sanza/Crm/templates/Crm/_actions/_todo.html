@@ -7,9 +7,7 @@
     <span class="glyphicon glyphicon-check"></span>
     <span class="done-date">
       <span class="glyphicon glyphicon-check"></span> {% trans "done on" %}<br />
-      {{a.done_date|date:'d/m/Y H:i'|cut_null_hour}}</span>
+      {{action.done_date|date:'d/m/Y H:i'|cut_null_hour}}</span>
   </div>
 {% endif %}
 </a>
-
-

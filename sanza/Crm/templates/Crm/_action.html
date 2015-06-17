@@ -6,56 +6,61 @@
 
       <div class="row">
 
-        <div class="col-md-6">
-          {% block favorite %}
-            {% favorite_item object=action %}
-          {% endblock %}
+        <div class="col-md-7">
+          <div class="row">
+            <div class="col-md-12">
+              {% block favorite %}
+                {% favorite_item object=action %}
+              {% endblock %}
 
-          {% block definition %}
-            {% include "Crm/_actions/_definition.html" %}
-          {% endblock %}
+              {% block date %}
+              {% include "Crm/_actions/_date.html" %}
+              {% endblock %}
 
-          {% block document %}
-            {% include "Crm/_actions/_document.html" %}
-          {% endblock %}
+              {% block definition %}
+                {% include "Crm/_actions/_definition.html" %}
+              {% endblock %}
 
-          {% block edit_button %}
-            {% include "Crm/_actions/_edit.html" %}
-          {% endblock %}
+              {% block document %}
+                {% include "Crm/_actions/_document.html" %}
+              {% endblock %}
 
-        </div>
-
-        <div class="col-md-6">
-          <div class="pull-right">
-            {% include "Crm/_actions/_in_charge.html" %}
-            {% include "Crm/_actions/_date.html" %}
-            {% include "Crm/_actions/_todo.html" %}
+              {% block opportunity %}
+                {% include "Crm/_actions/_opportunity.html" %}
+              {% endblock %}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              {% block details %}
+                {% include "Crm/_actions/_details.html" %}
+              {% endblock %}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-
-        <div class="col-md-5">
+        <div class="col-md-3">
           {% block contacts_and_entities %}
           {% include "Crm/_actions/_contacts_and_entities.html" %}
           {% endblock %}
         </div>
 
-        <div class="col-md-5">
-          {% block details %}
-            {% include "Crm/_actions/_details.html" %}
-          {% endblock %}
-        </div>
-
         <div class="col-md-2">
-          <div class="action-details pull-right">
-            {% block opportunity %}
-              {% include "Crm/_actions/_opportunity.html" %}
-            {% endblock %}
+          <div class="pull-right">
+          {% block edit_button %}
+            {% include "Crm/_actions/_todo.html" %}&nbsp;
+            {% include "Crm/_actions/_menu.html" %}
+          {% endblock %}
           </div>
+          <div class="pull-right" style="margin-top: 10px">
+          {% block in_charge %}
+          {% include "Crm/_actions/_in_charge.html" %}
+          {% endblock %}
+          </div>
+
         </div>
-      </div>  
+        
+      </div>
     </div>
   </div>
 </div>

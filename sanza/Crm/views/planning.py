@@ -34,10 +34,13 @@ class ActionArchiveView(object):
         except ValueError:
             raise Http404
 
+    def _get_queryset(self):
+        return models.Action.objects.all().order_by("planned_date", "priority")
+
     def get_queryset(self):
         """queryset ob objects"""
         values = self.request.GET.get("filter", None)
-        queryset = self.queryset
+        queryset = self._get_queryset()
         if values and values != "null":
             values_dict = self._get_selection(values)
 
@@ -107,7 +110,6 @@ class ActionArchiveView(object):
 
 class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
     """view"""
-    queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
     month_format = '%m'
     allow_future = True
@@ -116,7 +118,6 @@ class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
 
 class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
     """view"""
-    queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
     week_format = "%U"
     allow_future = True
@@ -125,7 +126,6 @@ class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
 
 class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
     """view"""
-    queryset = models.Action.objects.all().order_by("planned_date", "priority")
     date_field = "planned_date"
     allow_future = True
     allow_empty = True
@@ -136,3 +136,6 @@ class NotPlannedActionArchiveView(ActionArchiveView, ListView):
     """view"""
     queryset = models.Action.objects.filter(planned_date=None).order_by("priority")
     template_name = "Crm/action_archive_not_planned.html"
+
+    def _get_queryset(self):
+        return models.Action.objects.filter(planned_date=None).order_by("priority")

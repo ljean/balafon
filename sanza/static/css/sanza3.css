@@ -90,7 +90,8 @@ body {
   padding-bottom: 99999px;
 }
 .actions .row {
-  overflow: hidden;
+  /*overflow: hidden;*/
+
   padding: 1px 0;
 }
 .actions .label {
@@ -640,4 +641,8 @@ ul.coop-cms_user-messages {
 }
 .nav .tooltip .tooltip-arrow {
   border-bottom-color: #444444;
+}
+.dropdown-menu {
+  height: auto !important;
+  overflow: visible !important;
 }
