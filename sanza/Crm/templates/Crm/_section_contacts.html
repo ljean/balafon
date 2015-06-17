@@ -47,11 +47,13 @@
 </div>
 {% endblock %}
 
+{% block section_menu_name %}<span class="glyphicon glyphicon-user"></span> {% trans "Do" %}{% endblock %}
+
 {% block section_buttons %}
   {% if entity %}
-    <li><a class="colorbox-form" href="{% url "crm_add_contact" entity.id %}">{% trans "Add" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_add_contact' entity.id %}">{% trans "Add" %}</a></li>
   {% endif %}
   {% if opportunity %}
-    <li><a href="{% url "search_opportunity" opportunity.id %}">{% trans "View in search" %}</a></li>
+    <li><a href="{% url 'search_opportunity' opportunity.id %}">{% trans "View in search" %}</a></li>
   {% endif %}
 {% endblock %}

@@ -245,6 +245,12 @@ def create_action(request, entity_id, contact_id):
         except (ValueError, models.Opportunity.DoesNotExist):
             pass
 
+        try:
+            type_id = int(request.GET.get('type', 0))
+            initial['type'] = models.ActionType.objects.get(id=type_id)
+        except (ValueError, models.ActionType.DoesNotExist):
+            pass
+
         form = forms.ActionForm(initial=initial)
 
     context = {

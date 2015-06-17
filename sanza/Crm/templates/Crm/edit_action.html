@@ -11,7 +11,7 @@
     $("select#id_type").change(function() {
       var dt = new Date().getTime();
       $.ajax({
-          url: "{% url "crm_get_action_status" %}?t="+$(this).val()+"&timestamp="+dt,
+          url: "{% url 'crm_get_action_status' %}?t="+$(this).val()+"&timestamp="+dt,
           success: function(data){
             var allowed_status = data.allowed_status;
             var default_status = parseInt(data.default_status, 10);
@@ -50,25 +50,28 @@
 
 {% block doc_header %}
   {% if action %}
-  <h2>{% trans "Edit action" %}</h2>
+  <h4>{{ form.title }}</h4>
   {% else %}
-  <h2>{% trans "Create action" %}</h2>
+  <h4>{{ form.title }}</h4>
   {% endif %}
 
   {% if action.done %}
-  <h3 class="action-warning">{% trans "This action has be done on" %} {{action.done_date}}</h3>
+  <div class="alert alert-warning">
+    <span class="glyphicon glyphicon-warning-sign"></span>
+    {% trans "This action has be done on" %} {{action.done_date}}
+  </div>
   {% endif %}
 {% endblock %}
 
-{% block title %}{% if action %}{% trans "Edit action" %}{% else %}{% trans "Create action" %}{% endif %}{% endblock %}
+{% block title %}{{ form.title }}{% endblock %}
 
 {% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_create_action" entity_id contact_id %}{% endif %}{% endblock %}
 
 
 {% block popup_buttons %}
-    <input class="btn btn-primary" type="submit" value="{% trans "Save"%}">
+    <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}">
     {% if action %}
-    <a class="btn btn-default colorbox-form" href="{% url "crm_delete_action" action.id %}">{% trans "Delete" %}</a>
+    <a class="btn btn-warning colorbox-form" href="{% url 'crm_delete_action' action.id %}">{% trans "Delete" %}</a>
     {% endif %}
     <a class="btn btn-default cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}

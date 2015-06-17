@@ -23,19 +23,19 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span title="{% trans "Address" %}" class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span> {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Email" %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
       </td></tr>
       <tr><td>
-        <span title="{% trans "Phone" %}" class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Web Site" %}" class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Web Site' %}" class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
       </td></tr>
       <tr><td>
-        <span title="{% trans "Fax" %}" class="glyphicon glyphicon-print"></span> {{entity.fax}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Fax' %}" class="glyphicon glyphicon-print"></span> {{entity.fax}}
       </td></tr>
     </table>
   </div>
@@ -75,6 +75,8 @@
 </div>  
 
 {% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
   <li><a class="colorbox-form" href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>

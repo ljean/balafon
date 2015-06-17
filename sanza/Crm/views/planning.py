@@ -35,6 +35,7 @@ class ActionArchiveView(object):
             raise Http404
 
     def _get_queryset(self):
+        """return actions displayed by this page. The date is managed by each Archive"""
         return models.Action.objects.all().order_by("planned_date", "priority")
 
     def get_queryset(self):
@@ -138,4 +139,5 @@ class NotPlannedActionArchiveView(ActionArchiveView, ListView):
     template_name = "Crm/action_archive_not_planned.html"
 
     def _get_queryset(self):
+        """return actions displayed by this page"""
         return models.Action.objects.filter(planned_date=None).order_by("priority")

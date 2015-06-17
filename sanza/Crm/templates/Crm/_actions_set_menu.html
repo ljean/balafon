@@ -1,0 +1,22 @@
+{% load i18n %}
+{% if contact %}
+  <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 contact.id %}{% if action_type %}?type={{ action_type.id }}{% endif %}">
+    {% if action_type %}{{ action_type.name }}{% else %}{% trans "Action" %}{% endif %}
+  </a></li>
+{% else %}
+  {% if entity %}
+    <li><a class="colorbox-form" href="{% url 'crm_create_action' entity.id 0 %}{% if action_type %}?type={{ action_type.id }}{% endif %}">
+      {% if action_type %}{{ action_type.name }}{% else %}{% trans "Action" %}{% endif %}
+    </a></li>
+  {% else %}
+    {% if opportunity %}
+      <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 0 %}?opportunity={{opportunity.id}}{% if action_type %}&type={{ action_type.id }}{% endif %}">
+        {% if action_type %}{{ action_type.name }}{% else %}{% trans "Action" %}{% endif %}
+      </a></li>
+    {% else %}
+      <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 0 %}{% if action_type %}?type={{ action_type.id }}{% endif %}">
+          {% if action_type %}{{ action_type.name }}{% else %}{% trans "Action" %}{% endif %}
+      </a></li>
+    {% endif %}
+  {% endif %}
+{% endif %}

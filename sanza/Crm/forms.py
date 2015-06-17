@@ -488,8 +488,8 @@ class ActionForm(BetterBsModelForm):
         fieldsets = [
             ('summary', {
                 'fields': [
-                    'subject', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
-                    'in_charge', 'opportunity'
+                    'subject', 'in_charge', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
+                    'opportunity'
                 ],
                 'legend': _(u'Summary')
             }),
@@ -501,7 +501,28 @@ class ActionForm(BetterBsModelForm):
         kwargs.pop('entity', None)
         instance = kwargs.get('instance', None)
         super(ActionForm, self).__init__(*args, **kwargs)
-        
+        self.title = u""
+
+        #Force the type to be hidden
+        action_type = None
+        if instance:
+            #If a type is already defined and belongs to a set
+            if instance.type and instance.type.set:
+                action_type = instance.type
+        else:
+            #if initial value is provided (from url)
+            action_type = kwargs.get('initial', {}).get('type', None)
+
+        if action_type:
+            self.fieldsets['type'].legend = action_type.name
+            self.fields['type'].widget = forms.HiddenInput()
+            if instance:
+                self.title = ugettext(u"Edition {0}").format(action_type.name)
+            else:
+                self.title = ugettext(u"Creation {0}").format(action_type.name)
+        else:
+            self.title = ugettext(u"Edit action") if instance else ugettext(u"Create action")
+
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             # let javascript disable the blank value if default_status
             choices = [('', "---------")]

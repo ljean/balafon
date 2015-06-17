@@ -958,6 +958,7 @@ class ActionType(NamedElement):
         _(u'action template'), max_length=200, blank=True, default="",
         help_text=_(u'Action of this type will be displayed using the given template')
     )
+    order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -967,6 +968,7 @@ class ActionType(NamedElement):
     class Meta:
         verbose_name = _(u'action type')
         verbose_name_plural = _(u'action types')
+        ordering = ['order_index', 'name']
 
 
 class TeamMember(models.Model):
