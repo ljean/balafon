@@ -220,6 +220,7 @@ INSTALLED_APPS = (
     'sanza.Search',
     'sanza.Emailing',
     'sanza.Profile',
+    'sanza.Store',
     'sanza.Users',
 
     'django.contrib.admin',
@@ -259,6 +260,10 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'colorbox': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'sanza_crm': {
             'handlers': ['console'],
             'level': 'DEBUG',
         },

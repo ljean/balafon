@@ -314,8 +314,8 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t{0}".format(y.id) for y in [action_type1, action_type2]],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            sorted([u"t{0}".format(y.id) for y in [action_type1, action_type2]]),
+            sorted([x["value"] for x in soup.select("select option[selected=selected]")])
         )
 
     def test_action_type_none(self):
