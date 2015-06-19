@@ -5,7 +5,22 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from sanza.Crm.models import Action
+from sanza.Crm.models import Action, ActionType
+
+
+class StoreManagementActionType(models.Model):
+    """
+    Define if an action type is linked to the store.
+    If so it will be possible to link a Sale with an Action of this ActionType
+    """
+    action_type = models.OneToOneField(ActionType)
+
+    class Meta:
+        verbose_name = _(u"Store management action type")
+        verbose_name_plural = _(u"Store management action types")
+
+    def __unicode__(self):
+        return u"{0}".format(self.action_type)
 
 
 class VatRate(models.Model):
@@ -130,14 +145,14 @@ class Sale(models.Model):
         verbose_name_plural = _(u"Sales")
 
     def __unicode__(self):
-        return self.name
+        return unicode(self.action)
 
 
 class StoreItemSale(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale)
     item = models.ForeignKey(StoreItem)
-    quantity = models.DecimalField(verbose_name=_("vat rate"), max_digits=9, decimal_places=2)
+    quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
 
     class Meta:
         verbose_name = _(u"Store item sale")

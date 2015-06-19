@@ -50,6 +50,11 @@ if 'sanza.Profile' in settings.INSTALLED_APPS:
         (r'^accounts/', include('sanza.Profile.urls')),
     )
 
+if 'sanza.Store' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^store/', include('sanza.Store.urls')),
+    )
+
 urlpatterns += patterns('',
     (
         r'^accounts/login/?$',

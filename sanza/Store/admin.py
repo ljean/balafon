@@ -12,6 +12,8 @@ admin.site.register(models.Unit)
 admin.site.register(models.StoreItemCategory)
 admin.site.register(models.StoreItemTag)
 admin.site.register(models.Sale)
+admin.site.register(models.StoreManagementActionType)
+admin.site.register(models.StoreItemSale)
 
 
 class StockThresholdFilter(admin.SimpleListFilter):
@@ -51,7 +53,7 @@ class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'category', 'vat_rate', 'purchase_price', 'pre_tax_price', 'vat_incl_price', 'stock_count',
-        'stock_threshold_alert', 'unit', 'tags'
+        'stock_threshold_alert', 'unit'
     ]
     ordering = ['name']
     list_filter = ['category', 'tags', StockThresholdFilter]

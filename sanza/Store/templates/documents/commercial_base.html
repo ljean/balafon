@@ -1,0 +1,62 @@
+{% extends "documents/base.html" %}
+
+{% load i18n coop_edition sanza_utils %}
+
+{% block extra_head %}
+    {{ block.super }}
+<style>
+    .address {
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    .contact-address{
+       
+    }
+    p {
+        page-break-inside: avoid;
+        text-align: justify;
+    }
+    .subject {
+        margin: 10px 0;
+    }
+</style>
+{% endblock %}
+
+{% block document %}
+<div class="address company-address">
+    {% block our_company %}
+        {% try_to_include "documents/_our_company.html" %}
+    {% endblock %}
+</div>
+
+<div class="address">
+    <div class="contact-address">
+{% for contact in action.contacts.all %}
+    {{ contact }}<br />
+    {{ contact.get_address }}<br />
+    {% if contact.get_address2 %} {{ contact.get_address2 }}<br />{% endif %}
+    {% if contact.get_address3 %}{{ contact.get_address3 }}<br />{% endif %}
+    {{ contact.get_zip_code }} {{ contact.get_city }} {{ contact.get_cedex|default:"" }}
+{% endfor %}
+    </div>
+</div>
+
+<div class="info">
+    <div>{{ action.type.name }} N°{{ action.number }}</div>
+    <div>{{ action.planned_date|date:"d F Y" }}</div>
+</div>
+
+{% cms_edit %}
+  <table>
+  {% for obj in objects %}
+	  <tr>
+      <td>{{ obj.id }}</td>
+      <td>{{ obj.item }}</td>
+      <td>{{ obj.quantity }}</td>
+    </tr>
+  {% endfor %}
+ </table>
+{{ formset.management_form }}
+{% end_cms_edit %}
+
+{% endblock %}
