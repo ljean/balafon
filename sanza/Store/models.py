@@ -27,12 +27,17 @@ class VatRate(models.Model):
     """Tax : A VAT rate"""
     rate = models.DecimalField(verbose_name=_("vat rate"), max_digits=4, decimal_places=2)
 
+    @property
+    def name(self):
+        return u"{0}%".format(self.rate)
+
     class Meta:
         verbose_name = _(u"VAT rate")
         verbose_name_plural = _(u"VAT rates")
+        ordering = ['rate']
 
     def __unicode__(self):
-        return u"{0}%".format(self.rate)
+        return self.name
 
 
 class Unit(models.Model):
@@ -151,12 +156,18 @@ class Sale(models.Model):
 class StoreItemSale(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale)
-    item = models.ForeignKey(StoreItem)
+    item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
     quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
+    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
+    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
+    text = models.TextField(verbose_name=_(u"Text"), max_length=3000, default='', blank=True)
 
     class Meta:
         verbose_name = _(u"Store item sale")
         verbose_name_plural = _(u"Store item sales")
 
     def __unicode__(self):
-        return _(u"{1} x {0}").format(self.item, self.quantity)
+        if self.id:
+            return _(u"{1} x {0}").format(self.item, self.quantity)
+        else:
+            return _(u"StoreItemSale not set")

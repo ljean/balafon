@@ -2,9 +2,17 @@
 """urls"""
 # pylint: disable=C0330
 
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
+
+from rest_framework import routers
 
 from sanza.Crm.views import planning as planning_views, documents as document_views
+from sanza.Crm.api import (
+    UpdateActionDate, CreateAction, DeleteAction, UpdateAction, ContactViewSet
+)
+
+router = routers.DefaultRouter()
+router.register(r'contacts', ContactViewSet)
 
 
 urlpatterns = patterns('sanza.Crm.views.entities',
@@ -229,4 +237,12 @@ urlpatterns += patterns('',
         document_views.ActionDocumentDetailView.as_view(),
         name='crm_view_action_document'
     ),
+)
+
+urlpatterns += patterns('',
+    url(r'^api/', include(router.urls)),
+    url(r'^api/update-action-date/(?P<pk>\d*)/$', UpdateActionDate.as_view(), name="calendar_action_date"),
+    url(r'^api/update-action/(?P<pk>\d*)/$', UpdateAction.as_view(), name="calendar_update_action"),
+    url(r'^api/create-action/$', CreateAction.as_view(), name="calendar_create_action"),
+    url(r'^api/delete-action/(?P<pk>\d*)/$', DeleteAction.as_view(), name="calendar_delete_action"),
 )

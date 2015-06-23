@@ -1,0 +1,23 @@
+{% extends "sanza/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+  <style>
+    select.form-control + .chosen-container.chosen-container-single .chosen-single {
+      height: auto;
+      width: auto;
+    }
+  </style>
+  <script type="text/javascript">
+  $(document).bind('cbox_complete', function(){
+    $.colorbox.resize({
+      width: 500,
+      height: 220
+    });
+    $(".chosen-container").attr('width', '300px');
+    //$(".chosen-single").attr({width: 'auto', height: 'auto'});
+  });
+  </script>
+{% endblock %}
+{% block title %}{% trans "Choose item" %}{% endblock %}
+{% block form_url %}{% url "store_choose_item" %}{% endblock %}
