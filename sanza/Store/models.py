@@ -14,6 +14,7 @@ class StoreManagementActionType(models.Model):
     If so it will be possible to link a Sale with an Action of this ActionType
     """
     action_type = models.OneToOneField(ActionType)
+    template_name = models.CharField(default='', blank=True, max_length=100, verbose_name=_(u'template name'))
 
     class Meta:
         verbose_name = _(u"Store management action type")

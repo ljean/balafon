@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from rest_framework.renderers import JSONRenderer
 
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
-from sanza.Store.models import SaleItem, VatRate
+from sanza.Store.models import Sale, SaleItem, VatRate, StoreManagementActionType
 from sanza.Store.serializers import SaleItemSerializer, SaleSerializer, VatRateSerializer
 
 
@@ -22,16 +26,39 @@ class SalesDocumentView(TemplateView):
     template_name = "Store/commercial_document.html"
     action = None
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(SalesDocumentView, self).dispatch(*args, **kwargs)
+
+    def get_template_names(self):
+        """return customized template of exists"""
+        action = self.get_action()
+        try:
+            store_action_type = StoreManagementActionType.objects.get(action_type=action.type)
+            if store_action_type.template_name:
+                return store_action_type.template_name
+        except StoreManagementActionType.DoesNotExist:
+            pass
+        return super(SalesDocumentView, self).get_template_names()
+
     def get_context_data(self, **kwargs):
         """get context data"""
         context = super(SalesDocumentView, self).get_context_data(**kwargs)
 
+        if not self.request.user.is_staff:
+            raise PermissionDenied
+
         action = self.get_action()
+
+        try:
+            sale = action.sale
+        except Sale.DoesNotExist:
+            raise Http404
 
         action_serializer = ActionSerializer(self.get_action())
         action_data = Utf8JSONRenderer().render(action_serializer.data)
 
-        sale_serializer = SaleSerializer(action.sale)
+        sale_serializer = SaleSerializer(sale)
         sale_data = Utf8JSONRenderer().render(sale_serializer.data)
 
         sale_items_serializer = SaleItemSerializer(self.get_sale_items(), many=True)
