@@ -40,8 +40,14 @@
         SEARCH: 'Search',
         SELECT_A_STORE_ITEM: 'Select a store item',
         TOTAL: 'Total',
-        ENTER_A_NAME: 'Enter a name'
-
+        ENTER_A_NAME: 'Enter a name',
+        AN_ERROR_OCCURED: 'An error occured',
+        ERROR: 'Error',
+        THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER: 'The order index is required number',
+        THE_LABEL_FIELD_IS_REQUIRED: 'The label field is required',
+        THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'The quantity field is required number',
+        THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'The pre-tax price field is required number',
+        THE_VAT_REQUIRED: 'The VAT rate is required'
       });
 
       $translateProvider.translations('fr', {
@@ -59,19 +65,28 @@
         SEARCH: 'Chercher dans le catalogue',
         SELECT_A_STORE_ITEM: 'Selectionner un élément du catalogue',
         TOTAL: 'Total',
-        ENTER_A_NAME: 'Entrez un nom'
+        ENTER_A_NAME: 'Entrez un nom',
+        AN_ERROR_OCCURED: 'Une erreur est survenue',
+        ERROR: 'Erreur',
+        THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER: 'Le numéro d\'ordre doit être un nombre',
+        THE_LABEL_FIELD_IS_REQUIRED: 'Le libellé est requis',
+        THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'La quantité doit être un nombre',
+        THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'Le prix unitaire doit être un nombre',
+        THE_VAT_REQUIRED: 'La TVA est requise'
       });
       $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
       $translateProvider.useSanitizeValueStrategy('escape');
     }]);
 
-    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', function ($scope, $modal, $http, $translate) {
+    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', '$filter',
+    function ($scope, $modal, $http, $translate, $filter) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
       $scope.allowEdit = true;
       $scope.formErrors = '';
       $scope.editBackup = null;
       $translate.use('{{ LANGUAGE_CODE }}');
+      var translate = $filter('translate')
 
       $scope.getDefaultVatRate = function() {
         for (var i=0; i<$scope.app.vat_rates.length; i++){
@@ -124,7 +139,7 @@
             $scope.formErrors = '';
             $scope.editBackup = null;
           }).error(function() {
-            $scope.formErrors = 'An error occured';
+            $scope.formErrors = translate('AN_ERROR_OCCURED');
             $scope.app.sale_items = $scope.editBackup;
             $scope.editBackup = null;
           });
@@ -184,7 +199,7 @@
             $scope.editBackup = null;
             $scope.switchOffEditMode();
           }).error(function(response) {
-            $scope.formErrors = 'An error occured: '+JSON.stringify(response);
+            $scope.formErrors = translate('AN_ERROR_OCCURED')+' : '+JSON.stringify(response);
           });
         }
       };
@@ -192,7 +207,7 @@
       $scope.getItemPreTaxPrice = function(item) {
         var value = item.pre_tax_price * item.quantity;
         if (isNaN(value)) {
-          return "Error";
+          return translate('ERROR');
         }
         return value;
       };
@@ -201,7 +216,7 @@
         if (item.vat_rate !== null) {
           var value = $scope.getItemPreTaxPrice(item) * (100 + item.vat_rate.rate) / 100;
           if (isNaN(value)) {
-            return "Error";
+            return translate('ERROR');
           }
           return value;
         }
@@ -214,7 +229,7 @@
           sum += $scope.getItemPreTaxPrice($scope.app.sale_items[i]);
         }
         if (isNaN(sum)) {
-          return "Error";
+          return translate('ERROR');
         }
         return sum;
       }
@@ -225,7 +240,7 @@
           sum += $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
         }
         if (isNaN(sum)) {
-          return "Error";
+          return translate('ERROR');
         }
         return sum;
       }
@@ -234,19 +249,23 @@
 
       $scope.isFormInvalid = function(item) {
         if (!item.text) {
-          return 'The label field is required';
+          return translate('THE_LABEL_FIELD_IS_REQUIRED');
         }
 
         if (isNaN(item.quantity)) {
-          return 'The quantity field is required number';
+          return translate('THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER');
+        };
+
+        if (isNaN(item.order_index)) {
+          return translate('THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER');
         };
 
         if (isNaN(item.pre_tax_price)) {
-          return 'The pre-tax price field is required number';
+          return translate('THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER');
         }
 
         if (!item.vat_rate) {
-          return 'The VAT rate is required';
+          return translate('THE_VAT_REQUIRED');
         }
 
         return "";
