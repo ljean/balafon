@@ -7,6 +7,7 @@ from sanza.Store.models import Sale, StoreItem, StoreItemCategory, SaleItem, Vat
 
 
 class SaleSerializer(serializers.ModelSerializer):
+    """json serializer"""
 
     class Meta:
         model = Sale
@@ -14,6 +15,7 @@ class SaleSerializer(serializers.ModelSerializer):
 
 
 class StoreItemCategorySerializer(serializers.ModelSerializer):
+    """json serializer"""
 
     class Meta:
         model = StoreItemCategory
@@ -21,6 +23,8 @@ class StoreItemCategorySerializer(serializers.ModelSerializer):
 
 
 class VatRateSerializer(serializers.ModelSerializer):
+    """json serializer"""
+
     rate = serializers.FloatField()
     name = serializers.CharField(read_only=True)
 
@@ -30,6 +34,8 @@ class VatRateSerializer(serializers.ModelSerializer):
         
 
 class StoreItemSerializer(serializers.ModelSerializer):
+    """json serializer"""
+
     pre_tax_price = serializers.FloatField()
     vat_rate = VatRateSerializer()
     category = StoreItemCategorySerializer()

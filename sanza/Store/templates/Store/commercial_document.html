@@ -130,7 +130,8 @@
       };
 
       $scope.deleteItem = function(item, index) {
-        if (confirm("delete '"+item.text+"' ?")) {
+        var text = translate('DELETE') + " '" + item.text + "' ?";
+        if (confirm(text)) {
           $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
           $scope.app.sale_items.splice(index, 1);
           $scope.editedLines.splice(index, 1);
