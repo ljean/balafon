@@ -11,6 +11,7 @@
   <script src="{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
   <script src="{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
   <script src="{{ STATIC_URL }}modules/angular-i18n/angular-locale_{{ LANGUAGE_CODE }}-{{ LANGUAGE_CODE }}.js"></script>
+  <script src="{{ STATIC_URL }}modules/angular-translate/angular-translate.js"></script>
   <script>
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
@@ -18,19 +19,59 @@
 
     {{ DJANGO_APP|safe }}
 
-    var app = angular.module('commercialDocApp', ['ui.bootstrap']);
+    var app = angular.module('commercialDocApp', ['ui.bootstrap', 'pascalprecht.translate']);
 
-    app.config(['$httpProvider', function($httpProvider) {
+    app.config(['$httpProvider', '$translateProvider', function($httpProvider, $translateProvider) {
       $httpProvider.defaults.xsrfCookieName = 'csrftoken';
       $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+      $translateProvider.translations('en', {
+        LABEL: 'Label',
+        QUANTITY: 'Quantity',
+        UNIT_PRICE: 'Unit Price',
+        PRE_TAX_TOTAL: 'Pre-tax total',
+        VAT_RATE: 'VAT rate',
+        TAX_INCL_TOTAL: 'Tax Incl. Total',
+        OK: 'Ok',
+        CANCEL: 'Cancel',
+        ADD: 'Add',
+        EDIT: 'Edit',
+        DELETE: 'Delete',
+        SEARCH: 'Search',
+        SELECT_A_STORE_ITEM: 'Select a store item',
+        TOTAL: 'Total',
+        ENTER_A_NAME: 'Enter a name'
+
+      });
+
+      $translateProvider.translations('fr', {
+        LABEL: 'Libellé',
+        QUANTITY: 'Quantité',
+        UNIT_PRICE: 'Prix unitaire',
+        PRE_TAX_TOTAL: 'Total HT',
+        VAT_RATE: 'TVA',
+        TAX_INCL_TOTAL: 'Total TTC',
+        OK: 'Ok',
+        CANCEL: 'Annuler',
+        ADD: 'Ajouter',
+        EDIT: 'Editer',
+        DELETE: 'Supprimer',
+        SEARCH: 'Chercher dans le catalogue',
+        SELECT_A_STORE_ITEM: 'Selectionner un élément du catalogue',
+        TOTAL: 'Total',
+        ENTER_A_NAME: 'Entrez un nom'
+      });
+      $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
+      $translateProvider.useSanitizeValueStrategy('escape');
     }]);
 
-    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', function ($scope, $modal, $http) {
+    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', function ($scope, $modal, $http, $translate) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
       $scope.allowEdit = true;
       $scope.formErrors = '';
       $scope.editBackup = null;
+      $translate.use('{{ LANGUAGE_CODE }}');
 
       $scope.getDefaultVatRate = function() {
         for (var i=0; i<$scope.app.vat_rates.length; i++){
@@ -431,12 +472,12 @@
                 <table class="table table-bordered">
                   <tr>
                     <th></th>
-                    <th>Label</th>
-                    <th class="number">Quantity</th>
-                    <th class="number">Price</th>
-                    <th class="number">Pre-tax Total</th>
-                    <th class="number">VAT Rate</th>
-                    <th class="number">Tax incl. Total</th>
+                    <th>{{ 'LABEL' | translate }}</th>
+                    <th class="number">{{ 'QUANTITY' | translate }}</th>
+                    <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
+                    <th class="number">{{ 'PRE_TAX_TOTAL' | translate }}</th>
+                    <th class="number">{{ 'VAT_RATE' | translate }}</th>
+                    <th class="number">{{ 'TAX_INCL_TOTAL' | translate }}</th>
                   </tr>
 
                   <tr class="tr-row" ng-repeat="item in app.sale_items">
@@ -453,17 +494,17 @@
                     <td class="cell-label">
                       <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
                         <div class="show-on-hover">
-                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="Edit" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-pencil"></span>
                           </a>
-                          <a href class="btn btn-xs btn-default" title="Delete" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+                          <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
                             <span class="glyphicon glyphicon-trash"></span>
                           </a>
                         </div>
                       </div>
                       <div ng-show="allowEdit && editedLines[$index]" class="pull-right">
                           <input type="hidden" name="item" ng-model="item.item" />
-                          <a href class="btn btn-xs btn-default" title="Search" data-toggle="tooltip" ng-click="lookFor(item)">
+                          <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
                             <span class="glyphicon glyphicon-search"></span>
                           </a>
                       </div>
@@ -520,12 +561,12 @@
 
                       <div ng-show="allowEdit" class="pull-right">
                         <div class="show-on-hover">
-                              <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="Add" data-toggle="tooltip">
+                              <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-plus"></span>
                           </a>
                         </div>
                       </div>
-                      Total
+                      {{ 'TOTAL' | translate }}
                     </td>
                     <td></td>
                     <td></td>
@@ -545,11 +586,11 @@
                 <div ng-show="allowEdit" class="pull-right">
 
                   <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="saveEdit()">
-                    <span class="glyphicon glyphicon-ok"></span> Ok
+                    <span class="glyphicon glyphicon-ok"></span> {{ 'OK' | translate }}
                   </a>
 
                   <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="cancelEdit()">
-                    <span class="glyphicon glyphicon-remove"></span> Cancel
+                    <span class="glyphicon glyphicon-remove"></span> {{ 'CANCEL' | translate }}
                   </a>
                 </div>
               </div></div>
@@ -574,7 +615,7 @@
 
         <script type="text/ng-template" id="LoadItemModal.html">
           <div class="modal-header">
-              <h3 class="modal-title">Select a store item</h3>
+              <h3 class="modal-title">{{ 'SELECT_A_STORE_ITEM' | translate }}</h3>
           </div>
           <div class="modal-body">
             <div class="row">
@@ -585,7 +626,7 @@
                   typeahead-template-url="storeItemSelector.html"
                   typeahead="item for item in getStoreItems($viewValue)"
                   typeahead-input-formatter="formatStoreItem($model)"
-                  placeholder="Enter a name"
+                  placeholder="{{ 'ENTER_A_NAME' | translate }}"
                   ng-trim="false"
                   typeahead-loading="loading"
                   name="item"
@@ -603,15 +644,13 @@
             </div>
           </div>
           <div class="modal-footer">
-              <button class="btn btn-xs btn-primary" ng-click="ok()">OK</button>
-              <button class="btn btn-xs btn-deafult" ng-click="cancel()">Cancel</button>
+              <button class="btn btn-xs btn-primary" ng-click="ok()">{{ 'OK' | translate }}</button>
+              <button class="btn btn-xs btn-deafult" ng-click="cancel()">{{ 'CANCEL' | translate }}</button>
           </div>
       </script>
 
     </div>
       </div>
-
-
 
   </div>
 {% endverbatim %}

@@ -15,11 +15,10 @@
   ],
   "dependencies": {
     "angular": "~1.4.1",
-    "angular-ui-bootstrap": "~0.13.0",
     "moment": "~2.10.3",
     "angular-messages": "~1.4.1",
     "bootstrap": "~3.3.5",
     "angular-bootstrap": "~0.13.0",
-    "ng-sortable": "~1.2.2"
+    "angular-translate": "~2.7.2"
   }
 }
