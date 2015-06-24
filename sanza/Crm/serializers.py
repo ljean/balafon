@@ -58,7 +58,7 @@ class ActionSerializer(serializers.ModelSerializer):
         model = Action
         fields = (
             'id', 'contacts', 'subject', 'planned_date', 'end_datetime',
-            'in_charge', 'detail', 'last_modified_by', 'modified',
+            'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number'
         )
 
 

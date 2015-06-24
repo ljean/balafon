@@ -7,13 +7,12 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from sanza.Store import models
 
 
-admin.site.register(models.VatRate)
 admin.site.register(models.Unit)
 admin.site.register(models.StoreItemCategory)
 admin.site.register(models.StoreItemTag)
 admin.site.register(models.Sale)
 admin.site.register(models.StoreManagementActionType)
-admin.site.register(models.StoreItemSale)
+admin.site.register(models.SaleItem)
 
 
 class StockThresholdFilter(admin.SimpleListFilter):
@@ -64,7 +63,13 @@ class StoreItemAdmin(admin.ModelAdmin):
 admin.site.register(models.StoreItem, StoreItemAdmin)
 
 
+class VatRateAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = [
+        'name', 'is_default',
+    ]
+    readonly_fields = ['name']
 
-
+admin.site.register(models.VatRate, VatRateAdmin)
 
 

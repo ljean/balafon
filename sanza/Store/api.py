@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 
-from sanza.Store.models import StoreItemSale, StoreItem
+from sanza.Store.models import SaleItem, StoreItem
 from sanza.Store import serializers
 
 
-class StoreItemSaleViewSet(viewsets.ModelViewSet):
+class SaleItemViewSet(viewsets.ModelViewSet):
     """returns sales items"""
-    queryset = StoreItemSale.objects.all()
-    serializer_class = serializers.StoreItemSaleSerializer
+    queryset = SaleItem.objects.all()
+    serializer_class = serializers.SaleItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method in ('PUT', 'POST'):
+            return serializers.UpdateSaleItemSerializer
+        else:
+            return super(SaleItemViewSet, self).get_serializer_class(*args, **kwargs)
 
     def get_queryset(self):
         """returns objects"""
@@ -22,6 +29,7 @@ class StoreItemViewSet(viewsets.ModelViewSet):
     """returns sales items"""
     queryset = StoreItem.objects.all()
     serializer_class = serializers.StoreItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         """returns objects"""

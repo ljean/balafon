@@ -19,6 +19,12 @@
     {{ DJANGO_APP|safe }}
 
     var app = angular.module('commercialDocApp', ['ui.bootstrap']);
+
+    app.config(['$httpProvider', function($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    }]);
+
     app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', function ($scope, $modal, $http) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
@@ -26,7 +32,16 @@
       $scope.formErrors = '';
       $scope.editBackup = null;
 
-      $scope.getEditedItem = function(item, index) {
+      $scope.getDefaultVatRate = function() {
+        for (var i=0; i<$scope.app.vat_rates.length; i++){
+          if ($scope.app.vat_rates[i].is_default) {
+            return $scope.app.vat_rates[i];
+          }
+        }
+        return null;
+      };
+
+      $scope.getEditedItem = function() {
         if ($scope.editMode) {
           for (var i=0; i<$scope.app.sale_items.length; i++){
             if ($scope.editedLines[i]) {
@@ -40,10 +55,6 @@
       $scope.editItem = function(item, index) {
         $scope.editMode = true;
         $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items))
-        /*$scope.editedLines = [];
-        for (var i=0; i<$scope.app.sale_items.length; i++){
-          $scope.editedLines.push(true);
-        }*/
         $scope.editedLines[index] = true;
       };
 
@@ -52,8 +63,9 @@
         $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
         $scope.app.sale_items.push({
           id: 0,
+          order_index: $scope.app.sale_items.length + 1,
           pre_tax_price: 0.0,
-          vat_rate: null,
+          vat_rate: $scope.getDefaultVatRate(),
           quantity: 1,
           text: '',
           added: true
@@ -63,8 +75,18 @@
 
       $scope.deleteItem = function(item, index) {
         if (confirm("delete '"+item.text+"' ?")) {
+          $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
           $scope.app.sale_items.splice(index, 1);
           $scope.editedLines.splice(index, 1);
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id+'/';
+          $http.delete(url).success(function() {
+            $scope.formErrors = '';
+            $scope.editBackup = null;
+          }).error(function() {
+            $scope.formErrors = 'An error occured';
+            $scope.app.sale_items = $scope.editBackup;
+            $scope.editBackup = null;
+          });
         }
       };
 
@@ -74,36 +96,55 @@
         for (var i=0; i<$scope.app.sale_items.length; i++){
           $scope.editedLines.push(false);
         }
+        $scope.app.sale_items.sort(function(itemA, itemB) {
+            if (itemA.order_index < itemB.order_index) {
+              return -1;
+            } else if (itemA.order_index > itemB.order_index){
+              return 1;
+            }
+            return 0;
+        });
+        for (var i=0; i<$scope.app.sale_items.length; i++){
+          $scope.app.sale_items[i].order_index = i + 1;
+        }
       };
 
-      $scope.cancelEdit = function(item) {
+      $scope.cancelEdit = function() {
         $scope.app.sale_items = $scope.editBackup;
         $scope.editBackup = null;
         $scope.switchOffEditMode();
         $scope.formErrors = '';
-
-        /*
-        $scope.editMode = false;
-        $scope.editedLines = [];
-        var indexToRemove = [];
-        for (var i=0; i<$scope.app.sale_items.length; i++){
-          $scope.editedLines.push(false);
-          if ($scope.app.sale_items[i].added) {
-            indexToRemove.push(i);
-          }
-        }
-
-        for (var i=0; i<indexToRemove.length; i++){
-          var index = indexToRemove[i];
-          $scope.app.sale_items.splice(index, 1);
-          $scope.editedLines.splice(index, 1);
-        }*/
       };
 
       $scope.saveEdit = function() {
-        $scope.formErrors = $scope.isFormInvalid();
+        var item = $scope.getEditedItem();
+        $scope.formErrors = $scope.isFormInvalid(item);
         if (!$scope.formErrors) {
-          $scope.switchOffEditMode();
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/';
+          var method = $http.post;
+          if (item.id) {
+            url += item.id+'/';
+            method = $http.put;
+          }
+          var postData = {
+            sale: $scope.app.sale.id,
+            text: item.text,
+            vat_rate: item.vat_rate.id,
+            pre_tax_price: item.pre_tax_price,
+            quantity: item.quantity,
+            item: item.item,
+            order_index: item.order_index
+          };
+          method(url, postData).success(function(respData) {
+            $scope.formErrors = '';
+            if (item.id === 0) {
+              item.id = respData.id;
+            }
+            $scope.editBackup = null;
+            $scope.switchOffEditMode();
+          }).error(function(response) {
+            $scope.formErrors = 'An error occured: '+JSON.stringify(response);
+          });
         }
       };
 
@@ -150,8 +191,7 @@
 
       $scope.switchOffEditMode();
 
-      $scope.isFormInvalid = function() {
-        var item = $scope.getEditedItem();
+      $scope.isFormInvalid = function(item) {
         if (!item.text) {
           return 'The label field is required';
         }
@@ -171,7 +211,14 @@
         return "";
       }
 
-      $scope.lookfor = function(item) {
+      $scope.sortableListeners = {
+          accept: function (sourceItemHandleScope, destSortableScope) {return true;},
+          itemMoved: function (event) {},
+          orderChanged: function(event) {}
+          //containment: '#board'//optional param.
+      };
+
+      $scope.lookFor = function(item) {
 
         var modalInstance = $modal.open({
           templateUrl: 'LoadItemModal.html',
@@ -188,6 +235,7 @@
           item.text = selectedItem.name;
           item.vat_rate = selectedItem.vat_rate;
           item.pre_tax_price = selectedItem.pre_tax_price;
+          item.item = selectedItem.id;
         }, function () {
 
         });
@@ -218,7 +266,7 @@
 
       $scope.getStoreItems = function(name) {
         var storeItems = [];
-        var fullUrl = "/store/api/store_items/?name="+name;
+        var fullUrl = "/store/api/store-items/?name="+name;
         return $http.get(fullUrl).then(function(response){
           return response.data;
         });
@@ -246,6 +294,23 @@
       background: #fff;
     }
 
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .doc-header {
+      margin-bottom: 20px;
+    }
+
+    .contacts {
+      margin-bottom: 20px;
+    }
+
+    .doc-footer {
+      margin-top: 20px;
+    }
+
+
     tr td {
       height: 42px;
     }
@@ -270,8 +335,17 @@
       padding: 2px;
     }
 
+    tr td.cell-order {
+      width: 6%;
+      padding: 0.5;
+    }
+
+    tr td input, tr td textarea, tr td select {
+      font-size: 0.9em !important;
+    }
+
     tr td.cell-label {
-      width: 50%;
+      width: 47%;
     }
 
     tr td.cell-label textarea {
@@ -288,7 +362,7 @@
 
     th.number, td.number {
       text-align: right;
-      width: 10%;
+      width: 9%;
     }
 
     th {
@@ -329,7 +403,10 @@
           </div>
 
           <div class="doc-header">
-            {{ app.action.planned_date }}{{ app.action.subject }}
+            <div class="row"><div class="col-md-12">
+              <div class="action-date">{{ app.action.planned_date|date }}</div>
+              <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
+              <div class="action-subject">{{ app.action.subject }}</div>
             </div></div>
           </div>
 
@@ -350,8 +427,10 @@
             <div>
               <div class="row"><div class="col-md-12">
                 <form role="form" class="form" name="editForm">
+
                 <table class="table table-bordered">
                   <tr>
+                    <th></th>
                     <th>Label</th>
                     <th class="number">Quantity</th>
                     <th class="number">Price</th>
@@ -361,23 +440,30 @@
                   </tr>
 
                   <tr class="tr-row" ng-repeat="item in app.sale_items">
+                    <td class="cell-order">
+                      <span ng-hide="editedLines[$index]">{{ item.order_index }}</span>
+                      <input
+                        class="form-control"
+                        type="number"
+                        ng-model="item.order_index"
+                        ng-show="editedLines[$index]"
+                        name=order_index
+                      />
+                    </td>
                     <td class="cell-label">
                       <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
                         <div class="show-on-hover">
-
                           <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="Edit" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-pencil"></span>
                           </a>
-
                           <a href class="btn btn-xs btn-default" title="Delete" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
                             <span class="glyphicon glyphicon-trash"></span>
                           </a>
-
-
                         </div>
                       </div>
                       <div ng-show="allowEdit && editedLines[$index]" class="pull-right">
-                          <a href class="btn btn-xs btn-default" title="Search" data-toggle="tooltip" ng-click="lookfor(item)">
+                          <input type="hidden" name="item" ng-model="item.item" />
+                          <a href class="btn btn-xs btn-default" title="Search" data-toggle="tooltip" ng-click="lookFor(item)">
                             <span class="glyphicon glyphicon-search"></span>
                           </a>
                       </div>
@@ -399,7 +485,6 @@
                         ng-show="editedLines[$index]"
                         name=quantity
                       />
-
                     </td>
                     <td class="number">
                       <span ng-hide="editedLines[$index]">{{ item.pre_tax_price | number:2}} €</span>
@@ -431,7 +516,7 @@
                   </tr>
 
                   <tr class="results tr-row">
-                    <td>
+                    <td colspan="2">
 
                       <div ng-show="allowEdit" class="pull-right">
                         <div class="show-on-hover">
@@ -440,9 +525,6 @@
                           </a>
                         </div>
                       </div>
-
-
-
                       Total
                     </td>
                     <td></td>
@@ -462,17 +544,23 @@
 
                 <div ng-show="allowEdit" class="pull-right">
 
-                  <a href ng-show="editMode" class="btn btn-xs btn-default" ng-click="saveEdit()" title="Save" data-toggle="tooltip">
+                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="saveEdit()">
                     <span class="glyphicon glyphicon-ok"></span> Ok
                   </a>
 
-                  <a href ng-show="editMode" class="btn btn-xs btn-default" ng-click="cancelEdit()" title="Cancel" data-toggle="tooltip">
+                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="cancelEdit()">
                     <span class="glyphicon glyphicon-remove"></span> Cancel
                   </a>
                 </div>
               </div></div>
             </div>
           </div>
+
+          <div class="doc-footer">
+            <div class="row"><div class="col-md-12">
+            </div></div>
+          </div>
+
         </div></div>
 
         <script type="text/ng-template" id="storeItemSelector.html">

@@ -25,7 +25,8 @@ class StoreManagementActionType(models.Model):
 
 class VatRate(models.Model):
     """Tax : A VAT rate"""
-    rate = models.DecimalField(verbose_name=_("vat rate"), max_digits=4, decimal_places=2)
+    rate = models.DecimalField(verbose_name=_(u"vat rate"), max_digits=4, decimal_places=2)
+    is_default = models.BooleanField(default=False, verbose_name=_("is default"))
 
     @property
     def name(self):
@@ -35,6 +36,12 @@ class VatRate(models.Model):
         verbose_name = _(u"VAT rate")
         verbose_name_plural = _(u"VAT rates")
         ordering = ['rate']
+
+    def save(self, *args, **kwargs):
+        return_value = super(VatRate, self).save(*args, **kwargs)
+        if self.is_default:
+            VatRate.objects.exclude(id=self.id).update(is_default=False)
+        return return_value
 
     def __unicode__(self):
         return self.name
@@ -125,25 +132,9 @@ class StoreItem(models.Model):
     stock_threshold_alert.allow_tags = True
 
 
-class ServiceItem(models.Model):
-    """an extra service"""
-    name = models.CharField(verbose_name=_(u"name"), max_length=500)
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
-    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
-
-    class Meta:
-        verbose_name = _(u"Service item")
-        verbose_name_plural = _(u"Service items")
-
-    def __unicode__(self):
-        return self.name
-
-
 class Sale(models.Model):
     """A sale"""
-    action = models.ForeignKey(Action, blank=True, default=None, null=True)
-    store_items = models.ManyToManyField(StoreItem, through='StoreItemSale', blank=True)
-    service_items = models.ManyToManyField(ServiceItem, blank=True)
+    action = models.OneToOneField(Action)
 
     class Meta:
         verbose_name = _(u"Sale")
@@ -153,7 +144,7 @@ class Sale(models.Model):
         return unicode(self.action)
 
 
-class StoreItemSale(models.Model):
+class SaleItem(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale)
     item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
@@ -161,13 +152,20 @@ class StoreItemSale(models.Model):
     vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
     pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
     text = models.TextField(verbose_name=_(u"Text"), max_length=3000, default='', blank=True)
+    order_index = models.IntegerField(default=0)
 
     class Meta:
-        verbose_name = _(u"Store item sale")
-        verbose_name_plural = _(u"Store item sales")
+        verbose_name = _(u"Sale item")
+        verbose_name_plural = _(u"Sales items")
+        ordering = ['order_index']
 
     def __unicode__(self):
         if self.id:
             return _(u"{1} x {0}").format(self.item, self.quantity)
         else:
-            return _(u"StoreItemSale not set")
+            return _(u"Sale item not set")
+
+    def save(self, *args, **kwargs):
+        if self.order_index == 0:
+            self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1
+        return super(SaleItem, self).save(*args, **kwargs)

@@ -1042,6 +1042,11 @@ class Action(LastModifiedModel):
                 message = u"get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
                 logger.warning(message)
         return 'Crm/_action.html'
+
+    def get_action_number(self):
+        if self.type and self.number:
+            return u'{0} {1}'.format(self.type.name, self.number)
+        return ''
         
     def save(self, *args, **kwargs):
         """save"""

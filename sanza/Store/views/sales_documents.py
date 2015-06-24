@@ -21,37 +21,42 @@ from coop_cms.generic_views import EditableFormsetView
 
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
-from sanza.Store.models import StoreItemSale, VatRate
-from sanza.Store.serializers import StoreItemSaleSerializer, SaleSerializer, VatRateSerializer
-from sanza.Store.forms import StoreItemSaleForm, ChooseStoreItemForm
+from sanza.Store.models import SaleItem, VatRate
+from sanza.Store.serializers import SaleItemSerializer, SaleSerializer, VatRateSerializer
+#from sanza.Store.forms import StoreItemSaleForm, ChooseStoreItemForm
 
 
-@login_required
-@popup_close
-def choose_item(request):
-    """edit fragments of the current template"""
+# @login_required
+# @popup_close
+# def choose_item(request):
+#     """edit fragments of the current template"""
+#
+#     if not request.user.is_staff:
+#         raise PermissionDenied
+#
+#     if request.method == "POST":
+#         form = ChooseStoreItemForm(request.POST)
+#         if form.is_valid():
+#             #popup_close decorator will close and refresh
+#             return None
+#     else:
+#         form = ChooseStoreItemForm()
+#
+#     context_dict = {
+#         'form': form,
+#         'title': _(u"Select Item?"),
+#     }
+#
+#     return render_to_response(
+#         'Store/popup_choose_item.html',
+#         context_dict,
+#         context_instance=RequestContext(request)
+#     )
 
-    if not request.user.is_staff:
-        raise PermissionDenied
 
-    if request.method == "POST":
-        form = ChooseStoreItemForm(request.POST)
-        if form.is_valid():
-            #popup_close decorator will close and refresh
-            return None
-    else:
-        form = ChooseStoreItemForm()
-
-    context_dict = {
-        'form': form,
-        'title': _(u"Select Item?"),
-    }
-
-    return render_to_response(
-        'Store/popup_choose_item.html',
-        context_dict,
-        context_instance=RequestContext(request)
-    )
+class Utf8JSONRenderer(JSONRenderer):
+    ensure_ascii = False
+#    encoding = "utf8"
 
 
 class SalesDocumentView(TemplateView):
@@ -64,25 +69,25 @@ class SalesDocumentView(TemplateView):
         action = self.get_action()
 
         action_serializer = ActionSerializer(self.get_action())
-        action_data = JSONRenderer().render(action_serializer.data)
+        action_data = Utf8JSONRenderer().render(action_serializer.data)
 
-        sales_serializer = SaleSerializer(action.sale_set.all(), many=True)
-        sales_data = JSONRenderer().render(sales_serializer.data)
+        sale_serializer = SaleSerializer(action.sale)
+        sale_data = Utf8JSONRenderer().render(sale_serializer.data)
 
-        sale_items_serializer = StoreItemSaleSerializer(self.get_sale_items(), many=True)
-        sale_items_data = JSONRenderer().render(sale_items_serializer.data)
+        sale_items_serializer = SaleItemSerializer(self.get_sale_items(), many=True)
+        sale_items_data = Utf8JSONRenderer().render(sale_items_serializer.data)
 
         vat_rates_serializer = VatRateSerializer(VatRate.objects.all(), many=True)
-        vat_rates_data = JSONRenderer().render(vat_rates_serializer.data)
+        vat_rates_data = Utf8JSONRenderer().render(vat_rates_serializer.data)
 
-        context['DJANGO_APP'] = u"""
+        context['DJANGO_APP'] = """
         var DJANGO_APP = {{
             action: {0},
             sale_items: {1},
-            sales: {2},
+            sale: {2},
             vat_rates: {3}
         }};""".format(
-            action_data, sale_items_data, sales_data, vat_rates_data
+            action_data, sale_items_data, sale_data, vat_rates_data
         )
         return context
 
@@ -95,7 +100,7 @@ class SalesDocumentView(TemplateView):
 
     def get_sale_items(self):
         """get the associated action"""
-        return StoreItemSale.objects.filter(sale__action=self.get_action())
+        return SaleItem.objects.filter(sale__action=self.get_action())
 
 
 
