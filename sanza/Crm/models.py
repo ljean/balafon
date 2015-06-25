@@ -985,6 +985,34 @@ class TeamMember(models.Model):
         verbose_name_plural = _(u'team members')
 
 
+class ActionMenu(models.Model):
+    """A menu to add to every action of this type"""
+
+    class Meta:
+        verbose_name = _(u'action')
+        verbose_name_plural = _(u'actions')
+
+    types = models.ManyToManyField(ActionType, blank=True)
+    view_name = models.CharField(_(u'view_name'), max_length=200)
+    icon = models.CharField(_(u'icon'), max_length=30, default="", blank=True)
+    label = models.CharField(_(u'label'), max_length=200)
+    a_attrs = models.CharField(
+        max_length=50,
+        verbose_name=_(u"Link args"),
+        default="",
+        help_text=_(u'Example: class="colorbox-form" for colorbos display')
+    )
+    order_index = models.IntegerField(default=0, verbose_name=_(u"order_index"))
+
+    class Meta:
+        verbose_name = _(u'action menu')
+        verbose_name_plural = _(u'action menus')
+        ordering = ['order_index']
+
+    def __unicode__(self):
+        return self.label
+
+
 class Action(LastModifiedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
@@ -1047,7 +1075,12 @@ class Action(LastModifiedModel):
         if self.type and self.number:
             return u'{0} {1}'.format(self.type.name, self.number)
         return ''
-        
+
+    def get_menus(self):
+        if self.type:
+            return ActionMenu.objects.filter(types=self.type)
+        return ActionMenu.objects.none()
+
     def save(self, *args, **kwargs):
         """save"""
         if not self.done_date and self.done:

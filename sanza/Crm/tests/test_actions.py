@@ -1582,3 +1582,121 @@ class ActionAutoGenerateNumberTestCase(TestCase):
         action_type = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
         action = models.Action.objects.create(type=action_type, subject="a")
         self.assertEqual(action.number, 0)
+
+
+class ActionMenuTest(BaseTestCase):
+    """Custom menu action"""
+
+    def test_action_menu(self):
+        """test custom menus are displayed"""
+        action_type1 = mommy.make(models.ActionType)
+
+        action = mommy.make(models.Action, type=action_type1)
+        entity = mommy.make(models.Entity)
+        action.entities.add(entity)
+        action.save()
+
+        menu1 = mommy.make(
+            models.ActionMenu,
+            icon="cog", label="DO ME", view_name='crm_do_action', a_attrs='class="colorbox-form"', order_index=2
+        )
+        menu1.types.add(action_type1)
+        menu1.save()
+
+        menu2 = mommy.make(
+            models.ActionMenu,
+            icon="remove", label="DELETE ME", view_name='crm_delete_action', a_attrs='target="_blank"', order_index=1
+        )
+        menu2.types.add(action_type1)
+        menu2.save()
+
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+
+        li_tags = soup.select('.ut-custom-action-menu-item')
+        self.assertEqual(len(li_tags), 2)
+
+        self.assertEqual(li_tags[0].text.strip(), menu2.label)
+        self.assertEqual(li_tags[0].a['target'], '"_blank"')
+        self.assertEqual(li_tags[0].a['href'], reverse('crm_delete_action', args=[action.id]))
+        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu2.icon)])
+
+        self.assertEqual(li_tags[1].text.strip(), menu1.label)
+        self.assertEqual(li_tags[1].a['class'], ['"colorbox-form"'])
+        self.assertEqual(li_tags[1].a['href'], reverse('crm_do_action', args=[action.id]))
+        self.assertEqual(li_tags[1].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+
+    def test_action_menu_one_not_set(self):
+        """test custom menus are displayed only for associated types"""
+        action_type1 = mommy.make(models.ActionType)
+
+        action = mommy.make(models.Action, type=action_type1)
+        entity = mommy.make(models.Entity)
+        action.entities.add(entity)
+        action.save()
+
+        menu1 = mommy.make(
+            models.ActionMenu,
+            icon="cog", label="DO ME", view_name='crm_do_action', a_attrs='class="colorbox-form"', order_index=2
+        )
+        menu1.types.add(action_type1)
+        menu1.save()
+
+        menu2 = mommy.make(
+            models.ActionMenu,
+            icon="remove", label="DELETE ME", view_name='crm_delete_action', a_attrs='target="_blank"', order_index=1
+        )
+
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+
+        li_tags = soup.select('.ut-custom-action-menu-item')
+        self.assertEqual(len(li_tags), 1)
+
+        self.assertEqual(li_tags[0].text.strip(), menu1.label)
+        self.assertEqual(li_tags[0].a['class'], ['"colorbox-form"'])
+        self.assertEqual(li_tags[0].a['href'], reverse('crm_do_action', args=[action.id]))
+        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+
+    def test_action_inavlid_view_name(self):
+        """test custom menus are displayed only for associated types"""
+        action_type1 = mommy.make(models.ActionType)
+
+        action = mommy.make(models.Action, type=action_type1)
+        entity = mommy.make(models.Entity)
+        action.entities.add(entity)
+        action.save()
+
+        menu1 = mommy.make(
+            models.ActionMenu,
+            icon="cog", label="DO ME", view_name='crm_blabla_dummy', a_attrs='class="colorbox-form"', order_index=2
+        )
+        menu1.types.add(action_type1)
+        menu1.save()
+
+        url = reverse('crm_view_entity', args=[entity.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+
+        li_tags = soup.select('.ut-custom-action-menu-item')
+        self.assertEqual(len(li_tags), 1)
+
+        self.assertEqual(li_tags[0].text.strip(), menu1.label)
+        self.assertEqual(li_tags[0].a['class'], ['"colorbox-form"'])
+        self.assertEqual(li_tags[0].a['href'], '')
+        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+
+
+
+

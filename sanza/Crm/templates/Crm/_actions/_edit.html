@@ -25,4 +25,6 @@
 </li>
 {% endif %}
 
-
+{% for menu in action.get_menus %}
+  {% include "Crm/_actions/_menu_item.html" %}
+{% endfor %}
