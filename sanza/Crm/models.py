@@ -959,6 +959,7 @@ class ActionType(NamedElement):
         help_text=_(u'Action of this type will be displayed using the given template')
     )
     order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
+    is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
 
     def status_defined(self):
         """true if a status is defined for this type"""

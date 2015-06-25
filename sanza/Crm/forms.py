@@ -33,7 +33,7 @@ class BetterBsForm(BetterForm, BootstrapableMixin):
         js = (
             'chosen/chosen.jquery.js',
         )
-        
+
     def __init__(self, *args, **kwargs):
         super(BetterBsForm, self).__init__(*args, **kwargs)
         self._bs_patch_field_class()
@@ -470,14 +470,14 @@ class EntityRoleForm(forms.ModelForm):
 
 
 class ActionForm(BetterBsModelForm):
-    """Edit action form"""
+    """form for creating or editing action"""
 
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
     time = forms.TimeField(label=_(u"planned time"), required=False)
-    
+
     end_date = forms.DateField(label=_(u"end date"), required=False, widget=forms.TextInput())
     end_time = forms.TimeField(label=_(u"end time"), required=False)
-    
+
     class Meta:
         """form from model"""
         model = models.Action
@@ -496,6 +496,9 @@ class ActionForm(BetterBsModelForm):
             ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
             ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
+        help_texts = {
+            'amount': _(u'Amount is disabled when value is calculated'),
+        }
 
     def __init__(self, *args, **kwargs):
         kwargs.pop('entity', None)
@@ -505,13 +508,21 @@ class ActionForm(BetterBsModelForm):
 
         #Force the type to be hidden
         action_type = None
+        action_type_name = ''
+        is_amount_calculated = False
         if instance:
             #If a type is already defined and belongs to a set
             if instance.type and instance.type.set:
                 action_type = instance.type
+            if instance.type:
+                is_amount_calculated = instance.type.is_amount_calculated
+                action_type_name = instance.type.name
         else:
             #if initial value is provided (from url)
             action_type = kwargs.get('initial', {}).get('type', None)
+            if action_type:
+                is_amount_calculated = action_type.is_amount_calculated
+                action_type_name = action_type.name
 
         if action_type:
             self.fieldsets['type'].legend = action_type.name
@@ -522,6 +533,9 @@ class ActionForm(BetterBsModelForm):
                 self.title = ugettext(u"Creation {0}").format(action_type.name)
         else:
             self.title = ugettext(u"Edit action") if instance else ugettext(u"Create action")
+
+        if is_amount_calculated:
+            self.fields['amount'].widget.attrs['disabled'] = 'disabled'
 
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             # let javascript disable the blank value if default_status

@@ -3,6 +3,7 @@
 
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Crm.models import Action, ActionMenu, ActionType
@@ -15,6 +16,7 @@ class StoreManagementActionType(models.Model):
     """
     action_type = models.OneToOneField(ActionType)
     template_name = models.CharField(default='', blank=True, max_length=100, verbose_name=_(u'template name'))
+    show_amount_as_pre_tax = models.BooleanField(default=True, verbose_name=_(u'Show amount as pre-tax'))
 
     class Meta:
         verbose_name = _(u"Store management action type")
@@ -33,6 +35,9 @@ class StoreManagementActionType(models.Model):
                     icon='file',
                     a_attrs='target="_blank"'
                 )
+            if not self.action_type.is_amount_calculated:
+                self.action_type.is_amount_calculated = True
+                self.action_type.save()
         return ret
 
     def __unicode__(self):
@@ -185,3 +190,51 @@ class SaleItem(models.Model):
         if self.order_index == 0:
             self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1
         return super(SaleItem, self).save(*args, **kwargs)
+
+
+def update_action_amount(sale_item, delete_me=False):
+    """update the corresponding action amount """
+    action = sale_item.sale.action
+    queryset = action.sale.saleitem_set.all()
+    if delete_me:
+        queryset = queryset.exclude(id=sale_item.id)
+    total_amount = 0
+    try:
+        show_amount_as_pre_tax = action.type.storemanagementactiontype.show_amount_as_pre_tax
+    except (AttributeError, StoreManagementActionType.DoesNotExist):
+        show_amount_as_pre_tax = False
+    for item in queryset:
+        pre_tax_value = item.pre_tax_price * item.quantity
+        if show_amount_as_pre_tax:
+            total_amount += pre_tax_value
+        else:
+            total_amount += pre_tax_value * (100 + item.vat_rate.rate) / 100
+    action.amount = total_amount
+    action.save()
+
+
+def on_save_sale_item(sender, instance, created, **kwargs):
+    """update the corresponding action amount when item is added or updated"""
+    update_action_amount(instance, False)
+
+
+def on_delete_sale_item(sender, instance, **kwargs):
+    """update the corresponding action amount when item is deleted"""
+    update_action_amount(instance, True)
+
+
+post_save.connect(on_save_sale_item, sender=SaleItem)
+pre_delete.connect(on_delete_sale_item, sender=SaleItem)
+
+
+def create_action_sale(sender, instance, created, **kwargs):
+    """create sale automatically"""
+    action = instance
+    if action.type and StoreManagementActionType.objects.filter(action_type=action.type).exists():
+        try:
+            #It would raise exception if sale doesn't exist
+            action.sale
+        except Sale.DoesNotExist:
+            Sale.objects.create(action=action)
+
+post_save.connect(create_action_sale, sender=Action)

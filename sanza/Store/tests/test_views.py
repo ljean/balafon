@@ -6,13 +6,16 @@ if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
+from bs4 import BeautifulSoup
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from model_mommy import mommy
 
-from sanza.Crm.models import Action, ActionType
+from sanza.Crm.models import Action, ActionType, Contact
+from sanza.Crm.tests import BaseTestCase
 from sanza.Store import models
 
 CUSTOM_STYLE = '''<style>
@@ -98,8 +101,8 @@ class ViewCommercialDocumentTest(TestCase):
         self.user.is_staff = False
         self.user.save()
 
-        action = mommy.make(Action, type=None)
-        mommy.make(models.Sale, action=action)
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type)
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
@@ -110,8 +113,8 @@ class ViewCommercialDocumentTest(TestCase):
         """It should redirect to login page"""
         self.client.logout()
 
-        action = mommy.make(Action, type=None)
-        mommy.make(models.Sale, action=action)
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type)
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
@@ -123,12 +126,67 @@ class ViewCommercialDocumentTest(TestCase):
     def test_view_values(self):
         """It should display item text"""
 
-        action = mommy.make(Action, type=None)
-        sale = mommy.make(models.Sale, action=action)
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type)
 
-        item = mommy.make(models.SaleItem, sale=sale, text=u'Promo été')
+        item = mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
 
         self.assertContains(response, item.text)
+
+
+class EditSaleActionTest(BaseTestCase):
+    """It should display edit action correctly"""
+
+    def test_edit_action_calculated_amount(self):
+        """edit with caculated amount"""
+        contact = mommy.make(Contact)
+
+        action_type = mommy.make(ActionType, is_amount_calculated=False)
+        mommy.make(
+            models.StoreManagementActionType,
+            action_type=action_type,
+            show_amount_as_pre_tax=False
+        )
+        action_type = ActionType.objects.get(id=action_type.id)
+        self.assertEqual(action_type.is_amount_calculated, True)
+
+        action = mommy.make(Action, type=action_type)
+
+        action.contacts.add(contact)
+        action.save()
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        fields = soup.select("#id_amount")
+        self.assertEqual(len(fields), 1)
+
+        self.assertEqual(fields[0]["disabled"], "disabled")
+
+    def test_create_action_calculated_amount(self):
+        """create with calculated amount"""
+        action_type = mommy.make(ActionType, is_amount_calculated=False)
+        mommy.make(
+            models.StoreManagementActionType,
+            action_type=action_type,
+            show_amount_as_pre_tax=False
+        )
+        action_type = ActionType.objects.get(id=action_type.id)
+        self.assertEqual(action_type.is_amount_calculated, True)
+
+        url = reverse('crm_create_action', args=[0, 0]) + "?type={0}".format(action_type.id)
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        fields = soup.select("#id_amount")
+        self.assertEqual(len(fields), 1)
+
+        self.assertEqual(fields[0]["disabled"], "disabled")
