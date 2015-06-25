@@ -3,9 +3,9 @@
 
 from django.db import models
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
-from sanza.Crm.models import Action, ActionType
+from sanza.Crm.models import Action, ActionMenu, ActionType
 
 
 class StoreManagementActionType(models.Model):
@@ -19,6 +19,21 @@ class StoreManagementActionType(models.Model):
     class Meta:
         verbose_name = _(u"Store management action type")
         verbose_name_plural = _(u"Store management action types")
+
+    def save(self, *args, **kwargs):
+        """save: create the corresponding menu"""
+        ret = super(StoreManagementActionType, self).save(*args, **kwargs)
+        if self.id and self.action_type:
+            queryset = ActionMenu.objects.filter(action_type=self.action_type, view_name='store_view_sales_document')
+            if not queryset.exists():
+                ActionMenu.objects.create(
+                    view_name='store_view_sales_document',
+                    action_type=self.action_type,
+                    label=self.action_type.name,
+                    icon='file',
+                    a_attrs='target="_blank"'
+                )
+        return ret
 
     def __unicode__(self):
         return u"{0}".format(self.action_type)

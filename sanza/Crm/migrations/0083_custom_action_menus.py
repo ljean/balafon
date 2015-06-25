@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'ActionMenu'
         db.create_table(u'Crm_actionmenu', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('action_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Crm.ActionType'])),
             ('view_name', self.gf('django.db.models.fields.CharField')(max_length=200)),
             ('icon', self.gf('django.db.models.fields.CharField')(default='', max_length=30, blank=True)),
             ('label', self.gf('django.db.models.fields.CharField')(max_length=200)),
@@ -19,22 +20,10 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'Crm', ['ActionMenu'])
 
-        # Adding M2M table for field types on 'ActionMenu'
-        m2m_table_name = db.shorten_name(u'Crm_actionmenu_types')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('actionmenu', models.ForeignKey(orm[u'Crm.actionmenu'], null=False)),
-            ('actiontype', models.ForeignKey(orm[u'Crm.actiontype'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['actionmenu_id', 'actiontype_id'])
-
 
     def backwards(self, orm):
         # Deleting model 'ActionMenu'
         db.delete_table(u'Crm_actionmenu')
-
-        # Removing M2M table for field types on 'ActionMenu'
-        db.delete_table(db.shorten_name(u'Crm_actionmenu_types'))
 
 
     models = {
@@ -72,11 +61,11 @@ class Migration(SchemaMigration):
         u'Crm.actionmenu': {
             'Meta': {'ordering': "['order_index']", 'object_name': 'ActionMenu'},
             'a_attrs': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'action_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.ActionType']"}),
             'icon': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'order_index': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'types': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['Crm.ActionType']", 'symmetrical': 'False', 'blank': 'True'}),
             'view_name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         u'Crm.actionset': {

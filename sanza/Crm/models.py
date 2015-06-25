@@ -988,11 +988,7 @@ class TeamMember(models.Model):
 class ActionMenu(models.Model):
     """A menu to add to every action of this type"""
 
-    class Meta:
-        verbose_name = _(u'action')
-        verbose_name_plural = _(u'actions')
-
-    types = models.ManyToManyField(ActionType, blank=True)
+    action_type = models.ForeignKey(ActionType, verbose_name=_(u'Action type'))
     view_name = models.CharField(_(u'view_name'), max_length=200)
     icon = models.CharField(_(u'icon'), max_length=30, default="", blank=True)
     label = models.CharField(_(u'label'), max_length=200)
@@ -1078,7 +1074,7 @@ class Action(LastModifiedModel):
 
     def get_menus(self):
         if self.type:
-            return ActionMenu.objects.filter(types=self.type)
+            return ActionMenu.objects.filter(action_type=self.type)
         return ActionMenu.objects.none()
 
     def save(self, *args, **kwargs):
