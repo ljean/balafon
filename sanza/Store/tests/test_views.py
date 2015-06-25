@@ -118,7 +118,8 @@ class ViewCommercialDocumentTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         login_url = reverse('django.contrib.auth.views.login')
-        self.assertEqual(response['Location'], 'http://testserver{0}?next={1}'.format(login_url, url))
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
 
     def test_view_values(self):
         """It should display item text"""
