@@ -1,0 +1,7 @@
+{% extends "sanza/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+{% endblock %}
+{% block title %}{% trans "Clone action" %}{% endblock %}
+{% block form_url %}{% url "crm_clone_action" action.id %}{% endblock %}

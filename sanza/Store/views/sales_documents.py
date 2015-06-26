@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 
 from rest_framework.renderers import JSONRenderer
 
+from sanza.permissions import can_access
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
 from sanza.Store.models import Sale, SaleItem, VatRate, StoreManagementActionType
@@ -45,7 +46,7 @@ class SalesDocumentView(TemplateView):
         """get context data"""
         context = super(SalesDocumentView, self).get_context_data(**kwargs)
 
-        if not self.request.user.is_staff:
+        if not can_access(self.request.user):
             raise PermissionDenied
 
         action = self.get_action()

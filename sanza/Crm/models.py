@@ -960,6 +960,7 @@ class ActionType(NamedElement):
     )
     order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
     is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
+    next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1045,6 +1046,7 @@ class Action(LastModifiedModel):
     entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
     favorites = GenericRelation(Favorite)
     end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
+    parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
     
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
@@ -1091,6 +1093,27 @@ class Action(LastModifiedModel):
             self.type.save()
             
         return super(Action, self).save(*args, **kwargs)
+
+    def clone(self, new_type):
+        """Create a new action with same values but different types"""
+        attrs_to_clone = (
+            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
+        )
+
+        new_action = Action(parent=self)
+        for attr in attrs_to_clone:
+            setattr(new_action, attr, getattr(self, attr))
+        new_action.type = new_type
+        new_action.status = new_type.default_status
+        new_action.save()
+
+        for contact in self.contacts.all():
+            new_action.contacts.add(contact)
+
+        for entity in self.entities.all():
+            new_action.entities.add(entity)
+        new_action.save()
+        return new_action
 
 
 class ActionDocument(models.Model):

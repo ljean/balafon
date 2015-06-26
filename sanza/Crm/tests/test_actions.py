@@ -1727,5 +1727,321 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
 
 
+class CloneActionTest(BaseTestCase):
+    """clone an action"""
 
+    def test_view_clone_action_1_type(self):
+        """it should display hidden input for the only allowed type"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
 
+        action = mommy.make(models.Action, type=action_type_1)
+
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        html_fields = soup.select("#id_action_type")
+        self.assertEqual(1, len(html_fields))
+        self.assertEqual(html_fields[0]["type"], "hidden")
+        self.assertEqual(html_fields[0]["value"], "{0}".format(action_type_2.id))
+
+    def test_view_clone_action_2_types(self):
+        """it should display a select with allowed types"""
+        action_type_1 = mommy.make(models.ActionType, order_index=1)
+        action_type_2 = mommy.make(models.ActionType, order_index=2)
+        action_type_3 = mommy.make(models.ActionType, order_index=3)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.next_action_types.add(action_type_3)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        html_fields = soup.select("#id_action_type")
+        self.assertEqual(1, len(html_fields))
+        options = html_fields[0].select("option")
+        self.assertEqual(len(options), 2)
+        self.assertEqual(options[0]["value"], "{0}".format(action_type_2.id))
+        self.assertEqual(options[1]["value"], "{0}".format(action_type_3.id))
+
+    def test_view_clone_action_no_types(self):
+        """it should display an empty select"""
+        action_type_1 = mommy.make(models.ActionType, order_index=1)
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        html_fields = soup.select("#id_action_type")
+        self.assertEqual(1, len(html_fields))
+        options = html_fields[0].select("option")
+        self.assertEqual(len(options), 0)
+
+    def test_view_clone_action_type_is_none(self):
+        """it should display 404"""
+        action = mommy.make(models.Action, type=None)
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(404, response.status_code)
+
+    def test_view_clone_anonymous(self):
+        """it should display hidden input for the only allowed type"""
+        self.client.logout()
+
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(302, response.status_code)
+
+    def test_view_clone_non_staff(self):
+        """it should display hidden input for the only allowed type"""
+        self.user.is_staff = False
+        self.user.save()
+
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        response = self.client.get(reverse('crm_clone_action', args=[action.id]))
+        self.assertEqual(302, response.status_code)
+
+    def test_post_clone_action(self):
+        """it should clone"""
+        action_status_1 = mommy.make(models.ActionStatus)
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_1.allowed_status.add(action_status_1)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        action = mommy.make(models.Action, type=action_type_1, done=True, status=action_status_1)
+
+        action.contacts.add(contact)
+        action.entities.add(entity)
+
+        action.save()
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
+
+        self.assertEqual(2, models.Action.objects.count())
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(original_action.subject, new_action.subject)
+        self.assertEqual(new_action.parent, original_action)
+        self.assertEqual(new_action.contacts.count(), 1)
+        self.assertEqual(new_action.entities.count(), 1)
+        self.assertEqual(list(original_action.contacts.all()), list(new_action.contacts.all()))
+        self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
+        self.assertEqual(new_action.done, False)
+        self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.status, None)
+        self.assertEqual(new_action.planned_date, original_action.planned_date)
+        self.assertEqual(new_action.amount, original_action.amount)
+
+    def test_post_clone_action_default_status(self):
+        """it should clone"""
+        action_status = mommy.make(models.ActionStatus)
+        action_status_1 = mommy.make(models.ActionStatus)
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_1.allowed_status.add(action_status_1)
+        action_type_2 = mommy.make(models.ActionType, default_status=action_status)
+        action_type_2.allowed_status.add(action_status)
+        action_type_2.save()
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        action = mommy.make(models.Action, type=action_type_1, done=True, status=action_status_1)
+
+        action.contacts.add(contact)
+        action.entities.add(entity)
+
+        action.save()
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
+
+        self.assertEqual(2, models.Action.objects.count())
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(original_action.subject, new_action.subject)
+        self.assertEqual(new_action.parent, original_action)
+        self.assertEqual(new_action.contacts.count(), 1)
+        self.assertEqual(new_action.entities.count(), 1)
+        self.assertEqual(list(original_action.contacts.all()), list(new_action.contacts.all()))
+        self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
+        self.assertEqual(new_action.done, False)
+        self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.status, action_status)
+        self.assertEqual(new_action.planned_date, original_action.planned_date)
+        self.assertEqual(new_action.amount, original_action.amount)
+
+    def test_post_clone_action_anonymous(self):
+        """it should not clone and redirect to login page"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        self.client.logout()
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(302, response.status_code)
+
+        self.assertEqual(1, models.Action.objects.count())
+
+    def test_post_clone_action_non_staff(self):
+        """it should not clone and redirect to login page"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        self.user.is_staff = False
+        self.user.save()
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(302, response.status_code)
+
+        self.assertEqual(1, models.Action.objects.count())
+
+    def test_post_clone_action_invalid(self):
+        """it should not clone and show error"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        data = {
+            'action_type': 'bla'
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".error-msg")), 1)
+        self.assertEqual(1, models.Action.objects.count())
+
+    def test_post_clone_no_type(self):
+        """it should not clone and show error"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        data = {
+            'action_type': ''
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".error-msg")), 1)
+        self.assertEqual(1, models.Action.objects.count())
+
+    def test_post_clone_other_type(self):
+        """it should not clone and show error"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_3 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=action_type_1)
+
+        data = {
+            'action_type': action_type_3.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".error-msg")), 1)
+        self.assertEqual(1, models.Action.objects.count())
+
+    def test_post_clone_type_is_none(self):
+        """it should not clone and 404"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        action = mommy.make(models.Action, type=None)
+
+        data = {
+            'action_type': action_type_2,
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(1, models.Action.objects.count())

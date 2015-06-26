@@ -7,6 +7,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup
+from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -14,7 +15,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from sanza.Crm.models import Action, ActionType, Contact
+from sanza.Crm.models import Action, ActionType, Contact, Entity
 from sanza.Crm.tests import BaseTestCase
 from sanza.Store import models
 
@@ -190,3 +191,151 @@ class EditSaleActionTest(BaseTestCase):
         self.assertEqual(len(fields), 1)
 
         self.assertEqual(fields[0]["disabled"], "disabled")
+
+
+class CloneSaleActionTest(BaseTestCase):
+    """clone an action"""
+
+    def test_post_clone_action(self):
+        """it should clone action and sale"""
+        action_type_1 = mommy.make(ActionType)
+        action_type_2 = mommy.make(ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        store_action_type1 = mommy.make(models.StoreManagementActionType, action_type=action_type_1)
+        store_action_type2 = mommy.make(models.StoreManagementActionType, action_type=action_type_2)
+
+        contact = mommy.make(Contact)
+        entity = mommy.make(Entity)
+
+        action = mommy.make(models.Action, type=action_type_1, done=True)
+
+        self.assertNotEqual(action.sale, None)
+
+        vat_rate1 = mommy.make(models.VatRate, rate="20.0")
+        vat_rate2 = mommy.make(models.VatRate, rate="10.0")
+
+        store_item = mommy.make(models.StoreItem)
+
+        sale_item1 = mommy.make(
+            models.SaleItem, quantity=1, pre_tax_price="10", vat_rate=vat_rate1,
+            sale=action.sale, order_index=1, item=store_item
+        )
+        sale_item2 = mommy.make(
+            models.SaleItem, quantity=2, pre_tax_price="1", vat_rate=vat_rate2,
+            sale=action.sale, order_index=2
+        )
+
+        action.contacts.add(contact)
+        action.entities.add(entity)
+
+        action.save()
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
+
+        self.assertEqual(2, models.Action.objects.count())
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(original_action.subject, new_action.subject)
+        self.assertEqual(new_action.parent, original_action)
+        self.assertEqual(new_action.contacts.count(), 1)
+        self.assertEqual(new_action.entities.count(), 1)
+        self.assertEqual(list(original_action.contacts.all()), list(new_action.contacts.all()))
+        self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
+        self.assertEqual(new_action.done, False)
+        self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.planned_date, original_action.planned_date)
+        self.assertEqual(new_action.amount, original_action.amount)
+        self.assertEqual(new_action.amount, Decimal("12"))
+        self.assertEqual(new_action.sale.saleitem_set.count(), 2)
+
+        for original, clone in zip(original_action.sale.saleitem_set.all(), new_action.sale.saleitem_set.all()):
+            self.assertEqual(original.quantity, clone.quantity)
+            self.assertEqual(original.vat_rate, clone.vat_rate)
+            self.assertEqual(original.pre_tax_price, clone.pre_tax_price)
+            self.assertEqual(original.text, clone.text)
+            self.assertEqual(original.item, clone.item)
+
+        sale_item = new_action.sale.saleitem_set.all()[0]
+        sale_item.quantity = 10
+        sale_item.save()
+
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+        self.assertNotEqual(new_action.amount, original_action.amount)
+        self.assertEqual(original_action.amount, Decimal("12"))
+        self.assertEqual(new_action.amount, Decimal("102"))
+
+    def test_post_clone_action_no_sale(self):
+        """it should clone action and sale"""
+        action_type_1 = mommy.make(ActionType)
+        action_type_2 = mommy.make(ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        store_action_type1 = mommy.make(models.StoreManagementActionType, action_type=action_type_1)
+
+        contact = mommy.make(Contact)
+        entity = mommy.make(Entity)
+
+        action = mommy.make(models.Action, type=action_type_1, done=True)
+
+        self.assertNotEqual(action.sale, None)
+
+        vat_rate1 = mommy.make(models.VatRate, rate="20.0")
+        vat_rate2 = mommy.make(models.VatRate, rate="10.0")
+
+        store_item = mommy.make(models.StoreItem)
+
+        sale_item1 = mommy.make(
+            models.SaleItem, quantity=1, pre_tax_price="10", vat_rate=vat_rate1,
+            sale=action.sale, order_index=1, item=store_item
+        )
+        sale_item2 = mommy.make(
+            models.SaleItem, quantity=2, pre_tax_price="1", vat_rate=vat_rate2,
+            sale=action.sale, order_index=2
+        )
+
+        action.contacts.add(contact)
+        action.entities.add(entity)
+
+        action.save()
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
+
+        self.assertEqual(2, models.Action.objects.count())
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(original_action.subject, new_action.subject)
+        self.assertEqual(new_action.parent, original_action)
+        self.assertEqual(new_action.contacts.count(), 1)
+        self.assertEqual(new_action.entities.count(), 1)
+        self.assertEqual(list(original_action.contacts.all()), list(new_action.contacts.all()))
+        self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
+        self.assertEqual(new_action.done, False)
+        self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.planned_date, original_action.planned_date)
+        self.assertEqual(new_action.amount, original_action.amount)
+        self.assertEqual(new_action.amount, Decimal("12.0"))
+        self.assertEqual(0, models.Sale.objects.filter(action=new_action).count())

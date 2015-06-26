@@ -524,7 +524,7 @@ def contacts_admin(request):
                     else:
                         messages.add_message(request, messages.SUCCESS,
                             _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts)))
-                    return None #popup_close will return js code to close the popup
+                    return None  # popup_close will return js code to close the popup
                 else:
                     return render_to_response(
                         'Search/contacts_admin_form.html',

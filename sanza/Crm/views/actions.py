@@ -7,13 +7,14 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, render, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from colorbox.decorators import popup_redirect
+from colorbox.decorators import popup_redirect, popup_close
 
 from sanza.Crm import models, forms
+from sanza.Crm.signals import action_cloned
 from sanza.Crm.views.contacts import select_contact_and_redirect
 from sanza.Crm.utils import get_actions_by_set
 from sanza.permissions import can_access
@@ -480,4 +481,33 @@ def add_action(request):
         request,
         'crm_add_action_for_contact',
         'Crm/add_action.html',
+    )
+
+
+@popup_close
+@user_passes_test(can_access)
+def clone_action(request, action_id):
+    """clone an action with different type"""
+
+    action = get_object_or_404(models.Action, id=action_id, type__isnull=False)
+
+    if request.method == 'POST':
+        form = forms.CloneActionForm(action.type, request.POST)
+        if form.is_valid():
+            action_type = form.cleaned_data['action_type']
+            new_action = action.clone(action_type)
+            action_cloned.send(sender=models.Action, original_action=action, new_action=new_action)
+            return None  # popup_close will return js code to close the popup
+    else:
+        form = forms.CloneActionForm(action.type)
+
+    context = {
+        'form': form,
+        'action': action,
+    }
+
+    return render(
+        request,
+        'Crm/popup_clone_action.html',
+        context,
     )

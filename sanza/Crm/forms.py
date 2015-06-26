@@ -1091,3 +1091,31 @@ class ConfirmForm(forms.Form):
 class UnsubscribeContactsImportForm(forms.Form):
     """A form for uploading a file"""
     input_file = forms.FileField()
+
+
+class CloneActionForm(forms.Form):
+    """form for clone_action: choose which type to chooses"""
+    action_type = forms.ChoiceField(required=True, choices=[], label=_(u'New type'))
+
+    def __init__(self, action_type, *args, **kwargs):
+        super(CloneActionForm, self).__init__(*args, **kwargs)
+
+        choices = [
+            (action_type.id, action_type.name)
+            for action_type in action_type.next_action_types.all().order_by('order_index')
+        ]
+        self.fields['action_type'].choices = choices
+        #If only 1 choice = change it to a confirmation
+        if len(choices) == 1:
+            self.fields['action_type'].initial = choices[0][0]
+            self.fields['action_type'].widget = forms.HiddenInput()
+            self.single_choice = True
+        else:
+            self.single_choice = False
+
+    def clean_action_type(self):
+        action_type = self.cleaned_data['action_type']
+        try:
+            return models.ActionType.objects.get(id=action_type)
+        except models.ActionType.DoesNotExist:
+            raise forms.ValidationError(_(u"Invalid type"))

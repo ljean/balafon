@@ -7,7 +7,7 @@ from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Crm.models import Action, ActionMenu, ActionType
-
+from sanza.Crm.signals import action_cloned
 
 class StoreManagementActionType(models.Model):
     """
@@ -164,6 +164,11 @@ class Sale(models.Model):
     def __unicode__(self):
         return unicode(self.action)
 
+    def clone(self, new_sale):
+        """clone a sale: clone its items"""
+        for item in self.saleitem_set.all():
+            item.clone(new_sale)
+
 
 class SaleItem(models.Model):
     """details about the sold item"""
@@ -190,6 +195,18 @@ class SaleItem(models.Model):
         if self.order_index == 0:
             self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1
         return super(SaleItem, self).save(*args, **kwargs)
+
+    def clone(self, new_sale):
+        """clone it for a new sale"""
+        return SaleItem.objects.create(
+            sale=new_sale,
+            item=self.item,
+            quantity=self.quantity,
+            vat_rate=self.vat_rate,
+            pre_tax_price=self.pre_tax_price,
+            text=self.text,
+            order_index=self.order_index
+        )
 
 
 def update_action_amount(sale_item, delete_me=False):
@@ -238,3 +255,14 @@ def create_action_sale(sender, instance, created, **kwargs):
             Sale.objects.create(action=action)
 
 post_save.connect(create_action_sale, sender=Action)
+
+
+def on_action_cloned(sender, original_action, new_action, **kwargs):
+    """clone the associated sale when an action is cloned"""
+    try:
+        if original_action.sale and new_action.sale:
+            original_action.sale.clone(new_action.sale)
+    except Sale.DoesNotExist:
+        pass
+
+action_cloned.connect(on_action_cloned, sender=Action)
