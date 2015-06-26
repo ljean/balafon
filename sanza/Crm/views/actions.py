@@ -504,6 +504,7 @@ def clone_action(request, action_id):
     context = {
         'form': form,
         'action': action,
+        'action_type_name': form.action_type_name,
     }
 
     return render(

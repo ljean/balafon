@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 from sanza.Crm.models import Action, ActionMenu, ActionType
 from sanza.Crm.signals import action_cloned
 
+
 class StoreManagementActionType(models.Model):
     """
     Define if an action type is linked to the store.
@@ -26,15 +27,15 @@ class StoreManagementActionType(models.Model):
         """save: create the corresponding menu"""
         ret = super(StoreManagementActionType, self).save(*args, **kwargs)
         if self.id and self.action_type:
-            queryset = ActionMenu.objects.filter(action_type=self.action_type, view_name='store_view_sales_document')
-            if not queryset.exists():
-                ActionMenu.objects.create(
-                    view_name='store_view_sales_document',
-                    action_type=self.action_type,
-                    label=self.action_type.name,
-                    icon='file',
-                    a_attrs='target="_blank"'
-                )
+
+            ActionMenu.create_action_menu(
+                action_type=self.action_type,
+                view_name='store_view_sales_document',
+                label=self.action_type.name,
+                icon='file',
+                a_attrs='target="_blank"'
+            )
+
             if not self.action_type.is_amount_calculated:
                 self.action_type.is_amount_calculated = True
                 self.action_type.save()

@@ -2045,3 +2045,24 @@ class CloneActionTest(BaseTestCase):
         )
         self.assertEqual(404, response.status_code)
         self.assertEqual(1, models.Action.objects.count())
+
+    def test_action_menu(self):
+        """it should create and delete an action menu"""
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_2 = mommy.make(models.ActionType)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        self.assertEqual(1, models.ActionMenu.objects.count())
+        menu = models.ActionMenu.objects.all()[0]
+        self.assertEqual(menu.action_type, action_type_1)
+        self.assertEqual(menu.view_name, 'crm_clone_action')
+
+        action_type_1.next_action_types.clear()
+        action_type_1.save()
+
+        self.assertEqual(0, models.ActionMenu.objects.count())
+
+
+
+

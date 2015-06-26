@@ -966,6 +966,22 @@ class ActionType(NamedElement):
         """true if a status is defined for this type"""
         return self.allowed_status.count() > 0
     status_defined.short_description = _(u"Status defined")
+
+    def save(self, *args, **kwargs):
+        """save: create the corresponding menu"""
+        ret = super(ActionType, self).save(*args, **kwargs)
+        if self.id:
+            if self.next_action_types.count():
+                ActionMenu.create_action_menu(
+                    action_type=self,
+                    view_name='crm_clone_action',
+                    label=__('Duplicate'),
+                    icon='duplicate',
+                    a_attrs='class="colorbox-form"'
+                )
+            else:
+                ActionMenu.objects.filter(action_type=self, view_name='crm_clone_action').delete()
+        return ret
     
     class Meta:
         verbose_name = _(u'action type')
@@ -1006,6 +1022,18 @@ class ActionMenu(models.Model):
         verbose_name = _(u'action menu')
         verbose_name_plural = _(u'action menus')
         ordering = ['order_index']
+
+    @classmethod
+    def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs=''):
+        queryset = ActionMenu.objects.filter(action_type=action_type, view_name=view_name)
+        if not queryset.exists():
+            return ActionMenu.objects.create(
+                view_name=view_name,
+                action_type=action_type,
+                label=label or view_name,
+                icon=icon,
+                a_attrs=a_attrs
+            )
 
     def __unicode__(self):
         return self.label

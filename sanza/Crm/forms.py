@@ -1110,8 +1110,10 @@ class CloneActionForm(forms.Form):
             self.fields['action_type'].initial = choices[0][0]
             self.fields['action_type'].widget = forms.HiddenInput()
             self.single_choice = True
+            self.action_type_name = choices[0][1]
         else:
             self.single_choice = False
+            self.action_type_name = ''
 
     def clean_action_type(self):
         action_type = self.cleaned_data['action_type']
