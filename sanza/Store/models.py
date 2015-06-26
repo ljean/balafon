@@ -33,7 +33,7 @@ class StoreManagementActionType(models.Model):
                 view_name='store_view_sales_document',
                 label=self.action_type.name,
                 icon='file',
-                a_attrs='target="_blank"'
+                a_attrs=''
             )
 
             if not self.action_type.is_amount_calculated:

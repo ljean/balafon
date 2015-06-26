@@ -1617,7 +1617,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(len(li_tags), 2)
 
         self.assertEqual(li_tags[0].text.strip(), menu2.label)
-        self.assertEqual(li_tags[0].a['target'], '"_blank"')
+        self.assertEqual(li_tags[0].a['target'], '_blank')
         self.assertEqual(li_tags[0].a['href'], reverse('crm_delete_action', args=[action.id]))
         self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu2.icon)])
 
@@ -1657,7 +1657,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(len(li_tags), 1)
 
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
-        self.assertEqual(li_tags[0].a['class'], ['"colorbox-form"'])
+        self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], reverse('crm_do_action', args=[action.id]))
         self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
 
@@ -1722,7 +1722,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(len(li_tags), 1)
 
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
-        self.assertEqual(li_tags[0].a['class'], ['"colorbox-form"'])
+        self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], '')
         self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
 

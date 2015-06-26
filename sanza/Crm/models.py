@@ -240,6 +240,13 @@ class Entity(LastModifiedModel):
     
     def __unicode__(self):
         return self.name
+
+    def get_view_url(self):
+        absolute_url = reverse('crm_view_entity', args=[self.id])
+        try:
+            return "//" + Site.objects.get_current().domain + absolute_url
+        except Site.objects.DoesNotExist:
+            return absolute_url
     
     def get_safe_logo(self):
         """get entity logo or default one"""

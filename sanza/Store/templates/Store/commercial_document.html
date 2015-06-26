@@ -376,14 +376,14 @@
       height: 42px;
     }
 
-    tr .show-on-hover {
+    tr .show-on-hover, div .show-on-hover {
     }
 
-    tr .show-on-hover a{
+    tr .show-on-hover a, div > .show-on-hover a{
       display: none;
     }
 
-    tr:hover .show-on-hover a{
+    tr:hover .show-on-hover a, div:hover > .show-on-hover a{
       display: inline-block;
     }
 
@@ -447,6 +447,10 @@
       border-radius: 8px;
     }
 
+    .contacts .contact, .contacts .entity {
+      margin-bottom: 10px;
+    }
+
   </style>
   {% endblock %}
 </head>
@@ -473,14 +477,34 @@
           </div>
 
           <div class="contacts">
-            <div ng-repeat="contact in app.action.contacts">
+            <div ng-repeat="entity in app.action.entities" class="entity">
               <div class="row"><div class="col-md-12">
-                <div>{{ contact.fullname }}</div>
+                <div>
+                  {{ entity.name }}
+                  <span class="show-on-hover">
+                    <a href="{{ entity.get_view_url }}"><span class="glyphicon glyphicon-link"></span></a>
+                  </span>
+                </div>
+                <div ng-show="entity.address">{{ entity.address }}</div>
+                <div ng-show="entity.address2">{{ entity.address2 }}</div>
+                <div ng-show="entity.address3">{{ entity.address3 }}</div>
+                <div>{{ entity.zip_code }} {{ entity.city.name }} {{ entity.cedex }}</div>
+                <div ng-show="entity.country.is_foreign_country">{{ entity.country.name }}</div>
+              </div></div>
+            </div>
+            <div ng-repeat="contact in app.action.contacts" class="contact">
+              <div class="row"><div class="col-md-12">
+                <div>
+                  {{ contact.fullname }}
+                  <span class="show-on-hover">
+                    <a href="{{ contact.get_view_url }}"><span class="glyphicon glyphicon-link"></span></a>
+                  </span>
+                </div>
                 <div ng-show="contact.get_address">{{ contact.get_address }}</div>
-                <div ng-show="contact.get_address2">{{ contact.get_address3 }}</div>
+                <div ng-show="contact.get_address2">{{ contact.get_address2 }}</div>
                 <div ng-show="contact.get_address3">{{ contact.get_address3 }}</div>
                 <div>{{ contact.get_zip_code }} {{ contact.get_city.name }} {{ contact.cedex }}</div>
-                <div ng-show="contact.get_country">{{ contact.get_country }}</div>
+                <div ng-show="contact.get_country.is_foreign_country">{{ contact.get_country.name }}</div>
               </div></div>
             </div>
           </div>

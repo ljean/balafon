@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from sanza.Crm.models import Action, Contact, City, TeamMember
+from sanza.Crm.models import Action, Contact, City, Entity, EntityType, TeamMember, Zone
 
 
 class TeamMemberSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,33 +31,68 @@ class CitySerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
+class CountrySerializer(serializers.ModelSerializer):
+    is_foreign_country = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Zone
+        fields = ('id', 'name', 'is_foreign_country')
+
+
 class ContactSerializer(serializers.ModelSerializer):
     """Serialize a contact"""
     get_city = CitySerializer(read_only=True)
+    get_country = CountrySerializer(read_only=True)
     get_address = serializers.CharField(read_only=True)
     get_address2 = serializers.CharField(read_only=True)
     get_address3 = serializers.CharField(read_only=True)
     get_zip_code = serializers.CharField(read_only=True)
+    get_cedex = serializers.CharField(read_only=True)
     get_phone = serializers.CharField(read_only=True)
     get_view_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Contact
         fields = (
-            'id', 'fullname', 'lastname', 'firstname', 'get_city', 'get_address', 'get_address2', 'get_address3',
-            'get_zip_code', 'mobile', 'get_phone', 'notes', 'get_view_url'
+            'id', 'fullname', 'lastname', 'firstname', 'title', 'job',
+            'get_city', 'get_address', 'get_address2', 'get_address3', 'get_cedex', 'get_zip_code', 'get_country',
+            'mobile', 'get_phone', 'email', 'notes', 'get_view_url', 'favorite_language'
+        )
+
+
+class EntityTypeSerializer(serializers.ModelSerializer):
+    """Serialize an entity type"""
+
+    class Meta:
+        model = EntityType
+        fields = ('id', 'name',)
+
+
+class EntitySerializer(serializers.ModelSerializer):
+    """Serialize an entity"""
+    city = CitySerializer(read_only=True)
+    type = EntityTypeSerializer(read_only=True)
+    get_view_url = serializers.CharField(read_only=True)
+    country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = Entity
+        fields = (
+            'id', 'name', 'type', 'city', 'address', 'address2', 'address3', 'cedex', 'country',
+            'zip_code', 'phone', 'email', 'website', 'notes', 'get_view_url'
         )
 
 
 class ActionSerializer(serializers.ModelSerializer):
     """Serialize an action"""
     contacts = ContactSerializer(many=True, read_only=True)
+    entities = EntitySerializer(many=True, read_only=True)
     last_modified_by = UserSerializer(many=False, read_only=True)
 
     class Meta:
         model = Action
         fields = (
-            'id', 'contacts', 'subject', 'planned_date', 'end_datetime',
+            'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime',
             'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number'
         )
 
