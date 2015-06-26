@@ -47,7 +47,8 @@
         THE_LABEL_FIELD_IS_REQUIRED: 'The label field is required',
         THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'The quantity field is required number',
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'The pre-tax price field is required number',
-        THE_VAT_REQUIRED: 'The VAT rate is required'
+        THE_VAT_REQUIRED: 'The VAT rate is required',
+        READ_ONLY: 'Read_only'
       });
 
       $translateProvider.translations('fr', {
@@ -72,7 +73,8 @@
         THE_LABEL_FIELD_IS_REQUIRED: 'Le libellé est requis',
         THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'La quantité doit être un nombre',
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'Le prix unitaire doit être un nombre',
-        THE_VAT_REQUIRED: 'La TVA est requise'
+        THE_VAT_REQUIRED: 'La TVA est requise',
+        READ_ONLY: 'Lecture seule'
       });
       $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
       $translateProvider.useSanitizeValueStrategy('escape');
@@ -82,7 +84,7 @@
     function ($scope, $modal, $http, $translate, $filter) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
-      $scope.allowEdit = true;
+      $scope.allowEdit = !$scope.app.isReadOnly;
       $scope.formErrors = '';
       $scope.editBackup = null;
       $translate.use('{{ LANGUAGE_CODE }}');
@@ -459,6 +461,10 @@
   <div ng-app="commercialDocApp">
 
     <div ng-controller="CommercialDocCtrl" class="container-fluid">
+
+      <div class="badges">
+        <div class="badge" ng-show="app.isReadOnly">{{ 'READ_ONLY' | translate }}</div>
+      </div>
 
       <div class="content">
         <div class="row"><div class="col-md-12">

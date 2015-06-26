@@ -5,14 +5,21 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Store import models
+from sanza.Store.forms import StoreManagementActionTypeAdminForm
 
 
 admin.site.register(models.Unit)
 admin.site.register(models.StoreItemCategory)
 admin.site.register(models.StoreItemTag)
 admin.site.register(models.Sale)
-admin.site.register(models.StoreManagementActionType)
 admin.site.register(models.SaleItem)
+
+
+class StoreManagementActionTypeAdmin(admin.ModelAdmin):
+    """StoreManagementActionTypeAdmin"""
+    form = StoreManagementActionTypeAdminForm
+
+admin.site.register(models.StoreManagementActionType, StoreManagementActionTypeAdmin)
 
 
 class StockThresholdFilter(admin.SimpleListFilter):
@@ -71,5 +78,3 @@ class VatRateAdmin(admin.ModelAdmin):
     readonly_fields = ['name']
 
 admin.site.register(models.VatRate, VatRateAdmin)
-
-

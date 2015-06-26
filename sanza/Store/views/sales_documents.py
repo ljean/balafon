@@ -56,6 +56,11 @@ class SalesDocumentView(TemplateView):
         except Sale.DoesNotExist:
             raise Http404
 
+        if action.type:
+            is_read_only = action.status in action.type.storemanagementactiontype.readonly_status.all()
+        else:
+            is_read_only = False
+
         action_serializer = ActionSerializer(self.get_action())
         action_data = Utf8JSONRenderer().render(action_serializer.data)
 
@@ -68,14 +73,20 @@ class SalesDocumentView(TemplateView):
         vat_rates_serializer = VatRateSerializer(VatRate.objects.all(), many=True)
         vat_rates_data = Utf8JSONRenderer().render(vat_rates_serializer.data)
 
+        context['is_read_only'] = is_read_only
         context['DJANGO_APP'] = """
         var DJANGO_APP = {{
             action: {0},
             sale_items: {1},
             sale: {2},
-            vat_rates: {3}
+            vat_rates: {3},
+            isReadOnly: {4}
         }};""".format(
-            action_data, sale_items_data, sale_data, vat_rates_data
+            action_data,
+            sale_items_data,
+            sale_data,
+            vat_rates_data,
+            'true' if is_read_only else 'false'
         )
         return context
 

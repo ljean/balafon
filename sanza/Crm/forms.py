@@ -2,6 +2,7 @@
 """Crm forms"""
 
 from datetime import datetime
+from decimal import Decimal
 
 from django.db.models import Q
 from django.conf import settings
@@ -478,6 +479,8 @@ class ActionForm(BetterBsModelForm):
     end_date = forms.DateField(label=_(u"end date"), required=False, widget=forms.TextInput())
     end_time = forms.TimeField(label=_(u"end time"), required=False)
 
+    amount = forms.DecimalField(label=_("Amount"), required=False)
+
     class Meta:
         """form from model"""
         model = models.Action
@@ -517,11 +520,13 @@ class ActionForm(BetterBsModelForm):
             if instance.type:
                 is_amount_calculated = instance.type.is_amount_calculated
                 action_type_name = instance.type.name
+                self.calculated_amount = instance.amount
         else:
             #if initial value is provided (from url)
             action_type = kwargs.get('initial', {}).get('type', None)
             if action_type:
                 is_amount_calculated = action_type.is_amount_calculated
+                self.calculated_amount = Decimal("0")
                 action_type_name = action_type.name
 
         if action_type:
@@ -536,6 +541,7 @@ class ActionForm(BetterBsModelForm):
 
         if is_amount_calculated:
             self.fields['amount'].widget.attrs['disabled'] = 'disabled'
+        self.is_amount_calculated = is_amount_calculated
 
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             # let javascript disable the blank value if default_status
@@ -630,6 +636,15 @@ class ActionForm(BetterBsModelForm):
         if end_date:
             return datetime.combine(end_date, end_time or datetime.min.time())
         return None
+
+    def clean_amount(self):
+        if self.is_amount_calculated:
+            return self.calculated_amount
+        else:
+            return self.cleaned_data['amount']
+
+    def save(self, *args, **kwargs):
+        return super(ActionForm, self).save(*args, **kwargs)
 
 
 class OpportunityForm(BetterBsModelForm):

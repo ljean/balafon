@@ -4,9 +4,9 @@
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 
-from sanza.Crm.models import Action, ActionMenu, ActionType
+from sanza.Crm.models import Action, ActionMenu, ActionStatus, ActionType
 from sanza.Crm.signals import action_cloned
 
 
@@ -16,8 +16,21 @@ class StoreManagementActionType(models.Model):
     If so it will be possible to link a Sale with an Action of this ActionType
     """
     action_type = models.OneToOneField(ActionType)
-    template_name = models.CharField(default='', blank=True, max_length=100, verbose_name=_(u'template name'))
-    show_amount_as_pre_tax = models.BooleanField(default=True, verbose_name=_(u'Show amount as pre-tax'))
+    template_name = models.CharField(
+        default='', blank=True, max_length=100, verbose_name=_(u'template name'),
+        help_text=_(u'Set the name of a custom template for commercial document')
+    )
+    show_amount_as_pre_tax = models.BooleanField(
+        default=True,
+        verbose_name=_(u'Show amount as pre-tax'),
+        help_text=_(
+            u'The action amount will be update with pre-tax total if checked and with tax-included total if not'
+        )
+    )
+    readonly_status = models.ManyToManyField(
+        ActionStatus, blank=True, verbose_name=_(u'readonly status'),
+        help_text=_(u'When action has one of these status, it is not possible to modify a commercial document')
+    )
 
     class Meta:
         verbose_name = _(u"Store management action type")

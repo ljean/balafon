@@ -11,7 +11,9 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup
+from decimal import Decimal
 from datetime import datetime, timedelta
+
 import json
 
 from django.contrib.auth.models import User
@@ -1404,6 +1406,38 @@ class ActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, datetime(2014, 1, 31, 11, 34, 00))
         self.assertEqual(action.contacts.count(), 1)
         self.assertEqual(action.entities.count(), 1)
+
+    def test_edit_calculated_amount(self):
+        """edit action"""
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        action = mommy.make(models.Action, display_on_board=True, done=True, amount=Decimal("12.5"))
+        action.contacts.add(contact)
+        action.entities.add(entity)
+        action.save()
+        act_id = action.id
+
+        action_type = mommy.make(models.ActionType, is_amount_calculated=True)
+        action_status = mommy.make(models.ActionStatus)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
+
+        data = {
+            'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
+            'amount': None, 'number': 5
+        }
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.id, act_id)
+
+        self.assertEqual(action.amount, Decimal("12.5"))
 
     def test_edit_action_anonymous(self):
         """edit action"""

@@ -15,7 +15,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from sanza.Crm.models import Action, ActionType, Contact, Entity
+from sanza.Crm.models import Action, ActionStatus, ActionType, Contact, Entity
 from sanza.Crm.tests import BaseTestCase
 from sanza.Store import models
 
@@ -51,7 +51,7 @@ class ViewCommercialDocumentTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-
+        self.assertEqual(response.context['is_read_only'], False)
         self.assertNotContains(response, CUSTOM_STYLE)
 
     def test_view_no_custom_template(self):
@@ -114,6 +114,46 @@ class ViewCommercialDocumentTest(TestCase):
         self.assertContains(response, CUSTOM_STYLE)
         self.assertContains(response, 'big head')
         self.assertContains(response, 'big foot')
+
+    def test_view_read_only(self):
+        """It should display as read only"""
+
+        action_type = mommy.make(ActionType)
+        action_status = mommy.make(ActionStatus)
+
+        action = mommy.make(Action, type=action_type, status=action_status)
+
+        store_type = mommy.make(models.StoreManagementActionType, action_type=action_type, template_name='')
+        store_type.readonly_status.add(action_status)
+        store_type.save()
+
+        mommy.make(models.Sale, action=action)
+
+        url = reverse('store_view_sales_document', args=[action.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['is_read_only'], True)
+
+    def test_view_status_change(self):
+        """It should display as writable"""
+
+        action_type = mommy.make(ActionType)
+        action_status = mommy.make(ActionStatus)
+
+        action = mommy.make(Action, type=action_type, status=action_status)
+
+        store_type = mommy.make(models.StoreManagementActionType, action_type=action_type, template_name='')
+
+        mommy.make(models.Sale, action=action)
+
+        url = reverse('store_view_sales_document', args=[action.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.context['is_read_only'], False)
 
     def test_view_no_sales(self):
         """It should display page not found"""
