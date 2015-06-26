@@ -70,6 +70,33 @@ class ViewCommercialDocumentTest(TestCase):
 
         self.assertNotContains(response, CUSTOM_STYLE)
 
+    def test_view_contacts_and_entities(self):
+        """It should display standard document with contacts and entities"""
+
+        action_type = mommy.make(ActionType)
+        action = mommy.make(Action, type=action_type)
+        mommy.make(models.StoreManagementActionType, action_type=action_type, template_name='')
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        contact2 = mommy.make(Contact, lastname='def' * 10)
+        contact3 = mommy.make(Contact, lastname='ghi' * 10)
+        entity1 = mommy.make(Entity, name='jkl' * 10)
+
+        action.contacts.add(contact1)
+        action.contacts.add(contact2)
+        action.entities.add(entity1)
+        action.save()
+
+        url = reverse('store_view_sales_document', args=[action.id])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, contact1.fullname)
+        self.assertContains(response, contact2.fullname)
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact3.fullname)
+
     def test_view_custom_template(self):
         """It should display custom document"""
 
