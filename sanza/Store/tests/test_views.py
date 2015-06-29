@@ -204,6 +204,22 @@ class ViewCommercialDocumentTest(TestCase):
 
         self.assertContains(response, item.text)
 
+    def test_view_pdf(self):
+        """It should display item text"""
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type)
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        action.contacts.add(contact1)
+        action.save()
+
+        mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+
+        url = reverse('store_view_sales_document_pdf', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
 
 class EditSaleActionTest(BaseTestCase):
     """It should display edit action correctly"""

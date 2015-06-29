@@ -3,15 +3,15 @@
 <head lang="{{ LANGUAGE_CODE }}">
   <meta charset="UTF-8">
   <title></title>
-  <link rel="stylesheet" href="{{ STATIC_URL }}modules/bootstrap/dist/css/bootstrap.css" />
-  <script src="{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
-  <script src="{{ STATIC_URL }}modules/angular/angular.js"></script>
-  <script src="{{ STATIC_URL }}modules/bootstrap/dist/js/bootstrap.js"></script>
-  <script src="{{ STATIC_URL }}modules/moment/moment.js"></script>
-  <script src="{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
-  <script src="{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-  <script src="{{ STATIC_URL }}modules/angular-i18n/angular-locale_{{ LANGUAGE_CODE }}-{{ LANGUAGE_CODE }}.js"></script>
-  <script src="{{ STATIC_URL }}modules/angular-translate/angular-translate.js"></script>
+  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/css/bootstrap.css" />
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/moment/moment.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-i18n/angular-locale_{{ LANGUAGE_CODE }}-{{ LANGUAGE_CODE }}.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-translate/angular-translate.js"></script>
   <script>
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
@@ -348,7 +348,7 @@
   {% block extra_head %}
   <style>
     body {
-      background: #ccc;
+      background: #fff;
     }
 
     .content {
@@ -453,6 +453,28 @@
       margin-bottom: 10px;
     }
 
+    .badges {
+      text-align: right;
+    }
+
+    .badge a {
+      color: #fff;
+    }
+
+    .badge a:hover {
+      color: #eee;
+    }
+
+    {% if is_pdf %}
+    body {
+      font-size: 0.7em;
+    }
+
+    tr td {
+      height: auto;
+    }
+    {% endif %}
+
   </style>
   {% endblock %}
 </head>
@@ -462,8 +484,12 @@
 
     <div ng-controller="CommercialDocCtrl" class="container-fluid">
 
-      <div class="badges">
+      <div ng-hide="app.isPdf" class="badges">
         <div class="badge" ng-show="app.isReadOnly">{{ 'READ_ONLY' | translate }}</div>
+        <div class="badge">
+          {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
+            {{ 'Download as PDF' | translate }}</a>
+        </div>
       </div>
 
       <div class="content">
