@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """settings"""
 
+from django.conf import settings
+from django.views.generic import TemplateView
+
+from wkhtmltopdf.views import PDFTemplateView
+
 
 def get_allowed_homepages():
     """returns all Sanza pages which can be set as homepage"""
@@ -36,3 +41,10 @@ def get_allowed_homepages():
         'users_favorites_list',
     )
 
+
+def get_pdf_view_base_class():
+    """returns base class for Pdf --> turn it to HTML for drone.IO"""
+    if getattr(settings, 'CI_DRONE', False):
+        return TemplateView
+    else:
+        return PDFTemplateView

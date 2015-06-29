@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """project settings"""
 
+import os.path
+import sys
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-import os.path, sys
+CI_DRONE = True
+
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 ADMINS = (

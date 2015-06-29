@@ -11,9 +11,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from rest_framework.renderers import JSONRenderer
-from wkhtmltopdf.views import PDFTemplateView
 
 from sanza.permissions import can_access
+from sanza.settings import get_pdf_view_base_class
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
 from sanza.Store.models import Sale, SaleItem, VatRate, StoreManagementActionType
@@ -114,7 +114,7 @@ class SalesDocumentView(SalesDocumentViewMixin, TemplateView):
     is_pdf = False
 
 
-class SalesDocumentPdfView(SalesDocumentViewMixin, PDFTemplateView):
+class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
     """display sales document as pdf"""
     is_pdf = True
     cmd_options = {
