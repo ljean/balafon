@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
-from rest_framework import generics, serializers, viewsets
+from rest_framework import generics, viewsets
 
 from sanza.Crm.models import Action, ActionType, Contact
 from sanza.Crm import serializers
