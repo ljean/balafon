@@ -267,6 +267,30 @@ class ListActionsTest(APITestCase):
         for action in actions_out:
             self.assertFalse(action.subject in [act['subject'] for act in response.data])
 
+    def test_read_two_in_charge_filter(self):
+        """It should return action in range with right user in charge"""
+        member_1 = mommy.make(models.TeamMember)
+        member_2 = mommy.make(models.TeamMember)
+
+        actions_in = self._get_actions_in(in_charge=member_1, prefix="in1-")
+        actions_in += self._get_actions_in(in_charge=member_2, prefix="in2-")
+
+        actions_out = self._get_actions_out(in_charge=member_1, prefix="out1-")
+        actions_out += self._get_actions_in(in_charge=None, prefix="in_charge-none-")
+
+        url = reverse('crm_api_list_actions') + "?start=2015-06-29&end=2015-07-06&in_charge={0},{1}".format(
+            member_1.id, member_2.id
+        )
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(actions_in), len(response.data))
+        for action in actions_in:
+            self.assertTrue(action.subject in [act['subject'] for act in response.data])
+        for action in actions_out:
+            self.assertFalse(action.subject in [act['subject'] for act in response.data])
+
     def test_read_in_charge_not_exists(self):
         """It should returns an error"""
         member_in = mommy.make(models.TeamMember)
@@ -278,7 +302,8 @@ class ListActionsTest(APITestCase):
         )
 
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(0, len(response.data))
 
     def test_read_in_charge_invalid(self):
         """It should returns an error"""

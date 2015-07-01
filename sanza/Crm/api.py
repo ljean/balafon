@@ -56,10 +56,13 @@ class ListActionsView(generics.ListAPIView):
 
         if in_charge:
             try:
-                TeamMember.objects.get(id=in_charge)
-            except (ValueError, TeamMember.DoesNotExist):
+                in_charge_ids = [int(_id) for _id in in_charge.split(',')]
+                team_members = TeamMember.objects.filter(id__in=in_charge_ids)
+                if team_members.count() == 0:
+                    return self.model.objects.none()
+            except ValueError:
                 raise ParseError("Invalid team member")
-            queryset = queryset.filter(in_charge__id=in_charge)
+            queryset = queryset.filter(in_charge__in=[member.id for member in team_members])
 
         try:
             start_date = self._parse_date(start_date)
@@ -73,7 +76,7 @@ class ListActionsView(generics.ListAPIView):
         if end_datetime < start_datetime:
             return self.model.objects.none()
 
-        return queryset.filter(
+        queryset = queryset.filter(
             Q(planned_date__lte=start_datetime, end_datetime__gte=end_datetime) |  # starts before, ends after period
             Q(planned_date__gte=start_datetime, end_datetime__lte=end_datetime) |  # starts and ends during period
             Q(planned_date__lte=start_datetime, end_datetime__gte=start_datetime) |  # starts before, ends during
@@ -84,6 +87,7 @@ class ListActionsView(generics.ListAPIView):
                 planned_date__lte=end_datetime
             )  # no end, starts during period
         )
+        return queryset
 
 
 class UpdateActionDateView(generics.UpdateAPIView):
