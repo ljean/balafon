@@ -116,6 +116,8 @@ class ContactIdSerializer(serializers.ModelSerializer):
 class ActionUpdateSerializer(serializers.ModelSerializer):
     """Serialize data for updating an action"""
     contacts = ContactIdSerializer(many=True, read_only=True)
+    planned_date = serializers.DateTimeField(allow_null=True)
+    end_datetime = serializers.DateTimeField(allow_null=True)
 
     class Meta:
         model = Action

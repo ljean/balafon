@@ -8,7 +8,7 @@ from rest_framework import routers
 
 from sanza.Crm.views import planning as planning_views, documents as document_views
 from sanza.Crm.api import (
-    UpdateActionDate, CreateAction, DeleteAction, UpdateAction, ContactViewSet
+    UpdateActionDateView, CreateActionView, DeleteActionView, UpdateActionView, ContactViewSet, ListActionsView
 )
 
 router = routers.DefaultRouter()
@@ -242,8 +242,9 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
     url(r'^api/', include(router.urls)),
-    url(r'^api/update-action-date/(?P<pk>\d*)/$', UpdateActionDate.as_view(), name="calendar_action_date"),
-    url(r'^api/update-action/(?P<pk>\d*)/$', UpdateAction.as_view(), name="calendar_update_action"),
-    url(r'^api/create-action/$', CreateAction.as_view(), name="calendar_create_action"),
-    url(r'^api/delete-action/(?P<pk>\d*)/$', DeleteAction.as_view(), name="calendar_delete_action"),
+    url(r'^api/update-action-date/(?P<pk>\d*)/$', UpdateActionDateView.as_view(), name="crm_api_update_action_date"),
+    url(r'^api/update-action/(?P<pk>\d*)/$', UpdateActionView.as_view(), name="crm_api_update_action"),
+    url(r'^api/create-action/$', CreateActionView.as_view(), name="crm_api_create_action"),
+    url(r'^api/delete-action/(?P<pk>\d*)/$', DeleteActionView.as_view(), name="crm_api_delete_action"),
+    url(r'^api/list-actions/$', ListActionsView.as_view(), name="crm_api_list_actions")
 )
