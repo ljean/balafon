@@ -189,6 +189,16 @@ SANZA_UNACCENT_FILTER_SUPPORT = True
 
 LOGIN_REDIRECT_URL = "/"
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
+
 INSTALLED_APPS = (
     #contribs
     'django.contrib.auth',
