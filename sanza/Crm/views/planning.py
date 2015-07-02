@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """display actions in different planning views"""
 
+from datetime import datetime
+
 from django.contrib.auth.decorators import user_passes_test
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404
+from django.views.generic import RedirectView
 from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView
@@ -171,3 +175,36 @@ class NotPlannedActionArchiveView(ActionArchiveView, ListView):
     def _get_queryset(self):
         """return actions displayed by this page"""
         return models.Action.objects.filter(planned_date=None).order_by("priority")
+
+
+class TodayActionsView(RedirectView):
+    """Redirect to today action"""
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = datetime.now()
+        self.url = reverse('crm_actions_of_day', args=[now.year, now.month, now.day])
+        return super(TodayActionsView, self).get_redirect_url(*args, **kwargs)
+
+
+class ThisWeekActionsView(RedirectView):
+    """Redirect this week actions action"""
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = datetime.now()
+        self.url = reverse('crm_actions_of_week', args=[now.year, now.isocalendar()[1]])
+        return super(ThisWeekActionsView, self).get_redirect_url(*args, **kwargs)
+
+
+class ThisMonthActionsView(RedirectView):
+    """Redirect this month actions action"""
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = datetime.now()
+        self.url = reverse('crm_actions_of_month', args=[now.year, now.month])
+        return super(ThisMonthActionsView, self).get_redirect_url(*args, **kwargs)

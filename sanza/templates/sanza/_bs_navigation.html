@@ -20,31 +20,31 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "View" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li>
-              <a href="{% url "users_favorites_list" %}">
+              <a href="{% url 'users_favorites_list' %}">
                 <span class="glyphicon glyphicon-star"></span>
                 {% trans "Favorites" %}
               </a>
             </li>
             <li>
-              <a href="{% url "crm_view_entities_list" %}">
+              <a href="{% url 'crm_view_entities_list' %}">
                 <span class="glyphicon glyphicon-user"></span>
               {% trans "Contacts" %}
               </a>
             </li>
             <li>
-              <a href="{% url "crm_all_opportunities" %}">
+              <a href="{% url 'crm_all_opportunities' %}">
                 <span class="glyphicon glyphicon-tag"></span>
                 {% trans "Opportunities" %}
               </a>
             </li>
             <li>
-              <a href="{% url "crm_see_my_groups" %}">
+              <a href="{% url 'crm_see_my_groups' %}">
                 <span class="glyphicon glyphicon-asterisk"></span>
                 {% trans "Groups" %}
               </a>
             </li>
             <li>
-              <a href="{% url "emailing_newsletter_list" %}">
+              <a href="{% url 'emailing_newsletter_list' %}">
                 <span class="glyphicon glyphicon-send"></span>
                 {% trans "Mailings" %}
               </a>
@@ -55,20 +55,20 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Add" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
           {% if SANZA_NO_ENTITY_TYPE %}
-              <li><a class="colorbox-form" href="{% url "crm_create_entity" 0 %}">
+              <li><a class="colorbox-form" href="{% url 'crm_create_entity' 0 %}">
                 <span class="glyphicon glyphicon-tower"></span>
                 {% trans "Entity" %}
               </a></li>
           {% else %}
           {% for entity_type in SANZA_ENTITY_TYPES %}
-              <li><a class="colorbox-form" href="{% url "crm_create_entity" entity_type.id %}">
+              <li><a class="colorbox-form" href="{% url 'crm_create_entity' entity_type.id %}">
                 <span class="glyphicon glyphicon-tower"></span>
                 {{ entity_type.name }}
               </a></li>
           {% endfor %}
           {% endif %}
           {% if SANZA_ALLOW_SINGLE_CONTACT %}
-              <li><a class="colorbox-form" href="{% url "crm_add_single_contact" %}">
+              <li><a class="colorbox-form" href="{% url 'crm_add_single_contact' %}">
                 <span class="glyphicon glyphicon-user"></span>
                 {% trans "Single contact" %}
               </a></li>
@@ -76,39 +76,52 @@
           </ul>
         </li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="{% url "crm_actions_of_month" NOW.year NOW.month %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Monthly actions" %}
-            </a></li>
-            <li><a href="{% url "crm_actions_of_week" NOW.year NOW|date:"W" %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Weekly actions" %}
-            </a></li>
-            <li><a href="{% url "crm_actions_of_day" NOW.year NOW.month NOW.day %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Daily actions" %}
-            </a></li>
-            <li><a href="{% url "crm_actions_not_planned" %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Not planned actions" %}
-            </a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{% url "search" %}">
+            <li><a href="{% url 'search' %}">
               <span class="glyphicon glyphicon-search"></span>
               {% trans "New search" %}
             </a></li>
-            <li><a href="{% url "search_list" %}">
+            <li><a href="{% url 'search_list' %}">
               <span class="glyphicon glyphicon-search"></span>
               {% trans "Saved searches" %}
             </a></li>
           </ul>
         </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'crm_this_month_actions' %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Monthly actions" %}
+            </a></li>
+            <li><a href="{% url 'crm_this_week_actions' %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Weekly actions" %}
+            </a></li>
+            <li><a href="{% url 'crm_today_actions' %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Daily actions" %}
+            </a></li>
+            <li><a href="{% url 'crm_actions_not_planned' %}">
+              <span class="glyphicon glyphicon-calendar"></span>
+              {% trans "Not planned actions" %}
+            </a></li>
+          </ul>
+        </li>
+        {% for the_custom_menu in users_custom_menus %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ the_custom_menu.label }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                {% for custom_menu_item in the_custom_menu.get_children %}
+                <li><a href="{{ custom_menu_item.url }}" {{ custom_menu_item.attributes|safe }} >
+                  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+                  {{ custom_menu_item.label }}
+                </a></li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
             <ul class="dropdown-menu">
@@ -139,19 +152,6 @@
                 </a></li>{% endif %}
             </ul>
         </li>
-        {% for the_custom_menu in users_custom_menus %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ the_custom_menu.label }} <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-                {% for custom_menu_item in the_custom_menu.get_children %}
-                <li><a href="{{ custom_menu_item.url }}" {{ custom_menu_item.attributes|safe }} >
-                  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
-                  {{ custom_menu_item.label }}
-                </a></li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>

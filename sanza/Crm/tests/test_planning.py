@@ -619,3 +619,46 @@ class ActionArchiveTest(BaseTestCase):
             [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
             [x["value"] for x in soup.select("select option[selected=selected]")]
         )
+
+
+class PlanningRedirectView(BaseTestCase):
+    """Test redirections"""
+
+    def test_view_this_month_actions(self):
+        """It should redirect and keep query string args"""
+        action_type = mommy.make(models.ActionType)
+        query_string = "?t={0}".format(action_type.id)
+        url = reverse('crm_this_month_actions') + query_string
+        response = self.client.get(url)
+        self.assertEqual(302, response.status_code)
+        now = datetime.now()
+        self.assertEqual(
+            response['Location'],
+            'http://testserver' + reverse('crm_actions_of_month', args=[now.year, now.month]) + query_string
+        )
+
+    def test_view_this_week_actions(self):
+        """It should redirect and keep query string args"""
+        action_type = mommy.make(models.ActionType)
+        query_string = "?t={0}".format(action_type.id)
+        url = reverse('crm_this_week_actions') + query_string
+        response = self.client.get(url)
+        self.assertEqual(302, response.status_code)
+        now = datetime.now()
+        self.assertEqual(
+            response['Location'],
+            'http://testserver' + reverse('crm_actions_of_week', args=[now.year, now.isocalendar()[1]]) + query_string
+        )
+
+    def test_view_today_actions(self):
+        """It should redirect and keep query string args"""
+        action_type = mommy.make(models.ActionType)
+        query_string = "?t={0}".format(action_type.id)
+        url = reverse('crm_today_actions') + query_string
+        response = self.client.get(url)
+        self.assertEqual(302, response.status_code)
+        now = datetime.now()
+        self.assertEqual(
+            response['Location'],
+            'http://testserver' + reverse('crm_actions_of_day', args=[now.year, now.month, now.day]) + query_string
+        )
