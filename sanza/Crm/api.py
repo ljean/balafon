@@ -8,7 +8,7 @@ from django.db.models import Q
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import ParseError
 
-from sanza.Crm.models import Action, ActionType, Contact, TeamMember
+from sanza.Crm.models import Action, ActionType, ActionStatus, Contact, TeamMember
 from sanza.Crm import serializers
 
 
@@ -101,6 +101,24 @@ class UpdateActionDateView(generics.UpdateAPIView):
 
 class EditActionMixin(object):
     """base class for create and update"""
+    contacts = None
+
+    def check_data(self, request):
+        """check and prepare data"""
+        self.contacts = request.data.get("contacts", [])
+        action_type_id = request.data.get('type', None)
+        action_status_id = request.data.get('status', None)
+
+        if action_type_id and action_status_id:
+            try:
+                action_type = ActionType.objects.get(id=action_type_id)
+                action_status = ActionStatus.objects.get(id=action_status_id)
+                if action_status not in action_type.allowed_status.all():
+                    raise ParseError(
+                        "status {0} is not allowed for type {1}".format(action_type.name, action_status.name)
+                    )
+            except (ValueError, ActionType.DoesNotExist, ActionStatus.DoesNotExist):
+                raise ParseError("Invalid parameters")
 
     def save_object(self, serializer):
         """save object"""
@@ -131,7 +149,7 @@ class UpdateActionView(EditActionMixin, generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         """handle HTTP request"""
-        self.contacts = request.data.get("contacts", [])
+        self.check_data(request)
         response = super(UpdateActionView, self).update(request, *args, **kwargs)
         return response
 
@@ -148,7 +166,7 @@ class CreateActionView(EditActionMixin, generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         """handle HTTP request"""
-        self.contacts = request.data.get("contacts", [])
+        self.check_data(request)
         response = super(CreateActionView, self).create(request, *args, **kwargs)
         return response
 

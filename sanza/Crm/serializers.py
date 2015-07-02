@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from sanza.Crm.models import Action, Contact, City, Entity, EntityType, TeamMember, Zone
+from sanza.Crm.models import Action, ActionType, ActionStatus, Contact, City, Entity, EntityType, TeamMember, Zone
 
 
 class TeamMemberSerializer(serializers.HyperlinkedModelSerializer):
@@ -13,7 +13,7 @@ class TeamMemberSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = TeamMember
-        fields = ('id', 'name',)
+        fields = ('id', 'name', )
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,7 +21,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'last_name', 'first_name')
+        fields = ('id', 'username', 'last_name', 'first_name', )
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Zone
-        fields = ('id', 'name', 'is_foreign_country')
+        fields = ('id', 'name', 'is_foreign_country', )
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'fullname', 'lastname', 'firstname', 'title', 'job',
             'get_city', 'get_address', 'get_address2', 'get_address3', 'get_cedex', 'get_zip_code', 'get_country',
-            'mobile', 'get_phone', 'email', 'notes', 'get_view_url', 'favorite_language'
+            'mobile', 'get_phone', 'email', 'notes', 'get_view_url', 'favorite_language',
         )
 
 
@@ -79,8 +79,26 @@ class EntitySerializer(serializers.ModelSerializer):
         model = Entity
         fields = (
             'id', 'name', 'type', 'city', 'address', 'address2', 'address3', 'cedex', 'country',
-            'zip_code', 'phone', 'email', 'website', 'notes', 'get_view_url'
+            'zip_code', 'phone', 'email', 'website', 'notes', 'get_view_url',
         )
+
+
+class ActionStatusSerializer(serializers.ModelSerializer):
+    """action status"""
+
+    class Meta:
+        model = ActionStatus
+        fields = ('id', 'name')
+
+
+class ActionTypeSerializer(serializers.ModelSerializer):
+    """action type serializer"""
+    allowed_status = ActionStatusSerializer(many=True, read_only=True)
+    default_status = ActionStatusSerializer(read_only=True)
+
+    class Meta:
+        model = ActionType
+        fields = ('id', 'name', 'allowed_status', 'default_status', 'order_index', )
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -92,8 +110,8 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = (
-            'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime',
-            'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number'
+            'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime', 'type', 'status',
+            'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number',
         )
 
 
@@ -121,4 +139,4 @@ class ActionUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ('contacts', 'planned_date', 'end_datetime', 'subject', 'in_charge', 'detail', )
+        fields = ('contacts', 'planned_date', 'end_datetime', 'subject', 'in_charge', 'detail', 'type', 'status', )

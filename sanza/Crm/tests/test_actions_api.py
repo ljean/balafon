@@ -544,6 +544,8 @@ class UpdateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -556,6 +558,245 @@ class UpdateActionTest(APITestCase):
         self.assertEqual(action.planned_date, datetime(2015, 6, 30, 12, 0))
         self.assertEqual(action.end_datetime, datetime(2015, 6, 30, 17, 0))
         self.assertEqual(list(action.contacts.all()), [contact])
+
+    def test_update_action_type(self):
+        """It should update action"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': None,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, data['subject'])
+        self.assertEqual(action.in_charge, member)
+        self.assertEqual(action.type, action_type)
+        self.assertEqual(action.detail, data['detail'])
+        self.assertEqual(action.planned_date, datetime(2015, 6, 30, 12, 0))
+        self.assertEqual(action.end_datetime, datetime(2015, 6, 30, 17, 0))
+        self.assertEqual(list(action.contacts.all()), [contact])
+
+    def test_update_action_type_and_status(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, data['subject'])
+        self.assertEqual(action.in_charge, member)
+        self.assertEqual(action.type, action_type)
+        self.assertEqual(action.status, action_status)
+        self.assertEqual(action.detail, data['detail'])
+        self.assertEqual(action.planned_date, datetime(2015, 6, 30, 12, 0))
+        self.assertEqual(action.end_datetime, datetime(2015, 6, 30, 17, 0))
+        self.assertEqual(list(action.contacts.all()), [contact])
+
+    def test_update_action_type_and_status_not_allowed(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.in_charge, None)
+        self.assertEqual(action.type, None)
+        self.assertEqual(action.status, None)
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        self.assertEqual(list(action.contacts.all()), [])
+
+    def test_update_action_type_not_found(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id+1,
+            'status': None,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.in_charge, None)
+        self.assertEqual(action.type, None)
+        self.assertEqual(action.status, None)
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        self.assertEqual(list(action.contacts.all()), [])
+
+    def test_update_action_type_invalid(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': "xxx",
+            'status': None,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.in_charge, None)
+        self.assertEqual(action.type, None)
+        self.assertEqual(action.status, None)
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        self.assertEqual(list(action.contacts.all()), [])
+
+    def test_update_action_status_not_found(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id + 1,
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.in_charge, None)
+        self.assertEqual(action.type, None)
+        self.assertEqual(action.status, None)
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        self.assertEqual(list(action.contacts.all()), [])
+
+    def test_update_action_status_invalid(self):
+        """It should not update and returns error"""
+        action = mommy.make(models.Action)
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_update_action', args=[action.id])
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': "xxx",
+        }
+
+        response = self.client.put(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.in_charge, None)
+        self.assertEqual(action.type, None)
+        self.assertEqual(action.status, None)
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, None)
+        self.assertEqual(action.end_datetime, None)
+        self.assertEqual(list(action.contacts.all()), [])
 
     def test_update_action_date_anonymous(self):
         """It should not update and returns error"""
@@ -574,6 +815,8 @@ class UpdateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -605,6 +848,8 @@ class UpdateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -643,6 +888,8 @@ class UpdateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': None,
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -681,6 +928,8 @@ class UpdateActionTest(APITestCase):
             'detail': '',
             'planned_date': 'ab',
             'end_datetime': None,
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -719,6 +968,8 @@ class UpdateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': 'cd',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -757,6 +1008,8 @@ class UpdateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': None,
+            'type': None,
+            'status': None,
         }
 
         response = self.client.put(url, data=data, format='json')
@@ -796,6 +1049,8 @@ class CreateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -826,6 +1081,8 @@ class CreateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -850,6 +1107,8 @@ class CreateActionTest(APITestCase):
             'detail': 'Blabla',
             'planned_date': '2015-06-30T12:00:00Z',
             'end_datetime': '2015-06-30T17:00:00Z',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -868,6 +1127,8 @@ class CreateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': None,
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -893,6 +1154,8 @@ class CreateActionTest(APITestCase):
             'detail': '',
             'planned_date': 'ab',
             'end_datetime': None,
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -910,6 +1173,8 @@ class CreateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': 'cd',
+            'type': None,
+            'status': None,
         }
 
         response = self.client.post(url, data=data, format='json')
@@ -927,6 +1192,198 @@ class CreateActionTest(APITestCase):
             'detail': '',
             'planned_date': None,
             'end_datetime': None,
+            'type': None,
+            'status': None,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(0, models.Action.objects.count())
+
+    def test_create_action_type(self):
+        """It should create action"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': None,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.subject, data['subject'])
+        self.assertEqual(action.in_charge, member)
+        self.assertEqual(action.type, action_type)
+        self.assertEqual(action.detail, data['detail'])
+        self.assertEqual(action.planned_date, datetime(2015, 6, 30, 12, 0))
+        self.assertEqual(action.end_datetime, datetime(2015, 6, 30, 17, 0))
+        self.assertEqual(list(action.contacts.all()), [contact])
+
+    def test_create_action_type_and_status(self):
+        """It should create action"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(1, models.Action.objects.count())
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.subject, data['subject'])
+        self.assertEqual(action.in_charge, member)
+        self.assertEqual(action.type, action_type)
+        self.assertEqual(action.status, action_status)
+        self.assertEqual(action.detail, data['detail'])
+        self.assertEqual(action.planned_date, datetime(2015, 6, 30, 12, 0))
+        self.assertEqual(action.end_datetime, datetime(2015, 6, 30, 17, 0))
+        self.assertEqual(list(action.contacts.all()), [contact])
+
+    def test_create_action_type_and_status_not_allowed(self):
+        """It should not create and returns error"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        self.assertEqual(0, models.Action.objects.count())
+
+    def test_create_action_type_not_found(self):
+        """It should not create and returns error"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id+1,
+            'status': None,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(0, models.Action.objects.count())
+
+    def test_create_action_type_invalid(self):
+        """It should not create and returns error"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': "xxx",
+            'status': None,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(0, models.Action.objects.count())
+
+    def test_create_action_status_not_found(self):
+        """It should not create and returns error"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': action_status.id + 1,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(0, models.Action.objects.count())
+
+    def test_create_action_status_invalid(self):
+        """It should not create and returns error"""
+        contact = mommy.make(models.Contact)
+        member = mommy.make(models.TeamMember)
+        action_status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+
+        url = reverse('crm_api_create_action')
+
+        data = {
+            'contacts': [contact.id],
+            'subject': 'Test',
+            'in_charge': member.id,
+            'detail': 'Blabla',
+            'planned_date': '2015-06-30T12:00:00Z',
+            'end_datetime': '2015-06-30T17:00:00Z',
+            'type': action_type.id,
+            'status': "xxx",
         }
 
         response = self.client.post(url, data=data, format='json')
