@@ -647,7 +647,7 @@ class PlanningRedirectView(BaseTestCase):
         now = datetime.now()
         self.assertEqual(
             response['Location'],
-            'http://testserver' + reverse('crm_actions_of_week', args=[now.year, now.isocalendar()[1]]) + query_string
+            'http://testserver' + reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")]) + query_string
         )
 
     def test_view_today_actions(self):

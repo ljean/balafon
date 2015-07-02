@@ -195,7 +195,7 @@ class ThisWeekActionsView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         now = datetime.now()
-        self.url = reverse('crm_actions_of_week', args=[now.year, now.isocalendar()[1]])
+        self.url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         return super(ThisWeekActionsView, self).get_redirect_url(*args, **kwargs)
 
 
