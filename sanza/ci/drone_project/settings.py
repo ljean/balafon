@@ -137,6 +137,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages",
     "sanza.Search.context_processors.quick_search_form",
     "sanza.Crm.context_processors.crm",
+    "sanza.Users.context_processors.user_config",
 )
 
 AUTHENTICATION_BACKENDS = (

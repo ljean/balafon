@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
+from coop_cms.utils import RequestManager, RequestNotFound
+
+from sanza.permissions import can_access
 
 class UserPreferences(models.Model):
     """user preferences"""
@@ -51,3 +54,51 @@ class UserHomepage(models.Model):
         
     def __unicode__(self):
         return u"{0} - {1}".format(self.user, self.url)
+
+
+class CustomMenu(models.Model):
+    """Menus that can be added to the Sanza menu"""
+    label = models.CharField(max_length=100, verbose_name=_("label"))
+    order_index = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = _(u'Custom menu')
+        verbose_name_plural = _(u'Custom menus')
+        ordering = ['order_index', 'label']
+
+    def get_children(self):
+        """returns children"""
+        children = []
+        try:
+            request = RequestManager().get_request()
+            if can_access(request.user):
+                for item in self.custommenuitem_set.all():
+                    if item.only_for_users.count() == 0 or (request.user in item.only_for_users.all()):
+                        children.append(item)
+        except (RequestNotFound, AttributeError):
+            pass
+        return children
+
+    def __unicode__(self):
+        return self.label
+
+
+class CustomMenuItem(models.Model):
+    """Menus items hat can be added to the Sanza menu"""
+    parent = models.ForeignKey(CustomMenu)
+    label = models.CharField(max_length=100, verbose_name=_("label"))
+    icon = models.CharField(max_length=20, verbose_name=_("icon"))
+    url = models.CharField(max_length=100, verbose_name=_("url"))
+    order_index = models.IntegerField(default=0)
+    only_for_users = models.ManyToManyField(User, blank=True)
+    attributes = models.CharField(max_length=100, verbose_name=_(u"attributes"), default="", blank=True)
+
+    class Meta:
+        verbose_name = _(u'Custom menu item')
+        verbose_name_plural = _(u'Custom menu items')
+        ordering = ['order_index', 'label']
+
+    def __unicode__(self):
+        return u"{0} > {1}".format(self.parent.label, self.label)
+
+

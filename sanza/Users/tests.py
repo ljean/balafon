@@ -8,6 +8,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
 from datetime import datetime, timedelta
 import json
 import logging
+from unittest import skipIf
 from StringIO import StringIO
 import sys
 
@@ -26,7 +27,7 @@ from sanza.utils import is_allowed_homepage
 from sanza.Crm import models
 from sanza.Emailing.models import Emailing
 from sanza.Search.models import Search
-from sanza.Users.models import UserPreferences, Favorite, UserHomepage
+from sanza.Users.models import UserPreferences, Favorite, UserHomepage, CustomMenu, CustomMenuItem
 
 
 class BaseTestCase(TestCase):
@@ -56,7 +57,7 @@ class NotifyDueActionsTestCase(BaseTestCase):
         """before each test"""
         super(NotifyDueActionsTestCase, self).setUp()
         self._from_email = settings.DEFAULT_FROM_EMAIL
-        settings.DEFAULT_FROM_EMAIL  = "toto@toto.fr"
+        settings.DEFAULT_FROM_EMAIL = "toto@toto.fr"
         
     def tearDown(self):
         """after each test"""
@@ -625,3 +626,59 @@ class UserHomepageTestCase(BaseTestCase):
         
         self.assertEqual(302, response.status_code)
         self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+
+
+
+@skipIf(
+    "sanza.Users.context_processors.user_config" not in settings.TEMPLATE_CONTEXT_PROCESSORS,
+    "User context processor not set"
+)
+class CustomMenuTestCase(BaseTestCase):
+    """Test if custom menus are properly displayed"""
+
+    def test_view_custom_menu(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU")
+        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT")
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_empty(self):
+        """It should nor display the menu"""
+        menu = mommy.make(CustomMenu)
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+
+    def test_view_custom_menu_user(self):
+        """It should display the menu"""
+        menu = mommy.make(CustomMenu)
+        menu_item = mommy.make(CustomMenuItem, parent=menu)
+        menu_item.only_for_users.add(self.user)
+        menu_item.save()
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_other_user(self):
+        """It should not display the menu"""
+        menu = mommy.make(CustomMenu)
+        menu_item = mommy.make(CustomMenuItem, parent=menu)
+        menu_item.only_for_users.add(mommy.make(models.User))
+        menu_item.save()
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+

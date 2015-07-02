@@ -116,29 +116,42 @@
                   <span class="glyphicon glyphicon-home"></span>
                   {% trans "Back to site" %}
                 </a></li>{% endif %}
-                <li><a href="{% url "django.contrib.auth.views.logout" %}">
+                <li><a href="{% url 'django.contrib.auth.views.logout' %}">
                   <span class="glyphicon glyphicon-off"></span>
                   {% trans "Logout" %}
                 </a></li>
-                <li><a href="{% url "django.contrib.auth.views.password_change" %}">
+                <li><a href="{% url 'django.contrib.auth.views.password_change' %}">
                   <span class="glyphicon glyphicon-cog"></span>
                   {% trans "Password" %}
                 </a></li>
                 {%if user.is_staff %}
-                  <li><a href="{% url "admin:index" %}">
+                  <li><a href="{% url 'admin:index' %}">
                   <span class="glyphicon glyphicon-cog"></span>
                   {% trans "Admin" %}
                   </a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">
+                {%if user.is_staff %}<li><a href="{% url 'crm_new_contacts_import' %}">
                   <span class="glyphicon glyphicon-import"></span>
                   {% trans "Contacts import" %}
                 </a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url "crm_unsubscribe_contacts_import" %}">
+                {%if user.is_staff %}<li><a href="{% url 'crm_unsubscribe_contacts_import' %}">
                   <span class="glyphicon glyphicon-import"></span>
                   {% trans "Unsubscribe emails" %}
                 </a></li>{% endif %}
             </ul>
         </li>
+        {% for the_custom_menu in users_custom_menus %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ the_custom_menu.label }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                {% for custom_menu_item in the_custom_menu.get_children %}
+                <li><a href="{{ custom_menu_item.url }}" {{ custom_menu_item.attributes|safe }} >
+                  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+                  {{ custom_menu_item.label }}
+                </a></li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
