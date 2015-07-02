@@ -290,9 +290,9 @@ class ActionArchiveTest(BaseTestCase):
     def test_type_filter(self):
         """view actions of the month action type filter"""
 
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
-        action_type3 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
+        action_type3 = mommy.make(models.ActionType, name='Abe')
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type1)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=action_type1)
@@ -321,9 +321,9 @@ class ActionArchiveTest(BaseTestCase):
     def test_action_type_none(self):
         """view actions of the month no type"""
 
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
-        action_type3 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
+        action_type3 = mommy.make(models.ActionType, name='Abe')
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type1)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=action_type1)
@@ -347,9 +347,9 @@ class ActionArchiveTest(BaseTestCase):
     def test_type_none_and_defined(self):
         """view actions of the month action type some are set"""
 
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
-        action_type3 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
+        action_type3 = mommy.make(models.ActionType, name='Abe')
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type1)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=action_type1)
@@ -419,8 +419,8 @@ class ActionArchiveTest(BaseTestCase):
     def test_action_type_in_charge_filter(self):
         """view actions of the month incharge filter"""
         user_joe = mommy.make(models.TeamMember, name="Joe")
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
 
         action1 = mommy.make(
             models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=user_joe, type=action_type1
@@ -446,6 +446,97 @@ class ActionArchiveTest(BaseTestCase):
         self.assertEqual(
             [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
             [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+
+    def test_action_type_and_status(self):
+        """view actions of the month incharge filter"""
+        action_type1 = mommy.make(models.ActionType, name='XYZ')
+        action_type2 = mommy.make(models.ActionType, name="UVW")
+        action_status1 = mommy.make(models.ActionStatus, name='Def')
+        action_status2 = mommy.make(models.ActionStatus, name='Abc')
+        action_type1.allowed_status.add(action_status1)
+        action_type1.allowed_status.add(action_status2)
+        action_type1.save()
+        action_type2.allowed_status.add(action_status2)
+        action_type2.save()
+
+        action1 = mommy.make(
+            models.Action, subject="#ACT1#", planned_date=datetime.now(), status=action_status1, type=action_type1
+        )
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=action_type1)
+        action3 = mommy.make(
+            models.Action, subject="#ACT3#", planned_date=datetime.now(), status=action_status2, type=action_type1
+        )
+        action4 = mommy.make(
+            models.Action, subject="#ACT4#", planned_date=datetime.now(), status=action_status2, type=action_type2
+        )
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+
+        now = datetime.now()
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=s{0},t{1}".format(action_status2.id, action_type1.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, action1.subject)
+        self.assertNotContains(response, action2.subject)
+        self.assertContains(response, action3.subject)
+        self.assertNotContains(response, action4.subject)
+        self.assertNotContains(response, action5.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(
+            [u"t{0}".format(action_type1.id)] + [u"s{0}".format(action_status2.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        self.assertEqual(
+            [
+                u"t0",
+                u"t{0}".format(action_type2.id), u"t{0}".format(action_type1.id),
+                u"s{0}".format(action_status2.id), u"s{0}".format(action_status1.id)
+            ],
+            [x["value"] for x in soup.select("select option")]
+        )
+
+    def test_action_type_and_not_managed_status(self):
+        """view actions of the month incharge filter"""
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+
+        action1 = mommy.make(
+            models.Action, subject="#ACT1#", planned_date=datetime.now(), status=action_status1, type=action_type1
+        )
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), type=action_type1)
+        action3 = mommy.make(
+            models.Action, subject="#ACT3#", planned_date=datetime.now(), status=action_status2, type=action_type1
+        )
+        action4 = mommy.make(
+            models.Action, subject="#ACT4#", planned_date=datetime.now(), status=action_status2, type=action_type2
+        )
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=datetime.now())
+
+        now = datetime.now()
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=s{0},t{1}".format(action_status2.id, action_type1.id)
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+        self.assertContains(response, action2.subject)
+        self.assertContains(response, action3.subject)
+        self.assertNotContains(response, action4.subject)
+        self.assertNotContains(response, action5.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(
+            [u"t{0}".format(action_type1.id)],
+            [x["value"] for x in soup.select("select option[selected=selected]")]
+        )
+        self.assertEqual(
+            [u"t0", u"t{0}".format(action_type1.id), u"t{0}".format(action_type2.id)],
+            [x["value"] for x in soup.select("select option")]
         )
 
     def test_view_not_planned_action_anonymous(self):
@@ -474,8 +565,8 @@ class ActionArchiveTest(BaseTestCase):
     def test_view_not_planned_action(self):
         """view actions not planned"""
         user_joe = mommy.make(models.TeamMember, name="Joe")
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=user_joe, type=action_type1)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=user_joe)
@@ -503,8 +594,8 @@ class ActionArchiveTest(BaseTestCase):
     def test_not_planned_type_in_charge_filter(self):
         """view actions not planned filtered by in charge"""
         user_joe = mommy.make(models.TeamMember, name="Joe")
-        action_type1 = mommy.make(models.ActionType)
-        action_type2 = mommy.make(models.ActionType)
+        action_type1 = mommy.make(models.ActionType, name='Abc')
+        action_type2 = mommy.make(models.ActionType, name='Abd')
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=None, in_charge=user_joe, type=action_type1)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=None, in_charge=user_joe)

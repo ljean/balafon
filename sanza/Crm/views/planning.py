@@ -58,16 +58,36 @@ class ActionArchiveView(object):
                     #only some types
                     queryset = queryset.filter(type__in=selected_types)
 
+            selected_status = values_dict.get("s", [])
+            if selected_status:
+                #only some status
+                action_types = models.ActionType.objects.filter(id__in=selected_types)
+                allowed_status = [status.id for status in self._get_allowed_status(action_types, selected_types)]
+                selected_status = [status for status in selected_status if status in allowed_status]
+                if selected_status:
+                    queryset = queryset.filter(status__in=selected_status)
+
             selected_users = values_dict.get("u", [])
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
 
         return queryset
 
+    def _get_allowed_status(self, action_types, selected_types):
+        """list of allowed status"""
+        action_status = []
+        for action_type in action_types:
+            if action_type.id in selected_types:
+                setattr(action_type, 'selected', True)
+                action_status.extend(action_type.allowed_status.all())
+        # unique action status sorted by name
+        return sorted(set(action_status), key=lambda status: status.name)
+
     def get_context_data(self, *args, **kwargs):
         """get context for template"""
         context = super(ActionArchiveView, self).get_context_data(*args, **kwargs)
-        action_types = models.ActionType.objects.all()
+        action_types = models.ActionType.objects.all().order_by('order_index', 'name')
+        action_status = []
         in_charge = get_in_charge_users()
         values = self.request.GET.get("filter", None)
         if values and values != "null":
@@ -78,6 +98,10 @@ class ActionArchiveView(object):
             for action_type in action_types:
                 if action_type.id in selected_types:
                     setattr(action_type, 'selected', True)
+
+            #list of unique action status sorted by name
+            action_status = self._get_allowed_status(action_types, selected_types)
+
             if 0 in selected_types:
                 context["no_type_selected"] = True
 
@@ -86,8 +110,14 @@ class ActionArchiveView(object):
                 if user.id in selected_users:
                     setattr(user, 'selected', True)
 
+            selected_status = values_dict.get("s", [])
+            for status in action_status:
+                if status.id in selected_status:
+                    setattr(status, 'selected', True)
+
         context["action_types"] = action_types
         context["in_charge"] = in_charge
+        context["action_status"] = action_status
         return context
 
     def get_dated_queryset(self, **lookup_kwargs):

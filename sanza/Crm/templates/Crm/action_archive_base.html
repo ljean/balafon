@@ -35,14 +35,21 @@
 
 <select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans "Filter by" %}">
     {% if action_types %}
-    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "Action types" %}">
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
         <option value="t0" {% if no_type_selected %}selected="selected"{% endif %}>{% trans "No type" %}</option>
     {% for at in action_types %}
         <option value="t{{at.id}}" {% if at.selected %}selected="selected"{% endif %}>{{at.name}}</option>
     {% endfor %}
     </optgroup>
     {% endif %}
-    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "In charge" %}">
+    {% if action_status %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action status' %}">
+    {% for status in action_status %}
+        <option value="s{{status.id}}" {% if status.selected %}selected="selected"{% endif %}>{{status.name}}</option>
+    {% endfor %}
+    </optgroup>
+    {% endif %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'In charge' %}">
     {% for team_member in in_charge %}
         <option value="u{{team_member.id}}" {% if team_member.selected %}selected="selected"{% endif %}>
             {{team_member.name}}
