@@ -1,6 +1,8 @@
 {% extends "sanza/bs_base.html" %}
 {% load i18n %}
 
+{% block extra_title %}{{ entity.name }} {% endblock %}
+
 {% block document_content %}
   
 {% include "Crm/_section_entity_info.html" with groups=entity.group_set %}
