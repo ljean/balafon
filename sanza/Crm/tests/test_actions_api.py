@@ -80,6 +80,53 @@ class ListActionsTest(APITestCase):
             ),
         ]
 
+    def _get_daily_actions_in(self, prefix='in-', **kwargs):
+        """actions in the test period"""
+        return [
+            mommy.make(
+                models.Action,
+                subject=prefix + 'A',
+                planned_date=datetime(2015, 6, 30, 12, 0),
+                end_datetime=datetime(2015, 6, 30, 15, 0),
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'B',
+                planned_date=datetime(2015, 6, 30, 0, 0, 0),
+                end_datetime=None,
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'C',
+                planned_date=datetime(2015, 6, 30, 23, 59, 59),
+                end_datetime=None,
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'D',
+                planned_date=datetime(2015, 6, 29, 23, 0),
+                end_datetime=datetime(2015, 6, 30, 2, 0),
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'E',
+                planned_date=datetime(2015, 6, 30, 23, 0),
+                end_datetime=datetime(2015, 7, 1, 1, 0),
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'F',
+                planned_date=datetime(2015, 6, 28, 12, 0),
+                end_datetime=datetime(2015, 7, 2, 12, 0),
+                **kwargs
+            ),
+        ]
+
     def _get_actions_out(self, prefix="out-", **kwargs):
         """action out of the test period"""
         return [
@@ -106,12 +153,61 @@ class ListActionsTest(APITestCase):
             ),
         ]
 
+    def _get_daily_actions_out(self, prefix="out-", **kwargs):
+        """action out of the test period"""
+        return [
+            mommy.make(
+                models.Action,
+                subject=prefix + 'A',
+                planned_date=datetime(2015, 6, 29, 12, 0),
+                end_datetime=datetime(2015, 6, 29, 15, 0),
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'B',
+                planned_date=datetime(2015, 6, 29, 23, 59, 59),
+                end_datetime=None,
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'C',
+                planned_date=datetime(2015, 7, 1, 0, 0, 0),
+                end_datetime=None,
+                **kwargs
+            ),
+            mommy.make(
+                models.Action,
+                subject=prefix + 'D',
+                planned_date=datetime(2015, 7, 1, 8, 0, 0),
+                end_datetime=datetime(2015, 7, 1, 10, 0, 0),
+                **kwargs
+            ),
+        ]
+
     def test_read_actions_in_range(self):
         """It should return action in range"""
         actions_in = self._get_actions_in()
         actions_out = self._get_actions_out()
 
         url = reverse('crm_api_list_actions') + "?start=2015-06-29&end=2015-07-06"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(actions_in), len(response.data))
+        for action in actions_in:
+            self.assertTrue(action.subject in [act['subject'] for act in response.data])
+        for action in actions_out:
+            self.assertFalse(action.subject in [act['subject'] for act in response.data])
+
+    def test_read_daily_actions(self):
+        """It should return action of the day"""
+        actions_in = self._get_daily_actions_in()
+        actions_out = self._get_daily_actions_out()
+
+        url = reverse('crm_api_list_actions') + "?start=2015-06-30&end=2015-06-30"
 
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -315,6 +411,105 @@ class ListActionsTest(APITestCase):
 
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_team_member_action(self):
+        """It should returns team member actions"""
+        user = mommy.make(User, username='bill', is_active=True, is_staff=False)
+        user.set_password('pass')
+        user.save()
+        self.client.logout()
+        self.client.login(username=user.username, password='pass')
+
+        member_1 = mommy.make(models.TeamMember, user=user)
+        member_2 = mommy.make(models.TeamMember)
+
+        actions_in = self._get_actions_in(in_charge=member_1, prefix="in1-")
+
+        actions_out = self._get_actions_in(in_charge=member_2, prefix="in2-")
+        actions_out += self._get_actions_out(in_charge=member_1, prefix="out1-")
+        actions_out += self._get_actions_in(in_charge=None, prefix="in_charge-none-")
+
+        url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(actions_in), len(response.data))
+        for action in actions_in:
+            self.assertTrue(action.subject in [act['subject'] for act in response.data])
+        for action in actions_out:
+            self.assertFalse(action.subject in [act['subject'] for act in response.data])
+
+    def test_team_daily_actions(self):
+        """It should returns team member actions"""
+        user = mommy.make(User, username='bill', is_active=True, is_staff=False)
+        user.set_password('pass')
+        user.save()
+        self.client.logout()
+        self.client.login(username=user.username, password='pass')
+
+        member_1 = mommy.make(models.TeamMember, user=user)
+        member_2 = mommy.make(models.TeamMember)
+
+        actions_in = self._get_daily_actions_in(in_charge=member_1, prefix="in1-")
+
+        actions_out = self._get_daily_actions_in(in_charge=member_2, prefix="in2-")
+        actions_out += self._get_daily_actions_out(in_charge=member_1, prefix="out1-")
+        actions_out += self._get_daily_actions_in(in_charge=None, prefix="in_charge-none-")
+
+        url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-30&end=2015-06-30"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(actions_in), len(response.data))
+        for action in actions_in:
+            self.assertTrue(action.subject in [act['subject'] for act in response.data])
+        for action in actions_out:
+            self.assertFalse(action.subject in [act['subject'] for act in response.data])
+
+    def test_team_member_action_inactive(self):
+        """It should returns returns an error"""
+        user = mommy.make(User, username='bill', is_active=True, is_staff=False)
+        user.set_password('pass')
+        user.save()
+        self.client.logout()
+        self.client.login(username=user.username, password='pass')
+
+        user.is_active = False
+        user.save()
+
+        member_1 = mommy.make(models.TeamMember, user=user)
+
+        actions_out = self._get_actions_in(in_charge=member_1, prefix="in1-")
+
+        url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_team_member_action_not_member(self):
+        """It should returns returns an error"""
+        user = mommy.make(User, username='bill', is_active=True, is_staff=False)
+        user.set_password('pass')
+        user.save()
+        self.client.logout()
+        self.client.login(username=user.username, password='pass')
+
+        url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_team_member_action_anonymous(self):
+        """It should returns returns an error"""
+        self.client.logout()
+
+        url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class DeleteActionTest(APITestCase):

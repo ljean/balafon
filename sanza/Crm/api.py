@@ -3,10 +3,12 @@
 
 from datetime import date, datetime, time
 
+from django.contrib.auth.models import User
 from django.db.models import Q
 
 from rest_framework import generics, viewsets
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 
 from sanza.Crm.models import Action, ActionType, ActionStatus, Contact, TeamMember
 from sanza.Crm import serializers
@@ -32,28 +34,13 @@ class ListActionsView(generics.ListAPIView):
     serializer_class = serializers.ActionSerializer
 
     def _parse_date(self, date_str):
+        """string to date"""
         year, month, day = [int(val) for val in date_str.split("-")]
         return date(year, month, day)
 
-    def get_queryset(self):
-        """returns actions"""
-        start_date = self.request.GET.get('start')
-        end_date = self.request.GET.get('end')
-        action_type = self.request.GET.get('action_type')
+    def _apply_in_charge_lookup(self, queryset):
+        """apply a in_charge lookup if needed"""
         in_charge = self.request.GET.get('in_charge')
-
-        if not start_date or not end_date:
-            raise ParseError("Period frame missing")
-
-        queryset = self.model.objects.all()
-
-        if action_type:
-            try:
-                ActionType.objects.get(id=action_type)
-            except (ValueError, ActionType.DoesNotExist):
-                raise ParseError("Invalid action type")
-            queryset = queryset.filter(type__id=action_type)
-
         if in_charge:
             try:
                 in_charge_ids = [int(_id) for _id in in_charge.split(',')]
@@ -63,6 +50,30 @@ class ListActionsView(generics.ListAPIView):
             except ValueError:
                 raise ParseError("Invalid team member")
             queryset = queryset.filter(in_charge__in=[member.id for member in team_members])
+        return queryset
+
+    def _apply_in_action_type_lookup(self, queryset):
+        """apply an action type lookup if needed"""
+        action_type = self.request.GET.get('action_type')
+        if action_type:
+            try:
+                ActionType.objects.get(id=action_type)
+            except (ValueError, ActionType.DoesNotExist):
+                raise ParseError("Invalid action type")
+            queryset = queryset.filter(type__id=action_type)
+        return queryset
+
+    def get_queryset(self):
+        """returns actions"""
+        start_date = self.request.GET.get('start')
+        end_date = self.request.GET.get('end')
+
+        if not start_date or not end_date:
+            raise ParseError("Period frame missing")
+
+        queryset = self.model.objects.all()
+        queryset = self._apply_in_action_type_lookup(queryset)
+        queryset = self._apply_in_charge_lookup(queryset)
 
         try:
             start_date = self._parse_date(start_date)
@@ -88,6 +99,22 @@ class ListActionsView(generics.ListAPIView):
             )  # no end, starts during period
         )
         return queryset
+
+
+class ListTeamMemberActionsView(ListActionsView):
+    """
+    Get the actions of a current team member
+    The team member doesn't have to be a sanza user
+    """
+    permission_classes = [IsAuthenticated]
+
+    def _apply_in_charge_lookup(self, queryset):
+        """apply a in_charge lookup if needed"""
+        try:
+            team_member = TeamMember.objects.get(user=self.request.user)
+        except TeamMember.DoesNotExist:
+            raise PermissionDenied
+        return queryset.filter(in_charge=team_member)
 
 
 class UpdateActionDateView(generics.UpdateAPIView):
@@ -182,3 +209,13 @@ class DeleteActionView(generics.DestroyAPIView):
 
     def get_queryset(self):
         return self.model.objects.filter(pk=self.kwargs['pk'])
+
+
+class AboutMeView(generics.ListAPIView):
+    """update an action date"""
+    model = User
+    serializer_class = serializers.UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.model.objects.filter(id=self.request.user.id)
