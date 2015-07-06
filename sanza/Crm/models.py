@@ -2,6 +2,7 @@
 """models"""
 #pylint: disable=model-no-explicit-unicode
 
+from datetime import datetime
 import uuid
 import unicodedata
 from urlparse import urlparse
@@ -872,7 +873,7 @@ class Opportunity(TimeStampedModel):
     probability = models.IntegerField(
         _('probability'), default=PROBABILITY_MEDIUM, choices=PROBABILITY_CHOICES
     )
-    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    amount = models.DecimalField(_(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2)
     #----------------
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     #TO BE REMOVED---
@@ -1072,7 +1073,9 @@ class Action(LastModifiedModel):
     in_charge = models.ForeignKey(TeamMember, verbose_name=_(u'in charge'), blank=True, null=True, default=None)
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
-    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    amount = models.DecimalField(
+        _(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2
+    )
     number = models.IntegerField(
         _(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.')
     )
@@ -1131,11 +1134,18 @@ class Action(LastModifiedModel):
 
     def clone(self, new_type):
         """Create a new action with same values but different types"""
-        attrs_to_clone = (
-            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
-        )
-
         new_action = Action(parent=self)
+
+        if self.end_datetime:
+            attrs_to_clone = (
+                'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
+            )
+        else:
+            attrs_to_clone = (
+                'subject', 'detail', 'priority', 'opportunity', 'in_charge', 'amount',
+            )
+            new_action.planned_date = datetime.now()
+
         for attr in attrs_to_clone:
             setattr(new_action, attr, getattr(self, attr))
         new_action.type = new_type
