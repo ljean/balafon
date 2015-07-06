@@ -22,18 +22,26 @@
 </div></div>
 {% endblock %}
 
+{% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
+
 {% block section_buttons %}
   {% if contact %}
-    <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 contact.id %}">{% trans "Add action" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 contact.id %}">
+      {% trans "action" %}</a></li>
   {% else %}
     {% if entity %}
       <li><a class="colorbox-form" href="{% url 'crm_create_action' entity.id 0 %}">
-        {% trans "Add action" %}
+        {% trans "action" %}
       </a></li>
     {% else %} 
       <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 0 %}">
-        {% trans "Add action" %}
+        {% trans "action" %}
       </a></li>
     {% endif %}
   {% endif %}
+
+  {% for action_type in addable_action_types %}
+  {% include "Crm/_actions_set_menu.html" %}
+  {% endfor %}
+
 {% endblock %}
