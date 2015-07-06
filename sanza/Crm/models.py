@@ -1025,6 +1025,7 @@ class ActionMenu(models.Model):
         help_text=_(u'Example: class="colorbox-form" for colorbos display')
     )
     order_index = models.IntegerField(default=0, verbose_name=_(u"order_index"))
+    only_for_status = models.ManyToManyField(ActionStatus, blank=True)
 
     class Meta:
         verbose_name = _(u'action menu')
@@ -1115,7 +1116,12 @@ class Action(LastModifiedModel):
 
     def get_menus(self):
         if self.type:
-            return ActionMenu.objects.filter(action_type=self.type)
+            queryset = ActionMenu.objects.filter(action_type=self.type)
+            if self.status:
+                queryset = queryset.filter(
+                    Q(only_for_status=self.status) | Q(only_for_status__isnull=True)
+                )
+            return queryset
         return ActionMenu.objects.none()
 
     def save(self, *args, **kwargs):
