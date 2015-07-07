@@ -61,8 +61,8 @@ class SaleItemSerializer(serializers.ModelSerializer):
 
 class UpdateSaleItemSerializer(serializers.ModelSerializer):
     """Serialize a sale item for update"""
-    quantity = serializers.FloatField()
-    pre_tax_price = serializers.FloatField()
+    quantity = serializers.DecimalField(max_digits=9, decimal_places=2)
+    pre_tax_price = serializers.DecimalField(max_digits=9, decimal_places=2)
 
     class Meta:
         model = SaleItem
