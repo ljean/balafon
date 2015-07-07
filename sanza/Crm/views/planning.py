@@ -139,7 +139,7 @@ class ActionArchiveView(object):
 
     def get(self, *args, **kwargs):
         """http get"""
-        self.request.session["redirect_url"] = self.request.path
+        self.request.session["redirect_url"] = self.request.get_full_path()
         return super(ActionArchiveView, self).get(*args, **kwargs)
 
 
