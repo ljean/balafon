@@ -1142,15 +1142,9 @@ class Action(LastModifiedModel):
         """Create a new action with same values but different types"""
         new_action = Action(parent=self)
 
-        if self.end_datetime:
-            attrs_to_clone = (
-                'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
-            )
-        else:
-            attrs_to_clone = (
-                'subject', 'detail', 'priority', 'opportunity', 'in_charge', 'amount',
-            )
-            new_action.planned_date = datetime.now()
+        attrs_to_clone = (
+            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
+        )
 
         for attr in attrs_to_clone:
             setattr(new_action, attr, getattr(self, attr))
