@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, render, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from colorbox.decorators import popup_redirect, popup_close
+from colorbox.decorators import popup_redirect, popup_reload
 
 from sanza.Crm import models, forms
 from sanza.Crm.signals import action_cloned
@@ -484,8 +484,8 @@ def add_action(request):
     )
 
 
-@popup_close
 @user_passes_test(can_access)
+@popup_reload
 def clone_action(request, action_id):
     """clone an action with different type"""
 
@@ -497,7 +497,9 @@ def clone_action(request, action_id):
             action_type = form.cleaned_data['action_type']
             new_action = action.clone(action_type)
             action_cloned.send(sender=models.Action, original_action=action, new_action=new_action)
-            return None  # popup_close will return js code to close the popup
+
+            next_url = reverse('crm_edit_action', args=[new_action.id])
+            return HttpResponseRedirect(next_url)
     else:
         form = forms.CloneActionForm(action.type)
 

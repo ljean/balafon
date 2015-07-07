@@ -457,11 +457,12 @@ class CloneActionTest(BaseTestCase):
             data=data
         )
         self.assertEqual(200, response.status_code)
-        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
 
         self.assertEqual(2, models.Action.objects.count())
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
@@ -506,11 +507,12 @@ class CloneActionTest(BaseTestCase):
             data=data
         )
         self.assertEqual(200, response.status_code)
-        self.assertEqual(response.content, '<script>$.colorbox.close(); window.location=window.location;</script>')
 
         self.assertEqual(2, models.Action.objects.count())
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
