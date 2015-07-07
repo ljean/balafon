@@ -997,8 +997,8 @@ class ActionSearchTest(BaseTestCase):
         self.assertContains(response, entity2.name)
         self.assertContains(response, contact2.lastname)
 
-        self.assertContains(response, entity3.name) #amount default value is 0
-        self.assertContains(response, contact4.lastname)
+        self.assertNotContains(response, entity3.name)  #amount default value is None
+        self.assertNotContains(response, contact4.lastname)
 
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
