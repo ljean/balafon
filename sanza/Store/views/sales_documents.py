@@ -135,7 +135,7 @@ class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
         else:
             try:
                 site = Site.objects.get_current()
-                context["DOMAIN"] = '//{0}'.format(site.domain)
+                context["DOMAIN"] = 'http://{0}'.format(site.domain)
             except Site.DoesNotExist:
                 pass
 
