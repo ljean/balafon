@@ -1021,6 +1021,7 @@ class ActionMenu(models.Model):
     a_attrs = models.CharField(
         max_length=50,
         verbose_name=_(u"Link args"),
+        blank=True,
         default="",
         help_text=_(u'Example: class="colorbox-form" for colorbos display')
     )
