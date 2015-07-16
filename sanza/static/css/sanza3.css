@@ -154,8 +154,14 @@ body {
     border: solid thin #eee;
     background: #fff;
 }*/
+.label-date.label-danger {
+  background: #fc8c84;
+}
+.label-date.label-warning {
+  background: #ffcc77;
+}
 .label-not-yet {
-  background: #888;
+  background: #ddd;
 }
 .action-subject {
   display: inline-block;
