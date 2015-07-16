@@ -457,6 +457,22 @@
       text-align: right;
     }
 
+    .badges {
+      text-align: right;
+    }
+
+    .badges .badge {
+      background: #888;
+    }
+
+    .badges .badge:hover {
+      background: #777;
+    }
+
+    .badges .badge.badge-inactive {
+      background: #000;
+    }
+
     .badge a {
       color: #fff;
     }
@@ -490,10 +506,25 @@
     <div ng-controller="CommercialDocCtrl" class="container-fluid">
 
       <div ng-hide="app.isPdf" class="badges">
-        <div class="badge" ng-show="app.isReadOnly">{{ 'READ_ONLY' | translate }}</div>
+        <div class="badge badge-inactive" ng-show="app.isReadOnly">
+          <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
+        </div>
+
+        <div class="badge" ng-repeat="entity in app.action.entities">
+          <a href="{{ entity.get_view_url }}">
+            <span class="glyphicon glyphicon-tower"></span> {{ entity.name }}
+          </a>
+        </div>
+
+        <div class="badge" ng-repeat="contact in app.action.contacts">
+          <a href="{{ contact.get_view_url }}">
+            <span class="glyphicon glyphicon-user"></span> {{ contact.fullname }}
+          </a>
+        </div>
+
         <div class="badge">
           {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
-            {{ 'Download as PDF' | translate }}</a>
+            <span class="glyphicon glyphicon-download-alt"></span> {{ 'Download as PDF' | translate }}</a>
         </div>
       </div>
 
@@ -518,9 +549,6 @@
               <div class="row"><div class="col-md-12">
                 <div>
                   {{ entity.name }}
-                  <span class="show-on-hover">
-                    <a href="{{ entity.get_view_url }}"><span class="glyphicon glyphicon-link"></span></a>
-                  </span>
                 </div>
                 <div ng-show="entity.address">{{ entity.address }}</div>
                 <div ng-show="entity.address2">{{ entity.address2 }}</div>
@@ -533,9 +561,6 @@
               <div class="row"><div class="col-md-12">
                 <div>
                   {{ contact.fullname }}
-                  <span class="show-on-hover">
-                    <a href="{{ contact.get_view_url }}"><span class="glyphicon glyphicon-link"></span></a>
-                  </span>
                 </div>
                 <div ng-show="contact.get_address">{{ contact.get_address }}</div>
                 <div ng-show="contact.get_address2">{{ contact.get_address2 }}</div>
