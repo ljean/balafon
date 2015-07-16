@@ -440,8 +440,59 @@ class CloneActionTest(BaseTestCase):
 
         contact = mommy.make(models.Contact)
         entity = mommy.make(models.Entity)
+        team_member = mommy.make(models.TeamMember)
 
-        action = mommy.make(models.Action, type=action_type_1, done=True, status=action_status_1)
+        action = mommy.make(models.Action, type=action_type_1, done=True, status=action_status_1, in_charge=team_member)
+
+        action.contacts.add(contact)
+        action.entities.add(entity)
+
+        action.save()
+
+        data = {
+            'action_type': action_type_2.id
+        }
+
+        response = self.client.post(
+            reverse('crm_clone_action', args=[action.id]),
+            data=data
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(2, models.Action.objects.count())
+        original_action = models.Action.objects.get(type=action_type_1)
+        new_action = models.Action.objects.get(type=action_type_2)
+
+        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+
+        self.assertEqual(original_action.subject, new_action.subject)
+        self.assertEqual(new_action.parent, original_action)
+        self.assertEqual(new_action.contacts.count(), 1)
+        self.assertEqual(new_action.entities.count(), 1)
+        self.assertEqual(list(original_action.contacts.all()), list(new_action.contacts.all()))
+        self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
+        self.assertEqual(new_action.done, False)
+        self.assertEqual(new_action.in_charge, original_action.in_charge)
+        self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.status, None)
+        self.assertEqual(new_action.planned_date, original_action.planned_date)
+        self.assertEqual(new_action.amount, original_action.amount)
+
+    def test_post_clone_action_dont_affect(self):
+        """it should clone without assigning the user to the task"""
+        action_status_1 = mommy.make(models.ActionStatus)
+        action_type_1 = mommy.make(models.ActionType)
+        action_type_1.allowed_status.add(action_status_1)
+        action_type_2 = mommy.make(models.ActionType, not_assigned_when_cloned=True)
+        action_type_1.next_action_types.add(action_type_2)
+        action_type_1.save()
+
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        team_member = mommy.make(models.TeamMember)
+
+        action = mommy.make(models.Action, type=action_type_1, done=True, status=action_status_1, in_charge=team_member)
 
         action.contacts.add(contact)
         action.entities.add(entity)
@@ -472,6 +523,7 @@ class CloneActionTest(BaseTestCase):
         self.assertEqual(list(original_action.entities.all()), list(new_action.entities.all()))
         self.assertEqual(new_action.done, False)
         self.assertEqual(original_action.done, True)
+        self.assertEqual(new_action.in_charge, None)
         self.assertEqual(new_action.status, None)
         self.assertEqual(new_action.planned_date, original_action.planned_date)
         self.assertEqual(new_action.amount, original_action.amount)

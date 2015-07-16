@@ -969,6 +969,7 @@ class ActionType(NamedElement):
     order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
     is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
     next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
+    not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_(u"Not assigned when cloned"))
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1143,9 +1144,12 @@ class Action(LastModifiedModel):
         """Create a new action with same values but different types"""
         new_action = Action(parent=self)
 
-        attrs_to_clone = (
-            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'in_charge', 'amount', 'end_datetime'
-        )
+        attrs_to_clone = [
+            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'amount', 'end_datetime'
+        ]
+
+        if not new_type.not_assigned_when_cloned:
+            attrs_to_clone += ['in_charge', ]
 
         for attr in attrs_to_clone:
             setattr(new_action, attr, getattr(self, attr))

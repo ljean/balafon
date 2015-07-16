@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-09 12:31+0200\n"
+"POT-Creation-Date: 2015-07-16 11:33+0200\n"
 "PO-Revision-Date: 2013-11-14 11:41+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr "Groupe"
 msgid "Location"
 msgstr "Lieu"
 
-#: config.py:39 Crm/forms.py:684 Crm/models.py:1201 Crm/search_forms.py:1240
+#: config.py:39 Crm/forms.py:684 Crm/models.py:1205 Crm/search_forms.py:1240
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Search/views.py:354
 #: templates/sanza/_bs_navigation.html:60 templates/sanza/_navigation.html:27
 msgid "Entity"
@@ -103,14 +103,14 @@ msgstr "Entrez un nom pour le groupe"
 msgid "A group with this name already exists"
 msgstr "Un groupe avec ce nom existe déjà"
 
-#: Crm/forms.py:168 Crm/models.py:391 Crm/models.py:1086
+#: Crm/forms.py:168 Crm/models.py:391 Crm/models.py:1087
 #: Crm/templates/Crm/_section_my_groups.html:16
 #: Search/templates/Search/_section_qs_cities.html:13
 #: Search/templates/Search/_section_qs_groups.html:12
 msgid "entities"
 msgstr "entités"
 
-#: Crm/forms.py:174 Crm/models.py:773 Crm/models.py:1085
+#: Crm/forms.py:174 Crm/models.py:773 Crm/models.py:1086
 #: Crm/templates/Crm/_section_my_groups.html:17
 #: Search/templates/Search/_section_qs_cities.html:18
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -190,7 +190,7 @@ msgstr "Photo"
 msgid "Select the roles played by the contact in his entity"
 msgstr "Choisissez les rôles joués par le contact au sein de l'entité"
 
-#: Crm/forms.py:476 Crm/models.py:1068 Search/forms.py:685
+#: Crm/forms.py:476 Crm/models.py:1069 Search/forms.py:685
 msgid "planned date"
 msgstr "date prévue"
 
@@ -198,7 +198,7 @@ msgstr "date prévue"
 msgid "planned time"
 msgstr "heure prévue"
 
-#: Crm/forms.py:479 Crm/models.py:1088
+#: Crm/forms.py:479 Crm/models.py:1089
 msgid "end date"
 msgstr "date de fin"
 
@@ -287,7 +287,7 @@ msgid "The entity does'nt exist"
 msgstr "L'entité n'existe pas"
 
 #: Crm/forms.py:708 Crm/forms.py:713 Crm/forms.py:745 Crm/forms.py:786
-#: Crm/forms.py:804 Crm/models.py:1202 Crm/search_forms.py:1241
+#: Crm/forms.py:804 Crm/models.py:1206 Crm/search_forms.py:1241
 #: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:497
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:11
 msgid "Contact"
@@ -436,7 +436,7 @@ msgstr "Affiché sur le formulaire d'inscription"
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:90 Crm/models.py:1294 Profile/models.py:24
+#: Crm/models.py:90 Crm/models.py:1298 Profile/models.py:24
 msgid "entity type"
 msgstr "type d'entité"
 
@@ -481,7 +481,7 @@ msgid "cities"
 msgstr "villes"
 
 #: Crm/models.py:191 Crm/models.py:421 Crm/models.py:779 Crm/models.py:809
-#: Crm/models.py:868 Crm/models.py:1003 Crm/models.py:1205 Crm/models.py:1287
+#: Crm/models.py:868 Crm/models.py:1004 Crm/models.py:1209 Crm/models.py:1291
 #: Search/models.py:12 Search/models.py:25 Store/models.py:87
 #: Store/models.py:99 Store/models.py:111 Store/models.py:123
 msgid "name"
@@ -700,7 +700,7 @@ msgstr "Garder ceci coché pour recevoir notre newsletter"
 msgid "This group will be proposed on the public subscribe form"
 msgstr "Ce groupe sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:835 Crm/models.py:1298
+#: Crm/models.py:835 Crm/models.py:1302
 msgid "groups"
 msgstr "groupes"
 
@@ -728,7 +728,7 @@ msgstr "moyenne"
 msgid "high"
 msgstr "haute"
 
-#: Crm/models.py:871 Crm/models.py:1070
+#: Crm/models.py:871 Crm/models.py:1071
 msgid "detail"
 msgstr "détail"
 
@@ -736,7 +736,7 @@ msgstr "détail"
 msgid "probability"
 msgstr "probabilité"
 
-#: Crm/models.py:876 Crm/models.py:1079
+#: Crm/models.py:876 Crm/models.py:1080
 msgid "amount"
 msgstr "montant"
 
@@ -752,11 +752,11 @@ msgstr "date de début"
 msgid "closing date"
 msgstr "date de fin"
 
-#: Crm/models.py:884 Crm/models.py:1076
+#: Crm/models.py:884 Crm/models.py:1077
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: Crm/models.py:914 Crm/models.py:1072
+#: Crm/models.py:914 Crm/models.py:1073
 msgid "opportunity"
 msgstr "dossier"
 
@@ -764,7 +764,7 @@ msgstr "dossier"
 msgid "opportunities"
 msgstr "dossiers"
 
-#: Crm/models.py:920 Crm/models.py:930 Crm/models.py:1209
+#: Crm/models.py:920 Crm/models.py:930 Crm/models.py:1213
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
@@ -837,209 +837,213 @@ msgstr "Motant calculé"
 msgid "next action type"
 msgstr "Types d'action suivants"
 
-#: Crm/models.py:976
+#: Crm/models.py:972
+msgid "Not assigned when cloned"
+msgstr "Non affectée lorsque dupliquée"
+
+#: Crm/models.py:977
 msgid "Status defined"
 msgstr "Etats définis"
 
-#: Crm/models.py:995
+#: Crm/models.py:996
 msgid "action type"
 msgstr "type d'action"
 
-#: Crm/models.py:996
+#: Crm/models.py:997
 msgid "action types"
 msgstr "types d'action"
 
-#: Crm/models.py:1002 Users/models.py:31 Users/models.py:48
+#: Crm/models.py:1003 Users/models.py:31 Users/models.py:48
 msgid "user"
 msgstr "utilisateur"
 
-#: Crm/models.py:1004
+#: Crm/models.py:1005
 msgid "active"
 msgstr "actif"
 
-#: Crm/models.py:1010
+#: Crm/models.py:1011
 msgid "team member"
 msgstr "membre de l'équipe"
 
-#: Crm/models.py:1011
+#: Crm/models.py:1012
 msgid "team members"
 msgstr "membres de l'équipe"
 
-#: Crm/models.py:1017 Crm/search_forms.py:884
+#: Crm/models.py:1018 Crm/search_forms.py:884
 msgid "Action type"
 msgstr "Type d'action"
 
-#: Crm/models.py:1018
+#: Crm/models.py:1019
 msgid "view_name"
 msgstr "nom de la vue"
 
-#: Crm/models.py:1019 Users/models.py:90
+#: Crm/models.py:1020 Users/models.py:90
 msgid "icon"
 msgstr "icone"
 
-#: Crm/models.py:1020 Crm/models.py:1206 Users/models.py:61 Users/models.py:89
+#: Crm/models.py:1021 Crm/models.py:1210 Users/models.py:61 Users/models.py:89
 msgid "label"
 msgstr "libellé"
 
-#: Crm/models.py:1023
+#: Crm/models.py:1024
 msgid "Link args"
 msgstr "arguments du Lien"
 
-#: Crm/models.py:1026
+#: Crm/models.py:1027
 msgid "Example: class=\"colorbox-form\" for colorbos display"
 msgstr "Exemple: class=\"colorbox-form\" pour un affichage dans une colorbox"
 
-#: Crm/models.py:1028
+#: Crm/models.py:1029
 msgid "order_index"
 msgstr "ordre"
 
-#: Crm/models.py:1032
+#: Crm/models.py:1033
 msgid "action menu"
 msgstr "menu d'actions"
 
-#: Crm/models.py:1033
+#: Crm/models.py:1034
 msgid "action menus"
 msgstr "menus d'actions"
 
-#: Crm/models.py:1058
+#: Crm/models.py:1059
 msgid "low priority"
 msgstr "priorité basse"
 
-#: Crm/models.py:1059
+#: Crm/models.py:1060
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: Crm/models.py:1060
+#: Crm/models.py:1061
 msgid "high priority"
 msgstr "priorité haute"
 
-#: Crm/models.py:1064 Crm/templates/Crm/_section_actions.html:30
+#: Crm/models.py:1065 Crm/templates/Crm/_section_actions.html:30
 #: Crm/templates/Crm/_section_actions.html:34
 #: Crm/templates/Crm/_section_actions.html:38
 msgid "action"
 msgstr "action"
 
-#: Crm/models.py:1065
+#: Crm/models.py:1066
 msgid "actions"
 msgstr "actions"
 
-#: Crm/models.py:1067
+#: Crm/models.py:1068
 msgid "subject"
 msgstr "sujet"
 
-#: Crm/models.py:1071
+#: Crm/models.py:1072
 msgid "priority"
 msgstr "priorité"
 
-#: Crm/models.py:1073
+#: Crm/models.py:1074
 msgid "done"
 msgstr "réalisé"
 
-#: Crm/models.py:1074
+#: Crm/models.py:1075
 msgid "done date"
 msgstr "date de réalisation"
 
-#: Crm/models.py:1075
+#: Crm/models.py:1076
 msgid "in charge"
 msgstr "en charge"
 
-#: Crm/models.py:1077
+#: Crm/models.py:1078
 msgid "archived"
 msgstr "archivé"
 
-#: Crm/models.py:1082
+#: Crm/models.py:1083
 msgid "number"
 msgstr "numéro"
 
-#: Crm/models.py:1082
+#: Crm/models.py:1083
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: Crm/models.py:1089
+#: Crm/models.py:1090
 msgid "parent"
 msgstr "parent"
 
-#: Crm/models.py:1167
+#: Crm/models.py:1171
 msgid "content"
 msgstr "contenu"
 
-#: Crm/models.py:1169 Search/forms.py:650
+#: Crm/models.py:1173 Search/forms.py:650
 msgid "template"
 msgstr "Modèle"
 
-#: Crm/models.py:1207
+#: Crm/models.py:1211
 msgid "model"
 msgstr "modèle"
 
-#: Crm/models.py:1208
+#: Crm/models.py:1212
 msgid "widget"
 msgstr "widget"
 
-#: Crm/models.py:1210
+#: Crm/models.py:1214
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: Crm/models.py:1211
+#: Crm/models.py:1215
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: Crm/models.py:1214
+#: Crm/models.py:1218
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: Crm/models.py:1224 Crm/models.py:1231
+#: Crm/models.py:1228 Crm/models.py:1235
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: Crm/models.py:1225
+#: Crm/models.py:1229
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:1232 Search/models.py:37
+#: Crm/models.py:1236 Search/models.py:37
 msgid "value"
 msgstr "valeur"
 
-#: Crm/models.py:1235
+#: Crm/models.py:1239
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: Crm/models.py:1236
+#: Crm/models.py:1240
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: Crm/models.py:1245
+#: Crm/models.py:1249
 msgid "entity custom field value"
 msgstr "cal"
 
-#: Crm/models.py:1246
+#: Crm/models.py:1250
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: Crm/models.py:1257
+#: Crm/models.py:1261
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: Crm/models.py:1258
+#: Crm/models.py:1262
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: Crm/models.py:1274 Search/templates/Search/mailto_groups.html:110
+#: Crm/models.py:1278 Search/templates/Search/mailto_groups.html:110
 msgid "Coma"
 msgstr "Virgule"
 
-#: Crm/models.py:1275
+#: Crm/models.py:1279
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: Crm/models.py:1283
+#: Crm/models.py:1287
 msgid "import file"
 msgstr "fichier d'import"
 
-#: Crm/models.py:1284
+#: Crm/models.py:1288
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: Crm/models.py:1288
+#: Crm/models.py:1292
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -1047,29 +1051,29 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:1290
+#: Crm/models.py:1294
 msgid "imported by"
 msgstr "importé par"
 
-#: Crm/models.py:1295
+#: Crm/models.py:1299
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: Crm/models.py:1299
+#: Crm/models.py:1303
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: Crm/models.py:1302
+#: Crm/models.py:1306
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: Crm/models.py:1309
+#: Crm/models.py:1313
 msgid "contact import"
 msgstr "import de contacts"
 
-#: Crm/models.py:1310
+#: Crm/models.py:1314
 msgid "contact imports"
 msgstr "imports de contacts"
 
@@ -1939,9 +1943,9 @@ msgid ""
 "  "
 msgstr ""
 "\n"
-"    <p>Voulez vous dupliquer cette action? Selectionnez le nouveau type ci-dessous:</p>\n"
+"    <p>Voulez vous dupliquer cette action? Selectionnez le nouveau type ci-"
+"dessous:</p>\n"
 "  "
-
 
 #: Crm/templates/Crm/unsubscribe_contacts_import.html:11
 msgid "Unsubscribe contacts"
@@ -3272,8 +3276,7 @@ msgstr "Afficher les prix en HT"
 msgid ""
 "The action amount will be update with pre-tax total if checked and with tax-"
 "included total if not"
-msgstr ""
-"Le montant de l'action sera calculé en HT si coché et en TTC sinon"
+msgstr "Le montant de l'action sera calculé en HT si coché et en TTC sinon"
 
 #: Store/models.py:31
 msgid "readonly status"
@@ -3284,8 +3287,8 @@ msgid ""
 "When action has one of these status, it is not possible to modify a "
 "commercial document"
 msgstr ""
-"Si l'action a un de ces status, il n'est pas possible de modifier le doucment commercial"
-
+"Si l'action a un de ces status, il n'est pas possible de modifier le "
+"doucment commercial"
 
 #: Store/models.py:36
 msgid "Store management action type"
