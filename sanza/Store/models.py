@@ -124,11 +124,11 @@ class StoreItem(models.Model):
     category = models.ForeignKey(StoreItemCategory, verbose_name=_(u"category"))
     tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u"tags"))
     vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
-    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
-    stock_count = models.IntegerField(default=None, verbose_name=_("stock count"), blank=True, null=True)
-    stock_threshold = models.IntegerField(default=None, verbose_name=_("stock count"), blank=True, null=True)
+    pre_tax_price = models.DecimalField(verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2)
+    stock_count = models.IntegerField(default=None, verbose_name=_(u"stock count"), blank=True, null=True)
+    stock_threshold = models.IntegerField(default=None, verbose_name=_(u"stock count"), blank=True, null=True)
     purchase_price = models.DecimalField(
-        verbose_name=_("purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
+        verbose_name=_(u"purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
     )
     unit = models.ForeignKey(Unit, blank=True, default=None, null=True)
 
@@ -188,9 +188,9 @@ class SaleItem(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale)
     item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
-    quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
+    quantity = models.DecimalField(verbose_name=_(u"quantity"), max_digits=9, decimal_places=2)
     vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
-    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
+    pre_tax_price = models.DecimalField(verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2)
     text = models.TextField(verbose_name=_(u"Text"), max_length=3000, default='', blank=True)
     order_index = models.IntegerField(default=0)
 
