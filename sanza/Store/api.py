@@ -3,8 +3,16 @@
 
 from rest_framework import viewsets, permissions
 
-from sanza.Store.models import SaleItem, StoreItem
-from sanza.Store import serializers
+from sanza.Store.models import SaleItem, StoreItem, StoreItemCategory, StoreItemTag
+from sanza.Store import serializers, settings
+
+
+def get_public_api_permissions():
+    """get public api permissions"""
+    if settings.is_public_api_allowed():
+        return [permissions.IsAuthenticatedOrReadOnly]
+    else:
+        return [permissions.IsAuthenticated]
 
 
 class SaleItemViewSet(viewsets.ModelViewSet):
@@ -29,11 +37,30 @@ class StoreItemViewSet(viewsets.ModelViewSet):
     """returns sales items"""
     queryset = StoreItem.objects.all()
     serializer_class = serializers.StoreItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = get_public_api_permissions()
 
     def get_queryset(self):
         """returns objects"""
         name = self.request.GET.get('name', None)
         if name:
             return self.queryset.filter(name__icontains=name)[:20]
+
+        category = self.request.GET.get('category', None)
+        if category:
+            return self.queryset.filter(category=category)
+
         return self.queryset
+
+
+class StoreItemCategoryViewSet(viewsets.ModelViewSet):
+    """returns categories"""
+    queryset = StoreItemCategory.objects.all()
+    serializer_class = serializers.StoreItemCategorySerializer
+    permission_classes = get_public_api_permissions()
+
+
+class StoreItemTagViewSet(viewsets.ModelViewSet):
+    """returns tags"""
+    queryset = StoreItemTag.objects.all()
+    serializer_class = serializers.StoreItemTagSerializer
+    permission_classes = get_public_api_permissions()

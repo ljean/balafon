@@ -34,6 +34,7 @@ setup(
         'django-registration',
         'model_mommy',
         'django-tastypie',
+        'django-cors-headers',
     ],
     long_description=open('README.rst').read(),
     url='https://bitbucket.org/ljean/apidev-sanza',

@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from sanza.Store.models import Sale, StoreItem, StoreItemCategory, SaleItem, VatRate
+from sanza.Store.models import Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, VatRate
 
 
 class SaleSerializer(serializers.ModelSerializer):
@@ -39,10 +39,11 @@ class StoreItemSerializer(serializers.ModelSerializer):
     pre_tax_price = serializers.FloatField()
     vat_rate = VatRateSerializer()
     category = StoreItemCategorySerializer()
+    vat_incl_price = serializers.FloatField(read_only=True)
 
     class Meta:
         model = StoreItem
-        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price')
+        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price')
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
@@ -68,4 +69,13 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale',
+        )
+
+
+class StoreItemTagSerializer(serializers.ModelSerializer):
+    """tags"""
+    class Meta:
+        model = StoreItemTag
+        fields = (
+            'id', 'name',
         )

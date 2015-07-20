@@ -5,12 +5,13 @@ from django.conf.urls import patterns, url, include
 
 from rest_framework import routers
 
-from sanza.Store.api import SaleItemViewSet, StoreItemViewSet
+from sanza.Store.api import SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet
 from sanza.Store.views.sales_documents import SalesDocumentView, SalesDocumentPdfView
 
 
 store_items_router = routers.DefaultRouter()
 store_items_router.register(r'store-items', StoreItemViewSet)
+store_items_router.register(r'categories', StoreItemViewSet)
 
 sales_items_router = routers.DefaultRouter()
 sales_items_router.register(r'sales-items', SaleItemViewSet)

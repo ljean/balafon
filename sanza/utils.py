@@ -9,6 +9,8 @@ import urlparse
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
 
+from rest_framework.renderers import JSONRenderer
+
 try:
     from localeurl.utils import strip_path
 except ImportError:
@@ -63,3 +65,8 @@ def is_allowed_homepage(url_string):
     if resolved.url_name in get_allowed_homepages():
         return True
     return False
+
+
+class Utf8JSONRenderer(JSONRenderer):
+    """Utf-8 support"""
+    ensure_ascii = False

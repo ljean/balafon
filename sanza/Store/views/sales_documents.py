@@ -10,19 +10,13 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
-from rest_framework.renderers import JSONRenderer
-
 from sanza.permissions import can_access
 from sanza.settings import get_pdf_view_base_class
+from sanza.utils import Utf8JSONRenderer
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
 from sanza.Store.models import Sale, SaleItem, VatRate, StoreManagementActionType
 from sanza.Store.serializers import SaleItemSerializer, SaleSerializer, VatRateSerializer
-
-
-class Utf8JSONRenderer(JSONRenderer):
-    """Utf-8 support"""
-    ensure_ascii = False
 
 
 class SalesDocumentViewMixin(object):
