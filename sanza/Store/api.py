@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
-from rest_framework import viewsets, permissions
+from django.utils.translation import ugettext as _
 
-from sanza.Store.models import SaleItem, StoreItem, StoreItemCategory, StoreItemTag
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from sanza.Crm.models import Action, ActionType
+from sanza.Profile.models import ContactProfile
+from sanza.Store.models import SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType
 from sanza.Store import serializers, settings
+from sanza.Store.settings import get_cart_type_name
 
 
 def get_public_api_permissions():
@@ -72,3 +79,60 @@ class StoreItemTagViewSet(viewsets.ModelViewSet):
     queryset = StoreItemTag.objects.all()
     serializer_class = serializers.StoreItemTagSerializer
     permission_classes = get_public_api_permissions()
+
+
+class CartView(APIView):
+    """post a cart"""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+
+        print request.data
+
+        cart_serializer = serializers.CartSerializer(data=request.data)
+        if cart_serializer.is_valid():
+
+            #Get Contact
+            try:
+                profile = ContactProfile.objects.get(user=request.user)
+                contact = profile.contact
+            except ContactProfile.DoesNotExist:
+                return Response({'ok': False, 'message': _(u"You don't have a valid profile")})
+
+            #Create a new Sale
+            action_type_name = get_cart_type_name()
+            action_type = ActionType.objects.get_or_create(name=action_type_name)[0]
+
+            #Force this type to be managed by the store
+            StoreManagementActionType.objects.get_or_create(action_type=action_type)
+
+            action = Action.objects.create(
+                planned_date=cart_serializer.validated_data['purchase_datetime'],
+                status=action_type.default_status,
+                type=action_type
+            )
+            action.contacts.add(contact)
+            action.save()
+
+            #for each line add a sale item
+            for index, item in enumerate(cart_serializer.validated_data['items']):
+
+                try:
+                    store_item = StoreItem.objects.get(id=item['id'])
+                except StoreItem.DoesNotExist:
+                    #ignore if not existing
+                    continue
+
+                SaleItem.objects.create(
+                    sale=action.sale,
+                    quantity=item['quantity'],
+                    item=store_item,
+                    vat_rate=store_item.vat_rate,
+                    pre_tax_price=store_item.pre_tax_price,
+                    text=store_item.name,
+                    order_index=index+1
+                )
+
+            #Done
+
+        return Response({'ok': True})

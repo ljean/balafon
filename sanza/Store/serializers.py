@@ -79,3 +79,14 @@ class StoreItemTagSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name',
         )
+
+
+class CartItemSerializer(serializers.Serializer):
+    """Serialize a sales item"""
+    id = serializers.IntegerField()
+    quantity = serializers.FloatField()
+
+
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    purchase_datetime = serializers.DateTimeField()
