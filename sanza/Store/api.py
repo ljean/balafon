@@ -45,9 +45,17 @@ class StoreItemViewSet(viewsets.ModelViewSet):
         if name:
             return self.queryset.filter(name__icontains=name)[:20]
 
+        fullname = self.request.GET.get('fullname', None)
+        if fullname:
+            return self.queryset.filter(name__icontains=fullname)
+
         category = self.request.GET.get('category', None)
         if category:
             return self.queryset.filter(category=category)
+
+        tag = self.request.GET.get('tag', None)
+        if tag:
+            return self.queryset.filter(tags=tag)
 
         return self.queryset
 

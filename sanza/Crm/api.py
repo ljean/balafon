@@ -9,6 +9,7 @@ from django.db.models import Q
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import ParseError, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
 from sanza.Crm.models import Action, ActionType, ActionStatus, Contact, TeamMember
 from sanza.Crm import serializers
@@ -219,3 +220,4 @@ class AboutMeView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.model.objects.filter(id=self.request.user.id)
+

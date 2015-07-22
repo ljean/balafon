@@ -14,8 +14,13 @@
         {% if form.non_field_errors %}
         {{form.non_field_errors}}
         {% endif %}
-    
-        {% include "sanza/_field_form.html" with field=form.username %}
+
+        {% if form.email %}
+          {% include "sanza/_field_form.html" with field=form.email %}
+        {% else %}
+           {% include "sanza/_field_form.html" with field=form.username %}
+        {% endif %}
+
         {% include "sanza/_field_form.html" with field=form.password %}
 
         <div class="row"><div class="col-md-6" style="margin-top: 20px;">

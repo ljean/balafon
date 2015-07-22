@@ -246,14 +246,41 @@ class EmailSubscribeForm(forms.ModelForm):
 class SubscriptionTypeFormMixin(object):
     """Base class requiring subscription type"""
 
-    def _add_subscription_types_field(self):
+    def _add_subscription_types_field(self, contact=None):
         """add the subscription_type field dynamically"""
-        self.fields['subscription_types'] = forms.MultipleChoiceField(
-            widget=forms.CheckboxSelectMultiple(),
-            label='',
-            required=False,
-            choices=[(st.id, st.name) for st in self.get_queryset()]
-        )
+        subscription_types = list(self.get_queryset())
+        if len(subscription_types) > 0:
+            if len(subscription_types) > 1:
+                help_text = ugettext('Check the boxes of the newsletters that you want to receive')
+            else:
+                help_text = ugettext('Check the box if you want to receive our newsletter')
+
+            initial = None
+            if contact:
+                initial = u','.join(
+                    [
+                        str(subscription.subscription_type.id)
+                        for subscription in contact.subscription_set.all()
+                        if subscription.accept_subscription
+                    ]
+                )
+
+            self.fields['subscription_types'] = forms.MultipleChoiceField(
+                widget=forms.CheckboxSelectMultiple(),
+                label='',
+                help_text=help_text,
+                required=False,
+                initial=initial,
+                choices=[(st.id, st.name) for st in subscription_types]
+            )
+
+        else:
+            self.fields['subscription_types'] = forms.MultipleChoiceField(
+                widget=forms.HiddenInput(),
+                label='',
+                required=False,
+                choices=[]
+            )
 
     def get_queryset(self):
         """returns subscription_types"""

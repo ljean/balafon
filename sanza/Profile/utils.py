@@ -65,18 +65,23 @@ def create_profile_contact(user):
             action.contacts.add(contact)
             action.save()
 
-    contact.gender = profile.gender
+    fields = (
+        'gender', 'firstname', 'lastname', 'phone', 'mobile', 'address', 'address2', 'address3',
+        'zip_code', 'city', 'cedex', 'country',
+    )
+    if profile:
+        for field in fields:
+            value = getattr(profile, field, None)
+            if value:
+                setattr(contact, field, value)
+
     contact.lastname = contact.lastname or user.last_name
     contact.firstname = contact.firstname or user.first_name
     contact.email = user.email
     contact.email_verified = True
     if not contact.lastname:
         contact.lastname = user.email.split("@")[0]
-    
-    if profile:
-        contact.city = profile.city
-        contact.zip_code = profile.zip_code
-    
+
     contact.save()
 
     try:

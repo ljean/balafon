@@ -394,7 +394,9 @@ class ContactForm(ModelFormWithCity):
         #create the dynamic fields
         for subscription_type in models.SubscriptionType.objects.all():
             field_name = "subscription_{0}".format(subscription_type.id)
-            field = self.fields[field_name] = forms.BooleanField(label=subscription_type.name, required=False)
+            field = self.fields[field_name] = forms.BooleanField(
+                label=subscription_type.name, required=False
+            )
             if self.instance:
                 try:
                     subscription = models.Subscription.objects.get(

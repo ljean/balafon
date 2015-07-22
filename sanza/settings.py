@@ -4,6 +4,7 @@
 from django.conf import settings
 from django.views.generic import TemplateView
 
+from coop_cms.settings import load_class
 from wkhtmltopdf.views import PDFTemplateView
 
 
@@ -48,3 +49,21 @@ def get_pdf_view_base_class():
         return TemplateView
     else:
         return PDFTemplateView
+
+
+def get_profile_form():
+    """returns a form to be used for editing a user profile"""
+    return load_class('SANZA_PROFILE_FORM', 'sanza.Profile.forms.ProfileForm')
+
+
+def get_registration_form():
+    """returns a form to be used for editing a user profile"""
+    return load_class('SANZA_REGISTRATION_FORM', 'sanza.Profile.forms.UserRegistrationForm')
+
+
+def has_entity_on_registration_form():
+    """
+    returns True if entity type and entity name are displayed on registration form (Profile)
+    register as individual if not
+    """
+    return getattr(settings, 'SANZA_ENTITY_ON_REGISTRATION_FORM', True)

@@ -3,10 +3,10 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
@@ -14,9 +14,10 @@ from django.utils.translation import ugettext as _
 from registration.backends.default.views import RegistrationView, ActivationView
 
 from sanza.Crm.models import Action, ActionType
-from sanza.Profile.forms import ProfileForm, MessageForm, UserRegistrationForm
+from sanza.Profile.forms import MessageForm, UserRegistrationForm
 from sanza.Profile.models import ContactProfile
 from sanza.Profile.utils import create_profile_contact, notify_registration
+from sanza.settings import get_profile_form, get_registration_form
 from sanza.utils import now_rounded
 
 
@@ -26,15 +27,18 @@ def edit_profile(request):
         profile = request.user.get_profile()
     except ContactProfile.DoesNotExist:
         raise Http404
+
+    profile_form_class = get_profile_form()
     
     if request.method == "POST":
-        form = ProfileForm(request.POST, request.FILES, instance=profile.contact)
+        form = profile_form_class(request.POST, request.FILES, instance=profile.contact)
         if form.is_valid():
-            contact = form.save()
+            #save contact
+            form.save()
             messages.add_message(request, messages.SUCCESS, _(u"Your profile has been updated."))
             return HttpResponseRedirect(reverse('homepage'))
     else:
-        form = ProfileForm(instance=profile.contact)
+        form = profile_form_class(instance=profile.contact)
         
     return render_to_response(
         'Profile/edit_profile.html',
@@ -107,7 +111,7 @@ def post_message(request):
 class AcceptNewsletterRegistrationView(RegistrationView):
     
     def get_form_class(self, request):
-        return UserRegistrationForm
+        return get_registration_form()
     
     def register(self, request, **kwargs):
         kwargs["username"] = kwargs["email"][:30]
@@ -115,11 +119,25 @@ class AcceptNewsletterRegistrationView(RegistrationView):
 
         user.first_name = kwargs.get('firstname', "")
         user.last_name = kwargs.get('lastname', "")
+
+        user.contactprofile.firstname = kwargs.get('firstname', "")
+        user.contactprofile.lastname = kwargs.get('lastname', "")
+
         user.contactprofile.entity_type = kwargs.get('entity_type', None)
         user.contactprofile.entity_name = kwargs.get('entity', "")
+
+        user.contactprofile.phone = kwargs.get('phone', "")
+        user.contactprofile.mobile = kwargs.get('mobile', "")
+
         user.contactprofile.city = kwargs.get('city', None)
         user.contactprofile.zip_code = kwargs.get('zip_code', None)
         user.contactprofile.gender = kwargs.get('gender', 0) or 0
+
+        user.contactprofile.address = kwargs.get('address', "")
+        user.contactprofile.address2 = kwargs.get('address2', "")
+        user.contactprofile.address3 = kwargs.get('address3', "")
+        user.contactprofile.cedex = kwargs.get('cedex', "")
+        user.contactprofile.birth_date = kwargs.get('birth_date', None)
 
         user.save()
         user.contactprofile.save()

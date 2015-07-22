@@ -44,7 +44,23 @@ if 'sanza.Apis' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'', include('sanza.Apis.urls')),
     )
-    
+
+
+if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
+    urlpatterns += patterns('',
+        (r'^accounts/', include('coop_cms.apps.email_auth.urls')),
+    )
+else:
+    urlpatterns += patterns('',
+        (
+            r'^accounts/login/?$',
+            'django.contrib.auth.views.login',
+            {'authentication_form': BsAuthenticationForm}
+        ),
+        (r'^accounts/', include('django.contrib.auth.urls')),
+    )
+
+
 if 'sanza.Profile' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',
         (r'^accounts/', include('sanza.Profile.urls')),
@@ -55,14 +71,6 @@ if 'sanza.Store' in settings.INSTALLED_APPS:
         (r'^store/', include('sanza.Store.urls')),
     )
 
-urlpatterns += patterns('',
-    (
-        r'^accounts/login/?$',
-        'django.contrib.auth.views.login',
-        {'authentication_form': BsAuthenticationForm}
-    ),
-    (r'^accounts/', include('django.contrib.auth.urls')),
-)
 
 if 'sanza.Users' in settings.INSTALLED_APPS:
     urlpatterns += patterns('',

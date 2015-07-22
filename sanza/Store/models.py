@@ -97,10 +97,13 @@ class Unit(models.Model):
 class StoreItemCategory(models.Model):
     """something for organization of store items"""
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
+    order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
+    active = models.BooleanField(verbose_name=_(u"active"), default=True)
 
     class Meta:
         verbose_name = _(u"Store item category")
         verbose_name_plural = _(u"Store item categories")
+        ordering = ['order_index', 'name']
 
     def __unicode__(self):
         return self.name
@@ -109,10 +112,13 @@ class StoreItemCategory(models.Model):
 class StoreItemTag(models.Model):
     """something for finding store items more easily"""
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
+    order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
+    active = models.BooleanField(verbose_name=_(u"active"), default=True)
 
     class Meta:
         verbose_name = _(u"Store item tag")
         verbose_name_plural = _(u"Store item tags")
+        ordering = ['order_index', 'name']
 
     def __unicode__(self):
         return self.name
@@ -135,6 +141,7 @@ class StoreItem(models.Model):
     class Meta:
         verbose_name = _(u"Store item")
         verbose_name_plural = _(u"Store items")
+        ordering = ['name']
 
     def __unicode__(self):
         return self.name
