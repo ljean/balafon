@@ -21,7 +21,6 @@ class ContactProfile(models.Model):
     user = models.OneToOneField(User)
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
 
-
     entity_name = models.CharField(_('Entity name'), max_length=200, blank=True, default="")
     entity_type = models.ForeignKey(EntityType, verbose_name=_(u'Entity type'), blank=True, null=True, default=None)
 

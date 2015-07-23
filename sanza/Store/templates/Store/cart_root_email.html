@@ -1,0 +1,68 @@
+{% load i18n %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{LANG}}" xml:lang="{{LANG}}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ subject }}</title>
+</head>
+<body style="{% block body_style %}background: #000;{% endblock %}">
+  {% block style %}
+  <style>
+    
+  </style>
+ {% endblock %}
+
+  <div>
+  {% block content %}
+
+      {% block header %}
+      <h1>
+        {{ subject }}
+      </h1>
+      {% endblock %}
+
+      {% block profile %}
+      <div>
+        {{ profile.contact.fullname }}
+      </div>
+      {% endblock %}
+
+      {% block delivery %}
+      <div>
+        {% trans "Delivery point" %} :
+        {{ action.sale.delivery_point.name }} {{ action.planned_date|date:'l j F H:i' }}
+      </div>
+      {% endblock %}
+
+
+      {% block cart %}
+      <div>
+        <table>
+          <tr>
+            <th>{% trans "Store_item" %}</th>
+            <th>{% trans "Price" %}</th>
+            <th>{% trans "Quantity" %}</th>
+            <th>{% trans "Total" %}</th>
+          </tr>
+        {% for item in action.sale.saleitem_set.all %}
+          <tr>
+            <td>{{ item.text }}</td>
+            <td>{{ item.vat_incl_price }} €</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.vat_incl_total_price }} €</td>
+          </tr>
+        {% endfor %}
+          <tr>
+            <th colspan="3">{% trans "Total" %}</th>
+            <th>{{ action.amount }} €</th>
+          </tr>
+        </table>
+
+      </div>
+      {% endblock %}
+
+
+  {% endblock %}
+  </div>
+
+</body>
+</html>

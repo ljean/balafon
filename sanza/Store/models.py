@@ -230,6 +230,14 @@ class SaleItem(models.Model):
         else:
             return _(u"Sale item not set")
 
+    def vat_incl_price(self):
+        """VAT inclusive price"""
+        return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
+
+    def vat_incl_total_price(self):
+        """VAT inclusive price"""
+        return self.vat_incl_price() * self.quantity
+
     def save(self, *args, **kwargs):
         if self.order_index == 0:
             self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1

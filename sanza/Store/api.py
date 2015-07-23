@@ -14,6 +14,7 @@ from sanza.Store.models import (
 )
 from sanza.Store import serializers, settings
 from sanza.Store.settings import get_cart_type_name
+from sanza.Store.utils import notify_cart_to_admin, confirm_cart_to_user
 
 
 def get_public_api_permissions():
@@ -113,7 +114,7 @@ class CartView(APIView):
             #Force this type to be managed by the store
             StoreManagementActionType.objects.get_or_create(action_type=action_type)
 
-            notes = cart_serializer.validated_data["notes"]
+            notes = cart_serializer.validated_data["notes"].strip()
             if notes:
                 lines = notes.split('\n')
                 subject = lines[0]
@@ -152,6 +153,9 @@ class CartView(APIView):
                     text=store_item.name,
                     order_index=index+1
                 )
+
+            confirm_cart_to_user(profile, action)
+            notify_cart_to_admin(profile, action)
 
             #Done
             return Response({
