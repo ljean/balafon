@@ -88,6 +88,7 @@ class CartView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
+        """receive a new cart"""
 
         cart_serializer = serializers.CartSerializer(data=request.data)
         if cart_serializer.is_valid():
@@ -144,9 +145,12 @@ class CartView(APIView):
                 )
 
             #Done
-            return Response({'ok': True})
+            return Response({
+                'ok': True,
+                'deliveryDate': action.planned_date,
+                'deliveryPlace': action.sale.delivery_point.name,
+            })
         else:
-            print cart_serializer.errors
             return Response(
                 {
                     'ok': False,
