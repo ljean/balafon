@@ -19,7 +19,7 @@ class StoreItemCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StoreItemCategory
-        fields = ('id', 'name')
+        fields = ('id', 'name', "icon")
 
 
 class VatRateSerializer(serializers.ModelSerializer):
@@ -77,7 +77,7 @@ class StoreItemTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreItemTag
         fields = (
-            'id', 'name',
+            'id', 'name', "icon"
         )
 
 
@@ -90,3 +90,5 @@ class CartItemSerializer(serializers.Serializer):
 class CartSerializer(serializers.Serializer):
     items = CartItemSerializer(many=True)
     purchase_datetime = serializers.DateTimeField()
+    delivery_point = serializers.IntegerField()
+    notes = serializers.CharField(max_length=3000, required=False)

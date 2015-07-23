@@ -9,8 +9,22 @@ from sanza.Store.forms import StoreManagementActionTypeAdminForm
 
 
 admin.site.register(models.Unit)
-admin.site.register(models.StoreItemCategory)
-admin.site.register(models.StoreItemTag)
+admin.site.register(models.DeliveryPoint)
+
+class StoreItemCategoryAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active')
+    list_editable = ('name', 'order_index', 'icon', 'active')
+
+admin.site.register(models.StoreItemCategory, StoreItemCategoryAdmin)
+
+
+class StoreItemTagAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active')
+    list_editable = ('name', 'order_index', 'icon', 'active')
+
+admin.site.register(models.StoreItemTag, StoreItemTagAdmin)
+
+
 admin.site.register(models.Sale)
 admin.site.register(models.SaleItem)
 

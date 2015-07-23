@@ -99,6 +99,7 @@ class StoreItemCategory(models.Model):
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
     order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
     active = models.BooleanField(verbose_name=_(u"active"), default=True)
+    icon = models.CharField(max_length=20, default="", blank=True)
 
     class Meta:
         verbose_name = _(u"Store item category")
@@ -114,6 +115,7 @@ class StoreItemTag(models.Model):
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
     order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
     active = models.BooleanField(verbose_name=_(u"active"), default=True)
+    icon = models.CharField(max_length=20, default="", blank=True)
 
     class Meta:
         verbose_name = _(u"Store item tag")
@@ -174,9 +176,25 @@ class StoreItem(models.Model):
     stock_threshold_alert.allow_tags = True
 
 
+class DeliveryPoint(models.Model):
+    """Where to get a sale"""
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _(u"Delivery point")
+        verbose_name_plural = _(u"Delivery points")
+        ordering = ('name',)
+
+
 class Sale(models.Model):
     """A sale"""
     action = models.OneToOneField(Action)
+    delivery_point = models.ForeignKey(
+        DeliveryPoint, default=None, blank=True, null=True, verbose_name=_(u"delivery point")
+    )
 
     class Meta:
         verbose_name = _(u"Sale")

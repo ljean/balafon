@@ -9,7 +9,9 @@ from rest_framework.views import APIView
 
 from sanza.Crm.models import Action, ActionType
 from sanza.Profile.models import ContactProfile
-from sanza.Store.models import SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType
+from sanza.Store.models import (
+    SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint
+)
 from sanza.Store import serializers, settings
 from sanza.Store.settings import get_cart_type_name
 
@@ -87,8 +89,6 @@ class CartView(APIView):
 
     def post(self, request):
 
-        print request.data
-
         cart_serializer = serializers.CartSerializer(data=request.data)
         if cart_serializer.is_valid():
 
@@ -99,6 +99,12 @@ class CartView(APIView):
             except ContactProfile.DoesNotExist:
                 return Response({'ok': False, 'message': _(u"You don't have a valid profile")})
 
+            #Get Delivery point
+            try:
+                delivery_point = DeliveryPoint.objects.get(id=cart_serializer.validated_data["delivery_point"])
+            except DeliveryPoint.DoesNotExist:
+                return Response({'ok': False, 'message': _(u"Invalid delivery point")})
+
             #Create a new Sale
             action_type_name = get_cart_type_name()
             action_type = ActionType.objects.get_or_create(name=action_type_name)[0]
@@ -108,11 +114,15 @@ class CartView(APIView):
 
             action = Action.objects.create(
                 planned_date=cart_serializer.validated_data['purchase_datetime'],
+                detail=cart_serializer.validated_data["notes"],
                 status=action_type.default_status,
                 type=action_type
             )
             action.contacts.add(contact)
             action.save()
+
+            action.sale.delivery_point = delivery_point
+            action.sale.save()
 
             #for each line add a sale item
             for index, item in enumerate(cart_serializer.validated_data['items']):
@@ -134,5 +144,12 @@ class CartView(APIView):
                 )
 
             #Done
-
-        return Response({'ok': True})
+            return Response({'ok': True})
+        else:
+            print cart_serializer.errors
+            return Response(
+                {
+                    'ok': False,
+                    'message': u', '.join([u'{0}: {1}'.format(*err) for err in cart_serializer.errors.items()])
+                }
+            )
