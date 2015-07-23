@@ -113,9 +113,18 @@ class CartView(APIView):
             #Force this type to be managed by the store
             StoreManagementActionType.objects.get_or_create(action_type=action_type)
 
+            notes = cart_serializer.validated_data["notes"]
+            if notes:
+                lines = notes.split('\n')
+                subject = lines[0]
+                detail = '\n'.join(lines[1:])
+            else:
+                subject = detail = ''
+
             action = Action.objects.create(
                 planned_date=cart_serializer.validated_data['purchase_datetime'],
-                detail=cart_serializer.validated_data["notes"],
+                subject=subject,
+                detail=detail,
                 status=action_type.default_status,
                 type=action_type
             )
