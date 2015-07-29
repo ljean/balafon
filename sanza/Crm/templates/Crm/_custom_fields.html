@@ -20,7 +20,14 @@
         {% with instance|custom_field:f.name as cfv %}
         {% if cfv %}
         <span class="custom-field">
-          <span class="custom-field-label">{{f.label}}:</span><span class="custom-field-value">{{cfv}}</span>
+          <span class="custom-field-label">{{f.label}}:</span>
+          <span class="custom-field-value">
+            {% if field.is_link %}
+              <a href="{{cfv}}" class="colorbox">{% trans "Open" %}</a>
+            {% else %}
+              {{cfv}}
+            {% endif %}
+          </span>
         </span>
         {% endif %}
         {% endwith %}

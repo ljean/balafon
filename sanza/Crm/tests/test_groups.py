@@ -485,3 +485,67 @@ class EditGroupTestCase(BaseTestCase):
         g = models.Group.objects.get(id=g.id)
         self.assertEqual(g.name, data['name'])
         self.assertEqual(g.description, data['description'])
+
+
+class AddToGroupTest(BaseTestCase):
+    """Test the add_group methods"""
+
+    def test_add_entity_to_new_group(self):
+        """it should create group and add the entity to it"""
+        entity = mommy.make(models.Entity)
+
+        self.assertEqual(0, models.Group.objects.count())
+
+        entity.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.entities.count(), 1)
+        self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.contacts.count(), 0)
+
+    def test_add_entity_to_existing_group(self):
+        """it should add the entity to existing group"""
+        entity = mommy.make(models.Entity)
+
+        mommy.make(models.Group, name='toto')
+
+        entity.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.entities.count(), 1)
+        self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.contacts.count(), 0)
+
+    def test_add_contact_to_new_group(self):
+        """it should create group and add the entity to it"""
+        contact = mommy.make(models.Contact)
+
+        self.assertEqual(0, models.Group.objects.count())
+
+        contact.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.contacts.count(), 1)
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(group.entities.count(), 0)
+
+    def test_add_contact_to_existing_group(self):
+        """it should add the entity to existing group"""
+        contact = mommy.make(models.Contact)
+
+        mommy.make(models.Group, name='toto')
+
+        contact.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.contacts.count(), 1)
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(group.entities.count(), 0)
