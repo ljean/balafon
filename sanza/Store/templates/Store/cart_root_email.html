@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <title>{{ subject }}</title>
 </head>
-<body style="{% block body_style %}background: #000;{% endblock %}">
+<body style="{% block body_style %}{% endblock %}">
   {% block style %}
   <style>
     
@@ -33,6 +33,15 @@
       </div>
       {% endblock %}
 
+      {% block notes %}
+      {% if action.subject %}
+      <div>
+        {% trans "Notes" %} :
+        {{ action.subject }}<br />
+        {{ action.detail|linebreaksbr }}
+      </div>
+      {% endif %}
+      {% endblock %}
 
       {% block cart %}
       <div>
@@ -46,14 +55,14 @@
         {% for item in action.sale.saleitem_set.all %}
           <tr>
             <td>{{ item.text }}</td>
-            <td>{{ item.vat_incl_price }} €</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.vat_incl_total_price }} €</td>
+            <td>{{ item.vat_incl_price|floatformat:2 }} €</td>
+            <td>{{ item.quantity|floatformat:2 }}</td>
+            <td>{{ item.vat_incl_total_price|floatformat:2 }} €</td>
           </tr>
         {% endfor %}
           <tr>
             <th colspan="3">{% trans "Total" %}</th>
-            <th>{{ action.amount }} €</th>
+            <th>{{ action.amount|floatformat:2 }} €</th>
           </tr>
         </table>
 
