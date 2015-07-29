@@ -368,6 +368,19 @@ class Entity(LastModifiedModel):
         """logo thumbnail"""
         return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center')
 
+    def set_custom_field(self, field_name, value):
+        """set the value of a custom field"""
+        field = CustomField.objects.get_or_create(model=CustomField.MODEL_ENTITY, name=field_name)[0]
+        field_value = EntityCustomFieldValue.objects.get_or_create(custom_field=field, contact=self)[0]
+        field_value.value = value
+        field_value.save()
+
+    def add_to_group(self, group_name):
+        """add to group"""
+        group = Group.objects.get_or_create(group_name)[0]
+        group.entities.add(self)
+        group.save()
+
     def get_custom_fields(self):
         """additional fields"""
         return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
@@ -748,6 +761,19 @@ class Contact(LastModifiedModel):
             return _(u"{1}{0.firstname}{0.lastname}").format(self, title)
         
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
+
+    def set_custom_field(self, field_name, value):
+        """set the value of a custom field"""
+        field = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)[0]
+        field_value = ContactCustomFieldValue.objects.get_or_create(custom_field=field, contact=self)[0]
+        field_value.value = value
+        field_value.save()
+
+    def add_to_group(self, group_name):
+        """add to group"""
+        group = Group.objects.get_or_create(group_name)[0]
+        group.contacts.add(self)
+        group.save()
 
     def save(self, *args, **kwargs):
         """save"""
