@@ -199,7 +199,7 @@ class _CityBasedForm(object):
                 pass
         if not self.country_id:
             self.country_id = get_default_country().id
-            
+
         self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
 
         zones_choices = [(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
@@ -243,6 +243,7 @@ class _CityBasedForm(object):
                     
                 country = self._get_country(country_id)
                 default_country = get_default_country()
+
                 if country != default_country:
                     city = models.City.objects.get_or_create(name=city, parent=country)[0]
                 else:
@@ -259,7 +260,11 @@ class _CityBasedForm(object):
 
 class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
     """ModelForm with city"""
-
+    city = forms.CharField(
+        required=False,
+        label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+    )
     country = forms.ChoiceField(required=False, label=_(u'Country'))
     
     def __init__(self, *args, **kwargs):
@@ -281,12 +286,7 @@ class FormWithCity(BetterBsForm, _CityBasedForm):
 
 class EntityForm(ModelFormWithCity):
     """Edit entity form"""
-    city = forms.CharField(
-        required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
-    )
-    
+
     def __init__(self, *args, **kwargs):
         super(EntityForm, self).__init__(*args, **kwargs)
         
@@ -328,12 +328,7 @@ class EntityForm(ModelFormWithCity):
 
 class ContactForm(ModelFormWithCity):
     """Edit contact form"""
-    city = forms.CharField(
-        required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
-    )
-    
+
     class Meta:
         """form is defined from model"""
         model = models.Contact
