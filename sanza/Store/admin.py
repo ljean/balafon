@@ -89,7 +89,7 @@ class StoreItemAdmin(admin.ModelAdmin):
     list_filter = ['category', 'tags', StockThresholdFilter]
     search_fields = ['name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
-    #inlines = [StoreItemPropertyValueInline]
+    inlines = [StoreItemPropertyValueInline]
 
 
 admin.site.register(models.StoreItem, StoreItemAdmin)

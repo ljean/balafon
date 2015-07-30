@@ -218,7 +218,7 @@ class StoreItem(models.Model):
 class StoreItemProperty(models.Model):
     """a property for a store item: DLC, Colisage..."""
     name = models.CharField(max_length=100, verbose_name=_(u'name'))
-    label = models.CharField(max_length=100, verbose_name=_(u'name'), default='', blank=True)
+    label = models.CharField(max_length=100, verbose_name=_(u'label'), default='', blank=True)
 
     class Meta:
         verbose_name = _(u"Store item: property value")
@@ -377,20 +377,18 @@ class StoreItemImport(models.Model):
         self.save()
 
 
-
-
 class StoreItemPropertyValue(models.Model):
     """The value of a property for a given item"""
     item = models.ForeignKey(StoreItem, verbose_name=_(u'item'))
     property = models.ForeignKey(StoreItemProperty, verbose_name=_(u'property'))
-    value = models.CharField(max_length=100, verbose_name=_(u'value'))
+    value = models.CharField(max_length=100, verbose_name=_(u'value'), blank=True, default='')
 
     class Meta:
         verbose_name = _(u"Store item: property value")
         verbose_name_plural = _(u"Store item: property values")
 
     def __unicode__(self):
-        return self.name
+        return u'{0}'.format(self.property)
 
 
 class DeliveryPoint(models.Model):
