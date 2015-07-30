@@ -2,6 +2,7 @@
 """admin"""
 
 from django.contrib import admin
+from django.contrib.messages import success, error
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Store import models
@@ -69,6 +70,14 @@ class StockThresholdFilter(admin.SimpleListFilter):
             return queryset
 
 
+class StoreItemPropertyValueInline(admin.TabularInline):
+    """display property on the store item"""
+
+    class Meta:
+        model = models.StoreItemPropertyValue
+        fields = ('property', 'value')
+
+
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -79,7 +88,7 @@ class StoreItemAdmin(admin.ModelAdmin):
     list_filter = ['category', 'tags', StockThresholdFilter]
     search_fields = ['name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
-
+    inlines = [StoreItemPropertyValueInline]
 
 admin.site.register(models.StoreItem, StoreItemAdmin)
 
@@ -92,3 +101,35 @@ class VatRateAdmin(admin.ModelAdmin):
     readonly_fields = ['name']
 
 admin.site.register(models.VatRate, VatRateAdmin)
+
+
+class StoreItemImportAdmin(admin.ModelAdmin):
+    def import_data(modeladmin, request, queryset):
+        for import_file in queryset:
+            import_file.import_data()
+            if import_file.is_successful:
+                success(
+                    request,
+                    _(u'The file {0} has been properly imported : {0} items have been created').format(
+                        import_file, import_file.storeitem_set.count()
+                    )
+                )
+            else:
+                success(
+                    request,
+                    _(u'Error while importing the file {0}: {1}').format(
+                        import_file, import_file.error_message
+                    )
+                )
+
+    import_data.short_description = _(u"Import")
+    actions = []
+
+admin.site.register(models.StoreItemImport)
+
+
+
+admin.site.register(models.Brand)
+admin.site.register(models.StoreItemProperty)
+
+

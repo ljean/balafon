@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """models"""
 
+import datetime
+from decimal import Decimal
+import traceback
+import xlrd
+
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import pre_delete, post_save
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Crm.models import Action, ActionMenu, ActionStatus, ActionType
 from sanza.Crm.signals import action_cloned
@@ -126,8 +131,21 @@ class StoreItemTag(models.Model):
         return self.name
 
 
+class Brand(models.Model):
+    """A brand : cola-cola, peugeot or whatever"""
+    name = models.CharField(max_length=100, verbose_name=_(u'name'))
+
+    class Meta:
+        verbose_name = _(u"Brand")
+        verbose_name_plural = _(u"Brands")
+
+    def __unicode__(self):
+        return self.name
+
+
 class StoreItem(models.Model):
     """something than can be buy in this store"""
+
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
     category = models.ForeignKey(StoreItemCategory, verbose_name=_(u"category"))
     tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u"tags"))
@@ -139,6 +157,11 @@ class StoreItem(models.Model):
         verbose_name=_(u"purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
     )
     unit = models.ForeignKey(Unit, blank=True, default=None, null=True)
+    brand = models.ForeignKey(Brand, default=None, blank=True, null=True, verbose_name=_(u'brand'))
+    reference = models.CharField(max_length=100, default='', blank=True, verbose_name=_(u'reference'))
+    imported_by = models.ForeignKey(
+        'StoreItemImport', default=None, blank=True, null=True, verbose_name=_(u'imported by')
+    )
 
     class Meta:
         verbose_name = _(u"Store item")
@@ -152,6 +175,22 @@ class StoreItem(models.Model):
         """VAT inclusive price"""
         return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
     vat_incl_price.short_description = _(u"VAT inclusive price")
+
+    def set_property(self, property_name, value):
+        """create and set a property for this item"""
+        the_property = StoreItemProperty.objects.get_or_create(name=property_name)[0]
+        property_value = StoreItemPropertyValue.objects.get_or_create(property=the_property, item=self)[0]
+        property_value.value = value
+        property_value.save()
+
+    def get_property(self, property_name):
+        """create and set a property for this item"""
+        the_property = StoreItemProperty.objects.get_or_create(name=property_name)[0]
+        try:
+            property_value = StoreItemPropertyValue.objects.get(property=the_property, item=self)
+            return property_value.value
+        except StoreItemPropertyValue.DoesNotExist:
+            return ''
 
     def has_stock_threshold_alert(self):
         """returns True if stock is below threshold"""
@@ -174,6 +213,183 @@ class StoreItem(models.Model):
 
     stock_threshold_alert.short_description = _(u"Stock threshold")
     stock_threshold_alert.allow_tags = True
+
+
+class StoreItemProperty(models.Model):
+    """a property for a store item: DLC, Colisage..."""
+    name = models.CharField(max_length=100, verbose_name=_(u'name'))
+    label = models.CharField(max_length=100, verbose_name=_(u'name'), default='', blank=True)
+
+    class Meta:
+        verbose_name = _(u"Store item: property value")
+        verbose_name_plural = _(u"Store item: properties")
+
+    def __unicode__(self):
+        return self.label or self.name
+
+
+class StoreItemImport(models.Model):
+    """Makes possible to import store item"""
+    data = models.FileField(
+        upload_to='store_item_imports',
+        verbose_name=_(u"Import file"),
+        help_text=_(u'An Excel file (*.xls) with the data')
+    )
+    tags = models.ManyToManyField(
+        StoreItemTag,
+        blank=True,
+        verbose_name=_(u"tags"),
+        help_text=_(u'Tags that can be added to the items')
+    )
+    fields = models.CharField(
+        max_length=300,
+        default='name,brand,reference,category,purchase_price,vat_rate',
+        verbose_name=_(u"fields"),
+        help_text=_(u"Fields to import in order: if the attribute doesn't exist, create a custom property")
+    )
+    last_import_date = models.DateTimeField(default=None, blank=True, null=True, verbose_name=_(u"last import"))
+    import_error = models.TextField(default='', blank=True, verbose_name=_(u'import error'))
+    is_successful = models.BooleanField(default=True, verbose_name=_('is successful'))
+    ignore_first_line = models.BooleanField(default=True, verbose_name=_('ignore first line'))
+    margin_rate = models.DecimalField(
+        default=None, null=True, verbose_name=_('margin_rate'), max_digits=9, decimal_places=2
+    )
+    error_message = models.CharField(
+        default='', blank=True, max_length=100, verbose_name=_(u'error message')
+    )
+
+    class Meta:
+        verbose_name = _(u"Store item import")
+        verbose_name_plural = _(u"Store item imports")
+
+    def __unicode__(self):
+        return self.data.url
+
+    def get_url(self):
+        return self.data.url
+
+    def _to_decimal(self, raw_value):
+        """convert string to decimal"""
+        return Decimal(raw_value)
+
+    def _to_itself(self, raw_value):
+        """dummy : just a function to use in the dict"""
+        return raw_value
+
+    def _to_brand(self, raw_value):
+        """convert string to brand"""
+        if raw_value:
+            return Brand.objects.get_or_create(name=raw_value)[0]
+
+    def _to_category(self, raw_value):
+        """convert string to category"""
+        raw_value = raw_value or ugettext('Uncategorized')
+        return StoreItemCategory.objects.get_or_create(name=raw_value)[0]
+
+    def _to_vat(self, raw_value):
+        """convert string to vat"""
+        if raw_value:
+            return VatRate.objects.get_or_create(rate=Decimal(raw_value))[0]
+        else:
+            try:
+                return VatRate.objects.get(is_default=True)
+            except VatRate.DoesNotExist:
+                try:
+                    return VatRate.objects.all()[0]
+                except IndexError:
+                    return VatRate.objects.create(is_default=True, rate=Decimal("20.0"))
+
+    def import_data(self):
+        """import data from xls file"""
+        self.last_import_date = datetime.datetime.now()
+        self.import_error = u''
+        self.error_message = u''
+        self.is_successful = False
+        self.save()
+        self.is_successful = True  # Assume everything will be ok :-)
+        try:
+            book = xlrd.open_workbook(file_contents=self.data.read())
+            sheet = book.sheet_by_index(0)
+
+            fields = self.fields.split(',')
+
+            fields_conversion = {
+                'name': self._to_itself,
+                'reference': self._to_itself,
+                'purchase_price': self._to_decimal,
+                'brand': self._to_brand,
+                'category': self._to_category,
+                'vat_rate': self._to_vat,
+                'pre_tax_price': self._to_decimal,
+            }
+
+            for row_index in xrange(sheet.nrows):
+
+                if self.ignore_first_line and row_index == 0:
+                    #ignore
+                    continue
+
+                store_item = StoreItem()
+                properties = []
+
+                #for all fields
+                for field, col_index in zip(fields, xrange(sheet.ncols)):
+                    raw_value = sheet.cell(rowx=row_index, colx=col_index).value
+
+                    if field in fields_conversion:
+                        #call the function associated with this field
+                        value = fields_conversion[field](raw_value)
+                        setattr(store_item, field, value)
+                    else:
+                        #for extra fields : create a property (once the object has been saved)
+                        properties.append((field, raw_value))
+
+                if 'pre_tax_price' not in fields:
+                    if 'purchase_price' in fields:
+                        margin_rate = self.margin_rate or 1
+                        store_item.pre_tax_price = store_item.purchase_price * margin_rate
+                    else:
+                        store_item.pre_tax_price = 0
+
+                if 'vat_rate' not in fields:
+                    store_item.vat_rate = self._to_vat(None)  # force default
+
+                if 'category' not in fields:
+                    store_item.category = self._to_category(None)  # force default
+
+                store_item.imported_by = self
+                store_item.save()
+
+                for (property_field, value) in properties:
+                    store_item.set_property(property_field, value)
+
+                for tag in self.tags.all():
+                    store_item.tags.add(tag)
+                    store_item.save()
+
+        except Exception as msg:  # pylint: disable=broad-except
+            error_stack = traceback.format_exc()
+            self.import_error = repr(error_stack)
+            self.is_successful = False
+            self.error_message = unicode(msg)[:100]
+
+        self.save()
+
+
+
+
+class StoreItemPropertyValue(models.Model):
+    """The value of a property for a given item"""
+    item = models.ForeignKey(StoreItem, verbose_name=_(u'item'))
+    property = models.ForeignKey(StoreItemProperty, verbose_name=_(u'property'))
+    value = models.CharField(max_length=100, verbose_name=_(u'value'))
+
+    class Meta:
+        verbose_name = _(u"Store item: property value")
+        verbose_name_plural = _(u"Store item: property values")
+
+    def __unicode__(self):
+        return self.name
 
 
 class DeliveryPoint(models.Model):
