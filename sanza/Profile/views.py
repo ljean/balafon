@@ -91,7 +91,7 @@ def post_message(request):
             message_action, _is_new = ActionType.objects.get_or_create(name=_(u'Message'))
             action = Action.objects.create(
                 subject=_(u"New message on web site"), planned_date=now_rounded(),
-                type = message_action, detail=message, contact=profile.contact, display_on_board=True
+                type=message_action, detail=message, contact=profile.contact, display_on_board=True
             )
         
             return HttpResponseRedirect(reverse('homepage'))
