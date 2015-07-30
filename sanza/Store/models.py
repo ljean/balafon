@@ -289,6 +289,7 @@ class StoreItemImport(models.Model):
     def _to_vat(self, raw_value):
         """convert string to vat"""
         if raw_value:
+            raw_value = u'{0}'.format(raw_value)  # float to string and the to decimal
             return VatRate.objects.get_or_create(rate=Decimal(raw_value))[0]
         else:
             try:
