@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from sanza.Store.models import Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, VatRate
+from sanza.Store.models import Brand, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, VatRate
 
 
 class SaleSerializer(serializers.ModelSerializer):
@@ -33,6 +33,13 @@ class VatRateSerializer(serializers.ModelSerializer):
         fields = ('id', 'rate', 'name', 'is_default')
         
 
+class BrandSerializer(serializers.ModelSerializer):
+    """json serializer"""
+    class Meta:
+        model = Brand
+        fields = ('id', 'name',)
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
@@ -40,10 +47,11 @@ class StoreItemSerializer(serializers.ModelSerializer):
     vat_rate = VatRateSerializer()
     category = StoreItemCategorySerializer()
     vat_incl_price = serializers.FloatField(read_only=True)
+    brand = BrandSerializer(read_only=True)
 
     class Meta:
         model = StoreItem
-        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price')
+        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference')
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
