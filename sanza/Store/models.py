@@ -121,6 +121,7 @@ class StoreItemTag(models.Model):
     order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
     active = models.BooleanField(verbose_name=_(u"active"), default=True)
     icon = models.CharField(max_length=20, default="", blank=True)
+    show_always = models.BooleanField(verbose_name=_(u"show always"), default=True)
 
     class Meta:
         verbose_name = _(u"Store item tag")
