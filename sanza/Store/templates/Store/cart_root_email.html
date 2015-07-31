@@ -48,6 +48,9 @@
         <table>
           <tr>
             <th>{% trans "Store_item" %}</th>
+            <th>{% trans "Brand" %}</th>
+            <th>{% trans "Reference" %}</th>
+            <th>{% trans "Store_item" %}</th>
             <th>{% trans "Price" %}</th>
             <th>{% trans "Quantity" %}</th>
             <th>{% trans "Total" %}</th>
@@ -55,6 +58,8 @@
         {% for item in action.sale.saleitem_set.all %}
           <tr>
             <td>{{ item.text }}</td>
+            <td>{{ item.item.brand.name }}</td>
+            <td>{{ item.item.reference }}</td>
             <td>{{ item.vat_incl_price|floatformat:2 }} €</td>
             <td>{{ item.quantity|floatformat:2 }}</td>
             <td>{{ item.vat_incl_total_price|floatformat:2 }} €</td>
