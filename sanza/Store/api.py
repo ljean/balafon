@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+from decimal import Decimal
+
 from django.utils.translation import ugettext as _
 
 from rest_framework import viewsets, permissions
@@ -146,7 +148,7 @@ class CartView(APIView):
 
                 SaleItem.objects.create(
                     sale=action.sale,
-                    quantity=item['quantity'],
+                    quantity=Decimal(u'{0}'.format(item['quantity'])),
                     item=store_item,
                     vat_rate=store_item.vat_rate,
                     pre_tax_price=store_item.pre_tax_price,
