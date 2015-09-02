@@ -5,6 +5,8 @@ if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
+from bs4 import BeautifulSoup
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -469,19 +471,107 @@ class GetGroupsListTestCase(GroupSuggestListTestCase):
 
 
 class EditGroupTestCase(BaseTestCase):
+    """test edit group"""
+
     def test_view_edit_group(self):
-        g = mommy.make(models.Group)
-        response = self.client.get(reverse('crm_edit_group', args=[g.id]))
+        """it should display the edit group page"""
+        group = mommy.make(models.Group)
+        response = self.client.get(reverse('crm_edit_group', args=[group.id]))
         self.assertEqual(200, response.status_code)
 
     def test_edit_group(self):
-        g = mommy.make(models.Group)
+        """it should modify the group"""
+        group = mommy.make(models.Group)
         data = {
             'name': 'my group name',
             'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
         }
-        response = self.client.post(reverse('crm_edit_group', args=[g.id]), data=data)
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
-        g = models.Group.objects.get(id=g.id)
-        self.assertEqual(g.name, data['name'])
-        self.assertEqual(g.description, data['description'])
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_fore_color(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '#ccc',
+            'background_color': '',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_background_color(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '#123456',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_invalid_color(self):
+        """it should not modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': 'hello',
+            'background_color': '#123456',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        errors = soup.select('ul.errorlist li')
+        self.assertEqual(len(errors), 1)
+
+        group = models.Group.objects.get(id=group.id)
+        self.assertNotEqual(group.name, data['name'])
+        self.assertNotEqual(group.description, data['description'])
+        self.assertNotEqual(group.fore_color, data['fore_color'])
+        self.assertNotEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_invalid_background_color(self):
+        """it should not modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '#123',
+            'background_color': 'hello',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        errors = soup.select('ul.errorlist li')
+        self.assertEqual(len(errors), 1)
+
+        group = models.Group.objects.get(id=group.id)
+        self.assertNotEqual(group.name, data['name'])
+        self.assertNotEqual(group.description, data['description'])
+        self.assertNotEqual(group.fore_color, data['fore_color'])
+        self.assertNotEqual(group.background_color, data['background_color'])

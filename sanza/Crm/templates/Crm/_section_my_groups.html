@@ -12,13 +12,25 @@
   {% autopaginate groups 50 %}
   {% for g in groups %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-      <td>{% favorite_item object=g %} <a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
+      <td>
+        {% favorite_item object=g %}
+        <a
+          href="{% url 'search_group' g.id %}"
+          class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+          style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+        >
+          {{g.name}}
+        </a>
+      </td>
       <td>{{g.entities.count}} {% trans "entities" %}
       - {{g.contacts.count}} {% trans "contacts" %}</td>
-      <td><span class="description contenteditable" contenteditable="true" rel="{% url "auto_save_data" "group" "description" g.id %}">
-        {{g.description}}</span></td>
-      <td class="ico-col" title="{% trans "Edit" %}">
-        <a class="btn btn-xs btn-default" href="{% url "crm_edit_group" g.id %}">
+      <td>
+        <span class="description contenteditable" contenteditable="true" rel="{% url 'auto_save_data' 'group' 'description' g.id %}">
+          {{g.description}}
+        </span>
+      </td>
+      <td class="ico-col" title="{% trans 'Edit' %}">
+        <a class="btn btn-xs btn-default" href="{% url 'crm_edit_group' g.id %}">
             <span class="glyphicon glyphicon-cog"></span> {% trans "Edit" %}
       </a></td>
     </tr>
@@ -29,12 +41,12 @@
 
 {% block section_buttons %}
     {% if entity %}
-        <li><a href="{% url "crm_add_entity_to_group" entity.id %}">{% trans "Add" %}</a></li>
+        <li><a href="{% url 'crm_add_entity_to_group' entity.id %}">{% trans "Add" %}</a></li>
     {% else %}
-        <li><a href="{% url "crm_add_group" %}">{% trans "Add" %}</a></li>
+        <li><a href="{% url 'crm_add_group' %}">{% trans "Add" %}</a></li>
     {% endif %}
     {% comment %}
-    <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=name">{% trans "Order by name" %}</a></li>
-    <li><a class="{% if ordering == 'date' %}disabled{% endif %}" href="{% url "crm_see_my_groups" %}?ordering=date">{% trans "Order by date" %}</a></li>
+    <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url 'crm_see_my_groups' %}?ordering=name">{% trans "Order by name" %}</a></li>
+    <li><a class="{% if ordering == 'date' %}disabled{% endif %}" href="{% url 'crm_see_my_groups' %}?ordering=date">{% trans "Order by date" %}</a></li>
     {% endcomment %}
 {% endblock %}

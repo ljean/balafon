@@ -12,16 +12,20 @@
         {% for g in contact.entity.group_set.all %}
           <span class="group-tag btn btn-xs btn-gray" title="{{g.description}}">
             {% spaceless %}
-            <a href="{% url "search_group" g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+            <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
             <span class="glyphicon glyphicon-remove disabled"></span>
             {% endspaceless %}
           </span>
         {% endfor %}
         {% for g in contact.group_set.all %}
-          <span class="group-tag btn btn-xs btn-primary" title="{{g.description}}">
+          <span
+              class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+              style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+              title="{{g.description}}"
+            >
             {% spaceless %}
-            <a href="{% url "search_group" g.id %}" class="group-name">{{g.name}}</a>&nbsp;
-              <a class="colorbox-form btn-close" href="{% url "crm_remove_contact_from_group" g.id contact.id %}" title="{% trans "Remove from group" %}">
+            <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+              <a class="colorbox-form btn-close" href="{% url 'crm_remove_contact_from_group' g.id contact.id %}" title="{% trans 'Remove from group' %}">
                 <span class="glyphicon glyphicon-remove"></span>
               </a>
             {% endspaceless %}

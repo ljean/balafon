@@ -111,7 +111,7 @@ class EditGroupForm(BsModelForm):
     class Meta:
         """Define the form from model"""
         model = models.Group
-        fields = ('name', 'description', 'subscribe_form', 'entities', 'contacts')
+        fields = ('name', 'description', 'background_color', 'fore_color', 'subscribe_form', 'entities', 'contacts')
         widgets = {
             'description': forms.TextInput(
                 attrs={

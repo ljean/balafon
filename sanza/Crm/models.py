@@ -25,7 +25,7 @@ from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
 
 from sanza.Crm import settings
-from sanza.utils import now_rounded, logger
+from sanza.utils import now_rounded, logger, validate_rgb
 from sanza.Users.models import Favorite
 
 
@@ -813,6 +813,14 @@ class Group(TimeStampedModel):
     subscribe_form = models.BooleanField(
         default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This group will be proposed on the public subscribe form')
+    )
+    fore_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Fore color'),
+        help_text=_(u"Fore color. Must be a rgb code. For example: #ffffff")
+    )
+    background_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Background color'),
+        help_text=_(u"Background color. Must be a rgb code. For example: #000000")
     )
     
     favorites = GenericRelation(Favorite)

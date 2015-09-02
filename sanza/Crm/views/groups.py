@@ -165,7 +165,7 @@ def edit_group(request, group_id):
     if request.method == "POST":
         form = forms.EditGroupForm(request.POST, instance=group)
         if form.is_valid():
-            group = form.save()
+            form.save()
             next_url = request.session.pop('next_url', reverse('crm_see_my_groups'))
             return HttpResponseRedirect(next_url)
     else:
