@@ -16,11 +16,18 @@
   <div class="row">
     <div class="col-md-12">
       <div class="data-groups">
-      {% for f in custom_fields %}
-        {% with instance|custom_field:f.name as cfv %}
-        {% if cfv %}
+      {% for field in custom_fields %}
+        {% with instance|custom_field:field.name as field_value %}
+        {% if field_value %}
         <span class="custom-field">
-          <span class="custom-field-label">{{f.label}}:</span><span class="custom-field-value">{{cfv}}</span>
+          <span class="custom-field-label">{% if field.label %}{{field.label}}{% else %}{{ field.name }}{% endif %}:</span>
+          <span class="custom-field-value">
+            {% if field.is_link %}
+              <a href="{{field_value}}" target="_blank">{% trans "Open" %}</a>
+            {% else %}
+              {{field_value}}
+            {% endif %}
+          </span>
         </span>
         {% endif %}
         {% endwith %}

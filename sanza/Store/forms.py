@@ -21,3 +21,4 @@ class StoreManagementActionTypeAdminForm(forms.ModelForm):
         else:
             self.fields['readonly_status'].queryset = ActionStatus.objects.none()
             self.fields['readonly_status'].widget = forms.HiddenInput()
+

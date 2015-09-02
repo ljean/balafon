@@ -3,7 +3,7 @@
 
 from rest_framework import serializers
 
-from sanza.Store.models import Sale, StoreItem, StoreItemCategory, SaleItem, VatRate
+from sanza.Store.models import Brand, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, VatRate
 
 
 class SaleSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class StoreItemCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StoreItemCategory
-        fields = ('id', 'name')
+        fields = ('id', 'name', "icon")
 
 
 class VatRateSerializer(serializers.ModelSerializer):
@@ -33,16 +33,25 @@ class VatRateSerializer(serializers.ModelSerializer):
         fields = ('id', 'rate', 'name', 'is_default')
         
 
+class BrandSerializer(serializers.ModelSerializer):
+    """json serializer"""
+    class Meta:
+        model = Brand
+        fields = ('id', 'name',)
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
     pre_tax_price = serializers.FloatField()
     vat_rate = VatRateSerializer()
     category = StoreItemCategorySerializer()
+    vat_incl_price = serializers.FloatField(read_only=True)
+    brand = BrandSerializer(read_only=True)
 
     class Meta:
         model = StoreItem
-        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price')
+        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference')
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
@@ -69,3 +78,25 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale',
         )
+
+
+class StoreItemTagSerializer(serializers.ModelSerializer):
+    """tags"""
+    class Meta:
+        model = StoreItemTag
+        fields = (
+            'id', 'name', "icon"
+        )
+
+
+class CartItemSerializer(serializers.Serializer):
+    """Serialize a sales item"""
+    id = serializers.IntegerField()
+    quantity = serializers.FloatField()
+
+
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    purchase_datetime = serializers.DateTimeField()
+    delivery_point = serializers.IntegerField()
+    notes = serializers.CharField(max_length=3000, required=False)

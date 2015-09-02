@@ -269,7 +269,7 @@ def send_verification_email(contact):
         )
         try:
             email.send()
-        except Exception, msg: # pylint: disable=broad-except
+        except Exception, msg:  # pylint: disable=broad-except
             raise EmailSendError(unicode(msg))
         return True
     return False

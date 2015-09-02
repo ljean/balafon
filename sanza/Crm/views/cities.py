@@ -45,7 +45,11 @@ def get_cities(request):
     """view"""
     #subscribe form : no login required
     term = request.GET.get('term')
-    country_id = int(request.GET.get('country', 0))
+    country_id = request.GET.get('country', 0)
+    if country_id == 'undefined':
+        # javascript none
+        country_id = 0
+    country_id = int(country_id)
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
     if country_id == 0 or country_id == default_country.id:
         cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]

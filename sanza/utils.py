@@ -11,6 +11,8 @@ from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
 from django.utils.translation import ugettext as _
 
+from rest_framework.renderers import JSONRenderer
+
 try:
     from localeurl.utils import strip_path
 except ImportError:
@@ -82,3 +84,9 @@ def validate_rgb(value):
                 wrong = True
     if wrong:
         raise ValidationError(_(u'RGB format (e.g. #123456) expected'))
+    return False
+
+
+class Utf8JSONRenderer(JSONRenderer):
+    """Utf-8 support"""
+    ensure_ascii = False
