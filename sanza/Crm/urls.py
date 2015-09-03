@@ -135,7 +135,8 @@ urlpatterns += patterns('sanza.Crm.views.groups',
     url(r'^group-name/(?P<gr_id>\d+)/$', 'get_group_name', name='crm_get_group_name'),
     url(r'^groups/list/$', 'get_groups', name='crm_get_groups'),
     url(r'^group-id/$', 'get_group_id', name='crm_get_group_id'),
-
+    url(r'^select-contact-or-entity/$', 'select_contact_or_entity', name='crm_select_contact_or_entity'),
+    url(r'^get-contact-or-entity/$', 'get_contact_or_entity', name='crm_get_contact_or_entity'),
 )
 
 

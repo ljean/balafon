@@ -576,6 +576,87 @@ class EditGroupTestCase(BaseTestCase):
         self.assertNotEqual(group.fore_color, data['fore_color'])
         self.assertNotEqual(group.background_color, data['background_color'])
 
+    def test_edit_group_add_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0}]'.format(contact.id),
+            'entities': '[{0}]'.format(entity.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(list(group.entities.all()), [entity])
+
+    def test_edit_group_add_several_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact1 = mommy.make(models.Contact)
+        contact2 = mommy.make(models.Contact)
+        entity1 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0},{1}]'.format(contact1.id, contact2.id),
+            'entities': '[{0},{1}]'.format(entity1.id, entity2.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all().order_by('id')), [contact1, contact2])
+        self.assertEqual(list(group.entities.all().order_by('id')), [entity1, entity2])
+
+    def test_edit_group_remove_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact1 = mommy.make(models.Contact)
+        contact2 = mommy.make(models.Contact)
+        entity1 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity)
+
+        group.contacts.add(contact1)
+        group.contacts.add(contact2)
+        group.entities.add(entity1)
+        group.entities.add(entity2)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0}]'.format(contact1.id),
+            'entities': '[{0}]'.format(entity2.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all().order_by('id')), [contact1])
+        self.assertEqual(list(group.entities.all().order_by('id')), [entity2])
+
 
 class AddToGroupTest(BaseTestCase):
     """Test the add_group methods"""

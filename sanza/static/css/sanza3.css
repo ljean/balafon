@@ -115,6 +115,11 @@ body {
   color: #000;
   margin-right: 2px;
 }
+.label-member {
+  color: #000;
+  background: #eee;
+  border: solid thin #ccc;
+}
 .actions .action .label-in-charge {
   margin-top: 4px;
 }

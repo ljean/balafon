@@ -5,7 +5,7 @@ import json
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
@@ -160,7 +160,14 @@ def remove_contact_from_group(request, group_id, contact_id):
 @user_passes_test(can_access)
 def edit_group(request, group_id):
     """view"""
-    group = get_object_or_404(models.Group, id=group_id)
+
+    groups = models.Group.objects.filter(id=group_id).select_related('contacts', 'entities')
+
+    if groups.count() == 0:
+        raise Http404
+
+    group = groups[0]
+
     next_url = request.session.get('next_url', reverse('crm_see_my_groups'))
     if request.method == "POST":
         form = forms.EditGroupForm(request.POST, instance=group)
@@ -174,6 +181,7 @@ def edit_group(request, group_id):
     context_dict = {
         'form': form,
         'group': group,
+        'members_count': group.contacts.count() + group.entities.count(),
         'request': request,
         'next_url': next_url,
     }
@@ -291,3 +299,71 @@ def get_group_id(request):
     except models.Group.MultipleObjectsReturned:
         group = get_object_or_404(models.Group, name=name)
     return HttpResponse(json.dumps({'id': group.id}), 'application/json')
+
+
+@user_passes_test(can_access)
+@popup_redirect
+def select_contact_or_entity(request):
+    """view"""
+
+    if request.method == 'POST':
+        form = forms.SelectContactOrEntityForm(request.POST)
+        if form.is_valid():
+            obj = form.cleaned_data['name']
+            dict_obj = {
+                'id': form.cleaned_data['object_id'],
+                'type': form.cleaned_data['object_type'],
+                'name': unicode(obj),
+                'url': obj.get_absolute_url(),
+            }
+            json_data = json.dumps(dict_obj)
+            return HttpResponse(
+                u'<script>$.colorbox.close(); addMember({0});</script>'.format(json_data)
+            )
+    else:
+        form = forms.SelectContactOrEntityForm()
+
+    return render_to_response(
+        'Crm/popup_select_contact_or_entity.html',
+        {
+            'form': form,
+        },
+        context_instance=RequestContext(request)
+    )
+
+@user_passes_test(can_access)
+def get_contact_or_entity(request):
+    """view"""
+    try:
+        suggestions = []
+        #the 1st chars entered in the autocomplete
+        term = request.GET["term"]
+
+        if len(term):
+
+            for contact in models.Contact.objects.filter(lastname__icontains=term)[:10]:
+                suggestions.append(
+                    {
+                        'name': contact.fullname,
+                        'type_and_id': 'contact#{0}'.format(contact.id),
+                        'raw': contact.lastname
+                    }
+                )
+
+            for entity in models.Entity.objects.filter(name__icontains=term, is_single_contact=False)[:10]:
+                suggestions.append(
+                    {
+                        'name': entity.name,
+                        'type_and_id': 'entity#{0}'.format(entity.id),
+                        'raw': entity.name}
+                )
+
+        suggestions = sorted(
+            suggestions, key=lambda obj_dict: obj_dict['raw']
+        )
+
+        return HttpResponse(json.dumps(suggestions), content_type='application/json')
+
+    # pylint: disable=broad-except
+    except Exception, msg:
+        print '###', msg

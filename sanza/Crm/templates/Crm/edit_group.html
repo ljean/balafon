@@ -31,16 +31,51 @@
   <form method="POST" action="">{% csrf_token %}
     <table class="table">
       {{form.as_table}}
+
+      <tr>
+        <th>
+          {% trans 'Members' %}
+        </th>
+        <td>
+          <p>
+          {% if members_count %}
+            {{ members_count }} {% if members_count > 1 %}{% trans "members" %}{% else %}{% trans "member" %}{% endif %}
+          {% else %}
+            {% trans "No members" %}
+          {% endif %}
+          </p>
+
+          <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
+            <span class="glyphicon glyphicon-plus colorbox-form"></span> {% trans 'Add new member' %}
+          </a>
+
+          <a class="btn btn-sm btn-default" href="{% url 'search_group' group.id %}">
+            <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
+          </a>
+
+
+          <div class="new-members" style="display: none;">
+            <div class="helptext">
+              {% trans "These members will be added if you save the group" %}
+            </div>
+
+            <div class="new-members-list" style="margin: 20px 0;">
+
+            </div>
+
+          </div>
+      </tr>
+
     </table>
     <div class="row">
       <div class="col-md-10">
         <div class="buttons pull-right">
           <input class="btn btn-md btn-primary" type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
           {% if group %}
-            <a class="btn btn-md btn-default" class="colorbox-form" href="{% url "crm_delete_group" group.id %}">{% trans "Delete" %}</a>
+            <a class="btn btn-md btn-default" class="colorbox-form" href="{% url 'crm_delete_group' group.id %}">{% trans "Delete" %}</a>
             <a class="btn btn-md btn-default" href="{{ next_url }}">{% trans "Cancel" %}</a>
           {% else %}
-            <a class="btn btn-md btn-default" href="{% url "crm_see_my_groups" %}">{% trans "Cancel" %}</a>
+            <a class="btn btn-md btn-default" href="{% url 'crm_see_my_groups' %}">{% trans "Cancel" %}</a>
           {% endif %}
           </div>
       </div>

@@ -127,28 +127,28 @@ class EditGroupForm(BsModelForm):
             ),
         }
     
-    class Media:
-        """Media files"""
-        try:
-            css = {
-                'all': (
-                    settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',
-                    'css/bootstrap-transfer.css',
-                )
-            }
-            js = (
-                'js/bootstrap-transfer.js',
-            )
-        except AttributeError:
-            css = {
-                'all': (
-                    settings.STATIC_URL+'admin/css/widgets.css',
-                    'css/bootstrap-transfer.css',
-                )
-            }
-            js = (
-                'js/bootstrap-transfer.js',
-            )
+    # class Media:
+    #     """Media files"""
+    #     try:
+    #         css = {
+    #             'all': (
+    #                 settings.ADMIN_MEDIA_PREFIX+'css/widgets.css',
+    #                 'css/bootstrap-transfer.css',
+    #             )
+    #         }
+    #         js = (
+    #             'js/bootstrap-transfer.js',
+    #         )
+    #     except AttributeError:
+    #         css = {
+    #             'all': (
+    #                 settings.STATIC_URL+'admin/css/widgets.css',
+    #                 'css/bootstrap-transfer.css',
+    #             )
+    #         }
+    #         js = (
+    #             'js/bootstrap-transfer.js',
+    #         )
         
     def clean_name(self):
         """name validation"""
@@ -157,21 +157,32 @@ class EditGroupForm(BsModelForm):
             if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count() > 0:
                 raise ValidationError(ugettext(u"A group with this name already exists"))
         return name
-    
+
+    def _clean_list(self, the_list):
+        return [int(id_) for id_ in the_list.strip('[').strip(']').split(',') if id_]
+
+    def clean_entities(self):
+        """name validation"""
+        entities_ids = self._clean_list(self.cleaned_data['entities'])
+        return entities_ids
+
+    def clean_contacts(self):
+        """name validation"""
+        contacts_ids = self._clean_list(self.cleaned_data['contacts'])
+        return contacts_ids
+
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance')
         super(EditGroupForm, self).__init__(*args, **kwargs)
-        
-        self.fields['entities'] = forms.ModelMultipleChoiceField(
-            required=False,
-            queryset=models.Entity.objects.all(),
-            widget=FilteredSelectMultiple(_(u"entities"), False)
+
+        self.fields['entities'] = forms.CharField(
+            widget=forms.HiddenInput(),
+            required=False
         )
-        
-        self.fields['contacts'] = forms.ModelMultipleChoiceField(
-            required=False,
-            queryset=models.Contact.objects.all(),
-            widget=FilteredSelectMultiple(_(u"contacts"), False)
+
+        self.fields['contacts'] = forms.CharField(
+            widget=forms.HiddenInput(),
+            required=False
         )
 
 
@@ -716,6 +727,31 @@ class SelectContactForm(forms.Form):
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
             raise ValidationError(ugettext(u"The contact does'nt exist"))
+
+
+class SelectContactOrEntityForm(forms.Form):
+    """Select a contact or entity"""
+    object_id = forms.IntegerField(widget=forms.HiddenInput(), required=True)
+    object_type = forms.CharField(widget=forms.HiddenInput(), required=True)
+    name = forms.CharField(required=True, label=_('Name'))
+
+    def clean_name(self):
+        """validation"""
+        object_id = self.cleaned_data['object_id']
+        object_type = self.cleaned_data['object_type']
+        object_class = {
+            'contact': models.Contact,
+            'entity': models.Entity,
+        }.get(object_type, None)
+
+        if not object_class:
+            raise ValidationError(ugettext(u"Invalid type '{0}'").format(object_type))
+
+        try:
+            object_id = int(object_id)
+            return object_class.objects.get(id=object_id)
+        except (ValueError, object_id.DoesNotExist):
+            raise ValidationError(ugettext(u"Does'nt exist"))
 
 
 class SelectOpportunityForm(forms.Form):
