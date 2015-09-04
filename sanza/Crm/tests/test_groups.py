@@ -864,7 +864,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
             'id': entity.id,
             'type': 'entity',
             'name': entity.name,
-            'url': entity.get_absolute_url(),
+            'url': entity.get_preview_url(),
         }
         json_data = json.dumps(expected_data)
 
@@ -891,7 +891,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
             'id': contact.id,
             'type': 'contact',
             'name': contact.fullname,
-            'url': contact.get_absolute_url(),
+            'url': contact.get_preview_url(),
         }
         json_data = json.dumps(expected_data)
 
@@ -940,7 +940,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
             'id': contact.id,
             'type': 'contact',
             'name': contact.fullname,
-            'url': contact.get_absolute_url(),
+            'url': contact.get_preview_url(),
         }
 
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
@@ -962,7 +962,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
             'id': contact.id,
             'type': 'contact',
             'name': contact.fullname,
-            'url': contact.get_absolute_url(),
+            'url': contact.get_preview_url(),
         }
 
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)

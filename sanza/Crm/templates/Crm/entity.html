@@ -1,4 +1,4 @@
-{% extends "sanza/bs_base.html" %}
+{% extends template_base %}
 {% load i18n %}
 
 {% block extra_title %}{{ entity.name }} {% endblock %}
@@ -9,11 +9,9 @@
 
 {% include "Crm/_section_contacts.html" %}
 
-{% include "Crm/_section_actions_by_set.html" %}
+{% if not preview %}
 
-{% comment %}
-  
-{% include "Crm/_section_opportunities.html" %}
-{% endcomment %}
+  {% include "Crm/_section_actions_by_set.html" %}
+{% endif %}
 
 {% endblock %}

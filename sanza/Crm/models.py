@@ -248,6 +248,9 @@ class Entity(LastModifiedModel):
             return "//" + Site.objects.get_current().domain + absolute_url
         except Site.objects.DoesNotExist:
             return absolute_url
+
+    def get_preview_url(self):
+        return u"{0}?preview=1".format(self.get_absolute_url())
     
     def get_safe_logo(self):
         """get entity logo or default one"""
@@ -537,6 +540,9 @@ class Contact(LastModifiedModel):
             return "//" + Site.objects.get_current().domain + absolute_url
         except Site.objects.DoesNotExist:
             return absolute_url
+
+    def get_preview_url(self):
+        return u"{0}?preview=1".format(self.get_absolute_url())
     
     def get_relationships(self):
         """get all retlationships for this contact"""

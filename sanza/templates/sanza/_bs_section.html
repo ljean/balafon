@@ -14,6 +14,7 @@
                 <div class="section-favorite text-right">
                   {% block section_favorite %}{% endblock %}
                 </div>
+                {% if not preview %}
                 <div class="dropdown btn-group pull-right">
                     <a class="btn btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" href="#">
                       {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span>{% endblock %}
@@ -24,6 +25,7 @@
                     </ul>
                 </div>
                 {% block section_buttons_extra %}{% endblock %}
+                {% endif %}
               </div>
             </div>
           </div>

@@ -16,6 +16,28 @@ from sanza.Crm import models
 from sanza.Crm.tests import BaseTestCase
 
 
+class ViewContactTest(BaseTestCase):
+    """It should displat-y contact info"""
+
+    def test_view_entity(self):
+        """view contact"""
+        contact = mommy.make(models.Contact)
+        url = contact.get_absolute_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact.lastname)
+        self.assertTemplateUsed(response, "sanza/bs_base.html")
+
+    def test_preview_entity(self):
+        """view contact in popup"""
+        contact = mommy.make(models.Contact)
+        url = contact.get_preview_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact.lastname)
+        self.assertTemplateUsed(response, "sanza/bs_base_raw.html")
+
+
 class AddressOverloadTest(BaseTestCase):
 
     def test_address_of_contact(self):
@@ -216,7 +238,6 @@ class SingleContactTest(BaseTestCase):
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
         self.assertEqual(len(response.redirect_chain), 0)
-
 
     def test_view_delete_contact(self):
         entity = mommy.make(models.Entity, is_single_contact=True)

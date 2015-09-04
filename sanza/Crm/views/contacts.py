@@ -123,6 +123,11 @@ def view_contact(request, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id)
     same_as_contact = None
 
+    try:
+        preview = bool(request.GET.get('preview', False))
+    except ValueError:
+        preview = False
+
     actions = contact.action_set.filter(archived=False)
     actions_by_set = get_actions_by_set(actions, 5)
 
@@ -137,7 +142,9 @@ def view_contact(request, contact_id):
             'contact': contact,
             'actions_by_set': actions_by_set,
             'same_as': same_as_contact,
-            'entity': contact.entity
+            'entity': contact.entity,
+            'preview': preview,
+            'template_base': "sanza/bs_base.html" if not preview else "sanza/bs_base_raw.html"
         },
         context_instance=RequestContext(request)
     )

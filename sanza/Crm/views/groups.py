@@ -184,7 +184,7 @@ def edit_group(request, group_id):
             'id': member.id,
             'type': 'entity' if isinstance(member, models.Entity) else 'contact',
             'name': member.name if isinstance(member, models.Entity) else member.fullname,
-            'url': member.get_absolute_url(),
+            'url': member.get_preview_url(),
             'raw': member.name if isinstance(member, models.Entity) else member.lastname,
         }
         for member in members
@@ -328,7 +328,7 @@ def select_contact_or_entity(request):
                 'id': form.cleaned_data['object_id'],
                 'type': form.cleaned_data['object_type'],
                 'name': obj.name if isinstance(obj, models.Entity) else obj.fullname,
-                'url': obj.get_absolute_url(),
+                'url': obj.get_preview_url(),
             }
             json_data = json.dumps(dict_obj)
             return HttpResponse(

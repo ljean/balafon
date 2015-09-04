@@ -23,11 +23,23 @@ class ViewEntityTest(BaseTestCase):
         """view entity"""
         entity = mommy.make(models.Entity)
         contact = entity.default_contact
-        url = reverse('crm_view_entity', args=[entity.id])
+        url = entity.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, entity.name)
         self.assertContains(response, reverse("crm_view_contact", args=[contact.id]))
+        self.assertTemplateUsed(response, "sanza/bs_base.html")
+
+    def test_preview_entity(self):
+        """view entity in popup"""
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        url = entity.get_preview_url()
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, entity.name)
+        self.assertContains(response, reverse("crm_view_contact", args=[contact.id]))
+        self.assertTemplateUsed(response, "sanza/bs_base_raw.html")
 
     def test_view_entity_secondary_contact(self):
         """view entity with secondary contact"""
