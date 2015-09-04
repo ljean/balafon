@@ -178,10 +178,24 @@ def edit_group(request, group_id):
     else:
         form = forms.EditGroupForm(instance=group)
 
+    members = list(group.contacts.all()) + list(group.entities.all())
+    members = [
+        {
+            'id': member.id,
+            'type': 'entity' if isinstance(member, models.Entity) else 'contact',
+            'name': member.name if isinstance(member, models.Entity) else member.fullname,
+            'url': member.get_absolute_url(),
+            'raw': member.name if isinstance(member, models.Entity) else member.lastname,
+        }
+        for member in members
+    ]
+    members = sorted(members, key=lambda member: member['raw'])
+
     context_dict = {
         'form': form,
         'group': group,
-        'members_count': group.contacts.count() + group.entities.count(),
+        'members': members,
+        'members_count': len(members),
         'request': request,
         'next_url': next_url,
     }
@@ -313,12 +327,14 @@ def select_contact_or_entity(request):
             dict_obj = {
                 'id': form.cleaned_data['object_id'],
                 'type': form.cleaned_data['object_type'],
-                'name': unicode(obj),
+                'name': obj.name if isinstance(obj, models.Entity) else obj.fullname,
                 'url': obj.get_absolute_url(),
             }
             json_data = json.dumps(dict_obj)
             return HttpResponse(
-                u'<script>$.colorbox.close(); addMember({0});</script>'.format(json_data)
+                u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                    json_data, dict_obj['type'], dict_obj['id']
+                )
             )
     else:
         form = forms.SelectContactOrEntityForm()
@@ -341,7 +357,7 @@ def get_contact_or_entity(request):
 
         if len(term):
 
-            for contact in models.Contact.objects.filter(lastname__icontains=term)[:10]:
+            for contact in models.Contact.objects.filter(lastname__istartswith=term)[:20]:
                 suggestions.append(
                     {
                         'name': contact.fullname,
@@ -350,17 +366,18 @@ def get_contact_or_entity(request):
                     }
                 )
 
-            for entity in models.Entity.objects.filter(name__icontains=term, is_single_contact=False)[:10]:
+            for entity in models.Entity.objects.filter(name__istartswith=term, is_single_contact=False)[:20]:
                 suggestions.append(
                     {
                         'name': entity.name,
                         'type_and_id': 'entity#{0}'.format(entity.id),
-                        'raw': entity.name}
+                        'raw': entity.name
+                    }
                 )
 
         suggestions = sorted(
             suggestions, key=lambda obj_dict: obj_dict['raw']
-        )
+        )[:20]
 
         return HttpResponse(json.dumps(suggestions), content_type='application/json')
 
