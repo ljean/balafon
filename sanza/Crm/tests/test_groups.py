@@ -6,6 +6,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup
+import json
 
 from django.core.urlresolvers import reverse
 
@@ -466,6 +467,126 @@ class GroupSuggestListTestCase(BaseTestCase):
         self.assertTrue(response['Location'].find(login_url) > 0)
 
 
+class ContactAndEntitySuggestListTestCase(BaseTestCase):
+    """"""
+    view_name = 'crm_get_contact_or_entity'
+
+    def test_get_contact_and_entity(self):
+        """It should return contact and entity"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        entity2 = mommy.make(models.Entity, name=u"Rab")
+        contact2 = entity2.default_contact
+        contact2.lastname = u'Plabo'
+        contact2.save()
+
+        entity3 = mommy.make(models.Entity, name=u"ABO")
+        contact3 = entity3.default_contact
+        contact3.lastname = u'Wab'
+        contact3.save()
+
+        entity4 = mommy.make(models.Entity, name="Waw")
+        contact4 = entity4.default_contact
+        contact4.lastname = u'Aby'
+        contact4.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=ab')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        print data
+
+        self.assertEqual(len(data), 4)
+
+        self.assertEqual(data[0]['name'], 'Abbes')
+        self.assertEqual(data[1]['name'], 'Abc')
+        self.assertEqual(data[2]['name'], 'ABO')
+        self.assertEqual(data[3]['name'], 'Aby')
+
+        self.assertEqual(data[0]['type_and_id'], 'contact#'+str(contact1.id))
+        self.assertEqual(data[1]['type_and_id'], 'entity#'+str(entity1.id))
+        self.assertEqual(data[2]['type_and_id'], 'entity#'+str(entity3.id))
+        self.assertEqual(data[3]['type_and_id'], 'contact#'+str(contact4.id))
+
+    def test_get_contact_and_entity_empty(self):
+        """It should return empty"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        entity2 = mommy.make(models.Entity, name=u"Rab")
+        contact2 = entity2.default_contact
+        contact2.lastname = u'Plabo'
+        contact2.save()
+
+        entity3 = mommy.make(models.Entity, name=u"ABO")
+        contact3 = entity3.default_contact
+        contact3.lastname = u'Wab'
+        contact3.save()
+
+        entity4 = mommy.make(models.Entity, name="Waw")
+        contact4 = entity4.default_contact
+        contact4.lastname = u'Aby'
+        contact4.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        self.assertEqual(len(data), 0)
+
+    def test_get_contact_and_entity_invalid_url(self):
+        """It should return empty"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?zz=Ab')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        self.assertEqual(len(data), 0)
+
+    def test_get_contact_and_entity_anonymous(self):
+        """It should return error"""
+
+        self.client.logout()
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+    def test_get_contact_and_entity_forbidden(self):
+        """It should return error"""
+
+        self.user.is_staff = False
+        self.user.save()
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+
 class GetGroupsListTestCase(GroupSuggestListTestCase):
     view_name = 'crm_get_groups'
 
@@ -720,3 +841,165 @@ class AddToGroupTest(BaseTestCase):
         self.assertEqual(group.contacts.count(), 1)
         self.assertEqual(list(group.contacts.all()), [contact])
         self.assertEqual(group.entities.count(), 0)
+
+
+class SelectContactOrEntityGroupTestCase(BaseTestCase):
+    """test select contact or entity"""
+
+    def test_view_select_contact_or_entity(self):
+        """it should return Ok"""
+        response = self.client.get(reverse('crm_select_contact_or_entity'))
+        self.assertEqual(200, response.status_code)
+
+    def test_post_select_entity(self):
+        """it should return js code"""
+        entity = mommy.make(models.Entity, name="Abc")
+        data = {
+            'object_id': entity.id,
+            'object_type': 'entity',
+            'name': entity.name
+        }
+
+        expected_data = {
+            'id': entity.id,
+            'type': 'entity',
+            'name': entity.name,
+            'url': entity.get_absolute_url(),
+        }
+        json_data = json.dumps(expected_data)
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(
+            response.content,
+            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                json_data, 'entity', entity.id
+            )
+        )
+
+    def test_post_select_contact(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_absolute_url(),
+        }
+        json_data = json.dumps(expected_data)
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(
+            response.content,
+            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                json_data, 'contact', contact.id
+            )
+        )
+
+    def test_post_select_invalid_type(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'woo',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_absolute_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_invalid_id(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': 'AA',
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_absolute_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_unknown_id(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id+1,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_absolute_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_contact_anonymous(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        self.client.logout()
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+    def test_post_select_contact_not_allowed(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        self.user.is_staff = False
+        self.user.save()
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)

@@ -751,9 +751,9 @@ class Contact(LastModifiedModel):
         """fullname"""
         if not (self.firstname or self.lastname):
             if self.email:
-                return self.email
+                return self.email.strip()
             else:
-                return u"< {0} >".format(__(u"Unknown"))
+                return u"< {0} >".format(__(u"Unknown")).strip()
         
         if self.gender and self.lastname:
             title = u'{0} '.format(self.get_gender_display())
@@ -761,9 +761,9 @@ class Contact(LastModifiedModel):
             title = u''
         
         if (not self.firstname) or (not self.lastname):
-            return _(u"{1}{0.firstname}{0.lastname}").format(self, title)
+            return _(u"{1}{0.firstname}{0.lastname}").format(self, title).strip()
         
-        return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
+        return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
 
     def set_custom_field(self, field_name, value, is_link=False):
         """set the value of a custom field"""

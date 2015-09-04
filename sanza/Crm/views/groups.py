@@ -353,7 +353,7 @@ def get_contact_or_entity(request):
     try:
         suggestions = []
         #the 1st chars entered in the autocomplete
-        term = request.GET["term"]
+        term = request.GET.get("term", '')
 
         if len(term):
 
@@ -376,7 +376,7 @@ def get_contact_or_entity(request):
                 )
 
         suggestions = sorted(
-            suggestions, key=lambda obj_dict: obj_dict['raw']
+            suggestions, key=lambda obj_dict: obj_dict['raw'].lower()
         )[:20]
 
         return HttpResponse(json.dumps(suggestions), content_type='application/json')

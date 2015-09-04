@@ -737,8 +737,8 @@ class SelectContactOrEntityForm(forms.Form):
 
     def clean_name(self):
         """validation"""
-        object_id = self.cleaned_data['object_id']
-        object_type = self.cleaned_data['object_type']
+        object_id = self.cleaned_data.get('object_id', '')
+        object_type = self.cleaned_data.get('object_type', '')
         object_class = {
             'contact': models.Contact,
             'entity': models.Entity,
@@ -750,7 +750,7 @@ class SelectContactOrEntityForm(forms.Form):
         try:
             object_id = int(object_id)
             return object_class.objects.get(id=object_id)
-        except (ValueError, object_id.DoesNotExist):
+        except (ValueError, object_class.DoesNotExist):
             raise ValidationError(ugettext(u"Does'nt exist"))
 
 
