@@ -10,8 +10,10 @@ from bs4 import BeautifulSoup
 from decimal import Decimal
 
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.utils.translation import ugettext as _
 
 from model_mommy import mommy
 
@@ -201,8 +203,45 @@ class ViewCommercialDocumentTest(TestCase):
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
-
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, item.text)
+
+    def test_view_public(self):
+        """It should display item text"""
+
+        action_type = mommy.make(ActionType, generate_uuid=True)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type)
+
+        self.assertNotEqual(action.uuid, '')
+
+        item = mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+
+        self.client.logout()
+        url = reverse('store_view_sales_document_public', args=[action.uuid])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, item.text)
+
+    def test_view_public_invalid_uuid(self):
+        """It should not display item text"""
+
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type)
+
+        self.assertEqual(action.uuid, '')
+
+        self.client.logout()
+
+        dummy_uuid = 'xxxxxxxxxxxxx'
+        url = reverse('store_view_sales_document_public', args=[dummy_uuid])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        url = url.replace(dummy_uuid, '')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     def test_view_pdf(self):
         """It should display item text"""
@@ -219,6 +258,130 @@ class ViewCommercialDocumentTest(TestCase):
         url = reverse('store_view_sales_document_pdf', args=[action.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+
+
+class ActionMailtoTest(BaseTestCase):
+    """It should generate mailto properly"""
+
+    def test_mail_to(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Dalton', firstname='Joe')
+        action.contacts.add(contact)
+        action.save()
+        self.assertEqual(
+            action.mail_to, 'mailto:"{0}" <{1}>?subject={2}&body='.format(
+                contact.fullname, contact.email, action.subject,
+            )
+        )
+
+    def test_mail_to_entity(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        entity = mommy.make(Entity, email='toto@toto.fr')
+        action.entities.add(entity)
+        action.save()
+        self.assertEqual(
+            action.mail_to, 'mailto:"{0}" <{1}>?subject={2}&body='.format(
+                entity.name, entity.email, action.subject,
+            )
+        )
+
+    def test_mail_to_entity_contact(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        entity = mommy.make(Entity, email='toto@toto.fr')
+        action.contacts.add(entity.default_contact)
+        action.save()
+        self.assertEqual(
+            action.mail_to, 'mailto:{0}?subject={1}&body='.format(
+                entity.email, action.subject,
+            )
+        )
+
+    def test_mail_to_several(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+
+        entity = mommy.make(Entity, email='titi@toto.fr', name='')
+        action.entities.add(entity)
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='', firstname='')
+        action.contacts.add(contact)
+
+        action.save()
+        self.assertEqual(
+            action.mail_to, 'mailto:{0},{1}?subject={2}&body='.format(
+                entity.email, contact.email, action.subject,
+            )
+        )
+
+    def test_mail_to_twice(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+
+        entity = mommy.make(Entity, email='toto@toto.fr', name='')
+        action.entities.add(entity)
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='', firstname='')
+        action.contacts.add(contact)
+
+        action.save()
+
+        self.assertEqual(
+            action.mail_to, 'mailto:{0}?subject={1}&body='.format(
+                entity.email, action.subject,
+            )
+        )
+
+    def test_mail_to_uuid(self):
+        """it should generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=True, name='Doc')
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        contact = mommy.make(Contact, email='toto@toto.fr')
+        action.contacts.add(contact)
+        action.save()
+
+        body = _(u"Here is a link to your {0}: {1}{2}").format(
+            action_type.name,
+            "http://" + Site.objects.get_current().domain,
+            reverse('store_view_sales_document_public', args=[action.uuid])
+        )
+
+        self.assertEqual(contact.lastname, '')
+        self.assertEqual(contact.firstname, '')
+
+        self.assertEqual(
+            action.mail_to, 'mailto:{0}?subject={1}&body={2}'.format(
+                contact.email, action.subject, body
+            )
+        )
+
+    def test_mail_to_no_email(self):
+        """it should not generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        contact = mommy.make(Contact, email='')
+        action.contacts.add(contact)
+        action.save()
+        self.assertEqual(
+            action.mail_to, ''
+        )
+
+    def test_mail_to_no_contact(self):
+        """it should not generate a mailto link"""
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        action = mommy.make(Action, type=action_type, subject="Hello")
+        action.save()
+        self.assertEqual(
+            action.mail_to, ''
+        )
 
 
 class EditSaleActionTest(BaseTestCase):

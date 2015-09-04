@@ -106,12 +106,13 @@ class ActionSerializer(serializers.ModelSerializer):
     contacts = ContactSerializer(many=True, read_only=True)
     entities = EntitySerializer(many=True, read_only=True)
     last_modified_by = UserSerializer(many=False, read_only=True)
+    mail_to = serializers.CharField(read_only=True)
 
     class Meta:
         model = Action
         fields = (
             'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime', 'type', 'status',
-            'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number',
+            'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number', 'mail_to'
         )
 
 

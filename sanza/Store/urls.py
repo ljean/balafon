@@ -6,7 +6,9 @@ from django.conf.urls import patterns, url, include
 from rest_framework import routers
 
 from sanza.Store.api import SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView
-from sanza.Store.views.sales_documents import SalesDocumentView, SalesDocumentPdfView
+from sanza.Store.views.sales_documents import (
+    SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView
+)
 
 
 store_items_router = routers.DefaultRouter()
@@ -24,6 +26,12 @@ urlpatterns = patterns('sanza.Store.views',
         r'^view-sales-document/(?P<action_id>\d+)/$',
         SalesDocumentView.as_view(),
         name='store_view_sales_document'
+    ),
+
+    url(
+        r'^document/(?P<action_uuid>[\w\d-]+)/$',
+        SalesDocumentPublicView.as_view(),
+        name='store_view_sales_document_public'
     ),
 
     url(

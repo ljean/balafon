@@ -13,6 +13,7 @@ from django.conf import settings as project_settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -250,7 +251,15 @@ class Entity(LastModifiedModel):
             return absolute_url
 
     def get_preview_url(self):
+        """absolute_url in popup"""
         return u"{0}?preview=1".format(self.get_absolute_url())
+
+    def get_email_address(self):
+        """email address"""
+        if self.name:
+            return u'"{1}" <{0}>'.format(self.email, self.name)
+        else:
+            return self.email
     
     def get_safe_logo(self):
         """get entity logo or default one"""
@@ -542,6 +551,7 @@ class Contact(LastModifiedModel):
             return absolute_url
 
     def get_preview_url(self):
+        """absolute url in popup"""
         return u"{0}?preview=1".format(self.get_absolute_url())
     
     def get_relationships(self):
@@ -721,7 +731,10 @@ class Contact(LastModifiedModel):
 
     def get_email_address(self):
         """email address"""
-        return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
+        if self.lastname or self.firstname:
+            return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
+        else:
+            return self.get_email
         
     def get_phones(self):
         """list of phones"""
@@ -1016,6 +1029,7 @@ class ActionType(NamedElement):
     is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
     next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
     not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_(u"Not assigned when cloned"))
+    generate_uuid = models.BooleanField(default=False, verbose_name=_(u"Generate UUID for action"))
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1036,6 +1050,17 @@ class ActionType(NamedElement):
                 )
             else:
                 ActionMenu.objects.filter(action_type=self, view_name='crm_clone_action').delete()
+
+            #update action uuid if needed
+            for action in self.action_set.all():
+                if self.generate_uuid:
+                    if not action.uuid:
+                        action.save()  # force uuid to be generated
+                else:
+                    if action.uuid:
+                        action.uuid = ''
+                        action.save()  # force uuid to be empty
+
         return ret
     
     class Meta:
@@ -1134,6 +1159,7 @@ class Action(LastModifiedModel):
     favorites = GenericRelation(Favorite)
     end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
     parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
+    uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
@@ -1183,8 +1209,23 @@ class Action(LastModifiedModel):
         if self.number == 0 and self.type and self.type.number_auto_generated:
             self.number = self.type.last_number = self.type.last_number + 1
             self.type.save()
-            
-        return super(Action, self).save(*args, **kwargs)
+
+        ret = super(Action, self).save(*args, **kwargs)
+
+        if self.type:
+            if self.type.generate_uuid and not self.uuid:
+                name = u'{0}-action-{1}-{2}'.format(
+                    project_settings.SECRET_KEY, self.id, self.type.id if self.type else 0
+                )
+                name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
+                self.uuid = unicode(uuid.uuid5(uuid.NAMESPACE_URL, name))
+                super(Action, self).save()
+
+            if not self.type.generate_uuid and self.uuid:
+                self.uuid = ''
+                super(Action, self).save()
+
+        return ret
 
     def clone(self, new_type):
         """Create a new action with same values but different types"""
@@ -1210,6 +1251,38 @@ class Action(LastModifiedModel):
             new_action.entities.add(entity)
         new_action.save()
         return new_action
+
+    @property
+    def mail_to(self):
+        """returns a mailto link"""
+        unique_emails = sorted(list(set(
+            [
+                contact.get_email_address() for contact in self.contacts.all() if contact.get_email
+            ] + [
+                entity.get_email_address() for entity in self.entities.all() if entity.email
+            ]
+        )))
+
+        if not unique_emails:
+            return u""
+
+        body = u""
+        if self.uuid and hasattr(self, 'sale'):
+            try:
+                url = reverse('store_view_sales_document_public', args=[self.uuid])
+                body = __(u"Here is a link to your {0}: {1}{2}").format(
+                    self.type.name,
+                    "http://" + Site.objects.get_current().domain,
+                    url
+                )
+            except ObjectDoesNotExist:
+                pass
+
+        return u"mailto:{0}?subject={1}&body={2}".format(
+            u",".join(unique_emails),
+            self.subject,
+            body
+        )
 
 
 class ActionDocument(models.Model):

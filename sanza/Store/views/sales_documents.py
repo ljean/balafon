@@ -2,12 +2,11 @@
 """a simple store"""
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 from sanza.permissions import can_access
@@ -22,10 +21,13 @@ from sanza.Store.serializers import SaleItemSerializer, SaleSerializer, VatRateS
 class SalesDocumentViewMixin(object):
     """display sales document: to be inherited in TemplateView and PdfTemplateView"""
     action = None
+    is_public = False
     template_name = "Store/commercial_document.html"
 
-    @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
+        if not self.is_public:
+            if not self.request.user.is_authenticated():
+                return HttpResponseRedirect(reverse('login'))
         return super(SalesDocumentViewMixin, self).dispatch(*args, **kwargs)
 
     def get_template_names(self):
@@ -43,7 +45,7 @@ class SalesDocumentViewMixin(object):
         """get context data"""
         context = super(SalesDocumentViewMixin, self).get_context_data(**kwargs)
 
-        if not can_access(self.request.user):
+        if not self.is_public and not can_access(self.request.user):
             raise PermissionDenied
 
         action = self.get_action()
@@ -53,10 +55,13 @@ class SalesDocumentViewMixin(object):
         except Sale.DoesNotExist:
             raise Http404
 
-        if action.type:
-            is_read_only = action.status in action.type.storemanagementactiontype.readonly_status.all()
+        if self.is_public:
+            is_read_only = True
         else:
-            is_read_only = False
+            if action.type:
+                is_read_only = action.status in action.type.storemanagementactiontype.readonly_status.all()
+            else:
+                is_read_only = False
 
         action_serializer = ActionSerializer(self.get_action())
         action_data = Utf8JSONRenderer().render(action_serializer.data)
@@ -80,13 +85,15 @@ class SalesDocumentViewMixin(object):
             sale: {2},
             vat_rates: {3},
             isPdf: {4},
-            isReadOnly: {5}
+            isPublic: {5},
+            isReadOnly: {6}
         }};""".format(
             action_data,
             sale_items_data,
             sale_data,
             vat_rates_data,
             'true' if self.is_pdf else 'false',
+            'true' if self.is_public else 'false',
             'true' if is_read_only else 'false'
         )
         return context
@@ -94,8 +101,14 @@ class SalesDocumentViewMixin(object):
     def get_action(self):
         """get the associated action"""
         if self.action is None:
-            action_id = self.kwargs.get('action_id', 0)
-            self.action = get_object_or_404(Action, id=action_id)
+            if self.is_public:
+                action_uuid = self.kwargs.get('action_uuid', '')
+                if not action_uuid:
+                    raise Http404
+                self.action = get_object_or_404(Action, uuid=action_uuid)
+            else:
+                action_id = self.kwargs.get('action_id', 0)
+                self.action = get_object_or_404(Action, id=action_id)
         return self.action
 
     def get_sale_items(self):
@@ -134,5 +147,11 @@ class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
                 pass
 
         return context
+
+
+class SalesDocumentPublicView(SalesDocumentViewMixin, TemplateView):
+    """display sales document as pdf"""
+    is_pdf = False
+    is_public = True
 
 
