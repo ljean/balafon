@@ -82,14 +82,15 @@ class StoreItemPropertyValueInline(admin.TabularInline):
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
-        'name', 'category', 'vat_rate', 'purchase_price', 'pre_tax_price', 'vat_incl_price', 'stock_count',
+        'fullname', 'brand', 'category', 'vat_rate', 'purchase_price', 'pre_tax_price', 'vat_incl_price', 'stock_count',
         'stock_threshold_alert', 'unit'
     ]
     ordering = ['name']
-    list_filter = ['category', 'tags', StockThresholdFilter]
+    list_filter = [StockThresholdFilter, 'tags', 'category', 'brand']
     search_fields = ['name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
     inlines = [StoreItemPropertyValueInline]
+    list_per_page = 500
 
 
 admin.site.register(models.StoreItem, StoreItemAdmin)

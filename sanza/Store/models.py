@@ -177,6 +177,19 @@ class StoreItem(models.Model):
         return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
     vat_incl_price.short_description = _(u"VAT inclusive price")
 
+    def fullname(self):
+        properties = []
+        for the_property in StoreItemProperty.objects.filter(in_fullname=True):
+            try:
+                property_value = StoreItemPropertyValue.objects.get(property=the_property, item=self)
+                properties.append(property_value.value)
+            except StoreItemPropertyValue.DoesNotExist:
+                pass
+        if properties:
+            return u'{0} ({1})'.format(self.name, u', '.join(properties))
+        return self.name
+    fullname.short_description = _(u'Name')
+
     def set_property(self, property_name, value):
         """create and set a property for this item"""
         the_property = StoreItemProperty.objects.get_or_create(name=property_name)[0]
@@ -220,6 +233,9 @@ class StoreItemProperty(models.Model):
     """a property for a store item: DLC, Colisage..."""
     name = models.CharField(max_length=100, verbose_name=_(u'name'))
     label = models.CharField(max_length=100, verbose_name=_(u'label'), default='', blank=True)
+    in_fullname = models.BooleanField(
+        default=False, verbose_name=_(u'in fullname'), help_text=_(u'is inserted in fullname if checked')
+    )
 
     class Meta:
         verbose_name = _(u"Store item: property value")
