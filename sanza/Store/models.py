@@ -295,7 +295,7 @@ class StoreItemImport(models.Model):
 
     def _to_decimal(self, raw_value):
         """convert string to decimal"""
-        return Decimal(raw_value)
+        return Decimal(u'{0}'.format(raw_value))
 
     def _to_itself(self, raw_value):
         """dummy : just a function to use in the dict"""
