@@ -274,6 +274,14 @@ class StoreItemImport(models.Model):
     error_message = models.CharField(
         default='', blank=True, max_length=100, verbose_name=_(u'error message')
     )
+    category_lines_mode = models.BooleanField(
+        default=False, verbose_name=_('category-lines mode'),
+        help_text=_(u'If checked, the store item category are expected as merged-cells header lines')
+    )
+    default_brand = models.CharField(
+        default='', verbose_name=_(u'default Brand'), blank=True, max_length=50,
+        help_text=_(u'If defined, it will be used if no brand is given')
+    )
 
     class Meta:
         verbose_name = _(u"Store item import")
@@ -326,7 +334,7 @@ class StoreItemImport(models.Model):
         self.save()
         self.is_successful = True  # Assume everything will be ok :-)
         try:
-            book = xlrd.open_workbook(file_contents=self.data.read())
+            book = xlrd.open_workbook(file_contents=self.data.read(), formatting_info=True)
             sheet = book.sheet_by_index(0)
 
             fields = self.fields.split(',')
@@ -341,18 +349,32 @@ class StoreItemImport(models.Model):
                 'pre_tax_price': self._to_decimal,
             }
 
+            if self.category_lines_mode:
+                category_lines = [line[0] for line in sheet.merged_cells]
+            else:
+                category_lines = []
+            last_category = u''
             for row_index in xrange(sheet.nrows):
 
                 if self.ignore_first_line and row_index == 0:
                     #ignore
                     continue
 
+                raw_values = [sheet.cell(rowx=row_index, colx=col_index).value for col_index in xrange(sheet.ncols)]
+
+                if not any(raw_values):
+                    #blank lines
+                    continue
+
+                if row_index in category_lines:
+                    last_category = sheet.cell(rowx=row_index, colx=0).value
+                    continue
+
                 store_item = StoreItem()
                 properties = []
 
                 #for all fields
-                for field, col_index in zip(fields, xrange(sheet.ncols)):
-                    raw_value = sheet.cell(rowx=row_index, colx=col_index).value
+                for field, raw_value in zip(fields, raw_values):
 
                     if field in fields_conversion:
                         #call the function associated with this field
@@ -361,6 +383,13 @@ class StoreItemImport(models.Model):
                     else:
                         #for extra fields : create a property (once the object has been saved)
                         properties.append((field, raw_value))
+
+                if not store_item.name:
+                    #empty line : ignore
+                    continue
+
+                if ('brand' not in fields or not store_item.brand) and self.default_brand:
+                    store_item.brand = self._to_brand(self.default_brand)
 
                 if 'pre_tax_price' not in fields:
                     if 'purchase_price' in fields:
@@ -373,7 +402,10 @@ class StoreItemImport(models.Model):
                     store_item.vat_rate = self._to_vat(None)  # force default
 
                 if 'category' not in fields:
-                    store_item.category = self._to_category(None)  # force default
+                    if last_category:
+                        store_item.category = self._to_category(last_category)
+                    else:
+                        store_item.category = self._to_category(None)
 
                 store_item.imported_by = self
                 store_item.save()
