@@ -90,7 +90,7 @@ class CustomMenuItem(models.Model):
     icon = models.CharField(max_length=20, verbose_name=_("icon"))
     url = models.CharField(max_length=100, verbose_name=_("url"))
     order_index = models.IntegerField(default=0)
-    only_for_users = models.ManyToManyField(User, blank=True)
+    only_for_users = models.ManyToManyField(User, blank=True, verbose_name=_(u"only for users"))
     attributes = models.CharField(max_length=100, verbose_name=_(u"attributes"), default="", blank=True)
 
     class Meta:
