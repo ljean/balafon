@@ -69,7 +69,7 @@ class StoreItemViewSet(viewsets.ModelViewSet):
         if tag:
             return self.queryset.filter(tags=tag)
 
-        return self.queryset
+        return self.queryset.prefetch_related("tags")
 
 
 class StoreItemCategoryViewSet(viewsets.ModelViewSet):

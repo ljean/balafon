@@ -40,6 +40,15 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ('id', 'name',)
 
 
+class StoreItemTagSerializer(serializers.ModelSerializer):
+    """tags"""
+    class Meta:
+        model = StoreItemTag
+        fields = (
+            'id', 'name', "icon"
+        )
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
@@ -48,10 +57,13 @@ class StoreItemSerializer(serializers.ModelSerializer):
     category = StoreItemCategorySerializer()
     vat_incl_price = serializers.FloatField(read_only=True)
     brand = BrandSerializer(read_only=True)
+    tags = StoreItemTagSerializer(read_only=True, many=True)
 
     class Meta:
         model = StoreItem
-        fields = ('id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference')
+        fields = (
+            'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags'
+        )
 
 
 class SaleItemSerializer(serializers.ModelSerializer):
@@ -77,15 +89,6 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale',
-        )
-
-
-class StoreItemTagSerializer(serializers.ModelSerializer):
-    """tags"""
-    class Meta:
-        model = StoreItemTag
-        fields = (
-            'id', 'name', "icon"
         )
 
 
