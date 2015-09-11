@@ -77,7 +77,7 @@ class StoreManagementActionTypeTest(TestCase):
         self.assertEqual(1, ActionMenu.objects.count())
 
 
-class UpdateActionItem(TestCase):
+class UpdateActionItemTest(TestCase):
     """It should keep Action amount up-to-date"""
 
     def test_amount_on_add(self):
@@ -223,5 +223,48 @@ class UpdateActionItem(TestCase):
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.amount, Decimal("14.4"))
+
+
+class SaleTotalTest(TestCase):
+    """test that the total amount of a sale is calculated correctly"""
+
+    def test_amount_empty_cart(self):
+        """It should return 0"""
+        sale = mommy.make(models.Sale)
+        self.assertEqual(Decimal(0), sale.vat_incl_total_price())
+
+    def test_amount_cart(self):
+        """It should return sum"""
+        sale = mommy.make(models.Sale)
+        vat_rate_20 = mommy.make(models.VatRate, rate="20.0")
+        vat_rate_10 = mommy.make(models.VatRate, rate="10.0")
+
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="10", vat_rate=vat_rate_20, sale=sale)
+        mommy.make(models.SaleItem, quantity=2, pre_tax_price="1", vat_rate=vat_rate_10, sale=sale)
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="5", vat_rate=vat_rate_10, sale=sale)
+
+        self.assertEqual(Decimal("19.7"), sale.vat_incl_total_price())
+
+    def test_vat_amount_empty_cart(self):
+        """It should return empty list"""
+        sale = mommy.make(models.Sale)
+        self.assertEqual([], sale.vat_total_amounts())
+
+    def test_vat_amount_cart(self):
+        """It should return list with dictionary with total amount of vat per rate"""
+        sale = mommy.make(models.Sale)
+        vat_rate_20 = mommy.make(models.VatRate, rate="20.0")
+        vat_rate_10 = mommy.make(models.VatRate, rate="10.0")
+
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="10", vat_rate=vat_rate_20, sale=sale)
+        mommy.make(models.SaleItem, quantity=2, pre_tax_price="1", vat_rate=vat_rate_10, sale=sale)
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="5", vat_rate=vat_rate_10, sale=sale)
+
+        vat_totals = sale.vat_total_amounts()
+        self.assertEqual(len(vat_totals), 2)
+        self.assertEqual(vat_totals[0]['vat_rate'], vat_rate_10)
+        self.assertEqual(vat_totals[0]['amount'], Decimal("0.7"))
+        self.assertEqual(vat_totals[1]['vat_rate'], vat_rate_20)
+        self.assertEqual(vat_totals[1]['amount'], Decimal("2"))
 
 

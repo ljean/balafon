@@ -460,6 +460,29 @@ class Sale(models.Model):
         DeliveryPoint, default=None, blank=True, null=True, verbose_name=_(u"delivery point")
     )
 
+    def vat_total_amounts(self):
+        """returns amount of VAT by VAT rate"""
+        #caluclaute price for each VAT rate
+        total_by_vat = {}
+        for sale_item in self.saleitem_set.all():
+            if sale_item.vat_rate.id in total_by_vat:
+                total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price()
+            else:
+                total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price()
+        #returns vat rate in order
+        vat_totals = []
+        for vat_rate in sorted(VatRate.objects.all(), key=lambda _vat: _vat.rate):
+            if vat_rate.id in total_by_vat:
+                vat_totals.append({'vat_rate': vat_rate, 'amount': total_by_vat[vat_rate.id]})
+        return vat_totals
+
+    def vat_incl_total_price(self):
+        """return total price of the command"""
+        total = Decimal(0)
+        for sale_item in self.saleitem_set.all():
+            total += sale_item.vat_incl_total_price()
+        return total
+
     class Meta:
         verbose_name = _(u"Sale")
         verbose_name_plural = _(u"Sales")
@@ -496,7 +519,15 @@ class SaleItem(models.Model):
 
     def vat_incl_price(self):
         """VAT inclusive price"""
-        return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
+        return self.pre_tax_price + self.vat_price()
+
+    def total_vat_price(self):
+        """VAT price * quantity"""
+        return self.quantity * self.vat_price()
+
+    def vat_price(self):
+        """VAT price"""
+        return self.pre_tax_price * (self.vat_rate.rate / 100)
 
     def vat_incl_total_price(self):
         """VAT inclusive price"""
