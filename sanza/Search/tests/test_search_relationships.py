@@ -24,7 +24,7 @@ class RelationshipSearchTest(BaseTestCase):
 
         anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
         obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
-        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doe")
+        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doedoedoe")
 
         master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
 
@@ -46,7 +46,7 @@ class RelationshipSearchTest(BaseTestCase):
 
         anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
         obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
-        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doe")
+        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doedoedoe")
 
         master = mommy.make(models.RelationshipType, name="Master", reverse="Padawan")
 
@@ -65,9 +65,9 @@ class RelationshipSearchTest(BaseTestCase):
 
     def test_relationship_type(self):
         """contacts by relationship type : no reverse"""
-        john = mommy.make(models.Contact, firstname="John", lastname="Lennon")
-        ringo = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
-        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doe")
+        john = mommy.make(models.Contact, firstname="John", lastname="Lennon#")
+        ringo = mommy.make(models.Contact, firstname="Georges", lastname="Harrison")
+        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doedoedoe")
 
         friends = mommy.make(models.RelationshipType, name="Fiends")
 
@@ -87,8 +87,8 @@ class RelationshipSearchTest(BaseTestCase):
     def test_relationship_date(self):
         """contacts by relationship date"""
         john = mommy.make(models.Contact, firstname="John", lastname="Lennon")
-        ringo = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
-        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doe")
+        ringo = mommy.make(models.Contact, firstname="Georges", lastname="Harrison")
+        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doedoedoe")
 
         friends = mommy.make(models.RelationshipType, name="Fiends")
 
@@ -109,8 +109,8 @@ class RelationshipSearchTest(BaseTestCase):
     def test_relationship_not_in_date(self):
         """contacts by relationship not in date"""
         john = mommy.make(models.Contact, firstname="John", lastname="Lennon")
-        ringo = mommy.make(models.Contact, firstname="Ringo", lastname="Star")
-        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doe")
+        ringo = mommy.make(models.Contact, firstname="Georges", lastname="Harrison")
+        doe = mommy.make(models.Contact, firstname="Jack", lastname="Doedoedoe")
 
         friends = mommy.make(models.RelationshipType, name="Fiends")
 
