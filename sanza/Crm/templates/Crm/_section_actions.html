@@ -3,10 +3,10 @@
 
 {% block section_title %}
   {% if all_actions and entity %}
-    {{title}} - <a href="{% url "crm_view_entity" entity.id %}">{{entity.name}}</a>
+    {{title}} - <a href="{% url 'crm_view_entity' entity.id %}">{{entity.name}}</a>
   {% else %}
     {% if all_actions and contact %}
-      {{title}} - <a href="{% url "crm_view_contact" contact.id %}">{{contact.fullname}}</a>
+      {{title}} - <a href="{% url 'crm_view_contact' contact.id %}">{{contact.fullname}}</a>
     {% else %}
       {% trans "Actions" %}
   {% endif %}{% endif %}

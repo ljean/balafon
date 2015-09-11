@@ -15,7 +15,11 @@ from django.views.generic import ListView
 from sanza.Crm import models
 from sanza.Crm.utils import get_in_charge_users
 from sanza.permissions import can_access
-
+try:
+    from sanza.Users.models import CustomMenu
+    HAS_CUSTOM_MENU = True
+except ImportError:
+    HAS_CUSTOM_MENU = False
 
 class ActionArchiveView(object):
     """view"""
@@ -118,6 +122,11 @@ class ActionArchiveView(object):
             for status in action_status:
                 if status.id in selected_status:
                     setattr(status, 'selected', True)
+
+        if HAS_CUSTOM_MENU:
+            context['planning_custom_menus'] = [
+                menu for menu in CustomMenu.objects.filter(position=CustomMenu.POSITION_PLANNING) if menu.get_children()
+            ]
 
         context["action_types"] = action_types
         context["in_charge"] = in_charge

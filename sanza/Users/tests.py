@@ -5,7 +5,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 import json
 import logging
 from unittest import skipIf
@@ -639,9 +639,51 @@ class CustomMenuTestCase(BaseTestCase):
     def test_view_custom_menu(self):
         """It should display custom menu"""
         menu = mommy.make(CustomMenu, label="MON MENU")
-        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT")
+        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT", url='/test')
 
         response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_planning(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_PLANNING)
+        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT", url='/test')
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+
+        today = date.today()
+        response = self.client.get(
+            reverse("crm_actions_of_day", args=[today.year, today.month, today.day]),
+            follow=True
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_reverse(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
+        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT", reverse='crm_actions_of_day')
+
+        response = self.client.get(reverse("sanza_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+
+        today = date.today()
+        response = self.client.get(
+            reverse("crm_actions_of_day", args=[today.year, today.month, today.day]),
+            follow=True
+        )
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, menu.label)
@@ -659,7 +701,7 @@ class CustomMenuTestCase(BaseTestCase):
     def test_view_custom_menu_user(self):
         """It should display the menu"""
         menu = mommy.make(CustomMenu)
-        menu_item = mommy.make(CustomMenuItem, parent=menu)
+        menu_item = mommy.make(CustomMenuItem, parent=menu, url='/test')
         menu_item.only_for_users.add(self.user)
         menu_item.save()
 
@@ -672,7 +714,7 @@ class CustomMenuTestCase(BaseTestCase):
     def test_view_custom_menu_other_user(self):
         """It should not display the menu"""
         menu = mommy.make(CustomMenu)
-        menu_item = mommy.make(CustomMenuItem, parent=menu)
+        menu_item = mommy.make(CustomMenuItem, parent=menu, url='/test')
         menu_item.only_for_users.add(mommy.make(models.User))
         menu_item.save()
 

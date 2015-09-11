@@ -61,6 +61,24 @@
 <a class="btn btn-default pull-right" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
     <span class="glyphicon glyphicon-chevron-right"></span>
 </a>
+
+{% for the_custom_menu in planning_custom_menus %}
+  <div class="dropdown btn-group pull-right">
+    <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+      {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+      {{ the_custom_menu.label }}
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        {% for custom_menu_item in the_custom_menu.get_children %}
+        <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
+          <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+          {{ custom_menu_item.label }}
+        </a></li>
+        {% endfor %}
+    </ul>
+  </div>
+{% endfor %}
 </div>
 
 {% include "Crm/_section_actions.html" with actions=object_list %}
