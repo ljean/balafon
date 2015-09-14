@@ -16,10 +16,11 @@ class SaleSerializer(serializers.ModelSerializer):
 
 class StoreItemCategorySerializer(serializers.ModelSerializer):
     """json serializer"""
+    get_path_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = StoreItemCategory
-        fields = ('id', 'name', "icon")
+        fields = ('id', 'name', "icon", "get_path_name")
 
 
 class VatRateSerializer(serializers.ModelSerializer):
@@ -45,7 +46,7 @@ class StoreItemTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreItemTag
         fields = (
-            'id', 'name', "icon"
+            'id', 'name', "icon", "show_always"
         )
 
 
