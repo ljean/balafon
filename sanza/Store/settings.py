@@ -18,3 +18,5 @@ def get_cart_type_name():
 def get_cart_confirmation_subject():
     """returns true if an anonymous can view some data : products, categories, tags"""
     return getattr(settings, 'SANZA_CART_CONFIRMATION_EMAIL_SUBJECT', _(u'Purchasing confirmation'))
+
+

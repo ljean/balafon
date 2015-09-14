@@ -15,11 +15,28 @@ admin.site.register(models.Unit)
 admin.site.register(models.DeliveryPoint)
 
 
+class StoreItemInline(admin.TabularInline):
+    """display property on the store item"""
+    model = models.StoreItem
+    fields = ('name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_rate')
+    readonly_fields = ['get_admin_link']
+
+
 class StoreItemCategoryAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active')
-    list_editable = ('name', 'order_index', 'icon', 'active')
+    list_display = ('name', 'icon', 'active', 'get_all_articles_count')
+    list_editable = ('active', )
+    readonly_fields = ('get_all_articles_count',)
+    inlines = (StoreItemInline, )
+
 
 admin.site.register(models.StoreItemCategory, StoreItemCategoryAdmin)
+
+
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    inlines = (StoreItemInline, )
+
+admin.site.register(models.Brand, BrandAdmin)
 
 
 class StoreItemTagAdmin(admin.ModelAdmin):
@@ -73,6 +90,42 @@ class StockThresholdFilter(admin.SimpleListFilter):
             return queryset
 
 
+class StoreCategoryFilter(admin.SimpleListFilter):
+    """filter items which are below their stock threshold"""
+    title = _(u'Store category')
+    parameter_name = 'store_category'
+
+    def lookups(self, request, model_admin):
+        store_category = request.GET.get(self.parameter_name, None)
+
+        if not store_category:
+            # returns letters
+            letters = sorted(set([category.name[0].upper() for category in models.StoreItemCategory.objects.all()]))
+            return [('_'+letter, letter) for letter in letters]
+        else:
+            try:
+                category = models.StoreItemCategory.objects.get(id=int(store_category))
+                letter = category.name[0].upper()
+            except ValueError:
+                letter = store_category[1:]
+
+            return [
+                (category.id, category.name)
+                for category in models.StoreItemCategory.objects.filter(
+                    name__istartswith=letter
+                ).extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+            ]
+
+    def queryset(self, request, queryset):
+        category = self.value()
+        if category:
+            try:
+                return queryset.filter(category__id=int(category))
+            except ValueError:
+                return queryset.filter(category__name__istartswith=category[1:])
+        return queryset
+
+
 class StoreItemPropertyValueInline(admin.TabularInline):
     """display property on the store item"""
     model = models.StoreItemPropertyValue
@@ -82,15 +135,17 @@ class StoreItemPropertyValueInline(admin.TabularInline):
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
-        'fullname', 'brand', 'category', 'vat_rate', 'purchase_price', 'pre_tax_price', 'vat_incl_price', 'stock_count',
-        'stock_threshold_alert', 'unit'
+        'fullname', 'brand', 'category', 'vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price',
+        'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
     ]
     ordering = ['name']
-    list_filter = [StockThresholdFilter, 'tags', 'category', 'brand']
-    search_fields = ['name']
+    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', StoreCategoryFilter]
+    list_editable = ['available']
+    search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
     inlines = [StoreItemPropertyValueInline]
     list_per_page = 500
+    save_as = True
 
 
 admin.site.register(models.StoreItem, StoreItemAdmin)
@@ -136,8 +191,6 @@ class StoreItemImportAdmin(admin.ModelAdmin):
 admin.site.register(models.StoreItemImport, StoreItemImportAdmin)
 
 
-
-admin.site.register(models.Brand)
 admin.site.register(models.StoreItemProperty)
 
 

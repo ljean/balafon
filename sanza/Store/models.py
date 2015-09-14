@@ -3,11 +3,13 @@
 
 import datetime
 from decimal import Decimal
+import os.path
 import traceback
 import xlrd
 
 from django.db import models
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -99,12 +101,47 @@ class Unit(models.Model):
         return self.name
 
 
+class PricePolicy(models.Model):
+
+    APPLY_TO_ALL = 0
+    APPLY_TO_ARTICLES = 1
+    APPLY_TO_CATEGORIES = 2
+
+    APPLY_TO_CHOICES = (
+        (APPLY_TO_ALL, _(u'All')),
+        (APPLY_TO_ARTICLES, _(u'Articles')),
+        (APPLY_TO_CATEGORIES, _(u'Categories')),
+    )
+
+    POLICIES = (
+        ('from_category', _(u'Inherit from category')),
+        ('multiply_purchase_by_ratio', _(u'Multiply purchase price by ratio')),
+    )
+
+    name = models.CharField(max_length=100, verbose_name=_(u'name'))
+    parameters = models.CharField(max_length=100, verbose_name=_(u'parameters'), blank=True, default='')
+    policy = models.CharField(max_length=100, verbose_name=_(u'policy'), choices=POLICIES)
+    apply_to = models.IntegerField(default=APPLY_TO_ALL, verbose_name=_(u'apply to'), choices=APPLY_TO_CHOICES)
+
+    class Meta:
+        verbose_name = _(u"Price policy")
+        verbose_name_plural = _(u"Price policies")
+
+    def __unicode__(self):
+        return self.name
+
+
 class StoreItemCategory(models.Model):
     """something for organization of store items"""
     name = models.CharField(verbose_name=_(u"name"), max_length=200)
     order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
     active = models.BooleanField(verbose_name=_(u"active"), default=True)
     icon = models.CharField(max_length=20, default="", blank=True)
+    parent = models.ForeignKey(
+        "StoreItemCategory", default=None, blank=True, null=True, verbose_name=_('parent category'),
+        related_name="subcategories_set"
+    )
+    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
 
     class Meta:
         verbose_name = _(u"Store item category")
@@ -114,16 +151,54 @@ class StoreItemCategory(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_all_articles(self):
+        """returns all articles"""
+        all_articles = []
+        for article in self.storeitem_set.all():
+            all_articles.append(article)
+        for sub_category in self.subcategories_set.all():
+            all_articles.extend(sub_category.get_all_articles())
+        return all_articles
+
+    def get_all_articles_count(self):
+        """returns all articles"""
+        all_articles_count = self.storeitem_set.count()
+        for sub_category in self.subcategories_set.all():
+            all_articles_count += sub_category.get_all_articles_count()
+        return all_articles_count
+    get_all_articles_count.short_description = _(u'Articles count')
+
+    def get_path_name(self):
+        """returns name with all parents"""
+        if self.parent:
+            return u'{0} > {1}'.format(self.parent.get_path_name(), self.name)
+        else:
+            return self.name
+
     def save(self, *args, **kwargs):
-        """Check that no duplicated name"""
+        """Save category"""
+
         self.name = self.name.strip()
-        super(StoreItemCategory, self).save()
+        ret = super(StoreItemCategory, self).save()
+
+        #Merge categories with same name
         siblings = StoreItemCategory.objects.filter(name=self.name).exclude(id=self.id)
         for sibling in siblings:
             for article in sibling.storeitem_set.all():
                 article.category = self
                 article.save()
+
+            for sub_category in sibling.subcategories_set.all():
+                sub_category.parent = self
+                sub_category.save()
+
             sibling.delete()
+
+        #recalculate price for all articles in this category
+        for article in self.get_all_articles():
+            article.calculate_price()
+
+        return ret
 
 
 class StoreItemTag(models.Model):
@@ -155,6 +230,18 @@ class Brand(models.Model):
         return self.name
 
 
+class Supplier(models.Model):
+    """supplier"""
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = _(u"Supplier")
+        verbose_name_plural = _(u"Suppliers")
+
+    def __unicode__(self):
+        return self.name
+
+
 class StoreItem(models.Model):
     """something than can be buy in this store"""
 
@@ -162,9 +249,15 @@ class StoreItem(models.Model):
     category = models.ForeignKey(StoreItemCategory, verbose_name=_(u"category"))
     tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u"tags"))
     vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
-    pre_tax_price = models.DecimalField(verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2)
-    stock_count = models.IntegerField(default=None, verbose_name=_(u"stock count"), blank=True, null=True)
-    stock_threshold = models.IntegerField(default=None, verbose_name=_(u"stock count"), blank=True, null=True)
+    pre_tax_price = models.DecimalField(
+        verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2
+    )
+    stock_count = models.DecimalField(
+        default=None, verbose_name=_(u"stock count"), blank=True, null=True, max_digits=9, decimal_places=2
+    )
+    stock_threshold = models.DecimalField(
+        default=None, verbose_name=_(u"stock threshold"), blank=True, null=True, max_digits=9, decimal_places=2
+    )
     purchase_price = models.DecimalField(
         verbose_name=_(u"purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
     )
@@ -174,6 +267,9 @@ class StoreItem(models.Model):
     imported_by = models.ForeignKey(
         'StoreItemImport', default=None, blank=True, null=True, verbose_name=_(u'imported by')
     )
+    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
+    available = models.BooleanField(default=False, verbose_name=_(u'Available'))
+    supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
 
     class Meta:
         verbose_name = _(u"Store item")
@@ -181,12 +277,19 @@ class StoreItem(models.Model):
         ordering = ['name']
 
     def __unicode__(self):
-        return self.name
+        return u'{0} > {1}{2}'.format(self.category, self.name, ' ({0})'.format(self.brand) if self.brand else '')
 
     def vat_incl_price(self):
         """VAT inclusive price"""
         return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
     vat_incl_price.short_description = _(u"VAT inclusive price")
+
+    def get_admin_link(self):
+        return u'<a href="{0}" target="_extra_admin">{1}</a>'.format(
+            reverse("admin:Store_storeitem_change", args=[self.id]), ugettext(u'Edit')
+        )
+    get_admin_link.short_description = 'Url'
+    get_admin_link.allow_tags = True
 
     def fullname(self):
         properties = []
@@ -238,6 +341,34 @@ class StoreItem(models.Model):
 
     stock_threshold_alert.short_description = _(u"Stock threshold")
     stock_threshold_alert.allow_tags = True
+
+    def calculate_price(self):
+        """calculate article price according to the defined policy"""
+
+        price_policy = self.price_policy.policy if self.price_policy else ''
+        policy_parameters = self.price_policy.parameters if self.price_policy else ''
+
+        #look for actual policy price
+        if price_policy == 'from_category':
+            category = self.category
+            while price_policy == 'from_category':
+                if category and category.price_policy:
+                    price_policy = category.price_policy.policy
+                    policy_parameters = category.price_policy.parameters
+                else:
+                    price_policy = ''
+
+                if price_policy == 'from_category':
+                    category = category.parent
+
+        if price_policy == 'multiply_purchase_by_ratio' and self.purchase_price is not None:
+            self.pre_tax_price = self.purchase_price * Decimal(policy_parameters)
+            super(StoreItem, self).save()
+
+    def save(self, *args, **kwargs):
+        ret = super(StoreItem, self).save(*args, **kwargs)
+        self.calculate_price()
+        return ret
 
 
 class StoreItemProperty(models.Model):
@@ -293,13 +424,14 @@ class StoreItemImport(models.Model):
         default='', verbose_name=_(u'default Brand'), blank=True, max_length=50,
         help_text=_(u'If defined, it will be used if no brand is given')
     )
+    supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
 
     class Meta:
         verbose_name = _(u"Store item import")
         verbose_name_plural = _(u"Store item imports")
 
     def __unicode__(self):
-        return self.data.url
+        return os.path.basename(self.data.file.name)
 
     def get_url(self):
         return self.data.url
@@ -381,7 +513,7 @@ class StoreItemImport(models.Model):
                     last_category = sheet.cell(rowx=row_index, colx=0).value
                     continue
 
-                store_item = StoreItem()
+                store_item = StoreItem(supplier=self.supplier)
                 properties = []
 
                 #for all fields

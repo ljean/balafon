@@ -276,7 +276,7 @@ class CategoryNameTest(TestCase):
         category = mommy.make(models.StoreItemCategory, name=' Abc ')
         self.assertEqual(category.name, 'Abc')
 
-    def test_merge_duplicates(self):
+    def test_merge_duplicates_articles(self):
         """it should merge articles in only 1 category"""
         category_name = "Abc"
         category1 = mommy.make(models.StoreItemCategory, name=category_name)
@@ -293,3 +293,201 @@ class CategoryNameTest(TestCase):
 
         self.assertEqual(models.StoreItemCategory.objects.filter(id=category1.id).count(), 0)
 
+    def test_merge_duplicates_subcategories(self):
+        """it should merge subcategories in only 1 category"""
+        category_name = "Abc"
+        category1 = mommy.make(models.StoreItemCategory, name=category_name)
+        sub_category1 = mommy.make(models.StoreItemCategory, name='Def', parent=category1)
+        sub_category2 = mommy.make(models.StoreItemCategory, name='Ghi', parent=category1)
+
+        category2 = mommy.make(models.StoreItemCategory, name=category_name)
+
+        category = models.StoreItemCategory.objects.get(name=category_name)
+        self.assertEqual(category.id, category2.id)
+        self.assertEqual(category.subcategories_set.count(), 2)
+        self.assertTrue(sub_category1 in category.subcategories_set.all())
+        self.assertTrue(sub_category2 in category.subcategories_set.all())
+
+        self.assertEqual(models.StoreItemCategory.objects.filter(id=category1.id).count(), 0)
+
+    def test_path_name(self):
+        """it should show full name"""
+        category_name = "Abc"
+        category1 = mommy.make(models.StoreItemCategory, name=category_name)
+        sub_category1 = mommy.make(models.StoreItemCategory, name='Def', parent=category1)
+
+        self.assertEqual(category1.get_path_name(), category1.name)
+        self.assertEqual(sub_category1.get_path_name(), u'{0} > {1}'.format(category1.name, sub_category1.name))
+
+
+class PricePolicyTest(TestCase):
+    """Test that price is calculated properly"""
+
+    def test_article_no_policy(self):
+        """it should not change the price"""
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_20_percent)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category1,
+            price_policy=None,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("2"))
+
+    def test_category_no_policy(self):
+        """it should not change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=None)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category1,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("2"))
+
+    def test_article_ratio_policy(self):
+        """it should change the price"""
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+        add_50_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.5")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_50_percent)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category1,
+            price_policy=add_20_percent,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("1.2"))
+
+    def test_category_ratio_policy(self):
+        """it should change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+        add_50_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.5")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_50_percent)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category1,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("1.5"))
+
+    def test_parent_category_ratio_policy(self):
+        """it should change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_20_percent)
+        category2 = mommy.make(models.StoreItemCategory, price_policy=from_category, parent=category1)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category2,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("1.2"))
+
+    def test_change_category_policy_update_price(self):
+        """it should change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+        add_50_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.5")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_20_percent)
+        category2 = mommy.make(models.StoreItemCategory, price_policy=from_category, parent=category1)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category2,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("1.2"))
+
+        category2.price_policy = add_50_percent
+        category2.save()
+
+        article = models.StoreItem.objects.get(id=article.id)
+        self.assertEqual(article.pre_tax_price, Decimal("1.5"))
+
+    def test_change_category_parent_policy_update_price(self):
+        """it should change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+        add_50_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.5")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=add_20_percent)
+        category2 = mommy.make(models.StoreItemCategory, price_policy=from_category, parent=category1)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category2,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("1.2"))
+
+        category1.price_policy = add_50_percent
+        category1.save()
+
+        article = models.StoreItem.objects.get(id=article.id)
+        self.assertEqual(article.pre_tax_price, Decimal("1.5"))
+
+    def test_category_parent_policy_not_set(self):
+        """it should change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=None)
+        category2 = mommy.make(models.StoreItemCategory, price_policy=from_category, parent=category1)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category2,
+            price_policy=from_category,
+            purchase_price=Decimal("1"),
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("2"))
+
+    def test_category_invalid_purchase_prise(self):
+        """it should not change the price"""
+        from_category = mommy.make(models.PricePolicy, policy='from_category', parameters='')
+        add_20_percent = mommy.make(models.PricePolicy, policy='multiply_purchase_by_ratio', parameters="1.2")
+
+        category1 = mommy.make(models.StoreItemCategory, price_policy=None)
+        category2 = mommy.make(models.StoreItemCategory, price_policy=from_category, parent=category1)
+
+        article = mommy.make(
+            models.StoreItem,
+            category=category2,
+            price_policy=add_20_percent,
+            purchase_price=None,
+            pre_tax_price=Decimal("2")
+        )
+
+        self.assertEqual(article.pre_tax_price, Decimal("2"))
