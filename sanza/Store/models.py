@@ -229,6 +229,10 @@ class Brand(models.Model):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.name = self.name.strip()
+        return super(Brand, self).save(*args, **kwargs)
+
 
 class Supplier(models.Model):
     """supplier"""
@@ -366,6 +370,7 @@ class StoreItem(models.Model):
             super(StoreItem, self).save()
 
     def save(self, *args, **kwargs):
+        self.name = self.name.strip()
         ret = super(StoreItem, self).save(*args, **kwargs)
         self.calculate_price()
         return ret
