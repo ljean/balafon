@@ -290,3 +290,38 @@ class CartTest(BaseTestCase):
 
         store_item2 = models.StoreItem.objects.get(id=store_item2.id)
         self.assertEqual(store_item2.stock_count, Decimal("-0.5"))
+
+    def test_cart_when_deleted_article(self):
+        """The cart should not be removed if store_item is deleted"""
+
+        #Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        store_item1 = mommy.make(models.StoreItem, stock_count=Decimal('10'))
+        store_item2 = mommy.make(models.StoreItem, stock_count=Decimal('0.5'))
+
+        sale = mommy.make(models.Sale)
+
+        sale_item1 = mommy.make(
+            models.SaleItem,
+            sale=sale,
+            item=store_item1,
+            quantity=2,
+            vat_rate=store_item1.vat_rate,
+            pre_tax_price=store_item1.pre_tax_price
+        )
+
+        sale_item2 = mommy.make(
+            models.SaleItem,
+            sale=sale,
+            item=store_item2,
+            quantity=1,
+            vat_rate=store_item2.vat_rate,
+            pre_tax_price=store_item2.pre_tax_price
+        )
+
+        store_item1.delete()
+
+        self.assertEqual(1, models.Sale.objects.count())
+        self.assertEqual(sale.id, models.Sale.objects.all()[0].id)
