@@ -114,6 +114,17 @@ class StoreItemCategory(models.Model):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        """Check that no duplicated name"""
+        self.name = self.name.strip()
+        super(StoreItemCategory, self).save()
+        siblings = StoreItemCategory.objects.filter(name=self.name).exclude(id=self.id)
+        for sibling in siblings:
+            for article in sibling.storeitem_set.all():
+                article.category = self
+                article.save()
+            sibling.delete()
+
 
 class StoreItemTag(models.Model):
     """something for finding store items more easily"""

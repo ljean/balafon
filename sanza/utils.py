@@ -50,7 +50,7 @@ class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
 
 def get_form_errors(response):
     """get form errors"""
-    soup = BeautifulSoup(response.content)
+    soup = BeautifulSoup(response.content, "html.parser")
     errors = soup.select('.field-error .label')
     return errors
 

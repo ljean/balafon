@@ -159,7 +159,7 @@ class NewNewsletterForm(forms.Form):
                         #if so get the content
                         html = urllib2.urlopen(url).read()
                         #and extract the selector content as initial content for the newsletter
-                        soup = BeautifulSoup(html)
+                        soup = BeautifulSoup(html, "html.parser")
                         content = u''.join([unicode(tag) for tag in soup.select(selector)])
                         if post_processor:
                             #import the post_processor function

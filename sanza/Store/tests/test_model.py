@@ -23,7 +23,7 @@ class StockThresholdTest(TestCase):
     def test_above_threshold(self):
         """It should not show a warning sign"""
         item = mommy.make(models.StoreItem, stock_count=40, stock_threshold=30)
-        soup = BeautifulSoup(item.stock_threshold_alert())
+        soup = BeautifulSoup(item.stock_threshold_alert(), "html.parser")
         self.assertEqual(0, len(soup.select("img")))
 
     def test_threshold_not_defined(self):
@@ -39,7 +39,7 @@ class StockThresholdTest(TestCase):
     def test_below_threshold(self):
         """It should show a warning sign"""
         item = mommy.make(models.StoreItem, stock_count=20, stock_threshold=30)
-        soup = BeautifulSoup(item.stock_threshold_alert())
+        soup = BeautifulSoup(item.stock_threshold_alert(), "html.parser")
         self.assertEqual(1, len(soup.select("img")))
 
 
@@ -267,4 +267,29 @@ class SaleTotalTest(TestCase):
         self.assertEqual(vat_totals[1]['vat_rate'], vat_rate_20)
         self.assertEqual(vat_totals[1]['amount'], Decimal("2"))
 
+
+class CategoryNameTest(TestCase):
+    """Test that category name can not be duplicated"""
+
+    def test_strip_name(self):
+        """it should strip name"""
+        category = mommy.make(models.StoreItemCategory, name=' Abc ')
+        self.assertEqual(category.name, 'Abc')
+
+    def test_merge_duplicates(self):
+        """it should merge articles in only 1 category"""
+        category_name = "Abc"
+        category1 = mommy.make(models.StoreItemCategory, name=category_name)
+        article1 = mommy.make(models.StoreItem, category=category1)
+        article2 = mommy.make(models.StoreItem, category=category1)
+
+        category2 = mommy.make(models.StoreItemCategory, name=category_name)
+
+        category = models.StoreItemCategory.objects.get(name=category_name)
+        self.assertEqual(category.id, category2.id)
+        self.assertEqual(category.storeitem_set.count(), 2)
+        self.assertTrue(article1 in category.storeitem_set.all())
+        self.assertTrue(article2 in category.storeitem_set.all())
+
+        self.assertEqual(models.StoreItemCategory.objects.filter(id=category1.id).count(), 0)
 
