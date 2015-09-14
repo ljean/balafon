@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-08 17:06+0200\n"
+"POT-Creation-Date: 2015-09-14 16:28+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,7 +62,7 @@ msgstr "Dossiers"
 msgid "Emailing"
 msgstr "Emailing"
 
-#: config.py:101 templates/sanza/_bs_navigation.html:143
+#: config.py:101 templates/sanza/_bs_navigation.html:146
 #: templates/sanza/_navigation.html:45
 msgid "Admin"
 msgstr "Admin"
@@ -138,7 +138,7 @@ msgstr "code postal"
 #: Crm/forms.py:315 Crm/forms.py:363 Crm/forms.py:736 Crm/models.py:35
 #: Crm/search_forms.py:1239 Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:14 Search/forms.py:769
-#: Store/models.py:191
+#: Store/models.py:309
 msgid "Name"
 msgstr "Nom"
 
@@ -480,9 +480,10 @@ msgstr "villes"
 
 #: Crm/models.py:192 Crm/models.py:449 Crm/models.py:830 Crm/models.py:860
 #: Crm/models.py:927 Crm/models.py:1075 Crm/models.py:1328 Crm/models.py:1411
-#: Search/models.py:12 Search/models.py:25 Store/models.py:92
-#: Store/models.py:104 Store/models.py:120 Store/models.py:137
-#: Store/models.py:150 Store/models.py:234 Store/models.py:445
+#: Search/models.py:12 Search/models.py:25 Store/models.py:94
+#: Store/models.py:121 Store/models.py:136 Store/models.py:206
+#: Store/models.py:223 Store/models.py:252 Store/models.py:381
+#: Store/models.py:593
 msgid "name"
 msgstr "nom"
 
@@ -887,11 +888,11 @@ msgstr "type d'action"
 msgid "action types"
 msgstr "types d'action"
 
-#: Crm/models.py:1074 Users/models.py:31 Users/models.py:48
+#: Crm/models.py:1074 Users/models.py:32 Users/models.py:49
 msgid "user"
 msgstr "utilisateur"
 
-#: Crm/models.py:1076 Store/models.py:106 Store/models.py:122
+#: Crm/models.py:1076 Store/models.py:138 Store/models.py:208
 msgid "active"
 msgstr "actif"
 
@@ -911,12 +912,12 @@ msgstr "Type d'action"
 msgid "view_name"
 msgstr "nom de la vue"
 
-#: Crm/models.py:1091 Users/models.py:90
+#: Crm/models.py:1091 Users/models.py:71 Users/models.py:105
 msgid "icon"
 msgstr "icone"
 
-#: Crm/models.py:1092 Crm/models.py:1329 Store/models.py:235
-#: Users/models.py:61 Users/models.py:89
+#: Crm/models.py:1092 Crm/models.py:1329 Store/models.py:382
+#: Users/models.py:70 Users/models.py:104
 msgid "label"
 msgstr "libellé"
 
@@ -928,7 +929,7 @@ msgstr "arguments du Lien"
 msgid "Example: class=\"colorbox-form\" for colorbos display"
 msgstr "Exemple: class=\"colorbox-form\" pour un affichage dans une colorbox"
 
-#: Crm/models.py:1100 Store/models.py:105 Store/models.py:121
+#: Crm/models.py:1100 Store/models.py:137 Store/models.py:207
 msgid "order_index"
 msgstr "ordre"
 
@@ -1038,7 +1039,7 @@ msgstr "champ personnalisé"
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:1356 Search/models.py:37 Store/models.py:433
+#: Crm/models.py:1356 Search/models.py:37 Store/models.py:581
 msgid "value"
 msgstr "valeur"
 
@@ -1090,7 +1091,7 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:1414 Store/models.py:164
+#: Crm/models.py:1414 Store/models.py:272
 msgid "imported by"
 msgstr "importé par"
 
@@ -1394,7 +1395,7 @@ msgstr "Autorise les contacts identiques"
 
 #: Crm/search_forms.py:1068 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
-#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:126
+#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:181
 msgid "Import"
 msgstr "Import"
 
@@ -1483,7 +1484,7 @@ msgstr "Champs"
 #: Crm/templates/Crm/_section_opportunity_info.html:28
 #: Crm/templates/Crm/_section_same_as.html:64
 #: Crm/templates/Crm/_actions/_edit.html:4
-#: Emailing/templates/Emailing/_section_emailing.html:39
+#: Emailing/templates/Emailing/_section_emailing.html:39 Store/models.py:293
 msgid "Edit"
 msgstr "Editer"
 
@@ -1532,7 +1533,7 @@ msgstr "Tous les contacts"
 msgid "Phone"
 msgstr "Téléphone"
 
-#: Crm/templates/Crm/_section_all_entities.html:99
+#: Crm/templates/Crm/_section_all_entities.html:99 Store/models.py:111
 msgid "All"
 msgstr "Tous"
 
@@ -1950,7 +1951,9 @@ msgstr "Les membres en jaune seront ajoutés au groupe lors de l'enregistrement"
 #: Crm/templates/Crm/edit_group.html:187
 msgid ""
 "The members with dark red background will be removed if you save the group"
-msgstr "Les membres en rouge foncé seront supprimés du groupe lors de l'enregistrement"
+msgstr ""
+"Les membres en rouge foncé seront supprimés du groupe lors de "
+"l'enregistrement"
 
 #: Crm/templates/Crm/edit_group.html:191
 msgid "No members"
@@ -2805,7 +2808,7 @@ msgstr ""
 "oublié' sur la page de login."
 
 #: Profile/forms.py:57 ci/drone_project/templates/registration/login.html:20
-#: templates/sanza/_bs_navigation.html:138 templates/sanza/_navigation.html:44
+#: templates/sanza/_bs_navigation.html:141 templates/sanza/_navigation.html:44
 msgid "Password"
 msgstr "Mot de passe"
 
@@ -3340,28 +3343,32 @@ msgstr "Enregistrer la recherche"
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
 
-#: Store/admin.py:45
+#: Store/admin.py:62
 msgid "Stock level"
 msgstr "Niveau du stcok"
 
-#: Store/admin.py:54
+#: Store/admin.py:71
 msgid "Threshold alert"
 msgstr "Seuil d'alerte"
 
-#: Store/admin.py:55
+#: Store/admin.py:72
 msgid "Threshold ok"
 msgstr "Ok"
 
-#: Store/admin.py:56
+#: Store/admin.py:73
 msgid "Threshold missing"
 msgstr "Manquant"
 
-#: Store/admin.py:115
+#: Store/admin.py:95
+msgid "Store category"
+msgstr "Catégorie"
+
+#: Store/admin.py:170
 msgid "The file {0} has been properly imported : {1} items have been created"
 msgstr ""
 "Le fichier {0} a été correctement importé : {1} article(s) ont été créé(s)"
 
-#: Store/admin.py:122
+#: Store/admin.py:177
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
@@ -3373,29 +3380,29 @@ msgstr "Votre profil d'utilisateur n'est pas valide"
 msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
 
-#: Store/models.py:25
+#: Store/models.py:27
 msgid "template name"
 msgstr "Nom du template"
 
-#: Store/models.py:26
+#: Store/models.py:28
 msgid "Set the name of a custom template for commercial document"
 msgstr "Nom du templaté personnalisé pour le document commercial"
 
-#: Store/models.py:30
+#: Store/models.py:32
 msgid "Show amount as pre-tax"
 msgstr "Afficher les prix en HT"
 
-#: Store/models.py:32
+#: Store/models.py:34
 msgid ""
 "The action amount will be update with pre-tax total if checked and with tax-"
 "included total if not"
 msgstr "Le montant de l'action sera calculé en HT si coché et en TTC sinon"
 
-#: Store/models.py:36
+#: Store/models.py:38
 msgid "readonly status"
 msgstr "Status en lecture-seule"
 
-#: Store/models.py:37
+#: Store/models.py:39
 msgid ""
 "When action has one of these status, it is not possible to modify a "
 "commercial document"
@@ -3403,143 +3410,207 @@ msgstr ""
 "Si l'action a un de ces status, il n'est pas possible de modifier le "
 "doucment commercial"
 
-#: Store/models.py:41
+#: Store/models.py:43
 msgid "Store management action type"
 msgstr "Type d'action géré par le Store"
 
-#: Store/models.py:42
+#: Store/models.py:44
 msgid "Store management action types"
 msgstr "Types d'action gérés par le Store"
 
-#: Store/models.py:68
+#: Store/models.py:70
 msgid "vat rate"
 msgstr "taux de TVA"
 
-#: Store/models.py:69
+#: Store/models.py:71
 msgid "is default"
 msgstr "par défaut"
 
-#: Store/models.py:76 Store/models.py:153 Store/models.py:481
+#: Store/models.py:78 Store/models.py:255 Store/models.py:652
 msgid "VAT rate"
 msgstr "Taux de TVA"
 
-#: Store/models.py:77
+#: Store/models.py:79
 msgid "VAT rates"
 msgstr "Taux de TVA"
 
-#: Store/models.py:95
+#: Store/models.py:97
 msgid "unit"
 msgstr "unité"
 
-#: Store/models.py:96
+#: Store/models.py:98
 msgid "units"
 msgstr "unités"
 
-#: Store/models.py:110
+#: Store/models.py:112
+msgid "Articles"
+msgstr "Articles"
+
+#: Store/models.py:113
+msgid "Categories"
+msgstr "Categories"
+
+#: Store/models.py:117
+msgid "Inherit from category"
+msgstr "Défini par la catégorie"
+
+#: Store/models.py:118
+msgid "Multiply purchase price by ratio"
+msgstr "Multiplie le prix d'achat par un ratio"
+
+#: Store/models.py:122
+msgid "parameters"
+msgstr "paramètres"
+
+#: Store/models.py:123
+msgid "policy"
+msgstr "calcul de prix"
+
+#: Store/models.py:124
+msgid "apply to"
+msgstr "s'applique à"
+
+#: Store/models.py:127
+msgid "Price policy"
+msgstr "Calcul de prix"
+
+#: Store/models.py:128
+msgid "Price policies"
+msgstr "Calculs de prix"
+
+#: Store/models.py:141
+msgid "parent category"
+msgstr "Catégorie parent"
+
+#: Store/models.py:144 Store/models.py:274
+msgid "price policy"
+msgstr "calcul de prix"
+
+#: Store/models.py:147
 msgid "Store item category"
 msgstr "Catégorie"
 
-#: Store/models.py:111
+#: Store/models.py:148
 msgid "Store item categories"
 msgstr "Catégories"
 
-#: Store/models.py:124
+#: Store/models.py:169
+msgid "Articles count"
+msgstr "Nombre d'articles"
+
+#: Store/models.py:210
 msgid "show always"
 msgstr "Toujours affiché"
 
-#: Store/models.py:127
+#: Store/models.py:213
 msgid "Store item tag"
 msgstr "Tag"
 
-#: Store/models.py:128
+#: Store/models.py:214
 msgid "Store item tags"
 msgstr "Tags"
 
-#: Store/models.py:140 Store/templates/Store/cart_root_email.html:51
+#: Store/models.py:226 Store/templates/Store/cart_root_email.html:51
 msgid "Brand"
 msgstr "Marque"
 
-#: Store/models.py:141
+#: Store/models.py:227
 msgid "Brands"
 msgstr "Marques"
 
-#: Store/models.py:151
+#: Store/models.py:242 Store/models.py:276 Store/models.py:432
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#: Store/models.py:243
+msgid "Suppliers"
+msgstr "Fournisseurs"
+
+#: Store/models.py:253
 msgid "category"
 msgstr "Catégorie"
 
-#: Store/models.py:152 Store/models.py:258
+#: Store/models.py:254 Store/models.py:405
 msgid "tags"
 msgstr "Tags"
 
-#: Store/models.py:154 Store/models.py:482
+#: Store/models.py:257 Store/models.py:653
 msgid "pre-tax price"
 msgstr "prix HT"
 
-#: Store/models.py:155 Store/models.py:156
+#: Store/models.py:260
 msgid "stock count"
 msgstr "Stock"
 
-#: Store/models.py:158
+#: Store/models.py:263
+msgid "stock threshold"
+msgstr "seuil du stock"
+
+#: Store/models.py:266
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: Store/models.py:161
+#: Store/models.py:269
 msgid "brand"
 msgstr "marque"
 
-#: Store/models.py:162
+#: Store/models.py:270
 msgid "reference"
 msgstr "référence"
 
-#: Store/models.py:168
+#: Store/models.py:275
+msgid "Available"
+msgstr "Disponible"
+
+#: Store/models.py:279
 msgid "Store item"
 msgstr "article"
 
-#: Store/models.py:169
+#: Store/models.py:280
 msgid "Store items"
 msgstr "articles"
 
-#: Store/models.py:178
+#: Store/models.py:289
 msgid "VAT inclusive price"
 msgstr "prix TTC"
 
-#: Store/models.py:228
+#: Store/models.py:346
 msgid "Stock threshold"
 msgstr "Seuil du stock"
 
-#: Store/models.py:237
+#: Store/models.py:384
 msgid "in fullname"
 msgstr "utilisé dans le nom complet"
 
-#: Store/models.py:237
+#: Store/models.py:384
 msgid "is inserted in fullname if checked"
 msgstr "est inséré dans le nom complet si coché"
 
-#: Store/models.py:241 Store/models.py:436
+#: Store/models.py:388 Store/models.py:584
 msgid "Store item: property value"
 msgstr "Valeur d'une propriété"
 
-#: Store/models.py:242
+#: Store/models.py:389
 msgid "Store item: properties"
 msgstr "Propriété"
 
-#: Store/models.py:252
+#: Store/models.py:399
 msgid "Import file"
 msgstr "fichier à importer"
 
-#: Store/models.py:253
+#: Store/models.py:400
 msgid "An Excel file (*.xls) with the data"
 msgstr "Un fichier Excel (*.xls) avec les données à importer"
 
-#: Store/models.py:259
+#: Store/models.py:406
 msgid "Tags that can be added to the items"
 msgstr "Les tags à affecter aux articles importés"
 
-#: Store/models.py:264
+#: Store/models.py:411
 msgid "fields"
 msgstr "champs"
 
-#: Store/models.py:265
+#: Store/models.py:412
 msgid ""
 "Fields to import in order: if the attribute doesn't exist, create a custom "
 "property"
@@ -3547,113 +3618,117 @@ msgstr ""
 "Les champs à importer : Si l'attribut n'existe pas une propriété "
 "personnalisée sera créée"
 
-#: Store/models.py:267
+#: Store/models.py:414
 msgid "last import"
 msgstr "dernier import"
 
-#: Store/models.py:268
+#: Store/models.py:415
 msgid "import error"
 msgstr "erreur d'import"
 
-#: Store/models.py:269
+#: Store/models.py:416
 msgid "is successful"
 msgstr "succès"
 
-#: Store/models.py:270
+#: Store/models.py:417
 msgid "ignore first line"
 msgstr "ignorer la 1ère ligne"
 
-#: Store/models.py:272
+#: Store/models.py:419
 msgid "margin_rate"
 msgstr "taux de marge"
 
-#: Store/models.py:275
+#: Store/models.py:422
 msgid "error message"
 msgstr "message d'erreur"
 
-#: Store/models.py:278
+#: Store/models.py:425
 msgid "category-lines mode"
 msgstr "Mode catégorie par ligne"
 
-#: Store/models.py:279
+#: Store/models.py:426
 msgid ""
 "If checked, the store item category are expected as merged-cells header lines"
-msgstr "Si coché, la catégorie de l'article sera lue depuis une ligne fusionnée précédente"
+msgstr ""
+"Si coché, la catégorie de l'article sera lue depuis une ligne fusionnée "
+"précédente"
 
-#: Store/models.py:282
+#: Store/models.py:429
 msgid "default Brand"
 msgstr "marque par défaut"
 
-#: Store/models.py:283
+#: Store/models.py:430
 msgid "If defined, it will be used if no brand is given"
-msgstr "Si défini, sera utilisé comme marque par défaut si aucune marque n'est extraite"
+msgstr ""
+"Si défini, sera utilisé comme marque par défaut si aucune marque n'est "
+"extraite"
 
-#: Store/models.py:287
+#: Store/models.py:435
 msgid "Store item import"
 msgstr "Import d'articles"
 
-#: Store/models.py:288
+#: Store/models.py:436
 msgid "Store item imports"
 msgstr "Imports d'articles"
 
-#: Store/models.py:311 Store/tests/test_import_store.py:205
+#: Store/models.py:459 Store/tests/test_import_store.py:205
 #: Store/tests/test_import_store.py:235
 msgid "Uncategorized"
 msgstr "Divers"
 
-#: Store/models.py:431
+#: Store/models.py:579
 msgid "item"
 msgstr "article"
 
-#: Store/models.py:432
+#: Store/models.py:580
 msgid "property"
 msgstr "propriété"
 
-#: Store/models.py:437
+#: Store/models.py:585
 msgid "Store item: property values"
 msgstr "valeurs d'une proroété"
 
-#: Store/models.py:451 Store/templates/Store/cart_root_email.html:31
+#: Store/models.py:599 Store/templates/Store/cart_root_email.html:31
 msgid "Delivery point"
 msgstr "Point de livraison"
 
-#: Store/models.py:452
+#: Store/models.py:600
 msgid "Delivery points"
 msgstr "Points de livraison"
 
-#: Store/models.py:460
+#: Store/models.py:608
 msgid "delivery point"
 msgstr "point de livraison"
 
-#: Store/models.py:464
+#: Store/models.py:635
 msgid "Sale"
 msgstr "Vente"
 
-#: Store/models.py:465
+#: Store/models.py:636
 msgid "Sales"
 msgstr "Ventes"
 
-#: Store/models.py:480
+#: Store/models.py:651
 msgid "quantity"
 msgstr "quantité"
 
-#: Store/models.py:483
+#: Store/models.py:654
 msgid "Text"
 msgstr "Texte"
 
-#: Store/models.py:487
+#: Store/models.py:658
 msgid "Sale item"
 msgstr "article vendu"
 
-#: Store/models.py:488
+#: Store/models.py:659
 msgid "Sales items"
 msgstr "articles vendus"
 
-#: Store/models.py:493
+#: Store/models.py:664
 msgid "{1} x {0}"
 msgstr "{1} x {0}"
 
-#: Store/models.py:495
+#: Store/models.py:666
 msgid "Sale item not set"
 msgstr "article vendu non défini"
 
@@ -3707,66 +3782,90 @@ msgstr "Le contenu de type {0} n'existe pas"
 msgid "The url {0} is not allowed as homepage"
 msgstr "L'URL {0} n'est pas autorisé comme page d'accueil"
 
-#: Users/models.py:18
+#: Users/models.py:19
 msgid "Notify due actions"
 msgstr "Notifier les actions à échéance"
 
-#: Users/models.py:21
+#: Users/models.py:22
 msgid "Create automatically a favorite for message posted from the public form"
 msgstr ""
 "Crée automatiquement un favori si un message est posté depuis le formulaire "
 "de contact"
 
-#: Users/models.py:32
+#: Users/models.py:33
 msgid "content_type"
 msgstr "type de contenu"
 
-#: Users/models.py:33
+#: Users/models.py:34
 msgid "object id"
 msgstr "id objet"
 
-#: Users/models.py:37
+#: Users/models.py:38
 msgid "Favorite"
 msgstr "Favori"
 
-#: Users/models.py:38 Users/templates/Users/favorites_list.html:4
+#: Users/models.py:39 Users/templates/Users/favorites_list.html:4
 #: templates/sanza/_bs_navigation.html:25
 msgid "Favorites"
 msgstr "Favoris"
 
-#: Users/models.py:49
+#: Users/models.py:50
 msgid "URL"
 msgstr "URL"
 
-#: Users/models.py:52
+#: Users/models.py:53
 msgid "User homepage"
 msgstr "Page d'accueil utilisateur"
 
-#: Users/models.py:53
+#: Users/models.py:54
 msgid "User homepages"
 msgstr "Pages d'accueil utilisateur"
 
-#: Users/models.py:65
+#: Users/models.py:66
+msgid "Menu"
+msgstr "Menu"
+
+#: Users/models.py:67 templates/sanza/_bs_navigation.html:92
+msgid "Planning"
+msgstr "Planning"
+
+#: Users/models.py:74
+msgid "position"
+msgstr "position"
+
+#: Users/models.py:75
+msgid "Where the menu will be set"
+msgstr "L'emplacement du menu"
+
+#: Users/models.py:79
 msgid "Custom menu"
 msgstr "Menu personnalisés"
 
-#: Users/models.py:66
+#: Users/models.py:80
 msgid "Custom menus"
 msgstr "Menus personnalisés"
 
-#: Users/models.py:91
+#: Users/models.py:106
 msgid "url"
 msgstr "url"
 
-#: Users/models.py:94
+#: Users/models.py:107
+msgid "reverse"
+msgstr "nom de la vue"
+
+#: Users/models.py:109
+msgid "only for users"
+msgstr "seulement pour les utilisateurs"
+
+#: Users/models.py:110
 msgid "attributes"
 msgstr "attributs"
 
-#: Users/models.py:97
+#: Users/models.py:113
 msgid "Custom menu item"
 msgstr "Élément de menu personnalisé"
 
-#: Users/models.py:98
+#: Users/models.py:114
 msgid "Custom menu items"
 msgstr "Éléments de menu personnalisé"
 
@@ -3999,10 +4098,6 @@ msgstr "Particulier"
 msgid "New search"
 msgstr "Nouvelle recherche"
 
-#: templates/sanza/_bs_navigation.html:92
-msgid "Planning"
-msgstr "Planning"
-
 #: templates/sanza/_bs_navigation.html:96
 msgid "Monthly actions"
 msgstr "Planning mensuel"
@@ -4015,31 +4110,31 @@ msgstr "Planning hebdomadaire"
 msgid "Daily actions"
 msgstr "Planning journalier"
 
-#: templates/sanza/_bs_navigation.html:126 templates/sanza/_navigation.html:40
+#: templates/sanza/_bs_navigation.html:129 templates/sanza/_navigation.html:40
 msgid "Account"
 msgstr "Compte"
 
-#: templates/sanza/_bs_navigation.html:130 templates/sanza/_navigation.html:42
+#: templates/sanza/_bs_navigation.html:133 templates/sanza/_navigation.html:42
 msgid "Back to site"
 msgstr "Retour au site"
 
-#: templates/sanza/_bs_navigation.html:134 templates/sanza/_navigation.html:43
+#: templates/sanza/_bs_navigation.html:137 templates/sanza/_navigation.html:43
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: templates/sanza/_bs_navigation.html:147 templates/sanza/_navigation.html:46
+#: templates/sanza/_bs_navigation.html:150 templates/sanza/_navigation.html:46
 msgid "Contacts import"
 msgstr "Import de contacts"
 
-#: templates/sanza/_bs_navigation.html:151
+#: templates/sanza/_bs_navigation.html:154
 msgid "Unsubscribe emails"
 msgstr "Désinscriptions de contacts"
 
-#: templates/sanza/_bs_navigation.html:163
+#: templates/sanza/_bs_navigation.html:166
 msgid "Make this homepage"
 msgstr "Faire de cette page, votre page d'accueil"
 
-#: templates/sanza/_bs_navigation.html:170
+#: templates/sanza/_bs_navigation.html:173
 msgid "This page can not be set as homepage"
 msgstr "Cette page ne peut pas être définie comme page d'accueil"
 
