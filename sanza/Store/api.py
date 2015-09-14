@@ -140,15 +140,20 @@ class CartView(APIView):
             #for each line add a sale item
             for index, item in enumerate(cart_serializer.validated_data['items']):
 
+                quantity = Decimal(u'{0}'.format(item['quantity']))
+
                 try:
                     store_item = StoreItem.objects.get(id=item['id'])
+                    if store_item.stock_count is not None:
+                        store_item.stock_count = store_item.stock_count - quantity
+                        store_item.save()
                 except StoreItem.DoesNotExist:
                     #ignore if not existing
                     continue
 
                 SaleItem.objects.create(
                     sale=action.sale,
-                    quantity=Decimal(u'{0}'.format(item['quantity'])),
+                    quantity=quantity,
                     item=store_item,
                     vat_rate=store_item.vat_rate,
                     pre_tax_price=store_item.pre_tax_price,
