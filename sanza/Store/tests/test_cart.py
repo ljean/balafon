@@ -75,6 +75,7 @@ class CartTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
         self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
         self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
 
@@ -140,6 +141,7 @@ class CartTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
         self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
         self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
 
@@ -197,6 +199,7 @@ class CartTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
         self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
         self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
 
@@ -254,6 +257,7 @@ class CartTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
         self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
         self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
 
@@ -290,6 +294,109 @@ class CartTest(BaseTestCase):
 
         store_item2 = models.StoreItem.objects.get(id=store_item2.id)
         self.assertEqual(store_item2.stock_count, Decimal("-0.5"))
+
+    def test_post_cart_not_available(self):
+        """It should create a new sale and ignore articles which are not available"""
+
+        #Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        store_item1 = mommy.make(models.StoreItem, stock_count=Decimal('10'))
+        store_item2 = mommy.make(models.StoreItem, stock_count=Decimal('0.5'), available=False)
+
+        delivery_point = mommy.make(models.DeliveryPoint)
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'delivery_point': delivery_point.id,
+            'notes': ' ',
+            'purchase_datetime': datetime(2015, 7, 23, 12, 0)
+        }
+
+        url = reverse('store_post_cart')
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 1)
+        self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
+        self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
+
+        action_type = ActionType.objects.get(name=get_cart_type_name())
+
+        action_queryset = Action.objects.filter(type=action_type)
+        self.assertEqual(action_queryset.count(), 1)
+        action = action_queryset[0]
+
+        self.assertEqual(list(action.contacts.all()), [contact])
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, data['purchase_datetime'])
+
+        self.assertEqual(action.sale.saleitem_set.count(), 1)
+        self.assertEqual(action.sale.saleitem_set.all()[0].item, store_item1)
+        self.assertEqual(action.sale.saleitem_set.all()[0].text, store_item1.name)
+        self.assertEqual(action.sale.saleitem_set.all()[0].pre_tax_price, store_item1.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[0].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[0].quantity, 2)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].to, [profile.contact.email])
+        self.assertEqual(mail.outbox[1].to, [settings.SANZA_NOTIFICATION_EMAIL])
+
+        store_item1 = models.StoreItem.objects.get(id=store_item1.id)
+        self.assertEqual(store_item1.stock_count, Decimal("8"))
+
+        store_item2 = models.StoreItem.objects.get(id=store_item2.id)
+        self.assertEqual(store_item2.stock_count, Decimal("0.5"))
+
+    def test_post_cart_empty(self):
+        """It should create a new sale and ignore articles which are not available"""
+
+        #Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        store_item1 = mommy.make(models.StoreItem, stock_count=Decimal('10'), available=False)
+        store_item2 = mommy.make(models.StoreItem, stock_count=Decimal('0.5'), available=False)
+
+        delivery_point = mommy.make(models.DeliveryPoint)
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'delivery_point': delivery_point.id,
+            'notes': ' ',
+            'purchase_datetime': datetime(2015, 7, 23, 12, 0)
+        }
+
+        url = reverse('store_post_cart')
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], False)
+        self.assertEqual(len(response.data['warnings']), 2)
+
+        action_type = ActionType.objects.get(name=get_cart_type_name())
+
+        action_queryset = Action.objects.filter(type=action_type)
+        self.assertEqual(action_queryset.count(), 0)
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        store_item1 = models.StoreItem.objects.get(id=store_item1.id)
+        self.assertEqual(store_item1.stock_count, Decimal("10"))
+
+        store_item2 = models.StoreItem.objects.get(id=store_item2.id)
+        self.assertEqual(store_item2.stock_count, Decimal("0.5"))
 
     def test_cart_when_deleted_article(self):
         """The cart should not be removed if store_item is deleted"""

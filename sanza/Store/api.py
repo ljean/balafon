@@ -137,6 +137,8 @@ class CartView(APIView):
             action.sale.delivery_point = delivery_point
             action.sale.save()
 
+            warnings = []
+            is_empty = True
             #for each line add a sale item
             for index, item in enumerate(cart_serializer.validated_data['items']):
 
@@ -144,32 +146,52 @@ class CartView(APIView):
 
                 try:
                     store_item = StoreItem.objects.get(id=item['id'])
-                    if store_item.stock_count is not None:
-                        store_item.stock_count = store_item.stock_count - quantity
-                        store_item.save()
                 except StoreItem.DoesNotExist:
                     #ignore if not existing
                     continue
 
-                SaleItem.objects.create(
-                    sale=action.sale,
-                    quantity=quantity,
-                    item=store_item,
-                    vat_rate=store_item.vat_rate,
-                    pre_tax_price=store_item.pre_tax_price,
-                    text=store_item.name,
-                    order_index=index+1
-                )
+                if not store_item.available:
+                    warnings.append(
+                        _(u"{0} is currently not available. It has been removed from your cart").format(
+                            store_item.name
+                        )
+                    )
+                else:
+                    if store_item.stock_count is not None:
+                        store_item.stock_count = store_item.stock_count - quantity
+                        store_item.save()
 
-            confirm_cart_to_user(profile, action)
-            notify_cart_to_admin(profile, action)
+                    is_empty = False
+                    SaleItem.objects.create(
+                        sale=action.sale,
+                        quantity=quantity,
+                        item=store_item,
+                        vat_rate=store_item.vat_rate,
+                        pre_tax_price=store_item.pre_tax_price,
+                        text=store_item.name,
+                        order_index=index+1
+                    )
 
             #Done
-            return Response({
-                'ok': True,
-                'deliveryDate': action.planned_date,
-                'deliveryPlace': action.sale.delivery_point.name,
-            })
+            if is_empty:
+                action.delete()
+
+                return Response({
+                    'ok': False,
+                    'message': _(u'Your cart is empty. Your articles are not available'),
+                    'warnings': warnings,
+                })
+            else:
+
+                confirm_cart_to_user(profile, action)
+                notify_cart_to_admin(profile, action)
+
+                return Response({
+                    'ok': True,
+                    'warnings': warnings,
+                    'deliveryDate': action.planned_date,
+                    'deliveryPlace': action.sale.delivery_point.name,
+                })
         else:
             return Response(
                 {

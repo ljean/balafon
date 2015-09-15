@@ -272,7 +272,7 @@ class StoreItem(models.Model):
         'StoreItemImport', default=None, blank=True, null=True, verbose_name=_(u'imported by')
     )
     price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
-    available = models.BooleanField(default=False, verbose_name=_(u'Available'))
+    available = models.BooleanField(default=True, verbose_name=_(u'Available'))
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
 
     class Meta:

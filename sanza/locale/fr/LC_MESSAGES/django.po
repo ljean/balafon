@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-14 16:28+0200\n"
+"POT-Creation-Date: 2015-09-15 09:25+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3379,6 +3379,14 @@ msgstr "Votre profil d'utilisateur n'est pas valide"
 #: Store/api.py:110
 msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
+
+#: Store/api.py:155
+msgid "{0} is currently not available. It has been removed from your cart"
+msgstr "{0} n'est pas disponible actuellement. Il a été supprimé de votre panier."
+
+#: Store/api.py:181
+msgid "Your cart is empty. Your articles are not available"
+msgstr "Votre panier est vide."
 
 #: Store/models.py:27
 msgid "template name"

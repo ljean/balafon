@@ -59,11 +59,13 @@ class StoreItemSerializer(serializers.ModelSerializer):
     vat_incl_price = serializers.FloatField(read_only=True)
     brand = BrandSerializer(read_only=True)
     tags = StoreItemTagSerializer(read_only=True, many=True)
+    available = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = StoreItem
         fields = (
-            'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags'
+            'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
+            'available',
         )
 
 
