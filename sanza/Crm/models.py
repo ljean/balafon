@@ -208,7 +208,7 @@ class AddressModel(LastModifiedModel):
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
 
     #These fields are just kept for editing the address field
-    number = models.CharField(_('number'), max_length=20, blank=True, default='')
+    street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
     street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'))
 
     class Meta:

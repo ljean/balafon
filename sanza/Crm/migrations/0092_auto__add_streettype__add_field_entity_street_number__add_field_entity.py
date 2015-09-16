@@ -15,8 +15,8 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'Crm', ['StreetType'])
 
-        # Adding field 'Entity.number'
-        db.add_column(u'Crm_entity', 'number',
+        # Adding field 'Entity.street_number'
+        db.add_column(u'Crm_entity', 'street_number',
                       self.gf('django.db.models.fields.CharField')(default='', max_length=20, blank=True),
                       keep_default=False)
 
@@ -25,8 +25,8 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['Crm.StreetType'], null=True, blank=True),
                       keep_default=False)
 
-        # Adding field 'Contact.number'
-        db.add_column(u'Crm_contact', 'number',
+        # Adding field 'Contact.street_number'
+        db.add_column(u'Crm_contact', 'street_number',
                       self.gf('django.db.models.fields.CharField')(default='', max_length=20, blank=True),
                       keep_default=False)
 
@@ -40,14 +40,14 @@ class Migration(SchemaMigration):
         # Deleting model 'StreetType'
         db.delete_table(u'Crm_streettype')
 
-        # Deleting field 'Entity.number'
-        db.delete_column(u'Crm_entity', 'number')
+        # Deleting field 'Entity.street_number'
+        db.delete_column(u'Crm_entity', 'street_number')
 
         # Deleting field 'Entity.street_type'
         db.delete_column(u'Crm_entity', 'street_type_id')
 
-        # Deleting field 'Contact.number'
-        db.delete_column(u'Crm_contact', 'number')
+        # Deleting field 'Contact.street_number'
+        db.delete_column(u'Crm_contact', 'street_number')
 
         # Deleting field 'Contact.street_type'
         db.delete_column(u'Crm_contact', 'street_type_id')
@@ -163,12 +163,12 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'nickname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'photo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
             'relationships': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'through': u"orm['Crm.Relationship']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
             'role': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.EntityRole']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
             'same_as': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.SameAs']", 'null': 'True', 'blank': 'True'}),
+            'street_number': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'street_type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.StreetType']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'uuid': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'db_index': 'True', 'blank': 'True'}),
@@ -226,9 +226,9 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
             'relationship_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'street_number': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'street_type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.StreetType']", 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.EntityType']", 'null': 'True', 'blank': 'True'}),
             'website': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),

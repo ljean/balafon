@@ -7,12 +7,12 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 import floppyforms as forms
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithCity
+from sanza.Crm.forms.base import ModelFormWithAddress
 from sanza.Crm.settings import NO_ENTITY_TYPE
 from sanza.Crm.widgets import EntityAutoComplete
 
 
-class EntityForm(ModelFormWithCity):
+class EntityForm(ModelFormWithAddress):
     """Edit entity form"""
 
     def __init__(self, *args, **kwargs):
@@ -26,13 +26,17 @@ class EntityForm(ModelFormWithCity):
         model = models.Entity
         fields = (
             'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax',
-            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country', 'logo',
+            'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
+            'logo',
         )
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
             ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Entity details')}),
             ('address', {
-                'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+                'fields': [
+                    'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',
+                    'cedex', 'country'
+                ],
                 'legend': _(u'Address')
             }),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),

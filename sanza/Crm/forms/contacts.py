@@ -11,12 +11,12 @@ import floppyforms as forms
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithCity
+from sanza.Crm.forms.base import ModelFormWithAddress
 from sanza.Crm.settings import get_language_choices, has_language_choices
 from sanza.Crm.widgets import ContactAutoComplete
 
 
-class ContactForm(ModelFormWithCity):
+class ContactForm(ModelFormWithAddress):
     """Edit contact form"""
 
     class Meta:
@@ -25,7 +25,7 @@ class ContactForm(ModelFormWithCity):
         fields = (
             'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
             'email', 'phone', 'mobile', 'favorite_language',
-            'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
+            'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
         )
         widgets = {
@@ -43,7 +43,10 @@ class ContactForm(ModelFormWithCity):
             }),
             ('web', {'fields': ['email', 'phone', 'mobile', 'favorite_language'], 'legend': _(u'Contact details')}),
             ('address', {
-                'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
+                'fields': [
+                    'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',
+                    'cedex', 'country'
+                ],
                 'legend': _(u'Address')
             }),
             ('relationship', {

@@ -164,3 +164,30 @@ class FormWithCity(BetterBsForm, _CityBasedForm):
     def __init__(self, *args, **kwargs):
         super(FormWithCity, self).__init__(*args, **kwargs)
         self._post_init(*args, **kwargs)
+
+
+class ModelFormWithAddress(ModelFormWithCity):
+    """ModelForm with address"""
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        if instance:
+            prefix = u" ".join([
+                instance.street_number,
+                instance.street_type.name if instance.street_type else '',
+            ]).strip()
+            instance.address = instance.address.replace(prefix, '', 1).strip()
+        super(ModelFormWithAddress, self).__init__(*args, **kwargs)
+        if not models.StreetType.objects.count():
+            self.fields['street_number'].widget = forms.HiddenInput()
+            self.fields['street_type'].widget = forms.HiddenInput()
+
+    def clean_address(self):
+        """add street type and number to the address"""
+        street_number = self.cleaned_data['street_number']
+        street_type = self.cleaned_data['street_type']
+        address = self.cleaned_data['address']
+        if street_number or street_type:
+            return u" ".join([street_number, street_type.name if street_type else '', address]).strip()
+        return address
+
