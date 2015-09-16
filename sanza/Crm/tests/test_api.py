@@ -84,7 +84,7 @@ class AboutMeTest(APITestCase):
         url = reverse('crm_api_about_me')
 
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_about_me_inactive(self):
         """It should return info about user"""
@@ -100,4 +100,4 @@ class AboutMeTest(APITestCase):
         url = reverse('crm_api_about_me')
 
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

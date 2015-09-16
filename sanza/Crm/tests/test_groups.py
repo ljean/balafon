@@ -498,8 +498,6 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
         self.assertEqual(200, response.status_code)
         data = json.loads(response.content)
 
-        print data
-
         self.assertEqual(len(data), 4)
 
         self.assertEqual(data[0]['name'], 'Abbes')
