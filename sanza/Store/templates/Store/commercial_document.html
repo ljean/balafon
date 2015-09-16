@@ -35,6 +35,7 @@
         OK: 'Ok',
         CANCEL: 'Cancel',
         ADD: 'Add',
+        BLANK: 'Add an empty line',
         EDIT: 'Edit',
         DELETE: 'Delete',
         SEARCH: 'Search',
@@ -49,7 +50,8 @@
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'The pre-tax price field is required number',
         THE_VAT_REQUIRED: 'The VAT rate is required',
         SEND_BY_MAIL: 'Send by email',
-        READ_ONLY: 'Read_only'
+        READ_ONLY: 'Read_only',
+        EDIT_ORDER: 'Change order'
       });
 
       $translateProvider.translations('fr', {
@@ -62,6 +64,7 @@
         OK: 'Ok',
         CANCEL: 'Annuler',
         ADD: 'Ajouter',
+        BLANK: 'Ajouter une ligne vide',
         EDIT: 'Editer',
         DELETE: 'Supprimer',
         SEARCH: 'Chercher dans le catalogue',
@@ -76,21 +79,30 @@
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'Le prix unitaire doit être un nombre',
         THE_VAT_REQUIRED: 'La TVA est requise',
         SEND_BY_MAIL: 'Envoyer par email',
-        READ_ONLY: 'Lecture seule'
+        READ_ONLY: 'Lecture seule',
+        EDIT_ORDER: 'Changer l\'ordre'
       });
       $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
       $translateProvider.useSanitizeValueStrategy('escape');
     }]);
 
-    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', '$filter',
-    function ($scope, $modal, $http, $translate, $filter) {
+    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', '$filter', '$log',
+    function ($scope, $modal, $http, $translate, $filter, $log) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
       $scope.allowEdit = !$scope.app.isReadOnly;
       $scope.formErrors = '';
       $scope.editBackup = null;
       $translate.use('{{ LANGUAGE_CODE }}');
-      var translate = $filter('translate')
+      var translate = $filter('translate');
+
+      var initMe = function() {
+        for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
+          $scope.app.sale_items[i].order_index = i + 1;
+          $scope.app.sale_items[i].order_memory = $scope.app.sale_items[i].order_index;
+        }
+      };
+      initMe();
 
       $scope.getDefaultVatRate = function() {
         for (var i=0; i<$scope.app.vat_rates.length; i++){
@@ -114,23 +126,35 @@
 
       $scope.editItem = function(item, index) {
         $scope.editMode = true;
-        $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items))
+        $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
         $scope.editedLines[index] = true;
       };
 
-      $scope.addItem = function(item) {
+      $scope.editOrder = function(item, index) {
+        $scope.editItem(item, index);
+        $scope.changeOrder = true;
+      };
+
+      $scope.addItem = function(item, isBlank) {
         $scope.editMode = true;
         $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
         $scope.app.sale_items.push({
           id: 0,
           order_index: $scope.app.sale_items.length + 1,
+          order_memory: $scope.app.sale_items.length + 1,
           pre_tax_price: 0.0,
           vat_rate: $scope.getDefaultVatRate(),
           quantity: 1,
-          text: '',
+          text: isBlank?' ':'',
+          is_blank: isBlank?true:false,
           added: true
         });
         $scope.editedLines.push(true);
+      };
+
+      $scope.addBlank = function(item) {
+        $scope.addItem(item, true);
+        $scope.saveEdit();
       };
 
       $scope.deleteItem = function(item, index) {
@@ -153,6 +177,7 @@
 
       $scope.switchOffEditMode = function() {
         $scope.editMode = false;
+        $scope.changeOrder = false;
         $scope.editedLines = [];
         for (var i=0; i<$scope.app.sale_items.length; i++){
           $scope.editedLines.push(false);
@@ -165,8 +190,8 @@
             }
             return 0;
         });
-        for (var i=0; i<$scope.app.sale_items.length; i++){
-          $scope.app.sale_items[i].order_index = i + 1;
+        for (var j=0; j<$scope.app.sale_items.length; j++){
+          $scope.app.sale_items[j].order_index = j + 1;
         }
       };
 
@@ -177,32 +202,102 @@
         $scope.formErrors = '';
       };
 
+      $scope.itemsToUpdate = [];
+
+      var reorderItems = function(item, nbItems) {
+        var isChangeOrder = $scope.changeOrder;
+        if (isChangeOrder) {
+          var newPos = item.order_index;
+          if (newPos < 1) {
+            newPos = 1;
+          } else if (newPos > nbItems) {
+            newPos = nbItems;
+          }
+          var oldPos = item.order_memory;
+          var i = 0;
+          var curItem = 0;
+          if (newPos < oldPos) {
+            for (i=0; i<nbItems; i++) {
+              curItem = $scope.app.sale_items[i];
+              if (curItem.id !== item.id) {
+                if ((curItem.order_index >= newPos) && (curItem.order_index < oldPos)) {
+                  curItem.order_index += 1;
+                  curItem.order_memory = curItem.order_index;
+                  $scope.itemsToUpdate.push(curItem);
+                }
+              }
+            }
+          } else if (newPos > oldPos) {
+            for (i=0; i<nbItems; i++) {
+              curItem = $scope.app.sale_items[i];
+              if (curItem.id !== item.id) {
+                if ((curItem.order_index > oldPos) && (curItem.order_index <= newPos)) {
+                  curItem.order_index -= 1;
+                  curItem.order_memory = curItem.order_index;
+                  $scope.itemsToUpdate.push(curItem);
+                }
+              }
+            }
+          }
+        }
+      };
+
+      var pushData = function() {
+        var item = $scope.itemsToUpdate.pop();
+        if (item) {
+          var postData = {
+            sale: $scope.app.sale.id,
+            text: item.text,
+            vat_rate: item.vat_rate?item.vat_rate.id:null,
+            pre_tax_price: item.pre_tax_price,
+            quantity: item.quantity,
+            item: item.item,
+            is_blank: item.is_blank,
+            order_index: item.order_index
+          };
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
+          $http.put(url, postData).success(function (respData) {
+            pushData(); //update next one
+          }).error(function (response) {
+            $log.error('push data fail: '+JSON.stringify(response))
+          });
+        }
+      };
+
       $scope.saveEdit = function() {
         var item = $scope.getEditedItem();
+
+        reorderItems(item, $scope.app.sale_items.length);
+        if (item.text === '' && item.is_blank){
+          item.text = ' ';
+        }
+
         $scope.formErrors = $scope.isFormInvalid(item);
         if (!$scope.formErrors) {
           var url = '/store/api/'+$scope.app.action.id+'/sales-items/';
-          var method = $http.post;
+          var httpMethod = $http.post;
           if (item.id) {
             url += item.id+'/';
-            method = $http.put;
+            httpMethod = $http.put;
           }
           var postData = {
             sale: $scope.app.sale.id,
             text: item.text,
-            vat_rate: item.vat_rate.id,
+            vat_rate: item.vat_rate?item.vat_rate.id:null,
             pre_tax_price: item.pre_tax_price,
             quantity: item.quantity,
             item: item.item,
+            is_blank: item.is_blank,
             order_index: item.order_index
           };
-          method(url, postData).success(function(respData) {
+          httpMethod(url, postData).success(function(respData) {
             $scope.formErrors = '';
             if (item.id === 0) {
               item.id = respData.id;
             }
             $scope.editBackup = null;
             $scope.switchOffEditMode();
+            pushData();  //update positions of others
           }).error(function(response) {
             $scope.formErrors = translate('AN_ERROR_OCCURED')+' : '+JSON.stringify(response);
           });
@@ -231,7 +326,9 @@
       $scope.getTotalPreTaxPrice = function() {
         var sum = 0;
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
-          sum += $scope.getItemPreTaxPrice($scope.app.sale_items[i]);
+          if (!$scope.app.sale_items[i].is_blank) {
+            sum += $scope.getItemPreTaxPrice($scope.app.sale_items[i]);
+          }
         }
         if (isNaN(sum)) {
           return translate('ERROR');
@@ -242,7 +339,9 @@
       $scope.getTotalTaxInclPrice = function() {
         var sum = 0;
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
-          sum += $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
+          if (!$scope.app.sale_items[i].is_blank) {
+            sum += $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
+          }
         }
         if (isNaN(sum)) {
           return translate('ERROR');
@@ -269,7 +368,7 @@
           return translate('THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER');
         }
 
-        if (!item.vat_rate) {
+        if (!item.vat_rate && !item.is_blank) {
           return translate('THE_VAT_REQUIRED');
         }
 
@@ -483,6 +582,10 @@
       color: #eee;
     }
 
+    input.inline {
+      display: inline-block;
+    }
+
     {% if is_pdf %}
     body {
       font-size: 0.7em;
@@ -589,7 +692,6 @@
 
                 <table class="table table-bordered">
                   <tr>
-                    <th></th>
                     <th>{{ 'LABEL' | translate }}</th>
                     <th class="number">{{ 'QUANTITY' | translate }}</th>
                     <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
@@ -599,19 +701,32 @@
                   </tr>
 
                   <tr class="tr-row" ng-repeat="item in app.sale_items">
-                    <td class="cell-order">
-                      <span ng-hide="editedLines[$index]">{{ item.order_index }}</span>
+                    <td colspan="6" ng-if="item.is_blank">
+                      <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+                        <div class="show-on-hover">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+                          </a>
+                          <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </div>
+                      </div>
                       <input
                         class="form-control"
                         type="number"
                         ng-model="item.order_index"
-                        ng-show="editedLines[$index]"
+                        ng-show="editedLines[$index] && changeOrder"
                         name=order_index
                       />
                     </td>
-                    <td class="cell-label">
+
+                    <td class="cell-label" ng-if="!item.is_blank">
                       <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
                         <div class="show-on-hover">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+                          </a>
                           <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-pencil"></span>
                           </a>
@@ -626,61 +741,71 @@
                             <span class="glyphicon glyphicon-search"></span>
                           </a>
                       </div>
-                      <span ng-hide="editedLines[$index]">{{ item.text }}</span>
+                      <input
+                        class="form-control inline"
+                        type="number"
+                        ng-model="item.order_index"
+                        ng-show="editedLines[$index] && changeOrder"
+                        name=order_index
+                      />
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.text }}</span>
                       <textarea
                         class="form-control"
                         ng-model="item.text"
                         required="required"
                         name="text"
-                        ng-show="editedLines[$index]"></textarea>
+                        ng-show="editedLines[$index] && !changeOrder"></textarea>
                     </td>
-                    <td class="number">
-                      <span ng-hide="editedLines[$index]">{{ item.quantity | number }}</span>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.quantity | number }}</span>
                       <input
                         class="form-control"
                         required="required"
                         type="number"
                         ng-model="item.quantity"
-                        ng-show="editedLines[$index]"
+                        ng-show="editedLines[$index] && !changeOrder"
                         name=quantity
                       />
                     </td>
-                    <td class="number">
-                      <span ng-hide="editedLines[$index]">{{ item.pre_tax_price | number:2}} €</span>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.pre_tax_price | number:2}} €</span>
                       <input
                         class="form-control"
                         required="required"
                         type="number"
                         ng-model="item.pre_tax_price"
-                        ng-show="editedLines[$index]"
+                        ng-show="editedLines[$index] && !changeOrder"
                       />
                     </td>
-                    <td class="number">
+                    <td class="number" ng-if="!item.is_blank">
                       <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>
                     </td>
-                    <td class="number">
-                      <span ng-hide="editedLines[$index]">{{ item.vat_rate.name }}</span>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.vat_rate.name }}</span>
                       <select
                         class="form-control"
                         ng-model="item.vat_rate"
                         ng-options="vat_rate as vat_rate.name for vat_rate in app.vat_rates track by vat_rate.id"
-                        ng-show="editedLines[$index]"
+                        ng-show="editedLines[$index] && !changeOrder"
                         required="required"
                        ></select>
                     </td>
-                    <td class="number">
+                    <td class="number" ng-if="!item.is_blank">
                       <span>{{ getItemTaxInclPrice(item) | number:2 }} €</span>
                     </td>
-
                   </tr>
 
                   <tr class="results tr-row">
-                    <td colspan="2">
+                    <td>
 
                       <div ng-show="allowEdit" class="pull-right">
                         <div class="show-on-hover">
-                              <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-plus"></span>
+                          </a>
+
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-resize-vertical"></span>
                           </a>
                         </div>
                       </div>

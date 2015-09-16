@@ -616,10 +616,11 @@ class Sale(models.Model):
         #caluclaute price for each VAT rate
         total_by_vat = {}
         for sale_item in self.saleitem_set.all():
-            if sale_item.vat_rate.id in total_by_vat:
-                total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price()
-            else:
-                total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price()
+            if sale_item.vat_rate:
+                if sale_item.vat_rate.id in total_by_vat:
+                    total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price()
+                else:
+                    total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price()
         #returns vat rate in order
         vat_totals = []
         for vat_rate in sorted(VatRate.objects.all(), key=lambda _vat: _vat.rate):
@@ -652,10 +653,13 @@ class SaleItem(models.Model):
     sale = models.ForeignKey(Sale)
     item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
     quantity = models.DecimalField(verbose_name=_(u"quantity"), max_digits=9, decimal_places=2)
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
+    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"), blank=True, null=True, default=None)
     pre_tax_price = models.DecimalField(verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2)
     text = models.TextField(verbose_name=_(u"Text"), max_length=3000, default='', blank=True)
     order_index = models.IntegerField(default=0)
+    is_blank = models.BooleanField(
+        default=False, verbose_name=_(u'is blank'), help_text=_(u'displayed as an empty line')
+    )
 
     class Meta:
         verbose_name = _(u"Sale item")
@@ -678,15 +682,28 @@ class SaleItem(models.Model):
 
     def vat_price(self):
         """VAT price"""
-        return self.pre_tax_price * (self.vat_rate.rate / 100)
+        vat_rate = self.vat_rate.rate if self.vat_rate else Decimal(0)
+        return self.pre_tax_price * (vat_rate / Decimal(100))
 
     def vat_incl_total_price(self):
         """VAT inclusive price"""
         return self.vat_incl_price() * self.quantity
 
+    def pre_tax_total_price(self):
+        """VAT inclusive price"""
+        return self.pre_tax_price * self.quantity
+
     def save(self, *args, **kwargs):
         if self.order_index == 0:
             self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1
+
+        if self.is_blank:
+            self.pre_tax_price = Decimal(0)
+            self.quantity = 0
+            self.item = None
+            self.text = ''
+            self.vat_rate = None
+
         return super(SaleItem, self).save(*args, **kwargs)
 
     def clone(self, new_sale):
@@ -698,6 +715,7 @@ class SaleItem(models.Model):
             vat_rate=self.vat_rate,
             pre_tax_price=self.pre_tax_price,
             text=self.text,
+            is_blank=self.is_blank,
             order_index=self.order_index
         )
 
@@ -714,11 +732,10 @@ def update_action_amount(sale_item, delete_me=False):
     except (AttributeError, StoreManagementActionType.DoesNotExist):
         show_amount_as_pre_tax = False
     for item in queryset:
-        pre_tax_value = item.pre_tax_price * item.quantity
         if show_amount_as_pre_tax:
-            total_amount += pre_tax_value
+            total_amount += item.pre_tax_total_price()
         else:
-            total_amount += pre_tax_value * (100 + item.vat_rate.rate) / 100
+            total_amount += item.vat_incl_total_price()
     action.amount = total_amount
     action.save()
 

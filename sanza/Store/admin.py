@@ -46,8 +46,17 @@ class StoreItemTagAdmin(admin.ModelAdmin):
 admin.site.register(models.StoreItemTag, StoreItemTagAdmin)
 
 
-admin.site.register(models.Sale)
-admin.site.register(models.SaleItem)
+class SaleItemInline(admin.TabularInline):
+    """display property on the store item"""
+    model = models.SaleItem
+    fields = ('text', 'item', 'quantity', 'pre_tax_price', 'vat_rate', 'order_index', 'is_blank')
+
+
+class SaleAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__', 'action')
+    inlines = (SaleItemInline, )
+
+admin.site.register(models.Sale, SaleAdmin)
 
 
 class StoreManagementActionTypeAdmin(admin.ModelAdmin):

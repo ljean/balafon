@@ -52,6 +52,27 @@ class VatInclusivePriceTest(TestCase):
         item = mommy.make(models.StoreItem, pre_tax_price=Decimal("20.0"), vat_rate=vat_rate)
         self.assertEqual(Decimal("22.0"), item.vat_incl_price())
 
+    def test_sale_no_vat(self):
+        """Vat should be 0"""
+        sale = mommy.make(models.Sale)
+        item = mommy.make(models.SaleItem, quantity=Decimal(2), pre_tax_price=Decimal("10"), vat_rate=None, sale=sale)
+
+        self.assertEqual(item.vat_price(), Decimal(0))
+        self.assertEqual(item.total_vat_price(), Decimal(0))
+        self.assertEqual(item.vat_incl_price(), Decimal("10"))
+        self.assertEqual(item.vat_incl_total_price(), Decimal("20"))
+
+    def test_sale_with_vat(self):
+        """Vat should not be 0"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("10.0"))
+        sale = mommy.make(models.Sale)
+        item = mommy.make(models.SaleItem, quantity=Decimal(2), pre_tax_price=Decimal("11"), vat_rate=vat_rate, sale=sale)
+
+        self.assertEqual(item.vat_price(), Decimal("1.1"))
+        self.assertEqual(item.total_vat_price(), Decimal("2.2"))
+        self.assertEqual(item.vat_incl_price(), Decimal("12.1"))
+        self.assertEqual(item.vat_incl_total_price(), Decimal("24.2"))
+
 
 class StoreManagementActionTypeTest(TestCase):
     """It should create actions menus"""
@@ -266,6 +287,13 @@ class SaleTotalTest(TestCase):
         self.assertEqual(vat_totals[0]['amount'], Decimal("0.7"))
         self.assertEqual(vat_totals[1]['vat_rate'], vat_rate_20)
         self.assertEqual(vat_totals[1]['amount'], Decimal("2"))
+
+    def test_amount_no_vat(self):
+        """It should return list with no vat value"""
+        sale = mommy.make(models.Sale)
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="10", vat_rate=None, sale=sale)
+        vat_totals = sale.vat_total_amounts()
+        self.assertEqual(len(vat_totals), 0)
 
 
 class CategoryNameTest(TestCase):
@@ -491,3 +519,21 @@ class PricePolicyTest(TestCase):
         )
 
         self.assertEqual(article.pre_tax_price, Decimal("2"))
+
+
+class BlankLineTest(TestCase):
+    """It should calculate price with VAT"""
+
+    def test_blank_lines(self):
+        """it should return all lines and calculate price properly"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("10.0"))
+        sale = mommy.make(models.Sale)
+        mommy.make(models.SaleItem, quantity=2, pre_tax_price="10", vat_rate=vat_rate, sale=sale)
+        item2 = mommy.make(models.SaleItem, quantity=1, pre_tax_price="1", vat_rate=None, sale=sale, is_blank=True)
+        mommy.make(models.SaleItem, quantity=1, pre_tax_price="15", vat_rate=vat_rate, sale=sale)
+
+        self.assertEqual(sale.saleitem_set.count(), 3)
+        self.assertEqual(item2.quantity, 0)
+        self.assertEqual(item2.pre_tax_price, 0)
+
+        self.assertEqual(Decimal("38.5"), sale.vat_incl_total_price())

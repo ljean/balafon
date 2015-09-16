@@ -79,7 +79,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleItem
         fields = (
-            'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index',
+            'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'is_blank',
         )
 
 
@@ -91,7 +91,7 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = SaleItem
         fields = (
-            'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale',
+            'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale', 'is_blank',
         )
 
 
