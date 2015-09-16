@@ -281,7 +281,7 @@ class StoreItem(models.Model):
         ordering = ['name']
 
     def __unicode__(self):
-        return u'{0} > {1}{2}'.format(self.category, self.name, ' ({0})'.format(self.brand) if self.brand else '')
+        return u'{0} > {1}{2}'.format(self.category, self.name, u' ({0})'.format(self.brand) if self.brand else '')
 
     def vat_incl_price(self):
         """VAT inclusive price"""
