@@ -187,7 +187,63 @@ def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 
-class Entity(LastModifiedModel):
+class StreetType(NamedElement):
+    """A selection for street type"""
+
+    class Meta:
+        verbose_name = _(u'street type')
+        verbose_name_plural = _(u'street types')
+        ordering = ('name', )
+
+
+class AddressModel(LastModifiedModel):
+    """Base class for entity or contact"""
+
+    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
+    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
+    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+
+    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
+    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
+
+    #These fields are just kept for editing the address field
+    number = models.CharField(_('number'), max_length=20, blank=True, default='')
+    street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'))
+
+    class Meta:
+        abstract = True
+
+    def get_full_address(self):
+        """join address fields"""
+        return u' '.join(self.get_address_fields())
+
+    def get_address_fields(self):
+        """address fields: address, cedex, zipcode, city..."""
+        if self.city:
+            fields = [
+                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
+            ]
+            country = self.city.get_foreign_country()
+            if country:
+                fields.append(country.name)
+            return [field for field in fields if field]
+        return []
+
+    def get_country(self):
+        """country"""
+        return self.city.get_country() if self.city else None
+
+    def get_foreign_country(self):
+        """country if not default"""
+        return self.city.get_foreign_country() if self.city else None
+
+    def get_display_address(self):
+        """addresses"""
+        return self.get_full_address()
+
+
+class Entity(AddressModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
@@ -200,15 +256,7 @@ class Entity(LastModifiedModel):
     fax = models.CharField(_('fax'), max_length=200, blank=True, default=u'')
     email = models.EmailField(_('email'), blank=True, default=u'')
     website = models.CharField(_('web site'), max_length=200, blank=True, default='')
-    
-    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
-    
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
-    
+
     notes = models.TextField(_('notes'), blank=True, default="")
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
@@ -298,42 +346,15 @@ class Entity(LastModifiedModel):
         """url to the entity page"""
         return reverse('crm_view_entity', args=[self.id])
 
-    def get_full_address(self):
-        """join address fields"""
-        return u' '.join(self.get_address_fields())
-        
-    def get_address_fields(self):
-        """address fields: address, cedex, zipcode, city..."""
-        if self.city:
-            fields = [
-                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
-            ]
-            country = self.city.get_foreign_country()
-            if country:
-                fields.append(country.name)
-            return [f for f in fields if f]
-        return []
-    
-    def get_country(self):
-        """country"""
-        return self.city.get_country() if self.city else None
-    
-    def get_foreign_country(self):
-        """country if not default"""
-        return self.city.get_foreign_country() if self.city else None
-
     def get_phones(self):
         """phones"""
         return [self.phone]
-        
-    def get_display_address(self):
-        """addresses"""
-        return self.get_full_address()
-    
+
     def main_contacts(self):
         """all contacts of the entity with the 'main' flag checked"""
         return [
-            c for c in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")
+            contact
+            for contact in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")
         ]
     
     def last_action(self):
@@ -471,7 +492,7 @@ class Relationship(TimeStampedModel):
         verbose_name_plural = _(u'relationships')
     
 
-class Contact(LastModifiedModel):
+class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
     GENDER_MALE = 1
     GENDER_FEMALE = 2
@@ -515,14 +536,6 @@ class Contact(LastModifiedModel):
     email = models.EmailField(_('email'), blank=True, default=u'')
     
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
-    
-    #optional : use the entity address in most cases
-    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
     
     notes = models.TextField(_('notes'), blank=True, default="")
     
@@ -636,36 +649,6 @@ class Contact(LastModifiedModel):
         image_format = "64" if width > height else "x64"
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, image_format, crop='center')
 
-    def get_full_address(self):
-        """jojn address fields"""
-        return u' '.join(self.get_address_fields())
-    
-    def get_address_fields(self):
-        """get address fields: address, zip, city..."""
-        if self.city:
-            fields = [
-                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
-            ]
-            country = self.city.get_foreign_country()
-            if country:
-                fields.append(country.name)
-            return [f for f in fields if f]
-        return self.entity.get_address_fields()
-    
-    def get_country(self):
-        """country"""
-        if self.city:
-            return self.city.get_country()
-        if not self.entity.is_single_contact:
-            return self.entity.get_country()
-        
-    def get_foreign_country(self):
-        """country if fifferent from default"""
-        if self.city:
-            return self.city.get_foreign_country()
-        if not self.entity.is_single_contact:
-            return self.entity.get_foreign_country()
-    
     def get_custom_fields(self):
         """additional fields"""
         return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
@@ -728,6 +711,31 @@ class Contact(LastModifiedModel):
     def get_absolute_url(self):
         """url to contact page"""
         return reverse('crm_view_contact', args=[self.id])
+
+    def get_address_fields(self):
+        """get address fields: address, zip, city..."""
+        fields = super(Contact, self).get_address_fields()
+        if fields:
+            return fields
+        else:
+            return self.entity.get_address_fields()
+
+    def get_country(self):
+        """country"""
+        country = super(Contact, self).get_country()
+        if country:
+            return country
+        elif not self.entity.is_single_contact:
+            return self.entity.get_country()
+
+    def get_foreign_country(self):
+        """country if different from default"""
+        country = super(Contact, self).get_foreign_country()
+        if country:
+            return country
+        elif not self.entity.is_single_contact:
+            return self.entity.get_foreign_country()
+
 
     def get_email_address(self):
         """email address"""
