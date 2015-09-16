@@ -411,7 +411,7 @@ class Entity(LastModifiedModel):
                 custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field=custom_field)
                 return custom_field_value.value
             except EntityCustomFieldValue.DoesNotExist:
-                return u'' #If no value defined: return empty string
+                return u''  # If no value defined: return empty string
         return object.__getattribute__(self, attr)
 
     class Meta:
