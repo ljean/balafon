@@ -194,3 +194,5 @@ admin.site.register(models.StoreItemImport, StoreItemImportAdmin)
 admin.site.register(models.StoreItemProperty)
 
 admin.site.register(models.Supplier)
+
+admin.site.register(models.PricePolicy)
