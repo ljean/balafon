@@ -9,7 +9,7 @@ import xlrd
 
 from django.db import models
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -289,9 +289,12 @@ class StoreItem(models.Model):
     vat_incl_price.short_description = _(u"VAT inclusive price")
 
     def get_admin_link(self):
-        return u'<a href="{0}" target="_extra_admin">{1}</a>'.format(
-            reverse("admin:Store_storeitem_change", args=[self.id]), ugettext(u'Edit')
-        )
+        try:
+            return u'<a href="{0}" target="_extra_admin">{1}</a>'.format(
+                reverse("admin:Store_storeitem_change", args=[self.id]), ugettext(u'Edit')
+            )
+        except NoReverseMatch:
+            return ''
     get_admin_link.short_description = 'Url'
     get_admin_link.allow_tags = True
 
