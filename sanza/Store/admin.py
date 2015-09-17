@@ -20,7 +20,7 @@ class StoreItemInline(admin.TabularInline):
     model = models.StoreItem
     fields = (
         'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price',
-        'vat_rate', 'available',
+        'vat_rate', 'available', 'stock_count', 'stock_threshold_alert'
     )
     readonly_fields = ['get_admin_link']
 
