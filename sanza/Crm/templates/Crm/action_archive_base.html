@@ -30,10 +30,10 @@
 </a>
 
 <h2 class="inline-block">
-    {% block this_title %}{% endblock%}
+    {% block this_title %}{% endblock %}
 </h2>
 
-<select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans "Filter by" %}">
+<select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans 'Filter by' %}">
     {% if action_types %}
     <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
         <option value="t0" {% if no_type_selected %}selected="selected"{% endif %}>{% trans "No type" %}</option>
@@ -81,6 +81,8 @@
 {% endfor %}
 </div>
 
+{% block action_archive_content %}
 {% include "Crm/_section_actions.html" with actions=object_list %}
+{% endblock %}
 
 {% endblock %}

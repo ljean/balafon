@@ -635,6 +635,13 @@ class Sale(models.Model):
             total += sale_item.vat_incl_total_price()
         return total
 
+    def pre_tax_total_price(self):
+        """return total price of the command"""
+        total = Decimal(0)
+        for sale_item in self.saleitem_set.all():
+            total += sale_item.pre_tax_total_price()
+        return total
+
     class Meta:
         verbose_name = _(u"Sale")
         verbose_name_plural = _(u"Sales")
@@ -682,6 +689,8 @@ class SaleItem(models.Model):
 
     def vat_price(self):
         """VAT price"""
+        if self.is_blank:
+            return Decimal(0)
         vat_rate = self.vat_rate.rate if self.vat_rate else Decimal(0)
         return self.pre_tax_price * (vat_rate / Decimal(100))
 
@@ -691,6 +700,8 @@ class SaleItem(models.Model):
 
     def pre_tax_total_price(self):
         """VAT inclusive price"""
+        if self.is_blank:
+            return Decimal(0)
         return self.pre_tax_price * self.quantity
 
     def save(self, *args, **kwargs):
