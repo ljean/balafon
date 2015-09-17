@@ -18,7 +18,10 @@ admin.site.register(models.DeliveryPoint)
 class StoreItemInline(admin.TabularInline):
     """display property on the store item"""
     model = models.StoreItem
-    fields = ('name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_rate')
+    fields = (
+        'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price',
+        'vat_rate', 'available',
+    )
     readonly_fields = ['get_admin_link']
 
 
