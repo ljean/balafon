@@ -22,7 +22,7 @@ class StoreItemInline(admin.TabularInline):
         'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price',
         'vat_rate', 'available', 'stock_count', 'stock_threshold_alert'
     )
-    readonly_fields = ['get_admin_link']
+    readonly_fields = ['get_admin_link', 'stock_threshold_alert']
 
 
 class StoreItemCategoryAdmin(admin.ModelAdmin):
