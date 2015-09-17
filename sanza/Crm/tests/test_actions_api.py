@@ -239,7 +239,7 @@ class ListActionsTest(APITestCase):
         self.client.logout()
         url = reverse('crm_api_list_actions') + "?start=2015-06-29&end=2015-07-06"
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
     def test_read_actions_non_staff(self):
         """It should return error"""
@@ -486,7 +486,7 @@ class ListActionsTest(APITestCase):
         url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
 
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
 
     def test_team_member_action_not_member(self):
@@ -509,7 +509,7 @@ class ListActionsTest(APITestCase):
         url = reverse('crm_api_list_team_member_actions') + "?start=2015-06-29&end=2015-07-06"
 
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
 
 class DeleteActionTest(APITestCase):
@@ -549,7 +549,7 @@ class DeleteActionTest(APITestCase):
         url = reverse('crm_api_delete_action', args=[action.id])
 
         response = self.client.delete(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
         self.assertEqual(models.Action.objects.filter(id=action.id).count(), 1)
 
@@ -614,7 +614,7 @@ class UpdateActionDateTest(APITestCase):
         }
 
         response = self.client.put(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.planned_date, None)
@@ -1015,7 +1015,7 @@ class UpdateActionTest(APITestCase):
         }
 
         response = self.client.put(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, '')
@@ -1281,7 +1281,7 @@ class CreateActionTest(APITestCase):
         }
 
         response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
         self.assertEqual(0, models.Action.objects.count())
 
