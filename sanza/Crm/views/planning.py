@@ -21,6 +21,7 @@ try:
 except ImportError:
     HAS_CUSTOM_MENU = False
 
+
 class ActionArchiveView(object):
     """view"""
 

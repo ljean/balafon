@@ -12,6 +12,7 @@ from coop_cms.utils import RequestManager, RequestNotFound
 
 from sanza.permissions import can_access
 
+
 class UserPreferences(models.Model):
     """user preferences"""
 
@@ -126,7 +127,11 @@ class CustomMenuItem(models.Model):
             url = self.url
         elif self.reverse:
             try:
-                url = reverse(self.reverse, args=args, kwargs=kwargs)
+                query_string = ''
+                request = RequestManager().get_request()
+                if request:
+                    query_string = request.META['QUERY_STRING']
+                url = reverse(self.reverse, args=args, kwargs=kwargs)+ "?" + query_string
             except NoReverseMatch:
                 pass
         setattr(self, '_cached_url', url)
