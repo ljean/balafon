@@ -615,8 +615,8 @@
           <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
         </div>
 
-        <div class="badge">
-          <a href="{{app.action.mail_to}}" ng-show="app.action.mail_to">
+        <div class="badge" ng-show="app.action.mail_to">
+          <a href="{{app.action.mail_to}}">
             <span class="glyphicon glyphicon-envelope"></span> {{ 'SEND_BY_MAIL' | translate}}
           </a>
         </div>
@@ -664,11 +664,20 @@
                 <div>
                   {{ entity.name }}
                 </div>
+                <span ng-show="entity.billing_city">
+                <div ng-show="entity.billing_address">{{ entity.billing_address }}</div>
+                <div ng-show="entity.billing_address2">{{ entity.billing_address2 }}</div>
+                <div ng-show="entity.billing_address3">{{ entity.billing_address3 }}</div>
+                <div>{{ entity.billing_zip_code }} {{ entity.billing_city.name }} {{ entity.billing_cedex }}</div>
+                <div ng-show="entity.billing_country.is_foreign_country">{{ entity.billing_country.name }}</div>
+                </span>
+                <span ng-hide="entity.billing_city">
                 <div ng-show="entity.address">{{ entity.address }}</div>
                 <div ng-show="entity.address2">{{ entity.address2 }}</div>
                 <div ng-show="entity.address3">{{ entity.address3 }}</div>
                 <div>{{ entity.zip_code }} {{ entity.city.name }} {{ entity.cedex }}</div>
                 <div ng-show="entity.country.is_foreign_country">{{ entity.country.name }}</div>
+                </span>
               </div></div>
             </div>
             <div ng-repeat="contact in app.action.contacts" class="contact">
@@ -676,11 +685,20 @@
                 <div>
                   {{ contact.fullname }}
                 </div>
+                <span ng-show="contact.get_billing_city">
+                <div ng-show="contact.get_billing_address">{{ contact.get_billing_address }}</div>
+                <div ng-show="contact.get_billing_address2">{{ contact.get_billing_address2 }}</div>
+                <div ng-show="contact.get_billing_address3">{{ contact.get_billing_address3 }}</div>
+                <div>{{ contact.get_billing_zip_code }} {{ contact.get_billing_city.name }} {{ contact.billing_cedex }}</div>
+                <div ng-show="contact.get_billing_country.is_foreign_country">{{ contact.get_billing_country.name }}</div>
+                </span>
+                <span ng-hide="contact.get_billing_city">
                 <div ng-show="contact.get_address">{{ contact.get_address }}</div>
                 <div ng-show="contact.get_address2">{{ contact.get_address2 }}</div>
                 <div ng-show="contact.get_address3">{{ contact.get_address3 }}</div>
                 <div>{{ contact.get_zip_code }} {{ contact.get_city.name }} {{ contact.cedex }}</div>
                 <div ng-show="contact.get_country.is_foreign_country">{{ contact.get_country.name }}</div>
+                </span>
               </div></div>
             </div>
           </div>

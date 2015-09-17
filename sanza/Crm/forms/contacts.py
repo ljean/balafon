@@ -27,6 +27,8 @@ class ContactForm(ModelFormWithAddress):
             'email', 'phone', 'mobile', 'favorite_language',
             'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
+            'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2', 'billing_address3',
+            'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country',
         )
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
@@ -48,6 +50,13 @@ class ContactForm(ModelFormWithAddress):
                     'cedex', 'country'
                 ],
                 'legend': _(u'Address')
+            }),
+            ('billing_address', {
+                'fields': [
+                    'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2',
+                    'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country'
+                ],
+                'legend': _(u'Billing address')
             }),
             ('relationship', {
                 'fields': ['main_contact', 'email_verified', 'has_left', 'accept_notifications'],

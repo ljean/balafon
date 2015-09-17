@@ -48,6 +48,13 @@ class ContactSerializer(serializers.ModelSerializer):
     get_address3 = serializers.CharField(read_only=True)
     get_zip_code = serializers.CharField(read_only=True)
     get_cedex = serializers.CharField(read_only=True)
+    get_billing_city = CitySerializer(read_only=True)
+    get_billing_country = CountrySerializer(read_only=True)
+    get_billing_address = serializers.CharField(read_only=True)
+    get_billing_address2 = serializers.CharField(read_only=True)
+    get_billing_address3 = serializers.CharField(read_only=True)
+    get_billing_zip_code = serializers.CharField(read_only=True)
+    get_billing_cedex = serializers.CharField(read_only=True)
     get_phone = serializers.CharField(read_only=True)
     get_view_url = serializers.CharField(read_only=True)
 
@@ -56,6 +63,8 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'fullname', 'lastname', 'firstname', 'title', 'job',
             'get_city', 'get_address', 'get_address2', 'get_address3', 'get_cedex', 'get_zip_code', 'get_country',
+            'get_billing_city', 'get_billing_address', 'get_billing_address2', 'get_billing_address3',
+            'get_billing_cedex', 'get_billing_zip_code', 'get_billing_country',
             'mobile', 'get_phone', 'email', 'notes', 'get_view_url', 'favorite_language',
         )
 
@@ -74,12 +83,14 @@ class EntitySerializer(serializers.ModelSerializer):
     type = EntityTypeSerializer(read_only=True)
     get_view_url = serializers.CharField(read_only=True)
     country = CountrySerializer(read_only=True)
+    billing_country = CountrySerializer(read_only=True)
 
     class Meta:
         model = Entity
         fields = (
-            'id', 'name', 'type', 'city', 'address', 'address2', 'address3', 'cedex', 'country',
-            'zip_code', 'phone', 'email', 'website', 'notes', 'get_view_url',
+            'id', 'name', 'type', 'city', 'address', 'address2', 'address3', 'cedex', 'country', 'zip_code',
+            'billing_city', 'billing_address', 'billing_address2', 'billing_address3', 'billing_cedex',
+            'billing_zip_code', 'billing_country', 'phone', 'email', 'website', 'notes', 'get_view_url',
         )
 
 

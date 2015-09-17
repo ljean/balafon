@@ -211,6 +211,23 @@ class AddressModel(LastModifiedModel):
     street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
     street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'))
 
+    billing_address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
+    billing_address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
+    billing_address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+
+    billing_zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
+    billing_cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    billing_city = models.ForeignKey(
+        City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set'
+    )
+
+    #These fields are just kept for editing the address field
+    billing_street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
+    billing_street_type = models.ForeignKey(
+        StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'),
+        related_name='%(class)s_billing_set'
+    )
+
     class Meta:
         abstract = True
 
@@ -229,6 +246,31 @@ class AddressModel(LastModifiedModel):
                 fields.append(country.name)
             return [field for field in fields if field]
         return []
+
+    def get_billing_address_fields(self):
+        """address fields: address, cedex, zipcode, city..."""
+        if self.billing_city:
+            fields = [
+                self.billing_address, self.billing_address2, self.billing_address3, u" ".join(
+                    [self.billing_zip_code, self.billing_city.name, self.billing_cedex]
+                )
+            ]
+            country = self.billing_city.get_foreign_country()
+            if country:
+                fields.append(country.name)
+            return [field for field in fields if field]
+        return []
+
+    def get_billing_address(self):
+        """join address fields"""
+        billing_address = u' '.join(self.get_billing_address_fields())
+        if not billing_address:
+            return self.get_full_address()
+        return billing_address
+
+    def has_billing_address(self):
+        """has a billing address"""
+        return len(self.get_billing_address_fields()) > 0
 
     def get_country(self):
         """country"""
@@ -666,13 +708,22 @@ class Contact(AddressModel):
         """
         if attr[:4] == "get_":
             address_fields = ('address', 'address2', 'address3', 'zip_code', 'cedex', 'city')
+            billing_address_fields = (
+                'billing_address', 'billing_address2', 'billing_address3', 'billing_zip_code', 'billing_cedex',
+                'billing_city'
+            )
             field_name = attr[4:]
             if field_name in ('phone', 'email',):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
             elif field_name in address_fields:
-                is_contact_address_defined = any([getattr(self, f) for f in address_fields])
+                is_contact_address_defined = any([getattr(self, field) for field in address_fields])
                 if is_contact_address_defined:
+                    return getattr(self, field_name)
+                return getattr(self.entity, field_name)
+            elif field_name in billing_address_fields:
+                is_billing_contact_address_defined = any([getattr(self, field) for field in address_fields])
+                if is_billing_contact_address_defined:
                     return getattr(self, field_name)
                 return getattr(self.entity, field_name)
             else:
@@ -680,12 +731,12 @@ class Contact(AddressModel):
                 prefix_length = len(prefix)
                 if field_name[:prefix_length] == prefix:
                     value = getattr(self, field_name)
-                    if not value: #if no value for the custom field
+                    if not value:  # if no value for the custom field
                         try:
-                            #Try to get a value for a custom field with same name on entity
+                            # Try to get a value for a custom field with same name on entity
                             value = getattr(self.entity, field_name)
                         except CustomField.DoesNotExist:
-                            #No custom field with same name on entity: returns empty string
+                            # No custom field with same name on entity: returns empty string
                             pass
                     return value
         else:
@@ -698,12 +749,12 @@ class Contact(AddressModel):
                     custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
                 except ContactCustomFieldValue.DoesNotExist:
-                    return u'' #If no value defined: return empty string
+                    return u''  # If no value defined: return empty string
             else:
                 entity_prefix = "entity_"
                 full_prefix = entity_prefix + prefix
-                if attr[:len(full_prefix)] == full_prefix: # if the attr is entity_custom_field_<something>
-                    #return self.entity.custom_field_<something>
+                if attr[:len(full_prefix)] == full_prefix:  # if the attr is entity_custom_field_<something>
+                    # return self.entity.custom_field_<something>
                     return getattr(self.entity, attr[len(entity_prefix):])
 
         return object.__getattribute__(self, attr)
@@ -727,6 +778,14 @@ class Contact(AddressModel):
             return country
         elif not self.entity.is_single_contact:
             return self.entity.get_country()
+
+    def get_billing_address(self):
+        """billing address"""
+        billing_address = super(Contact, self).get_billing_address()
+        if billing_address:
+            return billing_address
+        elif not self.entity.is_single_contact:
+            return self.entity.get_billing_address()
 
     def get_foreign_country(self):
         """country if different from default"""

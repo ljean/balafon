@@ -71,28 +71,36 @@ class _CityBasedForm(object):
             parent = parent.parent
         return country
 
-    def _post_init(self, *args, **kwargs):
-        """must be called at the end of __init__ of the subclasses"""
-        self.country_id = 0
+    def _manage_country_field(self, field_prefix, *args, **kwargs):
+        """"""
+        setattr(self, field_prefix + 'country_id', 0)
         if len(args):
             try:
-                self.country_id = int(args[0]["country"])
-            except KeyError:
+                setattr(self, field_prefix + 'country_id', int(args[0][field_prefix + "country"]))
+            except (KeyError, ValueError):
                 pass
-        if not self.country_id:
-            self.country_id = get_default_country().id
+        if not getattr(self, field_prefix + 'country_id', 0):
+            setattr(self, field_prefix + 'country_id', get_default_country().id)
 
-        self.fields['city'].widget = CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        self.fields[field_prefix + 'city'].widget = CityAutoComplete(
+            attrs={'placeholder': _(u'Enter a city'), 'size': '80'}
+        )
 
-        zones_choices = [(z.id, z.name) for z in models.Zone.objects.filter(parent__isnull=True).order_by('name')]
-        self.fields['country'].choices = [(0, '')] + zones_choices
+        zones_choices = [
+            (zone.id, zone.name) for zone in models.Zone.objects.filter(parent__isnull=True).order_by('name')
+        ]
+        self.fields[field_prefix + 'country'].choices = [(0, '')] + zones_choices
 
         try:
-            city = getattr(kwargs.get('instance'), 'city', 0)
+            city = getattr(kwargs.get('instance'), field_prefix + 'city', 0)
             if city:
-                self.fields['country'].initial = self._get_city_parent(city).id
+                self.fields[field_prefix + 'country'].initial = self._get_city_parent(city).id
         except models.City.DoesNotExist:
             pass
+
+    def _post_init(self, *args, **kwargs):
+        """must be called at the end of __init__ of the subclasses"""
+        self._manage_country_field('', *args, **kwargs)
 
     def _get_country(self, country_id):
         """get the country"""
@@ -101,9 +109,9 @@ class _CityBasedForm(object):
         else:
             return get_default_country()
 
-    def clean_city(self):
+    def _clean_city_field(self, field_prefix):
         """city validation"""
-        city = self.cleaned_data['city']
+        city = self.cleaned_data[field_prefix + 'city']
         if isinstance(city, models.City):
             return city
         else:
@@ -116,12 +124,13 @@ class _CityBasedForm(object):
                 except (ValueError, TypeError):
                     pass
 
-                zip_code = self.cleaned_data['zip_code']
+                zip_code = self.cleaned_data[field_prefix + 'zip_code']
 
                 try:
-                    country_id = int(self.cleaned_data.get('country')) or self.country_id
+                    country_id = int(self.cleaned_data.get(field_prefix + 'country')) \
+                        or getattr(self, field_prefix + 'country_id')
                 except (ValueError, TypeError):
-                    country_id = self.country_id
+                    country_id = getattr(self, field_prefix + 'country_id')
 
                 country = self._get_country(country_id)
                 default_country = get_default_country()
@@ -138,6 +147,10 @@ class _CityBasedForm(object):
                 raise
             except Exception, msg:
                 raise ValidationError(msg)
+
+    def clean_city(self):
+        """city validation"""
+        return self._clean_city_field('')
 
 
 class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
@@ -166,7 +179,29 @@ class FormWithCity(BetterBsForm, _CityBasedForm):
         self._post_init(*args, **kwargs)
 
 
-class ModelFormWithAddress(ModelFormWithCity):
+class BillingModelFormWithCity(ModelFormWithCity):
+    """ModelForm with city"""
+    billing_city = forms.CharField(
+        required=False,
+        label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+    )
+    billing_country = forms.ChoiceField(required=False, label=_(u'Country'))
+
+    def __init__(self, *args, **kwargs):
+        super(BillingModelFormWithCity, self).__init__(*args, **kwargs)
+
+    def _post_init(self, *args, **kwargs):
+        """called at the end of __init__ of the parent class"""
+        super(BillingModelFormWithCity, self)._post_init(*args, **kwargs)
+        self._manage_country_field('billing_', *args, **kwargs)
+
+    def clean_billing_city(self):
+        """city validation"""
+        return self._clean_city_field('billing_')
+
+
+class ModelFormWithAddress(BillingModelFormWithCity):
     """ModelForm with address"""
 
     def __init__(self, *args, **kwargs):
@@ -177,10 +212,20 @@ class ModelFormWithAddress(ModelFormWithCity):
                 instance.street_type.name if instance.street_type else '',
             ]).strip()
             instance.address = instance.address.replace(prefix, '', 1).strip()
+
+            billing_prefix = u" ".join([
+                instance.billing_street_number,
+                instance.billing_street_type.name if instance.billing_street_type else '',
+            ]).strip()
+            instance.billing_address = instance.billing_address.replace(billing_prefix, '', 1).strip()
+
         super(ModelFormWithAddress, self).__init__(*args, **kwargs)
+
         if not models.StreetType.objects.count():
             self.fields['street_number'].widget = forms.HiddenInput()
             self.fields['street_type'].widget = forms.HiddenInput()
+            self.fields['billing_street_number'].widget = forms.HiddenInput()
+            self.fields['billing_street_type'].widget = forms.HiddenInput()
 
     def clean_address(self):
         """add street type and number to the address"""
@@ -191,3 +236,13 @@ class ModelFormWithAddress(ModelFormWithCity):
             return u" ".join([street_number, street_type.name if street_type else '', address]).strip()
         return address
 
+    def clean_billing_address(self):
+        """add street type and number to the address"""
+        billing_street_number = self.cleaned_data['billing_street_number']
+        billing_street_type = self.cleaned_data['billing_street_type']
+        billing_address = self.cleaned_data['billing_address']
+        if billing_street_number or billing_street_type:
+            return u" ".join(
+                [billing_street_number, billing_street_type.name if billing_street_type else '', billing_address]
+            ).strip()
+        return billing_address

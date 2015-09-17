@@ -64,8 +64,15 @@
   <div class="col-md-4">
     <table class="table">
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
+        {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
       </td></tr>
+      {% if contact.has_billing_address %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
+        {{contact.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% endif %}
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
       </td></tr>

@@ -710,3 +710,48 @@ class CitySearchTest(BaseTestCase):
 
         self.assertNotContains(response, entity3.name)
         self.assertNotContains(response, contact4.lastname)
+
+
+class AddressSearchTest(BaseTestCase):
+    """search by address"""
+
+    def test_search_address(self):
+        """search by city"""
+        city = mommy.make(models.City)
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp", city=city, address="rue Paul Mc Cartney")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", email="toto1@toto.fr")
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL")
+
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(
+            models.Contact, entity=entity2, lastname=u"WXYZ", city=city, address="rue Jean-Paul Belmondo"
+        )
+
+        entity3 = mommy.make(models.Entity, name=u"The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC")
+
+        entity5 = mommy.make(models.Entity, is_single_contact=True)
+        contact5 = entity5.default_contact
+        contact5.lastname = "QWERTYUIOP"
+        contact5.address = "lot appaulou"
+        contact5.city = city
+        contact5.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-address-_-0": 'Paul'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact3.lastname)
+
+        self.assertContains(response, entity2.name)
+        self.assertContains(response, contact2.lastname)
+
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+
+        self.assertContains(response, contact5.lastname)

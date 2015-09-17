@@ -94,6 +94,32 @@ class EntityNameStartsWithSearchForm(SearchFieldForm):
         return {'entity__name__istartswith': self.value}
 
 
+class AddressSearchForm(SearchFieldForm):
+    """by address contains"""
+
+    name = 'address'
+    label = _(u'Contact or entity at this address')
+
+    def __init__(self, *args, **kwargs):
+        super(AddressSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(
+            label=self.label,
+            widget=forms.TextInput(
+                attrs={'placeholder': _(u'Enter text contained in an address')}
+            )
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = self.value
+        return (
+            Q(address__icontains=value) | Q(address2__icontains=value) | Q(address3__icontains=value) |
+            Q(entity__address__icontains=value) | Q(entity__address2__icontains=value) |
+            Q(entity__address3__icontains=value)
+        )
+
+
 class HasEntityForm(YesNoSearchFieldForm):
     """contacts member of an entity"""
 

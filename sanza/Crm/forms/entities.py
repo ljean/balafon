@@ -27,7 +27,8 @@ class EntityForm(ModelFormWithAddress):
         fields = (
             'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax',
             'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
-            'logo',
+            'logo', 'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2',
+            'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country',
         )
         fieldsets = [
             ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
@@ -38,6 +39,13 @@ class EntityForm(ModelFormWithAddress):
                     'cedex', 'country'
                 ],
                 'legend': _(u'Address')
+            }),
+            ('billing_address', {
+                'fields': [
+                    'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2',
+                    'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country'
+                ],
+                'legend': _(u'Billing address')
             }),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
