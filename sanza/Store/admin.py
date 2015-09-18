@@ -156,6 +156,8 @@ def export_stock(request):
     book = xlwt.Workbook()
     sheet = book.add_sheet(_(u"Stock"))
 
+    line = 0
+    
     for line, item in enumerate(models.StoreItem.objects.filter(stock_count__isnull=False).order_by('name')):
         sheet.write(line, 0, item.name)
         sheet.write(line, 1, unicode(item.category) if item.category else '')
