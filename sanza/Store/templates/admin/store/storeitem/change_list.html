@@ -3,15 +3,12 @@
 
     {{ block.super }}
     <li>
-        <a>*</a>
-    </li>
-    <li>
-        <a href="{% url 'admin:store_store_item_admin_export' %}" class="grp-state-focus" class="addlink">
+        <a href="{% url 'store_store_item_admin_export' %}" class="grp-state-focus" class="addlink">
           {% trans "Export Stock" %}
         </a>
     </li>
     <li>
-        <a href="{% url 'admin:store_store_item_admin_export_alert' %}" class="grp-state-focus" class="addlink">{% trans "Export missing Stock" %}</a>
+        <a href="{% url 'store_store_item_admin_export_alert' %}" class="grp-state-focus" class="addlink">{% trans "Export missing Stock" %}</a>
     </li>
 
 {% endblock %}
