@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """admin"""
 
+import xlwt
+
 from django import forms
 from django.db.models import CharField
+from django.conf.urls import url, patterns
 from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.messages import success, error
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Store import models
@@ -144,6 +149,53 @@ class StoreItemPropertyValueInline(admin.TabularInline):
     fields = ('property', 'value')
 
 
+@staff_member_required
+def export_stock(request):
+
+    book = xlwt.Workbook()
+    sheet = book.add_sheet(_(u"Stock"))
+
+    for line, item in enumerate(models.StoreItem.objects.filter(stock_count__isnull=False).order_by('name')):
+        sheet.write(line, 0, item.name)
+        sheet.write(line, 1, unicode(item.category) if item.category else '')
+        sheet.write(line, 2, item.purchase_price if item.purchase_price else 0)
+        sheet.write(line, 3, item.stock_count)
+        sheet.write(line, 4, item.stock_threshold)
+        sheet.write(line, 5, xlwt.Formula('C{0}*D{0})'.format(line+1)))
+
+    sheet.write(line+2, 5, xlwt.Formula('SUM(F1:F{0})'.format(line+1)))
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=export-stock.xls'
+    book.save(response)
+    return response
+
+
+@staff_member_required
+def export_stock_alert(request):
+
+    book = xlwt.Workbook()
+    sheet = book.add_sheet(_(u"Stock"))
+
+    line = 0
+    for item in models.StoreItem.objects.filter(stock_count__isnull=False).order_by('name'):
+        if item.has_stock_threshold_alert():
+            sheet.write(line, 0, item.name)
+            sheet.write(line, 1, unicode(item.category) if item.category else '')
+            sheet.write(line, 2, item.purchase_price if item.purchase_price else 0)
+            sheet.write(line, 3, item.stock_count)
+            sheet.write(line, 4, item.stock_threshold)
+            sheet.write(line, 5, xlwt.Formula('C{0}*D{0})'.format(line+1)))
+            line += 1
+
+    sheet.write(line+2, 5, xlwt.Formula('SUM(F1:F{0})'.format(line+1)))
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=export-stock-alert.xls'
+    book.save(response)
+    return response
+
+
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -159,6 +211,17 @@ class StoreItemAdmin(admin.ModelAdmin):
     list_per_page = 500
     save_as = True
 
+    def get_urls(self):
+        urls = super(StoreItemAdmin, self).get_urls()
+        my_urls = patterns("",
+            url(r"^/admin/store/storeitem/export-stock/$", export_stock, name='store_store_item_admin_export'),
+            url(
+                r"^/admin/store/storeitem/export-stock-alert/$",
+                export_stock_alert,
+                name='store_store_item_admin_export_alert'
+            )
+        )
+        return my_urls + urls
 
 admin.site.register(models.StoreItem, StoreItemAdmin)
 
