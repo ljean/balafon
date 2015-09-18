@@ -131,7 +131,7 @@ class CustomMenuItem(models.Model):
                 request = RequestManager().get_request()
                 if request:
                     query_string = request.META['QUERY_STRING']
-                url = reverse(self.reverse, args=args, kwargs=kwargs)+ "?" + query_string
+                url = reverse(self.reverse, args=args, kwargs=kwargs) + "?" + query_string
             except NoReverseMatch:
                 pass
         setattr(self, '_cached_url', url)

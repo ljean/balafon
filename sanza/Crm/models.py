@@ -2,7 +2,6 @@
 """models"""
 #pylint: disable=model-no-explicit-unicode
 
-from datetime import datetime
 import uuid
 import unicodedata
 from urlparse import urlparse
@@ -15,13 +14,13 @@ from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.template import TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, Context
 from django.template.loader import get_template
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
 
-from coop_cms.utils import RequestManager, RequestNotFound
+from coop_cms.utils import RequestManager, RequestNotFound, dehtml
 from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
 
@@ -1249,6 +1248,14 @@ class Action(LastModifiedModel):
                 message = u"get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
                 logger.warning(message)
         return 'Crm/_action.html'
+
+    def get_recipients(self, html=True):
+        """returns contacts and entites as html code. Use template for easy customization"""
+        template_file = get_template("Crm/_actions/recipients.html")
+        text = template_file.render(Context({'action': self}))
+        if not html:
+            text = dehtml(text)
+        return text
 
     def get_action_number(self):
         if self.type and self.number:
