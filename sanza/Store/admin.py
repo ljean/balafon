@@ -151,6 +151,7 @@ class StoreItemPropertyValueInline(admin.TabularInline):
 
 @staff_member_required
 def export_stock(request):
+    """export to excel all articles tin stock"""
 
     book = xlwt.Workbook()
     sheet = book.add_sheet(_(u"Stock"))
@@ -173,6 +174,7 @@ def export_stock(request):
 
 @staff_member_required
 def export_stock_alert(request):
+    """export to excel all articles that must be purchased"""
 
     book = xlwt.Workbook()
     sheet = book.add_sheet(_(u"Stock"))
@@ -212,6 +214,8 @@ class StoreItemAdmin(admin.ModelAdmin):
     save_as = True
 
     def get_urls(self):
+        """custom urls"""
+        
         urls = super(StoreItemAdmin, self).get_urls()
         my_urls = patterns("",
             url(r"^/admin/store/storeitem/export-stock/$", export_stock, name='store_store_item_admin_export'),
