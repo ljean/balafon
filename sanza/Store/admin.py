@@ -215,12 +215,12 @@ class StoreItemAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         """custom urls"""
-        
+
         urls = super(StoreItemAdmin, self).get_urls()
         my_urls = patterns("",
-            url(r"^/admin/store/storeitem/export-stock/$", export_stock, name='store_store_item_admin_export'),
+            url(r"^export-stock/$", export_stock, name='store_store_item_admin_export'),
             url(
-                r"^/admin/store/storeitem/export-stock-alert/$",
+                r"^export-stock-alert/$",
                 export_stock_alert,
                 name='store_store_item_admin_export_alert'
             )

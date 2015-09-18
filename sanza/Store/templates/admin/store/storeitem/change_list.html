@@ -2,7 +2,9 @@
 {% block object-tools-items %}
 
     {{ block.super }}
-
+    <li>
+        <a>*</a>
+    </li>
     <li>
         <a href="{% url 'admin:store_store_item_admin_export' %}" class="grp-state-focus" class="addlink">
           {% trans "Export Stock" %}
