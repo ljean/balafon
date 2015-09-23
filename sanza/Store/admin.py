@@ -5,13 +5,13 @@ import xlwt
 
 from django import forms
 from django.db.models import CharField
-from django.conf.urls import url, patterns
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.messages import success, error
 from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _, ugettext
 
+from sanza.widgets import VerboseManyToManyRawIdWidget
 from sanza.Store import models
 from sanza.Store.forms import StoreManagementActionTypeAdminForm
 
@@ -211,9 +211,18 @@ class StoreItemAdmin(admin.ModelAdmin):
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
+    raw_id_fields = ['tags']
     inlines = [StoreItemPropertyValueInline]
     list_per_page = 500
     save_as = True
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name in ('tags',):
+            kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.rel, self.admin_site)
+        else:
+            return super(StoreItemAdmin,self).formfield_for_dbfield(db_field, **kwargs)
+        kwargs.pop('request')
+        return db_field.formfield(**kwargs)
 
 admin.site.register(models.StoreItem, StoreItemAdmin)
 
