@@ -2,7 +2,7 @@
 """models"""
 
 import datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import os.path
 import traceback
 import xlrd
@@ -182,7 +182,7 @@ class StoreItemCategory(models.Model):
         ret = super(StoreItemCategory, self).save()
 
         #Merge categories with same name
-        siblings = StoreItemCategory.objects.filter(name=self.name).exclude(id=self.id)
+        siblings = StoreItemCategory.objects.filter(name=self.name, parent=self.parent).exclude(id=self.id)
         for sibling in siblings:
             for article in sibling.storeitem_set.all():
                 article.category = self
@@ -433,6 +433,7 @@ class StoreItemImport(models.Model):
         help_text=_(u'If defined, it will be used if no brand is given')
     )
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
+    make_available = models.BooleanField(default=False, verbose_name=_(u'articles will be available if price is set'))
 
     class Meta:
         verbose_name = _(u"Store item import")
@@ -456,6 +457,16 @@ class StoreItemImport(models.Model):
         """convert string to brand"""
         if raw_value:
             return Brand.objects.get_or_create(name=raw_value)[0]
+
+    def _to_unit(self, raw_value):
+        """convert string to unit"""
+        if raw_value:
+            return Unit.objects.get_or_create(name=raw_value)[0]
+
+    def _to_supplier(self, raw_value):
+        """convert string to provider"""
+        if raw_value:
+            return Supplier.objects.get_or_create(name=raw_value)[0]
 
     def _to_category(self, raw_value):
         """convert string to category"""
@@ -493,10 +504,15 @@ class StoreItemImport(models.Model):
             fields_conversion = {
                 'name': self._to_itself,
                 'reference': self._to_itself,
-                'purchase_price': self._to_decimal,
                 'brand': self._to_brand,
+                'supplier': self._to_supplier,
+                'unit': self._to_unit,
                 'category': self._to_category,
                 'vat_rate': self._to_vat,
+            }
+
+            price_conversion = {
+                'purchase_price': self._to_decimal,
                 'pre_tax_price': self._to_decimal,
             }
 
@@ -512,6 +528,11 @@ class StoreItemImport(models.Model):
                     continue
 
                 raw_values = [sheet.cell(rowx=row_index, colx=col_index).value for col_index in xrange(sheet.ncols)]
+
+                raw_values = [
+                    raw_value.strip() if type(raw_value) is unicode else raw_value
+                    for raw_value in raw_values
+                ]
 
                 if not any(raw_values):
                     #blank lines
@@ -530,7 +551,14 @@ class StoreItemImport(models.Model):
                     if field in fields_conversion:
                         #call the function associated with this field
                         value = fields_conversion[field](raw_value)
-                        setattr(store_item, field, value)
+                        if value:
+                            setattr(store_item, field, value)
+                    elif field in price_conversion:
+                        try:
+                            value = price_conversion[field](raw_value)
+                            setattr(store_item, field, value)
+                        except (ValueError, InvalidOperation):
+                            setattr(store_item, field, Decimal(0))
                     else:
                         #for extra fields : create a property (once the object has been saved)
                         properties.append((field, raw_value))
@@ -548,6 +576,10 @@ class StoreItemImport(models.Model):
                         store_item.pre_tax_price = store_item.purchase_price * margin_rate
                     else:
                         store_item.pre_tax_price = 0
+
+                store_item.available = self.make_available
+                if not store_item.pre_tax_price:
+                    store_item.available = False
 
                 if 'vat_rate' not in fields:
                     store_item.vat_rate = self._to_vat(None)  # force default

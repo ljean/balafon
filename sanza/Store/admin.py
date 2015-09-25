@@ -48,8 +48,12 @@ admin.site.register(models.Brand, BrandAdmin)
 
 
 class StoreItemTagAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active')
-    list_editable = ('name', 'order_index', 'icon', 'active')
+    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active', 'show_always')
+    list_editable = ('name', 'order_index', 'icon', 'active', 'show_always')
+    fields = (
+        'name', 'order_index', 'icon', 'active', 'show_always'
+    )
+
 
 admin.site.register(models.StoreItemTag, StoreItemTagAdmin)
 
