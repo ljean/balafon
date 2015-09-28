@@ -3,7 +3,9 @@
 
 from rest_framework import serializers
 
-from sanza.Store.models import Brand, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, VatRate
+from sanza.Store.models import (
+    Brand, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
+)
 
 
 class SaleSerializer(serializers.ModelSerializer):
@@ -17,10 +19,14 @@ class SaleSerializer(serializers.ModelSerializer):
 class StoreItemCategorySerializer(serializers.ModelSerializer):
     """json serializer"""
     get_path_name = serializers.CharField(read_only=True)
+    get_articles_count = serializers.IntegerField(read_only=True)
+    get_children_count = serializers.IntegerField(read_only=True)
+
+    #parent = serializers.CharField(read_only=True)
 
     class Meta:
         model = StoreItemCategory
-        fields = ('id', 'name', "icon", "get_path_name")
+        fields = ('id', 'name', "icon", "get_path_name", "parent", "get_articles_count", "get_children_count")
 
 
 class VatRateSerializer(serializers.ModelSerializer):
@@ -50,6 +56,15 @@ class StoreItemTagSerializer(serializers.ModelSerializer):
         )
 
 
+class UnitSerializer(serializers.ModelSerializer):
+    """unit"""
+    class Meta:
+        model = Unit
+        fields = (
+            'id', 'name'
+        )
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
@@ -60,12 +75,13 @@ class StoreItemSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     tags = StoreItemTagSerializer(read_only=True, many=True)
     available = serializers.BooleanField(read_only=True)
+    unit = UnitSerializer(read_only=True)
 
     class Meta:
         model = StoreItem
         fields = (
             'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
-            'available',
+            'available', 'unit'
         )
 
 

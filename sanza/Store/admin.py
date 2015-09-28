@@ -31,9 +31,11 @@ class StoreItemInline(admin.TabularInline):
 
 
 class StoreItemCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'icon', 'active', 'get_all_articles_count')
+    list_display = (
+        'name', 'icon', 'active', 'price_policy', 'get_articles_count', 'get_all_articles_count', 'get_children_count'
+    )
     list_editable = ('active', )
-    readonly_fields = ('get_all_articles_count',)
+    readonly_fields = ('get_all_articles_count', 'get_articles_count', 'get_children_count')
     inlines = (StoreItemInline, )
 
 

@@ -166,7 +166,17 @@ class StoreItemCategory(models.Model):
         for sub_category in self.subcategories_set.all():
             all_articles_count += sub_category.get_all_articles_count()
         return all_articles_count
-    get_all_articles_count.short_description = _(u'Articles count')
+    get_all_articles_count.short_description = _(u'Articles total count')
+
+    def get_articles_count(self):
+        """returns articles count"""
+        return self.storeitem_set.count()
+    get_articles_count.short_description = _(u'Articles count')
+
+    def get_children_count(self):
+        """returns children category count"""
+        return self.subcategories_set.count()
+    get_children_count.short_description = _(u'Sub-categories count')
 
     def get_path_name(self):
         """returns name with all parents"""
