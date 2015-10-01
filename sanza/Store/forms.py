@@ -8,7 +8,7 @@ from django.utils.translation import ugettext
 import floppyforms as forms
 
 from sanza.Crm.models import ActionStatus
-from sanza.Store.models import StoreManagementActionType, PricePolicy
+from sanza.Store.models import StoreManagementActionType, PricePolicy, StoreItemCategory
 
 
 class StoreManagementActionTypeAdminForm(forms.ModelForm):
@@ -27,9 +27,8 @@ class StoreManagementActionTypeAdminForm(forms.ModelForm):
             self.fields['readonly_status'].widget = forms.HiddenInput()
 
 
-
 class PricePolicyAdminForm(forms.ModelForm):
-    """"""
+    """Assert than price policy is correct"""
 
     class Meta:
         model = PricePolicy
@@ -47,4 +46,26 @@ class PricePolicyAdminForm(forms.ModelForm):
                     text += u' ' + ugettext(u'Did you use coma rather than dot as decimal separator?')
                 raise forms.ValidationError(text)
         return parameters
+
+
+class StoreItemCategoryAdminForm(forms.ModelForm):
+    """Assert than price policy is correct"""
+
+    class Meta:
+        model = StoreItemCategory
+        fields = ('name', 'parent', 'order_index', 'active', 'icon', )
+
+    def clean_parent(self):
+        parent = self.cleaned_data['parent']
+        if self.instance and parent == self.instance:
+            raise forms.ValidationError(ugettext(u'A category can not be its own parent'))
+
+        if self.instance:
+            print self.instance.get_sub_categories()
+            if parent in self.instance.get_sub_categories():
+                raise forms.ValidationError(
+                    ugettext(u'A category can not be parent and children of another category')
+                )
+
+        return parent
 

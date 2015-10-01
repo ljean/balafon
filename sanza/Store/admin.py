@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.widgets import VerboseManyToManyRawIdWidget
 from sanza.Store import models
-from sanza.Store.forms import StoreManagementActionTypeAdminForm, PricePolicyAdminForm
+from sanza.Store.forms import StoreManagementActionTypeAdminForm, PricePolicyAdminForm, StoreItemCategoryAdminForm
 
 
 admin.site.register(models.Unit)
@@ -59,6 +59,7 @@ class StoreItemCategoryAdmin(admin.ModelAdmin):
         'name', 'parent', 'icon', 'active', 'price_policy', 'get_articles_count', 'get_all_articles_count',
         'get_children_count'
     )
+    form = StoreItemCategoryAdminForm
     list_editable = ('active', )
     list_filter = (StoreParentCategoryFilter, )
     readonly_fields = ('get_all_articles_count', 'get_articles_count', 'get_children_count')

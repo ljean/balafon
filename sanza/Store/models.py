@@ -160,6 +160,14 @@ class StoreItemCategory(models.Model):
             all_articles.extend(sub_category.get_all_articles())
         return all_articles
 
+    def get_sub_categories(self):
+        """returns all sub cartegories"""
+        all_categories = []
+        for sub_category in self.subcategories_set.all():
+            all_categories.append(sub_category)
+            all_categories.extend(sub_category.get_sub_categories())
+        return all_categories
+
     def get_all_articles_count(self):
         """returns all articles"""
         all_articles_count = self.storeitem_set.count()
