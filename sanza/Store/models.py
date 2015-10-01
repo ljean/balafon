@@ -337,6 +337,18 @@ class StoreItem(models.Model):
         except StoreItemPropertyValue.DoesNotExist:
             return ''
 
+    @property
+    def public_properties(self):
+        """get an dict of the public properties: name and values"""
+        public_properties = {}
+        for the_property in StoreItemProperty.objects.filter(is_public=True):
+            try:
+                property_value = StoreItemPropertyValue.objects.get(property=the_property, item=self)
+            except StoreItemPropertyValue.DoesNotExist:
+                property_value = None
+            public_properties[the_property.name] = property_value.value
+        return public_properties
+
     def has_stock_threshold_alert(self):
         """returns True if stock is below threshold"""
         if self.stock_threshold:
@@ -395,6 +407,9 @@ class StoreItemProperty(models.Model):
     label = models.CharField(max_length=100, verbose_name=_(u'label'), default='', blank=True)
     in_fullname = models.BooleanField(
         default=False, verbose_name=_(u'in fullname'), help_text=_(u'is inserted in fullname if checked')
+    )
+    is_public = models.BooleanField(
+        default=False, verbose_name=_(u'is public'), help_text=_(u'returned in public API')
     )
 
     class Meta:

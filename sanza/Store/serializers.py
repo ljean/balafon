@@ -76,12 +76,13 @@ class StoreItemSerializer(serializers.ModelSerializer):
     tags = StoreItemTagSerializer(read_only=True, many=True)
     available = serializers.BooleanField(read_only=True)
     unit = UnitSerializer(read_only=True)
+    public_properties = serializers.DictField(read_only=True)
 
     class Meta:
         model = StoreItem
         fields = (
             'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
-            'available', 'unit'
+            'available', 'unit', 'public_properties'
         )
 
 

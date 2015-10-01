@@ -13,7 +13,7 @@ from sanza.Store.views.sales_documents import (
 
 
 store_items_router = routers.DefaultRouter()
-store_items_router.register(r'store-items', StoreItemViewSet)
+store_items_router.register(r'store-items', StoreItemViewSet, base_name='store_store-items')
 store_items_router.register(r'categories', StoreItemCategoryViewSet)
 store_items_router.register(r'tags', StoreItemTagViewSet)
 
