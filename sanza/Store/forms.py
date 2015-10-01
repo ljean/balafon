@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
+from decimal import Decimal, InvalidOperation
+
+from django.utils.translation import ugettext
+
 import floppyforms as forms
 
 from sanza.Crm.models import ActionStatus
-from sanza.Store.models import StoreManagementActionType
+from sanza.Store.models import StoreManagementActionType, PricePolicy
 
 
 class StoreManagementActionTypeAdminForm(forms.ModelForm):
@@ -21,4 +25,26 @@ class StoreManagementActionTypeAdminForm(forms.ModelForm):
         else:
             self.fields['readonly_status'].queryset = ActionStatus.objects.none()
             self.fields['readonly_status'].widget = forms.HiddenInput()
+
+
+
+class PricePolicyAdminForm(forms.ModelForm):
+    """"""
+
+    class Meta:
+        model = PricePolicy
+        fields = ('name', 'policy', 'parameters', 'apply_to', )
+
+    def clean_parameters(self):
+        parameters = self.cleaned_data['parameters']
+        policy = self.cleaned_data['policy']
+        if policy == 'multiply_purchase_by_ratio':
+            try:
+                Decimal(parameters)
+            except InvalidOperation:
+                text = ugettext(u'{0} is not a valid decimal'.format(parameters))
+                if ',' in parameters:
+                    text += u' ' + ugettext(u'Did you use coma rather than dot as decimal separator?')
+                raise forms.ValidationError(text)
+        return parameters
 

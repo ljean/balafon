@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.widgets import VerboseManyToManyRawIdWidget
 from sanza.Store import models
-from sanza.Store.forms import StoreManagementActionTypeAdminForm
+from sanza.Store.forms import StoreManagementActionTypeAdminForm, PricePolicyAdminForm
 
 
 admin.site.register(models.Unit)
@@ -303,4 +303,8 @@ admin.site.register(models.StoreItemProperty)
 
 admin.site.register(models.Supplier)
 
-admin.site.register(models.PricePolicy)
+
+class PricePolicyAdmin(admin.ModelAdmin):
+    form = PricePolicyAdminForm
+
+admin.site.register(models.PricePolicy, PricePolicyAdmin)
