@@ -91,11 +91,14 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     def __init__(self, *args, **kwargs):
         super(UserRegistrationForm, self).__init__(*args, **kwargs)
 
-        self.fields['gender'].choices = ((0, u'----------'),)+Contact.GENDER_CHOICE[:2]  #do not display Mrs and Mr
-        
-        self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
-            (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
-        ]
+        if 'gender' in self.fields:
+            #do not display Mrs and Mr
+            self.fields['gender'].choices = ((0, u'----------'), ) + Contact.GENDER_CHOICE[:2]
+
+        if 'entity_type' in self.fields:
+            self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
+                (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
+            ]
         if not has_entity_on_registration_form():
             self.fields['entity_type'].inital = 0
             self.fields['entity_type'].widget = forms.HiddenInput()

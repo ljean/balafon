@@ -9,7 +9,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
 
 from django.conf.urls import url, patterns, include
 
-from sanza.forms import BsAuthenticationForm
+from sanza.forms import BsAuthenticationForm, BsPasswordChangeForm, BsPasswordResetForm
 
 from django.contrib import admin
 admin.autodiscover()
@@ -52,10 +52,22 @@ if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
     )
 else:
     urlpatterns += patterns('',
-        (
+        url(
             r'^accounts/login/?$',
             'django.contrib.auth.views.login',
-            {'authentication_form': BsAuthenticationForm}
+            {'authentication_form': BsAuthenticationForm},
+            name='login'
+        ),
+        url(r'^accounts/password_change/$',
+            'django.contrib.auth.views.password_change',
+            {'password_change_form': BsPasswordChangeForm},
+            name='password_change'
+        ),
+        url(
+            r'^accounts/password_reset/$',
+            'django.contrib.auth.views.password_reset',
+            {'password_reset_form': BsPasswordResetForm},
+            name='password_reset'
         ),
         (r'^accounts/', include('django.contrib.auth.urls')),
     )

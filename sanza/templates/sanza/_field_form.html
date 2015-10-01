@@ -15,7 +15,9 @@
             </div>
         {% else %}
             {% if field.label %}
-              <label class="control-label col-sm-3" for="{{ field.name }}">{{field.label}}</label>
+              <label class="control-label col-sm-3" for="{{ field.name }}">
+                {{ field.label }} {% if allow_required_sign and field.field.required %}*{% endif %}
+              </label>
             {% else %}
               <div class="col-sm-3"></div>
             {% endif %}
