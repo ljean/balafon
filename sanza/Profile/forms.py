@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
@@ -11,7 +12,7 @@ from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing.forms import SubscriptionTypeFormMixin
 from sanza.Profile.models import ContactProfile
-from sanza.settings import has_entity_on_registration_form
+from sanza.settings import has_entity_on_registration_form, get_registration_accept_terms_of_use_link
 
 
 class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
@@ -70,7 +71,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
 
     accept_termofuse = forms.BooleanField(
-        label=_(u'Accept term of use'),
+        label=_(u'Accept terms of use'),
         help_text=_(u"Check for accepting the terms of use")
     )
 
@@ -103,6 +104,14 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             self.fields['entity_type'].inital = 0
             self.fields['entity_type'].widget = forms.HiddenInput()
             self.fields['entity'].widget = forms.HiddenInput()
+
+        termsofuse_url = get_registration_accept_terms_of_use_link()
+        if 'accept_termofuse' in self.fields and termsofuse_url:
+            self.fields['accept_termofuse'].label = mark_safe(
+                ugettext(u'Accept <a href="{0}">terms of use</a>').format(
+                    termsofuse_url
+                )
+            )
 
         self._add_subscription_types_field()
 

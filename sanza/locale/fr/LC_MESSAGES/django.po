@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-01 10:02+0200\n"
+"POT-Creation-Date: 2015-10-01 11:36+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -893,15 +893,15 @@ msgid "Contact by modified date"
 msgstr "Contacts par date de mise à jour"
 
 #: Crm/search_forms.py:170 Crm/forms/base.py:86 Crm/forms/base.py:161
-#: Crm/forms/base.py:187 Emailing/forms.py:325 Profile/forms.py:22
-#: Profile/forms.py:80
+#: Crm/forms/base.py:187 Emailing/forms.py:325 Profile/forms.py:23
+#: Profile/forms.py:81
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
 #: Crm/search_forms.py:178 Crm/forms/base.py:160 Crm/forms/base.py:175
 #: Crm/forms/base.py:186 Crm/templates/Crm/_section_all_entities.html:23
 #: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:324
-#: Profile/forms.py:21 Profile/forms.py:79 Profile/models.py:28
+#: Profile/forms.py:22 Profile/forms.py:80 Profile/models.py:28
 #: Search/templates/Search/_section_qs_cities.html:4
 #: Search/templates/Search/_section_qs_contacts.html:10
 msgid "City"
@@ -1065,7 +1065,7 @@ msgstr "Rôle du contact"
 #: Crm/templates/Crm/_section_contacts.html:13
 #: Crm/templates/Crm/_section_entity_info.html:36
 #: Crm/templates/Crm/confirm_contacts_import.html:75 Emailing/forms.py:190
-#: Emailing/forms.py:348 Profile/forms.py:56
+#: Emailing/forms.py:348 Profile/forms.py:57
 #: Search/templates/Search/_section_qs_contacts.html:10
 #: ci/drone_project/templates/registration/login.html:16
 msgid "Email"
@@ -2347,7 +2347,7 @@ msgstr "Cocher la case pour recevoir notre lettre d'information"
 msgid "Invalid subscription type"
 msgstr "Type d'inscription invalide"
 
-#: Emailing/forms.py:330 Profile/forms.py:67
+#: Emailing/forms.py:330 Profile/forms.py:68
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
@@ -2364,15 +2364,15 @@ msgstr ""
 "Entrez le texte affiché sur l'image afin que nous vérifions que vous n'êtes "
 "pas un robot de spam"
 
-#: Emailing/forms.py:364 Profile/forms.py:99
+#: Emailing/forms.py:364 Profile/forms.py:100
 msgid "Individual"
 msgstr "Particulier"
 
-#: Emailing/forms.py:395 Profile/forms.py:121
+#: Emailing/forms.py:395 Profile/forms.py:130
 msgid "Invalid entity type"
 msgstr "Type d'entité invalide"
 
-#: Emailing/forms.py:420 Profile/forms.py:114
+#: Emailing/forms.py:420 Profile/forms.py:123
 msgid "{0}: Please enter a name"
 msgstr "{0}: veuillez entrer un nom"
 
@@ -2832,7 +2832,7 @@ msgstr ""
 "      Vous êtes inscrit à la liste de diffusion de %(my_company)s.\n"
 "      "
 
-#: Profile/forms.py:50
+#: Profile/forms.py:51
 msgid ""
 "This email is already registered. Use the 'forgot password' link on the "
 "login page"
@@ -2840,36 +2840,40 @@ msgstr ""
 "Cette adresse email est déjà inscrite. Utilisez le lien \"Mot de passe "
 "oublié' sur la page de login."
 
-#: Profile/forms.py:57 ci/drone_project/templates/registration/login.html:20
+#: Profile/forms.py:58 ci/drone_project/templates/registration/login.html:20
 #: templates/sanza/_bs_navigation.html:141 templates/sanza/_navigation.html:44
 msgid "Password"
 msgstr "Mot de passe"
 
-#: Profile/forms.py:58
+#: Profile/forms.py:59
 msgid "Repeat your password"
 msgstr "Confirmez le mot de passe"
 
-#: Profile/forms.py:73
-msgid "Accept term of use"
+#: Profile/forms.py:74
+msgid "Accept terms of use"
 msgstr "Accepter les conditions d'utilisation"
 
-#: Profile/forms.py:74
+#: Profile/forms.py:75
 msgid "Check for accepting the terms of use"
 msgstr "Cocher la case pour accepter les conditions d'utilisation"
 
-#: Profile/forms.py:127
+#: Profile/forms.py:111
+msgid "Accept <a href=\"{0}\">terms of use</a>"
+msgstr "Accepter <a href=\"{0}\">les conditions d'utilisation</a>"
+
+#: Profile/forms.py:136
 msgid "Unknown entity type"
 msgstr "type d'entité inconnu"
 
-#: Profile/forms.py:135
+#: Profile/forms.py:144
 msgid "Passwords are not the same"
 msgstr "Les mots de passe sont différents"
 
-#: Profile/forms.py:142
+#: Profile/forms.py:151
 msgid "Your message"
 msgstr "Votre message"
 
-#: Profile/forms.py:148
+#: Profile/forms.py:157
 msgid "Message is too long"
 msgstr "Message trop long"
 

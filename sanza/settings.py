@@ -67,3 +67,8 @@ def has_entity_on_registration_form():
     register as individual if not
     """
     return getattr(settings, 'SANZA_ENTITY_ON_REGISTRATION_FORM', True)
+
+
+def get_registration_accept_terms_of_use_link():
+    """returns a link for the use of terms"""
+    return getattr(settings, 'SANZA_REGISTRATION_ACCEPT_USE_OF_TERMS_LINK', '')
