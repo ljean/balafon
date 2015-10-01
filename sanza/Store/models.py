@@ -474,9 +474,9 @@ class StoreItemImport(models.Model):
         """convert string to decimal"""
         return Decimal(u'{0}'.format(raw_value))
 
-    def _to_itself(self, raw_value):
-        """dummy : just a function to use in the dict"""
-        return raw_value
+    def _to_string(self, raw_value):
+        """to string"""
+        return unicode(raw_value)
 
     def _to_brand(self, raw_value):
         """convert string to brand"""
@@ -527,8 +527,8 @@ class StoreItemImport(models.Model):
             fields = self.fields.split(',')
 
             fields_conversion = {
-                'name': self._to_itself,
-                'reference': self._to_itself,
+                'name': self._to_string,
+                'reference': self._to_string,
                 'brand': self._to_brand,
                 'supplier': self._to_supplier,
                 'unit': self._to_unit,
