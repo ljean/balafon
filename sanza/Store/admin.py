@@ -30,11 +30,37 @@ class StoreItemInline(admin.TabularInline):
     readonly_fields = ['get_admin_link', 'stock_threshold_alert']
 
 
+class StoreParentCategoryFilter(admin.SimpleListFilter):
+    """filter items which are below their stock threshold"""
+    title = _(u'parent')
+    parameter_name = 'parent_category'
+
+    def lookups(self, request, model_admin):
+        return [(0, _(u'None'))] + [
+            (category.id, category.name)
+            for category in models.StoreItemCategory.objects.filter(
+                subcategories_set__isnull=False
+            ).distinct().order_by('name')
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            if value == '0':
+                return queryset.filter(parent__isnull=True)
+            else:
+                return queryset.filter(parent__id=value)
+        else:
+            return queryset
+
+
 class StoreItemCategoryAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'icon', 'active', 'price_policy', 'get_articles_count', 'get_all_articles_count', 'get_children_count'
+        'name', 'parent', 'icon', 'active', 'price_policy', 'get_articles_count', 'get_all_articles_count',
+        'get_children_count'
     )
     list_editable = ('active', )
+    list_filter = (StoreParentCategoryFilter, )
     readonly_fields = ('get_all_articles_count', 'get_articles_count', 'get_children_count')
     inlines = (StoreItemInline, )
 
@@ -213,7 +239,7 @@ class StoreItemAdmin(admin.ModelAdmin):
         'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
     ]
     ordering = ['name']
-    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', StoreCategoryFilter]
+    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', 'category']
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
