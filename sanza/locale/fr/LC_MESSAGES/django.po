@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-01 11:36+0200\n"
+"POT-Creation-Date: 2015-10-01 23:16+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgstr "Pdf"
 #: Crm/forms/contacts.py:184 Crm/forms/entities.py:34
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:14 Search/forms.py:769
-#: Store/models.py:322
+#: Store/models.py:330
 msgid "Name"
 msgstr "Nom"
 
@@ -200,9 +200,9 @@ msgstr "numéro de rue"
 #: Crm/models.py:289 Crm/models.py:511 Crm/models.py:896 Crm/models.py:926
 #: Crm/models.py:993 Crm/models.py:1141 Crm/models.py:1402 Crm/models.py:1485
 #: Search/models.py:14 Search/models.py:29 Store/models.py:94
-#: Store/models.py:121 Store/models.py:136 Store/models.py:216
-#: Store/models.py:233 Store/models.py:262 Store/models.py:394
-#: Store/models.py:638
+#: Store/models.py:121 Store/models.py:136 Store/models.py:224
+#: Store/models.py:241 Store/models.py:270 Store/models.py:414
+#: Store/models.py:661
 msgid "name"
 msgstr "nom"
 
@@ -599,7 +599,7 @@ msgstr "types d'action"
 msgid "user"
 msgstr "utilisateur"
 
-#: Crm/models.py:1142 Store/models.py:138 Store/models.py:218
+#: Crm/models.py:1142 Store/models.py:138 Store/models.py:226
 msgid "active"
 msgstr "actif"
 
@@ -623,7 +623,7 @@ msgstr "nom de la vue"
 msgid "icon"
 msgstr "icone"
 
-#: Crm/models.py:1158 Crm/models.py:1403 Store/models.py:395
+#: Crm/models.py:1158 Crm/models.py:1403 Store/models.py:415
 #: Users/models.py:71 Users/models.py:105
 msgid "label"
 msgstr "libellé"
@@ -636,7 +636,7 @@ msgstr "arguments du Lien"
 msgid "Example: class=\"colorbox-form\" for colorbos display"
 msgstr "Exemple: class=\"colorbox-form\" pour un affichage dans une colorbox"
 
-#: Crm/models.py:1166 Store/models.py:137 Store/models.py:217
+#: Crm/models.py:1166 Store/models.py:137 Store/models.py:225
 msgid "order_index"
 msgstr "ordre"
 
@@ -710,7 +710,7 @@ msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 msgid "end date"
 msgstr "date de fin"
 
-#: Crm/models.py:1227
+#: Crm/models.py:1227 Store/admin.py:35
 msgid "parent"
 msgstr "parent"
 
@@ -762,7 +762,7 @@ msgstr "champ personnalisé"
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:1430 Search/models.py:43 Store/models.py:626
+#: Crm/models.py:1430 Search/models.py:43 Store/models.py:649
 msgid "value"
 msgstr "valeur"
 
@@ -814,7 +814,7 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:1488 Store/models.py:282
+#: Crm/models.py:1488 Store/models.py:290
 msgid "imported by"
 msgstr "importé par"
 
@@ -1148,7 +1148,7 @@ msgstr "Autorise les contacts identiques"
 
 #: Crm/search_forms.py:1094 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
-#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:263
+#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:290
 msgid "Import"
 msgstr "Import"
 
@@ -1517,7 +1517,7 @@ msgstr "Champs"
 #: Crm/templates/Crm/_section_opportunity_info.html:28
 #: Crm/templates/Crm/_section_same_as.html:64
 #: Crm/templates/Crm/_actions/_edit.html:4
-#: Emailing/templates/Emailing/_section_emailing.html:39 Store/models.py:304
+#: Emailing/templates/Emailing/_section_emailing.html:39 Store/models.py:312
 msgid "Edit"
 msgstr "Editer"
 
@@ -3391,36 +3391,40 @@ msgstr "Enregistrer la recherche"
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
 
-#: Store/admin.py:85
+#: Store/admin.py:39
+msgid "None"
+msgstr ""
+
+#: Store/admin.py:112
 msgid "Stock level"
 msgstr "Niveau du stcok"
 
-#: Store/admin.py:94
+#: Store/admin.py:121
 msgid "Threshold alert"
 msgstr "Seuil d'alerte"
 
-#: Store/admin.py:95
+#: Store/admin.py:122
 msgid "Threshold ok"
 msgstr "Ok"
 
-#: Store/admin.py:96
+#: Store/admin.py:123
 msgid "Threshold missing"
 msgstr "Manquant"
 
-#: Store/admin.py:118
+#: Store/admin.py:145
 msgid "Store category"
 msgstr "Catégorie"
 
-#: Store/admin.py:163 Store/admin.py:188
+#: Store/admin.py:190 Store/admin.py:215
 msgid "Stock"
 msgstr "Stock"
 
-#: Store/admin.py:252
+#: Store/admin.py:279
 msgid "The file {0} has been properly imported : {1} items have been created"
 msgstr ""
 "Le fichier {0} a été correctement importé : {1} article(s) ont été créé(s)"
 
-#: Store/admin.py:259
+#: Store/admin.py:286
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
@@ -3440,6 +3444,22 @@ msgstr ""
 #: Store/api.py:181
 msgid "Your cart is empty. Your articles are not available"
 msgstr "Votre panier est vide."
+
+#: Store/forms.py:44
+msgid "{0} is not a valid decimal"
+msgstr "{0} n'est pas un nombre décimal valide"
+
+#: Store/forms.py:46
+msgid "Did you use coma rather than dot as decimal separator?"
+msgstr "Avez-vous utilisé une virgule plutôt qu'un point comme séparateur décimal?"
+
+#: Store/forms.py:61
+msgid "A category can not be its own parent"
+msgstr "Une catégorie ne peut pas être son propre parent"
+
+#: Store/forms.py:67
+msgid "A category can not be parent and children of another category"
+msgstr "Une catégorie ne peut pas être parent et enfant d'une autre catégorie"
 
 #: Store/models.py:27
 msgid "template name"
@@ -3487,7 +3507,7 @@ msgstr "taux de TVA"
 msgid "is default"
 msgstr "par défaut"
 
-#: Store/models.py:78 Store/models.py:265 Store/models.py:705
+#: Store/models.py:78 Store/models.py:273 Store/models.py:728
 msgid "VAT rate"
 msgstr "Taux de TVA"
 
@@ -3543,7 +3563,7 @@ msgstr "Calculs de prix"
 msgid "parent category"
 msgstr "Catégorie parent"
 
-#: Store/models.py:144 Store/models.py:284
+#: Store/models.py:144 Store/models.py:292
 msgid "price policy"
 msgstr "calcul de prix"
 
@@ -3555,131 +3575,139 @@ msgstr "Catégorie"
 msgid "Store item categories"
 msgstr "Catégories"
 
-#: Store/models.py:169
+#: Store/models.py:177
 msgid "Articles total count"
 msgstr "Nombre d'articles total"
 
-#: Store/models.py:174
+#: Store/models.py:182
 msgid "Articles count"
 msgstr "Nombre d'articles"
 
-#: Store/models.py:179
+#: Store/models.py:187
 msgid "Sub-categories count"
 msgstr "Nombre de sous-catégories"
 
-#: Store/models.py:220
+#: Store/models.py:228
 msgid "show always"
 msgstr "Toujours affiché"
 
-#: Store/models.py:223
+#: Store/models.py:231
 msgid "Store item tag"
 msgstr "Tag"
 
-#: Store/models.py:224
+#: Store/models.py:232
 msgid "Store item tags"
 msgstr "Tags"
 
-#: Store/models.py:236 Store/templates/Store/cart_root_email.html:51
+#: Store/models.py:244 Store/templates/Store/cart_root_email.html:51
 msgid "Brand"
 msgstr "Marque"
 
-#: Store/models.py:237
+#: Store/models.py:245
 msgid "Brands"
 msgstr "Marques"
 
-#: Store/models.py:252 Store/models.py:286 Store/models.py:445
+#: Store/models.py:260 Store/models.py:294 Store/models.py:468
 msgid "Supplier"
 msgstr "Fournisseur"
 
-#: Store/models.py:253
+#: Store/models.py:261
 msgid "Suppliers"
 msgstr "Fournisseurs"
 
-#: Store/models.py:263
+#: Store/models.py:271
 msgid "category"
 msgstr "Catégorie"
 
-#: Store/models.py:264 Store/models.py:418
+#: Store/models.py:272 Store/models.py:441
 msgid "tags"
 msgstr "Tags"
 
-#: Store/models.py:267 Store/models.py:706
+#: Store/models.py:275 Store/models.py:729
 msgid "pre-tax price"
 msgstr "prix HT"
 
-#: Store/models.py:270
+#: Store/models.py:278
 msgid "stock count"
 msgstr "Stock"
 
-#: Store/models.py:273
+#: Store/models.py:281
 msgid "stock threshold"
 msgstr "seuil du stock"
 
-#: Store/models.py:276
+#: Store/models.py:284
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: Store/models.py:279
+#: Store/models.py:287
 msgid "brand"
 msgstr "marque"
 
-#: Store/models.py:280
+#: Store/models.py:288
 msgid "reference"
 msgstr "référence"
 
-#: Store/models.py:285
+#: Store/models.py:293
 msgid "Available"
 msgstr "Disponible"
 
-#: Store/models.py:289
+#: Store/models.py:297
 msgid "Store item"
 msgstr "article"
 
-#: Store/models.py:290
+#: Store/models.py:298
 msgid "Store items"
 msgstr "articles"
 
-#: Store/models.py:299
+#: Store/models.py:307
 msgid "VAT inclusive price"
 msgstr "prix TTC"
 
-#: Store/models.py:359
+#: Store/models.py:379
 msgid "Stock threshold"
 msgstr "Seuil du stock"
 
-#: Store/models.py:397
+#: Store/models.py:417
 msgid "in fullname"
 msgstr "utilisé dans le nom complet"
 
-#: Store/models.py:397
+#: Store/models.py:417
 msgid "is inserted in fullname if checked"
 msgstr "est inséré dans le nom complet si coché"
 
-#: Store/models.py:401 Store/models.py:629
+#: Store/models.py:420
+msgid "is public"
+msgstr ""
+
+#: Store/models.py:420
+msgid "returned in public API"
+msgstr ""
+
+#: Store/models.py:424 Store/models.py:652
 msgid "Store item: property value"
 msgstr "Valeur d'une propriété"
 
-#: Store/models.py:402
+#: Store/models.py:425
 msgid "Store item: properties"
 msgstr "Propriété"
 
-#: Store/models.py:412
+#: Store/models.py:435
 msgid "Import file"
 msgstr "fichier à importer"
 
-#: Store/models.py:413
+#: Store/models.py:436
 msgid "An Excel file (*.xls) with the data"
 msgstr "Un fichier Excel (*.xls) avec les données à importer"
 
-#: Store/models.py:419
+#: Store/models.py:442
 msgid "Tags that can be added to the items"
 msgstr "Les tags à affecter aux articles importés"
 
-#: Store/models.py:424
+#: Store/models.py:447
 msgid "fields"
 msgstr "champs"
 
-#: Store/models.py:425
+#: Store/models.py:448
 msgid ""
 "Fields to import in order: if the attribute doesn't exist, create a custom "
 "property"
@@ -3687,129 +3715,129 @@ msgstr ""
 "Les champs à importer : Si l'attribut n'existe pas une propriété "
 "personnalisée sera créée"
 
-#: Store/models.py:427
+#: Store/models.py:450
 msgid "last import"
 msgstr "dernier import"
 
-#: Store/models.py:428
+#: Store/models.py:451
 msgid "import error"
 msgstr "erreur d'import"
 
-#: Store/models.py:429
+#: Store/models.py:452
 msgid "is successful"
 msgstr "succès"
 
-#: Store/models.py:430
+#: Store/models.py:453
 msgid "ignore first line"
 msgstr "ignorer la 1ère ligne"
 
-#: Store/models.py:432
+#: Store/models.py:455
 msgid "margin_rate"
 msgstr "taux de marge"
 
-#: Store/models.py:435
+#: Store/models.py:458
 msgid "error message"
 msgstr "message d'erreur"
 
-#: Store/models.py:438
+#: Store/models.py:461
 msgid "category-lines mode"
 msgstr "Mode catégorie par ligne"
 
-#: Store/models.py:439
+#: Store/models.py:462
 msgid ""
 "If checked, the store item category are expected as merged-cells header lines"
 msgstr ""
 "Si coché, la catégorie de l'article sera lue depuis une ligne fusionnée "
 "précédente"
 
-#: Store/models.py:442
+#: Store/models.py:465
 msgid "default Brand"
 msgstr "marque par défaut"
 
-#: Store/models.py:443
+#: Store/models.py:466
 msgid "If defined, it will be used if no brand is given"
 msgstr ""
 "Si défini, sera utilisé comme marque par défaut si aucune marque n'est "
 "extraite"
 
-#: Store/models.py:446
+#: Store/models.py:469
 msgid "articles will be available if price is set"
 msgstr "Les articles seront disponibles si le prix est défini"
 
-#: Store/models.py:449
+#: Store/models.py:472
 msgid "Store item import"
 msgstr "Import d'articles"
 
-#: Store/models.py:450
+#: Store/models.py:473
 msgid "Store item imports"
 msgstr "Imports d'articles"
 
-#: Store/models.py:483 Store/tests/test_import_store.py:205
+#: Store/models.py:506 Store/tests/test_import_store.py:205
 #: Store/tests/test_import_store.py:235
 msgid "Uncategorized"
 msgstr "Divers"
 
-#: Store/models.py:624
+#: Store/models.py:647
 msgid "item"
 msgstr "article"
 
-#: Store/models.py:625
+#: Store/models.py:648
 msgid "property"
 msgstr "propriété"
 
-#: Store/models.py:630
+#: Store/models.py:653
 msgid "Store item: property values"
 msgstr "valeurs d'une proroété"
 
-#: Store/models.py:644 Store/templates/Store/cart_root_email.html:31
+#: Store/models.py:667 Store/templates/Store/cart_root_email.html:31
 msgid "Delivery point"
 msgstr "Point de livraison"
 
-#: Store/models.py:645
+#: Store/models.py:668
 msgid "Delivery points"
 msgstr "Points de livraison"
 
-#: Store/models.py:653
+#: Store/models.py:676
 msgid "delivery point"
 msgstr "point de livraison"
 
-#: Store/models.py:688
+#: Store/models.py:711
 msgid "Sale"
 msgstr "Vente"
 
-#: Store/models.py:689
+#: Store/models.py:712
 msgid "Sales"
 msgstr "Ventes"
 
-#: Store/models.py:704
+#: Store/models.py:727
 msgid "quantity"
 msgstr "quantité"
 
-#: Store/models.py:707
+#: Store/models.py:730
 msgid "Text"
 msgstr "Texte"
 
-#: Store/models.py:710
+#: Store/models.py:733
 msgid "is blank"
 msgstr "est blanc"
 
-#: Store/models.py:710
+#: Store/models.py:733
 msgid "displayed as an empty line"
 msgstr "affiché comme une ligne vide"
 
-#: Store/models.py:714
+#: Store/models.py:737
 msgid "Sale item"
 msgstr "article vendu"
 
-#: Store/models.py:715
+#: Store/models.py:738
 msgid "Sales items"
 msgstr "articles vendus"
 
-#: Store/models.py:720
+#: Store/models.py:743
 msgid "{1} x {0}"
 msgstr "{1} x {0}"
 
-#: Store/models.py:722
+#: Store/models.py:745
 msgid "Sale item not set"
 msgstr "article vendu non défini"
 
