@@ -614,7 +614,7 @@ class StoreItemImport(models.Model):
                 if not store_item.pre_tax_price:
                     store_item.available = False
 
-                if 'vat_rate' not in fields:
+                if 'vat_rate' not in fields or not store_item.vat_rate:
                     store_item.vat_rate = self._to_vat(None)  # force default
 
                 if 'category' not in fields:
