@@ -579,7 +579,13 @@ class StoreItemImport(models.Model):
                 properties = []
 
                 #for all fields
-                for field, raw_value in zip(fields, raw_values):
+                #for field, raw_value in zip(fields, raw_values):
+                for index, field in enumerate(fields):
+
+                    if index < len(raw_values):
+                        raw_value = raw_values[index]
+                    else:
+                        raw_value = None
 
                     if field in fields_conversion:
                         #call the function associated with this field
@@ -594,7 +600,8 @@ class StoreItemImport(models.Model):
                             setattr(store_item, field, Decimal(0))
                     else:
                         #for extra fields : create a property (once the object has been saved)
-                        properties.append((field, raw_value))
+                        if raw_value:
+                            properties.append((field, raw_value))
 
                 if not store_item.name:
                     #empty line : ignore
@@ -614,7 +621,7 @@ class StoreItemImport(models.Model):
                 if not store_item.pre_tax_price:
                     store_item.available = False
 
-                if 'vat_rate' not in fields or not store_item.vat_rate:
+                if 'vat_rate' not in fields:
                     store_item.vat_rate = self._to_vat(None)  # force default
 
                 if 'category' not in fields:
@@ -637,7 +644,10 @@ class StoreItemImport(models.Model):
             error_stack = traceback.format_exc()
             self.import_error = repr(error_stack)
             self.is_successful = False
-            self.error_message = unicode(msg)[:100]
+            try:
+                self.error_message = unicode(msg)[:100]
+            except:
+                self.error_message = "!!!!!"
 
         self.save()
 
