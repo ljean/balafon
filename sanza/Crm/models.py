@@ -860,6 +860,12 @@ class Contact(AddressModel):
         field_value.value = value
         field_value.save()
 
+    def get_custom_field(self, field_name):
+        """get the value of a custom field"""
+        field = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)[0]
+        field_value = ContactCustomFieldValue.objects.get_or_create(custom_field=field, contact=self)[0]
+        return field_value.value
+
     def add_to_group(self, group_name):
         """add to group"""
         group = Group.objects.get_or_create(name=group_name)[0]
