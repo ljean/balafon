@@ -87,6 +87,7 @@ class ActionForm(BetterBsModelForm):
         else:
             self.title = ugettext(u"Edit action") if instance else ugettext(u"Create action")
 
+        self.fields['amount'].widget.attrs['step'] = 'any'
         if is_amount_calculated:
             self.fields['amount'].widget.attrs['disabled'] = 'disabled'
         self.is_amount_calculated = is_amount_calculated
