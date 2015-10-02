@@ -63,6 +63,12 @@
 <div class="row">
   <div class="col-md-4">
     <table class="table">
+      {% if contact.birth_date %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Birth date' %}" class="glyphicon glyphicon-calendar"></span>
+        {{ contact.birth_date|date:"d/m/Y" }}
+      </td></tr>
+      {% endif %}
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
         {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}

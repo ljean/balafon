@@ -847,7 +847,7 @@ class Contact(AddressModel):
         
         if (not self.firstname) or (not self.lastname):
             return _(u"{1}{0.firstname}{0.lastname}").format(self, title).strip()
-        
+
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
 
     def set_custom_field(self, field_name, value, is_link=False):

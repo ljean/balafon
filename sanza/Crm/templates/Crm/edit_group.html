@@ -76,7 +76,7 @@
           $("#id_entities").val(newValue);
           return true;
         } else {
-          alert('{% trans "This entity is already member of the group" %}');
+          alert("{% trans 'This entity is already member of the group' %}");
         }
       } else if (member_type === 'contact') {
         var newValue = addIdToList($("#id_contacts").val(), member_id);
@@ -84,10 +84,10 @@
           $("#id_contacts").val(newValue);
           return true;
         } else {
-          alert('{% trans "This contact is already member of the group" %}');
+          alert("{% trans 'This contact is already member of the group' %}");
         }
       } else {
-        alert('{% trans "Unknown type" %}');
+        alert("{% trans 'Unknown type' %}");
       }
       return false;
     };
