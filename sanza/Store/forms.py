@@ -53,7 +53,7 @@ class StoreItemCategoryAdminForm(forms.ModelForm):
 
     class Meta:
         model = StoreItemCategory
-        fields = ('name', 'parent', 'order_index', 'active', 'icon', )
+        fields = ('name', 'parent', 'price_policy', 'order_index', 'active', 'icon', )
 
     def clean_parent(self):
         parent = self.cleaned_data['parent']
