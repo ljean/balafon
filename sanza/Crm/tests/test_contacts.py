@@ -129,7 +129,6 @@ class AddressOverloadTest(BaseTestCase):
             if key != 'city':
                 contact_address['city'] = None
 
-
             entity = mommy.make(models.Entity, **entity_address)
             contact = mommy.make(models.Contact, entity=entity, **contact_address)
 
