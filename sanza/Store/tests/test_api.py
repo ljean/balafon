@@ -116,6 +116,121 @@ class StoreItemApiTest(BaseTestCase):
         self.assertEqual(item1['id'], store_item1.id)
         self.assertEqual(item1['name'], store_item1.name)
 
+    def test_view_store_items_ids(self):
+        """It should return only items of ids"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids={0}".format(
+            u','.join([str(id_) for id_ in (store_item1.id, store_item2.id)])
+        )
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 2)
+
+        data = sorted(response.data, key=lambda item_: item_['id'])
+
+        item1 = data[0]
+        item2 = data[1]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
+        self.assertEqual(item2['id'], store_item2.id)
+        self.assertEqual(item2['name'], store_item2.name)
+
+    def test_view_store_items_id(self):
+        """It should return only items of id"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids={0}".format(store_item1.id)
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+        data = sorted(response.data, key=lambda item_: item_['id'])
+
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
+    def test_view_store_items_missing(self):
+        """It should return only items of ids"""
+
+        store_item1 = mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids={0}".format(
+            u','.join([str(id_) for id_ in (store_item1.id, store_item1.id + 1)])
+        )
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+        data = sorted(response.data, key=lambda item_: item_['id'])
+
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
+    def test_view_store_items_none(self):
+        """It should return only items of ids"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids="
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 0)
+
+    def test_view_store_items_invalid(self):
+        """It should return only items of ids"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids={0}".format(
+            u','.join([str(id_) for id_ in (store_item1.id, "hjhkhz")])
+        )
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+        data = sorted(response.data, key=lambda item_: item_['id'])
+
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
+    def test_view_store_items_invalid2(self):
+        """It should return only items of ids"""
+
+        mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list') + "?ids=dejek"
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 0)
+
     def test_view_store_items_by_name(self):
         """It should return only items of name"""
 
