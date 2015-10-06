@@ -90,7 +90,10 @@ admin.site.register(models.StoreItemTag, StoreItemTagAdmin)
 class SaleItemInline(admin.TabularInline):
     """display property on the store item"""
     model = models.SaleItem
-    fields = ('text', 'item', 'quantity', 'pre_tax_price', 'vat_rate', 'order_index', 'is_blank')
+    fields = (
+        'text', 'item', 'quantity', 'pre_tax_price', 'discount', 'discount_price', 'vat_rate', 'order_index',
+        'is_blank',
+    )
 
 
 class SaleAdmin(admin.ModelAdmin):
@@ -309,3 +312,7 @@ class PricePolicyAdmin(admin.ModelAdmin):
     form = PricePolicyAdminForm
 
 admin.site.register(models.PricePolicy, PricePolicyAdmin)
+
+admin.site.register(models.Discount)
+
+admin.site.register(models.PriceClass)

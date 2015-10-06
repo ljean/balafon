@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 from sanza.Store.models import (
-    Brand, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
+    Brand, Discount, PriceClass, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
 )
 
 
@@ -65,6 +65,23 @@ class UnitSerializer(serializers.ModelSerializer):
         )
 
 
+class DiscountSerializer(serializers.ModelSerializer):
+    """json serializer"""
+    display_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Discount
+        fields = ('id', 'name', 'quantity', 'rate', 'display_name')
+
+
+class PriceClassSerializer(serializers.ModelSerializer):
+    """json serializer"""
+
+    class Meta:
+        model = PriceClass
+        fields = ('name', )
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
@@ -77,12 +94,14 @@ class StoreItemSerializer(serializers.ModelSerializer):
     available = serializers.BooleanField(read_only=True)
     unit = UnitSerializer(read_only=True)
     public_properties = serializers.DictField(read_only=True)
+    discounts = DiscountSerializer(many=True, read_only=True)
+    price_class = PriceClassSerializer(read_only=True)
 
     class Meta:
         model = StoreItem
         fields = (
             'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
-            'available', 'unit', 'public_properties'
+            'available', 'unit', 'public_properties', 'discounts', 'price_class'
         )
 
 
@@ -91,12 +110,15 @@ class SaleItemSerializer(serializers.ModelSerializer):
     sale = SaleSerializer(read_only=True)
     quantity = serializers.FloatField()
     pre_tax_price = serializers.FloatField()
+    unit_price = serializers.FloatField()
+    discount = DiscountSerializer()
     vat_rate = VatRateSerializer()
 
     class Meta:
         model = SaleItem
         fields = (
             'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'is_blank',
+            'discount', 'unit_price'
         )
 
 
@@ -109,6 +131,7 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale', 'is_blank',
+            'discount',
         )
 
 

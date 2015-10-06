@@ -264,6 +264,20 @@
         }
       };
 
+      var getItemData = function(item) {
+        var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
+        $http.get(url).success(function(respData) {
+          item.text = respData.text;
+          item.vat_rate = respData.vat_rate;
+          item.pre_tax_price = respData.pre_tax_price;
+          item.unit_price = respData.unit_price;
+          item.discount = respData.discount;
+          item.is_blank = respData.is_blank;
+          item.quantity = respData.quantity;
+          item.item = respData.item;
+        });
+      };
+
       $scope.saveEdit = function() {
         var item = $scope.getEditedItem();
 
@@ -295,6 +309,7 @@
             if (item.id === 0) {
               item.id = respData.id;
             }
+            getItemData(item);
             $scope.editBackup = null;
             $scope.switchOffEditMode();
             pushData();  //update positions of others
@@ -304,8 +319,16 @@
         }
       };
 
+      $scope.getUnitPrice = function(item) {
+        var value = item.unit_price;
+        if (isNaN(value)) {
+          return translate('ERROR');
+        }
+        return value;
+      };
+
       $scope.getItemPreTaxPrice = function(item) {
-        var value = item.pre_tax_price * item.quantity;
+        var value = (item.unit_price) * item.quantity;
         if (isNaN(value)) {
           return translate('ERROR');
         }
@@ -753,7 +776,7 @@
                           </a>
                         </div>
                       </div>
-                      <div ng-show="allowEdit && editedLines[$index]" class="pull-right">
+                      <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="pull-right">
                           <input type="hidden" name="item" ng-model="item.item" />
                           <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
                             <span class="glyphicon glyphicon-search"></span>
@@ -786,7 +809,9 @@
                       />
                     </td>
                     <td class="number" ng-if="!item.is_blank">
-                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.pre_tax_price | number:2}} €</span>
+                      <span ng-hide="editedLines[$index] && !changeOrder">
+                        {{ getUnitPrice(item) | number:2}} €
+                      </span>
                       <input
                         class="form-control"
                         required="required"
@@ -794,6 +819,11 @@
                         ng-model="item.pre_tax_price"
                         ng-show="editedLines[$index] && !changeOrder"
                       />
+                      <span ng-show="item.discount">
+                        <span class="label label-warning" title="{{ item.discount.name }}" data-toggle="tooltip">
+                          {{ item.discount.display_name }}
+                        </span>
+                      </span>
                     </td>
                     <td class="number" ng-if="!item.is_blank">
                       <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>

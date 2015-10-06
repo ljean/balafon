@@ -537,3 +537,368 @@ class BlankLineTest(TestCase):
         self.assertEqual(item2.pre_tax_price, 0)
 
         self.assertEqual(Decimal("38.5"), sale.vat_incl_total_price())
+
+
+class SaleDiscountTest(TestCase):
+    """It should take discount into account when calculating price"""
+
+    def test_calculate_discount(self):
+        """It should have a discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item.tags.add(tag)
+        item.save()
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=2, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("18"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("21.6"), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, discount)
+        self.assertEqual(sale_item.unit_price(), Decimal('9'))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal('10.8'))
+        self.assertEqual(sale_item.vat_price(), Decimal('1.8'))
+        self.assertEqual(sale_item.total_vat_price(), Decimal('3.6'))
+
+    def test_calculate_discount_price_class(self):
+        """It should have a discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate, price_class=price_class)
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=2, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("18"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("21.6"), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, discount)
+        self.assertEqual(sale_item.unit_price(), Decimal('9'))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal('10.8'))
+        self.assertEqual(sale_item.vat_price(), Decimal('1.8'))
+        self.assertEqual(sale_item.total_vat_price(), Decimal('3.6'))
+
+    def test_calculate_discount_disabled(self):
+        """It should not have a discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item.tags.add(tag)
+        item.save()
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=2, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("20"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("24"), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, None)
+        self.assertEqual(sale_item.unit_price(), Decimal('10'))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal('12'))
+        self.assertEqual(sale_item.vat_price(), Decimal('2'))
+        self.assertEqual(sale_item.total_vat_price(), Decimal('4'))
+
+    def test_several_discount(self):
+        """It should have only 1 discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-20% à partir de 2 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+        )
+        discount2.tags.add(tag)
+        discount2.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item.tags.add(tag)
+        item.save()
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=2, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("18"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("21.6"), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, discount)
+        self.assertEqual(sale_item.unit_price(), Decimal('9'))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal('10.8'))
+        self.assertEqual(sale_item.vat_price(), Decimal('1.8'))
+        self.assertEqual(sale_item.total_vat_price(), Decimal('3.6'))
+
+    def test_several_discount_right_quantity(self):
+        """It should have only 1 discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+        )
+        discount2.tags.add(tag)
+        discount2.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item.tags.add(tag)
+        item.save()
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=3, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("24"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("28.8"), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, discount2)
+        self.assertEqual(sale_item.unit_price(), Decimal('8'))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal('9.6'))
+        self.assertEqual(sale_item.vat_price(), Decimal('1.6'))
+        self.assertEqual(sale_item.total_vat_price(), Decimal('4.8'))
+
+
+class StoreItemDiscountTest(TestCase):
+    """It should return the list of discounts associated with an item"""
+
+    def test_view_discounts(self):
+        """if several tags are associated"""
+
+        tag1 = mommy.make(models.StoreItemTag, name="vrac")
+        tag2 = mommy.make(models.StoreItemTag, name="promo")
+        tag3 = mommy.make(models.StoreItemTag, name="soldes")
+        tag4 = mommy.make(models.StoreItemTag, name="super-promos")
+
+        discount = mommy.make(
+            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
+        )
+        discount.tags.add(tag1)
+        discount.tags.add(tag2)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+        )
+        discount2.tags.add(tag1)
+        discount2.save()
+
+        discount3 = mommy.make(
+            models.Discount, name=u'-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
+        )
+
+        item = mommy.make(models.StoreItem)
+        item.tags.add(tag1)
+        item.tags.add(tag2)
+        item.save()
+
+        self.assertEqual(list(item.discounts), [discount2, discount])
+
+    def test_view_discounts_price_class(self):
+        """if several tags are associated"""
+
+        discount = mommy.make(
+            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
+        )
+
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, price_class=price_class)
+
+        self.assertEqual(list(item.discounts), [discount])
+
+    def test_view_discounts_tag_and_price_class(self):
+        """if tags and price classes are associated"""
+        tag1 = mommy.make(models.StoreItemTag, name="vrac")
+        tag2 = mommy.make(models.StoreItemTag, name="promo")
+
+        discount = mommy.make(
+            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+        )
+        discount.tags.add(tag1)
+        discount.tags.add(tag2)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+        discount2.tags.add(tag1)
+        discount2.save()
+
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, price_class=price_class)
+        item.tags.add(tag1)
+        item.tags.add(tag2)
+        item.save()
+
+        self.assertEqual(list(item.discounts), [discount2, discount])
+
+    def test_view_discounts_tag_and_price_class2(self):
+        """if tags and price classes are associated"""
+        tag1 = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+        )
+        discount.tags.add(tag1)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount2)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, price_class=price_class)
+        item.tags.add(tag1)
+        item.save()
+
+        self.assertEqual(list(item.discounts), [discount2, discount])
+
+    def test_view_price_class_several_discounts(self):
+        """if several price classes are associated"""
+        discount = mommy.make(
+            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+        )
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount)
+        price_class.discounts.add(discount2)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, price_class=price_class)
+        self.assertEqual(list(item.discounts), [discount2, discount])
+
+    def test_view_price_class_no_discounts(self):
+        """if no price classes are associated"""
+        discount = mommy.make(
+            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=False
+        )
+
+        mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+        )
+
+        price_class = mommy.make(models.PriceClass)
+        price_class.discounts.add(discount)
+        price_class.save()
+
+        item = mommy.make(models.StoreItem, price_class=price_class)
+        self.assertEqual(list(item.discounts), [])
+
+    def test_view_discounts_inactive(self):
+        """If only 1 tag"""
+
+        tag1 = mommy.make(models.StoreItemTag, name="vrac")
+        tag2 = mommy.make(models.StoreItemTag, name="promo")
+        tag3 = mommy.make(models.StoreItemTag, name="soldes")
+
+        discount = mommy.make(
+            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
+        )
+        discount.tags.add(tag1)
+        discount.tags.add(tag2)
+        discount.save()
+
+        discount2 = mommy.make(
+            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+        )
+        discount2.tags.add(tag1)
+        discount2.save()
+
+        discount3 = mommy.make(
+            models.Discount, name=u'-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
+        )
+
+        item = mommy.make(models.StoreItem)
+        item.tags.add(tag1)
+        item.tags.add(tag2)
+        item.save()
+
+        self.assertEqual(list(item.discounts), [discount2])
+
+    def test_view_discounts_none(self):
+        """if no tag"""
+
+        tag1 = mommy.make(models.StoreItemTag, name="vrac")
+        tag2 = mommy.make(models.StoreItemTag, name="promo")
+
+        discount = mommy.make(
+            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
+        )
+        discount.tags.add(tag1)
+        discount.tags.add(tag2)
+        discount.save()
+
+        item = mommy.make(models.StoreItem)
+
+        self.assertEqual(list(item.discounts), [])

@@ -14,8 +14,8 @@ from sanza.settings import get_pdf_view_base_class
 from sanza.utils import Utf8JSONRenderer
 from sanza.Crm.models import Action
 from sanza.Crm.serializers import ActionSerializer
-from sanza.Store.models import Sale, SaleItem, VatRate, StoreManagementActionType
-from sanza.Store.serializers import SaleItemSerializer, SaleSerializer, VatRateSerializer
+from sanza.Store.models import Discount, Sale, SaleItem, VatRate, StoreManagementActionType
+from sanza.Store.serializers import DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer
 
 
 class SalesDocumentViewMixin(object):
@@ -75,6 +75,9 @@ class SalesDocumentViewMixin(object):
         vat_rates_serializer = VatRateSerializer(VatRate.objects.all(), many=True)
         vat_rates_data = Utf8JSONRenderer().render(vat_rates_serializer.data)
 
+        discounts_serializer = DiscountSerializer(Discount.objects.filter(active=True), many=True)
+        discounts_data = Utf8JSONRenderer().render(discounts_serializer.data)
+
         context['action'] = action
         context['is_read_only'] = is_read_only
         context['is_pdf'] = self.is_pdf
@@ -86,7 +89,8 @@ class SalesDocumentViewMixin(object):
             vat_rates: {3},
             isPdf: {4},
             isPublic: {5},
-            isReadOnly: {6}
+            isReadOnly: {6},
+            discounts: {7},
         }};""".format(
             action_data,
             sale_items_data,
@@ -94,7 +98,8 @@ class SalesDocumentViewMixin(object):
             vat_rates_data,
             'true' if self.is_pdf else 'false',
             'true' if self.is_public else 'false',
-            'true' if is_read_only else 'false'
+            'true' if is_read_only else 'false',
+            discounts_data
         )
         return context
 

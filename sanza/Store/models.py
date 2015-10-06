@@ -8,6 +8,7 @@ import traceback
 import xlrd
 
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models.signals import pre_delete, post_save
@@ -236,6 +237,44 @@ class StoreItemTag(models.Model):
         return self.name
 
 
+class Discount(models.Model):
+    """a discount on a store item price"""
+    name = models.CharField(verbose_name=_(u'name'), max_length=100)
+    short_name = models.CharField(verbose_name=_(u'short name'), max_length=100, default="", blank=True)
+    tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u'tags'))
+    quantity = models.DecimalField(
+        default=0, max_digits=9, decimal_places=2, verbose_name=_(u'quantity')
+    )
+    rate = models.DecimalField(
+        default=0, max_digits=4, decimal_places=2, verbose_name=_(u'rate')
+    )
+    active = models.BooleanField(
+        default=False,
+        verbose_name=_(u'active'),
+        help_text=_(u'Only active discounts are taken into account on a new purchase')
+    )
+
+    class Meta:
+        verbose_name = _(u"Discount")
+        verbose_name_plural = _(u"Discounts")
+        ordering = ['rate', 'name']
+
+    def __unicode__(self):
+        return self.name
+
+    @property
+    def display_name(self):
+        return self.short_name or self.name
+
+    def calculate_discount(self, sale_item):
+        """calculate a discount on a sale item"""
+        if sale_item.quantity >= self.quantity:
+            return Decimal("{0:.2f}".format(
+                round(sale_item.raw_total_price() * self.rate / Decimal(100), 2)
+            ))
+        return None
+
+
 class Brand(models.Model):
     """A brand : cola-cola, peugeot or whatever"""
     name = models.CharField(max_length=100, verbose_name=_(u'name'))
@@ -259,6 +298,20 @@ class Supplier(models.Model):
     class Meta:
         verbose_name = _(u"Supplier")
         verbose_name_plural = _(u"Suppliers")
+
+    def __unicode__(self):
+        return self.name
+
+
+class PriceClass(models.Model):
+    """price class"""
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, default='')
+    discounts = models.ManyToManyField(Discount, blank=True)
+
+    class Meta:
+        verbose_name = _(u"Price class")
+        verbose_name_plural = _(u"Price classes")
 
     def __unicode__(self):
         return self.name
@@ -292,6 +345,7 @@ class StoreItem(models.Model):
     price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
     available = models.BooleanField(default=True, verbose_name=_(u'Available'))
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
+    price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_(u"price class"))
 
     class Meta:
         verbose_name = _(u"Store item")
@@ -303,7 +357,9 @@ class StoreItem(models.Model):
 
     def vat_incl_price(self):
         """VAT inclusive price"""
-        return self.pre_tax_price * (1 + self.vat_rate.rate / 100)
+        return Decimal("{0:.2f}".format(
+            round(self.pre_tax_price * (1 + self.vat_rate.rate / 100), 2)
+        ))
     vat_incl_price.short_description = _(u"VAT inclusive price")
 
     def get_admin_link(self):
@@ -356,6 +412,15 @@ class StoreItem(models.Model):
                 property_value = None
             public_properties[the_property.name] = property_value.value
         return public_properties
+
+    @property
+    def discounts(self):
+        """return all available discounts for this store item"""
+        return Discount.objects.filter(
+            active=True
+        ).filter(
+            Q(tags=self.tags.all()) | Q(priceclass=self.price_class, priceclass__isnull=False)
+        ).distinct().order_by('quantity')
 
     def has_stock_threshold_alert(self):
         """returns True if stock is below threshold"""
@@ -729,6 +794,18 @@ class Sale(models.Model):
         for item in self.saleitem_set.all():
             item.clone(new_sale)
 
+    def calculate_discounts(self):
+        """calculate the discount for a product"""
+        for sale_item in self.saleitem_set.all():
+            sale_item.calculate_discount()
+            sale_item.save()
+
+    def save(self, *args, **kwargs):
+        """save and recalculate the discounts"""
+        ret = super(Sale, self).save(*args, **kwargs)
+        self.calculate_discounts()
+        return ret
+
 
 class SaleItem(models.Model):
     """details about the sold item"""
@@ -742,6 +819,7 @@ class SaleItem(models.Model):
     is_blank = models.BooleanField(
         default=False, verbose_name=_(u'is blank'), help_text=_(u'displayed as an empty line')
     )
+    discount = models.ForeignKey(Discount, blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = _(u"Sale item")
@@ -756,7 +834,7 @@ class SaleItem(models.Model):
 
     def vat_incl_price(self):
         """VAT inclusive price"""
-        return self.pre_tax_price + self.vat_price()
+        return self.unit_price() + self.vat_price()
 
     def total_vat_price(self):
         """VAT price * quantity"""
@@ -767,17 +845,33 @@ class SaleItem(models.Model):
         if self.is_blank:
             return Decimal(0)
         vat_rate = self.vat_rate.rate if self.vat_rate else Decimal(0)
-        return self.pre_tax_price * (vat_rate / Decimal(100))
+        return Decimal("{0:.2f}".format(
+            round(self.unit_price() * (vat_rate / Decimal(100)), 2)
+        ))
 
     def vat_incl_total_price(self):
         """VAT inclusive price"""
         return self.vat_incl_price() * self.quantity
 
+    def raw_total_price(self):
+        """VAT inclusive price"""
+        if self.is_blank:
+            return Decimal(0)
+        value = self.pre_tax_price * self.quantity
+        return Decimal("{0:.2f}".format(round(value, 2)))
+
     def pre_tax_total_price(self):
         """VAT inclusive price"""
         if self.is_blank:
             return Decimal(0)
-        return self.pre_tax_price * self.quantity
+        return self.unit_price() * self.quantity
+
+    def unit_price(self):
+        """pre tax price with discount"""
+        if self.is_blank:
+            return Decimal(0)
+        unit_price = self.pre_tax_price - self.calculate_discount()
+        return Decimal("{0:.2f}".format(round(unit_price, 2)))
 
     def save(self, *args, **kwargs):
         if self.order_index == 0:
@@ -802,8 +896,25 @@ class SaleItem(models.Model):
             pre_tax_price=self.pre_tax_price,
             text=self.text,
             is_blank=self.is_blank,
+            discount=self.discount,
             order_index=self.order_index
         )
+
+    def calculate_discount(self):
+        """calculate the discount"""
+        max_discount = Decimal(0)
+        better_discount = None
+        if self.item:
+            for discount in self.item.discounts:
+                discount_value = discount.calculate_discount(self)
+                if discount_value and discount_value > max_discount:
+                    max_discount = discount_value
+                    better_discount = discount
+        if better_discount != self.discount:
+            self.discount = better_discount
+            super(SaleItem, self).save()
+        discount_price = max_discount / self.quantity
+        return Decimal("{0:.2f}".format(round(discount_price, 2)))
 
 
 def update_action_amount(sale_item, delete_me=False):

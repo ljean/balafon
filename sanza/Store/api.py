@@ -183,6 +183,8 @@ class CartView(APIView):
                 })
             else:
 
+                action.sale.save()
+
                 confirm_cart_to_user(profile, action)
                 notify_cart_to_admin(profile, action)
 
