@@ -243,17 +243,17 @@ class StoreItemAdmin(admin.ModelAdmin):
         'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
     ]
     ordering = ['name']
-    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', 'category']
+    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', 'category', 'certificates']
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
-    raw_id_fields = ['tags']
+    raw_id_fields = ['tags', 'certificates']
     inlines = [StoreItemPropertyValueInline]
     list_per_page = 500
     save_as = True
 
     def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name in ('tags',):
+        if db_field.name in self.raw_id_fields:
             kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.rel, self.admin_site)
         else:
             return super(StoreItemAdmin,self).formfield_for_dbfield(db_field, **kwargs)
@@ -316,3 +316,5 @@ admin.site.register(models.PricePolicy, PricePolicyAdmin)
 admin.site.register(models.Discount)
 
 admin.site.register(models.PriceClass)
+
+admin.site.register(models.Certificate)

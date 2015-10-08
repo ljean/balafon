@@ -303,11 +303,28 @@ class Supplier(models.Model):
         return self.name
 
 
+class Certificate(models.Model):
+    """certificate"""
+    name = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to="certificates", blank=True, default="")
+
+    @property
+    def image(self):
+        return self.logo.url
+
+    class Meta:
+        verbose_name = _(u"certificate")
+        verbose_name_plural = _(u"certificates")
+
+    def __unicode__(self):
+        return self.name
+
+
 class PriceClass(models.Model):
     """price class"""
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=100, blank=True, default='')
-    discounts = models.ManyToManyField(Discount, blank=True)
+    name = models.CharField(max_length=100, verbose_name=_(u'Name'))
+    description = models.CharField(max_length=100, blank=True, default='', verbose_name=_(u'Description'))
+    discounts = models.ManyToManyField(Discount, blank=True, verbose_name=_(u'Discount'))
 
     class Meta:
         verbose_name = _(u"Price class")
@@ -346,6 +363,7 @@ class StoreItem(models.Model):
     available = models.BooleanField(default=True, verbose_name=_(u'Available'))
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
     price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_(u"price class"))
+    certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_(u"certificate"))
 
     class Meta:
         verbose_name = _(u"Store item")

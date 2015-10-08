@@ -4,7 +4,7 @@
 from rest_framework import serializers
 
 from sanza.Store.models import (
-    Brand, Discount, PriceClass, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
+    Brand, Certificate, Discount, PriceClass, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
 )
 
 
@@ -82,6 +82,14 @@ class PriceClassSerializer(serializers.ModelSerializer):
         fields = ('name', )
 
 
+class CertificateSerializer(serializers.ModelSerializer):
+    """json serializer"""
+
+    class Meta:
+        model = Certificate
+        fields = ('name', 'image',)
+
+
 class StoreItemSerializer(serializers.ModelSerializer):
     """json serializer"""
 
@@ -96,12 +104,13 @@ class StoreItemSerializer(serializers.ModelSerializer):
     public_properties = serializers.DictField(read_only=True)
     discounts = DiscountSerializer(many=True, read_only=True)
     price_class = PriceClassSerializer(read_only=True)
+    certificates = CertificateSerializer(many=True, read_only=True)
 
     class Meta:
         model = StoreItem
         fields = (
             'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
-            'available', 'unit', 'public_properties', 'discounts', 'price_class'
+            'available', 'unit', 'public_properties', 'discounts', 'price_class', 'certificates',
         )
 
 
