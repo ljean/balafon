@@ -126,9 +126,8 @@ class CartView(APIView):
             if 'notes' in cart_serializer.validated_data:
                 notes = cart_serializer.validated_data["notes"].strip()
                 if notes:
-                    lines = notes.split('\n')
-                    subject = lines[0]
-                    detail = '\n'.join(lines[1:])
+                    subject = _(u'Notes')
+                    detail = notes
 
             action = Action.objects.create(
                 planned_date=cart_serializer.validated_data['purchase_datetime'],
