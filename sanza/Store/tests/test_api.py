@@ -316,3 +316,154 @@ class StoreItemApiTest(BaseTestCase):
         self.assertEqual(item1['name'], store_item1.name)
         self.assertEqual(len(item1['public_properties']), 1)
         self.assertEqual(item1['public_properties']['size'], "179cm")
+
+
+class FavoriteApiTest(BaseTestCase):
+    """Test that we are getting user favorites"""
+
+    def test_view_empty_list(self):
+        """It should return none"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+
+        url = reverse('store_favorites_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        favorites = response.data['favorites']
+        self.assertEqual(len(favorites), 0)
+
+    def test_view_anonymous(self):
+        """It should return error"""
+        self.client.logout()
+
+        url = reverse('store_favorites_api')
+
+        response = self.client.get(url, format='json')
+        self.assertTrue(response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED))
+
+    def test_view_favorites(self):
+        """It should return favorites"""
+        other_user = mommy.make(models.User)
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+        store_item3 = mommy.make(models.StoreItem)
+
+        mommy.make(models.Favorite, user=self.user, item=store_item1)
+        mommy.make(models.Favorite, user=self.user, item=store_item2)
+        mommy.make(models.Favorite, user=other_user, item=store_item3)
+        mommy.make(models.Favorite, user=other_user, item=store_item1)
+
+        url = reverse('store_favorites_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        favorites = response.data['favorites']
+        self.assertEqual(len(favorites), 2)
+
+        data = sorted(favorites, key=lambda item_: item_['id'])
+        item1 = data[0]
+        item2 = data[1]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item2['id'], store_item2.id)
+
+    def test_add_favorites(self):
+        """It should add a favorite"""
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+        store_item3 = mommy.make(models.StoreItem)
+
+        url = reverse('store_favorites_api')
+
+        data = {
+            'items': [{'id': store_item1.id}],
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+
+        self.assertEqual(1, models.Favorite.objects.count())
+        self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item1).count())
+
+    def test_change_favorites(self):
+        """It should update favorites"""
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+        store_item3 = mommy.make(models.StoreItem)
+
+        url = reverse('store_favorites_api')
+
+        mommy.make(models.Favorite, user=self.user, item=store_item1)
+        mommy.make(models.Favorite, user=self.user, item=store_item2)
+
+        data = {
+            'items': [{'id': store_item1.id}, {'id': store_item3.id}],
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+
+        self.assertEqual(2, models.Favorite.objects.count())
+        self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item1).count())
+        self.assertEqual(0, models.Favorite.objects.filter(user=self.user, item=store_item2).count())
+        self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item3).count())
+
+        self.assertEqual(1, models.StoreItem.objects.filter(id=store_item2.id).count())
+
+    def test_delete_favorites(self):
+        """It should delete all favorites"""
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+
+        url = reverse('store_favorites_api')
+
+        mommy.make(models.Favorite, user=self.user, item=store_item1)
+        mommy.make(models.Favorite, user=self.user, item=store_item2)
+
+        data = {
+            'items': [],
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+
+        self.assertEqual(0, models.Favorite.objects.count())
+
+        self.assertEqual(1, models.StoreItem.objects.filter(id=store_item1.id).count())
+        self.assertEqual(1, models.StoreItem.objects.filter(id=store_item2.id).count())
+
+    def test_add_favorites_anonymous(self):
+        """It should not add a favorite"""
+        self.client.logout()
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+        store_item3 = mommy.make(models.StoreItem)
+
+        url = reverse('store_favorites_api')
+
+        mommy.make(models.Favorite, user=self.user, item=store_item1)
+        mommy.make(models.Favorite, user=self.user, item=store_item2)
+
+        data = {
+            'items': [{'id': store_item1.id}, {'id': store_item3.id}],
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertTrue(response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED))
+
+        self.assertEqual(2, models.Favorite.objects.count())
+        self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item1).count())
+        self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item2).count())
+        self.assertEqual(0, models.Favorite.objects.filter(user=self.user, item=store_item3).count())

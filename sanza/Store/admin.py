@@ -318,3 +318,10 @@ admin.site.register(models.Discount)
 admin.site.register(models.PriceClass)
 
 admin.site.register(models.Certificate)
+
+
+class FavoriteAdmin(admin.ModelAdmin):
+    list_display = ('item', 'user')
+    list_filter = ('item__category', 'user')
+
+admin.site.register(models.Favorite, FavoriteAdmin)

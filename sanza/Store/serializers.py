@@ -155,3 +155,12 @@ class CartSerializer(serializers.Serializer):
     purchase_datetime = serializers.DateTimeField()
     delivery_point = serializers.IntegerField()
     notes = serializers.CharField(max_length=3000, required=False)
+
+
+class FavoriteItemSerializer(serializers.Serializer):
+    """Serialize"""
+    id = serializers.IntegerField()
+
+
+class FavoriteSerializer(serializers.Serializer):
+    items = FavoriteItemSerializer(many=True)

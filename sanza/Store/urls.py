@@ -5,7 +5,9 @@ from django.conf.urls import patterns, url, include
 
 from rest_framework import routers
 
-from sanza.Store.api import SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView
+from sanza.Store.api import (
+    SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView
+)
 from sanza.Store.admin import export_stock, export_stock_alert
 from sanza.Store.views.sales_documents import (
     SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView
@@ -45,6 +47,12 @@ urlpatterns = patterns('sanza.Store.views',
         r'^api/cart/$',
         CartView.as_view(),
         name='store_post_cart'
+    ),
+
+    url(
+        r'^api/favorites/$',
+        FavoriteView.as_view(),
+        name='store_favorites_api'
     ),
 
     url(r'^api/', include(store_items_router.urls)),

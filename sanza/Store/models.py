@@ -10,6 +10,7 @@ import xlrd
 from django.db import models
 from django.db.models import Q
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -823,6 +824,18 @@ class Sale(models.Model):
         ret = super(Sale, self).save(*args, **kwargs)
         self.calculate_discounts()
         return ret
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, verbose_name=_(u'user'))
+    item = models.ForeignKey(StoreItem, verbose_name=_(u'store item'))
+
+    def __unicode__(self):
+        return u'{0} - {1}'.format(self.user, self.item)
+
+    class Meta:
+        verbose_name = _(u"Favorite")
+        verbose_name_plural = _(u"Favorites")
 
 
 class SaleItem(models.Model):

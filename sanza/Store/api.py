@@ -3,6 +3,7 @@
 
 from decimal import Decimal
 
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
 
 from rest_framework import viewsets, permissions
@@ -12,7 +13,7 @@ from rest_framework.views import APIView
 from sanza.Crm.models import Action, ActionType
 from sanza.Profile.models import ContactProfile
 from sanza.Store.models import (
-    SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint
+    Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint
 )
 from sanza.Store import serializers, settings
 from sanza.Store.settings import get_cart_type_name
@@ -206,3 +207,60 @@ class CartView(APIView):
                     'message': u', '.join([u'{0}: {1}'.format(*err) for err in cart_serializer.errors.items()])
                 }
             )
+
+
+class FavoriteView(APIView):
+    """post a cart"""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        """receive a new list of favorites"""
+
+        favorite_serializer = serializers.FavoriteSerializer(data=request.data)
+        if favorite_serializer.is_valid():
+
+            #Get Contact
+            try:
+                profile = ContactProfile.objects.get(user=request.user)
+            except ContactProfile.DoesNotExist:
+                raise PermissionDenied
+
+            items_ids = [item_['id'] for item_ in favorite_serializer.validated_data['items']]
+
+            #Delete favorites which are not in the new list
+            request.user.favorite_set.exclude(id__in=items_ids).delete()
+
+            #create new favorite
+            for item_id in items_ids:
+                try:
+                    item = StoreItem.objects.get(id=item_id)
+                except StoreItem.DoesNotExist:
+                    item = None
+                if item:
+                    Favorite.objects.get_or_create(
+                        user=request.user,
+                        item=item
+                    )
+
+            return Response({'ok': True})
+        else:
+            return Response(
+                {
+                    'ok': False,
+                    'message': u', '.join([u'{0}: {1}'.format(*err) for err in favorite_serializer.errors.items()])
+                }
+            )
+
+    def get(self, request):
+        """return a new list of favorites"""
+
+        #Get Contact
+        try:
+            profile = ContactProfile.objects.get(user=request.user)
+            contact = profile.contact
+        except ContactProfile.DoesNotExist:
+            return PermissionDenied
+
+        favorites = self.request.user.favorite_set.all()
+        favorites_serializer = serializers.FavoriteItemSerializer([fav.item for fav in favorites], many=True)
+        return Response({'favorites': favorites_serializer.data})
