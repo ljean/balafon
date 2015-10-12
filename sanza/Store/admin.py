@@ -209,57 +209,6 @@ class StoreItemPropertyValueInline(admin.TabularInline):
     fields = ('property', 'value')
 
 
-@staff_member_required
-def export_stock(request):
-    """export to excel all articles tin stock"""
-
-    book = xlwt.Workbook()
-    sheet = book.add_sheet(_(u"Stock"))
-
-    line = 0
-
-    for line, item in enumerate(models.StoreItem.objects.filter(stock_count__isnull=False).order_by('name')):
-        sheet.write(line, 0, item.name)
-        sheet.write(line, 1, unicode(item.category) if item.category else '')
-        sheet.write(line, 2, item.purchase_price if item.purchase_price else 0)
-        sheet.write(line, 3, item.stock_count)
-        sheet.write(line, 4, item.stock_threshold)
-        sheet.write(line, 5, xlwt.Formula('C{0}*D{0})'.format(line+1)))
-
-    sheet.write(line+2, 5, xlwt.Formula('SUM(F1:F{0})'.format(line+1)))
-
-    response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=export-stock.xls'
-    book.save(response)
-    return response
-
-
-@staff_member_required
-def export_stock_alert(request):
-    """export to excel all articles that must be purchased"""
-
-    book = xlwt.Workbook()
-    sheet = book.add_sheet(_(u"Stock"))
-
-    line = 0
-    for item in models.StoreItem.objects.filter(stock_count__isnull=False).order_by('name'):
-        if item.has_stock_threshold_alert():
-            sheet.write(line, 0, item.name)
-            sheet.write(line, 1, unicode(item.category) if item.category else '')
-            sheet.write(line, 2, item.purchase_price if item.purchase_price else 0)
-            sheet.write(line, 3, item.stock_count)
-            sheet.write(line, 4, item.stock_threshold)
-            sheet.write(line, 5, xlwt.Formula('C{0}*D{0})'.format(line+1)))
-            line += 1
-
-    sheet.write(line+2, 5, xlwt.Formula('SUM(F1:F{0})'.format(line+1)))
-
-    response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=export-stock-alert.xls'
-    book.save(response)
-    return response
-
-
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
