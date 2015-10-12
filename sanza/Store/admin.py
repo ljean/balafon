@@ -179,6 +179,30 @@ class StoreCategoryFilter(admin.SimpleListFilter):
         return queryset
 
 
+class CertificateFilter(admin.SimpleListFilter):
+    """filter items with a given certificate"""
+    title = _(u'Certificate')
+    parameter_name = 'store_certificate'
+
+    def lookups(self, request, model_admin):
+        return [(0, _(u'None'))] + [
+            (certificate.id, certificate.name)
+            for certificate in models.Certificate.objects.all().order_by('name')
+        ]
+
+    def queryset(self, request, queryset):
+        certificate = self.value()
+        if certificate:
+            if certificate == '0':
+                return queryset.filter(certificates__isnull=True)
+            else:
+                try:
+                    return queryset.filter(certificates__id=int(certificate))
+                except ValueError:
+                    return queryset.none()
+        return queryset
+
+
 class StoreItemPropertyValueInline(admin.TabularInline):
     """display property on the store item"""
     model = models.StoreItemPropertyValue
@@ -243,7 +267,7 @@ class StoreItemAdmin(admin.ModelAdmin):
         'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
     ]
     ordering = ['name']
-    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', 'category', 'certificates']
+    list_filter = ['available', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter]
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
