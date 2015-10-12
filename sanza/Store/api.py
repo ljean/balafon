@@ -71,7 +71,7 @@ class StoreItemViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(tags=tag)
 
         ids = self.request.GET.get('ids', None)
-        if ids:
+        if ids is not None:
             int_ids = [int(id_) for id_ in ids.split(',') if id_.isdigit()]
             return self.queryset.filter(id__in=int_ids)
 
