@@ -55,23 +55,23 @@ class StoreItemViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """returns objects"""
         name = self.request.GET.get('name', None)
-        if name is not None:
+        if name:
             return self.queryset.filter(name__icontains=name)[:20]
 
         fullname = self.request.GET.get('fullname', None)
-        if fullname is not None:
+        if fullname:
             return self.queryset.filter(name__icontains=fullname)
 
         category = self.request.GET.get('category', None)
-        if category is not None:
+        if category:
             return self.queryset.filter(category=category)
 
         tag = self.request.GET.get('tag', None)
-        if tag is not None:
+        if tag:
             return self.queryset.filter(tags=tag)
 
         ids = self.request.GET.get('ids', None)
-        if ids is not None:
+        if ids:
             int_ids = [int(id_) for id_ in ids.split(',') if id_.isdigit()]
             return self.queryset.filter(id__in=int_ids)
 
