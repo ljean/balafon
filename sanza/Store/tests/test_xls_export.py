@@ -75,7 +75,7 @@ class CatalogueTest(TestCase):
         item1 = mommy.make(models.StoreItem, available=True, category=category1)
         mommy.make(models.StoreItem, available=True, category=category2)
 
-        response = self.client.get(reverse('store_xls_catalogue', args=[item1.id]))
+        response = self.client.get(reverse('store_xls_catalogue', args=[category1.id]))
 
         self.assertEqual(response.status_code, 200)
         workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
