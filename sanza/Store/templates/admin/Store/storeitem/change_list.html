@@ -3,17 +3,17 @@
 
     {{ block.super }}
     <li>
-        <a href="{% url 'store_xls_catalogue' 0 %}" class="grp-state-focus addlink">
+        <a href="{% url 'store_xls_catalogue' 0 %}" class="grp-state-focus">
           {% trans "Catalogue" %}
         </a>
     </li>
     <li>
-        <a href="{% url 'store_store_item_admin_export' %}" class="grp-state-focus addlink">
+        <a href="{% url 'store_store_item_admin_export' %}" class="grp-state-focus">
           {% trans "Export Stock" %}
         </a>
     </li>
     <li>
-        <a href="{% url 'store_store_item_admin_export_alert' %}" class="grp-state-focus addlink">{% trans "Export missing Stock" %}</a>
+        <a href="{% url 'store_store_item_admin_export_alert' %}" class="grp-state-focus">{% trans "Export missing Stock" %}</a>
     </li>
 
 {% endblock %}
