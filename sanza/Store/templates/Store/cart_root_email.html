@@ -1,0 +1,81 @@
+{% load i18n %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{LANG}}" xml:lang="{{LANG}}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ subject }}</title>
+</head>
+<body style="{% block body_style %}{% endblock %}">
+  {% block style %}
+  <style>
+    
+  </style>
+ {% endblock %}
+
+  <div>
+  {% block content %}
+
+      {% block header %}
+      <h1>
+        {{ subject }}
+      </h1>
+      {% endblock %}
+
+      {% block profile %}
+      <div>
+        {{ profile.contact.fullname }}
+      </div>
+      {% endblock %}
+
+      {% block delivery %}
+      <div>
+        {% trans "Delivery point" %} :
+        {{ action.sale.delivery_point.name }} {{ action.planned_date|date:'l j F H:i' }}
+      </div>
+      {% endblock %}
+
+      {% block notes %}
+      {% if action.subject %}
+      <div>
+        {% trans "Notes" %} :
+        {{ action.subject }}<br />
+        {{ action.detail|linebreaksbr }}
+      </div>
+      {% endif %}
+      {% endblock %}
+
+      {% block cart %}
+      <div>
+        <table>
+          <tr>
+            <th style="text-align: left;">{% trans "Store_item" %}</th>
+            <th>{% trans "Brand" %}</th>
+            <th>{% trans "Reference" %}</th>
+            <th style="text-align: right;">{% trans "Price" %}</th>
+            <th style="text-align: right;">{% trans "Quantity" %}</th>
+            <th style="text-align: right;">{% trans "Total" %}</th>
+          </tr>
+        {% for item in action.sale.saleitem_set.all %}
+          <tr>
+            <td style="width: 200px">{{ item.text }}</td>
+            <td style="width: 100px; text-align: center;">{{ item.item.brand.name }}</td>
+            <td style="width: 100px; text-align: center;">{{ item.item.reference }}</td>
+            <td style="width: 100px; text-align: right;">{{ item.vat_incl_price|floatformat:2 }} €</td>
+            <td style="width: 100px; text-align: right;">{{ item.quantity|floatformat:2 }}</td>
+            <td style="width: 100px; text-align: right;">{{ item.vat_incl_total_price|floatformat:2 }} €</td>
+          </tr>
+        {% endfor %}
+          <tr>
+            <th colspan="5" style="text-align: left;">{% trans "Total" %}</th>
+            <th style="text-align: right;">{{ action.amount|floatformat:2 }} €</th>
+          </tr>
+        </table>
+
+      </div>
+      {% endblock %}
+
+
+  {% endblock %}
+  </div>
+
+</body>
+</html>

@@ -6,8 +6,12 @@ from datetime import datetime
 import logging
 import urlparse
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
+from django.utils.translation import ugettext as _
+
+from rest_framework.renderers import JSONRenderer
 
 try:
     from localeurl.utils import strip_path
@@ -46,7 +50,7 @@ class HttpResponseRedirectMailtoAllowed(HttpResponseRedirect):
 
 def get_form_errors(response):
     """get form errors"""
-    soup = BeautifulSoup(response.content)
+    soup = BeautifulSoup(response.content, "html.parser")
     errors = soup.select('.field-error .label')
     return errors
 
@@ -63,3 +67,26 @@ def is_allowed_homepage(url_string):
     if resolved.url_name in get_allowed_homepages():
         return True
     return False
+
+
+def validate_rgb(value):
+    """"check rgb"""
+    wrong = False
+    if not (len(value) == 7 or len(value) == 4):
+        wrong = True
+    else:
+        if value[0] != "#":
+            wrong = True
+        else:
+            try:
+                int(value[1:], 16)
+            except ValueError:
+                wrong = True
+    if wrong:
+        raise ValidationError(_(u'RGB format (e.g. #123456) expected'))
+    return False
+
+
+class Utf8JSONRenderer(JSONRenderer):
+    """Utf-8 support"""
+    ensure_ascii = False

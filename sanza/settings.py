@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 """settings"""
 
+from django.conf import settings
+from django.views.generic import TemplateView
+
+from coop_cms.settings import load_class
+from wkhtmltopdf.views import PDFTemplateView
+
 
 def get_allowed_homepages():
     """returns all Sanza pages which can be set as homepage"""
@@ -35,3 +41,34 @@ def get_allowed_homepages():
         # Users
         'users_favorites_list',
     )
+
+
+def get_pdf_view_base_class():
+    """returns base class for Pdf --> turn it to HTML for drone.IO"""
+    if getattr(settings, 'CI_DRONE', False):
+        return TemplateView
+    else:
+        return PDFTemplateView
+
+
+def get_profile_form():
+    """returns a form to be used for editing a user profile"""
+    return load_class('SANZA_PROFILE_FORM', 'sanza.Profile.forms.ProfileForm')
+
+
+def get_registration_form():
+    """returns a form to be used for editing a user profile"""
+    return load_class('SANZA_REGISTRATION_FORM', 'sanza.Profile.forms.UserRegistrationForm')
+
+
+def has_entity_on_registration_form():
+    """
+    returns True if entity type and entity name are displayed on registration form (Profile)
+    register as individual if not
+    """
+    return getattr(settings, 'SANZA_ENTITY_ON_REGISTRATION_FORM', True)
+
+
+def get_registration_accept_terms_of_use_link():
+    """returns a link for the use of terms"""
+    return getattr(settings, 'SANZA_REGISTRATION_ACCEPT_USE_OF_TERMS_LINK', '')

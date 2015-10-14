@@ -129,11 +129,29 @@ body {
 }
 
 .actions .row {
-    overflow: hidden;
+    /*overflow: hidden;*/
+    padding: 1px 0;
 }
 
 .actions .row [class*="col-"] div {
     
+}
+
+.actions .label {
+    font-size: 0.9em;
+}
+
+.actions .label-text {
+    color: #888;
+}
+
+.actions .label.label-default{
+    background: #ddd;
+    color: #000;
+}
+
+.actions .label.label-default a{
+    color: #000;
 }
 
 .label-in-charge {
@@ -146,12 +164,55 @@ body {
     margin-right: 2px;
 }
 
+.label-member {
+    color: #000;
+    background: #eee;
+    border: solid thin #ccc;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+.label-member.label-new-member {
+    background: #ffcc66;
+}
+
+.label-member.label-removed {
+    background: #882222;
+    color: #fff;
+}
+
+.label-group {
+    color: #000;
+    background: #eee;
+    border: solid thin #ccc;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+
+.label-member.label-removed a{
+    color: #eee;
+}
+
 .actions .action .label-in-charge {
     margin-top: 4px;
 }
 
 .label-in-charge.me-in-charge {
     background: @me_incharge_color;
+}
+
+.label-bigger {
+    font-size: 1em;
+}
+
+.label-bigger .glyphicon-tower,
+.label-bigger .glyphicon-user
+{
+    margin-right: 5px;
+}
+
+.label-bigger .glyphicon {
+    font-size: 0.7em;
 }
 
 /*
@@ -178,8 +239,16 @@ body {
     background: #fff;
 }*/
 
+.label-date.label-danger {
+    background: #fc8c84;
+}
+
+.label-date.label-warning {
+    background: #ffcc77;
+}
+
 .label-not-yet {
-    background: #888;    
+    background: #ddd;
 }
 
 .action-subject {
@@ -777,3 +846,8 @@ ul.coop-cms_user-messages {
 }
 
 .nav .tooltip .tooltip-arrow {border-bottom-color: @navigation_tooltip_color;}
+
+.dropdown-menu {
+    height: auto !important;
+    overflow: visible !important;
+}

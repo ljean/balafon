@@ -93,9 +93,9 @@ class QuickSearchTest(BaseTestCase):
         """quick search by name"""
         anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
         obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
-        doe = mommy.make(models.Contact, firstname="Doe", lastname="John")
+        doe = mommy.make(models.Contact, firstname="Benjamin", lastname="Doe")
         star_wars_company = mommy.make(models.Entity)
-        luke = mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=star_wars_company)
+        luke = mommy.make(models.Contact, firstname="Luuukeeee", lastname="Skywalker", entity=star_wars_company)
 
         url = reverse('quick_search')
 

@@ -1,6 +1,6 @@
 {% extends "registration/base.html" %}{% load i18n %}
 {% block registration_content %}
-    <div class="row"><div class="col-md-6">
+<div class="row"><div class="col-md-6">
     <H2>{% trans "Login" %}</H2>
     {% if form.errors %}
         <h3 class="warning">{% trans "Login has failed" %}</h3>
@@ -8,23 +8,33 @@
         <p />
     {% endif %}
 
-    <form action="{% url 'django.contrib.auth.views.login' %}" method="post">
+    <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
         {{form.non_field_errors}}
         {% endif %}
-    
-        {% include "sanza/_field_form.html" with field=form.username %}
+
+        {% if form.email %}
+          {% include "sanza/_field_form.html" with field=form.email %}
+        {% else %}
+           {% include "sanza/_field_form.html" with field=form.username %}
+        {% endif %}
+
         {% include "sanza/_field_form.html" with field=form.password %}
 
-        <div class="row"><div class="col-md-6" style="margin-top: 20px;">
-            <a class="btn btn-default" href="{% url 'django.contrib.auth.views.password_reset' %}">
+        <div class="row" style="margin-top: 20px;">
+          <div class="col-md-9">
+            <a class="" href="{% url 'password_reset' %}">
                 {% trans "Forgotten Password" %}
             </a>
+          </div>
+
+          <div class="col-md-3">
             <input class="btn btn-primary" type="submit" value="{% trans 'Login' %}" />
-        </div></div>
+          </div>
+        </div>
     </form>
-    </div></div>
+</div></div>
 {% endblock %}
     

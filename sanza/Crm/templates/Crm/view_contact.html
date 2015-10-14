@@ -1,18 +1,18 @@
-{% extends "sanza/bs_base.html" %}
+{% extends template_base %}
 {% load i18n %}
+
+{% block extra_title %}{{ contact.fullname }}{% endblock %}
 
 {% block document_content %}
   
 {% include "Crm/_section_contact_info.html" %}
 
-{% include "Crm/_section_same_as.html" %}
+{% if not preview %}
 
-{% include "Crm/_section_actions_by_set.html" %}
+  {% include "Crm/_section_same_as.html" %}
 
-{% comment %}
-{% include "Crm/_section_opportunities.html" %}
-{% endcomment %}
+  {% include "Crm/_section_actions_by_set.html" %}
 
-
+{% endif %}
 
 {% endblock %}

@@ -2,14 +2,17 @@
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
 
 from sanza.Crm.models import Contact, EntityType
-from sanza.Crm.forms import ModelFormWithCity, FormWithCity
+from sanza.Crm.forms import ModelFormWithCity
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing.forms import SubscriptionTypeFormMixin
+from sanza.Profile.models import ContactProfile
+from sanza.settings import has_entity_on_registration_form, get_registration_accept_terms_of_use_link
 
 
 class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
@@ -28,27 +31,16 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     
     class Meta:
         model = Contact
-        exclude = ('uuid', 'same_as', 'imported_by', 'entity')
         fields = (
             'gender', 'lastname', 'firstname', 'birth_date', 'email', 'phone', 'mobile',
             'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'accept_notifications',
-            #'photo'
         )
 
-        fieldsets = [
-            ('name', {'fields': ['gender', 'lastname', 'firstname', 'birth_date'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['email', 'phone', 'mobile'], 'legend': _(u'Phone / Web')}),
-            ('address', {
-                'fields': ['address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country'],
-                'legend': _(u'Address')
-            }),
-            ('relationship', {'fields': ['accept_newsletter', 'accept_3rdparty'], 'legend': _(u'Relationship')}),
-            #('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
-        ]
+    def __init__(self, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+        self._add_subscription_types_field(contact=self.instance)
 
-        #TODO : Subscription Types
-        
 
 class EmailField(forms.EmailField):
 
@@ -61,42 +53,68 @@ class EmailField(forms.EmailField):
         return value
 
 
-class UserRegistrationForm(FormWithCity, SubscriptionTypeFormMixin):
+class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     email = EmailField(required=True, label=_(u"Email"), widget=forms.TextInput())
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
-    gender = forms.ChoiceField(_(u'gender'), required=False)
-    firstname = forms.CharField(required=False, label=_(u"Firstname"))
-    lastname = forms.CharField(required=False, label=_(u"Lastname"))
+
+    # gender = forms.ChoiceField(_(u'gender'), required=False)
+    # firstname = forms.CharField(required=False, label=_(u"Firstname"))
+    # lastname = forms.CharField(required=False, label=_(u"Lastname"))
+    #
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
     entity = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')})
+         required=False,
+         widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')})
     )
+
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
+
     accept_termofuse = forms.BooleanField(
-        label=_(u'Accept term of use'),
+        label=_(u'Accept terms of use'),
         help_text=_(u"Check for accepting the terms of use")
     )
 
-    #TODO : Subscription Types
+    city = forms.CharField(
+        required=False,
+        label=_(u'City'),
+        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+    )
+
+    class Meta:
+        model = ContactProfile
+        fields = (
+            'email', 'password1', 'password2', 'entity_type', 'entity', 'gender', 'firstname', 'lastname',
+            'phone', 'mobile', 'address',
+            'zip_code', 'city', 'cedex', 'country', 'groups', 'accept_termofuse'
+        )
 
     def __init__(self, *args, **kwargs):
         super(UserRegistrationForm, self).__init__(*args, **kwargs)
-        
-        for (name, field) in self.fields.items():
-            field.widget.attrs['placeholder'] = field.label
-            #if not (name.find('accept')==0):
-            if field.required:
-                field.widget.attrs['required'] = "required"
-        
-        self.fields['gender'].choices = ((0, u'----------'),)+Contact.GENDER_CHOICE[:2] #do not display Mrs and Mr
-        
-        self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
-            (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
-        ]
+
+        if 'gender' in self.fields:
+            #do not display Mrs and Mr
+            self.fields['gender'].choices = ((0, u'----------'), ) + Contact.GENDER_CHOICE[:2]
+
+        if 'entity_type' in self.fields:
+            self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
+                (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
+            ]
+        if not has_entity_on_registration_form():
+            self.fields['entity_type'].inital = 0
+            self.fields['entity_type'].widget = forms.HiddenInput()
+            self.fields['entity'].widget = forms.HiddenInput()
+
+        termsofuse_url = get_registration_accept_terms_of_use_link()
+        if 'accept_termofuse' in self.fields and termsofuse_url:
+            self.fields['accept_termofuse'].label = mark_safe(
+                ugettext(u'Accept <a href="{0}">terms of use</a>').format(
+                    termsofuse_url
+                )
+            )
+
         self._add_subscription_types_field()
-        
+
     def clean_entity(self, ):
         entity_type = self.cleaned_data.get('entity_type', None)
         entity = self.cleaned_data['entity']

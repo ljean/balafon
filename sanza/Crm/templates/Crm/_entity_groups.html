@@ -2,7 +2,7 @@
 <div class="groups-box">
   <div class="groups-header">
     <span class="groups-title">{% trans "Groups" %}</span>
-    <a class="btn btn-xs pull-right colorbox-form" href="{% url "crm_add_entity_to_group" entity.id %}">
+    <a class="btn btn-xs pull-right colorbox-form" href="{% url 'crm_add_entity_to_group' entity.id %}">
       <span class="glyphicon glyphicon-plus"></span> {% trans "Add to a group" %}
     </a>
   </div>
@@ -10,13 +10,22 @@
     <div class="col-md-12">
       <div class="data-groups">
         {% for g in groups.all %}
-          <span class="group-tag btn btn-xs btn-primary" title="{{g.description}}">
+          <span
+            class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+            style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+            title="{{g.description}}"
+          >
             {% spaceless %}
-            <a href="{% url "search_group" g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+            <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
             {% if entity %}
-              <a class="colorbox-form btn-close" href="{% url "crm_remove_entity_from_group" g.id entity.id %}" title="{% trans "Remove from group" %}">
+              <a
+                class="colorbox-form btn-close"
+                href="{% url 'crm_remove_entity_from_group' g.id entity.id %}"
+                title="{% trans 'Remove from group' %}"
+              >
                 <span class="glyphicon glyphicon-remove"></span>
-              </a>{% endif %}
+              </a>
+            {% endif %}
             {% endspaceless %}
           </span>
         {% endfor %}

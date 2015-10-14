@@ -1,14 +1,32 @@
-{% extends "registration/base.html" %}{% load i18n %}{% load url from future %}
+{% extends "registration/base.html" %}{% load i18n %}
+{% block extra_head %}
+  {{ block.super }}
+  <script>
+    $(function() {
+      $("#id_city").addClass('form-control');
+    });
+  </script>
+{% endblock %}
+
 {% block registration_content %}
 <h2>{% trans "Registration" %}</h2>
 <form class="registration-form" action="" method="POST">{% csrf_token %}
-<table>
-{{form.as_table}}
-<tr>
-    <td>&nbsp;</td>
-    <td><input type="submit" value="{% trans "Register" %}"/></td>
-</tr>
-</table>
+
+  {% if form.non_field_errors %}
+    {{form.non_field_errors}}
+  {% endif %}
+
+  {% for field in form %}
+    {% include "sanza/_field_form.html" with allow_required_sign=1 %}
+  {% endfor %}
+
+  <div class="row"><div class="col-sm-12">
+    <div class="help-block required">{% trans "* : Required fields" %}</div>
+  </div></div>
+
+  <div class="row"><div class="col-sm-3 col-sm-offset-9" style="margin-top: 20px;">
+    <input class="btn btn-primary pull-right" type="submit" value="{% trans 'Register' %}" />
+  </div></div>
 
 </form>
 {% endblock %}

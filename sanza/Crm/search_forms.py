@@ -4,7 +4,6 @@
 from datetime import date, timedelta
 
 from django.db.models import Q, Count
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 import floppyforms as forms
@@ -93,6 +92,32 @@ class EntityNameStartsWithSearchForm(SearchFieldForm):
     def get_lookup(self):
         """lookup"""
         return {'entity__name__istartswith': self.value}
+
+
+class AddressSearchForm(SearchFieldForm):
+    """by address contains"""
+
+    name = 'address'
+    label = _(u'Contact or entity at this address')
+
+    def __init__(self, *args, **kwargs):
+        super(AddressSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(
+            label=self.label,
+            widget=forms.TextInput(
+                attrs={'placeholder': _(u'Enter text contained in an address')}
+            )
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = self.value
+        return (
+            Q(address__icontains=value) | Q(address2__icontains=value) | Q(address3__icontains=value) |
+            Q(entity__address__icontains=value) | Q(entity__address2__icontains=value) |
+            Q(entity__address3__icontains=value)
+        )
 
 
 class HasEntityForm(YesNoSearchFieldForm):
@@ -494,7 +519,7 @@ class ActionByUser(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(ActionByUser, self).__init__(*args, **kwargs)
-        choices = [(u.id, unicode(u)) for u in User.objects.all()]
+        choices = [(team_member.id, team_member.name) for team_member in models.TeamMember.objects.all()]
         field = forms.ChoiceField(choices=choices, label=self.label)
         self._add_field(field)
         

@@ -12,16 +12,20 @@ from django.conf import settings as project_settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.template import TemplateDoesNotExist, Context
+from django.template.loader import get_template
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as __
 
+from coop_cms.utils import RequestManager, RequestNotFound, dehtml
 from django_extensions.db.models import TimeStampedModel
 from sorl.thumbnail import default as sorl_thumbnail
 
 from sanza.Crm import settings
-from sanza.utils import now_rounded
+from sanza.utils import now_rounded, logger, validate_rgb
 from sanza.Users.models import Favorite
 
 
@@ -34,7 +38,29 @@ class NamedElement(models.Model):
     
     class Meta:
         abstract = True
-    
+
+
+class LastModifiedModel(TimeStampedModel):
+    """track the user who last modified an object"""
+
+    last_modified_by = models.ForeignKey(
+        User, default=None, blank=True, null=True, verbose_name=_(u"last modified by")
+    )
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        """save object : update the last_modified_by from request"""
+        try:
+            request = RequestManager().get_request()
+            if request.user.is_authenticated():
+                #object can be modified by anonymous user : subscription page for example, view magic-link ...
+                self.last_modified_by = request.user
+        except (RequestNotFound, AttributeError):
+            pass
+        return super(LastModifiedModel, self).save(*args, **kwargs)
+
 
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
@@ -160,7 +186,105 @@ def get_entity_logo_dir(instance, filename):
     return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 
-class Entity(TimeStampedModel):
+class StreetType(NamedElement):
+    """A selection for street type"""
+
+    class Meta:
+        verbose_name = _(u'street type')
+        verbose_name_plural = _(u'street types')
+        ordering = ('name', )
+
+
+class AddressModel(LastModifiedModel):
+    """Base class for entity or contact"""
+
+    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
+    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
+    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+
+    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
+    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
+
+    #These fields are just kept for editing the address field
+    street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
+    street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'))
+
+    billing_address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
+    billing_address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
+    billing_address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+
+    billing_zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
+    billing_cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    billing_city = models.ForeignKey(
+        City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set'
+    )
+
+    #These fields are just kept for editing the address field
+    billing_street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
+    billing_street_type = models.ForeignKey(
+        StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'),
+        related_name='%(class)s_billing_set'
+    )
+
+    class Meta:
+        abstract = True
+
+    def get_full_address(self):
+        """join address fields"""
+        return u' '.join(self.get_address_fields())
+
+    def get_address_fields(self):
+        """address fields: address, cedex, zipcode, city..."""
+        if self.city:
+            fields = [
+                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
+            ]
+            country = self.city.get_foreign_country()
+            if country:
+                fields.append(country.name)
+            return [field for field in fields if field]
+        return []
+
+    def get_billing_address_fields(self):
+        """address fields: address, cedex, zipcode, city..."""
+        if self.billing_city:
+            fields = [
+                self.billing_address, self.billing_address2, self.billing_address3, u" ".join(
+                    [self.billing_zip_code, self.billing_city.name, self.billing_cedex]
+                )
+            ]
+            country = self.billing_city.get_foreign_country()
+            if country:
+                fields.append(country.name)
+            return [field for field in fields if field]
+        return []
+
+    def get_billing_address(self):
+        """join address fields"""
+        billing_address = u' '.join(self.get_billing_address_fields())
+        if not billing_address:
+            return self.get_full_address()
+        return billing_address
+
+    def has_billing_address(self):
+        """has a billing address"""
+        return len(self.get_billing_address_fields()) > 0
+
+    def get_country(self):
+        """country"""
+        return self.city.get_country() if self.city else None
+
+    def get_foreign_country(self):
+        """country if not default"""
+        return self.city.get_foreign_country() if self.city else None
+
+    def get_display_address(self):
+        """addresses"""
+        return self.get_full_address()
+
+
+class Entity(AddressModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
@@ -173,15 +297,7 @@ class Entity(TimeStampedModel):
     fax = models.CharField(_('fax'), max_length=200, blank=True, default=u'')
     email = models.EmailField(_('email'), blank=True, default=u'')
     website = models.CharField(_('web site'), max_length=200, blank=True, default='')
-    
-    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
-    
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
-    
+
     notes = models.TextField(_('notes'), blank=True, default="")
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
@@ -215,6 +331,24 @@ class Entity(TimeStampedModel):
     
     def __unicode__(self):
         return self.name
+
+    def get_view_url(self):
+        absolute_url = reverse('crm_view_entity', args=[self.id])
+        try:
+            return "//" + Site.objects.get_current().domain + absolute_url
+        except Site.objects.DoesNotExist:
+            return absolute_url
+
+    def get_preview_url(self):
+        """absolute_url in popup"""
+        return u"{0}?preview=1".format(self.get_absolute_url())
+
+    def get_email_address(self):
+        """email address"""
+        if self.name:
+            return u'"{1}" <{0}>'.format(self.email, self.name)
+        else:
+            return self.email
     
     def get_safe_logo(self):
         """get entity logo or default one"""
@@ -253,42 +387,15 @@ class Entity(TimeStampedModel):
         """url to the entity page"""
         return reverse('crm_view_entity', args=[self.id])
 
-    def get_full_address(self):
-        """join address fields"""
-        return u' '.join(self.get_address_fields())
-        
-    def get_address_fields(self):
-        """address fields: address, cedex, zipcode, city..."""
-        if self.city:
-            fields = [
-                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
-            ]
-            country = self.city.get_foreign_country()
-            if country:
-                fields.append(country.name)
-            return [f for f in fields if f]
-        return []
-    
-    def get_country(self):
-        """country"""
-        return self.city.get_country() if self.city else None
-    
-    def get_foreign_country(self):
-        """country if not default"""
-        return self.city.get_foreign_country() if self.city else None
-
     def get_phones(self):
         """phones"""
         return [self.phone]
-        
-    def get_display_address(self):
-        """addresses"""
-        return self.get_full_address()
-    
+
     def main_contacts(self):
         """all contacts of the entity with the 'main' flag checked"""
         return [
-            c for c in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")
+            contact
+            for contact in self.contact_set.filter(main_contact=True, has_left=False).order_by("lastname", "firstname")
         ]
     
     def last_action(self):
@@ -335,6 +442,22 @@ class Entity(TimeStampedModel):
         """logo thumbnail"""
         return sorl_thumbnail.backend.get_thumbnail(self.logo.file, "128x128", crop='center')
 
+    def set_custom_field(self, field_name, value, is_link=False):
+        """set the value of a custom field"""
+        field, is_new = CustomField.objects.get_or_create(model=CustomField.MODEL_ENTITY, name=field_name)
+        if is_new:
+            field.is_link = is_link
+            field.save()
+        field_value = EntityCustomFieldValue.objects.get_or_create(custom_field=field, entity=self)[0]
+        field_value.value = value
+        field_value.save()
+
+    def add_to_group(self, group_name):
+        """add to group"""
+        group = Group.objects.get_or_create(name=group_name)[0]
+        group.entities.add(self)
+        group.save()
+
     def get_custom_fields(self):
         """additional fields"""
         return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
@@ -350,7 +473,7 @@ class Entity(TimeStampedModel):
                 custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field=custom_field)
                 return custom_field_value.value
             except EntityCustomFieldValue.DoesNotExist:
-                return u'' #If no value defined: return empty string
+                return u''  # If no value defined: return empty string
         return object.__getattribute__(self, attr)
 
     class Meta:
@@ -410,7 +533,7 @@ class Relationship(TimeStampedModel):
         verbose_name_plural = _(u'relationships')
     
 
-class Contact(TimeStampedModel):
+class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
     GENDER_MALE = 1
     GENDER_FEMALE = 2
@@ -455,14 +578,6 @@ class Contact(TimeStampedModel):
     
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     
-    #optional : use the entity address in most cases
-    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
-    
     notes = models.TextField(_('notes'), blank=True, default="")
     
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
@@ -478,6 +593,20 @@ class Contact(TimeStampedModel):
     favorite_language = models.CharField(
         _("favorite language"), max_length=10, default="", blank=True, choices=settings.get_language_choices()
     )
+
+    def get_view_url(self):
+        if self.entity.is_single_contact:
+            absolute_url = reverse('crm_view_entity', args=[self.entity.id])
+        else:
+            absolute_url = reverse('crm_view_contact', args=[self.id])
+        try:
+            return "//" + Site.objects.get_current().domain + absolute_url
+        except Site.objects.DoesNotExist:
+            return absolute_url
+
+    def get_preview_url(self):
+        """absolute url in popup"""
+        return u"{0}?preview=1".format(self.get_absolute_url())
     
     def get_relationships(self):
         """get all retlationships for this contact"""
@@ -561,36 +690,6 @@ class Contact(TimeStampedModel):
         image_format = "64" if width > height else "x64"
         return sorl_thumbnail.backend.get_thumbnail(self.photo.file, image_format, crop='center')
 
-    def get_full_address(self):
-        """jojn address fields"""
-        return u' '.join(self.get_address_fields())
-    
-    def get_address_fields(self):
-        """get address fields: address, zip, city..."""
-        if self.city:
-            fields = [
-                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
-            ]
-            country = self.city.get_foreign_country()
-            if country:
-                fields.append(country.name)
-            return [f for f in fields if f]
-        return self.entity.get_address_fields()
-    
-    def get_country(self):
-        """country"""
-        if self.city:
-            return self.city.get_country()
-        if not self.entity.is_single_contact:
-            return self.entity.get_country()
-        
-    def get_foreign_country(self):
-        """country if fifferent from default"""
-        if self.city:
-            return self.city.get_foreign_country()
-        if not self.entity.is_single_contact:
-            return self.entity.get_foreign_country()
-    
     def get_custom_fields(self):
         """additional fields"""
         return CustomField.objects.filter(model=CustomField.MODEL_CONTACT)
@@ -608,13 +707,22 @@ class Contact(TimeStampedModel):
         """
         if attr[:4] == "get_":
             address_fields = ('address', 'address2', 'address3', 'zip_code', 'cedex', 'city')
+            billing_address_fields = (
+                'billing_address', 'billing_address2', 'billing_address3', 'billing_zip_code', 'billing_cedex',
+                'billing_city'
+            )
             field_name = attr[4:]
             if field_name in ('phone', 'email',):
                 mine = getattr(self, field_name)
                 return mine or getattr(self.entity, field_name)
             elif field_name in address_fields:
-                is_contact_address_defined = any([getattr(self, f) for f in address_fields])
+                is_contact_address_defined = any([getattr(self, field) for field in address_fields])
                 if is_contact_address_defined:
+                    return getattr(self, field_name)
+                return getattr(self.entity, field_name)
+            elif field_name in billing_address_fields:
+                is_billing_contact_address_defined = any([getattr(self, field) for field in address_fields])
+                if is_billing_contact_address_defined:
                     return getattr(self, field_name)
                 return getattr(self.entity, field_name)
             else:
@@ -622,12 +730,12 @@ class Contact(TimeStampedModel):
                 prefix_length = len(prefix)
                 if field_name[:prefix_length] == prefix:
                     value = getattr(self, field_name)
-                    if not value: #if no value for the custom field
+                    if not value:  # if no value for the custom field
                         try:
-                            #Try to get a value for a custom field with same name on entity
+                            # Try to get a value for a custom field with same name on entity
                             value = getattr(self.entity, field_name)
                         except CustomField.DoesNotExist:
-                            #No custom field with same name on entity: returns empty string
+                            # No custom field with same name on entity: returns empty string
                             pass
                     return value
         else:
@@ -640,12 +748,12 @@ class Contact(TimeStampedModel):
                     custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
                 except ContactCustomFieldValue.DoesNotExist:
-                    return u'' #If no value defined: return empty string
+                    return u''  # If no value defined: return empty string
             else:
                 entity_prefix = "entity_"
                 full_prefix = entity_prefix + prefix
-                if attr[:len(full_prefix)] == full_prefix: # if the attr is entity_custom_field_<something>
-                    #return self.entity.custom_field_<something>
+                if attr[:len(full_prefix)] == full_prefix:  # if the attr is entity_custom_field_<something>
+                    # return self.entity.custom_field_<something>
                     return getattr(self.entity, attr[len(entity_prefix):])
 
         return object.__getattribute__(self, attr)
@@ -654,9 +762,45 @@ class Contact(TimeStampedModel):
         """url to contact page"""
         return reverse('crm_view_contact', args=[self.id])
 
+    def get_address_fields(self):
+        """get address fields: address, zip, city..."""
+        fields = super(Contact, self).get_address_fields()
+        if fields:
+            return fields
+        else:
+            return self.entity.get_address_fields()
+
+    def get_country(self):
+        """country"""
+        country = super(Contact, self).get_country()
+        if country:
+            return country
+        elif not self.entity.is_single_contact:
+            return self.entity.get_country()
+
+    def get_billing_address(self):
+        """billing address"""
+        billing_address = super(Contact, self).get_billing_address()
+        if billing_address:
+            return billing_address
+        elif not self.entity.is_single_contact:
+            return self.entity.get_billing_address()
+
+    def get_foreign_country(self):
+        """country if different from default"""
+        country = super(Contact, self).get_foreign_country()
+        if country:
+            return country
+        elif not self.entity.is_single_contact:
+            return self.entity.get_foreign_country()
+
+
     def get_email_address(self):
         """email address"""
-        return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
+        if self.lastname or self.firstname:
+            return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
+        else:
+            return self.get_email
         
     def get_phones(self):
         """list of phones"""
@@ -692,9 +836,9 @@ class Contact(TimeStampedModel):
         """fullname"""
         if not (self.firstname or self.lastname):
             if self.email:
-                return self.email
+                return self.email.strip()
             else:
-                return u"< {0} >".format(__(u"Unknown"))
+                return u"< {0} >".format(__(u"Unknown")).strip()
         
         if self.gender and self.lastname:
             title = u'{0} '.format(self.get_gender_display())
@@ -702,9 +846,31 @@ class Contact(TimeStampedModel):
             title = u''
         
         if (not self.firstname) or (not self.lastname):
-            return _(u"{1}{0.firstname}{0.lastname}").format(self, title)
-        
-        return _(u"{1}{0.firstname} {0.lastname}").format(self, title)
+            return _(u"{1}{0.firstname}{0.lastname}").format(self, title).strip()
+
+        return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
+
+    def set_custom_field(self, field_name, value, is_link=False):
+        """set the value of a custom field"""
+        field, is_new = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)
+        if is_new:
+            field.is_link = is_link
+            field.save()
+        field_value = ContactCustomFieldValue.objects.get_or_create(custom_field=field, contact=self)[0]
+        field_value.value = value
+        field_value.save()
+
+    def get_custom_field(self, field_name):
+        """get the value of a custom field"""
+        field = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)[0]
+        field_value = ContactCustomFieldValue.objects.get_or_create(custom_field=field, contact=self)[0]
+        return field_value.value
+
+    def add_to_group(self, group_name):
+        """add to group"""
+        group = Group.objects.get_or_create(name=group_name)[0]
+        group.contacts.add(self)
+        group.save()
 
     def save(self, *args, **kwargs):
         """save"""
@@ -771,6 +937,14 @@ class Group(TimeStampedModel):
         default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This group will be proposed on the public subscribe form')
     )
+    fore_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Fore color'),
+        help_text=_(u"Fore color. Must be a rgb code. For example: #ffffff")
+    )
+    background_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Background color'),
+        help_text=_(u"Background color. Must be a rgb code. For example: #000000")
+    )
     
     favorites = GenericRelation(Favorite)
 
@@ -830,7 +1004,7 @@ class Opportunity(TimeStampedModel):
     probability = models.IntegerField(
         _('probability'), default=PROBABILITY_MEDIUM, choices=PROBABILITY_CHOICES
     )
-    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    amount = models.DecimalField(_(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2)
     #----------------
     ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
     #TO BE REMOVED---
@@ -919,18 +1093,107 @@ class ActionType(NamedElement):
         default=True,
         help_text=_(u'If default_template is set, define if the template has a editable content')
     )
+    action_template = models.CharField(
+        _(u'action template'), max_length=200, blank=True, default="",
+        help_text=_(u'Action of this type will be displayed using the given template')
+    )
+    order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
+    is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
+    next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
+    not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_(u"Not assigned when cloned"))
+    generate_uuid = models.BooleanField(default=False, verbose_name=_(u"Generate UUID for action"))
 
     def status_defined(self):
         """true if a status is defined for this type"""
         return self.allowed_status.count() > 0
     status_defined.short_description = _(u"Status defined")
+
+    def save(self, *args, **kwargs):
+        """save: create the corresponding menu"""
+        ret = super(ActionType, self).save(*args, **kwargs)
+        if self.id:
+            if self.next_action_types.count():
+                ActionMenu.create_action_menu(
+                    action_type=self,
+                    view_name='crm_clone_action',
+                    label=__('Duplicate'),
+                    icon='duplicate',
+                    a_attrs='class="colorbox-form"'
+                )
+            else:
+                ActionMenu.objects.filter(action_type=self, view_name='crm_clone_action').delete()
+
+            #update action uuid if needed
+            for action in self.action_set.all():
+                if self.generate_uuid:
+                    if not action.uuid:
+                        action.save()  # force uuid to be generated
+                else:
+                    if action.uuid:
+                        action.uuid = ''
+                        action.save()  # force uuid to be empty
+
+        return ret
     
     class Meta:
         verbose_name = _(u'action type')
         verbose_name_plural = _(u'action types')
+        ordering = ['order_index', 'name']
 
 
-class Action(TimeStampedModel):
+class TeamMember(models.Model):
+    """A member of the team : can be in charge of actions"""
+    user = models.OneToOneField(User, default=None, blank=True, null=True, verbose_name=_(u"user"))
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    active = models.BooleanField(default=True, verbose_name=(_(u"active")))
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _(u'team member')
+        verbose_name_plural = _(u'team members')
+
+
+class ActionMenu(models.Model):
+    """A menu to add to every action of this type"""
+
+    action_type = models.ForeignKey(ActionType, verbose_name=_(u'Action type'))
+    view_name = models.CharField(_(u'view_name'), max_length=200)
+    icon = models.CharField(_(u'icon'), max_length=30, default="", blank=True)
+    label = models.CharField(_(u'label'), max_length=200)
+    a_attrs = models.CharField(
+        max_length=50,
+        verbose_name=_(u"Link args"),
+        blank=True,
+        default="",
+        help_text=_(u'Example: class="colorbox-form" for colorbos display')
+    )
+    order_index = models.IntegerField(default=0, verbose_name=_(u"order_index"))
+    only_for_status = models.ManyToManyField(ActionStatus, blank=True)
+
+    class Meta:
+        verbose_name = _(u'action menu')
+        verbose_name_plural = _(u'action menus')
+        ordering = ['order_index']
+
+    @classmethod
+    def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs=''):
+        queryset = ActionMenu.objects.filter(action_type=action_type, view_name=view_name)
+        if not queryset.exists():
+            return ActionMenu.objects.create(
+                view_name=view_name,
+                action_type=action_type,
+                label=label or view_name,
+                icon=icon,
+                a_attrs=a_attrs
+            )
+
+    def __unicode__(self):
+        return self.label
+
+
+class Action(LastModifiedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
     PRIORITY_MEDIUM = 2
@@ -953,14 +1216,12 @@ class Action(TimeStampedModel):
     opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
     done = models.BooleanField(_(u'done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
-    in_charge = models.ForeignKey(
-        User, verbose_name=_(u'in charge'),
-        blank=True, null=True, default=None,
-        limit_choices_to={'is_staff': True, 'first_name__regex': '.+'}
-    )
+    in_charge = models.ForeignKey(TeamMember, verbose_name=_(u'in charge'), blank=True, null=True, default=None)
     display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
-    amount = models.DecimalField(_(u'amount'), default=0, max_digits=11, decimal_places=2)
+    amount = models.DecimalField(
+        _(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2
+    )
     number = models.IntegerField(
         _(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.')
     )
@@ -969,6 +1230,8 @@ class Action(TimeStampedModel):
     entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
     favorites = GenericRelation(Favorite)
     end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
+    parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
+    uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
@@ -980,7 +1243,41 @@ class Action(TimeStampedModel):
     def has_editable_document(self):
         """true if an editable doc is linked to this action"""
         return self.type and self.type.default_template and self.type.is_editable
-        
+
+    def get_action_template(self):
+        if self.type and self.type.action_template:
+            try:
+                #Check if the template exists but return its name
+                get_template(self.type.action_template)
+                return self.type.action_template
+            except TemplateDoesNotExist:
+                message = u"get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
+                logger.warning(message)
+        return 'Crm/_action.html'
+
+    def get_recipients(self, html=True):
+        """returns contacts and entites as html code. Use template for easy customization"""
+        template_file = get_template("Crm/_actions/recipients.html")
+        text = template_file.render(Context({'action': self}))
+        if not html:
+            text = dehtml(text)
+        return text
+
+    def get_action_number(self):
+        if self.type and self.number:
+            return u'{0} {1}'.format(self.type.name, self.number)
+        return ''
+
+    def get_menus(self):
+        if self.type:
+            queryset = ActionMenu.objects.filter(action_type=self.type)
+            if self.status:
+                queryset = queryset.filter(
+                    Q(only_for_status=self.status) | Q(only_for_status__isnull=True)
+                )
+            return queryset
+        return ActionMenu.objects.none()
+
     def save(self, *args, **kwargs):
         """save"""
         if not self.done_date and self.done:
@@ -992,8 +1289,80 @@ class Action(TimeStampedModel):
         if self.number == 0 and self.type and self.type.number_auto_generated:
             self.number = self.type.last_number = self.type.last_number + 1
             self.type.save()
-            
-        return super(Action, self).save(*args, **kwargs)
+
+        ret = super(Action, self).save(*args, **kwargs)
+
+        if self.type:
+            if self.type.generate_uuid and not self.uuid:
+                name = u'{0}-action-{1}-{2}'.format(
+                    project_settings.SECRET_KEY, self.id, self.type.id if self.type else 0
+                )
+                name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
+                self.uuid = unicode(uuid.uuid5(uuid.NAMESPACE_URL, name))
+                super(Action, self).save()
+
+            if not self.type.generate_uuid and self.uuid:
+                self.uuid = ''
+                super(Action, self).save()
+
+        return ret
+
+    def clone(self, new_type):
+        """Create a new action with same values but different types"""
+        new_action = Action(parent=self)
+
+        attrs_to_clone = [
+            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'amount', 'end_datetime'
+        ]
+
+        if not new_type.not_assigned_when_cloned:
+            attrs_to_clone += ['in_charge', ]
+
+        for attr in attrs_to_clone:
+            setattr(new_action, attr, getattr(self, attr))
+        new_action.type = new_type
+        new_action.status = new_type.default_status
+        new_action.save()
+
+        for contact in self.contacts.all():
+            new_action.contacts.add(contact)
+
+        for entity in self.entities.all():
+            new_action.entities.add(entity)
+        new_action.save()
+        return new_action
+
+    @property
+    def mail_to(self):
+        """returns a mailto link"""
+        unique_emails = sorted(list(set(
+            [
+                contact.get_email_address() for contact in self.contacts.all() if contact.get_email
+            ] + [
+                entity.get_email_address() for entity in self.entities.all() if entity.email
+            ]
+        )))
+
+        if not unique_emails:
+            return u""
+
+        body = u""
+        if self.uuid and hasattr(self, 'sale'):
+            try:
+                url = reverse('store_view_sales_document_public', args=[self.uuid])
+                body = __(u"Here is a link to your {0}: {1}{2}").format(
+                    self.type.name,
+                    "http://" + Site.objects.get_current().domain,
+                    url
+                )
+            except ObjectDoesNotExist:
+                pass
+
+        return u"mailto:{0}?subject={1}&body={2}".format(
+            u",".join(unique_emails),
+            self.subject,
+            body
+        )
 
 
 class ActionDocument(models.Model):
@@ -1043,6 +1412,7 @@ class CustomField(models.Model):
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
     import_order = models.IntegerField(verbose_name=_(u'import ordering'), default=0)
     export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
+    is_link = models.BooleanField(default=False, verbose_name=_(u'is link'))
     
     def __unicode__(self):
         return _(u"{0}:{1}").format(self.model_name(), self.name)

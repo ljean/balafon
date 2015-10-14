@@ -33,6 +33,12 @@ class ContactAutoComplete(forms.HiddenInput):
     template_name = 'forms/contact_autocomplete.html'
 
 
+class ContactOrEntityAutoComplete(forms.HiddenInput):
+    input_type = 'text'
+    is_hidden = False
+    template_name = 'forms/contact_or_entity_autocomplete.html'
+
+
 class GroupAutoComplete(forms.HiddenInput):
     input_type = 'text'
     is_hidden = False

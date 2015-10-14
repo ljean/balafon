@@ -148,3 +148,180 @@ class CustomFieldTest(BaseTestCase):
 
         entity_custom_field_toto = lambda: contact.entity.custom_field_toto
         self.assertRaises(models.CustomField.DoesNotExist, entity_custom_field_toto)
+
+
+class SetFieldTest(BaseTestCase):
+    """Test the set_custom_field methods"""
+
+    def test_set_entity(self):
+        """it should create custom field and value"""
+        entity = mommy.make(models.Entity)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        entity.set_custom_field('toto', '1')
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_ENTITY, custom_field.model)
+        self.assertEqual('toto', custom_field.name)
+        self.assertEqual(False, custom_field.is_link)
+
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        entity.set_custom_field('toto', '2')
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity
+        )
+        self.assertEqual(custom_field_value.value, '2')
+
+    def test_set_entity_link(self):
+        """it should create custom field and value"""
+        entity = mommy.make(models.Entity)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        entity.set_custom_field('toto', '1', is_link=True)
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_ENTITY, custom_field.model)
+        self.assertEqual('toto', custom_field.name)
+        self.assertEqual(True, custom_field.is_link)
+
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        entity.set_custom_field('toto', '2')
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity
+        )
+        self.assertEqual(custom_field_value.value, '2')
+
+    def test_set_existing_entity(self):
+        """it should create 1custom field and 2 values"""
+
+        entity1 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        entity1.set_custom_field('toto', '1')
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_ENTITY, custom_field.model)
+
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity1
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        self.assertEqual(
+            0,
+            models.EntityCustomFieldValue.objects.filter(custom_field=custom_field, entity=entity2).count()
+        )
+
+        entity2.set_custom_field('toto', '2')
+
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity1
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        custom_field_value = models.EntityCustomFieldValue.objects.get(
+            custom_field=custom_field, entity=entity2
+        )
+        self.assertEqual(custom_field_value.value, '2')
+
+    def test_set_contact(self):
+        """it should create custom field and value"""
+        contact = mommy.make(models.Contact)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        contact.set_custom_field('toto', '1')
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_CONTACT, custom_field.model)
+        self.assertEqual('toto', custom_field.name)
+        self.assertEqual(False, custom_field.is_link)
+
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        contact.set_custom_field('toto', '2')
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact
+        )
+        self.assertEqual(custom_field_value.value, '2')
+
+    def test_set_contact_link(self):
+        """it should create custom field and value"""
+        contact = mommy.make(models.Contact)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        contact.set_custom_field('toto', '1', is_link=True)
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_CONTACT, custom_field.model)
+        self.assertEqual('toto', custom_field.name)
+        self.assertEqual(True, custom_field.is_link)
+
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        contact.set_custom_field('toto', '2')
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact
+        )
+        self.assertEqual(custom_field_value.value, '2')
+
+    def test_set_existing_contact(self):
+        """it should create 1custom field and 2 values"""
+
+        contact1 = mommy.make(models.Contact)
+        contact2 = mommy.make(models.Contact)
+
+        self.assertEqual(0, models.CustomField.objects.count())
+
+        contact1.set_custom_field('toto', '1')
+        self.assertEqual(1, models.CustomField.objects.count())
+
+        custom_field = models.CustomField.objects.all()[0]
+        self.assertEqual(models.CustomField.MODEL_CONTACT, custom_field.model)
+
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact1
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        self.assertEqual(
+            0,
+            models.ContactCustomFieldValue.objects.filter(custom_field=custom_field, contact=contact2).count()
+        )
+
+        contact2.set_custom_field('toto', '2')
+
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact1
+        )
+        self.assertEqual(custom_field_value.value, '1')
+
+        custom_field_value = models.ContactCustomFieldValue.objects.get(
+            custom_field=custom_field, contact=contact2
+        )
+        self.assertEqual(custom_field_value.value, '2')
+

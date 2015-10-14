@@ -58,6 +58,11 @@ def get_entity_id(request):
 def view_entity(request, entity_id):
     """view"""
 
+    try:
+        preview = bool(request.GET.get('preview', False))
+    except ValueError:
+        preview = False
+
     entity = get_object_or_404(models.Entity, id=entity_id)
     contacts = entity.contact_set.all().order_by("has_left", "-main_contact", "lastname", "firstname")
 
@@ -75,6 +80,8 @@ def view_entity(request, entity_id):
         'contacts': contacts,
         'actions_by_set': actions_by_set,
         'multi_user': multi_user,
+        'preview': preview,
+        'template_base': "sanza/bs_base.html" if not preview else "sanza/bs_base_raw.html"
     }
 
     return render_to_response(

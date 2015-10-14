@@ -58,7 +58,7 @@
   {% block header_bar %}
   {% include "sanza/_bs_navigation.html" %}
   {% endblock %}
-  <div class="container" style="padding-top: 70px;">
+  <div class="container" {% if not preview %}style="padding-top: 70px;"{% endif %}>
   {% block main %}
     {% include "coop_cms/_messages.html" %}
     
@@ -72,10 +72,11 @@
     {% block footer %}
     <footer>
     </footer>
-    {% endblock %}
     <div class="row"><div class="col-md-12">
         <div class="version pull-right">Sanza {{ SANZA_VERSION }}</div>
     </div></div>
+    {% endblock %}
+
   {% endblock %}
   </div>
 </body>

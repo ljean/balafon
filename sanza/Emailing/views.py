@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context
 from django.template.loader import get_template
@@ -29,8 +29,8 @@ from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
 from sanza.Emailing import models, forms
-from sanza.Emailing.utils import get_emailing_context
-from sanza.Emailing.utils import send_verification_email, EmailSendError, patch_emailing_html
+from sanza.Emailing.settings import is_subscribe_enabled, is_email_subscribe_enabled
+from sanza.Emailing.utils import get_emailing_context, send_verification_email, EmailSendError, patch_emailing_html
 
 
 @user_passes_test(can_access)
@@ -382,7 +382,16 @@ class SubscribeView(View):
     def get_template(self):
         """get template"""
         return self.template_name
-    
+
+    def is_enabled(self):
+        return is_subscribe_enabled()
+
+    def dispatch(self, request, *args, **kwargs):
+        """make possible to disable this view from settings"""
+        if not self.is_enabled():
+            raise Http404
+        return super(SubscribeView, self).dispatch(request, *args, **kwargs)
+
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_done', args=[contact.uuid])
@@ -448,7 +457,10 @@ class SubscribeView(View):
 class EmailSubscribeView(SubscribeView):
     """Just a email field for newsletter subscription"""
     template_name = 'Emailing/public/subscribe_email.html'
-    
+
+    def is_enabled(self):
+        return is_email_subscribe_enabled()
+
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_email_done')

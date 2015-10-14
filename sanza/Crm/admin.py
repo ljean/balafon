@@ -16,6 +16,7 @@ admin.site.register(models.Zone, ZoneAdmin)
 admin.site.register(models.EntityRole)
 admin.site.register(models.SameAs)
 admin.site.register(models.OpportunityType)
+admin.site.register(models.ActionMenu)
 
 
 class EntityTypeAdmin(admin.ModelAdmin):
@@ -38,9 +39,9 @@ class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated',
-        'default_template', 'is_editable'
+        'default_template', 'is_editable',
     ]
-    list_filter = ['set', 'subscribe_form', 'number_auto_generated', 'default_template']
+    list_filter = ['set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template']
     list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated']
 
 admin.site.register(models.ActionType, ActionTypeAdmin)
@@ -163,3 +164,7 @@ class RelationshipAdmin(admin.ModelAdmin):
 admin.site.register(models.Relationship, RelationshipAdmin)
 
 admin.site.register(models.SubscriptionType)
+
+admin.site.register(models.TeamMember)
+
+admin.site.register(models.StreetType)

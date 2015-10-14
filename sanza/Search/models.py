@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel, AutoSlugField
-from django.contrib.auth.models import User
-from datetime import date
-from django.contrib.contenttypes.generic import GenericRelation
+
+from django_extensions.db.models import TimeStampedModel
+
 from sanza.Users.models import Favorite
 
+
 class Search(TimeStampedModel):
+    """A search"""
     name = models.CharField(_('name'), max_length=100)
     
     favorites = GenericRelation(Favorite)
@@ -20,7 +22,9 @@ class Search(TimeStampedModel):
         verbose_name = _(u'search')
         verbose_name_plural = _(u'searchs')
 
+
 class SearchGroup(models.Model):
+    """blocks"""
     search = models.ForeignKey(Search, verbose_name=_('search'))
     name = models.CharField(_('name'), max_length=100)
     
@@ -31,7 +35,9 @@ class SearchGroup(models.Model):
         verbose_name = _(u'search group')
         verbose_name_plural = _(u'search groups')
 
+
 class SearchField(models.Model):
+    """fields"""
     search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'))
     field = models.CharField(_('field'), max_length=100)
     value = models.CharField(_('value'), max_length=200)

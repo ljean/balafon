@@ -5,6 +5,9 @@ if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
+from bs4 import BeautifulSoup
+import json
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -464,24 +467,537 @@ class GroupSuggestListTestCase(BaseTestCase):
         self.assertTrue(response['Location'].find(login_url) > 0)
 
 
+class ContactAndEntitySuggestListTestCase(BaseTestCase):
+    """"""
+    view_name = 'crm_get_contact_or_entity'
+
+    def test_get_contact_and_entity(self):
+        """It should return contact and entity"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        entity2 = mommy.make(models.Entity, name=u"Rab")
+        contact2 = entity2.default_contact
+        contact2.lastname = u'Plabo'
+        contact2.save()
+
+        entity3 = mommy.make(models.Entity, name=u"ABO")
+        contact3 = entity3.default_contact
+        contact3.lastname = u'Wab'
+        contact3.save()
+
+        entity4 = mommy.make(models.Entity, name="Waw")
+        contact4 = entity4.default_contact
+        contact4.lastname = u'Aby'
+        contact4.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=ab')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        self.assertEqual(len(data), 4)
+
+        self.assertEqual(data[0]['name'], 'Abbes')
+        self.assertEqual(data[1]['name'], 'Abc')
+        self.assertEqual(data[2]['name'], 'ABO')
+        self.assertEqual(data[3]['name'], 'Aby')
+
+        self.assertEqual(data[0]['type_and_id'], 'contact#'+str(contact1.id))
+        self.assertEqual(data[1]['type_and_id'], 'entity#'+str(entity1.id))
+        self.assertEqual(data[2]['type_and_id'], 'entity#'+str(entity3.id))
+        self.assertEqual(data[3]['type_and_id'], 'contact#'+str(contact4.id))
+
+    def test_get_contact_and_entity_empty(self):
+        """It should return empty"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        entity2 = mommy.make(models.Entity, name=u"Rab")
+        contact2 = entity2.default_contact
+        contact2.lastname = u'Plabo'
+        contact2.save()
+
+        entity3 = mommy.make(models.Entity, name=u"ABO")
+        contact3 = entity3.default_contact
+        contact3.lastname = u'Wab'
+        contact3.save()
+
+        entity4 = mommy.make(models.Entity, name="Waw")
+        contact4 = entity4.default_contact
+        contact4.lastname = u'Aby'
+        contact4.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        self.assertEqual(len(data), 0)
+
+    def test_get_contact_and_entity_invalid_url(self):
+        """It should return empty"""
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?zz=Ab')
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+
+        self.assertEqual(len(data), 0)
+
+    def test_get_contact_and_entity_anonymous(self):
+        """It should return error"""
+
+        self.client.logout()
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+    def test_get_contact_and_entity_forbidden(self):
+        """It should return error"""
+
+        self.user.is_staff = False
+        self.user.save()
+
+        entity1 = mommy.make(models.Entity, name=u"Abc")
+        contact1 = entity1.default_contact
+        contact1.lastname = u'Abbes'
+        contact1.save()
+
+        response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+
 class GetGroupsListTestCase(GroupSuggestListTestCase):
     view_name = 'crm_get_groups'
 
 
 class EditGroupTestCase(BaseTestCase):
+    """test edit group"""
+
     def test_view_edit_group(self):
-        g = mommy.make(models.Group)
-        response = self.client.get(reverse('crm_edit_group', args=[g.id]))
+        """it should display the edit group page"""
+        group = mommy.make(models.Group)
+        response = self.client.get(reverse('crm_edit_group', args=[group.id]))
         self.assertEqual(200, response.status_code)
 
     def test_edit_group(self):
-        g = mommy.make(models.Group)
+        """it should modify the group"""
+        group = mommy.make(models.Group)
         data = {
             'name': 'my group name',
             'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
         }
-        response = self.client.post(reverse('crm_edit_group', args=[g.id]), data=data)
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
-        g = models.Group.objects.get(id=g.id)
-        self.assertEqual(g.name, data['name'])
-        self.assertEqual(g.description, data['description'])
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_fore_color(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '#ccc',
+            'background_color': '',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_background_color(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '#123456',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_invalid_color(self):
+        """it should not modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': 'hello',
+            'background_color': '#123456',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        errors = soup.select('ul.errorlist li')
+        self.assertEqual(len(errors), 1)
+
+        group = models.Group.objects.get(id=group.id)
+        self.assertNotEqual(group.name, data['name'])
+        self.assertNotEqual(group.description, data['description'])
+        self.assertNotEqual(group.fore_color, data['fore_color'])
+        self.assertNotEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_invalid_background_color(self):
+        """it should not modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '#123',
+            'background_color': 'hello',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        errors = soup.select('ul.errorlist li')
+        self.assertEqual(len(errors), 1)
+
+        group = models.Group.objects.get(id=group.id)
+        self.assertNotEqual(group.name, data['name'])
+        self.assertNotEqual(group.description, data['description'])
+        self.assertNotEqual(group.fore_color, data['fore_color'])
+        self.assertNotEqual(group.background_color, data['background_color'])
+
+    def test_edit_group_add_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0}]'.format(contact.id),
+            'entities': '[{0}]'.format(entity.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(list(group.entities.all()), [entity])
+
+    def test_edit_group_add_several_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact1 = mommy.make(models.Contact)
+        contact2 = mommy.make(models.Contact)
+        entity1 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0},{1}]'.format(contact1.id, contact2.id),
+            'entities': '[{0},{1}]'.format(entity1.id, entity2.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all().order_by('id')), [contact1, contact2])
+        self.assertEqual(list(group.entities.all().order_by('id')), [entity1, entity2])
+
+    def test_edit_group_remove_members(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        contact1 = mommy.make(models.Contact)
+        contact2 = mommy.make(models.Contact)
+        entity1 = mommy.make(models.Entity)
+        entity2 = mommy.make(models.Entity)
+
+        group.contacts.add(contact1)
+        group.contacts.add(contact2)
+        group.entities.add(entity1)
+        group.entities.add(entity2)
+
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'contacts': '[{0}]'.format(contact1.id),
+            'entities': '[{0}]'.format(entity2.id),
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(list(group.contacts.all().order_by('id')), [contact1])
+        self.assertEqual(list(group.entities.all().order_by('id')), [entity2])
+
+
+class AddToGroupTest(BaseTestCase):
+    """Test the add_group methods"""
+
+    def test_add_entity_to_new_group(self):
+        """it should create group and add the entity to it"""
+        entity = mommy.make(models.Entity)
+
+        self.assertEqual(0, models.Group.objects.count())
+
+        entity.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.entities.count(), 1)
+        self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.contacts.count(), 0)
+
+    def test_add_entity_to_existing_group(self):
+        """it should add the entity to existing group"""
+        entity = mommy.make(models.Entity)
+
+        mommy.make(models.Group, name='toto')
+
+        entity.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.entities.count(), 1)
+        self.assertEqual(list(group.entities.all()), [entity])
+        self.assertEqual(group.contacts.count(), 0)
+
+    def test_add_contact_to_new_group(self):
+        """it should create group and add the entity to it"""
+        contact = mommy.make(models.Contact)
+
+        self.assertEqual(0, models.Group.objects.count())
+
+        contact.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.contacts.count(), 1)
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(group.entities.count(), 0)
+
+    def test_add_contact_to_existing_group(self):
+        """it should add the entity to existing group"""
+        contact = mommy.make(models.Contact)
+
+        mommy.make(models.Group, name='toto')
+
+        contact.add_to_group('toto')
+        self.assertEqual(1, models.Group.objects.count())
+
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, 'toto')
+        self.assertEqual(group.contacts.count(), 1)
+        self.assertEqual(list(group.contacts.all()), [contact])
+        self.assertEqual(group.entities.count(), 0)
+
+
+class SelectContactOrEntityGroupTestCase(BaseTestCase):
+    """test select contact or entity"""
+
+    def test_view_select_contact_or_entity(self):
+        """it should return Ok"""
+        response = self.client.get(reverse('crm_select_contact_or_entity'))
+        self.assertEqual(200, response.status_code)
+
+    def test_post_select_entity(self):
+        """it should return js code"""
+        entity = mommy.make(models.Entity, name="Abc")
+        data = {
+            'object_id': entity.id,
+            'object_type': 'entity',
+            'name': entity.name
+        }
+
+        expected_data = {
+            'id': entity.id,
+            'type': 'entity',
+            'name': entity.name,
+            'url': entity.get_preview_url(),
+        }
+        json_data = json.dumps(expected_data)
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(
+            response.content,
+            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                json_data, 'entity', entity.id
+            )
+        )
+
+    def test_post_select_contact(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_preview_url(),
+        }
+        json_data = json.dumps(expected_data)
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(
+            response.content,
+            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                json_data, 'contact', contact.id
+            )
+        )
+
+    def test_post_select_invalid_type(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'woo',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_absolute_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_invalid_id(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': 'AA',
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_preview_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_unknown_id(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id+1,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        expected_data = {
+            'id': contact.id,
+            'type': 'contact',
+            'name': contact.fullname,
+            'url': contact.get_preview_url(),
+        }
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_post_select_contact_anonymous(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        self.client.logout()
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)
+
+    def test_post_select_contact_not_allowed(self):
+        """it should return js code"""
+        contact = mommy.make(models.Contact, lastname="Abc", firstname='Joe')
+        data = {
+            'object_id': contact.id,
+            'object_type': 'contact',
+            'name': contact.fullname
+        }
+
+        self.user.is_staff = False
+        self.user.save()
+
+        response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
+        self.assertEqual(302, response.status_code)
+        login_url = reverse('django.contrib.auth.views.login')[3:]
+        self.assertTrue(response['Location'].find(login_url) > 0)

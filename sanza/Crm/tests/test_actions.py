@@ -1,15 +1,21 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
+
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-branches
+
 from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
 from bs4 import BeautifulSoup
+from decimal import Decimal
 from datetime import datetime, timedelta
+
 import json
 
-from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
@@ -227,7 +233,7 @@ class EditActionTest(BaseTestCase):
         data = {
             'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "", 'end_time': "", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -249,7 +255,7 @@ class EditActionTest(BaseTestCase):
         data = {
             'date': "2014-04-09", 'time': "12:25", 'planned_date': "", 'end_date': "", 'end_time': "",
             'end_datetime': "", 'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "",
-            'detail': "", 'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'detail': "", 'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -271,7 +277,7 @@ class EditActionTest(BaseTestCase):
         data = {
             'date': "", 'time': "12:25", 'planned_date': "", 'end_date': "", 'end_time': "", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -296,7 +302,7 @@ class EditActionTest(BaseTestCase):
         data = {
             'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-10", 'end_time': "",
             'end_datetime': "", 'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "",
-            'detail': "", 'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'detail': "", 'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -318,7 +324,7 @@ class EditActionTest(BaseTestCase):
         data = {
             'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "",
             'end_datetime': "", 'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "",
-            'detail': "", 'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'detail': "", 'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -333,7 +339,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
         self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 0, 0))
 
-    def test_edit_action_start_and_end_same_date_different_time(self):
+    def test_edit_action_start_and_end_different_time(self):
         """edit action start and end at same date different time"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -341,7 +347,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "14:00", 'planned_date': "", 'end_date': "2014-04-09",
             'end_time': "16:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -356,14 +362,14 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, datetime(2014, 4, 9, 14, 0))
         self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 16, 0))
 
-    def test_edit_action_start_and_end_same_date_different_time2(self):
+    def test_edit_action_start_and_end_different_time2(self):
         """edit action start and end at same date different time"""
         action = mommy.make(models.Action, subject="AAA")
 
         data = {
             'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "16:00",
             'end_datetime': "", 'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "",
-            'detail': "",  'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'detail': "",  'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -378,7 +384,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, datetime(2014, 4, 9, 0, 0))
         self.assertEqual(action.end_datetime, datetime(2014, 4, 9, 16, 0))
 
-    def test_edit_action_start_and_end_same_date_different_time3(self):
+    def test_edit_action_start_and_end_different_time3(self):
         """edit action start and end at same date different time"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -386,7 +392,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "16:30", 'planned_date': "", 'end_date': "2014-04-10",
             'end_time': "10:15", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -401,14 +407,14 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, datetime(2014, 4, 9, 16, 30))
         self.assertEqual(action.end_datetime, datetime(2014, 4, 10, 10, 15))
 
-    def test_edit_action_start_not_set_and_end_date(self):
+    def test_edit_action_no_start_and_end_date(self):
         """edit action no start and end"""
         action = mommy.make(models.Action, subject="AAA")
 
         data = {
             'date': "", 'time': "", 'planned_date': "", 'end_date': "2014-04-09", 'end_time': "", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -425,7 +431,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_before(self):
+    def test_edit_action_end_before_start1(self):
         """edit action end before start"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -433,7 +439,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "", 'planned_date': "", 'end_date': "2014-04-08", 'end_time': "",
             'end_datetime': "", 'subject': "BBB", 'type': "", 'status': "", 'in_charge': "",
             'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -451,7 +457,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_before_time(self):
+    def test_edit_action_end_before_start2(self):
         """edit action end time before start"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -459,7 +465,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09",
             'end_time': "", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -477,7 +483,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_before_time2(self):
+    def test_edit_action_end_before_start3(self):
         """edit action end before start"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -485,7 +491,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "12:00", 'planned_date': "",
             'end_date': "2014-04-09", 'end_time': "11:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -503,7 +509,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_not_set_time(self):
+    def test_edit_action_date_not_set(self):
         """edit action start. end not set"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -511,7 +517,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "12:00", 'planned_date': "",
             'end_date': "", 'end_time': "12:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -529,7 +535,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_not_invalid1(self):
+    def test_edit_action_date_invalid1(self):
         """edit action date invalid"""
 
         action = mommy.make(models.Action, subject="AAA")
@@ -538,7 +544,7 @@ class EditActionTest(BaseTestCase):
             'date': "AAAA", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09",
             'end_time': "13:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -554,7 +560,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_not_invalid2(self):
+    def test_edit_action_date_invalid2(self):
         """edit action date invalid"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -562,7 +568,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "AA", 'planned_date': "", 'end_date': "2014-04-09",
             'end_time': "13:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -578,7 +584,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_not_invalid3(self):
+    def test_edit_action_date_invalid3(self):
         """edit action date invalid"""
         action = mommy.make(models.Action, subject="AAA")
 
@@ -586,7 +592,7 @@ class EditActionTest(BaseTestCase):
             'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "AAA",
             'end_time': "13:00", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -602,14 +608,15 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_edit_action_start_and_end_not_invalid4(self):
+    def test_edit_action_date_invalid4(self):
+        """edit action date invalid"""
         action = mommy.make(models.Action, subject="AAA")
 
         data = {
             'date': "2014-04-09", 'time': "12:00", 'planned_date': "", 'end_date': "2014-04-09",
             'end_time': "AA", 'end_datetime': "",
             'subject': "BBB", 'type': "", 'status': "", 'in_charge': "", 'opportunity': "", 'detail': "",
-            'amount': 0, 'number': 0, 'done': False, 'planned_date': ""
+            'amount': 0, 'number': 0, 'done': False,
         }
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -625,7 +632,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(action.planned_date, None)
         self.assertEqual(action.end_datetime, None)
 
-    def test_view_action_start_and_end_datetime(self):
+    def test_view_action_start_and_end(self):
         """view action start and end"""
         action = mommy.make(
             models.Action, subject="AAA",
@@ -720,7 +727,7 @@ class ActionTest(BaseTestCase):
         for action in actions[:5]:
             self.assertNotContains(response, action.subject)
 
-    def test_view_contact_actions_more_than_five_datetime(self):
+    def test_view_contact_actions_gt_five(self):
         """view contact actions if more than five datetime is set"""
         entity = mommy.make(models.Entity)
         contact1 = entity.default_contact
@@ -747,7 +754,8 @@ class ActionTest(BaseTestCase):
         for action in [action3, action4]:
             self.assertNotContains(response, action.subject)
 
-    def test_view_entity_actions_more_than_five_datetime(self):
+    def test_view_entity_actions_gt_five(self):
+        """views more than 5 actions on entity view"""
         entity = mommy.make(models.Entity)
         contact1 = entity.default_contact
 
@@ -789,7 +797,7 @@ class ActionTest(BaseTestCase):
         visible_actions = []
         hidden_actions = []
 
-        for i in range(2):
+        for i in range(2):  # pylint: disable=unused-variable
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
             action.contacts.add(contact1)
             action.save()
@@ -840,81 +848,6 @@ class ActionTest(BaseTestCase):
         contact1 = entity.default_contact
 
         action_type1 = mommy.make(models.ActionType)
-        s1 = mommy.make(models.ActionSet)
-        at2 = mommy.make(models.ActionType, set=s1)
-        at3 = mommy.make(models.ActionType, set=s1)
-        s2 = mommy.make(models.ActionSet)
-        at4 = mommy.make(models.ActionType, set=s2)
-
-        counter = 0
-        visible_actions = []
-        hidden_actions = []
-
-        for i in range(2):
-            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
-            if i%2:
-                a.contacts.add(contact1)
-            else:
-                a.entities.add(entity)
-            a.save()
-            hidden_actions.append(a)
-            counter += 1
-
-        for i in range(2):
-            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
-            if i%2:
-                a.contacts.add(contact1)
-            else:
-                a.entities.add(entity)
-            a.save()
-            hidden_actions.append(a)
-            counter += 1
-
-        for i in range(10):
-            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at3, archived=False)
-            if i%2:
-                a.contacts.add(contact1)
-            else:
-                a.entities.add(entity)
-            a.save()
-            visible_actions.append(a)
-            counter += 1
-
-        for i in range(10):
-            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at2, archived=False)
-            if i%2:
-                a.contacts.add(contact1)
-            else:
-                a.entities.add(entity)
-            a.save()
-            visible_actions.append(a)
-            counter += 1
-
-        for i in range(3):
-            a = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=at4, archived=False)
-            if i%2:
-                a.contacts.add(contact1)
-            else:
-                a.entities.add(entity)
-            a.save()
-            hidden_actions.append(a)
-            counter += 1
-
-        url = reverse("crm_view_entity_actions", args=[entity.id, s1.id])
-        response = self.client.get(url)
-        self.assertEqual(200, response.status_code)
-
-        for a in visible_actions:
-            self.assertContains(response, a.subject)
-
-        for a in hidden_actions:
-            self.assertNotContains(response, a.subject)
-
-    def test_view_contact_actions_more_than_five_by_set(self):
-        entity = mommy.make(models.Entity)
-        c1 = entity.default_contact
-
-        action_type1 = mommy.make(models.ActionType)
         action_set1 = mommy.make(models.ActionSet)
         action_type2 = mommy.make(models.ActionType, set=action_set1)
         action_type3 = mommy.make(models.ActionType, set=action_set1)
@@ -927,75 +860,151 @@ class ActionTest(BaseTestCase):
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
-            action.contacts.add(c1)
+            if i % 2:
+                action.contacts.add(contact1)
+            else:
+                action.entities.add(entity)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
-            action.contacts.add(c1)
+            if i % 2:
+                action.contacts.add(contact1)
+            else:
+                action.entities.add(entity)
+            action.save()
+            hidden_actions.append(action)
+            counter += 1
+
+        for i in range(10):
+            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
+            if i % 2:
+                action.contacts.add(contact1)
+            else:
+                action.entities.add(entity)
+            action.save()
+            visible_actions.append(action)
+            counter += 1
+
+        for i in range(10):
+            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
+            if i % 2:
+                action.contacts.add(contact1)
+            else:
+                action.entities.add(entity)
+            action.save()
+            visible_actions.append(action)
+            counter += 1
+
+        for i in range(3):
+            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
+            if i % 2:
+                action.contacts.add(contact1)
+            else:
+                action.entities.add(entity)
+            action.save()
+            hidden_actions.append(action)
+            counter += 1
+
+        url = reverse("crm_view_entity_actions", args=[entity.id, action_set1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        for action in visible_actions:
+            self.assertContains(response, action.subject)
+
+        for action in hidden_actions:
+            self.assertNotContains(response, action.subject)
+
+    def test_contact_actions_set_gt5(self):
+        """vie more than 5 actions by set"""
+        entity = mommy.make(models.Entity)
+        contact1 = entity.default_contact
+
+        action_type1 = mommy.make(models.ActionType)
+        action_set1 = mommy.make(models.ActionSet)
+        action_type2 = mommy.make(models.ActionType, set=action_set1)
+        action_type3 = mommy.make(models.ActionType, set=action_set1)
+        action_set2 = mommy.make(models.ActionSet)
+        action_type4 = mommy.make(models.ActionType, set=action_set2)
+
+        counter = 0
+        visible_actions = []
+        hidden_actions = []
+
+        for i in range(2):  # pylint: disable=unused-variable
+            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            action.contacts.add(contact1)
+            action.save()
+            hidden_actions.append(action)
+            counter += 1
+
+        for i in range(2):
+            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
+            action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(5):
             action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
-            action.contacts.add(c1)
+            action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
-        url = reverse("crm_view_contact", args=[c1.id])
+        url = reverse("crm_view_contact", args=[contact1.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
@@ -1211,15 +1220,16 @@ class ActionTest(BaseTestCase):
     def test_add_action_from_board(self):
         """add action from board"""
         url = reverse('crm_create_action', args=[0, 0])
-        at = mommy.make(models.ActionType)
-        ast = mommy.make(models.ActionStatus)
-        at.allowed_status.add(ast)
-        at.save()
+        action_type = mommy.make(models.ActionType)
+        action_status = mommy.make(models.ActionStatus)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
         user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
-            'subject': "tested", 'type': at.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': ast.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
         response = self.client.post(url, data=data, follow=True)
@@ -1260,10 +1270,11 @@ class ActionTest(BaseTestCase):
         action_type.allowed_status.add(action_status)
         action_type.save()
         user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': action_status.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
         response = self.client.post(url, data=data, follow=True)
@@ -1303,11 +1314,12 @@ class ActionTest(BaseTestCase):
         action_status = mommy.make(models.ActionStatus)
         action_type.allowed_status.add(action_status)
         action_type.save()
-        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=False)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': action_status.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
         response = self.client.post(url, data=data, follow=True)
@@ -1339,10 +1351,10 @@ class ActionTest(BaseTestCase):
         action.entities.add(entity)
         action.save()
 
-        at = mommy.make(models.ActionType)
-        ast = mommy.make(models.ActionStatus)
-        at.allowed_status.add(ast)
-        at.save()
+        action_type = mommy.make(models.ActionType)
+        action_status = mommy.make(models.ActionStatus)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
         mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
 
         url = reverse('crm_edit_action', args=[action.id])
@@ -1367,10 +1379,11 @@ class ActionTest(BaseTestCase):
         action_type.allowed_status.add(action_status)
         action_type.save()
         user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': action_status.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
 
@@ -1394,6 +1407,38 @@ class ActionTest(BaseTestCase):
         self.assertEqual(action.contacts.count(), 1)
         self.assertEqual(action.entities.count(), 1)
 
+    def test_edit_calculated_amount(self):
+        """edit action"""
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        action = mommy.make(models.Action, display_on_board=True, done=True, amount=Decimal("12.5"))
+        action.contacts.add(contact)
+        action.entities.add(entity)
+        action.save()
+        act_id = action.id
+
+        action_type = mommy.make(models.ActionType, is_amount_calculated=True)
+        action_status = mommy.make(models.ActionStatus)
+        action_type.allowed_status.add(action_status)
+        action_type.save()
+        user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
+
+        data = {
+            'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
+            'amount': None, 'number': 5
+        }
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(models.Action.objects.count(), 1)
+        action = models.Action.objects.all()[0]
+        self.assertEqual(action.id, act_id)
+
+        self.assertEqual(action.amount, Decimal("12.5"))
+
     def test_edit_action_anonymous(self):
         """edit action"""
         entity = mommy.make(models.Entity)
@@ -1409,10 +1454,11 @@ class ActionTest(BaseTestCase):
         action_type.allowed_status.add(action_status)
         action_type.save()
         user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': action_status.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
 
@@ -1461,10 +1507,11 @@ class ActionTest(BaseTestCase):
         action_type.allowed_status.add(action_status)
         action_type.save()
         user = mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+        team_member = mommy.make(models.TeamMember, user=user)
 
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
-            'status': action_status.id, 'in_charge': user.id, 'detail': "ABCDEF",
+            'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
             'amount': 200, 'number': 5
         }
 
@@ -1479,85 +1526,3 @@ class ActionTest(BaseTestCase):
         self.assertEqual(action.id, act_id)
 
         self.assertNotEqual(action.subject, data["subject"])
-
-
-class DoActionTest(BaseTestCase):
-    """Do action"""
-
-    def test_do_action(self):
-        """do it"""
-        action = mommy.make(models.Action, done=False)
-        response = self.client.get(reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(action.done, False)
-
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': True})
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, reverse("crm_board_panel"))
-        action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.done, True)
-
-    def test_undo_action(self):
-        """undo it"""
-        action = mommy.make(models.Action, done=True)
-        response = self.client.get(reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(action.done, True)
-
-        response = self.client.post(reverse('crm_do_action', args=[action.id]), data={'done': False})
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, reverse("crm_board_panel"))
-        action = models.Action.objects.get(id=action.id)
-        self.assertEqual(action.done, False)
-
-    def test_view_action_warning_not_in_charge(self):
-        """warning if not in charge"""
-        user = mommy.make(User, is_active=True, is_staff=True, last_name="L", first_name="F")
-        action = mommy.make(models.Action, done=True, in_charge=user)
-        response = self.client.get(reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(200, response.status_code)
-        self.assertContains(response, "warning")
-
-
-class ActionAutoGenerateNumberTestCase(TestCase):
-
-    def test_create_action_with_auto_generated_number(self):
-        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 1)
-
-    def test_create_action_several_auto_generated_number(self):
-        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 1)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 2)
-        no_gen_type = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
-        a = models.Action.objects.create(type=no_gen_type, subject="a")
-        self.assertEqual(a.number, 0)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 3)
-
-    def test_save_action_several_auto_generated_number(self):
-        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 1)
-        a.save()
-        self.assertEqual(a.number, 1)
-
-    def test_create_action_several_auto_generated_types(self):
-        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=True)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 1)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 2)
-        no_gen_type = mommy.make(models.ActionType, last_number=27, number_auto_generated=True)
-        a = models.Action.objects.create(type=no_gen_type, subject="a")
-        self.assertEqual(a.number, 28)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 3)
-
-    def test_create_action_no_number_generation(self):
-        at = mommy.make(models.ActionType, last_number=0, number_auto_generated=False)
-        a = models.Action.objects.create(type=at, subject="a")
-        self.assertEqual(a.number, 0)

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html>
+<head lang="{{ LANGUAGE_CODE }}">
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/css/bootstrap.css" />
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/moment/moment.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-i18n/angular-locale_{{ LANGUAGE_CODE }}-{{ LANGUAGE_CODE }}.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-translate/angular-translate.js"></script>
+  <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+
+    {{ DJANGO_APP|safe }}
+
+    var app = angular.module('commercialDocApp', ['ui.bootstrap', 'pascalprecht.translate']);
+
+    app.config(['$httpProvider', '$translateProvider', function($httpProvider, $translateProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+      $translateProvider.translations('en', {
+        LABEL: 'Label',
+        QUANTITY: 'Quantity',
+        UNIT_PRICE: 'Unit Price',
+        PRE_TAX_TOTAL: 'Pre-tax total',
+        VAT_RATE: 'VAT rate',
+        TAX_INCL_TOTAL: 'Tax Incl. Total',
+        OK: 'Ok',
+        CANCEL: 'Cancel',
+        ADD: 'Add',
+        BLANK: 'Add an empty line',
+        EDIT: 'Edit',
+        DELETE: 'Delete',
+        SEARCH: 'Search',
+        SELECT_A_STORE_ITEM: 'Select a store item',
+        TOTAL: 'Total',
+        ENTER_A_NAME: 'Enter a name',
+        AN_ERROR_OCCURED: 'An error occured',
+        ERROR: 'Error',
+        THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER: 'The order index is required number',
+        THE_LABEL_FIELD_IS_REQUIRED: 'The label field is required',
+        THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'The quantity field is required number',
+        THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'The pre-tax price field is required number',
+        THE_VAT_REQUIRED: 'The VAT rate is required',
+        SEND_BY_MAIL: 'Send by email',
+        READ_ONLY: 'Read_only',
+        EDIT_ORDER: 'Change order'
+      });
+
+      $translateProvider.translations('fr', {
+        LABEL: 'Libellé',
+        QUANTITY: 'Quantité',
+        UNIT_PRICE: 'Prix unitaire',
+        PRE_TAX_TOTAL: 'Total HT',
+        VAT_RATE: 'TVA',
+        TAX_INCL_TOTAL: 'Total TTC',
+        OK: 'Ok',
+        CANCEL: 'Annuler',
+        ADD: 'Ajouter',
+        BLANK: 'Ajouter une ligne vide',
+        EDIT: 'Editer',
+        DELETE: 'Supprimer',
+        SEARCH: 'Chercher dans le catalogue',
+        SELECT_A_STORE_ITEM: 'Selectionner un élément du catalogue',
+        TOTAL: 'Total',
+        ENTER_A_NAME: 'Entrez un nom',
+        AN_ERROR_OCCURED: 'Une erreur est survenue',
+        ERROR: 'Erreur',
+        THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER: 'Le numéro d\'ordre doit être un nombre',
+        THE_LABEL_FIELD_IS_REQUIRED: 'Le libellé est requis',
+        THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'La quantité doit être un nombre',
+        THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'Le prix unitaire doit être un nombre',
+        THE_VAT_REQUIRED: 'La TVA est requise',
+        SEND_BY_MAIL: 'Envoyer par email',
+        READ_ONLY: 'Lecture seule',
+        EDIT_ORDER: 'Changer l\'ordre'
+      });
+      $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
+      $translateProvider.useSanitizeValueStrategy('escape');
+    }]);
+
+    app.controller('CommercialDocCtrl', ['$scope', '$modal', '$http', '$translate', '$filter', '$log',
+    function ($scope, $modal, $http, $translate, $filter, $log) {
+      $scope.app = DJANGO_APP;
+      $scope.editMode = false;
+      $scope.allowEdit = !$scope.app.isReadOnly;
+      $scope.formErrors = '';
+      $scope.editBackup = null;
+      $translate.use('{{ LANGUAGE_CODE }}');
+      var translate = $filter('translate');
+
+      var initMe = function() {
+        for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
+          $scope.app.sale_items[i].order_index = i + 1;
+          $scope.app.sale_items[i].order_memory = $scope.app.sale_items[i].order_index;
+        }
+      };
+      initMe();
+
+      $scope.getDefaultVatRate = function() {
+        for (var i=0; i<$scope.app.vat_rates.length; i++){
+          if ($scope.app.vat_rates[i].is_default) {
+            return $scope.app.vat_rates[i];
+          }
+        }
+        return null;
+      };
+
+      $scope.getEditedItem = function() {
+        if ($scope.editMode) {
+          for (var i=0; i<$scope.app.sale_items.length; i++){
+            if ($scope.editedLines[i]) {
+              return $scope.app.sale_items[i];
+            }
+          }
+        }
+        return null;
+      };
+
+      $scope.editItem = function(item, index) {
+        $scope.editMode = true;
+        $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
+        $scope.editedLines[index] = true;
+      };
+
+      $scope.editOrder = function(item, index) {
+        $scope.editItem(item, index);
+        $scope.changeOrder = true;
+      };
+
+      $scope.addItem = function(item, isBlank) {
+        $scope.editMode = true;
+        $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
+        $scope.app.sale_items.push({
+          id: 0,
+          order_index: $scope.app.sale_items.length + 1,
+          order_memory: $scope.app.sale_items.length + 1,
+          pre_tax_price: 0.0,
+          vat_rate: $scope.getDefaultVatRate(),
+          quantity: 1,
+          text: isBlank?' ':'',
+          is_blank: isBlank?true:false,
+          added: true
+        });
+        $scope.editedLines.push(true);
+      };
+
+      $scope.addBlank = function(item) {
+        $scope.addItem(item, true);
+        $scope.saveEdit();
+      };
+
+      $scope.deleteItem = function(item, index) {
+        var text = translate('DELETE') + " '" + item.text + "' ?";
+        if (confirm(text)) {
+          $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
+          $scope.app.sale_items.splice(index, 1);
+          $scope.editedLines.splice(index, 1);
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id+'/';
+          $http.delete(url).success(function() {
+            $scope.formErrors = '';
+            $scope.editBackup = null;
+          }).error(function() {
+            $scope.formErrors = translate('AN_ERROR_OCCURED');
+            $scope.app.sale_items = $scope.editBackup;
+            $scope.editBackup = null;
+          });
+        }
+      };
+
+      $scope.switchOffEditMode = function() {
+        $scope.editMode = false;
+        $scope.changeOrder = false;
+        $scope.editedLines = [];
+        for (var i=0; i<$scope.app.sale_items.length; i++){
+          $scope.editedLines.push(false);
+        }
+        $scope.app.sale_items.sort(function(itemA, itemB) {
+            if (itemA.order_index < itemB.order_index) {
+              return -1;
+            } else if (itemA.order_index > itemB.order_index){
+              return 1;
+            }
+            return 0;
+        });
+        for (var j=0; j<$scope.app.sale_items.length; j++){
+          $scope.app.sale_items[j].order_index = j + 1;
+        }
+      };
+
+      $scope.cancelEdit = function() {
+        $scope.app.sale_items = $scope.editBackup;
+        $scope.editBackup = null;
+        $scope.switchOffEditMode();
+        $scope.formErrors = '';
+      };
+
+      $scope.itemsToUpdate = [];
+
+      var reorderItems = function(item, nbItems) {
+        var isChangeOrder = $scope.changeOrder;
+        if (isChangeOrder) {
+          var newPos = item.order_index;
+          if (newPos < 1) {
+            newPos = 1;
+          } else if (newPos > nbItems) {
+            newPos = nbItems;
+          }
+          var oldPos = item.order_memory;
+          var i = 0;
+          var curItem = 0;
+          if (newPos < oldPos) {
+            for (i=0; i<nbItems; i++) {
+              curItem = $scope.app.sale_items[i];
+              if (curItem.id !== item.id) {
+                if ((curItem.order_index >= newPos) && (curItem.order_index < oldPos)) {
+                  curItem.order_index += 1;
+                  curItem.order_memory = curItem.order_index;
+                  $scope.itemsToUpdate.push(curItem);
+                }
+              }
+            }
+          } else if (newPos > oldPos) {
+            for (i=0; i<nbItems; i++) {
+              curItem = $scope.app.sale_items[i];
+              if (curItem.id !== item.id) {
+                if ((curItem.order_index > oldPos) && (curItem.order_index <= newPos)) {
+                  curItem.order_index -= 1;
+                  curItem.order_memory = curItem.order_index;
+                  $scope.itemsToUpdate.push(curItem);
+                }
+              }
+            }
+          }
+        }
+      };
+
+      var pushData = function() {
+        var item = $scope.itemsToUpdate.pop();
+        if (item) {
+          var postData = {
+            sale: $scope.app.sale.id,
+            text: item.text,
+            vat_rate: item.vat_rate?item.vat_rate.id:null,
+            pre_tax_price: item.pre_tax_price,
+            quantity: item.quantity,
+            item: item.item,
+            is_blank: item.is_blank,
+            order_index: item.order_index
+          };
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
+          $http.put(url, postData).success(function (respData) {
+            pushData(); //update next one
+          }).error(function (response) {
+            $log.error('push data fail: '+JSON.stringify(response))
+          });
+        }
+      };
+
+      var getItemData = function(item) {
+        var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
+        $http.get(url).success(function(respData) {
+          item.text = respData.text;
+          item.vat_rate = respData.vat_rate;
+          item.pre_tax_price = respData.pre_tax_price;
+          item.unit_price = respData.unit_price;
+          item.discount = respData.discount;
+          item.is_blank = respData.is_blank;
+          item.quantity = respData.quantity;
+          item.item = respData.item;
+        });
+      };
+
+      $scope.saveEdit = function() {
+        var item = $scope.getEditedItem();
+
+        reorderItems(item, $scope.app.sale_items.length);
+        if (item.text === '' && item.is_blank){
+          item.text = ' ';
+        }
+
+        $scope.formErrors = $scope.isFormInvalid(item);
+        if (!$scope.formErrors) {
+          var url = '/store/api/'+$scope.app.action.id+'/sales-items/';
+          var httpMethod = $http.post;
+          if (item.id) {
+            url += item.id+'/';
+            httpMethod = $http.put;
+          }
+          var postData = {
+            sale: $scope.app.sale.id,
+            text: item.text,
+            vat_rate: item.vat_rate?item.vat_rate.id:null,
+            pre_tax_price: item.pre_tax_price,
+            quantity: item.quantity,
+            item: item.item,
+            is_blank: item.is_blank,
+            order_index: item.order_index
+          };
+          httpMethod(url, postData).success(function(respData) {
+            $scope.formErrors = '';
+            if (item.id === 0) {
+              item.id = respData.id;
+            }
+            getItemData(item);
+            $scope.editBackup = null;
+            $scope.switchOffEditMode();
+            pushData();  //update positions of others
+          }).error(function(response) {
+            $scope.formErrors = translate('AN_ERROR_OCCURED')+' : '+JSON.stringify(response);
+          });
+        }
+      };
+
+      $scope.getUnitPrice = function(item) {
+        var value = item.unit_price;
+        if (isNaN(value)) {
+          return translate('ERROR');
+        }
+        return value;
+      };
+
+      $scope.getItemPreTaxPrice = function(item) {
+        var value = (item.unit_price) * item.quantity;
+        if (isNaN(value)) {
+          return translate('ERROR');
+        }
+        return value;
+      };
+
+      $scope.getItemTaxInclPrice = function(item) {
+        if (item.vat_rate !== null) {
+          var value = $scope.getItemPreTaxPrice(item) * (100 + item.vat_rate.rate) / 100;
+          if (isNaN(value)) {
+            return translate('ERROR');
+          }
+          return value;
+        }
+        return "";
+      };
+
+      $scope.getTotalPreTaxPrice = function() {
+        var sum = 0;
+        for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
+          if (!$scope.app.sale_items[i].is_blank) {
+            sum += $scope.getItemPreTaxPrice($scope.app.sale_items[i]);
+          }
+        }
+        if (isNaN(sum)) {
+          return translate('ERROR');
+        }
+        return sum;
+      }
+
+      $scope.getTotalTaxInclPrice = function() {
+        var sum = 0;
+        for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
+          if (!$scope.app.sale_items[i].is_blank) {
+            sum += $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
+          }
+        }
+        if (isNaN(sum)) {
+          return translate('ERROR');
+        }
+        return sum;
+      }
+
+      $scope.switchOffEditMode();
+
+      $scope.isFormInvalid = function(item) {
+        if (!item.text) {
+          return translate('THE_LABEL_FIELD_IS_REQUIRED');
+        }
+
+        if (isNaN(item.quantity)) {
+          return translate('THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER');
+        };
+
+        if (isNaN(item.order_index)) {
+          return translate('THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER');
+        };
+
+        if (isNaN(item.pre_tax_price)) {
+          return translate('THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER');
+        }
+
+        if (!item.vat_rate && !item.is_blank) {
+          return translate('THE_VAT_REQUIRED');
+        }
+
+        return "";
+      }
+
+      $scope.sortableListeners = {
+          accept: function (sourceItemHandleScope, destSortableScope) {return true;},
+          itemMoved: function (event) {},
+          orderChanged: function(event) {}
+          //containment: '#board'//optional param.
+      };
+
+      $scope.lookFor = function(item) {
+
+        var modalInstance = $modal.open({
+          templateUrl: 'LoadItemModal.html',
+          controller: 'LoadItemModalCtrl',
+          resolve: {
+            $http: function () {
+              return $http
+            }
+          }
+        });
+
+        modalInstance.result.then(function (selectedItem) {
+          //$scope.selected = selectedItem;
+          item.text = selectedItem.name;
+          item.vat_rate = selectedItem.vat_rate;
+          item.pre_tax_price = selectedItem.pre_tax_price;
+          item.item = selectedItem.id;
+        }, function () {
+
+        });
+      };
+
+    }]);
+
+    app.controller('LoadItemModalCtrl', function ($scope, $modalInstance, $http) {
+      $scope.selectedItem = null;
+
+      $scope.formatStoreItem = function(model) {
+        if (model) {
+          if (model.name) {
+            return model.name;
+          } else {
+            return model;
+          }
+        } else {
+          return '';
+        }
+      };
+
+      /**
+       * typeahead-on-select='onClientSelected($item, $model, $label)
+       */
+      $scope.onStoreItemSelected = function() {
+      };
+
+      $scope.getStoreItems = function(name) {
+        var storeItems = [];
+        var fullUrl = "/store/api/store-items/?name="+name;
+        return $http.get(fullUrl).then(function(response){
+          return response.data;
+        });
+      };
+
+      $scope.ok = function () {
+        $modalInstance.close($scope.selectedItem);
+      };
+
+      $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+      };
+    });
+
+  </script>
+  {% block extra_head %}
+  <style>
+    body {
+      background: #fff;
+    }
+
+    .content {
+      padding: 10px;
+      margin: 10px auto;
+      background: #fff;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .doc-header {
+      margin-bottom: 20px;
+    }
+
+    .contacts {
+      margin-bottom: 20px;
+    }
+
+    .doc-footer {
+      margin-top: 20px;
+    }
+
+
+    tr td {
+      height: 42px;
+    }
+
+    tr .show-on-hover, div .show-on-hover {
+    }
+
+    tr .show-on-hover a, div > .show-on-hover a{
+      display: none;
+    }
+
+    tr:hover .show-on-hover a, div:hover > .show-on-hover a{
+      display: inline-block;
+    }
+
+    tr.tr-row:hover {
+      background: #f0f0f0;
+    }
+
+    tr.tr-row:hover .show-on-hover{
+      background: #444;
+      padding: 2px;
+    }
+
+    tr td.cell-order {
+      width: 6%;
+      padding: 0.5;
+    }
+
+    tr td input, tr td textarea, tr td select {
+      font-size: 0.9em !important;
+    }
+
+    tr td.cell-label {
+      width: 47%;
+    }
+
+    tr td.cell-label textarea {
+      width: 95%;
+    }
+
+    tr td.cell-label > div {
+      display: inline-block;
+    }
+
+    input[type=number] {
+      max-width: 100px;
+    }
+
+    th.number, td.number {
+      text-align: right;
+      width: 9%;
+    }
+
+    th {
+      font-size: 0.7em;
+      background: #444;
+      color: #fff;
+    }
+
+    tr.results td {
+      background: #ccc;
+      font-weight: bold;
+    }
+
+    tr.results td > div {
+      font-weight: normal;
+    }
+
+    .selected-item-details {
+      padding: 10px;
+      border: solid thin #ccc;
+      border-radius: 8px;
+    }
+
+    .contacts .contact, .contacts .entity {
+      margin-bottom: 10px;
+    }
+
+    .badges {
+      text-align: right;
+    }
+
+    .badges {
+      text-align: right;
+    }
+
+    .badges .badge {
+      background: #888;
+    }
+
+    .badges .badge:hover {
+      background: #777;
+    }
+
+    .badges .badge.badge-inactive {
+      background: #000;
+    }
+
+    .badge a {
+      color: #fff;
+    }
+
+    .badge a:hover {
+      color: #eee;
+    }
+
+    input.inline {
+      display: inline-block;
+    }
+
+    {% if is_pdf %}
+    body {
+      font-size: 0.7em;
+    }
+
+    tr td {
+      height: auto;
+    }
+    {% endif %}
+
+  </style>
+  <style media="print">
+    .badges {
+      display: none;
+    }
+  </style>
+  {% endblock %}
+</head>
+<body>
+  {% verbatim %}
+  <div ng-app="commercialDocApp">
+
+    <div ng-controller="CommercialDocCtrl" class="container-fluid">
+
+      <div ng-hide="app.isPdf || app.isPublic" class="badges">
+        <div class="badge badge-inactive" ng-show="app.isReadOnly">
+          <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
+        </div>
+
+        <div class="badge" ng-show="app.action.mail_to">
+          <a href="{{app.action.mail_to}}">
+            <span class="glyphicon glyphicon-envelope"></span> {{ 'SEND_BY_MAIL' | translate}}
+          </a>
+        </div>
+
+        <div class="badge" ng-repeat="entity in app.action.entities">
+          <a href="{{ entity.get_view_url }}">
+            <span class="glyphicon glyphicon-tower"></span> {{ entity.name }}
+          </a>
+        </div>
+
+        <div class="badge" ng-repeat="contact in app.action.contacts">
+          <a href="{{ contact.get_view_url }}">
+            <span class="glyphicon glyphicon-user"></span> {{ contact.fullname }}
+            <a ng-show="contact.email" href="mailto:{{contact.email}}">
+              <span class="glyphicon glyphicon-envelope"></span>
+            </a>
+          </a>
+        </div>
+
+        <div class="badge">
+          {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
+            <span class="glyphicon glyphicon-download-alt"></span> {{ 'Download as PDF' | translate }}</a>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="row"><div class="col-md-12">
+          <div class="header">
+            <div class="row"><div class="col-md-12">
+              {% endverbatim %}{% block header %}{% endblock %}{% verbatim %}
+            </div></div>
+          </div>
+
+          <div class="doc-header">
+            <div class="row"><div class="col-md-12">
+              <div class="action-date">{{ app.action.planned_date|date }}</div>
+              <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
+              <div class="action-subject">{{ app.action.subject }}</div>
+            </div></div>
+          </div>
+
+          <div class="contacts">
+            <div ng-repeat="entity in app.action.entities" class="entity">
+              <div class="row"><div class="col-md-12">
+                <div>
+                  {{ entity.name }}
+                </div>
+                <span ng-show="entity.billing_city">
+                <div ng-show="entity.billing_address">{{ entity.billing_address }}</div>
+                <div ng-show="entity.billing_address2">{{ entity.billing_address2 }}</div>
+                <div ng-show="entity.billing_address3">{{ entity.billing_address3 }}</div>
+                <div>{{ entity.billing_zip_code }} {{ entity.billing_city.name }} {{ entity.billing_cedex }}</div>
+                <div ng-show="entity.billing_country.is_foreign_country">{{ entity.billing_country.name }}</div>
+                </span>
+                <span ng-hide="entity.billing_city">
+                <div ng-show="entity.address">{{ entity.address }}</div>
+                <div ng-show="entity.address2">{{ entity.address2 }}</div>
+                <div ng-show="entity.address3">{{ entity.address3 }}</div>
+                <div>{{ entity.zip_code }} {{ entity.city.name }} {{ entity.cedex }}</div>
+                <div ng-show="entity.country.is_foreign_country">{{ entity.country.name }}</div>
+                </span>
+              </div></div>
+            </div>
+            <div ng-repeat="contact in app.action.contacts" class="contact">
+              <div class="row"><div class="col-md-12">
+                <div>
+                  {{ contact.fullname }}
+                </div>
+                <span ng-show="contact.get_billing_city">
+                <div ng-show="contact.get_billing_address">{{ contact.get_billing_address }}</div>
+                <div ng-show="contact.get_billing_address2">{{ contact.get_billing_address2 }}</div>
+                <div ng-show="contact.get_billing_address3">{{ contact.get_billing_address3 }}</div>
+                <div>{{ contact.get_billing_zip_code }} {{ contact.get_billing_city.name }} {{ contact.billing_cedex }}</div>
+                <div ng-show="contact.get_billing_country.is_foreign_country">{{ contact.get_billing_country.name }}</div>
+                </span>
+                <span ng-hide="contact.get_billing_city">
+                <div ng-show="contact.get_address">{{ contact.get_address }}</div>
+                <div ng-show="contact.get_address2">{{ contact.get_address2 }}</div>
+                <div ng-show="contact.get_address3">{{ contact.get_address3 }}</div>
+                <div>{{ contact.get_zip_code }} {{ contact.get_city.name }} {{ contact.cedex }}</div>
+                <div ng-show="contact.get_country.is_foreign_country">{{ contact.get_country.name }}</div>
+                </span>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="sale_items">
+            <div>
+              <div class="row"><div class="col-md-12">
+                <form role="form" class="form" name="editForm">
+
+                <table class="table table-bordered">
+                  <tr>
+                    <th>{{ 'LABEL' | translate }}</th>
+                    <th class="number">{{ 'QUANTITY' | translate }}</th>
+                    <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
+                    <th class="number">{{ 'PRE_TAX_TOTAL' | translate }}</th>
+                    <th class="number">{{ 'VAT_RATE' | translate }}</th>
+                    <th class="number">{{ 'TAX_INCL_TOTAL' | translate }}</th>
+                  </tr>
+
+                  <tr class="tr-row" ng-repeat="item in app.sale_items">
+                    <td colspan="6" ng-if="item.is_blank">
+                      <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+                        <div class="show-on-hover">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+                          </a>
+                          <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </div>
+                      </div>
+                      <input
+                        class="form-control"
+                        type="number"
+                        ng-model="item.order_index"
+                        ng-show="editedLines[$index] && changeOrder"
+                        name=order_index
+                      />
+                    </td>
+
+                    <td class="cell-label" ng-if="!item.is_blank">
+                      <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+                        <div class="show-on-hover">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+                          </a>
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                          </a>
+                          <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+                            <span class="glyphicon glyphicon-trash"></span>
+                          </a>
+                        </div>
+                      </div>
+                      <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="pull-right">
+                          <input type="hidden" name="item" ng-model="item.item" />
+                          <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
+                            <span class="glyphicon glyphicon-search"></span>
+                          </a>
+                      </div>
+                      <input
+                        class="form-control inline"
+                        type="number"
+                        ng-model="item.order_index"
+                        ng-show="editedLines[$index] && changeOrder"
+                        name=order_index
+                      />
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.text }}</span>
+                      <textarea
+                        class="form-control"
+                        ng-model="item.text"
+                        required="required"
+                        name="text"
+                        ng-show="editedLines[$index] && !changeOrder"></textarea>
+                    </td>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.quantity | number }}</span>
+                      <input
+                        class="form-control"
+                        required="required"
+                        type="number"
+                        ng-model="item.quantity"
+                        ng-show="editedLines[$index] && !changeOrder"
+                        name=quantity
+                      />
+                    </td>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">
+                        {{ getUnitPrice(item) | number:2}} €
+                      </span>
+                      <input
+                        class="form-control"
+                        required="required"
+                        type="number"
+                        ng-model="item.pre_tax_price"
+                        ng-show="editedLines[$index] && !changeOrder"
+                      />
+                      <span ng-show="item.discount">
+                        <span class="label label-warning" title="{{ item.discount.name }}" data-toggle="tooltip">
+                          {{ item.discount.display_name }}
+                        </span>
+                      </span>
+                    </td>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>
+                    </td>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span ng-hide="editedLines[$index] && !changeOrder">{{ item.vat_rate.name }}</span>
+                      <select
+                        class="form-control"
+                        ng-model="item.vat_rate"
+                        ng-options="vat_rate as vat_rate.name for vat_rate in app.vat_rates track by vat_rate.id"
+                        ng-show="editedLines[$index] && !changeOrder"
+                        required="required"
+                       ></select>
+                    </td>
+                    <td class="number" ng-if="!item.is_blank">
+                      <span>{{ getItemTaxInclPrice(item) | number:2 }} €</span>
+                    </td>
+                  </tr>
+
+                  <tr class="results tr-row">
+                    <td>
+
+                      <div ng-show="allowEdit" class="pull-right">
+                        <div class="show-on-hover">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-plus"></span>
+                          </a>
+
+                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
+                            <span class="glyphicon glyphicon-resize-vertical"></span>
+                          </a>
+                        </div>
+                      </div>
+                      {{ 'TOTAL' | translate }}
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="number">{{ getTotalPreTaxPrice() | number:2 }} €</td>
+                    <td></td>
+                    <td class="number">{{ getTotalTaxInclPrice() | number:2 }} €</td>
+                  </tr>
+                </table>
+                </form>
+              </div></div>
+
+              <div class="row"><div class="col-md-12">
+                <div class="alert alert-danger" role="alert" ng-show="editMode && formErrors">
+                  {{ formErrors }}
+                </div>
+
+                <div ng-show="allowEdit" class="pull-right">
+
+                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="saveEdit()">
+                    <span class="glyphicon glyphicon-ok"></span> {{ 'OK' | translate }}
+                  </a>
+
+                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="cancelEdit()">
+                    <span class="glyphicon glyphicon-remove"></span> {{ 'CANCEL' | translate }}
+                  </a>
+                </div>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="doc-footer">
+            <div class="row"><div class="col-md-12">
+              {% endverbatim %}{% block footer %}{% endblock %}{% verbatim %}
+            </div></div>
+          </div>
+
+        </div></div>
+
+        <script type="text/ng-template" id="storeItemSelector.html">
+          <a class="typeahead-item">
+              <span bind-html-unsafe="match.model.name | typeaheadHighlight:query"></span>
+              <span class="typeahead-item-description">
+                  {{match.model.category.name}}
+              </span>
+          </a>
+        </script>
+
+        <script type="text/ng-template" id="LoadItemModal.html">
+          <div class="modal-header">
+              <h3 class="modal-title">{{ 'SELECT_A_STORE_ITEM' | translate }}</h3>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <input
+                  class="form-control"
+                  ng-model="selectedItem"
+                  typeahead-template-url="storeItemSelector.html"
+                  typeahead="item for item in getStoreItems($viewValue)"
+                  typeahead-input-formatter="formatStoreItem($model)"
+                  placeholder="{{ 'ENTER_A_NAME' | translate }}"
+                  ng-trim="false"
+                  typeahead-loading="loading"
+                  name="item"
+                  required
+                />
+                <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+              </div>
+              <div class="col-md-6">
+                <div ng-show="selectedItem.name" class="selected-item-details">
+                  <div>{{ selectedItem.category.name }}</div>
+                  <div>Pre-tax Price: {{ selectedItem.pre_tax_price }}</div>
+                  <div>VAT: {{ selectedItem.vat_rate.name }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button class="btn btn-xs btn-primary" ng-click="ok()">{{ 'OK' | translate }}</button>
+              <button class="btn btn-xs btn-deafult" ng-click="cancel()">{{ 'CANCEL' | translate }}</button>
+          </div>
+      </script>
+
+    </div>
+      </div>
+
+  </div>
+{% endverbatim %}
+</body>
+</html>

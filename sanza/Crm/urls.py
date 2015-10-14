@@ -2,9 +2,18 @@
 """urls"""
 # pylint: disable=C0330
 
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
+
+from rest_framework import routers
 
 from sanza.Crm.views import planning as planning_views, documents as document_views
+from sanza.Crm.api import (
+    UpdateActionDateView, CreateActionView, DeleteActionView, UpdateActionView, ContactViewSet, ListActionsView,
+    ListTeamMemberActionsView, AboutMeView
+)
+
+router = routers.DefaultRouter()
+router.register(r'contacts', ContactViewSet)
 
 
 urlpatterns = patterns('sanza.Crm.views.entities',
@@ -80,6 +89,7 @@ urlpatterns += patterns('sanza.Crm.views.actions',
     ),
     url(r'^create-action/(?P<entity_id>\d+)/(?P<contact_id>\d+)/$', 'create_action', name='crm_create_action'),
     url(r'allowed-action-status/$', 'get_action_status', name="crm_get_action_status"),
+    url(r'^clone-action/(?P<action_id>\d+)/$', 'clone_action', name='crm_clone_action'),
 )
 
 
@@ -125,7 +135,8 @@ urlpatterns += patterns('sanza.Crm.views.groups',
     url(r'^group-name/(?P<gr_id>\d+)/$', 'get_group_name', name='crm_get_group_name'),
     url(r'^groups/list/$', 'get_groups', name='crm_get_groups'),
     url(r'^group-id/$', 'get_group_id', name='crm_get_group_id'),
-
+    url(r'^select-contact-or-entity/$', 'select_contact_or_entity', name='crm_select_contact_or_entity'),
+    url(r'^get-contact-or-entity/$', 'get_contact_or_entity', name='crm_get_contact_or_entity'),
 )
 
 
@@ -190,6 +201,9 @@ urlpatterns += patterns('sanza.Crm.views.importers',
 
 
 urlpatterns += patterns('',
+    url(r'^actions-of-month/$', planning_views.ThisMonthActionsView.as_view(), name="crm_this_month_actions"),
+    url(r'^actions-of-week/$', planning_views.ThisWeekActionsView.as_view(), name="crm_this_week_actions"),
+    url(r'^actions-of-day/$', planning_views.TodayActionsView.as_view(), name="crm_today_actions"),
     url(
         r'^actions-of-month/(?P<year>\d{4})/(?P<month>\d+)/$',
         planning_views.ActionMonthArchiveView.as_view(),
@@ -229,4 +243,17 @@ urlpatterns += patterns('',
         document_views.ActionDocumentDetailView.as_view(),
         name='crm_view_action_document'
     ),
+)
+
+urlpatterns += patterns('',
+    url(r'^api/', include(router.urls)),
+    url(r'^api/update-action-date/(?P<pk>\d*)/$', UpdateActionDateView.as_view(), name="crm_api_update_action_date"),
+    url(r'^api/update-action/(?P<pk>\d*)/$', UpdateActionView.as_view(), name="crm_api_update_action"),
+    url(r'^api/create-action/$', CreateActionView.as_view(), name="crm_api_create_action"),
+    url(r'^api/delete-action/(?P<pk>\d*)/$', DeleteActionView.as_view(), name="crm_api_delete_action"),
+    url(r'^api/list-actions/$', ListActionsView.as_view(), name="crm_api_list_actions"),
+    url(
+        r'^api/list-team-member-actions/$', ListTeamMemberActionsView.as_view(), name="crm_api_list_team_member_actions"
+    ),
+    url(r'^api/about-me/$', AboutMeView.as_view(), name="crm_api_about_me"),
 )

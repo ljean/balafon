@@ -18,7 +18,7 @@
         {% if contact == contact.same_as.main_contact %}
             <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
         {% else %}
-          <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id contact.id %}">
+          <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id contact.id %}">
             <span class="glyphicon glyphicon-certificate disabled"  title="Make main contact"> </span>
           </a>
         {% endif %}
@@ -63,24 +63,37 @@
 <div class="row">
   <div class="col-md-4">
     <table class="table">
+      {% if contact.birth_date %}
       <tr><td>
-        <span title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span> {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Birth date' %}" class="glyphicon glyphicon-calendar"></span>
+        {{ contact.birth_date|date:"d/m/Y" }}
+      </td></tr>
+      {% endif %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
+        {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% if contact.has_billing_address %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
+        {{contact.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% endif %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
       </td></tr>
       <tr><td>
-        <span title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
       </td></tr>
       <tr><td>
-        <span title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Mobile' %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
       </td></tr>
       <tr><td>
-        <span title="{% trans 'Mobile' %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
-      </td></tr>
-      <tr><td>
-        <span title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
       </td></tr>
       {% if contact.favorite_language %}
       <tr><td>
-        <span title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
         {{contact.get_favorite_language_display}}
       </td></tr>
       {% endif %}
@@ -114,12 +127,17 @@
       <tr><td colspan="2"><b>{% trans "This contact has left." %}</b></td></tr>
       {% endif %}
       <tr><td><b>{% trans "ADD_DT" %}</b> {{contact.created|date:"d/m/Y"}}</td></tr>
-      <tr><td><b>{% trans "UPD_DT" %}</b> {{contact.modified|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>
+          {% trans "UPD_DT" %}</b>
+          {{contact.modified|date:"d/m/Y"}}
+          {% if contact.last_modified_by %} {% trans "by" %} {{contact.last_modified_by}} {% endif %}
+      </td></tr>
     </table>
   </div>
-</div>  
-
+</div>
 {% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
     <li><a class="colorbox-form" href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a></li>

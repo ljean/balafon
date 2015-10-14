@@ -9,6 +9,8 @@ import logging
 import os.path
 import shutil
 
+from coop_cms.utils import RequestManager
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
@@ -32,6 +34,7 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         """before each test"""
+        RequestManager().clean()
         logging.disable(logging.CRITICAL)
         self._clean_files()
 

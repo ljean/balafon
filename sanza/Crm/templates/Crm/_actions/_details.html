@@ -1,0 +1,16 @@
+{% load i18n %}
+{% spaceless %}
+<div class="action-subject" style="margin-top: 5px;">
+  <a href="" class="show-note pull-right {% if action.detail %}has-note{% endif %}">
+    <span class="glyphicon glyphicon-collapse-down" title="{% trans 'Show note' %}"></span>
+  </a>
+  <span class="contenteditable inline-block" rel="{% url 'auto_save_data' 'action' 'subject' action.id %}" style="font-weight: 500;" contenteditable="true">
+    {{action.subject}}
+  </span>
+
+</div>
+
+<div rel="{% url 'auto_save_data' 'action' 'detail' action.id %}" contenteditable="true" class="contenteditable action-note" style="display: none">
+  {{ action.detail|linebreaksbr }}
+</div>
+{% endspaceless %}

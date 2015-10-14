@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """project settings"""
 
+import os.path
+import sys
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-import os.path, sys
+CI_DRONE = True
+
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 ADMINS = (
@@ -107,6 +110,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
+    'coop_cms.utils.RequestMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -133,6 +137,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.messages.context_processors.messages",
     "sanza.Search.context_processors.quick_search_form",
     "sanza.Crm.context_processors.crm",
+    "sanza.Users.context_processors.user_config",
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -185,6 +190,16 @@ SANZA_UNACCENT_FILTER_SUPPORT = True
 
 LOGIN_REDIRECT_URL = "/"
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
+
 INSTALLED_APPS = (
     #contribs
     'django.contrib.auth',
@@ -219,6 +234,7 @@ INSTALLED_APPS = (
     'sanza.Search',
     'sanza.Emailing',
     'sanza.Profile',
+    'sanza.Store',
     'sanza.Users',
 
     'django.contrib.admin',
@@ -258,6 +274,10 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'colorbox': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'sanza_crm': {
             'handlers': ['console'],
             'level': 'DEBUG',
         },

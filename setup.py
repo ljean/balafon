@@ -22,6 +22,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'django==1.6.10',
+        'djangorestframework==3.1.2',
         'apidev-coop_cms',
         'beautifulsoup4',
         'BeautifulSoup',
@@ -33,6 +34,7 @@ setup(
         'django-registration',
         'model_mommy',
         'django-tastypie',
+        'django-cors-headers',
     ],
     long_description=open('README.rst').read(),
     url='https://bitbucket.org/ljean/apidev-sanza',

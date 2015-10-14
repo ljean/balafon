@@ -9,7 +9,7 @@
     {% else %}
         <span class="glyphicon glyphicon-check"></span> {% trans "Do you want to mark this action done?" %}
     {% endif %}
-    {% if action.in_charge and request.user != action.in_charge %}
+    {% if action.in_charge and request.user != action.in_charge.user %}
         <div style="margin-top: 5px;"><span class="label label-warning">
             {% trans "You are not in charge of this action. Are you sure to continue?" %}
         </span></div>

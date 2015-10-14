@@ -30,21 +30,30 @@
 </a>
 
 <h2 class="inline-block">
-    {% block this_title %}{% endblock%}
+    {% block this_title %}{% endblock %}
 </h2>
 
-<select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans "Filter by" %}">
+<select class="chosen-select filter inline-block" multiple="" data-placeholder="{% trans 'Filter by' %}">
     {% if action_types %}
-    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "Action types" %}">
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
         <option value="t0" {% if no_type_selected %}selected="selected"{% endif %}>{% trans "No type" %}</option>
     {% for at in action_types %}
         <option value="t{{at.id}}" {% if at.selected %}selected="selected"{% endif %}>{{at.name}}</option>
     {% endfor %}
     </optgroup>
     {% endif %}
-    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans "In charge" %}">
-    {% for u in in_charge %}
-        <option value="u{{u.id}}" {% if u.selected %}selected="selected"{% endif %}>{{u.username}}</option>
+    {% if action_status %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action status' %}">
+    {% for status in action_status %}
+        <option value="s{{status.id}}" {% if status.selected %}selected="selected"{% endif %}>{{status.name}}</option>
+    {% endfor %}
+    </optgroup>
+    {% endif %}
+    <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'In charge' %}">
+    {% for team_member in in_charge %}
+        <option value="u{{team_member.id}}" {% if team_member.selected %}selected="selected"{% endif %}>
+            {{team_member.name}}
+        </option>
     {% endfor %}
     </optgroup>
 </select>
@@ -52,8 +61,28 @@
 <a class="btn btn-default pull-right" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
     <span class="glyphicon glyphicon-chevron-right"></span>
 </a>
+
+{% for the_custom_menu in planning_custom_menus %}
+  <div class="dropdown btn-group pull-right">
+    <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
+      {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+      {{ the_custom_menu.label }}
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+        {% for custom_menu_item in the_custom_menu.get_children %}
+        <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
+          <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+          {{ custom_menu_item.label }}
+        </a></li>
+        {% endfor %}
+    </ul>
+  </div>
+{% endfor %}
 </div>
 
+{% block action_archive_content %}
 {% include "Crm/_section_actions.html" with actions=object_list %}
+{% endblock %}
 
 {% endblock %}

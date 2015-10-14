@@ -1,6 +1,6 @@
 {% extends "documents/base.html" %}
 
-{% load i18n coop_edition %}
+{% load i18n coop_edition sanza_utils %}
 
 {% block extra_head %}
     {{ block.super }}
@@ -29,21 +29,19 @@
 {% block document %}
 <div class="address company-address">
     {% block our_company %}
-        Our Company<br />
-        our addess<br />
-        ZipCode Town
+        {% try_to_include "documents/_our_company.html" %}
     {% endblock %}
 </div>
 
 <div class="address">
     <div class="contact-address">
-{% with c=object.action.contact %}
-    {{c}}<br />
-    {{c.get_address}}<br />
-    {% if c.get_address2 %}{{c.get_address2}}<br />{% endif %}
-    {% if c.get_address3 %}{{c.get_address3}}<br />{% endif %}
-    {{ c.get_zip_code }} {{ c.get_city }} {{ c.get_cedex|default:"" }}
-{% endwith %}
+{% for contact in object.action.contacts.all %}
+    {{ contact }}<br />
+    {{ contact.get_address }}<br />
+    {% if contact.get_address2 %} {{ contact.get_address2 }}<br />{% endif %}
+    {% if contact.get_address3 %}{{ contact.get_address3 }}<br />{% endif %}
+    {{ contact.get_zip_code }} {{ contact.get_city }} {{ contact.get_cedex|default:"" }}
+{% endfor %}
     </div>
 </div>
 
