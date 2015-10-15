@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 
+import six
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
-from form_utils.forms import BetterModelForm, BetterForm
+from form_utils.forms import BetterFormMetaclass, BetterModelFormMetaclass, BetterBaseForm
 
 from coop_cms.bs_forms import BootstrapableMixin
 
 from sanza.Crm import models
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.utils import get_default_country
+
+
+#redefine the BetterForm and BetterModelForm to be based on floppyforms.Form rather than django.forms.Form
+#This could cause bad dcreation of form if not
+
+class BetterForm(six.with_metaclass(BetterFormMetaclass, BetterBaseForm), forms.Form):
+    __doc__ = BetterBaseForm.__doc__
+
+
+class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, BetterBaseForm), forms.ModelForm):
+    __doc__ = BetterBaseForm.__doc__
 
 
 class BetterBsForm(BetterForm, BootstrapableMixin):
@@ -35,7 +48,7 @@ class BetterBsForm(BetterForm, BootstrapableMixin):
                     field.widget.attrs["class"] = klass + " chosen-select"
 
 
-class BetterBsModelForm(BetterModelForm, BootstrapableMixin):
+class BetterBsModelForm(BetterModelForm, BootstrapableMixin): #(BetterModelForm):
     """Base class inherit from Bootstrap and form-utils BetterModelForm"""
 
     class Media:
