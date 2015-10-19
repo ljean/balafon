@@ -7,6 +7,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
 from form_utils.forms import BetterFormMetaclass, BetterModelFormMetaclass, BetterBaseForm
+from form_utils.forms import BetterForm, BetterModelForm
 
 from coop_cms.bs_forms import BootstrapableMixin
 
@@ -15,15 +16,19 @@ from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.utils import get_default_country
 
 
+# TODO **************
+# remove form_utils dependency
+# *******************
+
 #redefine the BetterForm and BetterModelForm to be based on floppyforms.Form rather than django.forms.Form
-#This could cause bad dcreation of form if not
+#This could cause bad creation of form if not
 
-class BetterForm(six.with_metaclass(BetterFormMetaclass, BetterBaseForm), forms.Form):
-    __doc__ = BetterBaseForm.__doc__
-
-
-class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, BetterBaseForm), forms.ModelForm):
-    __doc__ = BetterBaseForm.__doc__
+# class BetterForm(forms.Form, six.with_metaclass(BetterFormMetaclass, BetterBaseForm)):
+#     __doc__ = BetterBaseForm.__doc__
+#
+#
+# class BetterModelForm(forms.ModelForm, six.with_metaclass(BetterModelFormMetaclass, BetterBaseForm)):
+#     __doc__ = BetterBaseForm.__doc__
 
 
 class BetterBsForm(BetterForm, BootstrapableMixin):

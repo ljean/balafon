@@ -638,6 +638,39 @@ class SaleDiscountTest(TestCase):
         self.assertEqual(sale_item.vat_price(), Decimal('2'))
         self.assertEqual(sale_item.total_vat_price(), Decimal('4'))
 
+    def test_calculate_discount_quantity_zero(self):
+        """It should not have a discount"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        item = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item.tags.add(tag)
+        item.save()
+
+        sale = mommy.make(models.Sale)
+        sale_item = mommy.make(
+            models.SaleItem, quantity=0, item=item, pre_tax_price=item.pre_tax_price, vat_rate=item.vat_rate, sale=sale
+        )
+        sale.save()
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal(0), sale.pre_tax_total_price())
+        self.assertEqual(Decimal(0), sale.vat_incl_total_price())
+
+        sale_item = models.SaleItem.objects.get(id=sale_item.id)
+        self.assertEqual(sale_item.discount, None)
+        self.assertEqual(sale_item.unit_price(), Decimal("10"))
+        self.assertEqual(sale_item.vat_incl_price(), Decimal("12"))
+        self.assertEqual(sale_item.vat_price(), Decimal("2"))
+        self.assertEqual(sale_item.total_vat_price(), Decimal(0))
+
     def test_several_discount(self):
         """It should have only 1 discount"""
         vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
