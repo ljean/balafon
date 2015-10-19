@@ -944,7 +944,11 @@ class SaleItem(models.Model):
         if better_discount != self.discount:
             self.discount = better_discount
             super(SaleItem, self).save()
-        discount_price = max_discount / self.quantity
+
+        if self.quantity:
+            discount_price = max_discount / self.quantity
+        else:
+            discount_price = Decimal(0)
         return Decimal("{0:.2f}".format(round(discount_price, 2)))
 
 
