@@ -676,3 +676,7 @@ ul.coop-cms_user-messages {
   height: auto !important;
   overflow: visible !important;
 }
+.btn-action-status {
+  background: #ddd;
+  font-weight: bold;
+}

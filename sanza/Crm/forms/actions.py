@@ -300,3 +300,33 @@ class CloneActionForm(forms.Form):
             return models.ActionType.objects.get(id=action_type)
         except models.ActionType.DoesNotExist:
             raise forms.ValidationError(_(u"Invalid type"))
+
+
+class UpdateActionStatusForm(forms.ModelForm):
+    """form changing the status"""
+
+    class Meta:
+        """form from model"""
+        model = models.Action
+        fields = (
+            'status',
+        )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        super(UpdateActionStatusForm, self).__init__(*args, **kwargs)
+
+        if instance and instance.id and instance.type and instance.type.allowed_status.count():
+            # let javascript disable the blank value if default_status
+            self.fields['status'].choices = [
+                (status.id, status.name) for status in instance.type.allowed_status.all()
+            ]
+
+    def clean_status(self):
+        """status validation"""
+        status = self.cleaned_data['status']
+        action_type = self.instance.type
+        allowed_status = ([] if action_type.default_status else [None]) + list(action_type.allowed_status.all())
+        if len(allowed_status) > 0 and status not in allowed_status:
+            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+        return status

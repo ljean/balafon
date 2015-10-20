@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-12 14:12+0200\n"
+"POT-Creation-Date: 2015-10-20 23:12+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -185,7 +185,7 @@ msgid "address 3"
 msgstr "adresse 3"
 
 #: Crm/models.py:205 Crm/models.py:217 Crm/search_forms.py:209
-#: Crm/forms/base.py:174 Emailing/forms.py:349
+#: Crm/forms/base.py:192 Emailing/forms.py:349
 msgid "zip code"
 msgstr "code postal"
 
@@ -894,14 +894,14 @@ msgstr "Entités par date de mise à jour"
 msgid "Contact by modified date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:170 Crm/forms/base.py:86 Crm/forms/base.py:161
-#: Crm/forms/base.py:187 Emailing/forms.py:325 Profile/forms.py:23
+#: Crm/search_forms.py:170 Crm/forms/base.py:104 Crm/forms/base.py:179
+#: Crm/forms/base.py:205 Emailing/forms.py:325 Profile/forms.py:23
 #: Profile/forms.py:81
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
-#: Crm/search_forms.py:178 Crm/forms/base.py:160 Crm/forms/base.py:175
-#: Crm/forms/base.py:186 Crm/templates/Crm/_section_all_entities.html:23
+#: Crm/search_forms.py:178 Crm/forms/base.py:178 Crm/forms/base.py:193
+#: Crm/forms/base.py:204 Crm/templates/Crm/_section_all_entities.html:23
 #: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:324
 #: Profile/forms.py:22 Profile/forms.py:80 Profile/models.py:28
 #: Search/templates/Search/_section_qs_cities.html:4
@@ -1210,7 +1210,7 @@ msgstr "heure prévue"
 msgid "end time"
 msgstr "heure de fin"
 
-#: Crm/forms/actions.py:30 Crm/templates/Crm/_actions/_definition.html:10
+#: Crm/forms/actions.py:30 Crm/templates/Crm/_actions/_definition.html:14
 msgid "Amount"
 msgstr "Montant"
 
@@ -1251,7 +1251,7 @@ msgstr "Ajout d'une action"
 msgid "enter details"
 msgstr "plus de détails"
 
-#: Crm/forms/actions.py:128
+#: Crm/forms/actions.py:128 Crm/forms/actions.py:331
 msgid "This status can't not be used for this action type"
 msgstr "Cet état ne peut pas être utilisé pour ce type d'action"
 
@@ -1299,12 +1299,12 @@ msgstr "Nouveau type"
 msgid "Invalid type"
 msgstr "Type invalide"
 
-#: Crm/forms/base.py:142
+#: Crm/forms/base.py:160
 msgid "You must enter a valid zip code for selecting a new city"
 msgstr ""
 "Veuillez entrer un code postal valide ou au minimum le numéro de département"
 
-#: Crm/forms/base.py:163 Crm/forms/base.py:173 Crm/forms/base.py:189
+#: Crm/forms/base.py:181 Crm/forms/base.py:191 Crm/forms/base.py:207
 #: Search/views.py:353
 msgid "Country"
 msgstr "Pays"
@@ -2080,6 +2080,16 @@ msgstr ""
 #: Crm/templates/Crm/popup_select_contact_or_entity.html:39
 msgid "Look for contact or entity"
 msgstr "Recherche de contact ou d'entité"
+
+#: Crm/templates/Crm/popup_update_action_status.html:6
+msgid "Change action status"
+msgstr "Modifier l'etat de l'action"
+
+#: Crm/templates/Crm/popup_update_action_status.html:9
+msgid ""
+"\n"
+"  <p>Select the new status</p>\n"
+msgstr ""
 
 #: Crm/templates/Crm/unsubscribe_contacts_import.html:11
 msgid "Unsubscribe contacts"

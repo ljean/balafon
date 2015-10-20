@@ -6,5 +6,9 @@
 {% else %}
   {% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
 {% endif %}
-{% if action.status %}<div class="label label-default">{{action.status}}</div>&nbsp;{% endif %}
+{% if action.status %}
+  <a href="{% url 'crm_update_action_status' action.id %}" class="colorbox-form btn btn-xs btn-default btn-action-status">
+    {{action.status}}
+  </a>&nbsp;
+{% endif %}
 {% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}

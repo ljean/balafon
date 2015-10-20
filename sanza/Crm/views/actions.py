@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response, render, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
-from colorbox.decorators import popup_redirect, popup_reload
+from colorbox.decorators import popup_redirect, popup_reload, popup_close
 
 from sanza.Crm import models, forms
 from sanza.Crm.signals import action_cloned
@@ -512,5 +512,33 @@ def clone_action(request, action_id):
     return render(
         request,
         'Crm/popup_clone_action.html',
+        context,
+    )
+
+@user_passes_test(can_access)
+@popup_close
+def update_action_status(request, action_id):
+    """change the action status"""
+
+    action = get_object_or_404(models.Action, id=action_id)
+
+    if request.method == 'POST':
+        form = forms.UpdateActionStatusForm(request.POST, instance=action)
+        if form.is_valid():
+            action.status = form.cleaned_data['status']
+            action.save()
+
+            return None
+    else:
+        form = forms.UpdateActionStatusForm(instance=action)
+
+    context = {
+        'form': form,
+        'action': action,
+    }
+
+    return render(
+        request,
+        'Crm/popup_update_action_status.html',
         context,
     )

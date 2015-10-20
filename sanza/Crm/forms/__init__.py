@@ -5,7 +5,7 @@ import floppyforms as forms
 
 from sanza.Crm.forms.actions import (
     ActionForm, ActionDocumentForm, ActionDoneForm, ActionTypeForm, CloneActionForm, SelectOpportunityForm,
-    OpportunityForm, OpportunityStatusForm
+    OpportunityForm, OpportunityStatusForm, UpdateActionStatusForm
 )
 from sanza.Crm.forms.base import BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity
 from sanza.Crm.forms.contacts import (
