@@ -7,7 +7,11 @@
   {% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
 {% endif %}
 {% if action.status %}
-  <a href="{% url 'crm_update_action_status' action.id %}" class="colorbox-form btn btn-xs btn-default btn-action-status">
+  <a
+    href="{% url 'crm_update_action_status' action.id %}"
+    class="colorbox-form btn btn-xs btn-default btn-action-status"
+    style="{{ action.status.style }}"
+  >
     {{action.status}}
   </a>&nbsp;
 {% endif %}

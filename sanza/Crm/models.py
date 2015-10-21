@@ -1059,6 +1059,28 @@ class ActionSet(NamedElement):
 class ActionStatus(NamedElement):
     """status for an action"""
     ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    is_final = models.BooleanField(
+        default=False,
+        verbose_name=_(u'is final'),
+        help_text=_(u'The action will be marked done when it gets a final status')
+    )
+    fore_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Fore color'),
+        help_text=_(u"Fore color. Must be a rgb code. For example: #ffffff")
+    )
+    background_color = models.CharField(
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Background color'),
+        help_text=_(u"Background color. Must be a rgb code. For example: #000000")
+    )
+
+    @property
+    def style(self):
+        style = ""
+        if self.background_color:
+            style += "background: {0}; ".format(self.background_color)
+        if self.fore_color:
+            style += "color: {0}; ".format(self.fore_color)
+        return style
 
     class Meta:
         verbose_name = _(u'action status')
@@ -1102,11 +1124,19 @@ class ActionType(NamedElement):
     next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
     not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_(u"Not assigned when cloned"))
     generate_uuid = models.BooleanField(default=False, verbose_name=_(u"Generate UUID for action"))
+    hide_contacts_buttons = models.BooleanField(
+        default=False,
+        verbose_name=_(u'hide contacts buttons'),
+        help_text=_(u'The add and remove contact buttons will be hidden')
+    )
 
     def status_defined(self):
         """true if a status is defined for this type"""
         return self.allowed_status.count() > 0
     status_defined.short_description = _(u"Status defined")
+
+    def has_final_status(self):
+        return self.allowed_status.filter(is_final=True).exists()
 
     def save(self, *args, **kwargs):
         """save: create the corresponding menu"""
@@ -1280,6 +1310,12 @@ class Action(LastModifiedModel):
 
     def save(self, *args, **kwargs):
         """save"""
+
+        if self.status and self.status.is_final:
+            self.done = True
+        elif self.type and self.type.allowed_status.filter(is_final=True).exists():
+            self.done = False
+
         if not self.done_date and self.done:
             self.done_date = now_rounded()
         elif self.done_date and not self.done:

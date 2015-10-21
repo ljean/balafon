@@ -5,6 +5,7 @@
   </a>
 </li>
 
+{% if not action.type.hide_contacts_buttons %}
 <li>
   <a class="colorbox-form" href="{% url 'crm_add_contact_to_action' action.id %}">
     <span class="glyphicon glyphicon-user"></span> {% trans "Add contact" %}
@@ -16,6 +17,7 @@
     <span class="glyphicon glyphicon-tower"></span> {% trans "Add entity" %}
   </a>
 </li>
+{% endif %}
 
 {% if not action.opportunity %}
 <li>

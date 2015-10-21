@@ -1532,7 +1532,7 @@ class UpdateActionStatusTest(BaseTestCase):
     """Can update status"""
 
     def test_view_update_action_status(self):
-        """view form"""
+        """it should display form"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1564,7 +1564,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, None)
 
     def test_view_update_action_status_existing(self):
-        """view form"""
+        """it should display form"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1596,8 +1596,42 @@ class UpdateActionStatusTest(BaseTestCase):
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, action_status1)
 
+    def test_view_update_action_status_on_done(self):
+        """it should display form"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus, is_final=True)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status1)
+        action_type.allowed_status.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, status=action_status1)
+
+        url = reverse('crm_update_action_status', args=[action.id]) + "?done=1"
+
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(2, len(soup.select("#id_status option")))
+        self.assertContains(response, action_status1.name)
+        self.assertContains(response, action_status2.name)
+        self.assertNotContains(response, action_status3.name)
+
+        #show a final status has selected item
+        self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
+        self.assertEqual(action_status2.name, soup.select("#id_status option[selected=selected]")[0].text)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status, action_status1)
+
     def test_update_action_status(self):
-        """change status"""
+        """it should change status"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1627,7 +1661,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, action_status2)
 
     def test_update_action_status_invalid(self):
-        """change status"""
+        """it should show error"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1657,7 +1691,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, None)
 
     def test_update_action_status_existing(self):
-        """change status"""
+        """it should change status"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1687,7 +1721,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, action_status2)
 
     def test_update_action_status_existing_invalid(self):
-        """change status"""
+        """it should show error"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1717,7 +1751,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, action_status1)
 
     def test_update_action_status_anonymous(self):
-        """change status"""
+        """it should show error"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1745,7 +1779,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.status, None)
 
     def test_update_action_status_denied(self):
-        """change status"""
+        """it should show error"""
 
         action_status1 = mommy.make(models.ActionStatus)
         action_status2 = mommy.make(models.ActionStatus)
@@ -1773,4 +1807,25 @@ class UpdateActionStatusTest(BaseTestCase):
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, None)
 
+    def test_save_final_status(self):
+        """It should change the done flag"""
 
+        action_status1 = mommy.make(models.ActionStatus, is_final=True)
+        action_status2 = mommy.make(models.ActionStatus, is_final=False)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status1)
+        action_type.allowed_status.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, done=False)
+
+        action.status = action_status1
+        action.save()
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.done, True)
+
+        action.status = action_status2
+        action.save()
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.done, False)

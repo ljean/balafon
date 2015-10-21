@@ -8,8 +8,11 @@
       {% if not c.entity.is_single_contact %}
         <a href="{% url 'crm_view_entity' c.entity.id %}">({{ c.entity }})</a>
       {% endif %}
+      {% if not action.type.hide_contacts_buttons %}
       <a href="{% url 'crm_remove_contact_from_action' action.id c.id %}" class="colorbox-form">
-          <span class="glyphicon glyphicon-remove"></span></a>
+          <span class="glyphicon glyphicon-remove"></span>
+      </a>
+      {% endif %}
     </span>&nbsp;
   {% endfor %}
 
@@ -17,9 +20,11 @@
     <span class="label label-bigger label-primary">
       <span class="glyphicon glyphicon-tower"></span>
       <a href="{% url 'crm_view_entity' e.id %}">{{ e }}</a>
+      {% if not action.type.hide_contacts_buttons %}
       <a href="{% url 'crm_remove_entity_from_action' action.id e.id %}" class="colorbox-form">
           <span class="glyphicon glyphicon-remove"></span>
       </a>
+      {% endif %}
     </span>&nbsp;
   {% endfor %}
 </div>

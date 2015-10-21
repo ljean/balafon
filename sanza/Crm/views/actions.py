@@ -530,6 +530,15 @@ def update_action_status(request, action_id):
 
             return None
     else:
+
+        # When the popup is shown after clicking on "done" button
+        # show a final status has default value
+        on_do = request.GET.get('done', None)
+        if on_do and action.type:
+            final_status = action.type.allowed_status.filter(is_final=True)
+            if final_status.count():
+                action.status = final_status[0]
+
         form = forms.UpdateActionStatusForm(instance=action)
 
     context = {

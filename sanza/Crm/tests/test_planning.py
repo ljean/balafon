@@ -620,6 +620,138 @@ class ActionArchiveTest(BaseTestCase):
             [x["value"] for x in soup.select("select option[selected=selected]")]
         )
 
+    def test_view_action_final_status(self):
+        """It should show change status when clicking on done button"""
+
+        status1 = mommy.make(models.ActionStatus, is_final=True)
+        status2 = mommy.make(models.ActionStatus, is_final=False)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(status1)
+        action_type.allowed_status.add(status2)
+        action_type.save()
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
+
+        now = datetime.now()
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".action")), 1)
+        self.assertContains(response, reverse('crm_update_action_status', args=[action1.id])+"?done=1")
+        self.assertNotContains(response, reverse('crm_do_action', args=[action1.id]))
+
+    def test_view_action_no_final_status(self):
+        """It should show change done flag when clicking on done button"""
+
+        status1 = mommy.make(models.ActionStatus, is_final=False)
+        status2 = mommy.make(models.ActionStatus, is_final=False)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(status1)
+        action_type.allowed_status.add(status2)
+        action_type.save()
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
+
+        now = datetime.now()
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".action")), 1)
+        self.assertNotContains(response, reverse('crm_update_action_status', args=[action1.id])+"?done=1")
+        self.assertContains(response, reverse('crm_do_action', args=[action1.id]))
+
+    def test_view_action_status_style(self):
+        """It should show status color correctly"""
+
+        status1 = mommy.make(models.ActionStatus, fore_color="#fff;", background_color="#000")
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), status=status1)
+
+        now = datetime.now()
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".action")), 1)
+        self.assertContains(response, "background: #000;")
+        self.assertContains(response, "color: #fff;")
+
+    def test_show_action_contacts_buttons(self):
+        """It should show add/remove contacts/entities buttons"""
+
+        action_type = mommy.make(models.ActionType)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
+
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        action1.contacts.add(contact)
+        action1.entities.add(entity)
+        action1.save()
+
+        now = datetime.now()
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".action")), 1)
+
+        urls = (
+            reverse('crm_add_contact_to_action', args=[action1.id]),
+            reverse('crm_add_entity_to_action', args=[action1.id]),
+            reverse('crm_remove_contact_from_action', args=[action1.id, contact.id]),
+            reverse('crm_remove_entity_from_action', args=[action1.id, entity.id]),
+        )
+
+        for link_url in urls:
+            self.assertContains(response, link_url)
+
+    def test_hide_action_contacts_buttons(self):
+        """It should hide add/remove contacts/entities buttons"""
+
+        action_type = mommy.make(models.ActionType, hide_contacts_buttons=True)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
+
+        contact = mommy.make(models.Contact)
+        entity = mommy.make(models.Entity)
+
+        action1.contacts.add(contact)
+        action1.entities.add(entity)
+        action1.save()
+
+        now = datetime.now()
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, action1.subject)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select(".action")), 1)
+
+        urls = (
+            reverse('crm_add_contact_to_action', args=[action1.id]),
+            reverse('crm_add_entity_to_action', args=[action1.id]),
+            reverse('crm_remove_contact_from_action', args=[action1.id, contact.id]),
+            reverse('crm_remove_entity_from_action', args=[action1.id, entity.id]),
+        )
+
+        for link_url in urls:
+            self.assertNotContains(response, link_url)
+
 
 class PlanningRedirectView(BaseTestCase):
     """Test redirections"""
