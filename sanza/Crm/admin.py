@@ -39,10 +39,13 @@ class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated',
-        'default_template', 'is_editable',
+        'default_template', 'is_editable', 'hide_contacts_buttons',
     ]
-    list_filter = ['set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template']
-    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated']
+    list_filter = [
+        'set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template',
+        'hide_contacts_buttons',
+    ]
+    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons',]
 
 admin.site.register(models.ActionType, ActionTypeAdmin)
 
@@ -145,7 +148,16 @@ admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin
 
 admin.site.register(models.ContactsImport)
 admin.site.register(models.ActionSet)
-admin.site.register(models.ActionStatus)
+
+
+class ActionStatusAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['name', 'ordering', 'is_final', 'background_color', 'fore_color']
+    list_filter = ['is_final']
+    list_editable = ['ordering', 'is_final', 'background_color', 'fore_color']
+
+admin.site.register(models.ActionStatus, ActionStatusAdmin)
+
 admin.site.register(models.ActionDocument)
 
 
