@@ -803,6 +803,8 @@
                         class="form-control"
                         required="required"
                         type="number"
+                        step="any"
+                        min="0"
                         ng-model="item.quantity"
                         ng-show="editedLines[$index] && !changeOrder"
                         name=quantity
