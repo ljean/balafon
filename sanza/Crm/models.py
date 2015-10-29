@@ -1432,7 +1432,8 @@ class ActionDocument(models.Model):
     
     
 class CustomField(models.Model):
-    """An additionnal field for a contact or an entity"""
+    """An additional field for a contact or an entity"""
+
     MODEL_ENTITY = 1
     MODEL_CONTACT = 2
     
