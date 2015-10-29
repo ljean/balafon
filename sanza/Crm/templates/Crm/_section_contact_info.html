@@ -48,11 +48,6 @@
       <a href="{% url 'crm_view_entity' contact.entity.id %}" class="contact-entity-info">
         {{contact.entity}}
       </a>
-      <div style="margin-top: 3px;">
-      {% with contact.get_roles as roles %}
-        {% for role in roles %}<span class="label label-xs label-default">{{role}}</span>{% endfor %}
-      {% endwith %}
-      </div>
     </div>
     {% endif %}
   </div>
@@ -91,6 +86,16 @@
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
       </td></tr>
+
+      {% with contact.get_roles as roles %}
+      {% if roles %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Roles' %}" class="glyphicon glyphicon-film"></span>
+        {{ roles|join:", " }}
+      </td></tr>
+      {% endif %}
+      {% endwith %}
+
       {% if contact.favorite_language %}
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
