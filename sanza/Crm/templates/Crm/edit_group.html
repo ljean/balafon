@@ -196,9 +196,11 @@
             <span class="glyphicon glyphicon-plus colorbox-form"></span> {% trans 'Add new member' %}
           </a>
 
+          {% if group %}
           <a class="btn btn-sm btn-default" href="{% url 'search_group' group.id %}">
             <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
           </a>
+          {% endif %}
       </tr>
 
     </table>

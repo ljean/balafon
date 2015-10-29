@@ -34,7 +34,7 @@ class GroupTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
     def test_add_group_new(self):
-        """add entiyy to non-existing group"""
+        """add entity to non-existing group"""
         entity = mommy.make(models.Entity)
         data = {
             'group_name': 'toto'
@@ -592,11 +592,35 @@ class GetGroupsListTestCase(GroupSuggestListTestCase):
 class EditGroupTestCase(BaseTestCase):
     """test edit group"""
 
+    def test_view_add_group(self):
+        """it should display the edit group page"""
+        response = self.client.get(reverse('crm_add_group'))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 0)
+
+    def test_add_group(self):
+        """it should modify add group"""
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+        }
+        response = self.client.post(reverse('crm_add_group'), data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 1)
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+
     def test_view_edit_group(self):
         """it should display the edit group page"""
         group = mommy.make(models.Group)
         response = self.client.get(reverse('crm_edit_group', args=[group.id]))
         self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 1)
 
     def test_edit_group(self):
         """it should modify the group"""
@@ -609,6 +633,7 @@ class EditGroupTestCase(BaseTestCase):
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 1)
         group = models.Group.objects.get(id=group.id)
         self.assertEqual(group.name, data['name'])
         self.assertEqual(group.description, data['description'])
