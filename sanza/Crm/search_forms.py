@@ -1253,6 +1253,58 @@ class EntityWithCustomField(SearchFieldForm):
         return Q(entity__entitycustomfieldvalue__custom_field=custom_field)
     
 
+class CustomFieldBaseSearchForm(SearchFieldForm):
+    """Base class for any Custom Field """
+    custom_field_name = ''
+    model = None
+    widget = None
+
+    def __init__(self, *args, **kwargs):
+        super(CustomFieldBaseSearchForm, self).__init__(*args, **kwargs)
+
+        self.custom_field = models.CustomField.objects.get_or_create(
+            name=self.custom_field_name, model=self.model
+        )[0]
+
+        label = self.custom_field.label or self.custom_field.name
+
+        field = forms.CharField(
+            label=label,
+            widget=self.widget
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = self.value
+        custom_field = self.custom_field
+
+        if custom_field.model == models.CustomField.MODEL_ENTITY:
+            queryset = models.EntityCustomFieldValue.objects.filter(custom_field=self.custom_field, value=value)
+            entity_ids = [custom_field_value.entity.id for custom_field_value in queryset]
+            return Q(entity__id__in=entity_ids)
+        else:
+            queryset = models.ContactCustomFieldValue.objects.filter(custom_field=self.custom_field, value=value)
+            contact_ids = [custom_field_value.contact.id for custom_field_value in queryset]
+            return Q(id__in=contact_ids)
+
+
+class UnitTestEntityCustomFieldForm(CustomFieldBaseSearchForm):
+    """Unit test for entity"""
+    custom_field_name = 'ut_cf_entity'
+    name = 'cf_ut_cf_entity'
+    model = models.CustomField.MODEL_ENTITY
+    label = "entity custom field"
+
+
+class UnitTestContactCustomFieldForm(CustomFieldBaseSearchForm):
+    """Unit test for contacts"""
+    custom_field_name = 'ut_cf_contact'
+    name = 'cf_ut_cf_contact'
+    model = models.CustomField.MODEL_CONTACT
+    label = "contact custom field"
+
+
 class SortContacts(SearchFieldForm):
     """sort contacts"""
     name = 'sort'
