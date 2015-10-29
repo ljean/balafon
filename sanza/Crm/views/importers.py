@@ -472,7 +472,7 @@ def confirm_contacts_import(request, import_id):
             )
         )
 
-    return HttpResponseRedirect(reverse("crm_new_contacts_import"))
+    return HttpResponseRedirect(reverse("crm_confirm_contacts_import", args=[import_id]))
 
 
 @user_passes_test(can_access)
@@ -501,7 +501,6 @@ def unsubscribe_contacts_import(request):
 
             except UnicodeDecodeError:
                 error(request, _(u"Unicode error while reading the file"))
-
 
             return HttpResponseRedirect(reverse('sanza_homepage'))
     else:
