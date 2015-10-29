@@ -4,9 +4,10 @@
 import floppyforms as forms
 
 from sanza.Crm import models
+from sanza.Crm.forms.base import BetterBsForm
 
 
-class CustomFieldForm(forms.Form):
+class CustomFieldForm(BetterBsForm):
     """base form for custom fields"""
     def __init__(self, instance, *args, **kwargs):
         super(CustomFieldForm, self).__init__(*args, **kwargs)
@@ -14,10 +15,11 @@ class CustomFieldForm(forms.Form):
         model_type = self._get_model_type()
         custom_fields = models.CustomField.objects.filter(model=model_type)
         for field in custom_fields:
-            self.fields[field.name] = forms.CharField(required=False, label=field.label)
+            self.fields[field.name] = forms.CharField(required=False, label=field.label or field.name)
 
+            self.fields[field.name].widget.attrs = {'class': 'form-control'}
             if field.widget:
-                self.fields[field.name].widget.attrs = {'class': field.widget}
+                self.fields[field.name].widget.attrs['class'] += ' ' + field.widget
 
             #No Post
             if len(args) == 0:
