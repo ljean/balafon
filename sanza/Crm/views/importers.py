@@ -278,15 +278,16 @@ def _create_contact(contact_data, contacts_import, entity_dict):
         is_first_for_entity = entity.name not in entity_dict
         entity_dict[entity.name] = True
 
-    for group in contacts_import.groups.all():
-        group.entities.add(entity)
-        group.save()
-
     #Contact
     contact = models.Contact.objects.get_or_create(
         entity=entity, firstname=contact_data['firstname'], lastname=contact_data['lastname']
     )[0]
     contact.imported_by = contacts_import
+
+    for group in contacts_import.groups.all():
+        group.contacts.add(contact)
+        group.save()
+
     return contact, is_first_for_entity
 
 
