@@ -206,7 +206,7 @@ def get_imports_fields():
         'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
         'address', 'address2', 'address3', 'city', 'cedex', 'zip_code', 'country',
-        'entity.groups', 'groups', 'favorite_language',
+        'entity.groups', 'groups', 'favorite_language', 'title', 'birth_date'
     ]
 
     #custom fields
@@ -310,6 +310,7 @@ def _set_contact_fields(contact, contact_data, fields, complex_fields, default_d
             contact_data['country'],
             default_department
         )
+
     if contact_data['entity.city']:
         contact.entity.city = resolve_city(
             contact_data['entity.city'],
@@ -317,12 +318,25 @@ def _set_contact_fields(contact, contact_data, fields, complex_fields, default_d
             contact_data['entity.country'],
             default_department
         )
+
     if contact_data['role']:
         for role_exists, role in zip(contact_data['role_exists'], contact_data['role']):
             if role_exists:
                 contact.role.add(models.EntityRole.objects.filter(name__iexact=role)[0])
             else:
                 contact.role.add(models.EntityRole.objects.create(name=role))
+
+    if contact_data['birth_date']:
+        value = contact_data['birth_date']
+        date_value = None
+        date_formats = ["%Y-%m-%d", "%d/%m/%Y"]
+        for date_format in date_formats:
+            try:
+                date_value = datetime.strptime(value, date_format).date()
+                break
+            except ValueError:
+                date_value = None
+        contact.birth_date = date_value
 
     for (is_entity, key) in ((True, 'entity_groups'), (False, 'contact_groups')):
         for group_data in contact_data[key]:

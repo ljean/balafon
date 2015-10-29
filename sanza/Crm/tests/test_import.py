@@ -6,8 +6,9 @@ if 'localeurl' in settings.INSTALLED_APPS:
     from localeurl.models import patch_reverse
     patch_reverse()
 
-import os.path
 from bs4 import BeautifulSoup
+from datetime import date
+import os.path
 
 from django.core.urlresolvers import reverse
 
@@ -38,7 +39,7 @@ class ImportFileTest(BaseTestCase):
             'entity.address', 'entity.address2', 'entity.address3',
             'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
             'address', 'address2', 'address3', 'city', 'cedex', 'zip_code', 'country',
-            'entity.groups', 'groups', 'favorite_language',
+            'entity.groups', 'groups', 'favorite_language', "title", "birth_date",
         ]
 
     def test_create_contacts_import(self, filename='contacts1.csv'):
@@ -161,6 +162,7 @@ class ImportFileTest(BaseTestCase):
         self.assertEqual(contact.entity.group_set.count(), 2)
         self.assertEqual(contact.role.all()[0].name, "Boss")
         self.assertEqual(contact.favorite_language, "fr")
+        self.assertEqual(contact.birth_date, date(1975, 2, 20))
 
     def test_confirm_import_subscriptions(self):
         """view confirm contact"""
@@ -429,7 +431,6 @@ class UnsubscribeImportFileTest(BaseTestCase):
         self.assertEqual(len(soup.select("#id_input_file .label-danger")), 1)
 
 
-
 class ImportTemplateTest(BaseTestCase):
     """Import test"""
 
@@ -475,6 +476,7 @@ class ImportTemplateTest(BaseTestCase):
             'entity.fax', 'entity.notes', 'entity.address', 'entity.address2', 'entity.address3',
             'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
             'address3', 'city', 'cedex', 'zip_code', 'country', 'entity.groups', 'groups', 'favorite_language',
+            'title', 'birth_date'
         ]
 
         for i, field in enumerate(fields):
