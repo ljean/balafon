@@ -21,8 +21,9 @@ admin.site.register(models.ActionMenu)
 
 class EntityTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['id', 'name', 'gender', 'order']
-    list_editable = ['name', 'gender', 'order']
+    list_display = ['id', 'name', 'gender', 'order', 'subscribe_form']
+    list_editable = ['name', 'gender', 'order', 'subscribe_form']
+    list_filter = ['subscribe_form']
 
 admin.site.register(models.EntityType, EntityTypeAdmin)
 
