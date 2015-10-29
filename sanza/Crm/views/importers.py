@@ -121,9 +121,19 @@ def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
 
 def _set_contact_roles(contact_data, role_dict):
     """set the contact role properly"""
-    contact_data['role'] = [x.strip() for x in contact_data['role'].split(";") if x.strip()]
+
+    split_roles = lambda text, sep: [elt.strip() for elt in text.split(sep) if elt.strip()]
+    roles = contact_data['role']
+    if ';' in roles:
+        roles = split_roles(roles, ";")
+    elif ',' in roles:
+        roles = split_roles(roles, ",")
+    else:
+        roles = [roles.strip()]
+
+    contact_data['role'] = roles
     contact_data['role_exists'] = []
-    for role in contact_data['role']:
+    for role in roles:
         contact_data['role_exists'].append(
             (models.EntityRole.objects.filter(name__iexact=role).count() != 0) or (role.lower() in role_dict)
         )
@@ -472,7 +482,8 @@ def confirm_contacts_import(request, import_id):
             )
         )
 
-    return HttpResponseRedirect(reverse("crm_confirm_contacts_import", args=[import_id]))
+    return HttpResponseRedirect(reverse("crm_new_contacts_import"))
+
 
 
 @user_passes_test(can_access)
