@@ -1464,7 +1464,7 @@ class CustomField(models.Model):
     class Meta:
         verbose_name = _(u'custom field')
         verbose_name_plural = _(u'custom fields')
-        ordering = ('ordering', )
+        ordering = ('ordering', 'import_order', 'export_order')
 
 
 class CustomFieldValue(models.Model):
