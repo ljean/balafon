@@ -6,14 +6,14 @@
 {% block section_title %}
 <div class="row">
   <div class="col-md-5">
-    <a class="header-link" href="{% url "crm_view_contact" contact.id %}">
+    <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">
       <span class="glyphicon glyphicon-user"></span>
       <div class="logo-container">
         <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
       </div>
     </a>
     <div style="display: inline-block; vertical-align: middle;">
-      <a class="header-link" href="{% url "crm_view_contact" contact.id %}">{{contact.fullname}}</a>
+      <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">{{contact.fullname}}</a>
       {% if contact.same_as %}
         {% if contact == contact.same_as.main_contact %}
             <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
@@ -45,7 +45,7 @@
       <img {{contact.entity.get_logo_center_style}} class="contact-entity-logo" src="{{contact.entity.get_safe_logo}}">
     </div>
     <div class="inline-block">
-      <a href="{% url "crm_view_entity" contact.entity.id %}" class="contact-entity-info">
+      <a href="{% url 'crm_view_entity' contact.entity.id %}" class="contact-entity-info">
         {{contact.entity}}
       </a>
       <div style="margin-top: 3px;">
@@ -104,7 +104,7 @@
     
     <div class="note" style="margin-bottom: 5px;">
       
-      <span class="contenteditable" contenteditable="true" rel="{% url "auto_save_data" "contact" "notes" contact.id %}">
+      <span class="contenteditable" contenteditable="true" rel="{% url 'auto_save_data' 'contact' 'notes' contact.id %}">
         {{contact.notes|linebreaksbr|default:"&nbsp;"}}
       </span>
       
@@ -140,9 +140,9 @@
 {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
-    <li><a class="colorbox-form" href="{% url "crm_edit_contact" contact.id %}">{% trans "Edit" %}</a></li>
-    <li><a class="colorbox-form" href="{% url "crm_delete_contact" contact.id%}">{% trans "Delete" %}</a></li>
-    <li><a class="colorbox-form" href="{% url "crm_change_contact_entity" contact.id%}">{% trans "Reassign" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
 {% endblock %}
 
 {% block section_favorite %}
