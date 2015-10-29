@@ -223,6 +223,8 @@ def get_imports_fields():
             custom_fields.append(custom_field)
         except models.CustomField.DoesNotExist:
             custom_fields.append(None)
+        except models.CustomField.MultipleObjectsReturned:
+            raise Exception(_(u"There are several custom fields with index {0}").format(index_))
 
     return fields, custom_fields
 
@@ -460,10 +462,13 @@ def confirm_contacts_import(request, import_id):
             request,
             _(u"An error occurred while reading the csv file. You should check that the file encoding is correct.")
         )
-    except Exception: #pylint: disable broad-except
+    except Exception, msg:  # pylint: disable broad-except
         error(
             request,
-            _(u"An error occurred. You should check that the file is a valid csv file.")
+            u'{0}: {1}'.format(
+                _(u"An error occurred. You should check that the file is a valid csv file."),
+                msg
+            )
         )
 
     return HttpResponseRedirect(reverse("crm_new_contacts_import"))
