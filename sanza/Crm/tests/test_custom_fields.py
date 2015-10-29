@@ -110,7 +110,7 @@ class CustomFieldTest(BaseTestCase):
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'class="datepicker"')
+        self.assertContains(response, 'class="form-control datepicker"')
 
     def test_contact_get_custom_field(self):
         """conatct custom fields"""
