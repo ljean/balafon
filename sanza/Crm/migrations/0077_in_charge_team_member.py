@@ -19,8 +19,11 @@ class Migration(DataMigration):
             )
 
         for action in orm.Action.objects.filter(in_charge_backup__isnull=False):
-            action.in_charge = staff[action.in_charge_backup.username]
-            action.save()
+            try:
+                action.in_charge = staff[action.in_charge_backup.username]
+                action.save()
+            except KeyError:
+                pass
 
     def backwards(self, orm):
         "Write your backwards methods here."
