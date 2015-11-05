@@ -1086,6 +1086,35 @@ class NoSameAsForm(YesNoSearchFieldForm):
                 else:
                     filtered_contacts.append(contact)
             return filtered_contacts
+        
+        
+class NoSameEmailForm(YesNoSearchFieldForm):
+    """Allow same as contact in results"""
+    name = 'no_same_email'
+    label = _(u'Allow duplicate emails')
+    
+    def get_lookup(self):
+        """lookup"""
+        pass
+    
+    def get_exclude_lookup(self):
+        """exclude lookup"""
+        pass
+    
+    def global_post_process(self, contacts):
+        """this filters the full list of results"""
+        if self.is_yes():
+            return contacts
+        else:
+            emails = {}
+            filtered_contacts = []
+            for contact in contacts:
+                email = contact.get_email
+                if email:
+                    if email not in emails:
+                        emails[email] = contact
+                        filtered_contacts.append(contact)
+            return filtered_contacts
 
 
 class ContactsImportSearchForm(SearchFieldForm):

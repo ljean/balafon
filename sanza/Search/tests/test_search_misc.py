@@ -567,3 +567,100 @@ class LanguageSearchTest(BaseTestCase):
         self.assertContains(response, contact1.lastname)
         self.assertNotContains(response, contact2.lastname)
         self.assertNotContains(response, contact3.lastname)
+
+
+class SameEmailTest(BaseTestCase):
+    """Search same-email"""
+
+    def test_search_email_not_allowed1(self):
+        """same as not allowed: search on entity group"""
+
+        contact1 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+        )
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.default_contact.delete()
+        contact1.entity.save()
+
+        contact2 = mommy.make(
+            models.Contact, lastname=u"EFGH", email="contact1@email1.fr", main_contact=True, has_left=False
+        )
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.default_contact.delete()
+        contact2.entity.save()
+
+        contact3 = mommy.make(
+            models.Contact, lastname=u"IJKL", main_contact=True, has_left=False
+        )
+        contact3.entity.email = 'contact1@email1.fr'
+        contact3.save()
+
+        contact4 = mommy.make(
+            models.Contact, lastname=u"MNOP", email="contact4@email1.fr",  main_contact=True, has_left=False
+        )
+
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(contact1.entity)
+        group.entities.add(contact2.entity)
+        group.entities.add(contact3.entity)
+        group.entities.add(contact4.entity)
+        group.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_email-_-1": '0'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertContains(response, contact4.lastname)
+
+    def test_search_email_allowed1(self):
+        """same eail allowed: search on entity group"""
+
+        contact1 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+        )
+        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.default_contact.delete()
+        contact1.entity.save()
+
+        contact2 = mommy.make(
+            models.Contact, lastname=u"EFGH", email="contact1@email1.fr", main_contact=True, has_left=False
+        )
+        contact2.entity.name = u'Other Corp'
+        contact2.entity.default_contact.delete()
+        contact2.entity.save()
+
+        contact3 = mommy.make(
+            models.Contact, lastname=u"IJKL", main_contact=True, has_left=False
+        )
+        contact3.entity.email = 'contact1@email1.fr'
+        contact3.save()
+
+        contact4 = mommy.make(
+            models.Contact, lastname=u"MNOP", email="contact4@email1.fr",  main_contact=True, has_left=False
+        )
+
+        group = mommy.make(models.Group, name="GROUP1")
+        group.entities.add(contact1.entity)
+        group.entities.add(contact2.entity)
+        group.entities.add(contact3.entity)
+        group.entities.add(contact4.entity)
+        group.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-group-_-0": group.id, "gr0-_-no_same_email-_-1": '1'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertContains(response, contact4.lastname)
+

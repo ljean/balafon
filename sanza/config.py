@@ -118,6 +118,7 @@ SEARCH_FORMS = [
         _(u'Options'),
         [
             search_forms.NoSameAsForm,
+            search_forms.NoSameEmailForm,
             search_forms.SortContacts,
         ],
     ), (
