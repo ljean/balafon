@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 00:58+0100\n"
+"POT-Creation-Date: 2015-11-05 01:51+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr "Groupe"
 msgid "Location"
 msgstr "Lieu"
 
-#: config.py:43 Crm/models.py:1441 Crm/search_forms.py:1347
+#: config.py:43 Crm/models.py:1441 Crm/search_forms.py:1358
 #: Crm/forms/entities.py:87 Crm/templates/Crm/confirm_contacts_import.html:70
 #: Search/views.py:354 templates/sanza/_bs_navigation.html:60
 #: templates/sanza/_navigation.html:27
@@ -84,7 +84,7 @@ msgstr "Format RGB (exemple (#123456) attendu"
 msgid "Pdf"
 msgstr "Pdf"
 
-#: Crm/models.py:34 Crm/search_forms.py:1346 Crm/forms/contacts.py:44
+#: Crm/models.py:34 Crm/search_forms.py:1357 Crm/forms/contacts.py:44
 #: Crm/forms/contacts.py:184 Crm/forms/entities.py:34
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:14 Search/forms.py:769
@@ -746,7 +746,7 @@ msgstr "contenu"
 msgid "template"
 msgstr "Modèle"
 
-#: Crm/models.py:1442 Crm/search_forms.py:1348 Crm/forms/contacts.py:164
+#: Crm/models.py:1442 Crm/search_forms.py:1359 Crm/forms/contacts.py:164
 #: Crm/forms/contacts.py:169 Crm/forms/contacts.py:207
 #: Crm/forms/contacts.py:248 Crm/forms/contacts.py:266
 #: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:524
@@ -1072,7 +1072,7 @@ msgstr "Contact secondaire"
 msgid "Include"
 msgstr "Inclure"
 
-#: Crm/search_forms.py:796 Crm/search_forms.py:817
+#: Crm/search_forms.py:796 Crm/search_forms.py:817 Crm/search_forms.py:1098
 msgid "Only"
 msgstr "Seulement"
 
@@ -1171,56 +1171,60 @@ msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
 #: Crm/search_forms.py:1094
-msgid "Allow duplicate emails"
-msgstr "Accepte les emails en doublon"
+msgid "Duplicate emails"
+msgstr "Emails en doublon"
 
-#: Crm/search_forms.py:1123 Crm/templates/Crm/confirm_contacts_import.html:44
+#: Crm/search_forms.py:1098
+msgid "Exclude"
+msgstr "Exclure"
+
+#: Crm/search_forms.py:1134 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
 #: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:266
 msgid "Import"
 msgstr "Import"
 
-#: Crm/search_forms.py:1139
+#: Crm/search_forms.py:1150
 msgid "Contacts by update date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:1150
+#: Crm/search_forms.py:1161
 msgid "Contacts by creation date"
 msgstr "Contacts par date de création"
 
-#: Crm/search_forms.py:1161
+#: Crm/search_forms.py:1172
 msgid "Entities by update date"
 msgstr "Entités par date de mise à jour"
 
-#: Crm/search_forms.py:1172
+#: Crm/search_forms.py:1183
 msgid "Entities by creation date"
 msgstr "Entités par date de création"
 
-#: Crm/search_forms.py:1183
+#: Crm/search_forms.py:1194
 msgid "Contacts and entities by change date"
 msgstr "Contacts et entités par date de création/modification"
 
-#: Crm/search_forms.py:1197
+#: Crm/search_forms.py:1208
 msgid "Relationship type"
 msgstr "type de relation"
 
-#: Crm/search_forms.py:1231
+#: Crm/search_forms.py:1242
 msgid "Relationship dates"
 msgstr "Date de relation"
 
-#: Crm/search_forms.py:1248
+#: Crm/search_forms.py:1259
 msgid "Contacts with custom field"
 msgstr "Contacts avec un champ personnalisé"
 
-#: Crm/search_forms.py:1268
+#: Crm/search_forms.py:1279
 msgid "Entities with custom field"
 msgstr "Entités avec champ personnalisé"
 
-#: Crm/search_forms.py:1340
+#: Crm/search_forms.py:1351
 msgid "Sort contacts"
 msgstr "Tri des contacts par"
 
-#: Crm/search_forms.py:1349
+#: Crm/search_forms.py:1360
 msgid "Zipcode"
 msgstr "Code postal"
 
