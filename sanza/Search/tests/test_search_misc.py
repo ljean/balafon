@@ -576,27 +576,27 @@ class SameEmailTest(BaseTestCase):
         """same as not allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"ABCDEFG", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"EFGH", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"EFGHIJK", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKL", main_contact=True, has_left=False
+            models.Contact, lastname=u"IJKLMNO", main_contact=True, has_left=False
         )
         contact3.entity.email = 'contact1@email1.fr'
         contact3.entity.save()
 
         contact4 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact4@email1.fr",  main_contact=True, has_left=False
+            models.Contact, lastname=u"MNOPQRS", email="contact4@email1.fr",  main_contact=True, has_left=False
         )
 
         group = mommy.make(models.Group, name="GROUP1")
@@ -622,27 +622,27 @@ class SameEmailTest(BaseTestCase):
         """same eail allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"ABCDEFG", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"EFGH", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"EFGHIJK", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKL", main_contact=True, has_left=False
+            models.Contact, lastname=u"IJKLMNO", main_contact=True, has_left=False
         )
         contact3.entity.email = 'contact1@email1.fr'
         contact3.entity.save()
 
         contact4 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact4@email1.fr",  main_contact=True, has_left=False
+            models.Contact, lastname=u"MNOPQRS", email="contact4@email1.fr",  main_contact=True, has_left=False
         )
 
         group = mommy.make(models.Group, name="GROUP1")
