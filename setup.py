@@ -31,7 +31,7 @@ setup(
         'xlwt',
         'xlrd',
         'django-simple-captcha',
-        'django-registration',
+        'django-registration==1.0',
         'model_mommy',
         'django-tastypie',
         'django-cors-headers',
