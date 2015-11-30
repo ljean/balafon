@@ -3,11 +3,10 @@
 import six
 
 from django.core.exceptions import ValidationError
+from django.forms.forms import BoundField
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
-from form_utils.forms import BetterFormMetaclass, BetterModelFormMetaclass, BetterBaseForm
-from form_utils.forms import BetterForm, BetterModelForm
 
 from coop_cms.bs_forms import BootstrapableMixin
 
@@ -16,22 +15,41 @@ from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.utils import get_default_country
 
 
-# TODO **************
-# remove form_utils dependency
-# *******************
+class Fieldset(object):
 
-#redefine the BetterForm and BetterModelForm to be based on floppyforms.Form rather than django.forms.Form
-#This could cause bad creation of form if not
+    def __init__(self, name, fields, legend, classes):
+        self.name = name
+        self.fields = fields
+        self.legend = legend
+        self.classes = classes
 
-# class BetterForm(forms.Form, six.with_metaclass(BetterFormMetaclass, BetterBaseForm)):
-#     __doc__ = BetterBaseForm.__doc__
-#
-#
-# class BetterModelForm(forms.ModelForm, six.with_metaclass(BetterModelFormMetaclass, BetterBaseForm)):
-#     __doc__ = BetterBaseForm.__doc__
+    def __iter__(self):
+        for field in self.fields:
+            yield field
 
 
-class BetterBsForm(BetterForm, BootstrapableMixin):
+class FormWithFieldsetMixin(object):
+
+    @property
+    def fieldsets(self):
+        for fieldset_name, fieldset_attrs in self.Meta.fieldsets:
+
+            fields = []
+            for field_name in fieldset_attrs.get('fields', None) or []:
+                if field_name in self.fields:
+                    fields.append(
+                        BoundField(self, self.fields[field_name], field_name)
+                    )
+
+            yield Fieldset(
+                fieldset_name,
+                fields=fields,
+                legend=fieldset_attrs.get('legend', ''),
+                classes=fieldset_attrs.get('classes', ''),
+            )
+
+
+class BetterBsForm(forms.Form, BootstrapableMixin):
     """Base class inherit from Bootstrap and form-utils BetterForm"""
 
     class Media:
@@ -53,7 +71,7 @@ class BetterBsForm(BetterForm, BootstrapableMixin):
                     field.widget.attrs["class"] = klass + " chosen-select"
 
 
-class BetterBsModelForm(BetterModelForm, BootstrapableMixin): #(BetterModelForm):
+class BetterBsModelForm(forms.ModelForm, BootstrapableMixin):  # (BetterModelForm):
     """Base class inherit from Bootstrap and form-utils BetterModelForm"""
 
     class Media:

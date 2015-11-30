@@ -11,12 +11,12 @@ import floppyforms as forms
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithAddress
+from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
 from sanza.Crm.settings import get_language_choices, has_language_choices
 from sanza.Crm.widgets import ContactAutoComplete
 
 
-class ContactForm(ModelFormWithAddress):
+class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit contact form"""
 
     class Meta:

@@ -27,7 +27,6 @@ setup(
         'beautifulsoup4',
         'BeautifulSoup',
         'django-wkhtmltopdf',
-        'django-form-utils',
         'xlwt',
         'xlrd',
         'django-simple-captcha',

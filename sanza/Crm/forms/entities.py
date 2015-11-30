@@ -7,12 +7,12 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 import floppyforms as forms
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithAddress
+from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
 from sanza.Crm.settings import NO_ENTITY_TYPE
 from sanza.Crm.widgets import EntityAutoComplete
 
 
-class EntityForm(ModelFormWithAddress):
+class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit entity form"""
 
     def __init__(self, *args, **kwargs):

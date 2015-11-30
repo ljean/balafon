@@ -14,11 +14,11 @@ import floppyforms as forms
 from coop_cms.forms import AlohaEditableModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import BetterBsModelForm
+from sanza.Crm.forms.base import BetterBsModelForm, FormWithFieldsetMixin
 from sanza.Crm.widgets import OpportunityAutoComplete
 
 
-class ActionForm(BetterBsModelForm):
+class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
     """form for creating or editing action"""
 
     date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
@@ -78,7 +78,7 @@ class ActionForm(BetterBsModelForm):
                 action_type_name = action_type.name
 
         if action_type:
-            self.fieldsets['type'].legend = action_type.name
+            self.Meta.fieldsets['type'].legend = action_type.name
             self.fields['type'].widget = forms.HiddenInput()
             if instance:
                 self.title = ugettext(u"Edition {0}").format(action_type.name)
@@ -229,7 +229,7 @@ class ActionDoneForm(forms.ModelForm):
         super(ActionDoneForm, self).__init__(*args, **kwargs)
 
 
-class OpportunityForm(BetterBsModelForm):
+class OpportunityForm(FormWithFieldsetMixin, BetterBsModelForm):
     """opportunity form"""
     class Meta:
         """form from model"""
