@@ -613,9 +613,11 @@ class SameEmailTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        self.assertNotContains(response, contact1.lastname)
-        self.assertContains(response, contact2.lastname)
-        self.assertContains(response, contact3.lastname)
+        in_response_count = 0
+        for contact in (contact1, contact2, contact3):
+            in_response_count += 1 if response.content.find(contact.lastname) >= 0 else 0
+
+        self.assertEqual(2, in_response_count)  # 2 contacts on 3 are found
         self.assertNotContains(response, contact4.lastname)
 
     def test_search_email_exclude_duplicate(self):
