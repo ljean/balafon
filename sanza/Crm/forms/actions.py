@@ -78,7 +78,10 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 action_type_name = action_type.name
 
         if action_type:
-            self.Meta.fieldsets['type'].legend = action_type.name
+            for fieldset_name, fieldset_attrs in self.Meta.fieldsets:
+                if fieldset_name == 'type':
+                    fieldset_attrs['legend'] = action_type.name
+                    break
             self.fields['type'].widget = forms.HiddenInput()
             if instance:
                 self.title = ugettext(u"Edition {0}").format(action_type.name)
