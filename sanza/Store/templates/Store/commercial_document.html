@@ -51,6 +51,7 @@
         THE_VAT_REQUIRED: 'The VAT rate is required',
         SEND_BY_MAIL: 'Send by email',
         READ_ONLY: 'Read_only',
+        DOWNLOAD_AS_PDF: 'Download as PDF',
         EDIT_ORDER: 'Change order'
       });
 
@@ -80,6 +81,7 @@
         THE_VAT_REQUIRED: 'La TVA est requise',
         SEND_BY_MAIL: 'Envoyer par email',
         READ_ONLY: 'Lecture seule',
+        DOWNLOAD_AS_PDF: 'Télécharger en PDF',
         EDIT_ORDER: 'Changer l\'ordre'
       });
       $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
@@ -357,7 +359,7 @@
           return translate('ERROR');
         }
         return sum;
-      }
+      };
 
       $scope.getTotalTaxInclPrice = function() {
         var sum = 0;
@@ -370,7 +372,7 @@
           return translate('ERROR');
         }
         return sum;
-      }
+      };
 
       $scope.switchOffEditMode();
 
@@ -381,11 +383,11 @@
 
         if (isNaN(item.quantity)) {
           return translate('THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER');
-        };
+        }
 
         if (isNaN(item.order_index)) {
           return translate('THE_ORDER_INDEX_FIELD_IS_REQUIRED_NUMBER');
-        };
+        }
 
         if (isNaN(item.pre_tax_price)) {
           return translate('THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER');
@@ -396,7 +398,7 @@
         }
 
         return "";
-      }
+      };
 
       $scope.sortableListeners = {
           accept: function (sourceItemHandleScope, destSortableScope) {return true;},
@@ -633,24 +635,24 @@
 
     <div ng-controller="CommercialDocCtrl" class="container-fluid">
 
-      <div ng-hide="app.isPdf || app.isPublic" class="badges">
-        <div class="badge badge-inactive" ng-show="app.isReadOnly">
+      <div ng-hide="app.isPdf" class="badges">
+        <div class="badge badge-inactive" ng-show="app.isReadOnly && !app.isPublic">
           <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
         </div>
 
-        <div class="badge" ng-show="app.action.mail_to">
+        <div class="badge" ng-show="app.action.mail_to && !app.isPublic">
           <a href="{{app.action.mail_to}}">
             <span class="glyphicon glyphicon-envelope"></span> {{ 'SEND_BY_MAIL' | translate}}
           </a>
         </div>
 
-        <div class="badge" ng-repeat="entity in app.action.entities">
+        <div class="badge" ng-repeat="entity in app.action.entities" ng-show="!app.isPublic">
           <a href="{{ entity.get_view_url }}">
             <span class="glyphicon glyphicon-tower"></span> {{ entity.name }}
           </a>
         </div>
 
-        <div class="badge" ng-repeat="contact in app.action.contacts">
+        <div class="badge" ng-repeat="contact in app.action.contacts" ng-show="!app.isPublic">
           <a href="{{ contact.get_view_url }}">
             <span class="glyphicon glyphicon-user"></span> {{ contact.fullname }}
             <a ng-show="contact.email" href="mailto:{{contact.email}}">
@@ -661,7 +663,7 @@
 
         <div class="badge">
           {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
-            <span class="glyphicon glyphicon-download-alt"></span> {{ 'Download as PDF' | translate }}</a>
+            <span class="glyphicon glyphicon-download-alt"></span> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
         </div>
       </div>
 
