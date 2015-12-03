@@ -29,7 +29,7 @@ setup(
         'django-wkhtmltopdf',
         'xlwt',
         'xlrd',
-        'django-simple-captcha',
+        'django-simple-captcha==0.4.0',
         'django-registration==1.0',
         'model_mommy',
         'django-tastypie',
