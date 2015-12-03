@@ -12,7 +12,7 @@ from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
 from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
-from sanza.Crm.settings import get_language_choices, has_language_choices
+from sanza.Crm.settings import get_language_choices, has_language_choices, get_subscription_default_value
 from sanza.Crm.widgets import ContactAutoComplete
 
 
@@ -101,7 +101,10 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                     )
                     field.initial = subscription.accept_subscription
                 except models.Subscription.DoesNotExist:
-                    pass
+                    field.initial = get_subscription_default_value()
+            else:
+
+                field.initial = get_subscription_default_value()
 
         if has_language_choices():
             self.fields['favorite_language'].widget = forms.Select(

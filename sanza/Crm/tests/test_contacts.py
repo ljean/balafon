@@ -566,6 +566,7 @@ class EditContactTest(BaseTestCase):
         redirect_url = response.redirect_chain[-1][0]
         self.assertEqual(redirect_url, "http://testserver"+next_url)
 
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_edit_contact_subscriptions(self):
         c = mommy.make(models.Contact)
         st1 = mommy.make(models.SubscriptionType)
@@ -589,6 +590,31 @@ class EditContactTest(BaseTestCase):
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
 
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=True)
+    def test_view_edit_contact_subscriptions_default_set(self):
+        c = mommy.make(models.Contact)
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        st3 = mommy.make(models.SubscriptionType)
+
+        s1 = models.Subscription.objects.create(subscription_type=st1, contact=c, accept_subscription=True)
+        s2 = models.Subscription.objects.create(subscription_type=st2, contact=c, accept_subscription=False)
+
+        response = self.client.get(reverse('crm_edit_contact', args=[c.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+
+        self.assertEqual(1, len(soup.select(f1)))
+        self.assertEqual(1, len(soup.select(f2)))
+        self.assertEqual(1, len(soup.select(f3)))
+
+        soup.select(f1)[0]["checked"]
+        self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
+        soup.select(f3)[0]["checked"]
+
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_add_contact_subscriptions(self):
         entity = mommy.make(models.Entity)
 
@@ -611,6 +637,7 @@ class EditContactTest(BaseTestCase):
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
 
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_add_single_contact_subscriptions(self):
         entity = mommy.make(models.Entity)
 
@@ -632,6 +659,52 @@ class EditContactTest(BaseTestCase):
         self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
+
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=True)
+    def test_view_add_contact_subscriptions_default_set(self):
+        entity = mommy.make(models.Entity)
+
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        st3 = mommy.make(models.SubscriptionType)
+
+        response = self.client.get(reverse('crm_add_contact', args=[entity.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+
+        self.assertEqual(1, len(soup.select(f1)))
+        self.assertEqual(1, len(soup.select(f2)))
+        self.assertEqual(1, len(soup.select(f3)))
+
+        #Is checked
+        soup.select(f1)[0]["checked"]
+        soup.select(f2)[0]["checked"]
+        soup.select(f3)[0]["checked"]
+
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=True)
+    def test_view_add_single_contact_subscriptions_default_set(self):
+        entity = mommy.make(models.Entity)
+
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+        st3 = mommy.make(models.SubscriptionType)
+
+        response = self.client.get(reverse('crm_add_single_contact'))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+
+        self.assertEqual(1, len(soup.select(f1)))
+        self.assertEqual(1, len(soup.select(f2)))
+        self.assertEqual(1, len(soup.select(f3)))
+
+        #Is checked
+        soup.select(f1)[0]["checked"]
+        soup.select(f2)[0]["checked"]
+        soup.select(f3)[0]["checked"]
 
     def test_add_contact_subscription_set(self):
         entity = mommy.make(models.Entity)

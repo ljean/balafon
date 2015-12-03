@@ -50,3 +50,8 @@ def get_language_choices(default_label=None):
 def has_language_choices():
     """returns true if we should propose language choices"""
     return len(project_settings.LANGUAGES) >= 2
+
+
+def get_subscription_default_value():
+    """returns the default value for subscriptions when """
+    return getattr(project_settings, 'SANZA_SUBSCRIPTION_DEFAULT_VALUE', False)
