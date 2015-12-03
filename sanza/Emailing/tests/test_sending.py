@@ -126,7 +126,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
-            self.assertTrue(MagicLink.objects.count()>0)
+            self.assertTrue(MagicLink.objects.count() > 0)
 
             #check an action has been created
             c = models.Contact.objects.get(id=contact.id)
@@ -838,6 +838,70 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(magic_link0.url, short_link)
 
         self.assertContains(response, long_link)
+
+    def test_view_duplicate_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/abcde/"
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">link1</a> <a href="{1}">link2</a></p>'.format(
+                short_link, short_link
+            ),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(MagicLink.objects.count(), 1)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, short_link)
+
+    def test_view_duplicate_emailing(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/abcde/"
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">link1</a></p>'.format(
+                short_link
+            ),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing1 = mommy.make(Emailing, newsletter=newsletter)
+        emailing1.sent_to.add(contact)
+        emailing1.save()
+
+        emailing2 = mommy.make(Emailing, newsletter=newsletter)
+        emailing2.sent_to.add(contact)
+        emailing2.save()
+
+        for emailing in (emailing1, emailing2):
+            url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+            response = self.client.get(url)
+            self.assertEqual(200, response.status_code)
+
+            magic_links = MagicLink.objects.filter(emailing=emailing)
+            self.assertEqual(magic_links.count(), 1)
+
+            magic_link0 = magic_links[0]
+            self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+            self.assertEqual(magic_link0.url, short_link)
 
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):

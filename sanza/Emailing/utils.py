@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import re
+import sys
 
 from django.conf import settings
 from django.contrib import messages
@@ -97,14 +98,23 @@ def patch_emailing_html(html_text, emailing, contact):
         if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
             #mailto, internal links, 'unregister' and 'view online' are not magic
             if len(link) < 500:
-                magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
+
+                magic_links = MagicLink.objects.filter(emailing=emailing, url=link)
+                if magic_links.count() == 0:
+                    magic_link = MagicLink.objects.create(emailing=emailing, url=link)
+                else:
+                    magic_link = magic_links[0]
+
+                #magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
+
                 view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
                 magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
                 html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
             else:
-                logger.warning(
-                    "magic link size is greater than 500 ({0}) : {1}".format(len(link), link)
-                )
+                if not 'test' in sys.argv:
+                    logger.warning(
+                        "magic link size is greater than 500 ({0}) : {1}".format(len(link), link)
+                    )
     return html_text
 
 
