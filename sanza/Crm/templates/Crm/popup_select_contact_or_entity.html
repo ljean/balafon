@@ -6,6 +6,7 @@
   $(document).bind('cbox_complete', function(){
     var name_to_id = {};
     var name_id_to_type = {};
+    $.colorbox.resize({width: 280});
     //when something is an entered, get the autocomplete list
     $(".colorbox-form input#id_name").autocomplete({
       source: function(request, add){

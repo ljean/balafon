@@ -391,9 +391,10 @@ def reassign_action(request, action_id):
     else:
         form = forms.SelectContactOrEntityForm()
 
+    title = _(u'Reassign {0}'.format(action.type.name.lower()) if action.type else _(u'action'))
     return render_to_response(
         'Crm/popup_reassign_action.html',
-        {'form': form, 'action': action},
+        {'form': form, 'action': action, 'title': title},
         context_instance=RequestContext(request)
     )
 
