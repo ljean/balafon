@@ -370,6 +370,33 @@ def do_action(request, action_id):
     )
 
 
+@user_passes_test(can_access)
+@popup_redirect
+def reassign_action(request, action_id):
+    """view"""
+    action = get_object_or_404(models.Action, id=action_id)
+    if request.method == 'POST':
+        form = forms.SelectContactOrEntityForm(request.POST)
+        if form.is_valid():
+            obj = form.cleaned_data['name']
+            action.contacts.clear()
+            action.entities.clear()
+            if isinstance(obj, models.Entity):
+                action.entities.add(obj)
+            else:
+                action.contacts.add(obj)
+            action.save()
+            return HttpResponseRedirect(obj.get_absolute_url())
+
+    else:
+        form = forms.SelectContactOrEntityForm()
+
+    return render_to_response(
+        'Crm/popup_reassign_action.html',
+        {'form': form, 'action': action},
+        context_instance=RequestContext(request)
+    )
+
 
 @user_passes_test(can_access)
 @popup_redirect

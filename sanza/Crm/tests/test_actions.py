@@ -1829,3 +1829,124 @@ class UpdateActionStatusTest(BaseTestCase):
         action.save()
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.done, False)
+
+
+class ReassignActionTest(BaseTestCase):
+    """View actions"""
+
+    def test_view_reassign_action_to_contact(self):
+        """view reassign contact popup"""
+        action = mommy.make(models.Action)
+        contact1 = mommy.make(models.Contact)
+        action.contacts.add(contact1)
+        action.save()
+
+        url = reverse('crm_reassign_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_reassign_action_to_contact(self):
+        """reassign action to another contact"""
+
+        action = mommy.make(models.Action)
+        contact1 = mommy.make(models.Contact)
+        action.contacts.add(contact1)
+        action.save()
+
+        contact2 = mommy.make(models.Contact)
+
+        data = {
+            'object_id': contact2.id,
+            'object_type': 'contact',
+            'name': contact2.fullname
+        }
+
+        url = reverse('crm_reassign_action', args=[action.id])
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        js_script = '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact2.get_absolute_url())
+        self.assertEqual(response.content, js_script)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(list(action.contacts.all()), [contact2])
+
+    def test_reassign_action_to_entity(self):
+        """reassign action to another entity"""
+
+        action = mommy.make(models.Action)
+        contact1 = mommy.make(models.Contact)
+        action.contacts.add(contact1)
+        action.save()
+
+        data = {
+            'object_id': contact1.entity.id,
+            'object_type': 'entity',
+            'name': contact1.entity.name
+        }
+
+        url = reverse('crm_reassign_action', args=[action.id])
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 200)
+        js_script = '<script>$.colorbox.close(); window.location="{0}";</script>'.format(
+            contact1.entity.get_absolute_url()
+        )
+        self.assertEqual(response.content, js_script)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 0)
+        self.assertEqual(action.entities.count(), 1)
+        self.assertEqual(list(action.entities.all()), [contact1.entity])
+
+    def test_reassign_action_anonymous(self):
+        """reassign action to another entity : anonymous"""
+        action = mommy.make(models.Action)
+        contact1 = mommy.make(models.Contact)
+        action.contacts.add(contact1)
+        action.save()
+
+        self.client.logout()
+
+        data = {
+            'object_id': contact1.entity.id,
+            'object_type': 'entity',
+            'name': contact1.entity.name
+        }
+
+        url = reverse('crm_reassign_action', args=[action.id])
+        response = self.client.post(url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(list(action.contacts.all()), [contact1])
+
+    def test_reassign_action_user_not_allowed(self):
+        """reassign action to another entity : non staff"""
+        action = mommy.make(models.Action)
+        contact1 = mommy.make(models.Contact)
+        action.contacts.add(contact1)
+        action.save()
+
+        self.user.is_staff = False
+        self.user.save()
+
+        data = {
+            'object_id': contact1.entity.id,
+            'object_type': 'entity',
+            'name': contact1.entity.name
+        }
+
+        url = reverse('crm_reassign_action', args=[action.id])
+        response = self.client.post(url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.contacts.count(), 1)
+        self.assertEqual(action.entities.count(), 0)
+        self.assertEqual(list(action.contacts.all()), [contact1])

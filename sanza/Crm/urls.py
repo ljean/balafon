@@ -91,6 +91,7 @@ urlpatterns += patterns('sanza.Crm.views.actions',
     url(r'allowed-action-status/$', 'get_action_status', name="crm_get_action_status"),
     url(r'^clone-action/(?P<action_id>\d+)/$', 'clone_action', name='crm_clone_action'),
     url(r'^update-action-status/(?P<action_id>\d+)/$', 'update_action_status', name='crm_update_action_status'),
+    url(r'^reassign-action/(?P<action_id>\d+)/$', 'reassign_action', name='crm_reassign_action'),
 )
 
 
