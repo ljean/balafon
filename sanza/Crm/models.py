@@ -1129,6 +1129,10 @@ class ActionType(NamedElement):
         verbose_name=_(u'hide contacts buttons'),
         help_text=_(u'The add and remove contact buttons will be hidden')
     )
+    mail_to_subject = models.CharField(
+        max_length=100, default='', blank=True, verbose_name=_(u'Subject of email'),
+        help_text=_(u'This would be used as subject when sending the action by email')
+    )
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1396,7 +1400,7 @@ class Action(LastModifiedModel):
 
         return u"mailto:{0}?subject={1}&body={2}".format(
             u",".join(unique_emails),
-            self.subject,
+            self.type.mail_to_subject if (self.type and self.type.mail_to_subject) else self.subject,
             body
         )
 

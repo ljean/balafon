@@ -10,10 +10,11 @@ from bs4 import BeautifulSoup
 from decimal import Decimal
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
 
-from sanza.Crm.models import Action, ActionMenu, ActionType
+from sanza.Crm.models import Action, ActionMenu, ActionType, Contact
 from sanza.Store import models
 
 
@@ -935,3 +936,82 @@ class StoreItemDiscountTest(TestCase):
         item = mommy.make(models.StoreItem)
 
         self.assertEqual(list(item.discounts), [])
+
+
+class MailtoActionTest(TestCase):
+    """mailtto"""
+
+    def test_mailto_to_action_body(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        action = mommy.make(Action, type=action_type, subject=u'Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+        url = reverse('store_view_sales_document_public', args=[action.uuid])
+
+        self.assertEqual(
+            action.mail_to,
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body=Voici un lien vers votre Doc: '
+            u'http://example.com{0}'.format(url)
+        )
+
+    def test_mailto_to_action_body_no_sale(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
+
+        action = mommy.make(Action, type=action_type, subject=u'Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+
+        self.assertEqual(
+            action.mail_to,
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
+        )
+
+    def test_mailto_to_action_body_no_uuid(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=False, name='Doc')
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        action = mommy.make(Action, type=action_type, subject=u'Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertEqual(action.uuid, '')
+
+        self.assertEqual(
+            action.mail_to,
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
+        )
+
+    def test_mailto_to_action_subject(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='Another subject', generate_uuid=True, name='Doc')
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        action = mommy.make(Action, type=action_type, subject=u'Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+        url = reverse('store_view_sales_document_public', args=[action.uuid])
+
+        self.assertEqual(
+            action.mail_to,
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body=Voici un lien vers votre Doc: '
+            u'http://example.com{0}'.format(url)
+        )

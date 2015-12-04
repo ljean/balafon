@@ -1832,7 +1832,7 @@ class UpdateActionStatusTest(BaseTestCase):
 
 
 class ReassignActionTest(BaseTestCase):
-    """View actions"""
+    """Change the action contacts and entities"""
 
     def test_view_reassign_action_to_contact(self):
         """view reassign contact popup"""
