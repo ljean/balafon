@@ -9,8 +9,10 @@ if 'localeurl' in settings.INSTALLED_APPS:
 from bs4 import BeautifulSoup
 from decimal import Decimal
 
-from django.test import TestCase
+from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.utils.translation import ugettext as _
 
 from model_mommy import mommy
 
@@ -955,10 +957,15 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
+        body = _(u"Here is a link to your {0}: {1}{2}").format(
+            action_type.name,
+            "http://" + Site.objects.get_current().domain,
+            url
+        )
+
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body=Voici un lien vers votre Doc: '
-            u'http://example.com{0}'.format(url)
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body={0}'.format(body)
         )
 
     def test_mailto_to_action_body_no_sale(self):
@@ -1010,8 +1017,13 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
+        body = _(u"Here is a link to your {0}: {1}{2}").format(
+            action_type.name,
+            "http://" + Site.objects.get_current().domain,
+            url
+        )
+
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body=Voici un lien vers votre Doc: '
-            u'http://example.com{0}'.format(url)
+            u'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body={0}'.format(body)
         )
