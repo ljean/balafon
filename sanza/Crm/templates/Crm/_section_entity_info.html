@@ -47,7 +47,7 @@
     </table>
   </div>
   
-  <div class="col-md-7">
+  <div class="col-md-6">
     
     <div class="note" style="margin-bottom: 5px;">
       <span class="contenteditable" contenteditable="true" rel="{% url "auto_save_data" "entity" "notes" entity.id %}">
@@ -64,7 +64,7 @@
     {% endwith %}
   </div>
   
-  <div class="col-md-1">
+  <div class="col-md-2">
     <table class="table micro-table table-striped">
       {% if entity.relationship_date %}
         <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
