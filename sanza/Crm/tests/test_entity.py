@@ -6,6 +6,7 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup
+import json
 
 from django.core.urlresolvers import reverse
 
@@ -287,3 +288,37 @@ class EditEntityTestCase(BaseTestCase):
         entity = models.Entity.objects.get(id=entity.id)
         self.assertEqual(entity.name, data['name'])
         self.assertEqual(entity.notes, u'Toto')
+
+
+class GetEntityIdTestCase(BaseTestCase):
+    """edit entity"""
+
+    def test_get_entity_no_name(self):
+        """raise Http404"""
+        entity = mommy.make(models.Entity, is_single_contact=False, name='ABC')
+        response = self.client.get(reverse('crm_get_entity_id'))
+        self.assertEqual(404, response.status_code)
+
+    def test_get_entity_name(self):
+        """return id"""
+        entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
+        mommy.make(models.Entity, is_single_contact=False, name='WABC')
+        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name))
+        self.assertEqual(200, response.status_code)
+        data = json.loads(response.content)
+        self.assertEqual(data['id'], entity1.id)
+
+    def test_get_entity_missing_name(self):
+        """raise Http404"""
+        entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
+        mommy.make(models.Entity, is_single_contact=False, name='WABC')
+        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name + 'D'))
+        self.assertEqual(404, response.status_code)
+
+    def test_get_duplicate_entity_name(self):
+        """raise Http404"""
+        entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
+        mommy.make(models.Entity, is_single_contact=False, name='ABC')
+        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name))
+        self.assertEqual(404, response.status_code)
+

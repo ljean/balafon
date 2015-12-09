@@ -7,6 +7,7 @@ import re
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.messages import warning
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
@@ -49,7 +50,11 @@ def get_entity_id(request):
     """view"""
     name = request.GET.get('name', '')
     if name:
-        entity = get_object_or_404(models.Entity, name=name)
+        try:
+            entity = get_object_or_404(models.Entity, name=name)
+        except models.Entity.MultipleObjectsReturned:
+            warning(request, _(u'Duplicate entities {0}').format(name))
+            raise Http404
         return HttpResponse(json.dumps({'id': entity.id}), 'application/json')
     raise Http404
 
