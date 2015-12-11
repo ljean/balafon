@@ -3,31 +3,34 @@
 {% if field.is_hidden %}
     {{ field }}
 {% else %}
+  <div class="form-group">
     <div class="row">
-    <div class="form-group">
-        {% if field|is_checkbox %}
-            <div class="col-sm-9 col-sm-offset-3">
-                <div class="checkbox">
-                {{ field }} {{field.label}}
-                </div>
-                {{ field.errors }}
-                {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
-            </div>
+      {% if field|is_checkbox %}
+        <div class="col-sm-8 col-sm-offset-4">
+          <div class="checkbox">
+          {{ field }} {{field.label}}
+          </div>
+          {{ field.errors }}
+          {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
+        </div>
+      {% else %}
+        {% if field.label %}
+          <div class="col-sm-4">
+            <label class="control-label" for="{{ field.name }}">
+              {{ field.label }} {% if allow_required_sign and field.field.required %}*{% endif %}
+            </label>
+          </div>
         {% else %}
-            {% if field.label %}
-              <label class="control-label col-sm-3" for="{{ field.name }}">
-                {{ field.label }} {% if allow_required_sign and field.field.required %}*{% endif %}
-              </label>
-            {% else %}
-              <div class="col-sm-3"></div>
-            {% endif %}
-            <div class="col-sm-9">
-                {{ field }}
-                {% if field.errors %}
-                <div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>
-                {% endif %}
-                {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
-            </div>
+          <div class="col-sm-4"></div>
         {% endif %}
-    </div></div>
+        <div class="col-sm-8">
+          {{ field }}
+          {% if field.errors %}
+          <div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>
+          {% endif %}
+          {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
+          </div>
+      {% endif %}
+    </div>
+  </div>
 {% endif %}

@@ -145,6 +145,24 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
 
 
+class MinimalUserRegistrationForm(UserRegistrationForm):
+
+    class Meta:
+        model = ContactProfile
+        fields = (
+            'email', 'password1', 'password2', 'firstname', 'lastname', 'accept_termofuse',
+            'zip_code', 'city', 'country', 'groups_ids',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super(MinimalUserRegistrationForm, self).__init__(*args, **kwargs)
+        for hidden_field in ('entity', 'entity_type', 'zip_code', 'city', 'country', 'groups_ids'):
+            self.fields[hidden_field].widget = forms.HiddenInput()
+
+        for required_field in ('firstname', 'lastname'):
+            self.fields[required_field].required = True
+
+
 class MessageForm(forms.Form):
     message = forms.CharField(
         required=True,

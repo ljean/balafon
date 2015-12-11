@@ -42,6 +42,8 @@ class ContactProfile(models.Model):
 
     subscriptions_ids = models.CharField(max_length=100, default="", blank=True)
 
+    groups_ids = models.CharField(max_length=100, default="", blank=True)
+
     def __unicode__(self):
         return self.user.username
     

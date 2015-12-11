@@ -139,6 +139,8 @@ class AcceptNewsletterRegistrationView(RegistrationView):
         user.contactprofile.cedex = kwargs.get('cedex', "")
         user.contactprofile.birth_date = kwargs.get('birth_date', None)
 
+        user.contactprofile.groups_ids = kwargs.get('groups_ids', '')
+
         user.save()
         user.contactprofile.save()
 
