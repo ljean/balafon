@@ -2,6 +2,7 @@
 """common place for all Emailing settings"""
 
 from django.conf import settings as project_settings
+from django.utils.importlib import import_module
 
 
 def get_default_subscription_type():
@@ -22,3 +23,15 @@ def is_subscribe_enabled():
 def is_email_subscribe_enabled():
     """return true if email subscribe page is enabled : True by default for compatibility reason"""
     return getattr(project_settings, 'SANZA_EMAIL_SUBSCRIBE_ENABLED', True)
+
+
+def get_subscription_form():
+    """return custom from for newsletter subscription"""
+    try:
+        form_name = getattr(project_settings, 'SANZA_SUBSCRIBE_FORM')
+        module_name, class_name = form_name.rsplit('.', 1)
+        module = import_module(module_name)
+        subscribe_form = getattr(module, class_name)
+    except AttributeError:
+        subscribe_form = None
+    return subscribe_form

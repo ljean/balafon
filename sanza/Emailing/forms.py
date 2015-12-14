@@ -21,7 +21,7 @@ from coop_cms.utils import dehtml
 import floppyforms as forms
 
 from sanza.Crm import settings as crm_settings
-from sanza.Crm.forms import ModelFormWithCity
+from sanza.Crm.forms import ModelFormWithCity, BetterBsModelForm
 from sanza.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType, SubscriptionType, Subscription
 from sanza.Crm.widgets import CityAutoComplete
 from sanza.Emailing import models
@@ -245,12 +245,15 @@ class EmailSubscribeForm(forms.ModelForm):
 
 class SubscriptionTypeFormMixin(object):
     """Base class requiring subscription type"""
+    subscription_required = False
+    subscription_types_count = 0
 
     def _add_subscription_types_field(self, contact=None):
         """add the subscription_type field dynamically"""
         subscription_types = list(self.get_queryset())
-        if len(subscription_types) > 0:
-            if len(subscription_types) > 1:
+        self.subscription_types_count = len(subscription_types)
+        if self.subscription_types_count > 0:
+            if self.subscription_types_count > 1:
                 help_text = ugettext('Check the boxes of the newsletters that you want to receive')
             else:
                 help_text = ugettext('Check the box if you want to receive our newsletter')
@@ -269,9 +272,9 @@ class SubscriptionTypeFormMixin(object):
                 widget=forms.CheckboxSelectMultiple(),
                 label='',
                 help_text=help_text,
-                required=False,
+                required=self.subscription_required and (self.subscription_types_count == 1),
                 initial=initial,
-                choices=[(st.id, st.name) for st in subscription_types]
+                choices=[(subscription_type.id, subscription_type.name) for subscription_type in subscription_types]
             )
 
         else:
@@ -294,6 +297,12 @@ class SubscriptionTypeFormMixin(object):
             ]
         except SubscriptionType.DoesNotExist:
             raise ValidationError(_(u"Invalid subscription type"))
+
+        if self.subscription_required and not (len(subscription_types)):
+            if self.subscription_types_count > 1:
+                raise ValidationError(_(u"You must check a least one subscription"))
+            else:
+                raise ValidationError(_(u"This field is required"))
         return subscription_types
 
     def _save_subscription_types(self, contact):
@@ -557,3 +566,60 @@ class NewsletterSchedulingForm(forms.ModelForm):
             raise ValidationError(ugettext(u"The scheduling date must be in future"))
 
         return sch_dt
+
+
+class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
+    """Subscribe to emailing"""
+    subscription_required = True
+
+    favorite_language = forms.CharField(required=False, widget=forms.HiddenInput())
+
+    class Meta:
+        model = Contact
+        fields = (
+            'email', 'firstname', 'lastname'
+        )
+        widgets = {
+            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
+            'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
+            'email': forms.TextInput(attrs={'placeholder': _(u'Email'), 'required': 'required'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(MinimalSubscribeForm, self).__init__(*args, **kwargs)
+
+        self.fields['email'].required = True
+
+        self._add_subscription_types_field()
+
+        if crm_settings.has_language_choices():
+            self.fields['favorite_language'].initial = get_language()
+
+    def get_entity(self):
+        """get entity from form"""
+        name = u'{0} {1}'.format(self.cleaned_data['lastname'], self.cleaned_data['firstname'])
+        if crm_settings.ALLOW_SINGLE_CONTACT:
+            return Entity.objects.create(name=name, type=None, is_single_contact=True)
+        else:
+            et_id = getattr(settings, 'SANZA_INDIVIDUAL_ENTITY_ID', 1)
+            entity_type = EntityType.objects.get(id=et_id)
+            return Entity.objects.create(name=name, type=entity_type)
+
+    def save(self, request=None):
+        """save"""
+        contact = super(MinimalSubscribeForm, self).save(commit=False)
+        contact.entity = self.get_entity()
+        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
+        contact.save()
+        #delete unknown contacts for the current entity
+        contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
+
+        subscriptions = self._save_subscription_types(contact)
+        if subscriptions:
+            create_subscription_action(contact, subscriptions)
+
+        #send an email
+        send_notification_email(request, contact, [], '')
+
+        return contact
+

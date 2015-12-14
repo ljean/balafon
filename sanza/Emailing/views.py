@@ -15,7 +15,6 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View, TemplateView
 
@@ -29,7 +28,9 @@ from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
 from sanza.Emailing import models, forms
-from sanza.Emailing.settings import is_subscribe_enabled, is_email_subscribe_enabled
+from sanza.Emailing.settings import (
+    is_subscribe_enabled, is_email_subscribe_enabled, get_subscription_form
+)
 from sanza.Emailing.utils import get_emailing_context, send_verification_email, EmailSendError, patch_emailing_html
 
 
@@ -370,14 +371,7 @@ class SubscribeView(View):
         
     def get_form_class(self):
         """get form: can be customized"""
-        try:
-            form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
-            module_name, class_name = form_name.rsplit('.', 1)
-            module = import_module(module_name)
-            subscribe_form = getattr(module, class_name)
-        except AttributeError:
-            subscribe_form = forms.SubscribeForm
-        return subscribe_form
+        return get_subscription_form() or forms.SubscribeForm
         
     def get_template(self):
         """get template"""
@@ -438,7 +432,7 @@ class SubscribeView(View):
                 logger.exception(except_text)
                 
                 #create action
-                detail = _(u"An error occured while verifying the email address of this contact.")
+                detail = _(u"An error occurred while verifying the email address of this contact.")
                 fix_action = ActionType.objects.get_or_create(name=_(u'Sanza'))[0]
                 action = Action.objects.create(
                     subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
