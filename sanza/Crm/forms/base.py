@@ -102,6 +102,7 @@ class _CityBasedForm(object):
     def _get_city_parent(self, city):
         """get city parent"""
         parent = city.parent
+        country = None
         while parent:
             country = parent
             parent = parent.parent
@@ -130,7 +131,9 @@ class _CityBasedForm(object):
         try:
             city = getattr(kwargs.get('instance'), field_prefix + 'city', 0)
             if city:
-                self.fields[field_prefix + 'country'].initial = self._get_city_parent(city).id
+                city_parent = self._get_city_parent(city)
+                if city_parent:
+                    self.fields[field_prefix + 'country'].initial = city_parent.id
         except models.City.DoesNotExist:
             pass
 
