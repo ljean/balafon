@@ -2,16 +2,39 @@
 """admin"""
 
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+
 from sanza.Crm import models
+
+
+class HasParentFilter(admin.SimpleListFilter):
+    """filter items to know if they have a parent"""
+    title = _(u'Has parent')
+    parameter_name = 'has_parent'
+
+    def lookups(self, request, model_admin):
+        return [
+            (1, _(u'Yes')),
+            (2, _(u'No')),
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == '1':
+            return queryset.filter(parent__isnull=False)
+        elif value == '2':
+            return queryset.filter(parent__isnull=True)
+        return queryset
 
 
 class ZoneAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'parent', 'type']
     ordering = ['type', 'name']
-    list_filter = ['type', 'parent']
+    list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']
 admin.site.register(models.Zone, ZoneAdmin)
+
 
 admin.site.register(models.EntityRole)
 admin.site.register(models.SameAs)
@@ -94,7 +117,7 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'parent']
     search_fields = ['name']
     ordering = ['name']
-    list_filer = ['parent',]
+    list_filter = [HasParentFilter, 'parent', ]
     raw_id_fields = ('groups',)
 
 admin.site.register(models.City, CityAdmin)
