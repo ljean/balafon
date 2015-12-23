@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import re
+import sys
 
 from django.conf import settings
 from django.contrib import messages
@@ -17,9 +18,9 @@ from django.utils.translation import get_language as django_get_language, ugette
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
-from coop_cms.utils import dehtml
-from coop_cms.utils import make_links_absolute
+from coop_cms.utils import dehtml, make_links_absolute
 
+from sanza.utils import logger
 from sanza.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
 from sanza.Emailing.models import Emailing, MagicLink
 from sanza.Emailing.settings import is_mandrill_used
@@ -54,16 +55,7 @@ def get_emailing_context(emailing, contact):
 
     html_content = format_context(newsletter.content, data)
 
-    #magic links
-    links = re.findall('href="(?P<url>.+?)"', html_content)
-    
-    for link in links:
-        if (not link.lower().startswith('mailto:')) and (link[0] != "#"): #mailto and internal links are not magic
-            magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
-            magic_url = newsletter.get_site_prefix()+reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
-            html_content = html_content.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
-        
-    unregister_url = newsletter.get_site_prefix()+reverse('emailing_unregister', args=[emailing.id, contact.uuid])
+    unregister_url = newsletter.get_site_prefix() + reverse('emailing_unregister', args=[emailing.id, contact.uuid])
     
     newsletter.content = html_content
 
@@ -88,6 +80,44 @@ def get_emailing_context(emailing, contact):
     return context_dict
 
 
+def patch_emailing_html(html_text, emailing, contact):
+    """transform links into magic link"""
+    links = re.findall('href="(?P<url>.+?)"', html_text)
+
+    ignore_links = [
+        reverse("emailing_unregister", args=[emailing.id, contact.uuid]),
+        reverse("emailing_view_online", args=[emailing.id, contact.uuid]),
+    ]
+
+    for lang_tuple in settings.LANGUAGES:
+        ignore_links.append(
+            reverse("emailing_view_online_lang", args=[emailing.id, contact.uuid, lang_tuple[0]])
+        )
+
+    for link in links:
+        if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
+            #mailto, internal links, 'unregister' and 'view online' are not magic
+            if len(link) < 500:
+
+                magic_links = MagicLink.objects.filter(emailing=emailing, url=link)
+                if magic_links.count() == 0:
+                    magic_link = MagicLink.objects.create(emailing=emailing, url=link)
+                else:
+                    magic_link = magic_links[0]
+
+                #magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
+
+                view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
+                magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
+                html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
+            else:
+                if not 'test' in sys.argv:
+                    logger.warning(
+                        "magic link size is greater than 500 ({0}) : {1}".format(len(link), link)
+                    )
+    return html_text
+
+
 def send_newsletter(emailing, max_nb):
     """send newsletter"""
 
@@ -107,13 +137,18 @@ def send_newsletter(emailing, max_nb):
     for contact in contacts:
         
         if contact.get_email:
-            lang = emailing.lang or settings.LANGUAGE_CODE[:2]
+            lang = emailing.lang or contact.favorite_language or settings.LANGUAGE_CODE[:2]
             translation.activate(lang)
 
-            context = Context(get_emailing_context(emailing, contact))
+            emailing_context = get_emailing_context(emailing, contact)
+            emailing_context["LANGUAGE_CODE"] = lang
+            context = Context(emailing_context)
             the_template = get_template(emailing.newsletter.get_template_name())
 
             html_text = the_template.render(context)
+
+            html_text = patch_emailing_html(html_text, emailing, contact)
+
             html_text = make_links_absolute(
                 html_text, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
             )
@@ -131,6 +166,7 @@ def send_newsletter(emailing, max_nb):
 
             if getattr(settings, 'COOP_CMS_REPLY_TO', None):
                 headers['Reply-To'] = settings.COOP_CMS_REPLY_TO
+
             email = EmailMultiAlternatives(
                 emailing.newsletter.subject,
                 text,
@@ -243,7 +279,7 @@ def send_verification_email(contact):
         )
         try:
             email.send()
-        except Exception, msg: # pylint: disable=broad-except
+        except Exception, msg:  # pylint: disable=broad-except
             raise EmailSendError(unicode(msg))
         return True
     return False

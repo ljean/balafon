@@ -20,12 +20,29 @@ class ContactProfile(models.Model):
     
     user = models.OneToOneField(User)
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
-    entity_name = models.CharField(_('entity name'), max_length=200, blank=True, default="")
-    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None)
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
-    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
+
+    entity_name = models.CharField(_('Entity name'), max_length=200, blank=True, default="")
+    entity_type = models.ForeignKey(EntityType, verbose_name=_(u'Entity type'), blank=True, null=True, default=None)
+
+    zip_code = models.CharField(_(u'Zip code'), max_length=20, blank=True, default=u'')
+    city = models.ForeignKey(City, verbose_name=_('City'), blank=True, default=None, null=True)
+    gender = models.IntegerField(_(u'Gender'), choices=GENDER_CHOICE, blank=True, default=0)
+    lastname = models.CharField(_(u'last name'), max_length=200, blank=True, default=u'')
+    firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
+
+    birth_date = models.DateField(_(u"birth date"), blank=True, default=None, null=True)
+
+    phone = models.CharField(_('phone'), max_length=200, blank=True, default=u'')
+    mobile = models.CharField(_('mobile'), max_length=200, blank=True, default=u'')
+
+    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
+    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
+    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+
     subscriptions_ids = models.CharField(max_length=100, default="", blank=True)
+
+    groups_ids = models.CharField(max_length=100, default="", blank=True)
 
     def __unicode__(self):
         return self.user.username

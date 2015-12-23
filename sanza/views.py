@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.management import call_command
-from StringIO import StringIO
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from sanza.Crm.models import Contact, Entity, Group, Action, Opportunity
@@ -13,19 +11,6 @@ from django.shortcuts import get_object_or_404
 from sanza.permissions import can_access
 import json
 
-#@user_passes_test(can_access)
-#def export_database_json(request):
-#    
-#    if not request.user.is_staff:
-#        raise PermissionDenied
-#    
-#    content = StringIO()
-#    
-#    call_command('dumpdata', 'auth', 'Crm', 'Search',  'Emailing', indent=1, stdout=content)
-#    content.seek(0)
-#    response = HttpResponse(content.read(), content_type='application/json')
-#    response['Content-Disposition'] = 'attachment; filename={0}.json'.format('sanza')
-#    return response
 
 def redirect_to_homepage(request):
     if getattr(settings, 'SANZA_AS_HOMEPAGE', False):

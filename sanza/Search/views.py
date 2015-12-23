@@ -33,14 +33,14 @@ from sanza.Search.forms import (
 
 
 #@transaction.commit_manually
-def filter_icontains_unaccent(qs, field, text):
+def filter_icontains_unaccent(queryset, field, text):
     if crm_settings.is_unaccent_filter_supported():
-        qs = qs.extra(
+        queryset = queryset.extra(
             where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
             params=[u"%{0}%".format(text)]
         )
-        return list(qs)    
-    return list(qs.filter(**{field+"__icontains": text}))
+        return list(queryset)
+    return list(queryset.filter(**{field+"__icontains": text}))
 
 
 @user_passes_test(can_access)
@@ -50,25 +50,25 @@ def quick_search(request):
         if form.is_valid():
             text = form.cleaned_data["text"]
             
-            qs = Entity.objects.filter(is_single_contact=False)
-            entities_by_name = filter_icontains_unaccent(qs, 'name', text)    
+            queryset = Entity.objects.filter(is_single_contact=False)
+            entities_by_name = filter_icontains_unaccent(queryset, 'name', text)
             
-            qs = Contact.objects.all()#.filter(has_left=False)
-            contacts_by_name = filter_icontains_unaccent(qs, 'lastname', text)
+            queryset = Contact.objects.all()#.filter(has_left=False)
+            contacts_by_name = filter_icontains_unaccent(queryset, 'lastname', text)
             
-            for e in entities_by_name:
-                setattr(e, 'is_entity', True)
-                for c in e.contact_set.all():
+            for entity in entities_by_name:
+                setattr(entity, 'is_entity', True)
+                for contact in entity.contact_set.all():
                     try:
                         # avoid duplicates
-                        contacts_by_name.remove(c)
+                        contacts_by_name.remove(contact)
                     except ValueError:
                         pass
             contacts = entities_by_name + contacts_by_name
             contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
             
-            qs = Group.objects.all()
-            groups_by_name = filter_icontains_unaccent(qs, 'name', text)
+            queryset = Group.objects.all()
+            groups_by_name = filter_icontains_unaccent(queryset, 'name', text)
             
             contacts_by_email = Contact.objects.filter(
                 Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
@@ -524,7 +524,7 @@ def contacts_admin(request):
                     else:
                         messages.add_message(request, messages.SUCCESS,
                             _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts)))
-                    return None #popup_close will return js code to close the popup
+                    return None  # popup_close will return js code to close the popup
                 else:
                     return render_to_response(
                         'Search/contacts_admin_form.html',

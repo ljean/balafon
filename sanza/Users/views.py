@@ -12,7 +12,7 @@ from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
 from sanza.permissions import can_access
-from sanza.utils import logger
+from sanza.utils import logger, is_allowed_homepage
 from sanza.Users import forms, models
 
 
@@ -107,7 +107,7 @@ def user_homepage(request):
     try:
         homepage = models.UserHomepage.objects.get(user=request.user)
         #Redirect to user homepage but make sure to avoid dead loop
-        if homepage.url != reverse("sanza_homepage"):
+        if is_allowed_homepage(homepage.url):
             return HttpResponseRedirect(homepage.url)
     except models.UserHomepage.DoesNotExist:
         pass
@@ -116,18 +116,21 @@ def user_homepage(request):
 
 @user_passes_test(can_access)
 def make_homepage(request):
-    """Change the homepgae of the user"""
+    """Change the homepage of the user"""
     if request.method == "POST":
         data = {"ok": False, "message": _(u"An error occured")}
         form = forms.UrlForm(request.POST)
         if form.is_valid():
+            homepage_url = form.cleaned_data["url"]
             try:
                 homepage = models.UserHomepage.objects.get(user=request.user)
-                homepage.url = form.cleaned_data["url"]
+                homepage.url = homepage_url
                 homepage.save()
             except models.UserHomepage.DoesNotExist:
-                models.UserHomepage.objects.create(user=request.user, url=form.cleaned_data["url"])
-            data["ok"] = True
+                models.UserHomepage.objects.create(user=request.user, url=homepage_url)
+            data = {"ok": True, "message": ""}
+        else:
+            data["message"] = u", ".join([unicode(error_list) for error_list in form.errors.values()])
         return HttpResponse(json.dumps(data), content_type="application/json")
     raise Http404
 

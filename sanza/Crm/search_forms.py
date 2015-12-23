@@ -4,7 +4,6 @@
 from datetime import date, timedelta
 
 from django.db.models import Q, Count
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 import floppyforms as forms
@@ -93,6 +92,32 @@ class EntityNameStartsWithSearchForm(SearchFieldForm):
     def get_lookup(self):
         """lookup"""
         return {'entity__name__istartswith': self.value}
+
+
+class AddressSearchForm(SearchFieldForm):
+    """by address contains"""
+
+    name = 'address'
+    label = _(u'Contact or entity at this address')
+
+    def __init__(self, *args, **kwargs):
+        super(AddressSearchForm, self).__init__(*args, **kwargs)
+        field = forms.CharField(
+            label=self.label,
+            widget=forms.TextInput(
+                attrs={'placeholder': _(u'Enter text contained in an address')}
+            )
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = self.value
+        return (
+            Q(address__icontains=value) | Q(address2__icontains=value) | Q(address3__icontains=value) |
+            Q(entity__address__icontains=value) | Q(entity__address2__icontains=value) |
+            Q(entity__address3__icontains=value)
+        )
 
 
 class HasEntityForm(YesNoSearchFieldForm):
@@ -494,7 +519,7 @@ class ActionByUser(SearchFieldForm):
     
     def __init__(self, *args, **kwargs):
         super(ActionByUser, self).__init__(*args, **kwargs)
-        choices = [(u.id, unicode(u)) for u in User.objects.all()]
+        choices = [(team_member.id, team_member.name) for team_member in models.TeamMember.objects.all()]
         field = forms.ChoiceField(choices=choices, label=self.label)
         self._add_field(field)
         
@@ -1061,6 +1086,46 @@ class NoSameAsForm(YesNoSearchFieldForm):
                 else:
                     filtered_contacts.append(contact)
             return filtered_contacts
+        
+        
+class NoSameEmailForm(SearchFieldForm):
+    """Allow same as contact in results"""
+    name = 'no_same_email'
+    label = _(u'Duplicate emails')
+
+    def __init__(self, *args, **kwargs):
+        super(NoSameEmailForm, self).__init__(*args, **kwargs)
+        choices = ((0, _('Exclude')), (1, _('Only')),)
+        field = forms.ChoiceField(choices=choices, label=self.label)
+        self._add_field(field)
+    
+    def get_lookup(self):
+        """lookup"""
+        pass
+    
+    def get_exclude_lookup(self):
+        """exclude lookup"""
+        pass
+    
+    def global_post_process(self, contacts):
+        """this filters the full list of results"""
+        try:
+            value = int(self.value)
+        except ValueError:
+            value = -1
+        emails = {}
+        filtered_contacts = []
+        for contact in contacts:
+            email = contact.get_email
+            if email:
+                if email not in emails:
+                    emails[email] = contact
+                    if value == 0:
+                        filtered_contacts.append(contact)
+                else:
+                    if value == 1:
+                        filtered_contacts.append(contact)
+        return filtered_contacts
 
 
 class ContactsImportSearchForm(SearchFieldForm):
@@ -1227,6 +1292,58 @@ class EntityWithCustomField(SearchFieldForm):
         custom_field = models.CustomField.objects.get(id=value, model=models.CustomField.MODEL_ENTITY)
         return Q(entity__entitycustomfieldvalue__custom_field=custom_field)
     
+
+class CustomFieldBaseSearchForm(SearchFieldForm):
+    """Base class for any Custom Field """
+    custom_field_name = ''
+    model = None
+    widget = None
+
+    def __init__(self, *args, **kwargs):
+        super(CustomFieldBaseSearchForm, self).__init__(*args, **kwargs)
+
+        self.custom_field = models.CustomField.objects.get_or_create(
+            name=self.custom_field_name, model=self.model
+        )[0]
+
+        label = self.custom_field.label or self.custom_field.name
+
+        field = forms.CharField(
+            label=label,
+            widget=self.widget
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = self.value
+        custom_field = self.custom_field
+
+        if custom_field.model == models.CustomField.MODEL_ENTITY:
+            queryset = models.EntityCustomFieldValue.objects.filter(custom_field=self.custom_field, value=value)
+            entity_ids = [custom_field_value.entity.id for custom_field_value in queryset]
+            return Q(entity__id__in=entity_ids)
+        else:
+            queryset = models.ContactCustomFieldValue.objects.filter(custom_field=self.custom_field, value=value)
+            contact_ids = [custom_field_value.contact.id for custom_field_value in queryset]
+            return Q(id__in=contact_ids)
+
+
+class UnitTestEntityCustomFieldForm(CustomFieldBaseSearchForm):
+    """Unit test for entity"""
+    custom_field_name = 'ut_cf_entity'
+    name = 'cf_ut_cf_entity'
+    model = models.CustomField.MODEL_ENTITY
+    label = "entity custom field"
+
+
+class UnitTestContactCustomFieldForm(CustomFieldBaseSearchForm):
+    """Unit test for contacts"""
+    custom_field_name = 'ut_cf_contact'
+    name = 'cf_ut_cf_contact'
+    model = models.CustomField.MODEL_CONTACT
+    label = "contact custom field"
+
 
 class SortContacts(SearchFieldForm):
     """sort contacts"""

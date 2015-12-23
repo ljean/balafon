@@ -1,6 +1,8 @@
 {% extends "sanza/bs_base.html" %}
 {% load i18n favorite_tags %}
 
+{% block extra_title %}{% trans "Search" %} {{ search.name }}{{group.name}}{{opportunity.name}}{% endblock %}
+
 {% block extra_head %}
     {{ block.super }}
     {{ search_form.media }}

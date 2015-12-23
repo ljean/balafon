@@ -1,9 +1,17 @@
-{% extends "base.html" %}
-{% load i18n %}
+{% extends "sanza/bs_base.html" %}{% load i18n %}
+
+{% block header_bar %}
+{% endblock %}
+
+{% block meta_title %}{% trans "Page not found" %}{% endblock %}
 
 {% block main %}
-	<h2>{% trans "Permission Denied" %}</h2>
-	<p>
-	{% trans "You are not allowed to see this page" %}
-	</p>
+<div class="login-header">
+    <a href="{% url 'sanza_homepage' %}"><img src="{{STATIC_URL}}img/logo-sanza.png"></a>
+</div>
+
+<h2>{% block document_title %}<h2>{% trans "Permission Denied" %}</h2>{% endblock %}</h2>
+
+{% block document_content %}{% trans "You are not allowed to see this page" %}{% endblock %}
+
 {% endblock %}

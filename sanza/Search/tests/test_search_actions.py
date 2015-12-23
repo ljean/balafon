@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """test search actions"""
+#pylint: disable=too-many-locals
 
 from django.conf import settings
 if 'localeurl' in settings.INSTALLED_APPS:
@@ -7,9 +8,8 @@ if 'localeurl' in settings.INSTALLED_APPS:
     patch_reverse()
 
 from bs4 import BeautifulSoup as BeautifulSoup4
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -121,7 +121,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
 
-    def test_search_action_type_contacts_and_entities(self):
+    def test_search_action_type_both(self):
         """search by action type: action on contacts and entities"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -174,7 +174,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
 
-    def test_search_action_subject_contacts_and_entities(self):
+    def test_search_action_subject_both(self):
         """search by action subject for contacts and entities"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -225,7 +225,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
 
-    def test_search_action_in_progress_contacts_and_entities(self):
+    def test_search_action_in_progress_both(self):
         """search by action status"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -280,7 +280,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_no_action_in_progress_contacts_and_entities(self):
+    def test_search_no_action_in_progress_both(self):
         """search by no action in progress"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -460,7 +460,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertContains(response, contact7.lastname)
 
-    def test_search_action_by_done_date_contacts_and_entities(self):
+    def test_search_action_by_done_date_both(self):
         """search by action done date"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -524,7 +524,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_by_planned_date_contacts_and_entities(self):
+    def test_search_action_by_planned_date_both(self):
         """search by action planned date"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -590,7 +590,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_by_planned_date_end_date_contacts(self):
+    def test_search_by_planned_end_contacts(self):
         """search by no action in planned date"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -675,7 +675,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, contact7.lastname)
         self.assertNotContains(response, contact8.lastname)
 
-    def test_search_action_by_planned_date_end_date_entities(self):
+    def test_search_by_planned_end_entities(self):
         """earch by planned date: entiy actions"""
         entity1 = mommy.make(models.Entity, name=u"#ENTITY-1#")
         entity2 = mommy.make(models.Entity, name=u"#ENTITY-2#")
@@ -753,7 +753,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, entity7.name)
         self.assertNotContains(response, entity8.name)
 
-    def test_search_action_by_start_date_contacts_and_entities(self):
+    def test_search_action_by_start_both(self):
         """search by action start date"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -819,7 +819,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_by_in_charge_contacts_and_entities(self):
+    def test_search_action_by_in_charge_both(self):
         """search by action in charge"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -835,8 +835,8 @@ class ActionSearchTest(BaseTestCase):
         entity4 = mommy.make(models.Entity, name=u"A huge corp")
         contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
 
-        user1 = mommy.make(User)
-        user2 = mommy.make(User)
+        user1 = mommy.make(models.TeamMember)
+        user2 = mommy.make(models.TeamMember)
 
         action = mommy.make(models.Action, in_charge=user1)
         action.contacts.add(contact1)
@@ -883,7 +883,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_by_amount_gte_contacts_and_entities(self):
+    def test_search_action_by_amount_gte_both(self):
         """search by action amount greater than"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -944,7 +944,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_by_amout_lt_contacts_and_entities(self):
+    def test_search_action_by_amout_lt_both(self):
         """seacrh by action amount less than"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -997,15 +997,15 @@ class ActionSearchTest(BaseTestCase):
         self.assertContains(response, entity2.name)
         self.assertContains(response, contact2.lastname)
 
-        self.assertContains(response, entity3.name) #amount default value is 0
-        self.assertContains(response, contact4.lastname)
+        self.assertNotContains(response, entity3.name)  #amount default value is None
+        self.assertNotContains(response, contact4.lastname)
 
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_status_contacts_and_entities(self):
+    def test_search_action_status_both(self):
         """search by action status"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -1069,7 +1069,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_opportunity_contacts_and_entities(self):
+    def test_search_action_opportunity_both(self):
         """search by action opportunity"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
@@ -1133,7 +1133,7 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, contact7.lastname)
 
-    def test_search_action_opportunity_name_contacts_and_entities(self):
+    def test_search_action_opportunity_name_both(self):
         """search by action opprtunities; contacts and entities"""
         entity1 = mommy.make(models.Entity, name=u"My tiny corp")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)

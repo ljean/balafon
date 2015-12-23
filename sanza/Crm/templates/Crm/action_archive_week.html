@@ -1,6 +1,8 @@
 {% extends "Crm/action_archive_base.html" %}
 {% load i18n %}
 
+{% block extra_title %}{% trans "The Week of" %} {{week|date:"j F Y"}}{% endblock %}
+
 {% block prev_url %}{% url "crm_actions_of_week" previous_week.year previous_week|date:"W" %}{% endblock %}
 
 {% block this_url %}{% url "crm_actions_of_week" week.year week|date:"W" %}{% endblock %}

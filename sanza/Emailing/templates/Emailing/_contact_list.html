@@ -1,8 +1,17 @@
 {% load i18n %}
 {%  if show_always or contacts.count %}
-<div class="row">
+<div class="row info-line">
     <div class="col-md-2">
+        {% if is_link %}
+        <div style="font-size: 9px" class="label-text">
+            <span class="glyphicon glyphicon-link"></span>
+            {{ label }}
+        </div>
+        {% else %}
         <div class="label-text">{{ label }}</div>
+        {% endif %}
+
+
     </div>
     <div class="col-md-2">
         <div class="contacts-count test-{{ label|lower }}">
@@ -10,8 +19,8 @@
         </div>
     </div>
     <div class="col-md-8">
-        <div class="contacts-list">
-        {%  if contacts and not hide_contacts %}
+        <div class="contacts-list {% if hide_contacts %}hidden-contacts{% endif %}">
+        {%  if contacts %}
         {% for contact in contacts %}
             <a href="{% url 'crm_view_contact' contact.id %}">{{ contact }}</a>
             {%  if not forloop.last %}&nbsp; - &nbsp;{% endif %}

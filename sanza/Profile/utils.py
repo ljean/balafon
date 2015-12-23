@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 
 from sanza.utils import logger, now_rounded
 from sanza.Crm import settings as crm_settings
-from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType
+from sanza.Crm.models import Contact, Entity, EntityType, Action, ActionType, Group
 from sanza.Emailing.models import SubscriptionType
 from sanza.Emailing.utils import save_subscriptions
 from sanza.Profile.models import ContactProfile, CategoryPermission
@@ -65,18 +65,23 @@ def create_profile_contact(user):
             action.contacts.add(contact)
             action.save()
 
-    contact.gender = profile.gender
+    fields = (
+        'gender', 'firstname', 'lastname', 'phone', 'mobile', 'address', 'address2', 'address3',
+        'zip_code', 'city', 'cedex', 'country',
+    )
+    if profile:
+        for field in fields:
+            value = getattr(profile, field, None)
+            if value:
+                setattr(contact, field, value)
+
     contact.lastname = contact.lastname or user.last_name
     contact.firstname = contact.firstname or user.first_name
     contact.email = user.email
     contact.email_verified = True
     if not contact.lastname:
         contact.lastname = user.email.split("@")[0]
-    
-    if profile:
-        contact.city = profile.city
-        contact.zip_code = profile.zip_code
-    
+
     contact.save()
 
     try:
@@ -91,6 +96,19 @@ def create_profile_contact(user):
         except SubscriptionType.DoesNotExist:
             pass
     save_subscriptions(contact, subscription_types)
+
+    try:
+        groups_ids = [int(s) for s in profile.groups_ids.split(",")]
+    except ValueError:
+        groups_ids = []
+
+    for group_id in groups_ids:
+        try:
+            group = Group.objects.get(id=group_id)
+            group.contacts.add(contact)
+            group.save()
+        except Group.DoesNotExist:
+            pass
 
     action_type = ActionType.objects.get_or_create(name=_(u"Account creation"))[0]
     action = Action.objects.create(

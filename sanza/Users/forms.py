@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+"""forms"""
 
-import floppyforms as forms
-from sanza.Users.models import UserPreferences
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
+
+import floppyforms as forms
+
+from sanza.utils import is_allowed_homepage
+from sanza.Users.models import UserPreferences
+
 
 class UserPreferencesAdminForm(forms.ModelForm):
 
@@ -16,6 +21,7 @@ class UserPreferencesAdminForm(forms.ModelForm):
     class Meta:
         model = UserPreferences
 
+
 class ContentTypeField(forms.CharField): 
     def clean(self, value):
         super(ContentTypeField, self).clean(value)
@@ -25,6 +31,7 @@ class ContentTypeField(forms.CharField):
             except ContentType.DoesNotExist:
                 raise ValidationError(_(u"The content type {0} doesn't exist").format(value))
         return value
+
 
 class UpdateFavoriteForm(forms.Form):
     object_id = forms.IntegerField(required=True)
@@ -38,8 +45,13 @@ class UpdateFavoriteForm(forms.Form):
                 'content_type': ContentType.objects.get_for_model(instance.__class__).id,
             }
         super(UpdateFavoriteForm, self).__init__(*args, **kwargs)
-        
+
+
 class UrlForm(forms.Form):
-    url = forms.URLField(required=True)
-    
-    
+    url = forms.CharField(required=True)
+
+    def clean_url(self):
+        url = self.cleaned_data['url']
+        if not is_allowed_homepage(url):
+            raise ValidationError(_(u"The url {0} is not allowed as homepage".format(url)))
+        return url

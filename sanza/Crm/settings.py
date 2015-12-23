@@ -40,11 +40,18 @@ def city_formatters():
     return getattr(project_settings, 'SANZA_CITY_FORMATTERS', ())
 
 
-def get_language_choices():
+def get_language_choices(default_label=None):
     """returns list of languages"""
-    return [('', _(u'Default'))] + list(project_settings.LANGUAGES)
+    if default_label is None:
+        default_label = _(u'Default')
+    return [('', default_label)] + list(project_settings.LANGUAGES)
 
 
 def has_language_choices():
     """returns true if we should propose language choices"""
     return len(project_settings.LANGUAGES) >= 2
+
+
+def get_subscription_default_value():
+    """returns the default value for subscriptions when """
+    return getattr(project_settings, 'SANZA_SUBSCRIPTION_DEFAULT_VALUE', False)

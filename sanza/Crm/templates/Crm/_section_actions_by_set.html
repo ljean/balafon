@@ -17,7 +17,9 @@
         <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
           <span class="glyphicon glyphicon-warning-sign"></span>
           {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
-          <a class="btn btn-default btn-xs" href="{% if contact %}{% url "crm_view_contact_actions" contact.id set_id %}{% else %}{% url "crm_view_entity_actions" entity.id set_id %}{% endif %}">
+          <a class="btn btn-default btn-xs"
+             href="{% if contact %}{% url 'crm_view_contact_actions' contact.id set_id %}{% else %}{% url 'crm_view_entity_actions' entity.id set_id %}{% endif %}"
+          >
             {% trans "View all" %}
           </a>
         </div>
@@ -27,19 +29,12 @@
   {% endfor %}
 {% endblock %}
 
+{% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
+
 {% block section_buttons %}
-  {% if contact %}
-    <li><a class="colorbox-form" href="{% url "crm_create_action" 0 contact.id %}">{% trans "Add action" %}</a></li>
-  {% else %}
-    {% if entity %}
-      <li><a class="colorbox-form" href="{% url "crm_create_action" entity.id 0 %}">{% trans "Add action" %}</a></li>
-    {% else %}
-      {% if opportunity %}
-        <li><a class="colorbox-form" href="{% url "crm_create_action" 0 0 %}?opportunity={{opportunity.id}}">{% trans "Add action" %}</a></li>
-      {% else %}
-        <li><a class="colorbox-form" href="{% url "crm_create_action" 0 0 %}">{% trans "Add action" %}</a></li>
-      {% endif %}
-    {% endif %}
-  {% endif %}
+  {% include "Crm/_actions_set_menu.html" %}
+  {% for action_type in addable_action_types %}
+  {% include "Crm/_actions_set_menu.html" %}
+  {% endfor %}
 {% endblock %}
 

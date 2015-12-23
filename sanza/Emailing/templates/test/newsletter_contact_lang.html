@@ -1,0 +1,9 @@
+{% extends "test/newsletter_contact.html" %}
+{% load i18n coop_edition %}
+
+ {% block newsletter %}
+    {{ block.super }}
+    <a style="color: #000;" href="{% url 'emailing_view_online_lang' emailing.id contact.uuid 'en' %}">
+        Read our newsletter in english.
+    </a>
+ {% endblock %}

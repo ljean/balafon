@@ -45,28 +45,28 @@
       return new_name;
     }
     
-    $(".remove-field").live('click', function() {
+    $(document).on('click', ".remove-field", function() {
       $(this).closest(".field-form").remove();
       return false;
     });
     
-    $(".remove-block").live('click', function() {
+    $(document).on('click', ".remove-block", function() {
       $(this).parent().parent().remove();
       return false;
     });
     
-    $(".clear-block").live('click', function() {
+    $(document).on('click', ".clear-block", function() {
       $(this).parent().parent().find('.fields').remove();
       $(this).parent().parent().append('<div class="fields"></div>')
       return false;
     });
     
-    $(".add-block").live('click', function() {
+    $(document).on('click', ".add-block", function() {
       add_block();
       return false;
     });
     
-    $(".duplicate-block").live('click', function() {
+    $(document).on('click', ".duplicate-block", function() {
       var new_rel = add_block();
       var rel = $(this).parent().parent().attr('rel');
       var fields = $(this).parent().parent().find('.fields').html();
@@ -85,7 +85,7 @@
       $('.search-block[rel="gr0"]').find('.actions a.remove-block').remove();
     }
     
-    $("select[name='field_choice']").live('change', function() {
+    $(document).on('change', "select[name='field_choice']", function() {
       var field_type = $(this).val();
       var add_field_button = $(this).parent().find(".add-field");
       if (field_type) {
@@ -97,7 +97,7 @@
     });
     $("select[name='field_choice']").trigger('change');
   
-    $(".add-field").live('click', function() {
+    $(document).on('click', ".add-field", function() {
       var field_type = $(this).parent().find("select[name='field_choice']").val();
       if (field_type) {
         $.ajax({
@@ -119,7 +119,7 @@
       return false;
     })
     
-    $('.datepicker').live('click', function() {
+    $(document).on('click', '.datepicker', function() {
       $(this).datepicker({
         dateFormat: 'dd/mm/yy',
         dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
@@ -130,7 +130,7 @@
       }).focus();
     });
     
-    $('.datepicker').live('change', function() {
+    $(document).on('change', '.datepicker', function() {
       if ($(this).hasClass('from')) {
         var to = $(this).parent().find(".to");
         var input = $(this).parent().find("input[type=hidden]");

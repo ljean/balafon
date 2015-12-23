@@ -1,0 +1,6 @@
+{% extends "Crm/popup_select_contact_or_entity.html" %}
+{% load i18n %}
+{% block title %}{{ title }}{% endblock %}
+{% block form_url %}{% url "crm_reassign_action" action.id %}{% endblock %}
+{% block doc_header %}
+{% endblock %}

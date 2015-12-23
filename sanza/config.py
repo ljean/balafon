@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 """configure the sanza search form"""
 
+import sys
+
 from django.utils.translation import ugettext as _
 
 from sanza.Crm import settings
 from sanza.Crm import search_forms
 from sanza.Emailing import search_forms as emailing_search_forms
+
 
 SEARCH_FORMS = [
     (
@@ -34,6 +37,7 @@ SEARCH_FORMS = [
             search_forms.HasCityAndZipcodeForm,
             search_forms.ZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
             search_forms.EntityZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
+            search_forms.AddressSearchForm,
         ],
     ), (
         _(u'Entity'),
@@ -114,7 +118,14 @@ SEARCH_FORMS = [
         _(u'Options'),
         [
             search_forms.NoSameAsForm,
+            search_forms.NoSameEmailForm,
             search_forms.SortContacts,
+        ],
+    ), (
+        _(u'Unit test'),
+        [
+            search_forms.UnitTestEntityCustomFieldForm if ('test' in sys.argv) else None,
+            search_forms.UnitTestContactCustomFieldForm if ('test' in sys.argv) else None,
         ],
     ),
 ]

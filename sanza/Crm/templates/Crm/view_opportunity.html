@@ -1,6 +1,8 @@
 {% extends "sanza/bs_base.html" %}
 {% load i18n %}
 
+{% block extra_title %}{% trans "Opportunity" %} {{ opportunity.name }} {% endblock %}
+
 {% block document_content %}
   
 {% include "Crm/_section_opportunity_info.html" %}

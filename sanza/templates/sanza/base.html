@@ -22,7 +22,7 @@
   <script type="text/javascript">
     $(function () {
       $("a.colorbox-form").colorboxify();
-      $(".note-icon.has-note").live('click', function() {
+      $(document).on('click', ".note-icon.has-note", function() {
         var pos = $(this).position();
         $(this).find(".action-note").toggle().css({
           left: 0,

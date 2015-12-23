@@ -10,17 +10,17 @@ from django.contrib import messages
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
-from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View, TemplateView
 
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
+from coop_cms.utils import redirect_to_language
 
 from sanza.permissions import can_access
 from sanza.utils import logger
@@ -28,8 +28,10 @@ from sanza.utils import now_rounded
 from sanza.Crm.forms import ConfirmForm
 from sanza.Crm.models import Contact, Action, ActionType, Subscription
 from sanza.Emailing import models, forms
-from sanza.Emailing.utils import get_emailing_context
-from sanza.Emailing.utils import send_verification_email, EmailSendError
+from sanza.Emailing.settings import (
+    is_subscribe_enabled, is_email_subscribe_enabled, get_subscription_form
+)
+from sanza.Emailing.utils import get_emailing_context, send_verification_email, EmailSendError, patch_emailing_html
 
 
 @user_passes_test(can_access)
@@ -289,7 +291,15 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     context = Context(get_emailing_context(emailing, contact))
     the_template = get_template(emailing.newsletter.get_template_name())
-    return HttpResponse(the_template.render(context))
+    html_text = the_template.render(context)
+    html_text = patch_emailing_html(html_text, emailing, contact)
+    return HttpResponse(html_text)
+
+
+def view_emailing_online_lang(request, emailing_id, contact_uuid, lang):
+    """view an emailing in a given lang"""
+    url = reverse("emailing_view_online", args=[emailing_id, contact_uuid])
+    return redirect_to_language(url, lang)
 
 
 def subscribe_done(request, contact_uuid):
@@ -361,19 +371,21 @@ class SubscribeView(View):
         
     def get_form_class(self):
         """get form: can be customized"""
-        try:
-            form_name = getattr(settings, 'SANZA_SUBSCRIBE_FORM')
-            module_name, class_name = form_name.rsplit('.', 1)
-            module = import_module(module_name)
-            subscribe_form = getattr(module, class_name)
-        except AttributeError:
-            subscribe_form = forms.SubscribeForm
-        return subscribe_form
+        return get_subscription_form() or forms.SubscribeForm
         
     def get_template(self):
         """get template"""
         return self.template_name
-    
+
+    def is_enabled(self):
+        return is_subscribe_enabled()
+
+    def dispatch(self, request, *args, **kwargs):
+        """make possible to disable this view from settings"""
+        if not self.is_enabled():
+            raise Http404
+        return super(SubscribeView, self).dispatch(request, *args, **kwargs)
+
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_done', args=[contact.uuid])
@@ -420,7 +432,7 @@ class SubscribeView(View):
                 logger.exception(except_text)
                 
                 #create action
-                detail = _(u"An error occured while verifying the email address of this contact.")
+                detail = _(u"An error occurred while verifying the email address of this contact.")
                 fix_action = ActionType.objects.get_or_create(name=_(u'Sanza'))[0]
                 action = Action.objects.create(
                     subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
@@ -439,7 +451,10 @@ class SubscribeView(View):
 class EmailSubscribeView(SubscribeView):
     """Just a email field for newsletter subscription"""
     template_name = 'Emailing/public/subscribe_email.html'
-    
+
+    def is_enabled(self):
+        return is_email_subscribe_enabled()
+
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_email_done')

@@ -12,8 +12,10 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
-from coop_cms.tests import test_newsletter as coop_cms_tests
 from coop_cms.models import Newsletter
+from coop_cms.settings import is_localized, is_multilang
+from coop_cms.tests import test_newsletter as coop_cms_tests
+from coop_cms.utils import get_url_in_language
 from model_mommy import mommy
 
 from sanza.Crm import models
@@ -124,7 +126,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
-            self.assertTrue(MagicLink.objects.count()>0)
+            self.assertTrue(MagicLink.objects.count() > 0)
 
             #check an action has been created
             c = models.Contact.objects.get(id=contact.id)
@@ -156,9 +158,9 @@ class SendEmailingTest(BaseTestCase):
         newsletter_data = {
             'subject_'+origin_lang: 'This is the {0} subject'.format(origin_lang),
             'subject_'+trans_lang: 'This is the {0} subject'.format(trans_lang),
-            'content_'+origin_lang: content.format(origin_lang),
+            'content_'+origin_lang: content.format(origin_lang, ),
             'content_'+trans_lang: content.format(trans_lang),
-            'template': 'test/newsletter_contact.html'
+            'template': 'test/newsletter_contact_lang.html'
         }
 
         newsletter = mommy.make(Newsletter, **newsletter_data)
@@ -206,6 +208,8 @@ class SendEmailingTest(BaseTestCase):
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
 
+            view_en_url = reverse("emailing_view_online_lang", args=[emailing.id, contact.uuid, 'en'])
+
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
             self.assertEqual(email.subject, newsletter_data['subject_'+trans_lang])
@@ -221,11 +225,13 @@ class SendEmailingTest(BaseTestCase):
 
             self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            #Check links are not magic
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(view_en_url) >= 0)
             #Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(trans_lang)) > 0)
-            #Check mailto links are not magic
+            #Check internal links are not magic
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
             #check magic links
@@ -235,6 +241,127 @@ class SendEmailingTest(BaseTestCase):
             c = models.Contact.objects.get(id=contact.id)
             self.assertEqual(c.action_set.count(), 1)
             self.assertEqual(c.action_set.all()[0].subject, email.subject)
+
+    @skipIf(len(settings.LANGUAGES) < 2, "LANGUAGES less than 2")
+    @override_settings(COOP_CMS_REPLY_TO="")
+    def test_send_newsletter_contact_language(self):
+        """test that we use the favorite language of the contact when sending him a newsletter"""
+
+        entity = mommy.make(models.Entity, name="my corp")
+
+        origin_lang = settings.LANGUAGES[0][0]
+        trans_lang = settings.LANGUAGES[1][0]
+
+        names = ['alpha', 'beta', 'gamma']
+        langs = ['', origin_lang, trans_lang]
+
+        contacts = [
+            mommy.make(
+                models.Contact,
+                entity=entity,
+                email=name+'@toto.fr',
+                lastname=name.capitalize(),
+                firstname=name,
+                favorite_language=lang
+            ) for (name, lang) in zip(names, langs)
+        ]
+
+        content = '<h2>Hello #!-fullname-!#!</h2><p>{0}Visit <a href="http://toto.{0}">{0}</a>'
+        content += '<a href="mailto:me@me.{0}">mailme</a><a href="#art1">internal link</a></p>'
+
+        newsletter_data = {
+            'subject_'+origin_lang: 'This is the {0} subject'.format(origin_lang),
+            'subject_'+trans_lang: 'This is the {0} subject'.format(trans_lang),
+            'content_'+origin_lang: content.format(origin_lang),
+            'content_'+trans_lang: content.format(trans_lang),
+            'template': 'test/newsletter_contact.html'
+        }
+
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+
+        site = Site.objects.get_current()
+        site.domain = "toto.fr"
+        site.save()
+
+        emailing = mommy.make(
+            Emailing,
+            newsletter=newsletter,
+            status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(),
+            sending_dt=None,
+            subscription_type=mommy.make(models.SubscriptionType, site=site),
+            lang=''
+        )
+
+        for contact in contacts:
+            emailing.send_to.add(contact)
+        emailing.save()
+
+        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+
+        emailing = Emailing.objects.get(id=emailing.id)
+
+        activate(origin_lang)
+
+        #check emailing status
+        self.assertEqual(emailing.status, Emailing.STATUS_SENT)
+        self.assertNotEqual(emailing.sending_dt, None)
+        self.assertEqual(emailing.send_to.count(), 0)
+        self.assertEqual(emailing.sent_to.count(), len(contacts))
+
+        self.assertEqual(len(mail.outbox), len(contacts))
+
+        outbox = list(mail.outbox)
+        outbox.sort(key=lambda email: email.to)
+        contacts.sort(key=lambda contact: contact.get_email)
+
+        activate(trans_lang)
+        for email, contact, lang in zip(outbox, contacts, langs):
+            viewonline_url = reverse(
+                'emailing_view_online', args=[emailing.id, contact.uuid]
+            )
+
+            unsubscribe_url = reverse(
+                'emailing_unregister', args=[emailing.id, contact.uuid]
+            )
+
+            contact_lang = lang or origin_lang
+            viewonline_url = get_url_in_language(viewonline_url, contact_lang)
+            unsubscribe_url = get_url_in_language(unsubscribe_url, contact_lang)
+
+            viewonline_url = emailing.get_domain_url_prefix() + viewonline_url
+            unsubscribe_url = emailing.get_domain_url_prefix() + unsubscribe_url
+
+            self.assertEqual(email.to, [contact.get_email_address()])
+            self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
+
+            self.assertEqual(email.subject, newsletter_data['subject_'+contact_lang])
+            self.assertTrue(email.body.find(entity.name) >= 0)
+            #print email.body
+            self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
+            self.assertEqual(
+                email.extra_headers['List-Unsubscribe'],
+                '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
+            )
+            self.assertTrue(email.body.find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][1], "text/html")
+
+            self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
+            self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(contact_lang)) > 0)
+            #Check mailto links are not magic
+            self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
+
+            #check magic links
+            self.assertTrue(MagicLink.objects.count() > 0)
+
+            #check an action has been created
+            contact = models.Contact.objects.get(id=contact.id)
+            self.assertEqual(contact.action_set.count(), 1)
+            self.assertEqual(contact.action_set.all()[0].subject, email.subject)
 
     @override_settings(COOP_CMS_REPLY_TO="reply_to@toto.fr")
     def test_send_newsletter_reply_to(self):
@@ -293,12 +420,16 @@ class SendEmailingTest(BaseTestCase):
         contacts.sort(key=lambda c: c.get_email)
 
         for email, contact in zip(outbox, contacts):
-            viewonline_url = emailing.get_domain_url_prefix() + reverse(
+            viewonline_url = reverse(
                 'emailing_view_online', args=[emailing.id, contact.uuid]
             )
-            unsubscribe_url = emailing.get_domain_url_prefix() + reverse(
+
+            unsubscribe_url = reverse(
                 'emailing_unregister', args=[emailing.id, contact.uuid]
             )
+
+            viewonline_url = emailing.get_domain_url_prefix() + viewonline_url
+            unsubscribe_url = emailing.get_domain_url_prefix() + unsubscribe_url
 
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
@@ -589,8 +720,10 @@ class SendEmailingTest(BaseTestCase):
 
     def test_view_online(self):
         entity = mommy.make(models.Entity, name="my corp")
-        contact = mommy.make(models.Contact, entity=entity,
-            email='toto@toto.fr', lastname='Azerty', firstname='Albert')
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
         newsletter_data = {
             'subject': 'This is the subject',
             'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
@@ -606,9 +739,169 @@ class SendEmailingTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, contact.fullname)
+        self.assertEqual(MagicLink.objects.count(), 2)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, '/this-link-without-prefix-in-template')
+
+        magic_link1 = MagicLink.objects.all()[1]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
+        self.assertEqual(magic_link1.url, 'http://toto.fr')
+
+    @skipIf(not is_localized() or not is_multilang(), "not localized")
+    def test_emailing_view_online_lang(self):
+        """test view emailing in other lang"""
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr">us</a></p>',
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        #default_lang = settings.LANGUAGES[0][0]
+        other_lang = settings.LANGUAGES[1][0]
+
+        url = reverse('emailing_view_online_lang', args=[emailing.id, contact.uuid, other_lang])
+        response = self.client.get(url)
+        self.assertEqual(302, response.status_code)
+        next_url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])[3:]
+        self.assertEqual(response["Location"], "http://testserver/"+other_lang+next_url)
+
+    @override_settings(SECRET_KEY=u"super-héros")
+    def test_view_online_utf_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr/à-bientôt">à bientôt</a></p>',
+            'template': 'test/newsletter_contact.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact.fullname)
+        self.assertEqual(MagicLink.objects.count(), 2)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, '/this-link-without-prefix-in-template')
+
+        magic_link1 = MagicLink.objects.all()[1]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
+        self.assertEqual(magic_link1.url, u'http://toto.fr/à-bientôt')
+
+    def test_view_long_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/{0}".format("abcde" * 100)[:499]
+        long_link = "http://toto.fr/{0}".format("abcde" * 100)  # >500 chars
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">long link</a> <a href="{1}">long link</a></p>'.format(
+                short_link, long_link),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
         self.assertEqual(MagicLink.objects.count(), 1)
-        ml = MagicLink.objects.all()[0]
-        self.assertContains(response, reverse('emailing_view_link', args=[ml.uuid, contact.uuid]))
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, short_link)
+
+        self.assertContains(response, long_link)
+
+    def test_view_duplicate_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/abcde/"
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">link1</a> <a href="{1}">link2</a></p>'.format(
+                short_link, short_link
+            ),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(MagicLink.objects.count(), 1)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+        self.assertEqual(magic_link0.url, short_link)
+
+    def test_view_duplicate_emailing(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        short_link = "http://toto.fr/abcde/"
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': u'<p>Visit <a href="{0}">link1</a></p>'.format(
+                short_link
+            ),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing1 = mommy.make(Emailing, newsletter=newsletter)
+        emailing1.sent_to.add(contact)
+        emailing1.save()
+
+        emailing2 = mommy.make(Emailing, newsletter=newsletter)
+        emailing2.sent_to.add(contact)
+        emailing2.save()
+
+        for emailing in (emailing1, emailing2):
+            url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+            response = self.client.get(url)
+            self.assertEqual(200, response.status_code)
+
+            magic_links = MagicLink.objects.filter(emailing=emailing)
+            self.assertEqual(magic_links.count(), 1)
+
+            magic_link0 = magic_links[0]
+            self.assertContains(response, reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid]))
+            self.assertEqual(magic_link0.url, short_link)
 
 
 class NewsletterTest(coop_cms_tests.NewsletterTest):
@@ -618,5 +911,5 @@ class NewsletterTest(coop_cms_tests.NewsletterTest):
         def extra_checker(e):
             site = Site.objects.get(id=settings.SITE_ID)
             url = "http://"+site.domain+"/this-link-without-prefix-in-template"
-            self.assertTrue(e.alternatives[0][0].find(url)>=0)
+            self.assertTrue(e.alternatives[0][0].find(url) >= 0)
         super(NewsletterTest, self).test_send_test_newsletter('test/newsletter_contact.html')

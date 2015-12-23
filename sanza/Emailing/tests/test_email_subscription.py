@@ -17,6 +17,7 @@ from model_mommy import mommy
 from sanza.Crm import models
 
 
+@override_settings(SANZA_EMAIL_SUBSCRIBE_ENABLED=True)
 class SubscribeTest(TestCase):
     """Subscription with just his email address"""
     
@@ -72,6 +73,7 @@ class SubscribeTest(TestCase):
         url = reverse("emailing_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
         
     @override_settings(SANZA_DEFAULT_SUBSCRIPTION_TYPE=None)
     def test_email_subscribe_newsletter(self):
@@ -473,3 +475,24 @@ class SubscribeTest(TestCase):
         self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
         for existing_contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4):
             self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)
+
+    @override_settings(SANZA_EMAIL_SUBSCRIBE_ENABLED=False)
+    def test_view_subscribe_disabled(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+
+    @override_settings(SANZA_EMAIL_SUBSCRIBE_ENABLED=False)
+    def test_subscribe_disabled(self):
+        url = reverse("emailing_email_subscribe_newsletter")
+
+        data = {
+            'email': 'pdupond@apidev.fr',
+        }
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+
+        self.assertEqual(len(mail.outbox), 0)

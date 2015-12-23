@@ -1,6 +1,8 @@
 {% extends "sanza/bs_base.html" %}
 {% load i18n favorite_tags %}
 
+{% block extra_title %}{% trans "Favorites" %}{% endblock %}
+
 {% block document_content %}
     {% if favs_by_type %}
     {% for type, favs, template_name in favs_by_type %}

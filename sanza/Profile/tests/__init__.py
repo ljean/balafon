@@ -11,12 +11,15 @@ import os.path
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from coop_cms.utils import RequestManager
+
 
 class BaseTestCase(TestCase):
     """Base class for test cases"""
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
+        RequestManager().clean()
         self.user = User.objects.create(username="toto")
         self.user.set_password("abc")
         self.user.save()
