@@ -3,13 +3,13 @@
 import sys
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, url, patterns
 from django.contrib import admin
 from django.contrib.auth import views as django_auth_views
 from django.contrib.staticfiles.views import serve as serve_static
 from django.views.static import serve as serve_media
 
-from coop_cms.settings import get_url_patterns
+from coop_cms.settings import get_url_patterns, get_media_root
 
 from sanza.forms import BsAuthenticationForm, BsPasswordChangeForm, BsPasswordResetForm
 from sanza.Users import views as users_views
@@ -23,7 +23,28 @@ localized_patterns = get_url_patterns()
 
 admin.autodiscover()
 
-urlpatterns = [
+urlpatterns = []
+
+if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
+    if settings.DEBUG:
+        urlpatterns += [
+            url(r'^static/(?P<path>.*)$', serve_static),
+        ]
+    else:
+        urlpatterns += [
+            url(r'^static/(?P<path>.*)$', serve_media, {'document_root': settings.STATIC_ROOT}),
+        ]
+    urlpatterns += patterns(
+        '',
+        url(
+            r'^media/(?P<path>.*)$',
+            serve_media,
+            {'document_root': get_media_root(), 'show_indexes': True}
+        ),
+    )
+
+
+urlpatterns += [
     url(r'^crm/$', users_views.user_homepage, name="sanza_homepage"),
     url(r'^crm/', include('sanza.Crm.urls')),
     url(r'^crm-search/', include('sanza.Search.urls')),
@@ -35,23 +56,6 @@ urlpatterns = [
         name="auto_save_data"
     ),
 ]
-
-if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
-    if settings.DEBUG:
-        urlpatterns += [
-            url(r'^static/(?P<path>.*)$', serve_static),
-        ]
-    else:
-        urlpatterns += [
-            url(r'^static/(?P<path>.*)$', serve_media, {'document_root': settings.STATIC_ROOT}),
-        ]
-    urlpatterns += [
-        url(
-            r'^media/(?P<path>.*)$',
-            serve_media,
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}
-        ),
-    ]
 
 
 urlpatterns += localized_patterns(
@@ -135,7 +139,5 @@ if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
 urlpatterns += localized_patterns(
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^djaloha/', include('djaloha.urls')),
     url(r'^', include('coop_cms.urls')),
-    url(r'^coop_bar/', include('coop_bar.urls')),
 )
