@@ -36,7 +36,7 @@ setup(
         'django-cors-headers',
     ],
     dependency_links=[
-        'git+https://github.com/ljean/coop_cms.git@f37070ff6e9148c91ea936711c1324308f2ca010#egg=apidev_coop_cms-dev',
+        'git+https://github.com/ljean/coop_cms.git@3dda8592da19cfb5c79d1badf9e320ac211cb2fe#egg=apidev_coop_cms-dev',
     ],
     long_description=open('README.rst').read(),
     url='https://bitbucket.org/ljean/apidev-sanza',
