@@ -39,7 +39,7 @@ TIME_ZONE = 'Europe/Paris'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-en'
+LANGUAGE_CODE = 'en'
 
 gettext = lambda s: s
 LANGUAGES = (
@@ -147,7 +147,7 @@ AUTHENTICATION_BACKENDS = (
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
-#SOUTH_SKIP_MIGRATIONS = True
+SOUTH_SKIP_MIGRATIONS = True
 SOUTH_TESTS_MIGRATE = False
 
 LOCALE_REDIRECT_PERMANENT = False
@@ -189,7 +189,7 @@ REST_FRAMEWORK = {
 }
 
 INSTALLED_APPS = (
-    #contribs
+    # contribs
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -198,7 +198,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
 
-    #3rd parties
+    # 3rd parties
     'south',
     'django_extensions',
     'floppyforms',
@@ -206,7 +206,7 @@ INSTALLED_APPS = (
     'captcha',
     'registration',
 
-    #externals
+    # externals
     'djaloha',
     'colorbox',
     'coop_cms',
@@ -214,7 +214,7 @@ INSTALLED_APPS = (
     'coop_cms.apps.basic_cms',
     'coop_cms.apps.email_auth',
 
-    #sanza
+    # sanza
     'sanza',
     'sanza.Crm',
     'sanza.Search',

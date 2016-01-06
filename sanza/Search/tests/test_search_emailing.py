@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """test search forms of the emailing module"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup
 from datetime import datetime
 import json
@@ -15,7 +10,6 @@ from django.core.urlresolvers import reverse
 from model_mommy import mommy
 
 from sanza.Crm import models
-
 from sanza.Emailing.models import Emailing
 from sanza.Emailing.tests import BaseTestCase
 from sanza.utils import get_form_errors

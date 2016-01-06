@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can save a search"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup as BeautifulSoup4
 import json
 

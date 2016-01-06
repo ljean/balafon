@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by zones"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup as BeautifulSoup4
 from unittest import skipIf
 

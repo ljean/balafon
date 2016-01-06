@@ -14,7 +14,7 @@ from django.utils.translation import activate
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import is_localized, is_multilang
-from coop_cms.tests import test_newsletter as coop_cms_tests
+from coop_cms.tests.test_newsletter import NewsletterTest as BaseNewsletterTest
 from coop_cms.utils import get_url_in_language
 from model_mommy import mommy
 
@@ -904,7 +904,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(magic_link0.url, short_link)
 
 
-class NewsletterTest(coop_cms_tests.NewsletterTest):
+class NewsletterTest(BaseNewsletterTest):
     """test coop_cms newsletter"""
 
     def test_send_newsletter_template(self):

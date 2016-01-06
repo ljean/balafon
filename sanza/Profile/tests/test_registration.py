@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from unittest import skipIf
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -17,6 +13,7 @@ from model_mommy import mommy
 from registration.models import RegistrationProfile
 
 from sanza.Crm import models
+
 
 @skipIf(not ("sanza.Profile" in settings.INSTALLED_APPS), "registration not installed")
 class RegisterTestCase(TestCase):

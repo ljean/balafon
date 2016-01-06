@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 
 import logging
 import os.path
 import shutil
 
-from coop_cms.utils import RequestManager
-
-from django.test import TestCase
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.test import TestCase
 from django.test.utils import override_settings
+
+from coop_cms.utils import RequestManager
 
 
 default_media_root = settings.MEDIA_ROOT

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 from unittest import skipIf
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.files import File
 

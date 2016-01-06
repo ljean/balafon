@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """test relationship search"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
 from django.core.urlresolvers import reverse
 

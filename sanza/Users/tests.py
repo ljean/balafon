@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 
 from datetime import datetime, date, timedelta
 import json
@@ -12,6 +8,7 @@ from unittest import skipIf
 from StringIO import StringIO
 import sys
 
+from django.conf import settings
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail, management
@@ -584,7 +581,6 @@ class UserHomepageTestCase(BaseTestCase):
 
     def test_is_allowed_homepage(self):
         """set is_allowed_homepage utility"""
-
         self.assertEqual(True, is_allowed_homepage(reverse("crm_view_entities_list")))
         self.assertEqual(True, is_allowed_homepage(reverse("users_favorites_list")))
         self.assertEqual(False, is_allowed_homepage(reverse("quick_search")))
