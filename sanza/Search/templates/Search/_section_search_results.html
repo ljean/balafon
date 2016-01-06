@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags sanza_utils %}
+{% load i18n sanza_utils %}
 
 {% block section_title %}
   <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
@@ -12,7 +12,6 @@
   {% if has_empty_entities %}
     <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
   {% endif %}
-  {% autopaginate results nb_results_by_page %}
   <table class="table table-bordered contact-table font-small">
     <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
   {% if contacts_display %}
@@ -81,7 +80,7 @@
     {% endfor %}
   {% endif %}
   </table>
-  {% paginate %}
+  {% include "coop_cms/_pagination.html" %}
   <script>
     $(function() {
       $(document).on('click', 'a.exclude-contact', function() {

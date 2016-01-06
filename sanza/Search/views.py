@@ -17,6 +17,7 @@ from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
+from coop_cms.utils import paginate
 from wkhtmltopdf.views import PDFTemplateView
 
 from sanza.permissions import can_access
@@ -145,12 +146,14 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
         search_form = SearchForm(instance=search_obj)
     
     entities_count = 0 if contacts_display else len(results)
+
+    page_obj = paginate(request, results, getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50))
+
     return render_to_response(
         'Search/search.html',
         {
-            'request': request,
-            'results': results,
-            'nb_results_by_page': getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50),
+            'page_obj': page_obj,
+            'results': results,#list(page_obj),
             'field_choice_form': field_choice_form,
             'message': message,
             'has_empty_entities': has_empty_entities,
@@ -266,10 +269,15 @@ def mailto_contacts(request, bcc):
 
 @user_passes_test(can_access)
 def view_search_list(request):
-    searches = Search.objects.all()#.order_by("-created")
+    searches = Search.objects.all()
+    page_obj = paginate(request, searches, 50)
+
     return render_to_response(
         'Search/search_list.html',
-        locals(),
+        {
+            'searches': list(page_obj),
+            'page_obj': page_obj,
+        },
         context_instance=RequestContext(request)
     )
 

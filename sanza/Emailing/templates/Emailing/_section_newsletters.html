@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags favorite_tags %}
+{% load i18n favorite_tags %}
 
 {% block section_title %}
   {% trans "Newsletters" %}
@@ -8,41 +8,38 @@
 {% block section_data %}
   
   {% if newsletters %}
-  {% autopaginate newsletters 10 %}
-  <div class="table-responsive">
-  <table class="table table-striped">
-    <tr>
-      <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
-    </tr>
-  {% for nl in newsletters %}
-    <tr>
-      <td>
-        {% favorite_item object=nl %}
-        <a href="{{ nl.get_absolute_url }}">{{nl.subject}}</a>
-      </td>
-      <td>
-        {% if nl.emailing_set.count %}
-          {% for e in nl.emailing_set.all %}
-            <div class="row">
-                <div class="col-md-6">
-                    {% favorite_item object=e %}
-                    <a href="{% url 'emailing_view' e.id %}">
-                        {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
-                    </a>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <tr>
+          <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
+        </tr>
+      {% for newsletter in newsletters %}
+        <tr>
+          <td>
+            {% favorite_item object=newsletter %}
+            <a href="{{ newsletter.get_absolute_url }}">{{newsletter.subject}}</a>
+          </td>
+          <td>
+            {% if newsletter.emailing_set.count %}
+              {% for e in newsletter.emailing_set.all %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% favorite_item object=e %}
+                        <a href="{% url 'emailing_view' e.id %}">
+                            {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+                        </a>
+                    </div>
                 </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          &nbsp;
-        {% endif %}
-      </td>
-      
-  </tr>
-  {% endfor %}
-  </table>
-  </div>
-
-    {% paginate %}
+              {% endfor %}
+            {% else %}
+              &nbsp;
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+    {% include "coop_cms/_pagination.html" %}
   {% else %}
     {% trans "No newsletters" %}
   {% endif %}

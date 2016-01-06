@@ -1,10 +1,9 @@
 {% extends "sanza/base.html" %}
-{% load i18n pagination_tags %}
+{% load i18n %}
 
 {% block document_content %}
   
-{% autopaginate actions 25 %}  
 {% include "Crm/_section_actions.html" %}
-{% paginate %}
+{% include "coop_cms/_pagination.html" %}
 
 {% endblock %}

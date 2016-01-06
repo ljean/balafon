@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags favorite_tags sanza_utils %}
+{% load i18n favorite_tags sanza_utils %}
 
 {% block section_title %}
   {%if partial %}{% trans "Latest contacts" %}{% else %}{% trans "All contacts" %}{%endif%}
@@ -14,7 +14,6 @@
 {% endfor %}
 </div>
 
-{% autopaginate entities 100 %}
 <table class="table with-odd-even contacts-table">
   <tr>
     <th colspan="2">{% trans "Contacts" %}</th>
@@ -38,7 +37,7 @@
         {% with e.single_contact as c %}
         <td colspan="2">
           <span class="glyphicon glyphicon-user"></span>
-          <a href="{% url "crm_view_contact" c.id %}">{{c.lastname|default:"?"}} {{c.firstname}}</a>
+          <a href="{% url 'crm_view_contact' c.id %}">{{c.lastname|default:"?"}} {{c.firstname}}</a>
         </td>
       
         <td class="extra-data">{{c.city.get_friendly_name|default:"&nbsp;"}}</td>
@@ -91,7 +90,7 @@
     {% endif %}
   {% endwith %}{% endfor %}
 </table>
-{% paginate %}
+{% include "coop_cms/_pagination.html" %}
 {% endblock %}
 
 {% block section_buttons %}

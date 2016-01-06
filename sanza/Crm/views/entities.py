@@ -5,15 +5,16 @@ from datetime import date
 import json
 import re
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.messages import warning
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
+from coop_cms.utils import paginate
 from colorbox.decorators import popup_redirect
 
 from sanza.Crm import models, forms
@@ -112,11 +113,18 @@ def view_entities_list(request):
             queryset = queryset.filter(name__istartswith=letter_filter)
     elif letter_filter == "~":
         queryset = queryset.filter(name__regex=r'^\W|^\d')
-    entities = list(queryset)
+
+    page_obj = paginate(request, queryset, 50)
+
+    entities = list(page_obj)
 
     return render_to_response(
         'Crm/all_entities.html',
-        {'entities': entities, "letter_filter": letter_filter},
+        {
+            'entities': entities,
+            'letter_filter': letter_filter,
+            'page_obj': page_obj,
+        },
         context_instance=RequestContext(request)
     )
 

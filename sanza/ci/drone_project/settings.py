@@ -103,13 +103,12 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'localeurl.middleware.LocaleURLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'pagination.middleware.PaginationMiddleware',
     'coop_cms.utils.RequestMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -144,17 +143,6 @@ AUTHENTICATION_BACKENDS = (
     'sanza.Profile.backends.ArticleCategoryPermissionBackend',
     'coop_cms.apps.email_auth.auth_backends.EmailAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
-)
-
-LOCALE_PATHS = (
-    PROJECT_PATH+'/locale/',
-)
-
-LOCALE_INDEPENDENT_MEDIA_URL = True
-import re
-LOCALE_INDEPENDENT_PATHS = (
-    re.compile(r'^/sitemap\.xml$'),
-    #re.compile('^/crm/.*$'),
 )
 
 ACCOUNT_ACTIVATION_DAYS = 7
@@ -215,8 +203,6 @@ INSTALLED_APPS = (
     'django_extensions',
     'floppyforms',
     'sorl.thumbnail',
-    'pagination',
-    'localeurl',
     'captcha',
     'registration',
 

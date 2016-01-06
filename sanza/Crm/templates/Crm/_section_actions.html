@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n sanza_utils pagination_tags %}{% load url from future %}
+{% load i18n sanza_utils %}
 
 {% block section_title %}
   {% if all_actions and entity %}
@@ -15,9 +15,8 @@
 {% block section_data %}
 <div class="row"><div class="col-md-12">
 {% if actions %}
-  {% if all_actions %}{% autopaginate actions 25 %}{% endif %}
   {% include "Crm/_actions_table.html" %}
-  {% if all_actions %}{% paginate %}{% endif %}
+  {% include "coop_cms/_pagination.html" %}
 {% endif %}
 </div></div>
 {% endblock %}

@@ -20,7 +20,7 @@ from django.views.generic.base import View, TemplateView
 
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
-from coop_cms.utils import redirect_to_language
+from coop_cms.utils import redirect_to_language, paginate
 
 from sanza.permissions import can_access
 from sanza.utils import logger
@@ -38,10 +38,13 @@ from sanza.Emailing.utils import get_emailing_context, send_verification_email, 
 def newsletter_list(request):
     """display list of newsletters"""
     newsletters = Newsletter.objects.all().order_by('-id')
-    
+    page_obj = paginate(request, newsletters, 10)
     return render_to_response(
         'Emailing/newsletter_list.html',
-        {'newsletters': newsletters},
+        {
+            'newsletters': list(page_obj),
+            'page_obj': page_obj
+        },
         context_instance=RequestContext(request)
     )
 

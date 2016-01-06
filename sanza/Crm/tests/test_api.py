@@ -5,11 +5,6 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 

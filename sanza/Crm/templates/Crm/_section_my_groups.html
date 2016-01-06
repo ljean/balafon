@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags favorite_tags %}
+{% load i18n favorite_tags %}
 
 {% block section_title %}
     {% trans "Groups" %}
@@ -9,7 +9,6 @@
   <table class="table table-striped">
   <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th>
       <th>{% trans "Description" %}</th><th>&nbsp;</th></tr>
-  {% autopaginate groups 50 %}
   {% for g in groups %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
       <td>
@@ -39,7 +38,7 @@
     </tr>
   {% endfor %}
   </table>
-  {% paginate %}
+  {% include "coop_cms/_pagination.html" %}
 {% endblock %}
 
 {% block section_buttons %}

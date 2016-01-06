@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 
 from bs4 import BeautifulSoup
 
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings

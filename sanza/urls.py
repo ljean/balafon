@@ -55,31 +55,27 @@ urlpatterns += [
         auto_save_data,
         name="auto_save_data"
     ),
+    url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
 
 
-urlpatterns += localized_patterns(
-    url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-)
-
-
 if 'djrill' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'^mandrill/', include('djrill.urls')),
-    )
+    ]
 
 
 if 'captcha' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'^captcha/', include('captcha.urls')),
-    )
+    ]
 
 
 if 'sanza.Apis' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'', include('sanza.Apis.urls')),
-    )
+    ]
 
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
@@ -121,19 +117,19 @@ if 'sanza.Store' in settings.INSTALLED_APPS:
 
 
 if 'sanza.Users' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'^users/', include('sanza.Users.urls')),
-    )
+    ]
 
 if 'jhouston' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'^jhouston/', include('jhouston.urls')),
-    )
+    ]
 
 if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
-    urlpatterns += localized_patterns(
+    urlpatterns += [
         url(r'^$', users_views.user_homepage, name='homepage'),
-    )
+    ]
 
 
 urlpatterns += localized_patterns(
