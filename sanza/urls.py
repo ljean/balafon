@@ -23,7 +23,10 @@ localized_patterns = get_url_patterns()
 
 admin.autodiscover()
 
-urlpatterns = []
+urlpatterns = [
+    url(r'^crm/$', users_views.user_homepage, name="sanza_homepage"),
+]
+
 
 if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
     if settings.DEBUG:
@@ -44,20 +47,20 @@ if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', T
     )
 
 
-urlpatterns += [
-    url(r'^crm/$', users_views.user_homepage, name="sanza_homepage"),
+urlpatterns += localized_patterns('',
     url(r'^crm/', include('sanza.Crm.urls')),
+    url(r'^crm/', include('sanza.Crm.api_urls')),
     url(r'^crm-search/', include('sanza.Search.urls')),
-    url(r'^emailing/', include('sanza.Emailing.urls')),
     url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
     url(
         r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
         auto_save_data,
         name="auto_save_data"
     ),
+    url(r'^emailing/', include('sanza.Emailing.urls')),
     url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
-]
+)
 
 
 if 'djrill' in settings.INSTALLED_APPS:
@@ -79,11 +82,11 @@ if 'sanza.Apis' in settings.INSTALLED_APPS:
 
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns(
+    urlpatterns += localized_patterns('',
         url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
     )
 else:
-    urlpatterns += localized_patterns(
+    urlpatterns += localized_patterns('',
         url(
             r'^accounts/login/?$',
             django_auth_views.login,

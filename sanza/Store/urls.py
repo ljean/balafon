@@ -8,6 +8,7 @@ from rest_framework import routers
 from sanza.Store.api import (
     SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView
 )
+
 from sanza.Store.views.sales_documents import (
     SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView
 )
@@ -23,7 +24,7 @@ sales_items_router = routers.DefaultRouter()
 sales_items_router.register(r'sales-items', SaleItemViewSet)
 
 
-urlpatterns = patterns('sanza.Store.views',
+urlpatterns = [
     url(
         r'^view-sales-document/(?P<action_id>\d+)/$',
         SalesDocumentView.as_view(),
@@ -68,5 +69,5 @@ urlpatterns = patterns('sanza.Store.views',
         r"^admin/store-catalogue/(?P<category_id>\d+)$",
         StoreXlsCatalogueView.as_view(),
         name=r'store_xls_catalogue'
-    )
-)
+    ),
+]

@@ -2,14 +2,14 @@
 
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView
-from views import AcceptNewsletterActivationView, AcceptNewsletterRegistrationView
 
-urlpatterns = patterns('sanza.Profile.views',
-    url(r'edit/$', 'edit_profile', name='profile_edit'),
-    url(r'post-message/$', 'post_message', name='profile_post_message'),
+from sanza.Profile.views import (
+    edit_profile, post_message,  AcceptNewsletterActivationView, AcceptNewsletterRegistrationView
 )
 
-urlpatterns += patterns('',
+urlpatterns = [
+    url(r'edit/$', edit_profile, name='profile_edit'),
+    url(r'post-message/$', post_message, name='profile_post_message'),
     url(r'^activate/complete/$',
         TemplateView.as_view(template_name='registration/activation_complete.html'),
         name='registration_activation_complete'),
@@ -30,4 +30,4 @@ urlpatterns += patterns('',
         TemplateView.as_view(template_name='registration/registration_closed.html'),
         name='registration_disallowed'),
     (r'', include('registration.auth_urls')),
-)
+]
