@@ -72,6 +72,7 @@ class EntityTypeForm(forms.ModelForm):
     class Meta:
         """form from model"""
         model = models.EntityType
+        fields = ('name', 'gender', 'order', 'logo', 'subscribe_form',)
 
 
 class EntityRoleForm(forms.ModelForm):
@@ -80,6 +81,7 @@ class EntityRoleForm(forms.ModelForm):
     class Meta:
         """form from model"""
         model = models.EntityRole
+        fields = ('name', )
 
 
 class SelectEntityForm(forms.Form):

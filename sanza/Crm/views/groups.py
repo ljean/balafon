@@ -162,7 +162,7 @@ def remove_contact_from_group(request, group_id, contact_id):
 def edit_group(request, group_id):
     """view"""
 
-    groups = models.Group.objects.filter(id=group_id).select_related('contacts', 'entities')
+    groups = models.Group.objects.filter(id=group_id).prefetch_related('contacts', 'entities')
 
     if groups.count() == 0:
         raise Http404

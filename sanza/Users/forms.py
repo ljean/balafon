@@ -20,6 +20,7 @@ class UserPreferencesAdminForm(forms.ModelForm):
 
     class Meta:
         model = UserPreferences
+        fields = ('user', 'notify_due_actions', 'message_in_favorites', )
 
 
 class ContentTypeField(forms.CharField): 

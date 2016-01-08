@@ -6,8 +6,10 @@ from datetime import date
 from sanza.Crm.settings import ALLOW_SINGLE_CONTACT
 from django.conf import settings
 
+
 class Command(BaseCommand):
     help = u"add a new credit of emailings"
+    use_argparse = False
 
     def handle(self, *args, **options):
         verbose = options.get('verbosity', 0)
@@ -25,4 +27,3 @@ class Command(BaseCommand):
             if verbose:
                 print e.name
         print models.Entity.objects.filter(type__id=individual_entity_id).count(), "entities have been renamed"
-            

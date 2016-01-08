@@ -199,7 +199,6 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
 
     # 3rd parties
-    'south',
     'django_extensions',
     'floppyforms',
     'sorl.thumbnail',
@@ -228,10 +227,10 @@ INSTALLED_APPS = (
 )
 
 
-if (len(sys.argv) > 1) and (not sys.argv[1] in ('schemamigration', 'datamigration')):
-    INSTALLED_APPS += (
+if (len(sys.argv) > 1) and (not sys.argv[1] in ('makemigrations', 'schemamigration', 'datamigration')):
+    INSTALLED_APPS = (
         'modeltranslation',
-    )
+    ) + INSTALLED_APPS
 
 if len(sys.argv) > 1 and 'test' == sys.argv[1]:
     INSTALLED_APPS = INSTALLED_APPS + ('coop_cms.apps.test_app',)

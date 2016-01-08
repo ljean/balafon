@@ -4,8 +4,10 @@ from django.core.management.base import BaseCommand
 from sanza.Crm import models
 from datetime import date
 
+
 class Command(BaseCommand):
     help = u"change the entity type"
+    use_argparse = False
 
     def handle(self, *args, **options):
         verbose = options.get('verbosity', 0)

@@ -434,7 +434,7 @@ class HasAction(YesNoSearchFieldForm):
         if self.is_yes():
             return queryset.filter(Q(num_actions__gt=0) | Q(num_entity_actions__gt=0))
         else:
-            return queryset.filter().filter(Q(num_actions__eq=0) & Q(num_entity_actions__eq=0))
+            return queryset.filter().filter(Q(num_actions=0) & Q(num_entity_actions=0))
 
 
 class ActionByDoneDate(TwoDatesForm):

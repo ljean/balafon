@@ -29,6 +29,9 @@ class CreateEmailingTest(BaseTestCase):
         mommy.make(Newsletter)
         mommy.make(models.SubscriptionType)
 
+        # TODO
+        settings.SANZA_EMAILING_SENDER_CHOICES = []
+
         data = {
             'contacts': [contact1.id]
         }
@@ -80,7 +83,7 @@ class CreateEmailingTest(BaseTestCase):
 
         data = {
             'create_emailing': True,
-            'subject': u"",
+        'subject': u"",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),

@@ -8,6 +8,7 @@ from datetime import datetime
 
 class Command(BaseCommand):
     help = u"send all emailing marked ready for sending"
+    use_argparse = False
 
     def handle(self, *args, **options):
         #look for emailing to be sent

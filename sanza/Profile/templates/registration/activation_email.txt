@@ -1,4 +1,4 @@
-{% load i18n %}{% load url from future %}
+{% load i18n %}
 {% blocktrans %}
 Hello,
 You have requested to create an account on {{site}}.

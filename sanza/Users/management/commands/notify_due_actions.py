@@ -44,6 +44,7 @@ def notify_due_actions(user, actions):
 class Command(BaseCommand):
     """The command"""
     help = u"notify due actions"
+    use_argparse = False
 
     def handle(self, *args, **options):
         """main of command"""

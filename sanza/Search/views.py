@@ -288,7 +288,7 @@ def create_emailing(request):
     try:
         if request.method == "POST":
             if "create_emailing" in request.POST:
-                #called by the colorbox
+                # called by the colorbox
                 form = NewEmailingForm(request.POST)
                 if form.is_valid():
                     newsletter_id = form.cleaned_data['newsletter']
@@ -306,8 +306,8 @@ def create_emailing(request):
                         subscription_type=subscription_type,
                         lang=form.cleaned_data['lang']
                     )
-                    for c in contacts:
-                        emailing.send_to.add(c)
+                    for contact in contacts:
+                        emailing.send_to.add(contact)
 
                     emailing.from_email = form.cleaned_data['from_email']
 

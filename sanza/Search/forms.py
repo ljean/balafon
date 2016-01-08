@@ -29,6 +29,10 @@ from sanza.Search.utils import get_date_bounds
 SEARCH_FORMS = None
 
 
+class HidableModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    hidden_widget = forms.HiddenInput
+
+
 def load_from_name(constant_full_name):
     """load module dynamically"""
     constant_full_path = constant_full_name.split('.')
@@ -723,7 +727,7 @@ class ActionForContactsForm(forms.ModelForm):
 class GroupForContactsForm(forms.Form):
     """Add contacts to group"""
     contacts = forms.CharField(widget=forms.HiddenInput())
-    groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
+    groups = HidableModelMultipleChoiceField(queryset=Group.objects.all())
     on_contact = forms.BooleanField(
         label=_(u"Group on contact"),
         required=False,
