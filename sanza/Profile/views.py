@@ -11,7 +11,11 @@ from django.template import RequestContext, Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
-from registration.backends.default.views import RegistrationView, ActivationView
+from registration import get_version as get_registration_version
+try:
+    from registration.backends.default.views import RegistrationView, ActivationView
+except ImportError:
+    from registration.backends.model_activation.views import RegistrationView, ActivationView
 
 from sanza.Crm.models import Action, ActionType
 from sanza.Profile.forms import MessageForm, UserRegistrationForm
@@ -110,41 +114,47 @@ def post_message(request):
 
 class AcceptNewsletterRegistrationView(RegistrationView):
     
-    def get_form_class(self, request):
+    def get_form_class(self, request=None):
         return get_registration_form()
     
-    def register(self, request, **kwargs):
-        kwargs["username"] = kwargs["email"][:30]
-        user = super(AcceptNewsletterRegistrationView, self).register(request, **kwargs)
+    def register(self, request_or_form, **kwargs):
 
-        user.first_name = kwargs.get('firstname', "")
-        user.last_name = kwargs.get('lastname', "")
+        if get_registration_version() >= '2.0.0':
+            data = request_or_form.cleaned_data
+        else:
+            data = kwargs
+            kwargs["username"] = kwargs["email"][:30]
 
-        user.contactprofile.firstname = kwargs.get('firstname', "")
-        user.contactprofile.lastname = kwargs.get('lastname', "")
+        user = super(AcceptNewsletterRegistrationView, self).register(request_or_form, **kwargs)
 
-        user.contactprofile.entity_type = kwargs.get('entity_type', None)
-        user.contactprofile.entity_name = kwargs.get('entity', "")
+        user.first_name = data.get('firstname', "")
+        user.last_name = data.get('lastname', "")
 
-        user.contactprofile.phone = kwargs.get('phone', "")
-        user.contactprofile.mobile = kwargs.get('mobile', "")
+        user.contactprofile.firstname = data.get('firstname', "")
+        user.contactprofile.lastname = data.get('lastname', "")
 
-        user.contactprofile.city = kwargs.get('city', None)
-        user.contactprofile.zip_code = kwargs.get('zip_code', None)
-        user.contactprofile.gender = kwargs.get('gender', 0) or 0
+        user.contactprofile.entity_type = data.get('entity_type', None)
+        user.contactprofile.entity_name = data.get('entity', "")
 
-        user.contactprofile.address = kwargs.get('address', "")
-        user.contactprofile.address2 = kwargs.get('address2', "")
-        user.contactprofile.address3 = kwargs.get('address3', "")
-        user.contactprofile.cedex = kwargs.get('cedex', "")
-        user.contactprofile.birth_date = kwargs.get('birth_date', None)
+        user.contactprofile.phone = data.get('phone', "")
+        user.contactprofile.mobile = data.get('mobile', "")
 
-        user.contactprofile.groups_ids = kwargs.get('groups_ids', '')
+        user.contactprofile.city = data.get('city', None)
+        user.contactprofile.zip_code = data.get('zip_code', None)
+        user.contactprofile.gender = data.get('gender', 0) or 0
+
+        user.contactprofile.address = data.get('address', "")
+        user.contactprofile.address2 = data.get('address2', "")
+        user.contactprofile.address3 = data.get('address3', "")
+        user.contactprofile.cedex = data.get('cedex', "")
+        user.contactprofile.birth_date = data.get('birth_date', None)
+
+        user.contactprofile.groups_ids = data.get('groups_ids', '')
 
         user.save()
         user.contactprofile.save()
 
-        subscription_types = kwargs.get('subscription_types', None)
+        subscription_types = data.get('subscription_types', None)
 
         user.contactprofile.subscriptions_ids = u",".join([str(s.id) for s in subscription_types])
         user.contactprofile.save()

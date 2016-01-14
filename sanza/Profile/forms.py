@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
+from registration import get_version as get_registration_version
 
 from sanza.Crm.models import Contact, EntityType
 from sanza.Crm.forms import ModelFormWithCity
@@ -22,7 +23,7 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         label=_(u'City'),
         widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
     )
-    
+
     class Media:
         css = {
             'all': ('css/base/jquery-ui-1.9.2.css',),
@@ -58,10 +59,6 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
 
-    # gender = forms.ChoiceField(_(u'gender'), required=False)
-    # firstname = forms.CharField(required=False, label=_(u"Firstname"))
-    # lastname = forms.CharField(required=False, label=_(u"Lastname"))
-    #
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
     entity = forms.CharField(
          required=False,
@@ -136,13 +133,33 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
                 raise ValidationError(ugettext(u'Unknown entity type'))
         
         return None
-        
+
     def clean(self, *args, **kwargs):
         password1 = self.cleaned_data.get('password1', "")
         password2 = self.cleaned_data.get('password2', "")
         if password1 and (password1 != password2):
             raise forms.ValidationError(_(u'Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
+
+    def save(self, commit=True):
+
+        if get_registration_version() >= "2.0.0":
+            # Django registration 2.0
+            # The registration form should return a user
+
+            email = self.cleaned_data["email"]
+            username = email[:30]
+
+            user = User.objects.create(
+                username=username, email=email, is_active=False
+            )
+            password = self.cleaned_data.get('password1', "")
+            user.set_password(password)
+
+            return user
+        else:
+            # Django registration 1.0
+            return super(UserRegistrationForm, self).save(commit)
 
 
 class MinimalUserRegistrationForm(UserRegistrationForm):
