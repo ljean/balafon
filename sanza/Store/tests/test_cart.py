@@ -62,7 +62,6 @@ class CartTest(BaseTestCase):
                 {'id': store_item2.id, 'quantity': 1},
             ],
             'delivery_point': delivery_point.id,
-            'notes': ' ',
             'purchase_datetime': datetime(2015, 7, 23, 12, 0)
         }
 
@@ -302,7 +301,6 @@ class CartTest(BaseTestCase):
                 {'id': store_item2.id, 'quantity': 1},
             ],
             'delivery_point': delivery_point.id,
-            'notes': ' ',
             'purchase_datetime': datetime(2015, 7, 23, 12, 0)
         }
 
@@ -368,7 +366,6 @@ class CartTest(BaseTestCase):
                 {'id': store_item2.id, 'quantity': 1},
             ],
             'delivery_point': delivery_point.id,
-            'notes': ' ',
             'purchase_datetime': datetime(2015, 7, 23, 12, 0)
         }
 
@@ -428,7 +425,6 @@ class CartTest(BaseTestCase):
                 {'id': store_item2.id, 'quantity': 1},
             ],
             'delivery_point': delivery_point.id,
-            'notes': ' ',
             'purchase_datetime': datetime(2015, 7, 23, 12, 0)
         }
 
@@ -515,7 +511,6 @@ class CartTest(BaseTestCase):
                 {'id': store_item3.id, 'quantity': 5},
             ],
             'delivery_point': delivery_point.id,
-            'notes': ' ',
             'purchase_datetime': datetime(2015, 7, 23, 12, 0)
         }
 

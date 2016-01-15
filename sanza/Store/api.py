@@ -102,24 +102,24 @@ class CartView(APIView):
         cart_serializer = serializers.CartSerializer(data=request.data)
         if cart_serializer.is_valid():
 
-            #Get Contact
+            # Get Contact
             try:
                 profile = ContactProfile.objects.get(user=request.user)
                 contact = profile.contact
             except ContactProfile.DoesNotExist:
                 return Response({'ok': False, 'message': _(u"You don't have a valid profile")})
 
-            #Get Delivery point
+            # Get Delivery point
             try:
                 delivery_point = DeliveryPoint.objects.get(id=cart_serializer.validated_data["delivery_point"])
             except DeliveryPoint.DoesNotExist:
                 return Response({'ok': False, 'message': _(u"Invalid delivery point")})
 
-            #Create a new Sale
+            # Create a new Sale
             action_type_name = get_cart_type_name()
             action_type = ActionType.objects.get_or_create(name=action_type_name)[0]
 
-            #Force this type to be managed by the store
+            # Force this type to be managed by the store
             StoreManagementActionType.objects.get_or_create(action_type=action_type)
 
             subject = detail = ''
@@ -144,7 +144,7 @@ class CartView(APIView):
 
             warnings = []
             is_empty = True
-            #for each line add a sale item
+            # for each line add a sale item
             for index, item in enumerate(cart_serializer.validated_data['items']):
 
                 quantity = Decimal(u'{0}'.format(item['quantity']))
@@ -152,7 +152,7 @@ class CartView(APIView):
                 try:
                     store_item = StoreItem.objects.get(id=item['id'])
                 except StoreItem.DoesNotExist:
-                    #ignore if not existing
+                    # ignore if not existing
                     continue
 
                 if not store_item.available:
