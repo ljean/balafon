@@ -160,3 +160,10 @@ signals.post_save.connect(force_message_in_favorites, sender=Action)
 if is_mandrill_used():
     #Import the mandrill backend
     import sanza.Emailing.backends.mandrill #pylint: disable=unused-import
+
+
+# TODO : Improve it or change HTML editor
+def newsletter_dirty_patch(sender, instance, raw, using, **kwargs):
+    instance.content = instance.content.replace('<br>', '<br />')
+
+pre_save.connect(newsletter_dirty_patch, sender=Newsletter)
