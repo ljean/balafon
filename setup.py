@@ -21,7 +21,7 @@ setup(
     license='CeCILL 2.1',
     zip_safe=False,
     install_requires=[
-        'django', # road to 1.9
+        'django >= 1.6, <1.10',
         'djangorestframework',
         'apidev-coop_cms',
         'beautifulsoup4',

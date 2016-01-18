@@ -161,5 +161,5 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
 signals.post_save.connect(force_message_in_favorites, sender=Action)
 
 if is_mandrill_used():
-    #Import the mandrill backend
-    import sanza.Emailing.backends.mandrill #pylint: disable=unused-import
+    # Import the mandrill backend
+    import sanza.Emailing.backends.mandrill  # pylint: disable=unused-import
