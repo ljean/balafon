@@ -6,11 +6,15 @@ import uuid
 import unicodedata
 from urlparse import urlparse
 
+from django import VERSION as DJANGO_VERSION
 from django.db import models
 from django.db.models import Q
 from django.conf import settings as project_settings
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.generic import GenericRelation
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.contrib.contenttypes.fields import GenericRelation
+else:
+    from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse

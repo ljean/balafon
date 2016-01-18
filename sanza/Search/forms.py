@@ -3,16 +3,20 @@
 
 from datetime import date, datetime
 from itertools import chain
+import importlib
 import json
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.forms.util import flatatt
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.forms.utils import flatatt
+else:
+    from django.forms.util import flatatt
 from django.template import Context
 from django.template.loader import get_template
-from django.utils import importlib
 from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _

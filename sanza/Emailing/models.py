@@ -5,13 +5,16 @@ from datetime import datetime
 import uuid
 import unicodedata
 
-from django.db import models
-from django.db.models import signals
-
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.generic import GenericRelation
+if DJANGO_VERSION > (1, 9, 0):
+    from django.contrib.contenttypes.fields import GenericRelation
+else:
+    from django.contrib.contenttypes.generic import GenericRelation
 from django.core.urlresolvers import reverse
+from django.db import models
+from django.db.models import signals
 from django.utils.dateformat import DateFormat
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _

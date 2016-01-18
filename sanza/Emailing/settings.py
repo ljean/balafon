@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """common place for all Emailing settings"""
 
+from importlib import import_module
+
 from django.conf import settings as project_settings
-from django.utils.importlib import import_module
 
 
 def get_default_subscription_type():

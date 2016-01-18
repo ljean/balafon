@@ -242,7 +242,7 @@ class EditEntityTestCase(BaseTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEqual(302, response.status_code)
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
         entity = models.Entity.objects.get(id=entity.id)
         self.assertNotEqual(entity.name, data['name'])
@@ -261,7 +261,7 @@ class EditEntityTestCase(BaseTestCase):
         self.assertEqual(302, response.status_code)
         self.assertEqual(302, response.status_code)
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
         entity = models.Entity.objects.get(id=entity.id)
         self.assertNotEqual(entity.name, data['name'])

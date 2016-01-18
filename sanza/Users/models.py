@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 """user customization"""
 
+from django import VERSION as DJANGO_VERSION
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.contrib.contenttypes.fields import GenericForeignKey
+else:
+    from django.contrib.contenttypes.generic import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 from coop_cms.utils import RequestManager, RequestNotFound
@@ -33,7 +37,7 @@ class Favorite(models.Model):
     user = models.ForeignKey(User, verbose_name=_("user"), related_name="user_favorite_set")
     content_type = models.ForeignKey(ContentType, verbose_name=_("content_type"), related_name="user_favorite_set")
     object_id = models.PositiveIntegerField(verbose_name=_("object id"))
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
     
     class Meta:
         verbose_name = _(u'Favorite')

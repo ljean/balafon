@@ -3,13 +3,13 @@
 
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+from importlib import import_module
 import re
 import urllib2
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
-from django.utils.importlib import import_module
 from django.utils.timezone import now as dt_now
 from django.utils.translation import ugettext, ugettext_lazy as _
 

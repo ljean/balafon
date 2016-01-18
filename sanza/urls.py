@@ -4,7 +4,6 @@ import sys
 
 from django.conf import settings
 from django.conf.urls import include, url, patterns
-from django.contrib import admin
 from django.contrib.auth import views as django_auth_views
 from django.contrib.staticfiles.views import serve as serve_static
 from django.views.static import serve as serve_media
@@ -20,8 +19,6 @@ if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
 
 
 localized_patterns = get_url_patterns()
-
-admin.autodiscover()
 
 urlpatterns = [
     url(r'^crm/$', users_views.user_homepage, name="sanza_homepage"),
@@ -89,7 +86,7 @@ if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
 else:
     urlpatterns += localized_patterns('',
         url(
-            r'^accounts/login/?$',
+            r'^accounts/login/$',
             django_auth_views.login,
             {'authentication_form': BsAuthenticationForm},
             name='login'
@@ -141,7 +138,6 @@ if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
 
 
 urlpatterns += localized_patterns(
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    '',
     url(r'^', include('coop_cms.urls')),
 )

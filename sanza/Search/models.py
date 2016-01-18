@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.contenttypes.generic import GenericRelation
+from django import VERSION as DJANGO_VERSION
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.contrib.contenttypes.fields import GenericRelation
+else:
+    from django.contrib.contenttypes.generic import GenericRelation
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 

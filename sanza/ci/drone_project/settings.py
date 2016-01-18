@@ -62,7 +62,7 @@ USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = os.path.abspath(PROJECT_PATH+'/public/media/')
+MEDIA_ROOT = os.path.abspath(PROJECT_PATH + '/public/media/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -73,7 +73,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = os.path.abspath(PROJECT_PATH+'/public/static/')
+STATIC_ROOT = os.path.abspath(PROJECT_PATH + '/public/static/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -123,7 +123,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_PATH+'/templates'),
+    os.path.abspath(PROJECT_PATH + '/templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -151,10 +151,8 @@ SOUTH_SKIP_MIGRATIONS = True
 SOUTH_TESTS_MIGRATE = False
 
 LOCALE_REDIRECT_PERMANENT = False
-#COOP_CMS_ARTICLE_CLASS = 'apps.content.models.Page'
-#COOP_CMS_NAVTREE_CLASS = 'content.NavTree'
-#COOP_BAR_MODULES = ('apps.content.coop_bar_cfg',)
-DJALOHA_LINK_MODELS = ('basic_cms.Article',)
+
+DJALOHA_LINK_MODELS = ('basic_cms.Article', )
 COOP_CMS_ARTICLE_LOGO_SIZE = "950x250"
 COOP_CMS_NEWSLETTER_TEMPLATES = (
     ('basic_newsletter.html', 'Basic'),
@@ -163,7 +161,7 @@ COOP_CMS_ARTICLE_TEMPLATES = (
     ('standard.html', u'Standard'),
 )
 COOP_CMS_FROM_EMAIL = u'"ljean@apidev.fr"'
-COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>',)# 'luc.jean@gmail.com')
+COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>', )  # 'luc.jean@gmail.com')
 COOP_CMS_SITE_PREFIX = ''
 COOP_CMS_REPLY_TO = 'ljean@apidev.fr'
 COOP_CMS_TITLE_OPTIONAL = True

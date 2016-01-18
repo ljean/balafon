@@ -773,7 +773,8 @@ class SendEmailingTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(302, response.status_code)
         next_url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])[3:]
-        self.assertEqual(response["Location"], "http://testserver/"+other_lang+next_url)
+        redirect_url = other_lang + next_url
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     @override_settings(SECRET_KEY=u"super-héros")
     def test_view_online_utf_links(self):

@@ -334,7 +334,9 @@ class UpdateFavoriteTestCase(BaseTestCase):
         url = reverse('users_toggle_favorite')
         response = self.client.post(url, data)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver/accounts/login/?next={0}".format(url))
+        redirect_url = "/accounts/login/?next={0}".format(url)
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
+
         self.assertEqual(0, Favorite.objects.count())
 
     def test_post_add(self):
@@ -604,7 +606,8 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     def test_view_homepage_redirect_invalid(self):
         """view homepage do not redirect to invalid hompeages"""
@@ -614,15 +617,16 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.get(reverse("sanza_homepage"))
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
         
     def test_view_homepage_not_set(self):
         """view homepage go to default if nothing is set"""
         response = self.client.get(reverse("sanza_homepage"))
         
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
-
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
 
 @skipIf(
