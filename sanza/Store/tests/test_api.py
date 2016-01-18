@@ -1,28 +1,16 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
-from datetime import datetime
-from decimal import Decimal
 import logging
-from unittest import skipIf
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core import mail
 
 from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-from sanza.Crm.models import Action, ActionType
-from sanza.Profile.utils import create_profile_contact
 from sanza.Store import models
-from sanza.Store.settings import get_cart_type_name
 
 
 class BaseTestCase(APITestCase):

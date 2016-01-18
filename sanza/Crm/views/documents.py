@@ -8,7 +8,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
-from django.template.loader import find_template
+from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
 from coop_cms.generic_views import EditableObjectView
@@ -73,7 +73,7 @@ class ActionDocumentPdfView(PDFTemplateView):
 
         for template_name in potential_templates:
             try:
-                find_template(template_name)
+                get_template(template_name)
                 return template_name
             except TemplateDoesNotExist:
                 pass

@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 from coop_cms.models import ArticleCategory
+from registration import get_version as get_registration_version
 
 from sanza.Crm.models import Contact, Group, City, EntityType
 
@@ -17,8 +18,9 @@ class ContactProfile(models.Model):
         (Contact.GENDER_MALE, _(u'Mr')),
         (Contact.GENDER_FEMALE, _(u'Mrs')),
     )
-    
+
     user = models.OneToOneField(User)
+
     contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
 
     entity_name = models.CharField(_('Entity name'), max_length=200, blank=True, default="")
@@ -48,7 +50,7 @@ class ContactProfile(models.Model):
         return self.user.username
     
  
-#signals
+# signals
 def create_profile(sender, instance, signal, created, **kwargs):
     if not created:
         created_profile = False
@@ -62,7 +64,7 @@ def create_profile(sender, instance, signal, created, **kwargs):
     if created_profile:
         ContactProfile(user=instance).save()
 
-if "sanza.Profile" in settings.INSTALLED_APPS:
+if "sanza.Profile" in settings.INSTALLED_APPS: # and get_registration_version() < "2.0.0":
     signals.post_save.connect(create_profile, sender=User)
 
 

@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from datetime import date
 from decimal import Decimal
 import os.path

@@ -295,10 +295,8 @@ class UpdateEmailingTestCase(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(
-            response['Location'],
-            u"http://testserver{0}?next={1}".format(settings.LOGIN_URL, url)
-        )
+        redirect_url = u"{0}?next={1}".format(settings.LOGIN_URL, url)
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     @override_settings(SANZA_EMAILING_SENDER_CHOICES=(('toto@toto.fr', 'toto'), ('titi@titi.fr', 'titi')))
     def test_view_update_emailing_from_email(self):

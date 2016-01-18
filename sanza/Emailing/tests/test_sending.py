@@ -14,7 +14,7 @@ from django.utils.translation import activate
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import is_localized, is_multilang
-from coop_cms.tests import test_newsletter as coop_cms_tests
+from coop_cms.tests.test_newsletter import NewsletterTest as BaseNewsletterTest
 from coop_cms.utils import get_url_in_language
 from model_mommy import mommy
 
@@ -82,7 +82,7 @@ class SendEmailingTest(BaseTestCase):
 
         emailing = Emailing.objects.get(id=emailing.id)
 
-        #check emailing status
+        # check emailing status
         self.assertEqual(emailing.status, Emailing.STATUS_SENT)
         self.assertNotEqual(emailing.sending_dt, None)
         self.assertEqual(emailing.send_to.count(), 0)
@@ -106,7 +106,6 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
             self.assertEqual(email.subject, newsletter_data['subject'])
             self.assertTrue(email.body.find(entity.name) >= 0)
-            #print email.body
             self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
@@ -120,15 +119,15 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr") > 0)
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
-            #check magic links
+            # check magic links
             self.assertTrue(MagicLink.objects.count() > 0)
 
-            #check an action has been created
+            # check an action has been created
             c = models.Contact.objects.get(id=contact.id)
             self.assertEqual(c.action_set.count(), 1)
             self.assertEqual(c.action_set.all()[0].subject, email.subject)
@@ -774,7 +773,8 @@ class SendEmailingTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(302, response.status_code)
         next_url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])[3:]
-        self.assertEqual(response["Location"], "http://testserver/"+other_lang+next_url)
+        redirect_url = other_lang + next_url
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     @override_settings(SECRET_KEY=u"super-héros")
     def test_view_online_utf_links(self):
@@ -904,7 +904,7 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(magic_link0.url, short_link)
 
 
-class NewsletterTest(coop_cms_tests.NewsletterTest):
+class NewsletterTest(BaseNewsletterTest):
     """test coop_cms newsletter"""
 
     def test_send_newsletter_template(self):

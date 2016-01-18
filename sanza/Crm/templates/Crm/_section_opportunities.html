@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n pagination_tags favorite_tags %}
+{% load i18n favorite_tags %}
 
 {% block section_title %}
   {% trans "Opportunities" %}
@@ -7,7 +7,6 @@
   
 {% block section_data %}
 {% if opportunities %}
-{% if all_opportunities %}{% autopaginate opportunities 25 %}{% endif %}
 <table class="table table-striped">
   <tr>
     <th></th>
@@ -39,7 +38,7 @@
   </tr>
   {% endfor %}
 </table>
-{% if all_opportunities %}{% paginate %}{% endif %}
+{% include "coop_cms/_pagination.html" %}
 {% endif %}
 {% endblock %}
 

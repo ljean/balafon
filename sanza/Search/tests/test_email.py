@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by email"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup as BeautifulSoup4
 
 from django.core.urlresolvers import reverse
@@ -13,7 +8,6 @@ from django.core.urlresolvers import reverse
 from model_mommy import mommy
 
 from sanza.Crm import models
-
 from sanza.Search.tests import BaseTestCase
 
 

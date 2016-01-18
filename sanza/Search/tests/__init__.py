@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """search test package"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from django.contrib.auth.models import User
 from django.test import TestCase
 

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import patterns, include, url
+
+from django.conf.urls import include, url
+from django.contrib import admin
+
+from coop_cms.settings import get_url_patterns
 
 from sanza.urls import urlpatterns as sanza_urlpatterns
 
-from django.contrib import admin
+
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    (r'^localeurl/', include('localeurl.urls')),
-    (r'^captcha/', include('captcha.urls')),
+localized_patterns = get_url_patterns()
 
-    # Uncomment the admin/doc line below to enable admin documentation:
+urlpatterns = localized_patterns('',
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 )
 

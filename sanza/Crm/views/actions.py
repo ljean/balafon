@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_reload, popup_close
+from coop_cms.utils import paginate
 
 from sanza.Crm import models, forms
 from sanza.Crm.signals import action_cloned
@@ -155,16 +156,18 @@ def view_entity_actions(request, entity_id, set_id):
     actions = models.Action.objects.filter(
         Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity), *filters
     ).order_by("planned_date", "priority")
-    all_actions = True
     request.session["redirect_url"] = reverse('crm_entity_actions', args=[entity_id, set_id])
+    page_obj = paginate(request, actions, 50)
+
     return render_to_response(
         'Crm/entity_actions.html',
         {
             'title': title,
             'entity': entity,
             'action_set': action_set,
-            'all_actions': all_actions,
-            'actions': actions,
+            'all_actions': True,
+            'actions': list(page_obj),
+            'page_obj': page_obj,
             'filters': filters,
         },
         context_instance=RequestContext(request)
@@ -186,15 +189,17 @@ def view_contact_actions(request, contact_id, set_id):
         title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _(u"Actions")
 
     actions = contact.action_set.filter(*filters).order_by("planned_date", "priority")
-    all_actions = True
+    page_obj = paginate(request, actions, 50)
     request.session["redirect_url"] = reverse('crm_contact_actions', args=[contact_id, set_id])
+
     return render_to_response(
         'Crm/entity_actions.html',
         {
             'contact': contact,
             'action_set': action_set,
-            'actions': actions,
-            'all_actions': all_actions,
+            'actions': list(page_obj),
+            'page_obj': page_obj,
+            'all_actions': True,
             'title': title,
         },
         context_instance=RequestContext(request)

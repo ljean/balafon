@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 """test mandrill webhooks"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 import datetime
 import json
 from unittest import skipIf
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 

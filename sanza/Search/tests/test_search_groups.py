@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search by groups"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup as BeautifulSoup4
 
 from django.core.urlresolvers import reverse
@@ -30,9 +25,9 @@ class GroupSearchTest(BaseTestCase):
         self.client.logout()
         response = self.client.get(reverse('search'))
         self.assertEqual(302, response.status_code)
-        #login url without lang prefix
+        # login url without lang prefix
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_search_non_staff(self):
         """view seacrch non-staff"""
@@ -40,9 +35,9 @@ class GroupSearchTest(BaseTestCase):
         self.user.save()
         response = self.client.get(reverse('search'))
         self.assertEqual(302, response.status_code)
-        #login url without lang prefix
+        # login url without lang prefix
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_group(self):
         """view the search_group"""

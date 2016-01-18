@@ -205,6 +205,12 @@ class ActionTypeForm(forms.ModelForm):
     class Meta:
         """form from model"""
         model = models.ActionType
+        fields = (
+            'subscribe_form', 'set', 'last_number', 'number_auto_generated', 'default_template', 'allowed_status',
+            'default_status', 'is_editable', 'action_template', 'order_index', 'is_amount_calculated',
+            'next_action_types', 'not_assigned_when_cloned', 'generate_uuid', 'hide_contacts_buttons',
+            'mail_to_subject',
+        )
 
 
 class ActionDocumentForm(AlohaEditableModelForm):
@@ -254,6 +260,7 @@ class OpportunityStatusForm(forms.ModelForm):
     class Meta:
         """form from model"""
         model = models.OpportunityStatus
+        fields = ('name', 'ordering', )
 
 
 class SelectOpportunityForm(forms.Form):

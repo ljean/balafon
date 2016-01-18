@@ -1,121 +1,143 @@
 # -*- coding: utf-8 -*-
+
 import sys
 
 from django.conf import settings
+from django.conf.urls import include, url, patterns
+from django.contrib.auth import views as django_auth_views
+from django.contrib.staticfiles.views import serve as serve_static
+from django.views.static import serve as serve_media
 
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
-from django.conf.urls import url, patterns, include
+from coop_cms.settings import get_url_patterns, get_media_root
 
 from sanza.forms import BsAuthenticationForm, BsPasswordChangeForm, BsPasswordResetForm
-
-from django.contrib import admin
-admin.autodiscover()
+from sanza.Users import views as users_views
+from sanza.views import redirect_to_homepage, auto_save_data
 
 if getattr(settings, 'SANZA_NOTIFY_SUBSCRIPTIONS', ''):
     raise Exception(u"Invalid setting : SANZA_NOTIFY_SUBSCRIPTIONS has been replaced by SANZA_NOTIFICATION_EMAIL")
 
-urlpatterns = patterns('',
-    url(r'^crm/$', 'sanza.Users.views.user_homepage', name="sanza_homepage"),
-    (r'^crm/', include('sanza.Crm.urls')),
-    (r'^crm-search/', include('sanza.Search.urls')),
-    (r'^emailing/', include('sanza.Emailing.urls')),
-    #url(r'^accounts/profile/$', 'sanza.Crm.views.view_board_panel'),
-    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    (r'^admin/', include(admin.site.urls)),
-    #url(r'^export-database$', 'sanza.views.export_database_json', name="export_database_json"),
-    url('^crm/go-to-home/', 'sanza.views.redirect_to_homepage', name="homepage"),
-    url(r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$', 'sanza.views.auto_save_data', name="auto_save_data"),
+
+localized_patterns = get_url_patterns()
+
+urlpatterns = [
+    url(r'^crm/$', users_views.user_homepage, name="sanza_homepage"),
+]
+
+
+if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
+    if settings.DEBUG:
+        urlpatterns += [
+            url(r'^static/(?P<path>.*)$', serve_static),
+        ]
+    else:
+        urlpatterns += [
+            url(r'^static/(?P<path>.*)$', serve_media, {'document_root': settings.STATIC_ROOT}),
+        ]
+    urlpatterns += patterns(
+        '',
+        url(
+            r'^media/(?P<path>.*)$',
+            serve_media,
+            {'document_root': get_media_root(), 'show_indexes': True}
+        ),
+    )
+
+
+urlpatterns += localized_patterns('',
+    url(r'^crm/', include('sanza.Crm.urls')),
+    url(r'^crm/', include('sanza.Crm.api_urls')),
+    url(r'^crm-search/', include('sanza.Search.urls')),
+    url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
+    url(
+        r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
+        auto_save_data,
+        name="auto_save_data"
+    ),
+    url(r'^emailing/', include('sanza.Emailing.urls')),
+    url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 )
 
+
 if 'djrill' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^mandrill/', include('djrill.urls')),
-    )
+    urlpatterns += [
+        url(r'^mandrill/', include('djrill.urls')),
+    ]
+
 
 if 'captcha' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^captcha/', include('captcha.urls')),
-    )
+    urlpatterns += [
+        url(r'^captcha/', include('captcha.urls')),
+    ]
+
 
 if 'sanza.Apis' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'', include('sanza.Apis.urls')),
-    )
+    urlpatterns += [
+        url(r'', include('sanza.Apis.urls')),
+    ]
 
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^accounts/', include('coop_cms.apps.email_auth.urls')),
+    urlpatterns += localized_patterns('',
+        url(r'^accounts/', include('coop_cms.apps.email_auth.urls'))
     )
+
 else:
-    urlpatterns += patterns('',
+    urlpatterns += localized_patterns('',
         url(
-            r'^accounts/login/?$',
-            'django.contrib.auth.views.login',
+            r'^accounts/login/$',
+            django_auth_views.login,
             {'authentication_form': BsAuthenticationForm},
             name='login'
         ),
         url(r'^accounts/password_change/$',
-            'django.contrib.auth.views.password_change',
+            django_auth_views.password_change,
             {'password_change_form': BsPasswordChangeForm},
             name='password_change'
         ),
         url(
             r'^accounts/password_reset/$',
-            'django.contrib.auth.views.password_reset',
+            django_auth_views.password_reset,
             {'password_reset_form': BsPasswordResetForm},
             name='password_reset'
         ),
-        (r'^accounts/', include('django.contrib.auth.urls')),
+        url(r'^accounts/', include('django.contrib.auth.urls'))
     )
 
 
 if 'sanza.Profile' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^accounts/', include('sanza.Profile.urls')),
+    urlpatterns += localized_patterns('',
+        url(r'^accounts/', include('sanza.Profile.urls'))
     )
 
+
 if 'sanza.Store' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^store/', include('sanza.Store.urls')),
+    urlpatterns += localized_patterns('',
+        url(r'^store/', include('sanza.Store.urls')),
+        url(r'^store/', include('sanza.Store.api_urls'))
     )
 
 
 if 'sanza.Users' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^users/', include('sanza.Users.urls')),
+    urlpatterns += localized_patterns('',
+        url(r'^users/', include('sanza.Users.urls')),
     )
-    
+
+
 if 'jhouston' in settings.INSTALLED_APPS:
-    urlpatterns += patterns('',
-        (r'^jhouston/', include('jhouston.urls')),
-    )
+    urlpatterns += [
+        url(r'^jhouston/', include('jhouston.urls')),
+    ]
+
 
 if getattr(settings, 'SANZA_AS_HOMEPAGE', False):
-    urlpatterns += patterns('',
-        url(r'^$', 'sanza.Users.views.user_homepage', name='homepage'),
-    )
+    urlpatterns += [
+        url(r'^$', users_views.user_homepage, name='homepage'),
+    ]
 
-if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', True):
-    if settings.DEBUG:
-        urlpatterns += patterns('django.contrib.staticfiles.views',
-            url(r'^static/(?P<path>.*)$', 'serve'),
-        )
-    else:
-        urlpatterns += patterns('',
-            (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
-        )
-    urlpatterns += patterns('',
-        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT, 'show_indexes':True}),
-    )
-    
 
-urlpatterns += patterns('',
-    (r'^djaloha/', include('djaloha.urls')),
-    (r'^', include('coop_cms.urls')),
-    (r'^coop_bar/', include('coop_bar.urls')),
+urlpatterns += localized_patterns(
+    '',
+    url(r'^', include('coop_cms.urls')),
 )
-

@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 """test we can create an emailing from search results"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 from bs4 import BeautifulSoup as BeautifulSoup4
 from unittest import skipIf
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -32,6 +28,9 @@ class CreateEmailingTest(BaseTestCase):
 
         mommy.make(Newsletter)
         mommy.make(models.SubscriptionType)
+
+        # TODO
+        settings.SANZA_EMAILING_SENDER_CHOICES = []
 
         data = {
             'contacts': [contact1.id]
@@ -84,7 +83,7 @@ class CreateEmailingTest(BaseTestCase):
 
         data = {
             'create_emailing': True,
-            'subject': u"",
+        'subject': u"",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
             'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 
 from datetime import datetime, date, timedelta
 import json
@@ -12,6 +8,7 @@ from unittest import skipIf
 from StringIO import StringIO
 import sys
 
+from django.conf import settings
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail, management
@@ -337,7 +334,9 @@ class UpdateFavoriteTestCase(BaseTestCase):
         url = reverse('users_toggle_favorite')
         response = self.client.post(url, data)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver/accounts/login/?next={0}".format(url))
+        redirect_url = "/accounts/login/?next={0}".format(url)
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
+
         self.assertEqual(0, Favorite.objects.count())
 
     def test_post_add(self):
@@ -584,7 +583,6 @@ class UserHomepageTestCase(BaseTestCase):
 
     def test_is_allowed_homepage(self):
         """set is_allowed_homepage utility"""
-
         self.assertEqual(True, is_allowed_homepage(reverse("crm_view_entities_list")))
         self.assertEqual(True, is_allowed_homepage(reverse("users_favorites_list")))
         self.assertEqual(False, is_allowed_homepage(reverse("quick_search")))
@@ -608,7 +606,8 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     def test_view_homepage_redirect_invalid(self):
         """view homepage do not redirect to invalid hompeages"""
@@ -618,15 +617,16 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.get(reverse("sanza_homepage"))
 
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
         
     def test_view_homepage_not_set(self):
         """view homepage go to default if nothing is set"""
         response = self.client.get(reverse("sanza_homepage"))
         
         self.assertEqual(302, response.status_code)
-        self.assertEqual(response['Location'], "http://testserver" + reverse("crm_board_panel"))
-
+        redirect_url = reverse("crm_board_panel")
+        self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
 
 @skipIf(

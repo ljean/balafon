@@ -39,7 +39,7 @@ TIME_ZONE = 'Europe/Paris'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-en'
+LANGUAGE_CODE = 'en'
 
 gettext = lambda s: s
 LANGUAGES = (
@@ -62,7 +62,7 @@ USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = os.path.abspath(PROJECT_PATH+'/public/media/')
+MEDIA_ROOT = os.path.abspath(PROJECT_PATH + '/public/media/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -73,7 +73,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = os.path.abspath(PROJECT_PATH+'/public/static/')
+STATIC_ROOT = os.path.abspath(PROJECT_PATH + '/public/static/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
@@ -103,13 +103,12 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'localeurl.middleware.LocaleURLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'pagination.middleware.PaginationMiddleware',
     'coop_cms.utils.RequestMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -124,7 +123,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_PATH+'/templates'),
+    os.path.abspath(PROJECT_PATH + '/templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -146,27 +145,14 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOCALE_PATHS = (
-    PROJECT_PATH+'/locale/',
-)
-
-LOCALE_INDEPENDENT_MEDIA_URL = True
-import re
-LOCALE_INDEPENDENT_PATHS = (
-    re.compile(r'^/sitemap\.xml$'),
-    #re.compile('^/crm/.*$'),
-)
-
 ACCOUNT_ACTIVATION_DAYS = 7
 
-#SOUTH_SKIP_MIGRATIONS = True
+SOUTH_SKIP_MIGRATIONS = True
 SOUTH_TESTS_MIGRATE = False
 
 LOCALE_REDIRECT_PERMANENT = False
-#COOP_CMS_ARTICLE_CLASS = 'apps.content.models.Page'
-#COOP_CMS_NAVTREE_CLASS = 'content.NavTree'
-#COOP_BAR_MODULES = ('apps.content.coop_bar_cfg',)
-DJALOHA_LINK_MODELS = ('basic_cms.Article',)
+
+DJALOHA_LINK_MODELS = ('basic_cms.Article', )
 COOP_CMS_ARTICLE_LOGO_SIZE = "950x250"
 COOP_CMS_NEWSLETTER_TEMPLATES = (
     ('basic_newsletter.html', 'Basic'),
@@ -175,7 +161,7 @@ COOP_CMS_ARTICLE_TEMPLATES = (
     ('standard.html', u'Standard'),
 )
 COOP_CMS_FROM_EMAIL = u'"ljean@apidev.fr"'
-COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>',)# 'luc.jean@gmail.com')
+COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>', )  # 'luc.jean@gmail.com')
 COOP_CMS_SITE_PREFIX = ''
 COOP_CMS_REPLY_TO = 'ljean@apidev.fr'
 COOP_CMS_TITLE_OPTIONAL = True
@@ -201,7 +187,7 @@ REST_FRAMEWORK = {
 }
 
 INSTALLED_APPS = (
-    #contribs
+    # contribs
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -210,17 +196,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
 
-    #3rd parties
-    'south',
+    # 3rd parties
     'django_extensions',
     'floppyforms',
     'sorl.thumbnail',
-    'pagination',
-    'localeurl',
     'captcha',
     'registration',
 
-    #externals
+    # externals
     'djaloha',
     'colorbox',
     'coop_cms',
@@ -228,7 +211,7 @@ INSTALLED_APPS = (
     'coop_cms.apps.basic_cms',
     'coop_cms.apps.email_auth',
 
-    #sanza
+    # sanza
     'sanza',
     'sanza.Crm',
     'sanza.Search',
@@ -242,10 +225,10 @@ INSTALLED_APPS = (
 )
 
 
-if (len(sys.argv) > 1) and (not sys.argv[1] in ('schemamigration', 'datamigration')):
-    INSTALLED_APPS += (
+if (len(sys.argv) > 1) and (not sys.argv[1] in ('makemigrations', 'schemamigration', 'datamigration')):
+    INSTALLED_APPS = (
         'modeltranslation',
-    )
+    ) + INSTALLED_APPS
 
 if len(sys.argv) > 1 and 'test' == sys.argv[1]:
     INSTALLED_APPS = INSTALLED_APPS + ('coop_cms.apps.test_app',)

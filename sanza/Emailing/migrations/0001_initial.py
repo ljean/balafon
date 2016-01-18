@@ -1,297 +1,53 @@
-# encoding: utf-8
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-class Migration(SchemaMigration):
-
-    def forwards(self, orm):
-        
-        # Adding model 'EmailTemplate'
-        db.create_table('Emailing_emailtemplate', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Account.Account'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('body', self.gf('django.db.models.fields.TextField')(default='', max_length=100, blank=True)),
-        ))
-        db.send_create_signal('Emailing', ['EmailTemplate'])
-
-        # Adding model 'Emailing'
-        db.create_table('Emailing_emailing', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Account.Account'])),
-            ('template', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['Emailing.EmailTemplate'], null=True, blank=True)),
-            ('subject', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('html_content', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-            ('sent_at', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-        ))
-        db.send_create_signal('Emailing', ['Emailing'])
-
-        # Adding M2M table for field to on 'Emailing'
-        db.create_table('Emailing_emailing_to', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('emailing', models.ForeignKey(orm['Emailing.emailing'], null=False)),
-            ('contact', models.ForeignKey(orm['Crm.contact'], null=False))
-        ))
-        db.create_unique('Emailing_emailing_to', ['emailing_id', 'contact_id'])
-
-        # Adding model 'MagicLink'
-        db.create_table('Emailing_magiclink', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('emailing', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Emailing.Emailing'])),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=200)),
-            ('uuid', self.gf('django.db.models.fields.CharField')(default='', max_length=100, db_index=True, blank=True)),
-        ))
-        db.send_create_signal('Emailing', ['MagicLink'])
-
-        # Adding M2M table for field visitors on 'MagicLink'
-        db.create_table('Emailing_magiclink_visitors', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('magiclink', models.ForeignKey(orm['Emailing.magiclink'], null=False)),
-            ('contact', models.ForeignKey(orm['Crm.contact'], null=False))
-        ))
-        db.create_unique('Emailing_magiclink_visitors', ['magiclink_id', 'contact_id'])
-
-        # Adding model 'EmailImage'
-        db.create_table('Emailing_emailimage', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Account.Account'])),
-            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('Emailing', ['EmailImage'])
-
-        # Adding model 'HtmlFragment'
-        db.create_table('Emailing_htmlfragment', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('account', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Account.Account'])),
-            ('div_id', self.gf('django.db.models.fields.CharField')(max_length=100, db_index=True)),
-            ('content', self.gf('django.db.models.fields.TextField')(default='', blank=True)),
-        ))
-        db.send_create_signal('Emailing', ['HtmlFragment'])
+from django.db import migrations, models
+import django_extensions.db.fields
 
 
-    def backwards(self, orm):
-        
-        # Deleting model 'EmailTemplate'
-        db.delete_table('Emailing_emailtemplate')
+class Migration(migrations.Migration):
 
-        # Deleting model 'Emailing'
-        db.delete_table('Emailing_emailing')
+    dependencies = [
+        ('Crm', '0001_initial'),
+        ('coop_cms', '0002_auto_20160108_1628'),
+    ]
 
-        # Removing M2M table for field to on 'Emailing'
-        db.delete_table('Emailing_emailing_to')
-
-        # Deleting model 'MagicLink'
-        db.delete_table('Emailing_magiclink')
-
-        # Removing M2M table for field visitors on 'MagicLink'
-        db.delete_table('Emailing_magiclink_visitors')
-
-        # Deleting model 'EmailImage'
-        db.delete_table('Emailing_emailimage')
-
-        # Deleting model 'HtmlFragment'
-        db.delete_table('Emailing_htmlfragment')
-
-
-    models = {
-        'Account.account': {
-            'Meta': {'object_name': 'Account'},
-            'allowed': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'allowed_set'", 'default': "''", 'to': "orm['auth.User']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
-            'default_country': ('django.db.models.fields.CharField', [], {'default': "'France'", 'max_length': '100'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'nb_entities_allowed': ('django.db.models.fields.IntegerField', [], {'default': '100'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'site': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['sites.Site']"})
-        },
-        'Crm.activitysector': {
-            'Meta': {'object_name': 'ActivitySector'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        'Crm.city': {
-            'Meta': {'object_name': 'City'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'to': "orm['Crm.Zone']", 'null': 'True', 'blank': 'True'})
-        },
-        'Crm.contact': {
-            'Meta': {'object_name': 'Contact'},
-            'accept_3rdparty': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'accept_newsletter': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'birth_date': ('django.db.models.fields.DateField', [], {'default': "u''", 'null': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'default': "u''", 'max_length': '75', 'blank': 'True'}),
-            'firstname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'gender': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'job': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'lastname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'main_contact': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'membership': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'contact'", 'unique': 'True', 'to': "orm['Crm.Membership']"}),
-            'mobile': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'nickname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'photo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'db_index': 'True', 'blank': 'True'})
-        },
-        'Crm.entity': {
-            'Meta': {'object_name': 'Entity'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'activity_sector': ('django.db.models.fields.related.ForeignKey', [], {'default': "u''", 'to': "orm['Crm.ActivitySector']", 'null': 'True', 'blank': 'True'}),
-            'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'cedex': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': "u''", 'to': "orm['Crm.City']", 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'default': "u''", 'max_length': '75', 'blank': 'True'}),
-            'fax': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'logo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'relationship': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Crm.Relationship']"}),
-            'relationship_date': ('django.db.models.fields.DateField', [], {'default': "''", 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Crm.EntityType']"}),
-            'website': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'zip_code': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '10', 'blank': 'True'})
-        },
-        'Crm.entityrole': {
-            'Meta': {'object_name': 'EntityRole'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        'Crm.entitytype': {
-            'Meta': {'object_name': 'EntityType'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        'Crm.membership': {
-            'Meta': {'object_name': 'Membership'},
-            'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Crm.Entity']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'joining_date': ('django.db.models.fields.DateField', [], {'default': "u''", 'null': 'True', 'blank': 'True'}),
-            'leaving_date': ('django.db.models.fields.DateField', [], {'default': "u''", 'null': 'True', 'blank': 'True'}),
-            'role': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'to': "orm['Crm.EntityRole']", 'null': 'True', 'blank': 'True'})
-        },
-        'Crm.relationship': {
-            'Meta': {'object_name': 'Relationship'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        'Crm.zone': {
-            'Meta': {'ordering': "['name']", 'object_name': 'Zone'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'default': "''", 'to': "orm['Crm.Zone']", 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Crm.ZoneType']"})
-        },
-        'Crm.zonetype': {
-            'Meta': {'object_name': 'ZoneType'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        'Emailing.emailimage': {
-            'Meta': {'object_name': 'EmailImage'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'Emailing.emailing': {
-            'Meta': {'object_name': 'Emailing'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'html_content': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'sent_at': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'subject': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'template': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['Emailing.EmailTemplate']", 'null': 'True', 'blank': 'True'}),
-            'to': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['Crm.Contact']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'Emailing.emailtemplate': {
-            'Meta': {'object_name': 'EmailTemplate'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'body': ('django.db.models.fields.TextField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'Emailing.htmlfragment': {
-            'Meta': {'object_name': 'HtmlFragment'},
-            'account': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Account.Account']"}),
-            'content': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'div_id': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'Emailing.magiclink': {
-            'Meta': {'object_name': 'MagicLink'},
-            'emailing': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Emailing.Emailing']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '200'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'db_index': 'True', 'blank': 'True'}),
-            'visitors': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['Crm.Contact']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'sites.site': {
-            'Meta': {'ordering': "('domain',)", 'object_name': 'Site', 'db_table': "'django_site'"},
-            'domain': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        }
-    }
-
-    complete_apps = ['Emailing']
+    operations = [
+        migrations.CreateModel(
+            name='Emailing',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
+                ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
+                ('status', models.IntegerField(default=1, choices=[(1, 'Edition in progress'), (2, 'Sending is scheduled'), (3, 'Sending in progress'), (4, 'Sent')])),
+                ('scheduling_dt', models.DateTimeField(default=None, null=True, verbose_name='scheduling date', blank=True)),
+                ('sending_dt', models.DateTimeField(default=None, null=True, verbose_name='sending date', blank=True)),
+                ('lang', models.CharField(default=b'', max_length=5, verbose_name='language', blank=True, choices=[(b'', 'Par d\xe9faut'), (b'fr', 'Fran\xe7ais'), (b'en', 'English')])),
+                ('from_email', models.CharField(default=b'', max_length=100, verbose_name='From email', blank=True)),
+                ('hard_bounce', models.ManyToManyField(related_name='emailing_hard_bounce', to='Crm.Contact', blank=True)),
+                ('newsletter', models.ForeignKey(to='coop_cms.Newsletter')),
+                ('opened_emails', models.ManyToManyField(related_name='emailing_opened', to='Crm.Contact', blank=True)),
+                ('rejected', models.ManyToManyField(related_name='emailing_rejected', to='Crm.Contact', blank=True)),
+                ('send_to', models.ManyToManyField(related_name='emailing_to_be_received', to='Crm.Contact', blank=True)),
+                ('sent_to', models.ManyToManyField(related_name='emailing_received', to='Crm.Contact', blank=True)),
+                ('soft_bounce', models.ManyToManyField(related_name='emailing_soft_bounce', to='Crm.Contact', blank=True)),
+                ('spam', models.ManyToManyField(related_name='emailing_spam', to='Crm.Contact', blank=True)),
+                ('subscription_type', models.ForeignKey(to='Crm.SubscriptionType')),
+                ('unsub', models.ManyToManyField(related_name='emailing_unsub', to='Crm.Contact', blank=True)),
+            ],
+            options={
+                'verbose_name': 'emailing',
+                'verbose_name_plural': 'emailings',
+            },
+        ),
+        migrations.CreateModel(
+            name='MagicLink',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('url', models.URLField(max_length=500)),
+                ('uuid', models.CharField(default=b'', max_length=100, db_index=True, blank=True)),
+                ('emailing', models.ForeignKey(to='Emailing.Emailing')),
+                ('visitors', models.ManyToManyField(to='Crm.Contact', blank=True)),
+            ],
+        ),
+    ]

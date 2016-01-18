@@ -1,5 +1,5 @@
 {% extends "sanza/_bs_section.html" %}
-{% load i18n sanza_utils pagination_tags favorite_tags %}
+{% load i18n sanza_utils favorite_tags %}
 
 {% block section_title %}
   {% trans "Saved searches" %}
@@ -8,7 +8,6 @@
   
 {% block section_data %}
 <table class="table table-striped">
-{% autopaginate searches 25 %}
 {% for search in searches %}
   <tr>
     <td>{% favorite_item object=search %}
@@ -20,5 +19,5 @@
   </tr>
 {% endfor %}
 </table>
-{% paginate %}
+{% include "coop_cms/_pagination.html" %}
 {% endblock %}

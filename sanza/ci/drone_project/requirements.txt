@@ -1,3 +1,2 @@
 psycopg2
-django-localeurl
-django-modeltranslation
+django-modeltranslation>=0.11rc2

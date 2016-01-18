@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
 import logging
 import os.path
 

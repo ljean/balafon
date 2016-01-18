@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 from unittest import skipIf
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.files import File
 
@@ -64,7 +61,7 @@ class DownloadTestCase(BaseTestCase):
         
         redirect_url = response.redirect_chain[-1][0]
         login_url = reverse('auth_login')
-        self.assertTrue(redirect_url.find(login_url)>0)
+        self.assertTrue(redirect_url.find(login_url) >= 0)
         
     def test_download_private_not_in_group(self):
         

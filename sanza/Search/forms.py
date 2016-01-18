@@ -3,16 +3,20 @@
 
 from datetime import date, datetime
 from itertools import chain
+import importlib
 import json
 
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.forms.util import flatatt
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.forms.utils import flatatt
+else:
+    from django.forms.util import flatatt
 from django.template import Context
 from django.template.loader import get_template
-from django.utils import importlib
 from django.utils.encoding import smart_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -27,6 +31,10 @@ from sanza.Search.widgets import DatespanInput
 from sanza.Search.utils import get_date_bounds
 
 SEARCH_FORMS = None
+
+
+class HidableModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    hidden_widget = forms.HiddenInput
 
 
 def load_from_name(constant_full_name):
@@ -723,7 +731,7 @@ class ActionForContactsForm(forms.ModelForm):
 class GroupForContactsForm(forms.Form):
     """Add contacts to group"""
     contacts = forms.CharField(widget=forms.HiddenInput())
-    groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all())
+    groups = HidableModelMultipleChoiceField(queryset=Group.objects.all())
     on_contact = forms.BooleanField(
         label=_(u"Group on contact"),
         required=False,

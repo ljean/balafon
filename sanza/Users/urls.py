@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """urls"""
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
+from sanza.Users import views
 
-urlpatterns = patterns('sanza.Users.views',
-    url(r'^toggle/$', 'toggle_favorite', name='users_toggle_favorite'),
-    url(r'^list/$', 'list_favorites', name='users_favorites_list'),
-    url(r'^make-homepage/$', 'make_homepage', name='users_make_homepage'),
-)
+urlpatterns = [
+    url(r'^toggle/$', views.toggle_favorite, name='users_toggle_favorite'),
+    url(r'^list/$', views.list_favorites, name='users_favorites_list'),
+    url(r'^make-homepage/$', views.make_homepage, name='users_make_homepage'),
+]

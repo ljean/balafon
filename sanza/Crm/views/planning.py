@@ -24,6 +24,7 @@ except ImportError:
 
 class ActionArchiveView(object):
     """view"""
+    paginate_by = 50
 
     @method_decorator(user_passes_test(can_access))
     def dispatch(self, *args, **kwargs):
@@ -58,18 +59,18 @@ class ActionArchiveView(object):
             if selected_types:
                 if 0 in selected_types:
                     if len(selected_types) == 1:
-                        #only : no types
+                        # only : no types
                         queryset = queryset.filter(type__isnull=True)
                     else:
-                        #combine no types and some types
+                        # combine no types and some types
                         queryset = queryset.filter(Q(type__isnull=True) | Q(type__in=selected_types))
                 else:
-                    #only some types
+                    # only some types
                     queryset = queryset.filter(type__in=selected_types)
 
             selected_status = values_dict.get("s", [])
             if selected_status:
-                #only some status
+                # only some status
                 action_types = models.ActionType.objects.filter(id__in=selected_types)
                 allowed_status = [status.id for status in self._get_allowed_status(action_types, selected_types)]
                 selected_status = [status for status in selected_status if status in allowed_status]
@@ -79,6 +80,8 @@ class ActionArchiveView(object):
             selected_users = values_dict.get("u", [])
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
+
+        #queryset, self.paginator = paginate(self.request, queryset, 50)
 
         return queryset
 
@@ -132,6 +135,9 @@ class ActionArchiveView(object):
         context["action_types"] = action_types
         context["in_charge"] = in_charge
         context["action_status"] = action_status
+        #context['pages'] = self.paginator
+        #context['pages_count'] = self.paginator.num_pages if self.paginator else None
+
         return context
 
     def get_dated_queryset(self, **lookup_kwargs):

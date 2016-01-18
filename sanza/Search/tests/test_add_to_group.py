@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we cans earch contacts y group"""
 
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
-
-
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
-from django.conf import settings
-if 'localeurl' in settings.INSTALLED_APPS:
-    from localeurl.models import patch_reverse
-    patch_reverse()
 
 from bs4 import BeautifulSoup
 
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -292,15 +289,15 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         self.assertEqual(302, response.status_code)
         #login url without lang prefix
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_contacts_not_logged(self):
         self.client.logout()
         response = self.client.get(reverse('crm_get_contacts')+'?term=c')
         self.assertEqual(302, response.status_code)
-        #login url without lang prefix
+        # login url without lang prefix
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_entities(self):
         e1 = mommy.make(models.Entity, name="ABCD")
@@ -495,7 +492,7 @@ class EditContactTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
         contact = models.Contact.objects.get(id=contact.id)
 
@@ -518,7 +515,7 @@ class EditContactTest(BaseTestCase):
 
         self.assertEqual(302, response.status_code)
         login_url = reverse('django.contrib.auth.views.login')[3:]
-        self.assertTrue(response['Location'].find(login_url) > 0)
+        self.assertTrue(response['Location'].find(login_url) >= 0)
 
         contact = models.Contact.objects.get(id=contact.id)
 

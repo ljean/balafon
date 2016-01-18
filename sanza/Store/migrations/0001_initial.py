@@ -1,449 +1,367 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'VatRate'
-        db.create_table(u'Store_vatrate', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('rate', self.gf('django.db.models.fields.DecimalField')(max_digits=4, decimal_places=2)),
-        ))
-        db.send_create_signal(u'Store', ['VatRate'])
+    dependencies = [
+        ('Crm', '0001_initial'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Unit'
-        db.create_table(u'Store_unit', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-        ))
-        db.send_create_signal(u'Store', ['Unit'])
-
-        # Adding model 'StoreItemCategory'
-        db.create_table(u'Store_storeitemcategory', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-        ))
-        db.send_create_signal(u'Store', ['StoreItemCategory'])
-
-        # Adding model 'StoreItemTag'
-        db.create_table(u'Store_storeitemtag', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-        ))
-        db.send_create_signal(u'Store', ['StoreItemTag'])
-
-        # Adding model 'StoreItem'
-        db.create_table(u'Store_storeitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('category', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Store.StoreItemCategory'])),
-            ('vat_rate', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Store.VatRate'])),
-            ('pre_tax_price', self.gf('django.db.models.fields.DecimalField')(max_digits=9, decimal_places=2)),
-            ('stock_count', self.gf('django.db.models.fields.IntegerField')(default=None, null=True, blank=True)),
-            ('stock_threshold', self.gf('django.db.models.fields.IntegerField')(default=None, null=True, blank=True)),
-            ('purchase_price', self.gf('django.db.models.fields.DecimalField')(default=None, null=True, max_digits=9, decimal_places=2, blank=True)),
-            ('unit', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['Store.Unit'], null=True, blank=True)),
-        ))
-        db.send_create_signal(u'Store', ['StoreItem'])
-
-        # Adding M2M table for field tags on 'StoreItem'
-        m2m_table_name = db.shorten_name(u'Store_storeitem_tags')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('storeitem', models.ForeignKey(orm[u'Store.storeitem'], null=False)),
-            ('storeitemtag', models.ForeignKey(orm[u'Store.storeitemtag'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['storeitem_id', 'storeitemtag_id'])
-
-        # Adding model 'ServiceItem'
-        db.create_table(u'Store_serviceitem', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=500)),
-            ('vat_rate', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Store.VatRate'])),
-            ('pre_tax_price', self.gf('django.db.models.fields.DecimalField')(max_digits=9, decimal_places=2)),
-        ))
-        db.send_create_signal(u'Store', ['ServiceItem'])
-
-        # Adding model 'Sale'
-        db.create_table(u'Store_sale', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('action', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['Crm.Action'], null=True, blank=True)),
-        ))
-        db.send_create_signal(u'Store', ['Sale'])
-
-        # Adding M2M table for field service_items on 'Sale'
-        m2m_table_name = db.shorten_name(u'Store_sale_service_items')
-        db.create_table(m2m_table_name, (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('sale', models.ForeignKey(orm[u'Store.sale'], null=False)),
-            ('serviceitem', models.ForeignKey(orm[u'Store.serviceitem'], null=False))
-        ))
-        db.create_unique(m2m_table_name, ['sale_id', 'serviceitem_id'])
-
-        # Adding model 'StoreItemSale'
-        db.create_table(u'Store_storeitemsale', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('sale', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Store.Sale'])),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Store.StoreItem'])),
-            ('quantity', self.gf('django.db.models.fields.DecimalField')(max_digits=9, decimal_places=2)),
-        ))
-        db.send_create_signal(u'Store', ['StoreItemSale'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'VatRate'
-        db.delete_table(u'Store_vatrate')
-
-        # Deleting model 'Unit'
-        db.delete_table(u'Store_unit')
-
-        # Deleting model 'StoreItemCategory'
-        db.delete_table(u'Store_storeitemcategory')
-
-        # Deleting model 'StoreItemTag'
-        db.delete_table(u'Store_storeitemtag')
-
-        # Deleting model 'StoreItem'
-        db.delete_table(u'Store_storeitem')
-
-        # Removing M2M table for field tags on 'StoreItem'
-        db.delete_table(db.shorten_name(u'Store_storeitem_tags'))
-
-        # Deleting model 'ServiceItem'
-        db.delete_table(u'Store_serviceitem')
-
-        # Deleting model 'Sale'
-        db.delete_table(u'Store_sale')
-
-        # Removing M2M table for field service_items on 'Sale'
-        db.delete_table(db.shorten_name(u'Store_sale_service_items'))
-
-        # Deleting model 'StoreItemSale'
-        db.delete_table(u'Store_storeitemsale')
-
-
-    models = {
-        u'Crm.action': {
-            'Meta': {'object_name': 'Action'},
-            'amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '11', 'decimal_places': '2'}),
-            'archived': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
-            'contacts': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'detail': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'display_on_board': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'db_index': 'True'}),
-            'done': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
-            'done_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'end_datetime': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'entities': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Entity']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'in_charge': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.TeamMember']", 'null': 'True', 'blank': 'True'}),
-            'last_modified_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'number': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'opportunity': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Opportunity']", 'null': 'True', 'blank': 'True'}),
-            'planned_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
-            'priority': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ActionStatus']", 'null': 'True', 'blank': 'True'}),
-            'subject': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ActionType']", 'null': 'True', 'blank': 'True'})
-        },
-        u'Crm.actionset': {
-            'Meta': {'ordering': "['ordering']", 'object_name': 'ActionSet'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '10'})
-        },
-        u'Crm.actionstatus': {
-            'Meta': {'ordering': "['ordering']", 'object_name': 'ActionStatus'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '10'})
-        },
-        u'Crm.actiontype': {
-            'Meta': {'ordering': "['order_index', 'name']", 'object_name': 'ActionType'},
-            'action_template': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'allowed_status': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.ActionStatus']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
-            'default_status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'type_default_status_set'", 'null': 'True', 'blank': 'True', 'to': u"orm['Crm.ActionStatus']"}),
-            'default_template': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_editable': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'last_number': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'number_auto_generated': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'order_index': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
-            'set': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ActionSet']", 'null': 'True', 'blank': 'True'}),
-            'subscribe_form': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'Crm.city': {
-            'Meta': {'ordering': "['name']", 'object_name': 'City'},
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'city_groups_set'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['Crm.Zone']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Zone']", 'null': 'True', 'blank': 'True'})
-        },
-        u'Crm.contact': {
-            'Meta': {'ordering': "('lastname', 'firstname')", 'object_name': 'Contact'},
-            'accept_notifications': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'address2': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'address3': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'birth_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'cedex': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.City']", 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'default': "u''", 'max_length': '75', 'blank': 'True'}),
-            'email_verified': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.Entity']"}),
-            'favorite_language': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'}),
-            'firstname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'gender': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'has_left': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'imported_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ContactsImport']", 'null': 'True', 'blank': 'True'}),
-            'job': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'last_modified_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
-            'lastname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'db_index': 'True', 'blank': 'True'}),
-            'main_contact': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'db_index': 'True'}),
-            'mobile': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'nickname': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'photo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'relationships': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'through': u"orm['Crm.Relationship']", 'blank': 'True', 'symmetrical': 'False', 'null': 'True'}),
-            'role': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.EntityRole']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
-            'same_as': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.SameAs']", 'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'db_index': 'True', 'blank': 'True'}),
-            'zip_code': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '20', 'blank': 'True'})
-        },
-        u'Crm.contactsimport': {
-            'Meta': {'object_name': 'ContactsImport'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'encoding': ('django.db.models.fields.CharField', [], {'default': "'utf-8'", 'max_length': '50'}),
-            'entity_name_from_email': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'entity_type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.EntityType']", 'null': 'True', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'default': 'None', 'to': u"orm['Crm.Group']", 'null': 'True', 'symmetrical': 'False', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'import_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
-            'imported_by': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'separator': ('django.db.models.fields.CharField', [], {'default': "','", 'max_length': '5'})
-        },
-        u'Crm.entity': {
-            'Meta': {'ordering': "('name',)", 'object_name': 'Entity'},
-            'address': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'address2': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'address3': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'cedex': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.City']", 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'default': "u''", 'max_length': '75', 'blank': 'True'}),
-            'fax': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'imported_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.ContactsImport']", 'null': 'True', 'blank': 'True'}),
-            'is_single_contact': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_modified_by': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
-            'logo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
-            'notes': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'phone': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '200', 'blank': 'True'}),
-            'relationship_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.EntityType']", 'null': 'True', 'blank': 'True'}),
-            'website': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'zip_code': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '20', 'blank': 'True'})
-        },
-        u'Crm.entityrole': {
-            'Meta': {'object_name': 'EntityRole'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Crm.entitytype': {
-            'Meta': {'ordering': "['order']", 'object_name': 'EntityType'},
-            'gender': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'logo': ('django.db.models.fields.files.ImageField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'subscribe_form': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
-        },
-        u'Crm.group': {
-            'Meta': {'object_name': 'Group'},
-            'contacts': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['Crm.Contact']", 'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
-            'entities': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['Crm.Entity']", 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200', 'db_index': 'True'}),
-            'subscribe_form': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        u'Crm.opportunity': {
-            'Meta': {'object_name': 'Opportunity'},
-            'amount': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '11', 'decimal_places': '2'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'detail': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'display_on_board': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'db_index': 'True'}),
-            'end_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'ended': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True'}),
-            'entity': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Entity']", 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'probability': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'start_date': ('django.db.models.fields.DateField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'status': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.OpportunityStatus']", 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.OpportunityType']", 'null': 'True', 'blank': 'True'})
-        },
-        u'Crm.opportunitystatus': {
-            'Meta': {'object_name': 'OpportunityStatus'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'ordering': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        u'Crm.opportunitytype': {
-            'Meta': {'object_name': 'OpportunityType'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Crm.relationship': {
-            'Meta': {'object_name': 'Relationship'},
-            'contact1': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'relationships1'", 'to': u"orm['Crm.Contact']"}),
-            'contact2': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "u'relationships2'", 'to': u"orm['Crm.Contact']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'relationship_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.RelationshipType']"})
-        },
-        u'Crm.relationshiptype': {
-            'Meta': {'object_name': 'RelationshipType'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'reverse': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'})
-        },
-        u'Crm.sameas': {
-            'Meta': {'object_name': 'SameAs'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'main_contact': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Contact']", 'null': 'True', 'blank': 'True'})
-        },
-        u'Crm.teammember': {
-            'Meta': {'object_name': 'TeamMember'},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'default': 'None', 'to': u"orm['auth.User']", 'unique': 'True', 'null': 'True', 'blank': 'True'})
-        },
-        u'Crm.zone': {
-            'Meta': {'ordering': "['name']", 'object_name': 'Zone'},
-            'code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Zone']", 'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Crm.ZoneType']"})
-        },
-        u'Crm.zonetype': {
-            'Meta': {'object_name': 'ZoneType'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Store.sale': {
-            'Meta': {'object_name': 'Sale'},
-            'action': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Crm.Action']", 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'service_items': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['Store.ServiceItem']", 'symmetrical': 'False', 'blank': 'True'}),
-            'store_items': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['Store.StoreItem']", 'symmetrical': 'False', 'through': u"orm['Store.StoreItemSale']", 'blank': 'True'})
-        },
-        u'Store.serviceitem': {
-            'Meta': {'object_name': 'ServiceItem'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'pre_tax_price': ('django.db.models.fields.DecimalField', [], {'max_digits': '9', 'decimal_places': '2'}),
-            'vat_rate': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Store.VatRate']"})
-        },
-        u'Store.storeitem': {
-            'Meta': {'object_name': 'StoreItem'},
-            'category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Store.StoreItemCategory']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'pre_tax_price': ('django.db.models.fields.DecimalField', [], {'max_digits': '9', 'decimal_places': '2'}),
-            'purchase_price': ('django.db.models.fields.DecimalField', [], {'default': 'None', 'null': 'True', 'max_digits': '9', 'decimal_places': '2', 'blank': 'True'}),
-            'stock_count': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'stock_threshold': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['Store.StoreItemTag']", 'symmetrical': 'False', 'blank': 'True'}),
-            'unit': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['Store.Unit']", 'null': 'True', 'blank': 'True'}),
-            'vat_rate': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Store.VatRate']"})
-        },
-        u'Store.storeitemcategory': {
-            'Meta': {'object_name': 'StoreItemCategory'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Store.storeitemsale': {
-            'Meta': {'object_name': 'StoreItemSale'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Store.StoreItem']"}),
-            'quantity': ('django.db.models.fields.DecimalField', [], {'max_digits': '9', 'decimal_places': '2'}),
-            'sale': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Store.Sale']"})
-        },
-        u'Store.storeitemtag': {
-            'Meta': {'object_name': 'StoreItemTag'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Store.unit': {
-            'Meta': {'object_name': 'Unit'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
-        },
-        u'Store.vatrate': {
-            'Meta': {'object_name': 'VatRate'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'rate': ('django.db.models.fields.DecimalField', [], {'max_digits': '4', 'decimal_places': '2'})
-        },
-        u'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        u'auth.permission': {
-            'Meta': {'ordering': "(u'content_type__app_label', u'content_type__model', u'codename')", 'unique_together': "((u'content_type', u'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Group']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "u'user_set'", 'blank': 'True', 'to': u"orm['auth.Permission']"}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        u'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['Store']
+    operations = [
+        migrations.CreateModel(
+            name='Brand',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+            ],
+            options={
+                'verbose_name': 'Brand',
+                'verbose_name_plural': 'Brands',
+            },
+        ),
+        migrations.CreateModel(
+            name='Certificate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('logo', models.ImageField(default=b'', upload_to=b'certificates', blank=True)),
+            ],
+            options={
+                'verbose_name': 'certificate',
+                'verbose_name_plural': 'certificates',
+            },
+        ),
+        migrations.CreateModel(
+            name='DeliveryPoint',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+            ],
+            options={
+                'ordering': ('name',),
+                'verbose_name': 'Delivery point',
+                'verbose_name_plural': 'Delivery points',
+            },
+        ),
+        migrations.CreateModel(
+            name='Discount',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ('short_name', models.CharField(default=b'', max_length=100, verbose_name='short name', blank=True)),
+                ('quantity', models.DecimalField(default=0, verbose_name='quantity', max_digits=9, decimal_places=2)),
+                ('rate', models.DecimalField(default=0, verbose_name='rate', max_digits=4, decimal_places=2)),
+                ('active', models.BooleanField(default=False, help_text='Only active discounts are taken into account on a new purchase', verbose_name='active')),
+            ],
+            options={
+                'ordering': ['rate', 'name'],
+                'verbose_name': 'Discount',
+                'verbose_name_plural': 'Discounts',
+            },
+        ),
+        migrations.CreateModel(
+            name='Favorite',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+                'verbose_name': 'Favorite',
+                'verbose_name_plural': 'Favorites',
+            },
+        ),
+        migrations.CreateModel(
+            name='PriceClass',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='Name')),
+                ('description', models.CharField(default=b'', max_length=100, verbose_name='Description', blank=True)),
+                ('discounts', models.ManyToManyField(to='Store.Discount', verbose_name='Discount', blank=True)),
+            ],
+            options={
+                'verbose_name': 'Price class',
+                'verbose_name_plural': 'Price classes',
+            },
+        ),
+        migrations.CreateModel(
+            name='PricePolicy',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ('parameters', models.CharField(default=b'', max_length=100, verbose_name='parameters', blank=True)),
+                ('policy', models.CharField(max_length=100, verbose_name='policy', choices=[(b'from_category', 'Inherit from category'), (b'multiply_purchase_by_ratio', 'Multiply purchase price by ratio')])),
+                ('apply_to', models.IntegerField(default=0, verbose_name='apply to', choices=[(0, 'All'), (1, 'Articles'), (2, 'Categories')])),
+            ],
+            options={
+                'verbose_name': 'Price policy',
+                'verbose_name_plural': 'Price policies',
+            },
+        ),
+        migrations.CreateModel(
+            name='Sale',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('action', models.OneToOneField(to='Crm.Action')),
+                ('delivery_point', models.ForeignKey(default=None, blank=True, to='Store.DeliveryPoint', null=True, verbose_name='delivery point')),
+            ],
+            options={
+                'verbose_name': 'Sale',
+                'verbose_name_plural': 'Sales',
+            },
+        ),
+        migrations.CreateModel(
+            name='SaleItem',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('quantity', models.DecimalField(verbose_name='quantity', max_digits=9, decimal_places=2)),
+                ('pre_tax_price', models.DecimalField(verbose_name='pre-tax price', max_digits=9, decimal_places=2)),
+                ('text', models.TextField(default=b'', max_length=3000, verbose_name='Text', blank=True)),
+                ('order_index', models.IntegerField(default=0)),
+                ('is_blank', models.BooleanField(default=False, help_text='displayed as an empty line', verbose_name='is blank')),
+                ('discount', models.ForeignKey(default=None, blank=True, to='Store.Discount', null=True)),
+            ],
+            options={
+                'ordering': ['order_index'],
+                'verbose_name': 'Sale item',
+                'verbose_name_plural': 'Sales items',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItem',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='name')),
+                ('pre_tax_price', models.DecimalField(verbose_name='pre-tax price', max_digits=9, decimal_places=2)),
+                ('stock_count', models.DecimalField(decimal_places=2, default=None, max_digits=9, blank=True, null=True, verbose_name='stock count')),
+                ('stock_threshold', models.DecimalField(decimal_places=2, default=None, max_digits=9, blank=True, null=True, verbose_name='stock threshold')),
+                ('purchase_price', models.DecimalField(decimal_places=2, default=None, max_digits=9, blank=True, null=True, verbose_name='purchase price')),
+                ('reference', models.CharField(default=b'', max_length=100, verbose_name='reference', blank=True)),
+                ('available', models.BooleanField(default=True, verbose_name='Available')),
+                ('brand', models.ForeignKey(default=None, blank=True, to='Store.Brand', null=True, verbose_name='brand')),
+            ],
+            options={
+                'ordering': ['name'],
+                'verbose_name': 'Store item',
+                'verbose_name_plural': 'Store items',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItemCategory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='name')),
+                ('order_index', models.IntegerField(default=0, verbose_name='order_index')),
+                ('active', models.BooleanField(default=True, verbose_name='active')),
+                ('icon', models.CharField(default=b'', max_length=20, blank=True)),
+                ('parent', models.ForeignKey(related_name='subcategories_set', default=None, blank=True, to='Store.StoreItemCategory', null=True, verbose_name='parent category')),
+                ('price_policy', models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy')),
+            ],
+            options={
+                'ordering': ['order_index', 'name'],
+                'verbose_name': 'Store item category',
+                'verbose_name_plural': 'Store item categories',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItemImport',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('data', models.FileField(help_text='An Excel file (*.xls) with the data', upload_to=b'store_item_imports', verbose_name='Import file')),
+                ('fields', models.CharField(default=b'name,brand,reference,category,purchase_price,vat_rate', help_text="Fields to import in order: if the attribute doesn't exist, create a custom property", max_length=300, verbose_name='fields')),
+                ('last_import_date', models.DateTimeField(default=None, null=True, verbose_name='last import', blank=True)),
+                ('import_error', models.TextField(default=b'', verbose_name='import error', blank=True)),
+                ('is_successful', models.BooleanField(default=True, verbose_name='is successful')),
+                ('ignore_first_line', models.BooleanField(default=True, verbose_name='ignore first line')),
+                ('margin_rate', models.DecimalField(default=None, null=True, verbose_name='margin_rate', max_digits=9, decimal_places=2)),
+                ('error_message', models.CharField(default=b'', max_length=100, verbose_name='error message', blank=True)),
+                ('category_lines_mode', models.BooleanField(default=False, help_text='If checked, the store item category are expected as merged-cells header lines', verbose_name='category-lines mode')),
+                ('default_brand', models.CharField(default=b'', help_text='If defined, it will be used if no brand is given', max_length=50, verbose_name='default Brand', blank=True)),
+                ('make_available', models.BooleanField(default=False, verbose_name='articles will be available if price is set')),
+            ],
+            options={
+                'verbose_name': 'Store item import',
+                'verbose_name_plural': 'Store item imports',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItemProperty',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, verbose_name='name')),
+                ('label', models.CharField(default=b'', max_length=100, verbose_name='label', blank=True)),
+                ('in_fullname', models.BooleanField(default=False, help_text='is inserted in fullname if checked', verbose_name='in fullname')),
+                ('is_public', models.BooleanField(default=False, help_text='returned in public API', verbose_name='is public')),
+            ],
+            options={
+                'verbose_name': 'Store item: property value',
+                'verbose_name_plural': 'Store item: properties',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItemPropertyValue',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('value', models.CharField(default=b'', max_length=100, verbose_name='value', blank=True)),
+                ('item', models.ForeignKey(verbose_name='item', to='Store.StoreItem')),
+                ('property', models.ForeignKey(verbose_name='property', to='Store.StoreItemProperty')),
+            ],
+            options={
+                'verbose_name': 'Store item: property value',
+                'verbose_name_plural': 'Store item: property values',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreItemTag',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='name')),
+                ('order_index', models.IntegerField(default=0, verbose_name='order_index')),
+                ('active', models.BooleanField(default=True, verbose_name='active')),
+                ('icon', models.CharField(default=b'', max_length=20, blank=True)),
+                ('show_always', models.BooleanField(default=True, verbose_name='show always')),
+            ],
+            options={
+                'ordering': ['order_index', 'name'],
+                'verbose_name': 'Store item tag',
+                'verbose_name_plural': 'Store item tags',
+            },
+        ),
+        migrations.CreateModel(
+            name='StoreManagementActionType',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('template_name', models.CharField(default=b'', help_text='Set the name of a custom template for commercial document', max_length=100, verbose_name='template name', blank=True)),
+                ('show_amount_as_pre_tax', models.BooleanField(default=True, help_text='The action amount will be update with pre-tax total if checked and with tax-included total if not', verbose_name='Show amount as pre-tax')),
+                ('action_type', models.OneToOneField(to='Crm.ActionType')),
+                ('readonly_status', models.ManyToManyField(help_text='When action has one of these status, it is not possible to modify a commercial document', to='Crm.ActionStatus', verbose_name='readonly status', blank=True)),
+            ],
+            options={
+                'verbose_name': 'Store management action type',
+                'verbose_name_plural': 'Store management action types',
+            },
+        ),
+        migrations.CreateModel(
+            name='Supplier',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+            ],
+            options={
+                'verbose_name': 'Supplier',
+                'verbose_name_plural': 'Suppliers',
+            },
+        ),
+        migrations.CreateModel(
+            name='Unit',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=200, verbose_name='name')),
+            ],
+            options={
+                'verbose_name': 'unit',
+                'verbose_name_plural': 'units',
+            },
+        ),
+        migrations.CreateModel(
+            name='VatRate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('rate', models.DecimalField(verbose_name='vat rate', max_digits=4, decimal_places=2)),
+                ('is_default', models.BooleanField(default=False, verbose_name='is default')),
+            ],
+            options={
+                'ordering': ['rate'],
+                'verbose_name': 'VAT rate',
+                'verbose_name_plural': 'VAT rates',
+            },
+        ),
+        migrations.AddField(
+            model_name='storeitemimport',
+            name='supplier',
+            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier'),
+        ),
+        migrations.AddField(
+            model_name='storeitemimport',
+            name='tags',
+            field=models.ManyToManyField(help_text='Tags that can be added to the items', to='Store.StoreItemTag', verbose_name='tags', blank=True),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='category',
+            field=models.ForeignKey(verbose_name='category', to='Store.StoreItemCategory'),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='certificates',
+            field=models.ManyToManyField(to='Store.Certificate', verbose_name='certificate', blank=True),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='imported_by',
+            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItemImport', null=True, verbose_name='imported by'),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='price_class',
+            field=models.ForeignKey(default=None, blank=True, to='Store.PriceClass', null=True, verbose_name='price class'),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='price_policy',
+            field=models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy'),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='supplier',
+            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier'),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='tags',
+            field=models.ManyToManyField(to='Store.StoreItemTag', verbose_name='tags', blank=True),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='unit',
+            field=models.ForeignKey(default=None, blank=True, to='Store.Unit', null=True),
+        ),
+        migrations.AddField(
+            model_name='storeitem',
+            name='vat_rate',
+            field=models.ForeignKey(verbose_name='VAT rate', to='Store.VatRate'),
+        ),
+        migrations.AddField(
+            model_name='saleitem',
+            name='item',
+            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItem', null=True),
+        ),
+        migrations.AddField(
+            model_name='saleitem',
+            name='sale',
+            field=models.ForeignKey(to='Store.Sale'),
+        ),
+        migrations.AddField(
+            model_name='saleitem',
+            name='vat_rate',
+            field=models.ForeignKey(default=None, blank=True, to='Store.VatRate', null=True, verbose_name='VAT rate'),
+        ),
+        migrations.AddField(
+            model_name='favorite',
+            name='item',
+            field=models.ForeignKey(verbose_name='store item', to='Store.StoreItem'),
+        ),
+        migrations.AddField(
+            model_name='favorite',
+            name='user',
+            field=models.ForeignKey(verbose_name='user', to=settings.AUTH_USER_MODEL),
+        ),
+        migrations.AddField(
+            model_name='discount',
+            name='tags',
+            field=models.ManyToManyField(to='Store.StoreItemTag', verbose_name='tags', blank=True),
+        ),
+    ]

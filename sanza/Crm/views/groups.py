@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect
+from coop_cms.utils import paginate
 
 from sanza.Crm import models, forms
 from sanza.permissions import can_access
@@ -161,7 +162,7 @@ def remove_contact_from_group(request, group_id, contact_id):
 def edit_group(request, group_id):
     """view"""
 
-    groups = models.Group.objects.filter(id=group_id).select_related('contacts', 'entities')
+    groups = models.Group.objects.filter(id=group_id).prefetch_related('contacts', 'entities')
 
     if groups.count() == 0:
         raise Http404
@@ -238,19 +239,23 @@ def delete_group(request, group_id):
 @user_passes_test(can_access)
 def add_group(request):
     """view"""
+    group = None
+
     if request.method == "POST":
         group = models.Group()
         form = forms.EditGroupForm(request.POST, instance=group)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('crm_see_my_groups'))
-        group = None
     else:
         form = forms.EditGroupForm()
 
     return render_to_response(
         'Crm/edit_group.html',
-        locals(),
+        {
+            'group': group,
+            'form': form,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -264,7 +269,7 @@ def see_my_groups(request):
 
     if ordering == 'name':
         try:
-            #may fail for some databases
+            # may fail for some databases
             groups = groups.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
 
         # pylint: disable=broad-except
@@ -275,9 +280,15 @@ def see_my_groups(request):
     else:
         groups = groups.order_by('-modified')
 
+    page_obj = paginate(request, groups, 50)
+
     return render_to_response(
         'Crm/my_groups.html',
-        locals(),
+        {
+            'groups': list(page_obj),
+            'page_obj': page_obj,
+            'ordering': ordering,
+        },
         context_instance=RequestContext(request)
     )
 

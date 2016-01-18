@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect
+from coop_cms.utils import paginate
 
 from sanza.Crm import models, forms
 from sanza.Crm.utils import get_actions_by_set
@@ -86,11 +87,13 @@ def view_all_opportunities(request, ordering=None):
         opportunities.reverse()
 
     request.session["redirect_url"] = reverse('crm_all_opportunities')
+    page_obj = paginate(request, opportunities, 50)
 
     return render_to_response(
         'Crm/all_opportunities.html',
         {
-            "opportunities": opportunities,
+            "opportunities": list(page_obj),
+            'page_obj': page_obj,
             "ordering": ordering,
             "all_opportunities": True,
         },

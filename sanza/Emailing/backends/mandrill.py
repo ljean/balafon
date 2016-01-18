@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+from importlib import import_module
 
 from django.dispatch import receiver
-from django.utils.importlib import import_module
 
 from djrill.signals import webhook_event
 
@@ -15,7 +14,7 @@ def handle_bounce(sender, event_type, data, **kwargs):
     Manage hard_bounce and soft_bounce
     """
 
-    #Avoid import error
+    # Avoid import error
     on_bounce = import_module("sanza.Emailing.utils", ".").on_bounce
     emailing_class = import_module("sanza.Emailing.models", ".").Emailing
 

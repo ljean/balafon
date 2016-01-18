@@ -13,11 +13,6 @@ from django.utils.translation import ugettext as _
 
 from rest_framework.renderers import JSONRenderer
 
-try:
-    from localeurl.utils import strip_path
-except ImportError:
-    strip_path = lambda x: ('', x)
-
 from sanza.settings import get_allowed_homepages
 
 logger = logging.getLogger("sanza_crm")
@@ -59,8 +54,7 @@ def is_allowed_homepage(url_string):
     """return True is the current page can be set as homepage"""
     url = urlparse.urlparse(url_string)
     try:
-        #if localeurl is installed : remove the language prefix
-        safe_url = strip_path(url.path)[1]
+        safe_url = url.path
         resolved = resolve(safe_url)
     except Resolver404:
         return False

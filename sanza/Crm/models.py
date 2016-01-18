@@ -6,11 +6,15 @@ import uuid
 import unicodedata
 from urlparse import urlparse
 
+from django import VERSION as DJANGO_VERSION
 from django.db import models
 from django.db.models import Q
 from django.conf import settings as project_settings
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.generic import GenericRelation
+if DJANGO_VERSION >= (1, 9, 0):
+    from django.contrib.contenttypes.fields import GenericRelation
+else:
+    from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -62,13 +66,15 @@ class LastModifiedModel(TimeStampedModel):
         return super(LastModifiedModel, self).save(*args, **kwargs)
 
 
+def _get_logo_dir(obj, filename):
+    """path to directory for media files"""
+    return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
+
+
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
 
-    def _get_logo_dir(self, filename):
-        """path to directory for media files"""
-        return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
-    
+
     GENDER_MALE = 1
     GENDER_FEMALE = 2
     GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
@@ -1506,6 +1512,11 @@ class ContactCustomFieldValue(CustomFieldValue):
         return u'{0} {1}'.format(self.contact, self.custom_field)
 
 
+def _get_import_dir(contact_import, filename):
+    """directory fro storing the files to import"""
+    return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
+
+
 class ContactsImport(TimeStampedModel):
     """import from csv"""
     
@@ -1519,10 +1530,6 @@ class ContactsImport(TimeStampedModel):
         (',', _(u'Coma')),
         (';', _(u'Semi-colon')),
     )
-    
-    def _get_import_dir(self, filename):
-        """directory fro storing the files to import"""
-        return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
     import_file = models.FileField(
         _(u'import file'), upload_to=_get_import_dir,
