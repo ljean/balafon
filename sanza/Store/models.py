@@ -438,8 +438,7 @@ class StoreItem(models.Model):
         return Discount.objects.filter(
             active=True
         ).filter(
-            #Q(tags=self.tags.all()) |
-            Q(priceclass=self.price_class, priceclass__isnull=False)
+            Q(tags__in=self.tags.all()) | Q(priceclass=self.price_class, priceclass__isnull=False)
         ).distinct().order_by('quantity')
 
     def has_stock_threshold_alert(self):
