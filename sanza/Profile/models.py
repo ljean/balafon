@@ -71,10 +71,10 @@ if "sanza.Profile" in settings.INSTALLED_APPS: # and get_registration_version() 
 class CategoryPermission(models.Model):
     category = models.OneToOneField(ArticleCategory)
     can_view_groups = models.ManyToManyField(
-        Group, blank=True, default=None, null=True, related_name="can_view_perm"
+        Group, blank=True, default=None, related_name="can_view_perm"
     )
     can_edit_groups = models.ManyToManyField(
-        Group, blank=True, default=None, null=True, related_name="can_edit_perm"
+        Group, blank=True, default=None, related_name="can_edit_perm"
     )
     
     def __unicode__(self):

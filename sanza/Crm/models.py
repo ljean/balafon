@@ -153,7 +153,7 @@ class Zone(BaseZone):
 class City(BaseZone):
     """city"""
     groups = models.ManyToManyField(
-        Zone, blank=True, null=True, verbose_name=_(u'group'), related_name='city_groups_set'
+        Zone, blank=True, verbose_name=_(u'group'), related_name='city_groups_set'
     )
 
     class Meta:
@@ -558,7 +558,7 @@ class Contact(AddressModel):
         )
     
     entity = models.ForeignKey(Entity)
-    role = models.ManyToManyField(EntityRole, blank=True, null=True, default=None, verbose_name=_(u'Roles'))
+    role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_(u'Roles'))
     
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
     title = models.CharField(_(u'title'), max_length=200, blank=True, default=u'')
@@ -588,7 +588,7 @@ class Contact(AddressModel):
     
     same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
     
-    relationships = models.ManyToManyField("Contact", blank=True, null=True, default=None, through=Relationship)
+    relationships = models.ManyToManyField("Contact", blank=True, default=None, through=Relationship)
     
     has_left = models.BooleanField(_(u'has left'), default=False)
     
@@ -937,8 +937,8 @@ class Group(TimeStampedModel):
     """Group of contacts or entities"""
     name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
     description = models.CharField(_(u'description'), max_length=200, blank=True, default="")
-    entities = models.ManyToManyField(Entity, blank=True, null=True)
-    contacts = models.ManyToManyField(Contact, blank=True, null=True)
+    entities = models.ManyToManyField(Entity, blank=True)
+    contacts = models.ManyToManyField(Contact, blank=True)
     subscribe_form = models.BooleanField(
         default=False, verbose_name=_(u'Subscribe form'),
         help_text=_(u'This group will be proposed on the public subscribe form')
@@ -1108,8 +1108,7 @@ class ActionType(NamedElement):
         help_text=_(u'Action of this type will have a document with the given template')
     )
     allowed_status = models.ManyToManyField(
-        ActionStatus, blank=True, default=None, null=True,
-        help_text=_(u'Action of this type allow the given status')
+        ActionStatus, blank=True, default=None, help_text=_(u'Action of this type allow the given status')
     )
     default_status = models.ForeignKey(
         ActionStatus, blank=True, default=None, null=True,
@@ -1266,8 +1265,8 @@ class Action(LastModifiedModel):
         _(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.')
     )
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
-    contacts = models.ManyToManyField(Contact, blank=True, default=None, null=True, verbose_name=_(u'contacts'))
-    entities = models.ManyToManyField(Entity, blank=True, default=None, null=True, verbose_name=_(u'entities'))
+    contacts = models.ManyToManyField(Contact, blank=True, default=None, verbose_name=_(u'contacts'))
+    entities = models.ManyToManyField(Entity, blank=True, default=None, verbose_name=_(u'entities'))
     favorites = GenericRelation(Favorite)
     end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
     parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
@@ -1547,7 +1546,7 @@ class ContactsImport(TimeStampedModel):
         help_text=_(u'All created entities will get this type. Ignored if the entity already exist.')
     )
     groups = models.ManyToManyField(
-        Group, verbose_name=_(u'groups'), blank=True, default=None, null=True,
+        Group, verbose_name=_(u'groups'), blank=True, default=None,
         help_text=_(u'The created entities will be added to the selected groups.')
     )
     entity_name_from_email = models.BooleanField(

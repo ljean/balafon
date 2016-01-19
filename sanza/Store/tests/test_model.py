@@ -825,7 +825,8 @@ class StoreItemDiscountTest(TestCase):
         item.tags.add(tag2)
         item.save()
 
-        self.assertEqual(list(item.discounts), [discount2, discount])
+        discounts = list(item.discounts)
+        self.assertEqual(discounts, [discount2, discount])
 
     def test_view_discounts_tag_and_price_class2(self):
         """if tags and price classes are associated"""
