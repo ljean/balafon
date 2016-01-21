@@ -147,13 +147,13 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     
     entities_count = 0 if contacts_display else len(results)
 
-    page_obj = paginate(request, results, getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', 50))
+    page_obj = paginate(request, results, getattr(settings, 'SANZA_SEARCH_NB_IN_PAGE', None) or 50)
 
     return render_to_response(
         'Search/search.html',
         {
             'page_obj': page_obj,
-            'results': results,#list(page_obj),
+            'results': list(page_obj),
             'field_choice_form': field_choice_form,
             'message': message,
             'has_empty_entities': has_empty_entities,
