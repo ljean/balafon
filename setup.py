@@ -11,7 +11,7 @@ except ImportError:
 VERSION = __import__('sanza').__version__
 
 setup(
-    name='apidev-sanza',
+    name='balafon',
     version=VERSION,
     description='Contacts management',
     packages=find_packages(),
@@ -36,10 +36,10 @@ setup(
         'django-cors-headers',
     ],
     dependency_links=[
-        'git+https://github.com/ljean/coop_cms.git@dfed5fb535ff4986177f37b42f1d3e2568015a7a#egg=apidev_coop_cms-dev',
+        'git+https://github.com/ljean/coop_cms.git@b66660e1dc9d8812c15b46edb2dcfbd71247079a#egg=apidev_coop_cms-dev',
     ],
     long_description=open('README.rst').read(),
-    url='https://bitbucket.org/ljean/apidev-sanza',
+    url='https://github.com/ljean/balafon',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',

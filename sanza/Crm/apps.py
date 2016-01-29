@@ -10,5 +10,5 @@ if VERSION > (1, 7, 0):
 
     class SanzaAppConfig(AppConfig):
         name = 'sanza.Crm'
-        verbose_name = "Sanza CRM"
+        verbose_name = u"Sanza CRM"
 
