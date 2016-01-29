@@ -1,0 +1,2 @@
+psycopg2
+django-modeltranslation>=0.11rc2

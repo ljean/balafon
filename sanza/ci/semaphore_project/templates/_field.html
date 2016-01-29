@@ -1,0 +1,7 @@
+{% load i18n %}
+<td{% if colspan %} colspan={{colspan}}{% endif %}>
+  {{field}}
+  {{field.errors }}
+  {% if show_label %}{{field.label}}{% endif %}
+  {% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
+</td>

@@ -1,0 +1,13 @@
+{% extends "registration/base.html" %}{% load i18n %}
+{% block registration_content %}
+    <h2>{% trans "You've been logged out" %}</h2>
+    <br /><br />
+    <p>{% trans "You are going to be redirected to the" %} <a href="{% url "homepage" %}">{% trans "homepage" %}</a></p>
+    <script>
+        $(function() {
+            setTimeout(function() {
+                window.location = "{% url "homepage" %}";
+            }, 4000);
+        })
+    </script>
+{% endblock %}
