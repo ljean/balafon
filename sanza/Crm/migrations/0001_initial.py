@@ -84,9 +84,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=200, verbose_name='Name')),
                 ('ordering', models.IntegerField(default=10, verbose_name='display ordering')),
-                ('is_final', models.BooleanField(default=False, help_text='The action will be marked done when it gets a final status', verbose_name='is final')),
-                ('fore_color', models.CharField(default=b'', validators=[sanza.utils.validate_rgb], max_length=7, blank=True, help_text='Fore color. Must be a rgb code. For example: #ffffff', verbose_name='Fore color')),
-                ('background_color', models.CharField(default=b'', validators=[sanza.utils.validate_rgb], max_length=7, blank=True, help_text='Background color. Must be a rgb code. For example: #000000', verbose_name='Background color')),
             ],
             options={
                 'ordering': ['ordering'],
