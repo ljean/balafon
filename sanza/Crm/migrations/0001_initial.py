@@ -109,7 +109,6 @@ class Migration(migrations.Migration):
                 ('is_amount_calculated', models.BooleanField(default=False, verbose_name='Is amount calculated')),
                 ('not_assigned_when_cloned', models.BooleanField(default=False, verbose_name='Not assigned when cloned')),
                 ('generate_uuid', models.BooleanField(default=False, verbose_name='Generate UUID for action')),
-                ('mail_to_subject', models.CharField(default=b'', help_text='This would be used as subject when sending the action by email', max_length=100, verbose_name='Subject of email', blank=True)),
                 ('allowed_status', models.ManyToManyField(default=None, help_text='Action of this type allow the given status', null=True, to='Crm.ActionStatus', blank=True)),
                 ('default_status', models.ForeignKey(related_name='type_default_status_set', default=None, blank=True, to='Crm.ActionStatus', help_text='Default status for actions of this type', null=True)),
                 ('next_action_types', models.ManyToManyField(to='Crm.ActionType', verbose_name='next action type', blank=True)),
