@@ -236,7 +236,9 @@ def make_main_contact(request, current_contact_id, contact_id):
         'sanza/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you want to make the contact {0} to be the default contact for this person?').format(
+            'message': _(
+                u'{0}: Do you want to change the priority order of contacts for this person? (1 is higher priority)'
+            ).format(
                 contact
             ),
             'action_url': reverse("crm_make_main_contact", args=[current_contact_id, contact_id]),

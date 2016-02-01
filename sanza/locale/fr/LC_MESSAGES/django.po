@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-01 22:52+0100\n"
+"POT-Creation-Date: 2016-02-01 23:24+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -188,7 +188,7 @@ msgid "Select roles"
 msgstr "Sélectionnez les rôles de ce contact"
 
 #: Crm/forms/contacts.py:46 Crm/forms/contacts.py:200 Crm/forms/entities.py:34
-#: Crm/models.py:38 Crm/search_forms.py:1364
+#: Crm/models.py:38 Crm/search_forms.py:1387
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:13 Search/forms.py:777
 #: Store/models.py:326 Store/models.py:405 Store/views/xls_export.py:80
@@ -211,7 +211,7 @@ msgstr "Adresse"
 msgid "Billing address"
 msgstr "adresse de facturation"
 
-#: Crm/forms/contacts.py:65 config.py:118
+#: Crm/forms/contacts.py:65 config.py:119
 msgid "Options"
 msgstr "Options"
 
@@ -241,7 +241,7 @@ msgstr "Le nom du fichier est trop long"
 
 #: Crm/forms/contacts.py:180 Crm/forms/contacts.py:185
 #: Crm/forms/contacts.py:246 Crm/forms/contacts.py:287
-#: Crm/forms/contacts.py:305 Crm/models.py:1444 Crm/search_forms.py:1366
+#: Crm/forms/contacts.py:305 Crm/models.py:1444 Crm/search_forms.py:1389
 #: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:533
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:11
 msgid "Contact"
@@ -320,7 +320,7 @@ msgstr "Détails"
 msgid "Logo"
 msgstr "Logo"
 
-#: Crm/forms/entities.py:89 Crm/models.py:1443 Crm/search_forms.py:1365
+#: Crm/forms/entities.py:89 Crm/models.py:1443 Crm/search_forms.py:1388
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Search/views.py:362
 #: config.py:43 templates/sanza/_bs_navigation.html:60
 #: templates/sanza/_navigation.html:27
@@ -664,7 +664,6 @@ msgid "mobile"
 msgstr "portable"
 
 #: Crm/models.py:582
-#| msgid "medium priority"
 msgid "same as priority"
 msgstr "priorité des contacts identiques"
 
@@ -1353,7 +1352,7 @@ msgstr "Contact secondaire"
 msgid "Include"
 msgstr "Inclure"
 
-#: Crm/search_forms.py:796 Crm/search_forms.py:817 Crm/search_forms.py:1105
+#: Crm/search_forms.py:796 Crm/search_forms.py:817 Crm/search_forms.py:1128
 msgid "Only"
 msgstr "Seulement"
 
@@ -1446,60 +1445,76 @@ msgid "Allow same-as"
 msgstr "Autorise les contacts identiques"
 
 #: Crm/search_forms.py:1101
+msgid "Has same-as"
+msgstr "Dispose de contacts identiques"
+
+#: Crm/search_forms.py:1105
+msgid "No same as"
+msgstr "Contacts sans identiques"
+
+#: Crm/search_forms.py:1105
+msgid "Only top priority same-as"
+msgstr "Seulement ceux de plus haute priorité"
+
+#: Crm/search_forms.py:1105
+msgid "All priorities same-as"
+msgstr "Tous les contacts identiques"
+
+#: Crm/search_forms.py:1124
 msgid "Duplicate emails"
 msgstr "Emails en doublon"
 
-#: Crm/search_forms.py:1105
+#: Crm/search_forms.py:1128
 msgid "Exclude"
 msgstr "Exclure"
 
-#: Crm/search_forms.py:1141 Crm/templates/Crm/confirm_contacts_import.html:44
+#: Crm/search_forms.py:1164 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
 #: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:266
 msgid "Import"
 msgstr "Import"
 
-#: Crm/search_forms.py:1157
+#: Crm/search_forms.py:1180
 msgid "Contacts by update date"
 msgstr "Contacts par date de mise à jour"
 
-#: Crm/search_forms.py:1168
+#: Crm/search_forms.py:1191
 msgid "Contacts by creation date"
 msgstr "Contacts par date de création"
 
-#: Crm/search_forms.py:1179
+#: Crm/search_forms.py:1202
 msgid "Entities by update date"
 msgstr "Entités par date de mise à jour"
 
-#: Crm/search_forms.py:1190
+#: Crm/search_forms.py:1213
 msgid "Entities by creation date"
 msgstr "Entités par date de création"
 
-#: Crm/search_forms.py:1201
+#: Crm/search_forms.py:1224
 msgid "Contacts and entities by change date"
 msgstr "Contacts et entités par date de création/modification"
 
-#: Crm/search_forms.py:1215
+#: Crm/search_forms.py:1238
 msgid "Relationship type"
 msgstr "type de relation"
 
-#: Crm/search_forms.py:1249
+#: Crm/search_forms.py:1272
 msgid "Relationship dates"
 msgstr "Date de relation"
 
-#: Crm/search_forms.py:1266
+#: Crm/search_forms.py:1289
 msgid "Contacts with custom field"
 msgstr "Contacts avec un champ personnalisé"
 
-#: Crm/search_forms.py:1286
+#: Crm/search_forms.py:1309
 msgid "Entities with custom field"
 msgstr "Entités avec champ personnalisé"
 
-#: Crm/search_forms.py:1358
+#: Crm/search_forms.py:1381
 msgid "Sort contacts"
 msgstr "Tri des contacts par"
 
-#: Crm/search_forms.py:1367
+#: Crm/search_forms.py:1390
 msgid "Zipcode"
 msgstr "Code postal"
 
@@ -2327,11 +2342,13 @@ msgstr ""
 "\n"
 "Note: {0} est le contact principal. Ce role sera transféré à {1}."
 
-#: Crm/views/relationships.py:239
+#: Crm/views/relationships.py:240
 msgid ""
-"Do you want to make the contact {0} to be the default contact for this "
-"person?"
-msgstr "Voulez-vous faire de {0} le contact prioritaire pour cette personne?"
+"Do you want to change the priority order {0} of contacts for this person? (1 "
+"is higher priority)"
+msgstr ""
+"{0}: Voulez-vous changer l'ordre de priorité des contacts identiques pour cette personne?"
+"(1 est la priorité la plus haute)"
 
 #: Emailing/coop_bar_cfg.py:13 Emailing/views.py:443
 msgid "Sanza"
@@ -4308,7 +4325,7 @@ msgstr "Lieu"
 msgid "Admin"
 msgstr "Admin"
 
-#: config.py:125
+#: config.py:126
 msgid "Unit test"
 msgstr "Test unitaire"
 

@@ -1093,7 +1093,30 @@ class NoSameAsForm(YesNoSearchFieldForm):
                 else:
                     filtered_contacts.append(contact)
             return filtered_contacts
-        
+
+
+class HasSameAsForm(SearchFieldForm):
+    """all contacts with same as"""
+    name = 'has_same_as'
+    label = _(u'Has same-as')
+
+    def __init__(self, *args, **kwargs):
+        super(HasSameAsForm, self).__init__(*args, **kwargs)
+        choices = ((0, _('No same as')), (1, _('Only top priority same-as')), (2, _('All priorities same-as')),)
+        field = forms.ChoiceField(choices=choices, label=self.label)
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        value = int(self.value)
+
+        if value == 0:
+            return Q(same_as__isnull=True)
+        elif value == 1:
+            return Q(same_as__isnull=False, same_as_priority=1)
+        elif value == 2:
+            return Q(same_as__isnull=False)
+
         
 class NoSameEmailForm(SearchFieldForm):
     """Allow same as contact in results"""

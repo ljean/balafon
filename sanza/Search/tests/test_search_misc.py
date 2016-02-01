@@ -765,6 +765,97 @@ class LanguageSearchTest(BaseTestCase):
         self.assertNotContains(response, contact3.lastname)
 
 
+class HasSameAsTest(BaseTestCase):
+    """Search has same-as"""
+
+    def test_search_without_same_as(self):
+        """contact ithout same-as"""
+        same_as = models.SameAs.objects.create()
+
+        contact1 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=1
+        )
+
+        contact2 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=2
+        )
+
+        contact3 = mommy.make(
+            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+        )
+
+        url = reverse('search')
+
+        data = {"gr0-_-has_same_as-_-0": '0'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, contact1.email)
+        self.assertNotContains(response, contact2.email)
+        self.assertContains(response, contact3.email)
+
+    def test_search_with_same_as_only_prio1(self):
+        """contact ithout same-as"""
+        same_as = models.SameAs.objects.create()
+
+        contact1 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=1
+        )
+
+        contact2 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=2
+        )
+
+        contact3 = mommy.make(
+            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+        )
+
+        url = reverse('search')
+
+        data = {"gr0-_-has_same_as-_-0": '1'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.email)
+        self.assertNotContains(response, contact2.email)
+        self.assertNotContains(response, contact3.email)
+
+    def test_search_with_same_as_all(self):
+        """contact ithout same-as"""
+        same_as = models.SameAs.objects.create()
+
+        contact1 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=1
+        )
+
+        contact2 = mommy.make(
+            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            same_as=same_as, same_as_priority=2
+        )
+
+        contact3 = mommy.make(
+            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+        )
+
+        url = reverse('search')
+
+        data = {"gr0-_-has_same_as-_-0": '2'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.email)
+        self.assertContains(response, contact2.email)
+        self.assertNotContains(response, contact3.email)
+
+
 class SameEmailTest(BaseTestCase):
     """Search same-email"""
 

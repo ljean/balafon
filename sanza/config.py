@@ -113,6 +113,7 @@ SEARCH_FORMS = [
             search_forms.ContactsByUpdateDate,
             search_forms.EntitiesByCreationDate,
             search_forms.EntitiesByUpdateDate,
+            search_forms.HasSameAsForm,
         ],
     ), (
         _(u'Options'),
