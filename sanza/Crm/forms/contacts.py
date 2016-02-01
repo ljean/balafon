@@ -11,7 +11,7 @@ import floppyforms as forms
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
+from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm
 from sanza.Crm.settings import (
     get_language_choices, has_language_choices, get_subscription_default_value, ALLOW_COUPLE_GENDER
 )
@@ -216,6 +216,29 @@ class SelectContactOrEntityForm(forms.Form):
             return object_class.objects.get(id=object_id)
         except (ValueError, object_class.DoesNotExist):
             raise ValidationError(ugettext(u"Does'nt exist"))
+
+
+class SameAsPriorityForm(BetterBsForm):
+    """Define "same as" priority for a contact"""
+    priority = forms.IntegerField(label=_(u"Priority"))
+
+    def __init__(self, contact, *args, **kwargs):
+        super(SameAsPriorityForm, self).__init__(*args, **kwargs)
+        self.contact = contact
+        self.fields['priority'].initial = contact.same_as_priority
+
+    def clean_priority(self):
+        """make sure that the priority is an integer between 1 and number of same as"""
+        value = self.cleaned_data['priority']
+        min_value = 1
+        max_value = self.contact.same_as.contact_set.count()
+        if value < min_value or value > max_value:
+            raise ValidationError(
+                ugettext(u'Invalid value : It should be between {0} and {1}').format(
+                    min_value, max_value
+                )
+            )
+        return value
 
 
 class SameAsForm(forms.Form):

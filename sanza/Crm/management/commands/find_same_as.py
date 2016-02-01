@@ -25,9 +25,11 @@ class Command(BaseCommand):
         total_count = 0
         for i, contact in enumerate(models.Contact.objects.all()):
             if contact.lastname and contact.firstname:
-                same_as = models.Contact.objects.filter(lastname=contact.lastname, firstname=contact.firstname).exclude(id=contact.id)
+                same_as = models.Contact.objects.filter(
+                    lastname=contact.lastname, firstname=contact.firstname
+                ).exclude(id=contact.id)
                 same_as_count = same_as.count()
-                if same_as_count>0:
+                if same_as_count > 0:
                     print i, contact, same_as_count, "'SameAs'"
                     total_count += 1
                     if group:
@@ -36,4 +38,3 @@ class Command(BaseCommand):
         
         if verbose:
             print total_count, "SameAs"
-        

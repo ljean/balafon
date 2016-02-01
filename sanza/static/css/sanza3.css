@@ -46,7 +46,7 @@ body {
   background-color: #f8f8f8;
 }
 .note {
-  background: #ffeecc;
+  background: #fffa94;
   padding: 2px;
 }
 .table-row {
@@ -192,7 +192,7 @@ body {
   border: solid thin #f0f0fc;
   vertical-align: top;
   padding: 1px 4px;
-  background: #ffeecc;
+  background: #fffa94;
   color: #000;
 }
 .label-action-contact {
@@ -269,11 +269,9 @@ body {
   color: #fff;
   font-weight: bold;
 }
-.glyphicon-certificate.highlight {
-  color: #fd4;
-}
-.glyphicon-certificate.disabled {
-  color: #ccc;
+.badge.highlight {
+  background: #ffdd44;
+  color: #000;
 }
 .contact-entity-info,
 .contact-entity-info:hover {
@@ -320,7 +318,7 @@ li.quick-search-form {
   background: #fff;
 }
 .action-note {
-  background: #ffeecc;
+  background: #fffa94;
   padding: 2px;
 }
 .dropdown-menu > li > a.disabled {
@@ -428,13 +426,13 @@ table.contact-table {
   margin-top: -10px;
 }
 .description.contenteditable {
-  background: #ffeecc;
+  background: #fffa94;
 }
 .contenteditable {
   min-height: 14px;
   padding: 2px;
   min-width: 5px;
-  background: #ffeecc;
+  background: #fffa94;
 }
 .inline-block {
   display: inline-block;

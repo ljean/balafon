@@ -15,15 +15,14 @@
     <div style="display: inline-block; vertical-align: middle;">
       <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">{{contact.fullname}}</a>
       {% if contact.same_as %}
-        {% if contact == contact.same_as.main_contact %}
-            <span class="glyphicon glyphicon-certificate highlight" title="Is main contact"> </span>
-        {% else %}
-          <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id contact.id %}">
-            <span class="glyphicon glyphicon-certificate disabled"  title="Make main contact"> </span>
-          </a>
-        {% endif %}
+        <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id contact.id %}"
+          title="{% trans 'Change priority order for contact' %}"
+        >
+          <span class="badge {% if 1 == contact.same_as_priority %}highlight{% endif %}">
+            {{ contact.same_as_priority }}
+          </span>
+        </a>
       {% endif %}
-      
       {% if not contact.main_contact %}
         <div class="label label-default">{% trans "secondary" %}</div> 
       {% endif %}

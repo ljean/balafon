@@ -6,30 +6,37 @@
 {% block section_data %}
 <table class="table table-striped">
 {% if same_as %}
-  {% for c in same_as %}
-  {% with c.has_left as has_left %}
+  {% for same_as_contact in same_as %}
+  {% with same_as_contact.has_left as has_left %}
   <tr>
     <td>{%trans "Same As"%}
-      {% if c == contact.same_as.main_contact %}
-      <span class="glyphicon glyphicon-certificate highlight" title="{% trans "Is Main"%}"> </span>
-      {% else %}
-        <a class="colorbox-form" href="{% url "crm_make_main_contact" contact.id c.id %}">
-          <span class="glyphicon glyphicon-certificate disabled" title="{% trans "Make main" %}"> </span>
-        </a>
-      {% endif %}
+      <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id same_as_contact.id %}"
+        title="{% trans 'Change priority order for contact' %}"
+      >
+        <span class="badge {% if 1 == same_as_contact.same_as_priority %}highlight{% endif %}">
+          {{ same_as_contact.same_as_priority }}
+        </span>
+      </a>
     </td>
-    {% if c.entity.is_single_contact %}
-    <td colspan="2"><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+    {% if same_as_contact.entity.is_single_contact %}
+    <td colspan="2"><a href="{% url "crm_view_contact" same_as_contact.id %}">{{same_as_contact.fullname}}</a></td>
     {% else %}
-    <td><a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
-    <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
+    <td>
+      <a href="{% url "crm_view_contact" same_as_contact.id %}">
+        {{same_as_contact.fullname}}
+      </a>
+      {% if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+    </td>
+    <td><a href="{% url "crm_view_entity" same_as_contact.entity.id %}">{{ same_as_contact.entity }}</a></td>
     {% endif %}
-    <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
-    <td>{{c.get_phones|seq_to_br}}</td>
-    <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
-    <td><a class="colorbox-form" href="{% url "crm_remove_same_as" contact.id c.id %}">
-      <span class="glyphicon glyphicon-remove">
-    </a></td>
+    <td>{{same_as_contact.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
+    <td>{{same_as_contact.get_phones|seq_to_br}}</td>
+    <td><a href="mailto:{{same_as_contact.get_email}}">{{same_as_contact.get_email}}</a></td>
+    <td>
+      <a class="colorbox-form" href="{% url "crm_remove_same_as" contact.id same_as_contact.id %}">
+        <span class="glyphicon glyphicon-remove"></span>
+      </a>
+    </td>
   </tr>
   {% endwith %}
   {% endfor %}
@@ -37,21 +44,26 @@
 
 {% with contact.get_relationships as relationships %}
 {% if relationships %}
-  {% for r in relationships %}
-  {% with r.contact.has_left as has_left %}
-  <tr class="relationship {% if r.contact.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
-    <td>{{r.type_name}}</td>
-    {% if r.contact.entity.is_single_contact %}
-    <td colspan="2"><a href="{% url "crm_view_contact" r.contact.id %}">{{r.contact.fullname}}</a></td>
+  {% for relationship in relationships %}
+  {% with relationship.contact.has_left as has_left %}
+  <tr class="relationship {% if relationship.contact.main_contact %}main-contact{% endif %} {% if has_left %}old-contact{% endif %}">
+    <td>{{relationship.type_name}}</td>
+    {% if relationship.contact.entity.is_single_contact %}
+    <td colspan="2"><a href="{% url "crm_view_contact" relationship.contact.id %}">{{relationship.contact.fullname}}</a></td>
     {% else %}
-    <td><a href="{% url "crm_view_contact" r.contact.id %}">{{r.contact.fullname}}</a></td>
-    <td><a href="{% url "crm_view_entity" r.contact.entity.id %}">{{ r.contact.entity }}</a></td>
+    <td>
+      <a href="{% url "crm_view_contact" relationship.contact.id %}">
+        {{relationship.contact.fullname}}
+      </a>
+      {% if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+    </td>
+    <td><a href="{% url "crm_view_entity" relationship.contact.entity.id %}">{{ relationship.contact.entity }}</a></td>
     {% endif %}
-    <td>{{c.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
-    <td>{{r.contact.get_phones|seq_to_br}}</td>
-    <td><a href="mailto:{{r.contact.get_email}}">{{r.contact.get_email}}</a></td>
-    <td><a class="colorbox-form" href="{% url "crm_delete_relationship" contact.id r.id %}">
-      <span class="glyphicon glyphicon-remove">
+    <td>{{relationship.contact.get_roles|seq_to_dash|default:'&nbsp;'}}</td>
+    <td>{{relationship.contact.get_phones|seq_to_br}}</td>
+    <td><a href="mailto:{{relationship.contact.get_email}}">{{relationship.contact.get_email}}</a></td>
+    <td><a class="colorbox-form" href="{% url "crm_delete_relationship" contact.id relationship.id %}">
+      <span class="glyphicon glyphicon-remove"></span>
     </a></td>
   </tr>
   {% endwith %}

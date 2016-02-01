@@ -6,8 +6,9 @@
 @section_header_color: #fff;
 @section_header_background: #444;
 @section_header_color_hover: #ddd;
-@note_background: #fec;
+@note_background: #fffa94;
 @navigation_tooltip_color: #444;
+@highlight_color: #fd4;
 
 html,
 body {
@@ -359,14 +360,14 @@ body {
     font-weight: bold;
 }
 
-.glyphicon-certificate.highlight {
-    color: #fd4;
+.badge.highlight {
+    background: @highlight_color;
+    color: #000;
 }
 
-.glyphicon-certificate.disabled {
-    color: #ccc;
+.badge.disabled {
+    //color: #ccc;
 }
-
 
 .contact-entity-info, .contact-entity-info:hover {
   color: @section_header_color_hover;    

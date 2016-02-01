@@ -59,7 +59,7 @@ class LastModifiedModel(TimeStampedModel):
         try:
             request = RequestManager().get_request()
             if request.user.is_authenticated():
-                #object can be modified by anonymous user : subscription page for example, view magic-link ...
+                # object can be modified by anonymous user : subscription page for example, view magic-link ...
                 self.last_modified_by = request.user
         except (RequestNotFound, AttributeError):
             pass
@@ -501,8 +501,7 @@ def get_contact_photo_dir(instance, filename):
 
 class SameAs(models.Model):
     """Link between two contacts for the same physical person"""
-    main_contact = models.ForeignKey("Contact", blank=True, null=True, default=None)
-    
+
     def __unicode__(self):
         return _(u"Same As: {0}").format(self.id)
     
@@ -579,7 +578,8 @@ class Contact(AddressModel):
     
     notes = models.TextField(_('notes'), blank=True, default="")
     
-    same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None)
+    same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None, verbose_name=_(u'same as'))
+    same_as_priority = models.IntegerField(default=0, verbose_name=_(u'same as priority'))
     
     relationships = models.ManyToManyField("Contact", blank=True, default=None, through=Relationship)
     

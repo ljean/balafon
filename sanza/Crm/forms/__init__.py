@@ -9,8 +9,8 @@ from sanza.Crm.forms.actions import (
 )
 from sanza.Crm.forms.base import BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity
 from sanza.Crm.forms.contacts import (
-    ContactForm, SelectContactForm, SelectContactOrEntityForm, SameAsForm, AddRelationshipForm, ContactsImportForm,
-    ContactsImportConfirmForm, UnsubscribeContactsImportForm
+    ContactForm, SelectContactForm, SelectContactOrEntityForm, SameAsForm, SameAsPriorityForm, AddRelationshipForm,
+    ContactsImportForm, ContactsImportConfirmForm, UnsubscribeContactsImportForm
 )
 from sanza.Crm.forms.custom_fields import (
     CustomFieldForm, ContactCustomFieldForm, EntityCustomFieldForm
