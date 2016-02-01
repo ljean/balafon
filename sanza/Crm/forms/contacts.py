@@ -12,7 +12,9 @@ from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
 from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
-from sanza.Crm.settings import get_language_choices, has_language_choices, get_subscription_default_value
+from sanza.Crm.settings import (
+    get_language_choices, has_language_choices, get_subscription_default_value, ALLOW_COUPLE_GENDER
+)
 from sanza.Crm.widgets import ContactAutoComplete
 
 
@@ -93,7 +95,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             (models.Contact.GENDER_MALE, ugettext(u'Mr')),
             (models.Contact.GENDER_FEMALE, ugettext(u'Mrs')),
         ]
-        if settings.ALLOW_COUPLE_GENDER:
+        if ALLOW_COUPLE_GENDER:
             gender_choices += [
                 (models.Contact.GENDER_COUPLE, ugettext(u'Mrs and Mr'))
             ]
