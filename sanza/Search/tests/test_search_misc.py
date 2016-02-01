@@ -589,11 +589,14 @@ class SameEmailTest(BaseTestCase):
             models.Contact, lastname=u"IJKLMNO", main_contact=True, has_left=False
         )
         contact3.entity.email = u'contact1@email1.fr'
+        contact3.entity.default_contact.delete()
         contact3.entity.save()
 
         contact4 = mommy.make(
             models.Contact, lastname=u"MNOPQRS", email=u"contact4@email1.fr",  main_contact=True, has_left=False
         )
+        contact4.entity.default_contact.delete()
+        contact4.entity.save()
 
         group = mommy.make(models.Group, name=u"GROUP1")
         group.entities.add(contact1.entity)
