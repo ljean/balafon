@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-if DJANGO_VERSION >= (1, 9, 0):
+if DJANGO_VERSION >= (1, 8, 0):
     from django.contrib.contenttypes.fields import GenericForeignKey
 else:
     from django.contrib.contenttypes.generic import GenericForeignKey

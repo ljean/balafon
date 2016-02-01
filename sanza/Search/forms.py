@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-if DJANGO_VERSION >= (1, 9, 0):
+if DJANGO_VERSION >= (1, 8, 0):
     from django.forms.utils import flatatt
 else:
     from django.forms.util import flatatt

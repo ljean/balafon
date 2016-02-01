@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import VERSION as DJANGO_VERSION
-if DJANGO_VERSION >= (1, 9, 0):
+if DJANGO_VERSION >= (1, 8, 0):
     from django.contrib.contenttypes.fields import GenericRelation
 else:
     from django.contrib.contenttypes.generic import GenericRelation
