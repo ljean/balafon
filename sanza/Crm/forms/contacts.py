@@ -66,7 +66,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         ]
 
     def __init__(self, *args, **kwargs):
-        #Configure the fieldset with dynamic fields
+        # Configure the fieldset with dynamic fields
         fieldset_fields = self.Meta.fieldsets[-2][1]["fields"]
         for subscription_type in models.SubscriptionType.objects.all():
             field_name = "subscription_{0}".format(subscription_type.id)
@@ -83,12 +83,23 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
 
         self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
 
-        if not 'sanza.Profile' in settings.INSTALLED_APPS:
+        if 'sanza.Profile' not in settings.INSTALLED_APPS:
             self.fields["accept_notifications"].widget = forms.HiddenInput()
 
         self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
 
-        #create the dynamic fields
+        # define the allowed gender
+        gender_choices = [
+            (models.Contact.GENDER_MALE, ugettext(u'Mr')),
+            (models.Contact.GENDER_FEMALE, ugettext(u'Mrs')),
+        ]
+        if settings.ALLOW_COUPLE_GENDER:
+            gender_choices += [
+                (models.Contact.GENDER_COUPLE, ugettext(u'Mrs and Mr'))
+            ]
+        self.fields['gender'].choices = gender_choices
+
+        # create the dynamic fields
         for subscription_type in models.SubscriptionType.objects.all():
             field_name = "subscription_{0}".format(subscription_type.id)
             field = self.fields[field_name] = forms.BooleanField(

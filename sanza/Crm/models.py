@@ -74,12 +74,11 @@ def _get_logo_dir(obj, filename):
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
 
-
     GENDER_MALE = 1
     GENDER_FEMALE = 2
-    GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
+    GENDER_CHOICE = ((GENDER_MALE, _(u'Male')), (GENDER_FEMALE, _(u'Female')))
     
-    #required for translation into some languages (french for example)
+    # required for translation into some languages (french for example)
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
     order = models.IntegerField(_(u'order'), default=0)
     logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
@@ -545,18 +544,12 @@ class Contact(AddressModel):
     GENDER_FEMALE = 2
     GENDER_COUPLE = 3
     
-    if settings.ALLOW_COUPLE_GENDER:
-        GENDER_CHOICE = (
-            (GENDER_MALE, _(u'Mr')),
-            (GENDER_FEMALE, _(u'Mrs')),
-            (GENDER_COUPLE, _(u'Mrs and Mr'))
-        )
-    else:
-        GENDER_CHOICE = (
-            (GENDER_MALE, _(u'Mr')),
-            (GENDER_FEMALE, _(u'Mrs')),
-        )
-    
+    GENDER_CHOICE = (
+        (GENDER_MALE, _(u'Mr')),
+        (GENDER_FEMALE, _(u'Mrs')),
+        (GENDER_COUPLE, _(u'Mrs and Mr'))
+    )
+
     entity = models.ForeignKey(Entity)
     role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_(u'Roles'))
     
