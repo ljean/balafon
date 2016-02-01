@@ -39,6 +39,7 @@ class SearchTest(BaseTestCase):
 
     def test_search_contact(self):
         """search by name"""
+        """search by name"""
         contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
 
         response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
@@ -621,31 +622,34 @@ class SameEmailTest(BaseTestCase):
         self.assertNotContains(response, contact4.lastname)
 
     def test_search_email_exclude_duplicate(self):
-        """same eail allowed: search on entity group"""
+        """same email allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCDEFG", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"ABCDEFG123456#", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact1.entity.name = u'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"EFGHIJK", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname=u"EFGHIJK456789?", email="contact1@email1.fr", main_contact=True, has_left=False
         )
         contact2.entity.name = u'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKLMNO", main_contact=True, has_left=False
+            models.Contact, lastname=u"IJKLMNO789012$", main_contact=True, has_left=False
         )
         contact3.entity.email = 'contact1@email1.fr'
+        contact3.entity.default_contact.delete()
         contact3.entity.save()
 
         contact4 = mommy.make(
-            models.Contact, lastname=u"MNOPQRS", email="contact4@email1.fr",  main_contact=True, has_left=False
+            models.Contact, lastname=u"MNOPQRS135791@", email="contact4@email1.fr",  main_contact=True, has_left=False
         )
+        contact4.entity.default_contact.delete()
+        contact4.entity.save()
 
         group = mommy.make(models.Group, name="GROUP1")
         group.entities.add(contact1.entity)
