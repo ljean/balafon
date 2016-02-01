@@ -84,13 +84,12 @@ class ActionDocumentPdfView(PDFTemplateView):
         try:
             action = get_object_or_404(models.Action, pk=self.kwargs['pk'])
         except models.Action.DoesNotExist:
-            raise Exception("Pas d'action")
             raise Http404
         try:
             doc = action.actiondocument
         except models.ActionDocument.DoesNotExist:
-            raise Exception("Pas de document pour l'action")
             raise Http404
+
         if not self.request.user.has_perm('can_view_object', doc):
             raise PermissionDenied
         context['to_pdf'] = True

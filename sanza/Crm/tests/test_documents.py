@@ -147,12 +147,22 @@ class ActionDocumentTestCase(BaseTestCase):
     def test_anonymous_document_view(self):
         """view action document as anonymous user"""
 
-        self.client.logout()
         contact = mommy.make(models.Contact)
         action_ype = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
         action = mommy.make(models.Action, type=action_ype)
         action.contacts.add(contact)
         action.save()
+
+        # Make sure that this document is created
+        response = self.client.get(reverse('crm_edit_action_document', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+
+        # logout user
+        self.client.logout()
+
+        url = reverse('crm_pdf_action_document', args=[action.id])
+        response = self.client.get(url)
+        self._check_anonymous_not_allowed(response, url)
 
         url = reverse('crm_edit_action_document', args=[action.id])
         response = self.client.get(url)
@@ -162,30 +172,32 @@ class ActionDocumentTestCase(BaseTestCase):
         response = self.client.get(url)
         self._check_anonymous_not_allowed(response, url)
 
-        url = reverse('crm_pdf_action_document', args=[action.id])
-        response = self.client.get(url)
-        self._check_anonymous_not_allowed(response, url)
-
     def test_not_staff_document_view(self):
         """view action document as non-staff user"""
-        self.client.logout()
 
+        contact = mommy.make(models.Contact)
+        action_type = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
+        action = mommy.make(models.Action, type=action_type)
+
+        action.contacts.add(contact)
+        action.save()
+
+        # Make sure that this document is created
+        response = self.client.get(reverse('crm_edit_action_document', args=[action.id]))
+        self.assertEqual(200, response.status_code)
+
+        # change user
+        self.client.logout()
         user = User.objects.create(username="titi", is_staff=False, is_active=True)
         user.set_password("abc")
         user.save()
         self.client.login(username="titi", password="abc")
 
-        contact = mommy.make(models.Contact)
-        action_type = mommy.make(models.ActionType, default_template="documents/standard_letter.html")
-        action = mommy.make(models.Action, type=action_type)
-        action.contacts.add(contact)
-        action.save()
+        response = self.client.get(reverse('crm_pdf_action_document', args=[action.id]))
+        self.assertEqual(403, response.status_code)
 
         response = self.client.get(reverse('crm_edit_action_document', args=[action.id]))
         self.assertEqual(403, response.status_code)
 
         response = self.client.get(reverse('crm_view_action_document', args=[action.id]))
-        self.assertEqual(403, response.status_code)
-
-        response = self.client.get(reverse('crm_pdf_action_document', args=[action.id]))
         self.assertEqual(403, response.status_code)
