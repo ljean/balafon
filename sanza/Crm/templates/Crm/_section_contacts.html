@@ -19,7 +19,9 @@
           <td class="ut-contact-{{c.id}}">
             {% favorite_item object=c %}
             <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
-            
+            <a class="pull-right btn btn-xs btn-default colorbox-form" href="{% url "crm_edit_contact_on_entity" c.id %}">
+              <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+            </a>
             {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
             {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
           </td>

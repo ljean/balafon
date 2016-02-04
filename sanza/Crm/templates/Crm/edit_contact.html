@@ -47,7 +47,7 @@
 
 {% block title %}{% if contact %}{% trans "Edit contact" %}{% else %}{% trans "Create contact" %}{% endif %}{% endblock %}
 
-{% block form_url %}{% if contact %}{% url "crm_edit_contact" contact.id %}{% else %}{% if entity %}{% url "crm_add_contact" entity.id %}{% else %}{% url "crm_add_single_contact" %}{% endif %}{% endif %}{% endblock %}
+{% block form_url %}{% if contact %}{% if go_to_entity %}{% url "crm_edit_contact_on_entity" contact.id %}{% else %}{% url "crm_edit_contact" contact.id %}{% endif %}{% else %}{% if entity %}{% url "crm_add_contact" entity.id %}{% else %}{% url "crm_add_single_contact" %}{% endif %}{% endif %}{% endblock %}
 
 {% block doc_header %}
   <h2>

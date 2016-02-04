@@ -112,6 +112,7 @@ def edit_contact(request, contact_id, mini=True, go_to_entity=False):
             'form': form,
             'contact': contact,
             'entity': entity,
+            'go_to_entity': go_to_entity,
         },
         context_instance=RequestContext(request)
     )

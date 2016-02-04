@@ -44,6 +44,12 @@ urlpatterns = [
         kwargs={'go_to_entity': True},
         name='crm_edit_contact_after_entity_created'
     ),
+    url(
+        r'^edit-contact-on-entity/(?P<contact_id>\d+)/$',
+        contacts.edit_contact,
+        kwargs={'go_to_entity': True},
+        name='crm_edit_contact_on_entity'
+    ),
     url(r'^view-contact/(?P<contact_id>\d+)/$', contacts.view_contact, name='crm_view_contact'),
     url(r'^contact-name/(?P<contact_id>.+)/$', contacts.get_contact_name, name='crm_get_contact_name'),
     url(r'^contacts/list/$', contacts.get_contacts, name='crm_get_contacts'),
