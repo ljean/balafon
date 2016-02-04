@@ -148,14 +148,3 @@ def get_default_country():
             zone_type = models.ZoneType.objects.create(type="country", name=u"Country")
         default_country = models.Zone.objects.create(name=country_name, parent=None, type=zone_type)
     return default_country
-
-
-def hide_billing_address(fieldsets):
-    """remove the billing address tab of a contact or entity form"""
-    billing_address_index = -1
-    for index, fieldset in enumerate(fieldsets):
-        if fieldset[0] == 'billing_address':
-            billing_address_index = index
-            break
-    if billing_address_index != -1:
-        fieldsets.pop(billing_address_index)

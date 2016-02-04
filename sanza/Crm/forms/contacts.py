@@ -17,7 +17,7 @@ from sanza.Crm.settings import (
     ALLOW_COUPLE_GENDER,
 )
 from sanza.Crm.widgets import ContactAutoComplete
-from sanza.Crm.utils import hide_billing_address
+
 
 class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit contact form"""
@@ -76,9 +76,6 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             if field_name not in fieldset_fields:
                 fieldset_fields.append(field_name)
 
-        if not show_billing_address():
-            hide_billing_address(self.Meta.fieldsets)
-
         super(ContactForm, self).__init__(*args, **kwargs)
 
         try:
@@ -129,6 +126,14 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             )
         else:
             self.fields['favorite_language'].widget = forms.HiddenInput()
+
+    def get_fieldsets(self):
+        """return the list of fieldsets"""
+        for fieldset in self.Meta.fieldsets:
+            if fieldset[0] == 'billing_address' and not show_billing_address():
+                # Ignore 'Billing address' tab if disable in settings
+                continue
+            yield fieldset
 
     def clean_photo(self):
         """photo validation"""

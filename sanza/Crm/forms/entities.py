@@ -10,7 +10,7 @@ from sanza.Crm import models
 from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
 from sanza.Crm.settings import show_billing_address, NO_ENTITY_TYPE
 from sanza.Crm.widgets import EntityAutoComplete
-from sanza.Crm.utils import hide_billing_address
+
 
 class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit entity form"""
@@ -45,14 +45,19 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
         ]
 
     def __init__(self, *args, **kwargs):
-        if not show_billing_address():
-            hide_billing_address(self.Meta.fieldsets)
-
         super(EntityForm, self).__init__(*args, **kwargs)
 
         if NO_ENTITY_TYPE:
             self.fields["type"].widget = forms.HiddenInput()
 
+    def get_fieldsets(self):
+        """return the list of fieldsets"""
+
+        for fieldset in self.Meta.fieldsets:
+            if fieldset[0] == 'billing_address' and not show_billing_address():
+                # Ignore 'Billing address' tab if disable in settings
+                continue
+            yield fieldset
     
     def clean_logo(self):
         """logo validation"""

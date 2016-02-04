@@ -212,7 +212,7 @@ class EditEntityTestCase(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
     @override_settings(SANZA_SHOW_BILLING_ADDRESS=True)
-    def test_view_edit_contact_show_billing_address(self):
+    def test_view_edit_show_billing_address(self):
         """view edit contact form with billing address setting On"""
         entity = mommy.make(models.Entity, is_single_contact=False)
         response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))
@@ -221,7 +221,7 @@ class EditEntityTestCase(BaseTestCase):
         self.assertEqual(1, len(soup.select("#id_billing_address")))
 
     @override_settings(SANZA_SHOW_BILLING_ADDRESS=False)
-    def test_view_edit_contact_hide_billing_address(self):
+    def test_view_edit_hide_billing_address(self):
         """view edit contact form with billing address setting Off"""
         entity = mommy.make(models.Entity, is_single_contact=False)
         response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))

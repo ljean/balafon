@@ -30,9 +30,13 @@ class Fieldset(object):
 
 class FormWithFieldsetMixin(object):
 
+    def get_fieldsets(self):
+        """return the list of fieldsets"""
+        return self.Meta.fieldsets
+
     @property
     def fieldsets(self):
-        for fieldset_name, fieldset_attrs in self.Meta.fieldsets:
+        for fieldset_name, fieldset_attrs in self.get_fieldsets():
 
             fields = []
             for field_name in fieldset_attrs.get('fields', None) or []:
