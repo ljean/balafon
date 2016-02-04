@@ -8,19 +8,13 @@ import floppyforms as forms
 
 from sanza.Crm import models
 from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
-from sanza.Crm.settings import NO_ENTITY_TYPE
+from sanza.Crm.settings import show_billing_address, NO_ENTITY_TYPE
 from sanza.Crm.widgets import EntityAutoComplete
-
+from sanza.Crm.utils import hide_billing_address
 
 class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit entity form"""
 
-    def __init__(self, *args, **kwargs):
-        super(EntityForm, self).__init__(*args, **kwargs)
-        
-        if NO_ENTITY_TYPE:
-            self.fields["type"].widget = forms.HiddenInput()
-        
     class Meta:
         """form is defined from model"""
         model = models.Entity
@@ -49,6 +43,16 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
             }),
             ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
         ]
+
+    def __init__(self, *args, **kwargs):
+        if not show_billing_address():
+            hide_billing_address(self.Meta.fieldsets)
+
+        super(EntityForm, self).__init__(*args, **kwargs)
+
+        if NO_ENTITY_TYPE:
+            self.fields["type"].widget = forms.HiddenInput()
+
     
     def clean_logo(self):
         """logo validation"""

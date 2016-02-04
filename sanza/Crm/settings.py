@@ -55,3 +55,8 @@ def has_language_choices():
 def get_subscription_default_value():
     """returns the default value for subscriptions when """
     return getattr(project_settings, 'SANZA_SUBSCRIPTION_DEFAULT_VALUE', False)
+
+
+def show_billing_address():
+    """returns True if we must display the Billing address tab on contact and entity form"""
+    return getattr(project_settings, 'SANZA_SHOW_BILLING_ADDRESS', True)

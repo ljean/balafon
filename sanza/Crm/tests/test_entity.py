@@ -4,7 +4,9 @@
 from bs4 import BeautifulSoup
 import json
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from model_mommy import mommy
 
@@ -208,6 +210,34 @@ class EditEntityTestCase(BaseTestCase):
         entity = mommy.make(models.Entity, is_single_contact=False)
         response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))
         self.assertEqual(200, response.status_code)
+
+    @override_settings(SANZA_SHOW_BILLING_ADDRESS=True)
+    def test_view_edit_contact_show_billing_address(self):
+        """view edit contact form with billing address setting On"""
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("#id_billing_address")))
+
+    @override_settings(SANZA_SHOW_BILLING_ADDRESS=False)
+    def test_view_edit_contact_hide_billing_address(self):
+        """view edit contact form with billing address setting Off"""
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(0, len(soup.select("#id_billing_address")))
+
+    @override_settings()
+    def test_default_for_show_billing_address(self):
+        """Check default value for SANZA_SHOW_BILLING_ADDRESS"""
+        del settings.SANZA_SHOW_BILLING_ADDRESS
+        entity = mommy.make(models.Entity, is_single_contact=False)
+        response = self.client.get(reverse('crm_edit_entity', args=[entity.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("#id_billing_address")))
 
     def test_edit_entity(self):
         """edit entity"""

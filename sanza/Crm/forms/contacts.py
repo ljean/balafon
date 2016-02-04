@@ -13,10 +13,11 @@ from coop_cms.bs_forms import ModelForm as BsModelForm
 from sanza.Crm import models
 from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm
 from sanza.Crm.settings import (
-    get_language_choices, has_language_choices, get_subscription_default_value, ALLOW_COUPLE_GENDER
+    get_language_choices, has_language_choices, get_subscription_default_value, show_billing_address,
+    ALLOW_COUPLE_GENDER,
 )
 from sanza.Crm.widgets import ContactAutoComplete
-
+from sanza.Crm.utils import hide_billing_address
 
 class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit contact form"""
@@ -74,6 +75,9 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             field_name = "subscription_{0}".format(subscription_type.id)
             if field_name not in fieldset_fields:
                 fieldset_fields.append(field_name)
+
+        if not show_billing_address():
+            hide_billing_address(self.Meta.fieldsets)
 
         super(ContactForm, self).__init__(*args, **kwargs)
 

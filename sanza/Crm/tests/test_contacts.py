@@ -461,6 +461,37 @@ class EditContactTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
+    @override_settings(SANZA_SHOW_BILLING_ADDRESS=True)
+    def test_view_edit_contact_show_billing_address(self):
+        """view edit contact form with billing address setting On"""
+        contact = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("#id_billing_address")))
+
+    @override_settings(SANZA_SHOW_BILLING_ADDRESS=False)
+    def test_view_edit_contact_hide_billing_address(self):
+        """view edit contact form with billing address setting Off"""
+        contact = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(0, len(soup.select("#id_billing_address")))
+
+    @override_settings()
+    def test_default_for_show_billing_address(self):
+        """Check default value for SANZA_SHOW_BILLING_ADDRESS"""
+        del settings.SANZA_SHOW_BILLING_ADDRESS
+        contact = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("#id_billing_address")))
+
     def test_edit_contact(self):
         """view edit contact form"""
         contact = mommy.make(models.Contact)
