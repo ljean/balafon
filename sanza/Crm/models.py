@@ -821,7 +821,6 @@ class Contact(AddressModel):
         elif not self.entity.is_single_contact:
             return self.entity.get_foreign_country()
 
-
     def get_email_address(self):
         """email address"""
         if self.lastname or self.firstname:
@@ -854,9 +853,12 @@ class Contact(AddressModel):
         return self.entity.name if self.has_entity() else u""
             
     def __unicode__(self):
+        fullname = u"{0} {1}".format(self.lastname, self.firstname).strip()
+        if not fullname:
+            fullname = self.email
         if self.entity.is_single_contact:
-            return u"{0} {1}".format(self.lastname, self.firstname)
-        return u"{0} {1} ({2})".format(self.lastname, self.firstname, self.entity.name)
+            return fullname
+        return u"{0} ({1})".format(fullname, self.entity.name)
             
     @property
     def fullname(self):

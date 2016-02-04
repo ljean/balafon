@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
-from django.db.models import Q
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -11,16 +10,30 @@ import floppyforms as forms
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm
+from sanza.Crm.forms.base import (
+    ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm, HidableModelMultipleChoiceField
+)
 from sanza.Crm.settings import (
     get_language_choices, has_language_choices, get_subscription_default_value, show_billing_address,
     ALLOW_COUPLE_GENDER,
 )
+from sanza.Crm.utils import get_suggested_same_as_contacts
 from sanza.Crm.widgets import ContactAutoComplete
 
 
 class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit contact form"""
+    same_as_suggestions = forms.ChoiceField(
+        label=_(u'Same-as contacts'),
+        choices=[],
+        required=False,
+        help_text=_(
+            u'If this is a new contact for an existing person, you can link the different contacts between them'
+        ),
+        widget=forms.Select(
+            attrs={'class': 'chosen-select', 'data-placeholder': _(u'Select same-as contacts'), 'style': "width: 100%;"}
+        )
+    )
 
     class Meta:
         """form is defined from model"""
@@ -31,7 +44,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
             'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2', 'billing_address3',
-            'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country',
+            'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country', 'same_as_suggestions'
         )
         widgets = {
             'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
@@ -42,7 +55,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         fieldsets = [
             ('name', {
                 'fields': [
-                    'gender', 'lastname', 'firstname', 'email', 'phone', 'mobile',
+                    'gender', 'lastname', 'firstname', 'email', 'same_as_suggestions', 'phone', 'mobile'
                 ],
                 'legend': _(u'Name')
             }),
@@ -99,6 +112,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
 
         # define the allowed gender
         gender_choices = [
+            (0, u'-------'),
             (models.Contact.GENDER_MALE, ugettext(u'Mr')),
             (models.Contact.GENDER_FEMALE, ugettext(u'Mrs')),
         ]
@@ -132,6 +146,27 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             )
         else:
             self.fields['favorite_language'].widget = forms.HiddenInput()
+
+        if not self.instance or not any([self.instance.lastname, self.instance.firstname, self.instance.email]):
+            # If the contact has not been created of not filled
+            pass
+            # keep the widget
+            if len(args):
+                # The form has been posted; we must initialize the list with allowed values
+                contact_id = self.instance.id if self.instance else None
+                post_data = args[0]
+                lastname = post_data.get('lastname', '')
+                firstname = post_data.get('firstname', '')
+                email = post_data.get('email', '')
+                same_as_contacts = get_suggested_same_as_contacts(
+                    contact_id=contact_id, lastname=lastname, firstname=firstname, email=email
+                )
+                self.fields['same_as_suggestions'].choices = [
+                    (contact.id, unicode(contact)) for contact in same_as_contacts
+                ]
+        else:
+            # hide the field
+            self.fields['same_as_suggestions'].widget = forms.HiddenInput()
 
     def get_fieldsets(self):
         """return the list of fieldsets"""
@@ -176,11 +211,36 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                         accept_subscription=True
                     )
 
+    def clean_same_as_suggestions(self):
+        contact_id = self.cleaned_data.get('same_as_suggestions', '')
+        if contact_id:
+            try:
+                contact = models.Contact.objects.get(id=contact_id)
+                return contact
+            except models.Contact.DoesNotExist:
+                raise ValidationError(ugettext(u"Contact does'nt exist"))
+
+    def save_same_as(self, this_contact):
+        contact = self.cleaned_data['same_as_suggestions']
+        if contact:
+            # if not found create one
+            if not contact.same_as:
+                this_contact.same_as = models.SameAs.objects.create()
+                this_contact.same_as_priority = 2
+                contact.same_as = this_contact.same_as
+                contact.same_as_priority = 1
+                contact.save()
+            else:
+                this_contact.same_as = contact.same_as
+                this_contact.same_as_priority = contact.same_as.contact_set.count() + 1
+            this_contact.save()
+
     def save(self, *args, **kwargs):
         """save"""
         contact = super(ContactForm, self).save(*args, **kwargs)
         if kwargs.get('commit', True):
             self.save_contact_subscriptions(contact)
+            self.save_same_as(contact)
         return contact
 
 
@@ -256,22 +316,36 @@ class SameAsPriorityForm(BetterBsForm):
         return value
 
 
+class SameAsSuggestionForm(forms.Form):
+    """
+    generate suggestion list from a few data.
+    This form is not displayed and used by json API
+    """
+    id = forms.IntegerField(required=False)
+    lastname = forms.CharField(required=False)
+    firstname = forms.CharField(required=False)
+    email = forms.CharField(required=False)
+
+    def get_suggested_contacts(self):
+        """return list a suggestions for same as"""
+        contact_id = self.cleaned_data['id']
+        lastname = self.cleaned_data['lastname']
+        firstname = self.cleaned_data['firstname']
+        email = self.cleaned_data['email']
+        return get_suggested_same_as_contacts(
+            contact_id=contact_id, lastname=lastname, firstname=firstname, email=email
+        )
+
+
 class SameAsForm(forms.Form):
     """Define "same as" for two contacts"""
     contact = forms.IntegerField(label=_(u"Contact"))
 
     def __init__(self, contact, *args, **kwargs):
         super(SameAsForm, self).__init__(*args, **kwargs)
-        if contact.email:
-            potential_contacts = models.Contact.objects.filter(
-                Q(lastname__iexact=contact.lastname, firstname__iexact=contact.firstname) |
-                Q(email=contact.email) | Q(entity__email=contact.email),
-            )
-        else:
-            potential_contacts = models.Contact.objects.filter(
-                lastname__iexact=contact.lastname, firstname__iexact=contact.firstname
-            )
-        potential_contacts = potential_contacts.exclude(id=contact.id)
+        potential_contacts = get_suggested_same_as_contacts(
+            contact_id=contact.id, lastname=contact.lastname, firstname=contact.firstname, email=contact.email
+        )
         if contact.same_as:
             # Do not propose again current SameAs
             potential_contacts = potential_contacts.exclude(same_as=contact.same_as)

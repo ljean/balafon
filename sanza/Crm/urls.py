@@ -89,6 +89,7 @@ urlpatterns = [
 
     # relationships
     url(r'^same-as/(?P<contact_id>\d+)/$', relationships.same_as, name='crm_same_as'),
+    url('^same-as-suggestions/$', relationships.get_same_as_suggestions, name='crm_same_as_suggestions'),
     url(
         r'^remove-same-as/(?P<current_contact_id>\d+)/(?P<contact_id>\d+)/$',
         relationships.remove_same_as,

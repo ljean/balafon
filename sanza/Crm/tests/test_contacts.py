@@ -140,6 +140,8 @@ class SingleContactTest(BaseTestCase):
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Contact.objects.count(), 0)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("select#id_same_as_suggestions")))
 
     def test_add_single_contact(self):
         url = reverse('crm_add_single_contact')
@@ -172,7 +174,6 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 0)
-
 
         self.assertEqual(models.Contact.objects.count(), 1)
         john_doe = models.Contact.objects.all()[0]
@@ -280,14 +281,11 @@ class SingleContactTest(BaseTestCase):
 
 class ContactEntitiesSuggestListTestCase(BaseTestCase):
 
-    #def setUp(self):
-    #    super(ContactEntitiesSuggestListTestCase, self).setUp()
-
     def test_entities_not_logged(self):
         self.client.logout()
         response = self.client.get(reverse('crm_get_entities')+'?term=c')
         self.assertEqual(302, response.status_code)
-        #login url without lang prefix
+        # login url without lang prefix
         login_url = reverse('django.contrib.auth.views.login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
@@ -349,7 +347,6 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
 
         c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
         c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
-        #c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
         c3 = e2.default_contact
         e2.default_contact.lastname = "bbb"
         e2.default_contact.save()
@@ -456,10 +453,12 @@ class EditContactTest(BaseTestCase):
 
     def test_view_edit_contact(self):
         """view edit contact form"""
-        contact = mommy.make(models.Contact)
+        contact = mommy.make(models.Contact, lastname='ABCD')
         url = reverse('crm_edit_contact', args=[contact.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("input#id_same_as_suggestions")))
 
     @override_settings(SANZA_SHOW_BILLING_ADDRESS=True)
     def test_view_edit_contact_show_billing_address(self):
@@ -590,9 +589,430 @@ class EditContactTest(BaseTestCase):
         self.assertEqual(contact.city.name, data['city'])
         self.assertEqual(contact.billing_city.name, data['billing_city'])
 
-    def _check_redirect_url(self, response, next_url):
-        redirect_url = response.redirect_chain[-1][0]
-        self.assertEqual(redirect_url, "http://testserver"+next_url)
+    def test_edit_contact_city(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.id, data['city'])
+
+    def test_edit_contact_keep_note(self):
+        c = mommy.make(models.Contact, notes="Toto")
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.notes, "Toto")
+
+    def test_edit_contact_utf(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pepe@mémé.fr"
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.email, data['email'])
+
+    def test_edit_contact_utf2(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pépé@mémé.fr"
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertNotEqual(c.lastname, data['lastname'])
+        self.assertNotEqual(c.firstname, data['firstname'])
+        self.assertNotEqual(c.email, data['email'])
+
+    @override_settings(SECRET_KEY=u"super-héros")
+    def test_create_contact_uuid(self):
+        data = {
+            'lastname': u'Mémé',
+            'firstname': u'Pépé',
+            "email": u"pepe@mémé.fr"
+        }
+        c = mommy.make(models.Contact, **data)
+
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.email, data['email'])
+
+    def test_edit_contact_unknown_city(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': "ImagineCity",
+            'zip_code': "42999",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[c.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertEqual(c.lastname, data['lastname'])
+        self.assertEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city.name, data['city'])
+
+    def test_edit_contact_unknown_city_no_zipcode(self):
+        c = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[c.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': "ImagineCity",
+        }
+        response = self.client.post(url, data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(response.redirect_chain), 0)
+
+        c = models.Contact.objects.get(id=c.id)
+        self.assertNotEqual(c.lastname, data['lastname'])
+        self.assertNotEqual(c.firstname, data['firstname'])
+        self.assertEqual(c.city, None)
+
+
+class EditContactSameAsTest(BaseTestCase):
+    """It should be possible to edit a contact"""
+    fixtures = ['zones.json', ]
+
+    def test_view_edit_contact_with_email(self):
+        """view edit contact form"""
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='contact@company.com')
+        url = reverse('crm_edit_contact', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("input#id_same_as_suggestions")))
+
+    def test_view_edit_contact_unknown(self):
+        """view edit contact form"""
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("select#id_same_as_suggestions")))
+
+    def test_view_add_contact_with_email(self):
+        """view edit contact form"""
+        entity = mommy.make(models.Entity)
+        url = reverse('crm_add_contact', args=[entity.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(1, len(soup.select("select#id_same_as_suggestions")))
+
+    def test_edit_contact_same_as(self):
+        """view edit contact form"""
+        same_contact = mommy.make(models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr')
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': same_contact.lastname.upper(),
+            'firstname': same_contact.firstname,
+            'email': 'contact@def.fr',
+            'same_as_suggestions': same_contact.id
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        same_contact = models.Contact.objects.get(id=same_contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertEqual(getattr(contact, field), data[field])
+
+        self.assertNotEqual(contact.same_as, None)
+        self.assertEqual(same_contact.same_as, contact.same_as)
+        self.assertEqual(same_contact.same_as_priority, 1)
+        self.assertEqual(contact.same_as_priority, 2)
+
+    def test_edit_contact_same_as_email(self):
+        """view edit contact form"""
+        same_contact = mommy.make(models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr')
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': 'Durand',
+            'firstname': 'Pierre',
+            'email': same_contact.email,
+            'same_as_suggestions': same_contact.id
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        same_contact = models.Contact.objects.get(id=same_contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertEqual(getattr(contact, field), data[field])
+
+        self.assertNotEqual(contact.same_as, None)
+        self.assertEqual(same_contact.same_as, contact.same_as)
+        self.assertEqual(same_contact.same_as_priority, 1)
+        self.assertEqual(contact.same_as_priority, 2)
+
+    def test_edit_contact_same_as_existing(self):
+        """view edit contact form"""
+        same_as = mommy.make(models.SameAs)
+        same_contact1 = mommy.make(
+            models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr',
+            same_as=same_as, same_as_priority=1
+        )
+        same_contact2 = mommy.make(
+            models.Contact, lastname='Dupond', firstname='Paul', same_as=same_as, same_as_priority=2
+        )
+
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': same_contact1.lastname,
+            'firstname': same_contact1.firstname,
+            'email': 'contact@def.fr',
+            'same_as_suggestions': same_contact1.id
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        same_contact1 = models.Contact.objects.get(id=same_contact1.id)
+        same_contact2 = models.Contact.objects.get(id=same_contact2.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertEqual(getattr(contact, field), data[field])
+
+        self.assertEqual(contact.same_as, same_as)
+        self.assertEqual(same_contact1.same_as, same_as)
+        self.assertEqual(same_contact2.same_as, same_as)
+        self.assertEqual(same_contact1.same_as_priority, 1)
+        self.assertEqual(same_contact2.same_as_priority, 2)
+        self.assertEqual(contact.same_as_priority, 3)
+
+    def test_edit_contact_invalid(self):
+        """view edit contact form"""
+        same_contact = mommy.make(models.Contact, lastname=u'Dupond', firstname=u'Paul', email=u'contact@abc.fr')
+
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': u'Durand',
+            'firstname': u'Pierre',
+            'email': u'contact@def.fr',
+            'same_as_suggestions': same_contact.id
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        same_contact = models.Contact.objects.get(id=same_contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertNotEqual(getattr(contact, field), data[field])
+
+        self.assertEqual(contact.same_as, None)
+        self.assertEqual(contact.same_as_priority, 0)
+        self.assertEqual(same_contact.same_as, None)
+        self.assertEqual(same_contact.same_as_priority, 0)
+
+    def test_edit_contact_invalid2(self):
+        """view edit contact form"""
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': u'Durand',
+            'firstname': u'Pierre',
+            'email': u'contact@def.fr',
+            'same_as_suggestions': "hjkhk"
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+
+        contact = models.Contact.objects.get(id=contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertNotEqual(getattr(contact, field), data[field])
+
+        self.assertEqual(contact.same_as, None)
+        self.assertEqual(contact.same_as_priority, 0)
+
+    def test_edit_contact_invalid3(self):
+        """view edit contact form"""
+        contact = mommy.make(models.Contact, lastname='', firstname='', email='')
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': u'Durand',
+            'firstname': u'Pierre',
+            'email': u'contact@def.fr',
+            'same_as_suggestions': contact.id + 1
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+
+        contact = models.Contact.objects.get(id=contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertNotEqual(getattr(contact, field), data[field])
+
+        self.assertEqual(contact.same_as, None)
+        self.assertEqual(contact.same_as_priority, 0)
+
+    def test_add_contact_same_as(self):
+        """view edit contact form"""
+        entity = mommy.make(models.Entity)
+        url = reverse('crm_add_contact', args=[entity.id])
+
+        same_contact = mommy.make(models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr')
+
+        data = {
+            'lastname': same_contact.lastname.upper(),
+            'firstname': same_contact.firstname,
+            'email': 'contact@def.fr',
+            'same_as_suggestions': same_contact.id
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(entity=entity.id, lastname=data['lastname'])
+        same_contact = models.Contact.objects.get(id=same_contact.id)
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertEqual(getattr(contact, field), data[field])
+
+        self.assertNotEqual(contact.same_as, None)
+        self.assertEqual(same_contact.same_as, contact.same_as)
+        self.assertEqual(same_contact.same_as_priority, 1)
+        self.assertEqual(contact.same_as_priority, 2)
+
+    def test_add_single_contact_same_as(self):
+        """view edit contact form"""
+        same_contact = mommy.make(models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr')
+        url = reverse('crm_add_single_contact')
+
+        data = {
+            'lastname': same_contact.lastname.upper(),
+            'firstname': same_contact.firstname,
+            'email': 'contact@def.fr',
+            'same_as_suggestions': same_contact.id
+        }
+        response = self.client.post(url, data=data)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        self.assertEqual(200, response.status_code)
+        same_contact = models.Contact.objects.get(id=same_contact.id)
+        contact = models.Contact.objects.get(lastname=data['lastname'])
+
+        for field in ('lastname', 'firstname', 'email'):
+            self.assertEqual(getattr(contact, field), data[field])
+
+        self.assertNotEqual(contact.same_as, None)
+        self.assertEqual(same_contact.same_as, contact.same_as)
+        self.assertEqual(same_contact.same_as_priority, 1)
+        self.assertEqual(contact.same_as_priority, 2)
+
+
+class EditContactSubscriptionTest(BaseTestCase):
+    """It should be possible to edit a contact"""
+    fixtures = ['zones.json', ]
+
+    @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=False)
+    def test_add_contact_subscription_set(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'subscription_{0}'.format(st1.id): True,
+            'subscription_{0}'.format(st2.id): False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        c = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'])
+        self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
+        self.assertEqual(models.Subscription.objects.filter(subscription_type=st2, contact=c).count(), 0)
 
     @override_settings(SANZA_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_edit_contact_subscriptions(self):
@@ -785,27 +1205,6 @@ class EditContactTest(BaseTestCase):
         self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
         self.assertEqual(models.Subscription.objects.filter(subscription_type=st2, contact=c).count(), 0)
 
-    def test_edit_contact_city(self):
-        c = mommy.make(models.Contact)
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': 'Dupond',
-            'firstname': 'Paul',
-            'city': models.City.objects.get(name="Paris").id,
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 0)
-        next_url = reverse('crm_view_contact', args=[c.id])
-        self.assertContains(response, "<script>")
-        self.assertContains(response, next_url)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertEqual(c.lastname, data['lastname'])
-        self.assertEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.city.id, data['city'])
-
     def test_edit_contact_subscription_not_set(self):
         st1 = mommy.make(models.SubscriptionType)
         st2 = mommy.make(models.SubscriptionType)
@@ -865,121 +1264,3 @@ class EditContactTest(BaseTestCase):
         self.assertEqual(c.city.id, data['city'])
         self.assertEqual(models.Subscription.objects.get(subscription_type=st1, contact=c).accept_subscription, True)
         self.assertEqual(models.Subscription.objects.get(subscription_type=st2, contact=c).accept_subscription, False)
-
-    def test_edit_contact_keep_note(self):
-        c = mommy.make(models.Contact, notes="Toto")
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': 'Dupond',
-            'firstname': 'Paul',
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 0)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertEqual(c.lastname, data['lastname'])
-        self.assertEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.notes, "Toto")
-
-    def test_edit_contact_utf(self):
-        c = mommy.make(models.Contact)
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pepe@mémé.fr"
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 0)
-        next_url = reverse('crm_view_contact', args=[c.id])
-        self.assertContains(response, "<script>")
-        self.assertContains(response, next_url)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertEqual(c.lastname, data['lastname'])
-        self.assertEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.email, data['email'])
-
-    def test_edit_contact_utf2(self):
-        c = mommy.make(models.Contact)
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pépé@mémé.fr"
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertNotEqual(c.lastname, data['lastname'])
-        self.assertNotEqual(c.firstname, data['firstname'])
-        self.assertNotEqual(c.email, data['email'])
-
-    @override_settings(SECRET_KEY=u"super-héros")
-    def test_create_contact_uuid(self):
-        data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pepe@mémé.fr"
-        }
-        c = mommy.make(models.Contact, **data)
-
-        self.assertEqual(c.lastname, data['lastname'])
-        self.assertEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.email, data['email'])
-
-    def test_edit_contact_unknown_city(self):
-        c = mommy.make(models.Contact)
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': 'Dupond',
-            'firstname': 'Paul',
-            'city': "ImagineCity",
-            'zip_code': "42999",
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 0)
-        next_url = reverse('crm_view_contact', args=[c.id])
-        self.assertContains(response, "<script>")
-        self.assertContains(response, next_url)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertEqual(c.lastname, data['lastname'])
-        self.assertEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.city.name, data['city'])
-
-    def test_edit_contact_unknown_city_no_zipcode(self):
-        c = mommy.make(models.Contact)
-        url = reverse('crm_edit_contact', args=[c.id])
-        data = {
-            'lastname': 'Dupond',
-            'firstname': 'Paul',
-            'city': "ImagineCity",
-        }
-        response = self.client.post(url, data, follow=True)
-        self.assertEqual(200, response.status_code)
-        errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
-        self.assertEqual(len(response.redirect_chain), 0)
-
-        c = models.Contact.objects.get(id=c.id)
-        self.assertNotEqual(c.lastname, data['lastname'])
-        self.assertNotEqual(c.firstname, data['firstname'])
-        self.assertEqual(c.city, None)
-
-
-# 'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
-# 'email', 'phone', 'mobile', 'favorite_language',
-# 'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
-# 'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
-# 'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2', 'billing_address3',
-# 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country',

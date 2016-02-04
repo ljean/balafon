@@ -200,12 +200,15 @@ def add_single_contact(request):
                 is_single_contact=True
             )
             entity.save()
-            #This create a default contact
+            # This create a default contact
             default_contact = entity.default_contact
 
-            contact = contact_form.save(commit=False)
             contact.entity = entity
-            contact.save()
+            contact = contact_form.save()
+
+            # contact = contact_form.save(commit=False)
+            # contact.entity = entity
+            # contact.save()
 
             default_contact.delete()
             # change name of the entity

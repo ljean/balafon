@@ -3,6 +3,7 @@
 
 from bs4 import BeautifulSoup
 from cStringIO import StringIO
+import json
 import sys
 
 
@@ -891,3 +892,199 @@ class FindSameAsTest(BaseTestCase):
         self.assertTrue(contact3 in qs[0].contacts.all())
         self.assertFalse(contact4 in qs[0].contacts.all())
         self.assertFalse(contact5 in qs[0].contacts.all())
+
+
+class SameAsSuggestionApiTest(BaseTestCase):
+    """Return json list with Same_as contact"""
+
+    def test_empty(self):
+        """it should return empty list"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'lastname': 'Solo'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(0, len(resp_data))
+
+    def test_lastname(self):
+        """it should return list with 1 contact"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'lastname': 'Skywalker'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(1, len(resp_data))
+        self.assertEqual(resp_data[0]['id'], contact2.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+
+    def test_fullname(self):
+        """it should return list with 1 contact"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'lastname': 'Skywalker',
+            'firstname': 'Luke'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(1, len(resp_data))
+        self.assertEqual(resp_data[0]['id'], contact1.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+
+    def test_email(self):
+        """it should return list with 2 contacts"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'lastname': 'Skywalker',
+            'firstname': '',
+            'email': 'luke@starwars.com'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(2, len(resp_data))
+        resp_data = sorted(resp_data, key=lambda contact: contact['id'])
+        self.assertEqual(resp_data[0]['id'], contact1.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+        self.assertEqual(resp_data[1]['id'], contact2.id)
+        self.assertNotEqual(resp_data[1]['fullname'], '')
+
+    def test_only_email(self):
+        """it should return list with 1 contact"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'lastname': '',
+            'firstname': '',
+            'email': 'luke@starwars.com'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(1, len(resp_data))
+        resp_data = sorted(resp_data, key=lambda contact: contact['id'])
+        self.assertEqual(resp_data[0]['id'], contact1.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+
+
+    def test_entity_email(self):
+        """it should return contact based on entity email"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+        entity.default_contact.delete()
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'email': 'contact@starwars.com'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(1, len(resp_data))
+        resp_data = sorted(resp_data, key=lambda contact: contact['id'])
+        self.assertEqual(resp_data[0]['id'], contact2.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+
+    def test_ignore_existing(self):
+        """it should not return the contact with the given id"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+        contact3 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'id': contact3.id,
+            'lastname': 'Skywalker',
+            'firstname': '',
+            'email': 'luke@starwars.com'
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        resp_data = json.loads(response.content)
+        self.assertEqual(2, len(resp_data))
+        resp_data = sorted(resp_data, key=lambda contact: contact['id'])
+        self.assertEqual(resp_data[0]['id'], contact1.id)
+        self.assertNotEqual(resp_data[0]['fullname'], '')
+        self.assertEqual(resp_data[1]['id'], contact2.id)
+        self.assertNotEqual(resp_data[1]['fullname'], '')
+
+    def test_anonymous(self):
+        """it should return permission denied"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'id': contact1.id,
+            'lastname': 'Skywalker',
+            'firstname': '',
+            'email': 'luke@starwars.com'
+        }
+
+        self.client.logout()
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_not_allowed(self):
+        """it should return permission denied"""
+        entity = mommy.make(models.Entity, name='StarWars', email='contact@starwars.com')
+        contact1 = mommy.make(models.Contact, lastname='Skywalker', firstname='Luke', email='luke@starwars.com')
+        contact2 = mommy.make(models.Contact, entity=entity, lastname='Skywalker', firstname='', email='')
+
+        url = reverse('crm_same_as_suggestions')
+        data = {
+            'id': contact1.id,
+            'lastname': 'Skywalker',
+            'firstname': '',
+            'email': 'luke@starwars.com'
+        }
+
+        self.user.is_staff = False
+        self.user.save()
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)

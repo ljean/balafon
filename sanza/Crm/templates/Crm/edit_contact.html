@@ -4,6 +4,45 @@
 {% block extra_head %}
   {{block.super}}
   {% include "sanza/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
+  <script>
+  var reloadSameAs = function () {
+    var elt = $("#id_same_as_suggestions");
+    var container = elt.closest('.form-group');
+    if (elt.length) {
+      container.hide();
+      $('#id_lastname, #id_firstname, #id_email').change(function() {
+        var url = '{% url "crm_same_as_suggestions" %}';
+        var data = {
+          lastname: $("#id_lastname").val(),
+          firstname: $("#id_firstname").val(),
+          email: $("#id_email").val()
+        };
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: data,
+          success: function (recvData) {
+            elt.empty(); // remove old options
+            elt.append($("<option></option>").attr("value", '').text(''));
+            for (var i= 0, l=recvData.length; i<l; i++){
+              var contact = recvData[i];
+              elt.append($("<option></option>").attr("value", contact.id).text(contact.fullname));
+            }
+            elt.trigger("chosen:updated");
+            if (recvData.length) {
+              container.show();
+              $.colorbox.resize();
+            } else {
+              container.hide();
+            }
+          },
+          dataType: 'json'
+        });
+      });
+    }
+  };
+  $(document).bind('cbox_complete', reloadSameAs);
+  </script>
 {% endblock %}
 
 {% block title %}{% if contact %}{% trans "Edit contact" %}{% else %}{% trans "Create contact" %}{% endif %}{% endblock %}

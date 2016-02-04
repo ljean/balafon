@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """relationships between contacts"""
 
+import json
+
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
@@ -118,6 +120,21 @@ def same_as(request, contact_id):
         {'contact': contact, 'form': form},
         context_instance=RequestContext(request)
     )
+
+
+@user_passes_test(can_access)
+def get_same_as_suggestions(request):
+    """JSON API for getting same as contacts"""
+    if request.method == "POST":
+        form = forms.SameAsSuggestionForm(request.POST)
+        if form.is_valid():
+            suggestion_list = []
+            for contact in form.get_suggested_contacts():
+                suggestion_list.append({'id': contact.id, 'fullname': unicode(contact)})
+
+            return HttpResponse(json.dumps(suggestion_list), content_type='application/json')
+    else:
+        raise Http404
 
 
 @user_passes_test(can_access)

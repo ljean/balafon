@@ -5,6 +5,7 @@ import csv
 import codecs
 
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from sanza.Crm import models
 from sanza.Crm import settings as crm_settings
@@ -148,3 +149,23 @@ def get_default_country():
             zone_type = models.ZoneType.objects.create(type="country", name=u"Country")
         default_country = models.Zone.objects.create(name=country_name, parent=None, type=zone_type)
     return default_country
+
+
+def get_suggested_same_as_contacts(contact_id=None, lastname='', firstname='', email=''):
+    """return list a suggestions for same as"""
+    if not lastname and not email:
+        return models.Contact.objects.none()
+    else:
+        query_criteria = None
+        if lastname:
+            query_criteria = Q(lastname__iexact=lastname, firstname__iexact=firstname)
+        if email:
+            email_criteria = Q(email__iexact=email) | Q(entity__email__iexact=email)
+            if query_criteria:
+                query_criteria = query_criteria | email_criteria
+            else:
+                query_criteria = email_criteria
+        queryset = models.Contact.objects.filter(query_criteria)
+        if contact_id:
+            queryset = queryset.exclude(id=contact_id)
+        return queryset

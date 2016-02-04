@@ -15,6 +15,10 @@ from sanza.Crm.widgets import CityAutoComplete
 from sanza.Crm.utils import get_default_country
 
 
+class HidableModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    hidden_widget = forms.HiddenInput
+
+
 class Fieldset(object):
 
     def __init__(self, name, fields, legend, classes):
