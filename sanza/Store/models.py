@@ -9,10 +9,10 @@ import xlrd
 
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
-from django.db.models.signals import pre_delete, post_save
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sanza.Crm.models import Action, ActionMenu, ActionStatus, ActionType

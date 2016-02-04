@@ -9,6 +9,7 @@ from urlparse import urlparse
 from django import VERSION as DJANGO_VERSION
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import pre_delete
 from django.conf import settings as project_settings
 from django.contrib.auth.models import User
 if DJANGO_VERSION >= (1, 8, 0):
@@ -503,8 +504,35 @@ class SameAs(models.Model):
     """Link between two contacts for the same physical person"""
 
     def __unicode__(self):
-        return _(u"Same As: {0}").format(self.id)
-    
+        return _(u"Same As: {0}").format(
+            [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')]
+        )
+
+    def priority_contact(self):
+        """Th econtact with priority 1"""
+        try:
+            return u"{0}".format(
+                [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
+            )
+        except IndexError:
+            return ""
+    priority_contact.short_description = _(u'Priority contact')
+
+    def other_contacts(self):
+        """all contacts except the 1st one"""
+        try:
+            return u"{0}".format(
+                [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')][1:]
+            )
+        except IndexError:
+            return ""
+    other_contacts.short_description = _(u'Other contacts')
+
+    def contacts_count(self):
+        """Numbers of same-as contacts"""
+        return self.contact_set.count()
+    contacts_count.short_description = _(u'Contacts count')
+
     class Meta:
         verbose_name = _(u'same as')
         verbose_name_plural = _(u'sames as')
@@ -894,6 +922,28 @@ class Contact(AddressModel):
         verbose_name = _(u'contact')
         verbose_name_plural = _(u'contacts')
         ordering = ('lastname', 'firstname')
+
+
+def on_update_same_as(sender, instance, **kwargs):
+    """update the SameAs contacts when a contact is deleted"""
+    if instance.same_as:
+        if instance.same_as.contact_set.exclude(id=instance.id).count() > 1:
+            # If still some other contacts : Rebuild the priority orders for others
+            same_as_contacts = instance.same_as.contact_set.exclude(id=instance.id).order_by('same_as_priority')
+            for index, contact in enumerate(same_as_contacts):
+                contact.same_as_priority = 1 + index
+                contact.save()
+        else:
+            # If the other contact is now alone: delete the same_as
+            same_as = instance.same_as
+            for contact in same_as.contact_set.all():
+                contact.same_as = None
+                contact.same_as_priority = 0
+                contact.save()
+            same_as.delete()
+
+
+pre_delete.connect(on_update_same_as, sender=Contact)
 
 
 class SubscriptionType(models.Model):

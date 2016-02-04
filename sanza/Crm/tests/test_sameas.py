@@ -535,6 +535,7 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(1, models.SameAs.objects.count())
         same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, same_as)
@@ -566,6 +567,7 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(1, models.SameAs.objects.count())
         same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, same_as)
@@ -597,6 +599,7 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(1, models.SameAs.objects.count())
         same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, same_as)
@@ -648,6 +651,8 @@ class RemoveSameAsTest(BaseTestCase):
         contact3 = models.Contact.objects.get(id=contact3.id)
 
         self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, same_as)
         self.assertEqual(contact3.same_as, None)
@@ -679,6 +684,8 @@ class RemoveSameAsTest(BaseTestCase):
         contact3 = models.Contact.objects.get(id=contact3.id)
 
         self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, same_as)
         self.assertEqual(contact3.same_as, None)
@@ -711,6 +718,7 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(1, models.SameAs.objects.count())
         same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, None)
         self.assertEqual(contact3.same_as, same_as)
@@ -743,12 +751,59 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(1, models.SameAs.objects.count())
         same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 3)
         self.assertEqual(contact1.same_as, same_as)
         self.assertEqual(contact2.same_as, same_as)
         self.assertEqual(contact3.same_as, same_as)
         self.assertEqual(contact1.same_as_priority, 3)
         self.assertEqual(contact2.same_as_priority, 2)
         self.assertEqual(contact3.same_as_priority, 1)
+
+    def test_delete_same_as_contact(self):
+        """The same as is updated when we delete one of the orther contacts (1 remaining)"""
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact3 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for priority, contact in enumerate([contact3, contact2, contact1]):
+            contact.same_as = same_as
+            contact.same_as_priority = priority + 1
+            contact.save()
+        same_as.save()
+
+        contact3.delete()
+        # refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+        contact2 = models.Contact.objects.get(id=contact2.id)
+
+        self.assertEqual(1, models.SameAs.objects.count())
+        same_as = models.SameAs.objects.all()[0]
+        self.assertEqual(same_as.contact_set.count(), 2)
+        self.assertEqual(contact1.same_as, same_as)
+        self.assertEqual(contact2.same_as, same_as)
+        self.assertEqual(contact1.same_as_priority, 2)
+        self.assertEqual(contact2.same_as_priority, 1)
+
+    def test_delete_same_as_contact_last_one(self):
+        """The same is deleted if we delete the other contact"""
+        contact1 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+        contact2 = mommy.make(models.Contact, firstname="John", lastname="Lennon")
+
+        same_as = models.SameAs.objects.create()
+        for priority, contact in enumerate([contact2, contact1]):
+            contact.same_as = same_as
+            contact.same_as_priority = priority + 1
+            contact.save()
+        same_as.save()
+
+        contact2.delete()
+        # refresh
+        contact1 = models.Contact.objects.get(id=contact1.id)
+
+        self.assertEqual(0, models.SameAs.objects.count())
+        self.assertEqual(contact1.same_as_priority, 0)
+
 
 
 class FindSameAsTest(BaseTestCase):

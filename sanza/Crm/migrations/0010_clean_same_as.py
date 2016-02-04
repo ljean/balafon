@@ -14,23 +14,24 @@ def forwards(apps, schema_editor):
 
     for same_as in same_as_model.objects.all():
 
-        same_as.main_contact.same_as_priority = 1
-        same_as.main_contact.save()
+        if same_as.contact_set.count() == 1:
 
-        other_contacts_queryset = same_as.contact_set.exclude(id=same_as.main_contact.id)
-        for index, other_contact in enumerate(other_contacts_queryset):
-            other_contact.same_as_priority = index + 2
-            other_contact.save()
+            for contact in same_as.contact_set.all():
+                contact.same_as = None
+                contact.same_as_priority = 0
+                contact.save()
+
+        if same_as.contact_set.count() <= 1:
+
+            same_as.delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Crm', '0007_auto_20160201_1638'),
+        ('Crm', '0009_remove_sameas_main_contact'),
     ]
 
     operations = [
         migrations.RunPython(forwards),
     ]
-
-

@@ -134,7 +134,9 @@ def view_contact(request, contact_id):
     request.session["redirect_url"] = reverse('crm_view_contact', args=[contact_id])
 
     if contact.same_as:
-        same_as_contact = models.Contact.objects.filter(same_as=contact.same_as).exclude(id=contact.id)
+        same_as_contact = models.Contact.objects.filter(
+            same_as=contact.same_as
+        ).exclude(id=contact.id).order_by('same_as_priority')
 
     return render_to_response(
         'Crm/view_contact.html',

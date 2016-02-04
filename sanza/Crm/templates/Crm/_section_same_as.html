@@ -9,7 +9,7 @@
   {% for same_as_contact in same_as %}
   {% with same_as_contact.has_left as has_left %}
   <tr>
-    <td>{%trans "Same As"%}
+    <td>
       <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id same_as_contact.id %}"
         title="{% trans 'Change priority order for contact' %}"
       >
@@ -17,6 +17,7 @@
           {{ same_as_contact.same_as_priority }}
         </span>
       </a>
+      {% trans "Same As" %}
     </td>
     {% if same_as_contact.entity.is_single_contact %}
     <td colspan="2"><a href="{% url "crm_view_contact" same_as_contact.id %}">{{same_as_contact.fullname}}</a></td>

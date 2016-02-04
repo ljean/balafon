@@ -37,7 +37,15 @@ admin.site.register(models.Zone, ZoneAdmin)
 
 
 admin.site.register(models.EntityRole)
-admin.site.register(models.SameAs)
+
+
+class SameAsAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['priority_contact', 'other_contacts', 'contacts_count']
+
+admin.site.register(models.SameAs, SameAsAdmin)
+
+
 admin.site.register(models.OpportunityType)
 admin.site.register(models.ActionMenu)
 
