@@ -2,6 +2,7 @@
 """models"""
 #pylint: disable=model-no-explicit-unicode
 
+from datetime import datetime
 import uuid
 import unicodedata
 from urlparse import urlparse
@@ -1319,7 +1320,24 @@ class Action(LastModifiedModel):
     
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
-    
+
+    def show_duration(self):
+        """Show duration on action line. If False show end_time"""
+        return True
+
+    def duration(self):
+        """returns duration of the action"""
+        if self.end_datetime:
+            delta = self.end_datetime - self.planned_date
+            hours, remainder = divmod(delta.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            days, hours = divmod(hours, 24)
+
+            if days:
+                return _(u"{0} days {1}:{2:02}").format(int(days), int(hours), int(minutes))
+            else:
+                return u'{0}:{1:02}'.format(int(hours), int(minutes))
+
     def has_non_editable_document(self):
         """true if a non editable doc is linked to this action"""
         return self.type and self.type.default_template and (not self.type.is_editable)

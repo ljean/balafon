@@ -12,6 +12,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from model_mommy import mommy
 
@@ -1944,3 +1945,35 @@ class ReassignActionTest(BaseTestCase):
         self.assertEqual(action.contacts.count(), 1)
         self.assertEqual(action.entities.count(), 0)
         self.assertEqual(list(action.contacts.all()), [contact1])
+
+
+class ActionDurationTest(BaseTestCase):
+    """calculate duration test"""
+
+    def test_action_duration_same_day(self):
+        """return the duration of an action"""
+        action = mommy.make(
+            models.Action,
+            planned_date=datetime(2016, 2, 4, 14, 0),
+            end_datetime=datetime(2016, 2, 4, 16, 0)
+        )
+        self.assertEqual(action.duration(), "2:00")
+
+    def test_action_duration_same_day2(self):
+        """return the duration of an action"""
+        action = mommy.make(
+            models.Action,
+            planned_date=datetime(2016, 2, 4, 13, 48),
+            end_datetime=datetime(2016, 2, 4, 16, 15)
+        )
+        self.assertEqual(action.duration(), "2:27")
+
+    def test_action_duration_several_days(self):
+        """return the duration of an action"""
+        action = mommy.make(
+            models.Action,
+            planned_date=datetime(2016, 2, 2, 13, 48),
+            end_datetime=datetime(2016, 2, 4, 16, 15)
+        )
+        self.assertEqual(action.duration(), _(u"2 days 2:27"))
+
