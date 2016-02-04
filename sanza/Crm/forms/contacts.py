@@ -42,11 +42,17 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         fieldsets = [
             ('name', {
                 'fields': [
-                    'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job'
+                    'gender', 'lastname', 'firstname', 'email', 'phone', 'mobile',
                 ],
                 'legend': _(u'Name')
             }),
-            ('web', {'fields': ['email', 'phone', 'mobile', 'favorite_language'], 'legend': _(u'Contact details')}),
+            ('web', {
+                'fields': [
+                    'birth_date', 'title', 'role', 'job', 'favorite_language',
+                ],
+                'legend': _(u'Contact details')
+                }
+            ),
             ('address', {
                 'fields': [
                     'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',

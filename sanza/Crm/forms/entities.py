@@ -25,8 +25,12 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
             'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country',
         )
         fieldsets = [
-            ('name', {'fields': ['type', 'name', 'description', 'relationship_date'], 'legend': _(u'Name')}),
-            ('web', {'fields': ['website', 'email', 'phone', 'fax'], 'legend': _(u'Entity details')}),
+            ('name', {
+                'fields': [
+                    'type', 'name', 'description', 'relationship_date''website', 'email', 'phone', 'fax'
+                ],
+                'legend': _(u'Name')
+            }),
             ('address', {
                 'fields': [
                     'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',
