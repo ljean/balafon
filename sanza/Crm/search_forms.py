@@ -421,7 +421,7 @@ class ActionByDoneDate(TwoDatesForm):
         
     def get_lookup(self):
         """lookup"""
-        datetime1, datetime2 = self._get_dates()
+        datetime1, datetime2 = self._get_datetimes()
         return (
             (Q(action__done_date__gte=datetime1) & Q(action__done_date__lte=datetime2)) |
             (Q(entity__action__done_date__gte=datetime1) & Q(entity__action__done_date__lte=datetime2))
@@ -435,7 +435,7 @@ class ActionByPlannedDate(TwoDatesForm):
     
     def get_lookup(self):
         """lookup"""
-        datetime1, datetime2 = self._get_dates()
+        datetime1, datetime2 = self._get_datetimes()
         
         start_after_end_before = Q(
             action__end_datetime__isnull=True
@@ -482,7 +482,7 @@ class ActionByStartDate(TwoDatesForm):
     
     def get_lookup(self):
         """lookup"""
-        datetime1, datetime2 = self._get_dates()
+        datetime1, datetime2 = self._get_datetimes()
         return (
             (Q(action__planned_date__gte=datetime1) & Q(action__planned_date__lte=datetime2)) |
             (Q(entity__action__planned_date__gte=datetime1) & Q(entity__action__planned_date__lte=datetime2))
@@ -922,7 +922,7 @@ class RelationshipDateForm(TwoDatesForm):
             
     def get_lookup(self):
         """lookup"""
-        start_datetime, end_datetime = self._get_dates()
+        start_datetime, end_datetime = self._get_datetimes()
         return {'entity__relationship_date__gte': start_datetime, 'entity__relationship_date__lte': end_datetime}
 
 
@@ -1198,7 +1198,7 @@ class EntityByModifiedDate(TwoDatesForm):
 
     def get_lookup(self):
         """lookup"""
-        datetime1, datetime2 = self._get_dates()
+        datetime1, datetime2 = self._get_datetimes()
         datetime2 += timedelta(1)
         return Q(entity__is_single_contact=False, entity__modified__gte=datetime1, entity__modified__lt=datetime2)
 
@@ -1210,7 +1210,7 @@ class ContactByModifiedDate(TwoDatesForm):
 
     def get_lookup(self):
         """lookup"""
-        datetime1, datetime2 = self._get_dates()
+        datetime1, datetime2 = self._get_datetimes()
         datetime2 += timedelta(1)
         return {'modified__gte': datetime1, 'modified__lt': datetime2}
 
@@ -1222,7 +1222,7 @@ class ContactsByCreationDate(TwoDatesForm):
     
     def get_lookup(self):
         """lookup"""
-        start_datetime, end_datetime = self._get_dates()
+        start_datetime, end_datetime = self._get_datetimes()
         return Q(created__gte=start_datetime, created__lte=end_datetime)
 
 
@@ -1233,7 +1233,7 @@ class EntitiesByCreationDate(TwoDatesForm):
     
     def get_lookup(self):
         """lookup"""
-        start_datetime, end_datetime = self._get_dates()
+        start_datetime, end_datetime = self._get_datetimes()
         return Q(
             entity__is_single_contact=False, entity__created__gte=start_datetime, entity__created__lte=end_datetime
         )
@@ -1246,7 +1246,7 @@ class ContactsAndEntitiesByChangeDate(TwoDatesForm):
     
     def get_lookup(self):
         """lookup"""
-        start_datetime, end_datetime = self._get_dates()
+        start_datetime, end_datetime = self._get_datetimes()
         return Q(modified__gte=start_datetime, modified__lte=end_datetime) | \
             Q(created__gte=start_datetime, created__lte=end_datetime) | \
             Q(entity__modified__gte=start_datetime, entity__modified__lte=end_datetime) | \
@@ -1295,7 +1295,7 @@ class ContactsRelationshipByDate(TwoDatesForm):
     def get_lookup(self):
         """lookup"""
         relationship_ids = []
-        start_datetime, end_datetime = self._get_dates()
+        start_datetime, end_datetime = self._get_datetimes()
         end_datetime = end_datetime + timedelta(1)
         queryset = models.Relationship.objects.filter(created__gte=start_datetime, created__lt=end_datetime)
         for relationship_type in queryset:

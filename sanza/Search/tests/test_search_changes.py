@@ -3,14 +3,12 @@
 
 from bs4 import BeautifulSoup as BeautifulSoup4
 from datetime import date, timedelta
-from unittest import skipIf
 
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
 
 from sanza.Crm import models
-from sanza.Crm import settings as crm_settings
 from sanza.Search.tests import BaseTestCase
 
 
@@ -243,7 +241,7 @@ class ModificationDateSearchTest(BaseTestCase):
     """search by modified"""
 
     def test_contact_modified_today(self):
-        """mofidied today"""
+        """modified today"""
 
         contact1 = mommy.make(models.Contact, lastname="Azertuiop")
 
@@ -257,7 +255,7 @@ class ModificationDateSearchTest(BaseTestCase):
         self.assertContains(response, contact1.lastname)
 
     def test_search_contacts_and_entities_by_date(self):
-        """by moodifciation date"""
+        """by modification date"""
 
         # when saved 'modified' is updated
         contact1 = mommy.make(
@@ -273,8 +271,10 @@ class ModificationDateSearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup4(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
 
-        self.assertContains(response, contact1.email)
+        self.assertContains(response, contact1.lastname)
 
     def test_contact_modified_tomorrow(self):
         """modified tomorrow"""

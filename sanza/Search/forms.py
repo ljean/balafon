@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from itertools import chain
 import importlib
 import json
@@ -568,6 +568,11 @@ class TwoDatesForm(SearchFieldForm):
     def _get_dates(self):
         """return selected dates"""
         return get_date_bounds(self.value)
+
+    def _get_datetimes(self):
+        """return selected date times"""
+        start_date, end_date = get_date_bounds(self.value)
+        return datetime.combine(start_date, time.min), datetime.combine(end_date, time.max)
 
 
 class YesNoSearchFieldForm(SearchFieldForm):
