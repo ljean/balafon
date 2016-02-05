@@ -47,7 +47,6 @@ SEARCH_FORMS = [
             search_forms.TypeSearchForm if (not settings.NO_ENTITY_TYPE) else None,
             search_forms.HasEntityForm if (settings.ALLOW_SINGLE_CONTACT) else None,
             search_forms.RelationshipDateForm,
-            search_forms.EntityByModifiedDate,
             search_forms.EntityWithCustomField,
             search_forms.EntityDescriptionForm,
             search_forms.EntityNotesForm,
@@ -58,7 +57,6 @@ SEARCH_FORMS = [
             search_forms.ContactNameSearchForm,
             search_forms.ContactFirstnameSearchForm,
             search_forms.ContactRoleSearchForm,
-            search_forms.ContactByModifiedDate,
             search_forms.ContactAcceptSubscriptionSearchForm,
             search_forms.ContactRefuseSubscriptionSearchForm,
             search_forms.SecondarySearchForm,
@@ -69,7 +67,22 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
+            search_forms.ContactHasEmail,
+            search_forms.ContactHasPersonalEmail,
+            search_forms.UnknownContact,
             search_forms.ContactLanguageSearchForm,
+        ],
+    ), (
+        _(u'Changes'),
+        [
+            search_forms.EntityByModifiedDate,
+            search_forms.ContactByModifiedDate,
+            search_forms.ContactsByCreationDate,
+            search_forms.EntitiesByCreationDate,
+            search_forms.ContactsAndEntitiesByChangeDate,
+            search_forms.ContactsAndEntitiesModifiedBySearchForm,
+            search_forms.ContactsModifiedBySearchForm,
+            search_forms.EntitiesModifiedBySearchForm,
         ],
     ), (
         _(u'Actions'),
@@ -85,10 +98,6 @@ SEARCH_FORMS = [
             search_forms.ActionLtAmount,
             search_forms.ActionGteAmount,
             search_forms.HasAction,
-        ],
-    ), (
-        _(u'Opportunities'),
-        [
             search_forms.OpportunitySearchForm,
             search_forms.OpportunityNameSearchForm,
         ],
@@ -102,24 +111,20 @@ SEARCH_FORMS = [
             emailing_search_forms.EmailingBounceSearchForm,
         ],
     ), (
+        _(u'Same as'),
+        [
+            search_forms.HasSameAsForm,
+            search_forms.NoSameAsForm,
+            search_forms.NoSameEmailForm,
+        ],
+    ), (
         _(u'Admin'),
         [
             search_forms.ContactsImportSearchForm,
-            search_forms.ContactHasEmail,
-            search_forms.ContactHasPersonalEmail,
-            search_forms.UnknownContact,
-            search_forms.ContactsAndEntitiesByChangeDate,
-            search_forms.ContactsByCreationDate,
-            search_forms.ContactsByUpdateDate,
-            search_forms.EntitiesByCreationDate,
-            search_forms.EntitiesByUpdateDate,
-            search_forms.HasSameAsForm,
         ],
     ), (
         _(u'Options'),
         [
-            search_forms.NoSameAsForm,
-            search_forms.NoSameEmailForm,
             search_forms.SortContacts,
         ],
     ), (

@@ -4,6 +4,7 @@
 from datetime import date, timedelta
 
 from django.db.models import Q, Count
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 import floppyforms as forms
@@ -133,30 +134,6 @@ class HasEntityForm(YesNoSearchFieldForm):
             return ~no_entity
         else:
             return no_entity
-
-
-class EntityByModifiedDate(TwoDatesForm):
-    """every entity modified betwwen two dates"""
-    name = 'entity_by_modified_date'
-    label = _(u'Entity by modified date')
-        
-    def get_lookup(self):
-        """lookup"""
-        datetime1, datetime2 = self._get_dates()
-        datetime2 += timedelta(1)
-        return Q(entity__is_single_contact=False, entity__modified__gte=datetime1, entity__modified__lt=datetime2)
-
-
-class ContactByModifiedDate(TwoDatesForm):
-    """every contact modified between two dates"""
-    name = 'contact_by_modified_date'
-    label = _(u'Contact by modified date')
-        
-    def get_lookup(self):
-        """lookup"""
-        datetime1, datetime2 = self._get_dates()
-        datetime2 += timedelta(1)
-        return {'modified__gte': datetime1, 'modified__lt': datetime2}
 
 
 class BaseCitySearchForm(SearchFieldForm):
@@ -1174,16 +1151,69 @@ class ContactsImportSearchForm(SearchFieldForm):
         return {'imported_by': self.value}
 
 
-class ContactsByUpdateDate(TwoDatesForm):
-    """by update date"""
-    name = 'contacts_by_update_date'
-    label = _(u'Contacts by update date')
-    
+class ByUserBaseFormSearchForm(SearchFieldForm):
+    """by import"""
+
+    def __init__(self, *args, **kwargs):
+        super(ByUserBaseFormSearchForm, self).__init__(*args, **kwargs)
+        queryset = User.objects.filter(is_staff=True).order_by('username')
+        field = forms.ModelChoiceField(queryset, label=self.label)
+        self._add_field(field)
+
+
+class ContactsAndEntitiesModifiedBySearchForm(ByUserBaseFormSearchForm):
+    """by import"""
+    name = 'contacts_and_entities_modified_by'
+    label = _(u'Contacts and entities modified by')
+
     def get_lookup(self):
         """lookup"""
-        start_datetime, end_datetime = self._get_dates()
-        return Q(modified__gte=start_datetime, modified__lte=end_datetime)
-    
+        return Q(last_modified_by__id=self.value) | Q(entity__last_modified_by__id=self.value)
+
+
+class ContactsModifiedBySearchForm(ByUserBaseFormSearchForm):
+    """by import"""
+    name = 'contacts_modified_by'
+    label = _(u'Contacts and entities modified by')
+
+    def get_lookup(self):
+        """lookup"""
+        return Q(last_modified_by__id=self.value)
+
+
+class EntitiesModifiedBySearchForm(ByUserBaseFormSearchForm):
+    """by import"""
+    name = 'entities_modified_by'
+    label = _(u'Contacts and entities modified by')
+
+    def get_lookup(self):
+        """lookup"""
+        return Q(entity__last_modified_by__id=self.value)
+
+
+class EntityByModifiedDate(TwoDatesForm):
+    """every entity modified betwwen two dates"""
+    name = 'entity_by_modified_date'
+    label = _(u'Entity by modified date')
+
+    def get_lookup(self):
+        """lookup"""
+        datetime1, datetime2 = self._get_dates()
+        datetime2 += timedelta(1)
+        return Q(entity__is_single_contact=False, entity__modified__gte=datetime1, entity__modified__lt=datetime2)
+
+
+class ContactByModifiedDate(TwoDatesForm):
+    """every contact modified between two dates"""
+    name = 'contact_by_modified_date'
+    label = _(u'Contact by modified date')
+
+    def get_lookup(self):
+        """lookup"""
+        datetime1, datetime2 = self._get_dates()
+        datetime2 += timedelta(1)
+        return {'modified__gte': datetime1, 'modified__lt': datetime2}
+
 
 class ContactsByCreationDate(TwoDatesForm):
     """by creation date"""
@@ -1196,17 +1226,6 @@ class ContactsByCreationDate(TwoDatesForm):
         return Q(created__gte=start_datetime, created__lte=end_datetime)
 
 
-class EntitiesByUpdateDate(TwoDatesForm):
-    """by entity update date"""
-    name = 'entities_by_update_date'
-    label = _(u'Entities by update date')
-    
-    def get_lookup(self):
-        """lookup"""
-        start_datetime, end_datetime = self._get_dates()
-        return Q(entity__modified__gte=start_datetime, entity__modified__lte=end_datetime)
-    
-
 class EntitiesByCreationDate(TwoDatesForm):
     """by entity creation date"""
     name = 'entities_by_creation_date'
@@ -1215,7 +1234,9 @@ class EntitiesByCreationDate(TwoDatesForm):
     def get_lookup(self):
         """lookup"""
         start_datetime, end_datetime = self._get_dates()
-        return Q(entity__created__gte=start_datetime, entity__created__lte=end_datetime)
+        return Q(
+            entity__is_single_contact=False, entity__created__gte=start_datetime, entity__created__lte=end_datetime
+        )
     
 
 class ContactsAndEntitiesByChangeDate(TwoDatesForm):
