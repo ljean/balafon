@@ -4,6 +4,7 @@
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, PasswordChangeForm
 
 from coop_cms.bs_forms import BootstrapableMixin
+import floppyforms as forms
 
 
 class BsAuthenticationForm(BootstrapableMixin, AuthenticationForm):
@@ -26,3 +27,6 @@ class BsPasswordChangeForm(BootstrapableMixin, PasswordChangeForm):
         super(BsPasswordChangeForm, self).__init__(*args, **kwargs)
         self._bs_patch_field_class()
 
+
+class HidableModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    hidden_widget = forms.HiddenInput

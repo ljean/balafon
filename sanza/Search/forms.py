@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 import floppyforms as forms
 from coop_cms.bs_forms import Form as BsForm
 
-from sanza.Crm.forms.base import HidableModelMultipleChoiceField
+from sanza.fields import HidableModelMultipleChoiceField
 from sanza.Crm.models import Contact, Action, Group, Subscription, SubscriptionType
 from sanza.Crm.widgets import OpportunityAutoComplete
 from sanza.Search import models

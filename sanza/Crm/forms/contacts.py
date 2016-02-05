@@ -10,9 +10,7 @@ import floppyforms as forms
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
 from sanza.Crm import models
-from sanza.Crm.forms.base import (
-    ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm, HidableModelMultipleChoiceField
-)
+from sanza.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin, BetterBsForm
 from sanza.Crm.settings import (
     get_language_choices, has_language_choices, get_subscription_default_value, show_billing_address,
     ALLOW_COUPLE_GENDER,
