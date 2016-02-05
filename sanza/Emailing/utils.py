@@ -33,6 +33,7 @@ class EmailSendError(Exception):
 
 def format_context(text, data):
     """replace custom templating by something compliant with python format function"""
+
     # { and } need to be escaped for the format function
     text = text.replace('{', '{{').replace('}', '}}')
 
@@ -45,12 +46,13 @@ def format_context(text, data):
 def get_emailing_context(emailing, contact):
     """get context for emailing: user,...."""
     data = dict(contact.__dict__)
-    data['fullname'] = contact.fullname
+    for field in ('gender_name', 'city_name', 'entity_name', 'full_address', 'fullname'):
+        data[field] = getattr(contact, field)
     
-    #clone the object: Avoid overwriting {tags} for ever
+    # clone the object: Avoid overwriting {tags} for ever
     newsletter = Newsletter()
     newsletter.__dict__ = dict(emailing.newsletter.__dict__)
-    
+
     newsletter.subject = format_context(newsletter.subject, data)
 
     html_content = format_context(newsletter.content, data)
@@ -121,10 +123,10 @@ def patch_emailing_html(html_text, emailing, contact):
 def send_newsletter(emailing, max_nb):
     """send newsletter"""
 
-    #Create automatically an action type for logging one action by contact
+    # Create automatically an action type for logging one action by contact
     emailing_action_type = ActionType.objects.get_or_create(name=_(u'Emailing'))[0]
 
-    #Clean the urls
+    # Clean the urls
     emailing.newsletter.content = make_links_absolute(
         emailing.newsletter.content, emailing.newsletter, site_prefix=emailing.get_domain_url_prefix()
     )
@@ -168,7 +170,7 @@ def send_newsletter(emailing, max_nb):
                 headers['Reply-To'] = settings.COOP_CMS_REPLY_TO
 
             email = EmailMultiAlternatives(
-                emailing.newsletter.subject,
+                context['title'],
                 text,
                 from_email,
                 [contact.get_email_address()],
@@ -179,7 +181,7 @@ def send_newsletter(emailing, max_nb):
                 email.tags = [unicode(emailing.id), contact.uuid]
             emails.append(email)
             
-            #create action
+            # create action
             action = Action.objects.create(
                 subject=context['title'], planned_date=emailing.scheduling_dt,
                 type=emailing_action_type, detail=text, done=True,
@@ -188,7 +190,7 @@ def send_newsletter(emailing, max_nb):
             action.contacts.add(contact)
             action.save()
             
-        #print contact, "processed"
+        # print contact, "processed"
         emailing.send_to.remove(contact)
         emailing.sent_to.add(contact)
     
@@ -226,7 +228,7 @@ def send_notification_email(request, contact, actions, message):
         the_templatate = get_template('Emailing/subscribe_notification_email.txt')
         content = the_templatate.render(Context(data))
 
-        #remove empty lines and replace any line starting with ## by a line feed
+        # remove empty lines and replace any line starting with ## by a line feed
         lines = [line if line[:2] != "##" else "" for line in content.split("\n") if line]
         content = u"\n".join(lines)
         
@@ -240,7 +242,7 @@ def send_notification_email(request, contact, actions, message):
         success = True
         try:
             email.send()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             success = False
 
         if request:
@@ -299,7 +301,7 @@ def save_subscriptions(contact, subscription_types):
         if subscription_type in subscription_types:
             subscription.accept_subscription = True
             subscription.subscription_date = datetime.now()
-            #This is added to the notification email
+            # This is added to the notification email
             subscriptions.append(subscription_type.name)
         else:
             subscription.accept_subscription = False
@@ -326,7 +328,7 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
     action.entities = entities
     action.save()
 
-    #Unsubscribe emails for permanent errors
+    # Unsubscribe emails for permanent errors
     if permanent:
         all_contacts = list(contacts)
         for entity in entities:
@@ -339,7 +341,7 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
                 subscription.unsubscription_date = datetime.now()
                 subscription.save()
 
-    #Update emailing statistics
+    # Update emailing statistics
     if contact_uuid and emailing_id:
         try:
             contact = Contact.objects.get(uuid=contact_uuid)

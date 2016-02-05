@@ -880,6 +880,35 @@ class Contact(AddressModel):
 
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
 
+    @property
+    def full_address(self):
+        """address for custom templating in newsletter"""
+        fields = self.get_address_fields()
+        return u' '.join(fields)
+
+    @property
+    def entity_name(self):
+        """entity name  for custom templating in newsletter"""
+        if self.entity.is_single_contact:
+            return ''
+        return self.entity.name
+
+    @property
+    def city_name(self):
+        """city name for custom templating in newsletter"""
+        city = self.get_city
+        if city:
+            return city.name
+        return ''
+
+    @property
+    def gender_name(self):
+        """gender as string for custom templating in newsletter"""
+        for gender, name in Contact.GENDER_CHOICE:
+            if self.gender == gender:
+                return unicode(name)  # lazy translation must be converted in unicode
+        return u''
+
     def set_custom_field(self, field_name, value, is_link=False):
         """set the value of a custom field"""
         field, is_new = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)

@@ -913,3 +913,87 @@ class NewsletterTest(BaseNewsletterTest):
             url = "http://"+site.domain+"/this-link-without-prefix-in-template"
             self.assertTrue(e.alternatives[0][0].find(url) >= 0)
         super(NewsletterTest, self).test_send_test_newsletter('test/newsletter_contact.html')
+
+
+class CustomTemplateTest(BaseTestCase):
+    """Test the user-templating"""
+
+    def test_send_newsletter(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        city = mommy.make(models.City, name='MaVille')
+
+        contact = mommy.make(
+            models.Contact,
+            gender=models.Contact.GENDER_MALE,
+            entity=entity,
+            email='john@toto.fr',
+            lastname=u'Doe',
+            firstname=u'John',
+            address='2 rue de la lune',
+            zip_code='42424',
+            city=city
+        )
+
+        content = '''
+        <h2>Hello #!-gender_name-!# #!-firstname-!# #!-lastname-!#</h2>
+        Email: #!-email-!#
+        Addresse: #!-address-!# #!-zip_code-!# #!-city_name-!#
+        Address: #!-full_address-!#
+        Entity: #!-entity_name-!#
+        '''
+
+        newsletter_data = {
+            'subject': 'Hello #!-firstname-!#',
+            'content': content,
+            'template': 'test/newsletter_contact.html',
+        }
+
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+
+        site = Site.objects.get_current()
+        site.domain = "toto.fr"
+        site.save()
+
+        emailing = mommy.make(
+            Emailing,
+            newsletter=newsletter,
+            status=Emailing.STATUS_SCHEDULED,
+            scheduling_dt=datetime.now(),
+            sending_dt=None,
+            subscription_type=mommy.make(models.SubscriptionType, site=site),
+        )
+
+        emailing.send_to.add(contact)
+        emailing.save()
+
+        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+
+        emailing = Emailing.objects.get(id=emailing.id)
+
+        #check emailing status
+        self.assertEqual(emailing.status, Emailing.STATUS_SENT)
+        self.assertNotEqual(emailing.sending_dt, None)
+        self.assertEqual(emailing.send_to.count(), 0)
+        self.assertEqual(emailing.sent_to.count(), 1)
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        email = mail.outbox[0]
+
+        self.assertEqual(email.to, [contact.get_email_address()])
+        self.assertEqual(email.from_email, settings.COOP_CMS_FROM_EMAIL)
+
+        self.assertTrue(email.alternatives[0][1], "text/html")
+
+        html_body = email.alternatives[0][0]
+        self.assertTrue(html_body.find(contact.fullname) >= 0)
+
+        self.assertEqual(email.subject, 'Hello John')
+
+        fields = (
+            'firstname', 'lastname', 'gender_name', 'email', 'city_name', 'address', 'zip_code', 'full_address',
+            'entity_name'
+        )
+        for field_name in fields:
+            self.assertTrue(email.body.find(getattr(contact, field_name)) >= 0)
+            self.assertTrue(html_body.find(getattr(contact, field_name)) >= 0)
