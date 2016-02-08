@@ -1,0 +1,54 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+    {% trans "Groups" %}
+{% endblock %}
+  
+{% block section_data %}
+  <table class="table table-striped">
+  <tr><th>{% trans "Name" %}</th><th>{% trans "Number of members" %}</th>
+      <th>{% trans "Description" %}</th><th>&nbsp;</th></tr>
+  {% for g in groups %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+      <td>
+        {% favorite_item object=g %}
+        <span
+          class="group-tag label{% if not g.background_color %} label-group{% endif %}"
+          style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+        >
+          {{g.name}}
+        </span>
+      </td>
+      <td>{{g.entities.count}} {% trans "entities" %}
+      - {{g.contacts.count}} {% trans "contacts" %}</td>
+      <td>
+        <span class="description contenteditable" contenteditable="true" rel="{% url 'auto_save_data' 'group' 'description' g.id %}">
+          {{g.description}}
+        </span>
+      </td>
+      <td class="ico-col">
+        <a class="btn btn-xs btn-default pull-right" href="{% url 'crm_edit_group' g.id %}">
+            <span class="glyphicon glyphicon-cog"></span> {% trans "Edit" %}
+        </a>
+        <a href="{% url 'search_group' g.id %}" class="btn btn-xs btn-default pull-right" style="margin: 0 5px;">
+          <span class="glyphicon glyphicon-search"></span> {% trans "View" %}
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+  {% include "coop_cms/_pagination.html" %}
+{% endblock %}
+
+{% block section_buttons %}
+    {% if entity %}
+        <li><a href="{% url 'crm_add_entity_to_group' entity.id %}">{% trans "Add" %}</a></li>
+    {% else %}
+        <li><a href="{% url 'crm_add_group' %}">{% trans "Add" %}</a></li>
+    {% endif %}
+    {% comment %}
+    <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url 'crm_see_my_groups' %}?ordering=name">{% trans "Order by name" %}</a></li>
+    <li><a class="{% if ordering == 'date' %}disabled{% endif %}" href="{% url 'crm_see_my_groups' %}?ordering=date">{% trans "Order by date" %}</a></li>
+    {% endcomment %}
+{% endblock %}

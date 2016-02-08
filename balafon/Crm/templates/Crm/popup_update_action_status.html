@@ -1,0 +1,12 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+{% endblock %}
+{% block title %}{% trans "Change action status" %}{% endblock %}
+{% block form_url %}{% url "crm_update_action_status" action.id %}{% endblock %}
+{% block doc_header %}
+{% blocktrans %}
+  <p>Select the new status</p>
+{% endblocktrans %}
+{% endblock %}

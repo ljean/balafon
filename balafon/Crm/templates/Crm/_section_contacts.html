@@ -1,0 +1,61 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils favorite_tags %}
+
+{% block section_title %}{% trans "Contacts" %}{% endblock %}
+  
+{% block section_data %}
+<div class="row">
+  <div class="col-md-12">
+    {% if contacts %}
+    <table class="table table-responsive table-bordered">
+      <tr>
+        <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
+        <th>{% trans "Job" %}</th><th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
+      </tr>
+      {% for c in contacts %}
+      {% with c.has_left as has_left %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}has-left{% endif %}">
+        {% if entity %}
+          <td class="ut-contact-{{c.id}}">
+            {% favorite_item object=c %}
+            <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
+            <a class="pull-right btn btn-xs btn-default colorbox-form" href="{% url "crm_edit_contact_on_entity" c.id %}">
+              <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+            </a>
+            {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
+            {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+          </td>
+        {% else %}
+          {% if c.entity.is_single_contact %}
+            <td colspan=2>{% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a></td>
+          {% else %}
+            <td class="ut-contact-{{c.id}}">
+              {% favorite_item object=c %}<a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
+              {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
+            </td>
+            <td><a href="{% url "crm_view_entity" c.entity.id %}">{{ c.entity }}</a></td>
+          {% endif %}
+        {% endif %}
+        <td>{{ c.job|default:"&nbsp;" }}</td>
+        <td>{{ c.get_roles|seq_to_dash|default:"&nbsp;" }}</td>
+        <td>{{ c.get_phones|seq_to_br }}</td>
+        <td>{% if c.email %}<a href="mailto:{{c.email}}">{{c.email}}</a>{% else %}&nbsp;{% endif %}</td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-user"></span> {% trans "Do" %}{% endblock %}
+
+{% block section_buttons %}
+  {% if entity %}
+    <li><a class="colorbox-form" href="{% url 'crm_add_contact' entity.id %}">{% trans "Add" %}</a></li>
+  {% endif %}
+  {% if opportunity %}
+    <li><a href="{% url 'search_opportunity' opportunity.id %}">{% trans "View in search" %}</a></li>
+  {% endif %}
+{% endblock %}

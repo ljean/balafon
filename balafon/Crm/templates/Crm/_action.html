@@ -1,0 +1,66 @@
+{% load i18n balafon_utils staticfiles favorite_tags %}
+<div class="row">
+  <div class="col-md-12">
+    <div
+       class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if action.done %}done{% endif %} {% if action.planned_date|is_today %}due-today{% endif %} {% if action.in_charge != None and action.in_charge.user != user %}not-my-action{% endif %}">
+
+      <div class="row">
+
+        <div class="col-md-7">
+          <div class="row">
+            <div class="col-md-12">
+              {% block favorite %}
+                {% favorite_item object=action %}
+              {% endblock %}
+
+              {% block date %}
+              {% include "Crm/_actions/_date.html" %}
+              {% endblock %}
+
+              {% block definition %}
+                {% include "Crm/_actions/_definition.html" %}
+              {% endblock %}
+
+              {% block document %}
+                {% include "Crm/_actions/_document.html" %}
+              {% endblock %}
+
+              {% block opportunity %}
+                {% include "Crm/_actions/_opportunity.html" %}
+              {% endblock %}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              {% block details %}
+                {% include "Crm/_actions/_details.html" %}
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          {% block contacts_and_entities %}
+          {% include "Crm/_actions/_contacts_and_entities.html" %}
+          {% endblock %}
+        </div>
+
+        <div class="col-md-2">
+          <div class="pull-right">
+          {% block edit_button %}
+            {% include "Crm/_actions/_todo.html" %}&nbsp;
+            {% include "Crm/_actions/_menu.html" %}
+          {% endblock %}
+          </div>
+          <div class="pull-right" style="margin-top: 10px">
+          {% block in_charge %}
+          {% include "Crm/_actions/_in_charge.html" %}
+          {% endblock %}
+          </div>
+
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>

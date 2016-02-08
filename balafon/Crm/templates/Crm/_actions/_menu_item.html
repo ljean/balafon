@@ -1,0 +1,6 @@
+{% load i18n balafon_utils %}
+<li class="ut-custom-action-menu-item">
+  <a {{menu.a_attrs|safe}} href="{% menu_action_url menu.view_name action.id %}">
+    <span {% if menu.icon %}class="glyphicon glyphicon-{{menu.icon}}" {% endif %}title="{{ menu.label }}"></span> {{ menu.label }}
+  </a>
+</li>

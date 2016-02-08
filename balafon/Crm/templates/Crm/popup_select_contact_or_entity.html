@@ -1,0 +1,43 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+{{ block.super }}
+<script>
+  $(document).bind('cbox_complete', function(){
+    var name_to_id = {};
+    var name_id_to_type = {};
+    $.colorbox.resize({width: 280});
+    //when something is an entered, get the autocomplete list
+    $(".colorbox-form input#id_name").autocomplete({
+      source: function(request, add){
+			$.ajax({
+        url: '{% url "crm_get_contact_or_entity" %}?term='+request.term,
+        success : function(data) {
+          var items = [];
+          $.each(data, function(i, val){
+            name_to_id[val.name] = val.type_and_id; //store in local dict
+            items.push(val.name);
+          });
+          add(items);
+        }
+        });
+      },
+		  //when the item is selected : get the value
+      select: function(event, ui) {
+        var type_and_id = name_to_id[ui.item.value]; //get id from local dict
+        if (!type_and_id) {
+            type_and_id = ui.item.value;
+        }
+        var type_and_id_array = type_and_id.split('#');
+        $(".colorbox-form input#id_object_id").val(type_and_id_array[1]);
+        $(".colorbox-form input#id_object_type").val(type_and_id_array[0]);
+        $(".colorbox-form input#id_name").attr('value', ui.item.value);
+      }
+    });
+  });
+</script>
+{% endblock %}
+{% block title %}{% trans "Look for contact or entity" %}{% endblock %}
+{% block form_url %}{% url "crm_select_contact_or_entity" %}{% endblock %}
+{% block doc_header %}
+{% endblock %}

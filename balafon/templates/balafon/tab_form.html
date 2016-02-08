@@ -1,0 +1,75 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block extra_script %}
+<link type="text/css" href="{{ STATIC_URL }}chosen/chosen-bootstrap.css" rel="Stylesheet" />
+<script>
+  $(document).bind('cbox_complete', function(){
+    $(document).unbind('cbox_complete');
+    try {
+        $(".chosen-select").chosen({disable_search: false, width: "100%"});
+    } catch(e) {
+        //silence
+    }
+    
+    var error_index = -1;
+    $("form fieldset").each(function(idx, elt) {
+      $(elt).addClass('item'+idx);
+      var err_cls = "";
+      if ($(elt).find('.field-error').length>0) {
+        if (error_index==-1) {
+          error_index = idx;
+        }
+        var err_cls = "error";  
+      }
+      $(".tabbar").append('<span class="tab '+err_cls+'" rel="item'+idx+'">'+$(elt).find('legend').hide().text()+'</span>');
+      
+    });
+
+    parent.$.colorbox.resize({width: "60%"});
+    $(document).on('click', ".tabbar .tab", function() {
+      var item = $(this).attr('rel');
+      $(this).siblings().removeClass("selected");
+      $(this).addClass("selected");
+      $("fieldset").hide();
+      $("fieldset."+item).show();
+      parent.$.colorbox.resize();
+    })
+    if (error_index>0) {
+      $(".tabbar .tab[rel=item"+error_index+"]").click();  
+    } else {
+      $(".tabbar .tab:first").click();  
+    }
+  });
+</script>  
+{% endblock %}
+
+{% block form_fields %}
+  
+  <div class="doc-header">
+  {% block doc_header %}
+  {% endblock %}
+  {% if form.errors %}
+  <div class="pull-right error-msg label label-danger">{% trans "The form is not valid." %}</div>
+  {% endif %}
+  </div>
+
+  <div class="tabbar"></div>
+    <div class="tabbar-form">
+      {% if form.non_field_errors %}<div class="label label-danger">{{ form.non_field_errors }}</div>{% endif %}
+      {% for fieldset in form.fieldsets %}
+        <fieldset class="{{ fieldset.classes }}">
+        {% if fieldset.legend %}
+          <legend>{{ fieldset.legend }}</legend>
+        {% endif %}
+        <div class="fieldsets">
+        {% for field in fieldset %}
+          {% include "balafon/_field_form.html" %}
+        {% endfor %}
+        </div>
+        </fieldset>
+      {% endfor %}
+    </div>
+    {% block doc_footer %}
+    {% endblock %}
+{% endblock %}

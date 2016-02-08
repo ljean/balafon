@@ -1,0 +1,47 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+  <span class="glyphicon glyphicon-send"></span>
+  <h4 class="inline-block"> {% trans "Sending" %}: {{ emailing.newsletter.subject }}</h4>
+{% endblock %}
+  
+{% block section_data %}
+  <div class="row">
+      <div class="col-md-6"><h4>{{ emailing.get_info }}</h4></div>
+      <div class="col-md-6">
+          <div class="row">
+              <div class="col-md-12">{% trans "Newsletter" %}:
+                  <a href="{{emailing.newsletter.get_absolute_url }}">
+                      {{ emailing.newsletter.subject }}
+                  </a>
+                  {% favorite_item object=emailing.newsletter %}
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-md-12">{% trans "Subscription" %}: {{ emailing.subscription_type.name }}</div>
+          </div>
+          {% if emailing.lang %}
+          <div class="row">
+              <div class="col-md-12">{% trans "Language" %}: {{ emailing.get_lang_display }}</div>
+          </div>
+          {% endif %}
+          {% if emailing.from_email %}
+          <div class="row">
+              <div class="col-md-12">{% trans "Sender" %}: {{ emailing.from_email }}</div>
+          </div>
+          {% endif %}
+      </div>
+  </div>
+{% endblock %}
+
+{% block section_buttons %}
+  <li><a class="colorbox-form" href="{% url 'emailing_update_emailing' emailing.id %}">{% trans "Edit" %}</a></li>
+  <li>{{ emailing.next_action }}</li>
+  <li><a class="colorbox-form" href="{% url 'emailing_delete' emailing.id %}">{% trans "Delete" %}</a></li>
+  <li><a href="{% url 'emailing_newsletter_list' %}">{% trans "Back" %}</a></li>
+{% endblock %}
+
+{% block section_favorite %}
+  {% favorite_item object=emailing %}
+{% endblock %}

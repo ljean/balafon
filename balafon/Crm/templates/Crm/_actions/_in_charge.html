@@ -1,0 +1,10 @@
+{% load i18n %}
+{% if BALAFON_MULTI_USER %}
+<div class="label label-in-charge {% if user == action.in_charge.user %}me-in-charge{% endif %}">
+{% if action.in_charge %}
+  {{ action.in_charge }}
+{% else %}
+  {% trans "Not assigned" %}
+{% endif %}
+</div>
+{% endif %}

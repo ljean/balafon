@@ -1,0 +1,27 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+  {% trans "Sendings" %}
+{% endblock %}
+  
+{% block section_data %}
+  <div class="table-responsive">
+  <table class="table table-striped">
+    {% for e in emailings %}
+    <tr>
+      <td>
+        {% favorite_item object=e %} {{e.newsletter.subject}}
+      </td>
+      <td>
+
+        <a href="{% url "emailing_view" e.id %}">{{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  </div>
+{% endblock %}
+
+{% block section_buttons %}
+{% endblock %}

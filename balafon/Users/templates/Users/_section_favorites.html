@@ -1,0 +1,20 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+  {{type}}
+{% endblock %}
+  
+{% block section_data %}
+<table class="table">
+{% for fav in favs %}
+  <tr>
+    <td style="width: 20px;">{% favorite_item object=fav %}</td>
+    <td style="text-align: left;">{{ fav }}</td>
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}
+
+{% block section_buttons %}
+{% endblock %}

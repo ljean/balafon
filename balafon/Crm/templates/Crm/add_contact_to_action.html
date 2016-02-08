@@ -1,0 +1,5 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block title %}{% trans "Select a contact" %}{% endblock %}
+{% block form_url %}{% url "crm_add_contact_to_action" action.id %}{% endblock %}
+{% block form_ok %}{% trans "Ok" %}{% endblock %}

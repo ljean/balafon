@@ -1,0 +1,23 @@
+{% extends "balafon/tab_form.html" %}
+{% load i18n %}
+
+{% block doc_header %}
+  {% if opportunity %}
+  <h2>{% trans "Edit opportunity" %}</h2>
+  {% if opportunity.ended %}
+    {% trans "This opportunity has be closed on" %} {{opportunity.end_date}}
+  {% endif %}
+  {% else %}
+  <h2>{% trans "Create opportunity" %}</h2>
+  {% endif %}
+{% endblock %}
+
+{% block form_url %}{% if opportunity.id %}{% url "crm_edit_opportunity" opportunity.id %}{% else %}{% url "crm_add_opportunity" %}{% endif %}{% endblock %}
+
+
+{% block popup_buttons %}
+  <div class="buttons">
+  <input class="btn btn-primary" type="submit" value="{% trans "Save"%}" />
+  <a class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
+  </div>
+{% endblock %}

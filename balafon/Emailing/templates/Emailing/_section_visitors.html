@@ -1,0 +1,71 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n %}
+
+{% block section_title %}
+  {% trans "Statistics" %}
+{% endblock %}
+  
+{% block section_data %}
+
+<style>
+    .info-line .hidden-contacts {
+        display: none;
+        font-size: 0.7em;
+    }
+
+    .info-line:hover .hidden-contacts {
+        display: block;
+    }
+
+    .info-line:hover {
+        border: solid 1px #F0DA2D;
+    }
+
+</style>
+
+<div class="statistics">
+{% block send_to %}
+    {% trans "To be send" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.send_to.all show_always=True hide_contacts=True %}
+{% endblock %}
+
+{% block sent_to %}
+    {% trans "Sent" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.sent_to.all show_always=True hide_contacts=True %}
+{% endblock %}
+
+{% block openings %}
+    {% trans "Openings" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.opened_emails.all show_always=True hide_contacts=True %}
+{% endblock %}
+
+{% block unsub %}
+    {% trans "Unsubcribe" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.unsub.all show_always=True %}
+{% endblock %}
+
+{% block soft_bounce %}
+    {% trans "Soft Bounce" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.soft_bounce.all %}
+{% endblock %}
+
+{% block hard_bounce %}
+    {% trans "Hard Bounce" as label %}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.hard_bounce.all %}
+{% endblock %}
+
+{% block spam %}
+    {% trans "Spam" as label%}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.spam.all %}
+{% endblock %}
+
+{% block rejected %}
+    {% trans "Rejected" as label%}
+    {% include "Emailing/_contact_list.html" with contacts=emailing.rejected.all %}
+{% endblock %}
+
+{% for l in emailing.magiclink_set.all %}
+    {% include "Emailing/_contact_list.html" with contacts=l.visitors.all label=l.url show_always=True hide_contacts=True is_link=True %}
+{% endfor %}
+</div>
+{% endblock %}

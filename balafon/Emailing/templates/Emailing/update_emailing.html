@@ -1,0 +1,22 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+<script>
+$(document).bind('cbox_complete', function(){
+    $("#id_newsletter").change(function() {
+       var newsletter_id = parseInt($(this).attr('value'), 10);
+       if (newsletter_id != 0) {
+           $("#id_subject").attr('disabled', true);
+       } else {
+            $("#id_subject").removeAttr('disabled');
+       }
+    });
+})
+</script>
+{% endblock %}
+{% block title %}{% trans "Update emailing" %}{% endblock %}
+{% block form_url %}{% url "emailing_update_emailing" object.id %}{% endblock %}
+{% block popup_buttons %}
+<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="update_emailing" value="{% trans "Update" %}">
+{% endblock %}

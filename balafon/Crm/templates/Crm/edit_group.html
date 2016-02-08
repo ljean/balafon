@@ -1,0 +1,221 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  <script type="text/javascript" src="{{STATIC_URL}}js/js18n.js"></script>
+  <script type="text/javascript" src="{{STATIC_URL}}admin/js/jquery.min.js"></script>
+  <script type="text/javascript" src="{{STATIC_URL}}admin/js/jquery.init.js"></script>
+  {{form.media}}
+  <style>
+    table.edit-group-fields th {
+      width: 20%;
+    }
+    
+    table.edit-group-fields td, table.edit-group-fields th {
+      border: solid thin #ccc;
+    }
+    
+    .selector {
+      float: none !important;
+    }
+  </style>
+  <script>
+    /**
+      * add an id to a list
+      */
+    function addIdToList(listValue, newId) {
+      //list is s string '[1,2] --> addIdToList('1,2'], 3) should return '[1,2,3]'
+      var ids = listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+      for(var i=0; i<ids.length; i++) {
+        ids[i] = parseInt(ids[i], 10);
+        if (newId === ids[i]) {
+          return null;
+        }
+      }
+      ids.push(newId);
+      return '['+ids.toString()+']';
+    };
+
+    /**
+      * add an id to a list
+      */
+    function removeFromList(listValue, idToRemove) {
+      //list is s string '[1,2,3] --> addIdToList('1,2,3'], 3) should return '[1,3]'
+      var ids = listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+      var newList = [];
+      for(var i=0; i<ids.length; i++) {
+        ids[i] = parseInt(ids[i], 10);
+        if (idToRemove !== ids[i]) {
+          newList.push(ids[i]);
+        }
+      }
+      return '['+newList.toString()+']';
+    };
+
+    function addMemberToList(member) {
+      var typeIcon = '<a href="'+ member.url +'" class="colorbox-form">'+
+        '<span class="glyphicon glyphicon-' +
+        ((member.type === 'entity')?'tower':'user') +
+        '"></span></a> ';
+      var dataType = 'data-type="'+member.type+'" data-id="'+ member.id +'"';
+
+      $(".new-members-list").append(
+        '<span class="label label-member label-new-member">' +
+        typeIcon +
+        member.name +
+        ' <a class="remove-me" href '+dataType+'><span class="glyphicon glyphicon-remove"></span></a> ' +
+        '</span>&nbsp;'
+      );
+    };
+
+    function addMember(member_type, member_id, existing) {
+      if (member_type === 'entity') {
+        var newValue = addIdToList($("#id_entities").val(), member_id);
+        if (newValue) {
+          $("#id_entities").val(newValue);
+          return true;
+        } else {
+          alert("{% trans 'This entity is already member of the group' %}");
+        }
+      } else if (member_type === 'contact') {
+        var newValue = addIdToList($("#id_contacts").val(), member_id);
+        if (newValue) {
+          $("#id_contacts").val(newValue);
+          return true;
+        } else {
+          alert("{% trans 'This contact is already member of the group' %}");
+        }
+      } else {
+        alert("{% trans 'Unknown type' %}");
+      }
+      return false;
+    };
+
+    $(function() {
+
+      var removeLabel = function(label) {
+        if (label.hasClass('existing')) {
+          label.addClass('label-removed');
+          label.find('a.remove-me').hide();
+          label.find('a.add-me').show();
+        } else {
+          label.hide();
+        }
+      };
+
+      $('.new-members-list').on('click', "a.remove-me", function() {
+        var member_type = $(this).data('type');
+        var member_id = $(this).data('id');
+        var selector = '';
+
+        if (member_type === 'entity') {
+          selector = "#id_entities";
+        } else if (member_type === 'contact') {
+          selector = "#id_contacts";
+        } else {
+          alert('{% trans "Unknown type" %}');
+        }
+
+        if (selector) {
+          var newValue = removeFromList($(selector).val(), member_id);
+          $(selector).val(newValue);
+          var label = $(this).closest('.label');
+          removeLabel(label);
+        }
+
+        return false;
+      });
+
+      $('.new-members-list').on('click', "a.add-me", function() {
+        var member_type = $(this).data('type');
+        var member_id = $(this).data('id');
+
+        if (addMember(member_type, member_id)) {
+          var label = $(this).closest('.label');
+          if (label.hasClass('existing')) {
+            label.removeClass('label-removed');
+            $(this).hide();
+            label.find('a.remove-me').show();
+          }
+        }
+        return false;
+      });
+    })
+  </script>
+{% endblock %}
+
+{% block document_content %}
+  <h2>{% if group %}
+    {% blocktrans %}Edit the '{{group}}' group{% endblocktrans %}
+  {% else %}
+    {% trans "Create group" %}
+  {% endif %}</h2>
+  <form method="POST" action="">{% csrf_token %}
+    <table class="table">
+      {{form.as_table}}
+
+      <tr>
+        <th>
+          {% trans 'Members' %}
+        </th>
+        <td>
+          <p>
+          {% if members_count %}
+            {{ members_count }} {% if members_count > 1 %}{% trans "members" %}{% else %}{% trans "member" %}{% endif %}
+            <div class="new-members-list" style="margin: 20px 0;">
+              {% for member in members %}
+                {% spaceless %}<span class="label label-member existing">
+                  <a href="{{ member.url }}" class="colorbox-form">
+                    <span class="glyphicon glyphicon-{% if member.type == 'entity' %}tower{% else %}user{% endif %}"></span>
+                  </a>
+                  {{ member.name }}
+                  <a class="remove-me" href data-type="{{ member.type }}" data-id="{{ member.id }}">
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </a>
+                  <a class="add-me" href data-type="{{ member.type }}" data-id="{{ member.id }}" style="display: none;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                  </a>
+                </span>{% endspaceless %}&nbsp;
+              {% endfor %}
+            </div>
+            <div class="new-members">
+              <div class="helptext">
+                {% trans "The members with yellow background will be added if you save the group" %}
+              </div>
+              <div class="helptext">
+                {% trans "The members with dark red background will be removed if you save the group" %}
+              </div>
+            </div>
+          {% else %}
+            {% trans "No members" %}
+          {% endif %}
+          </p>
+
+          <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
+            <span class="glyphicon glyphicon-plus colorbox-form"></span> {% trans 'Add new member' %}
+          </a>
+
+          {% if group %}
+          <a class="btn btn-sm btn-default" href="{% url 'search_group' group.id %}">
+            <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
+          </a>
+          {% endif %}
+      </tr>
+
+    </table>
+    <div class="row">
+      <div class="col-md-10">
+        <div class="buttons pull-right">
+          <input class="btn btn-md btn-primary" type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
+          {% if group %}
+            <a class="btn btn-md btn-danger colorbox-form" href="{% url 'crm_delete_group' group.id %}">{% trans "Delete" %}</a>
+            <a class="btn btn-md btn-default" href="{{ next_url }}">{% trans "Cancel" %}</a>
+          {% else %}
+            <a class="btn btn-md btn-default" href="{% url 'crm_see_my_groups' %}">{% trans "Cancel" %}</a>
+          {% endif %}
+          </div>
+      </div>
+    </div>
+  </form>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}
+  <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
+  {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
+  
+{% endblock %}
+  
+{% block section_data %}
+{% if results %}
+  {% if has_empty_entities %}
+    <div class="warning">{% trans "The search contains empty entities: These entities may only have secondary or old contacts" %}</div>
+  {% endif %}
+  <table class="table table-bordered contact-table font-small">
+    <tr><th colspan=2>{% trans "Contacts" %}</th></tr>
+  {% if contacts_display %}
+    <!-- ut: contacts_display -->
+    {% for c in results %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        <td{% if c.entity.is_single_contact %} colspan=2{%endif%}>
+          <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+          {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+          {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+        </td>
+        {% if not c.entity.is_single_contact %}
+          <td>
+            <a href="{{c.entity.get_absolute_url}}">{{c.entity.name}}</a>
+          </td>
+        {% endif %}
+        <td>
+          <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+            <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+            <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  {% else %}
+    {% for e in results %}
+      <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        {% if not e.single_contact %}
+          <td><a href="{{e.get_absolute_url}}">{{e.name}}</a>
+          {% if e.is_empty %}
+            <td class="empty-entity">
+              {% trans "No contacts !!" %}
+            </td>
+          {% else %}
+            <td>
+          {% endif %}
+        {% else %}
+          <td colspan=2>
+        {% endif %}
+          
+        {% with e.search_contacts as contacts %}
+        {% if contacts %}
+          <table class="table contact-table table-striped font-small">
+          {% for c in contacts %}
+              <tr>
+              <td>
+                <a href="{{c.get_absolute_url}}">{{c.fullname}}</a>&nbsp;{{ c.get_roles|seq_to_dash }}&nbsp;</a>
+                {% if c.get_email %}<a href="mailto:{{c.get_email}}">{{c.get_email}}</a>{% endif %}
+                {% if c.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+              </td>
+              <td>
+              <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{c.id}}">
+                <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+                <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+              </a>
+              </td>
+              </tr>
+          {% endfor %}
+          </table>
+        {% else %}
+          &nbsp;
+        {% endif %}
+        {% endwith %}
+        </td>
+      </tr>
+    {% endfor %}
+  {% endif %}
+  </table>
+  {% include "coop_cms/_pagination.html" %}
+  <script>
+    $(function() {
+      $(document).on('click', 'a.exclude-contact', function() {
+        var val = $("input[name=excluded]").val();
+        var cid = '#'+$(this).attr('rel')+'#';
+        var parent = $(this).closest("tr");
+        if (val.search(cid) >= 0) {
+          parent.removeClass('excluded');
+          val = val.replace('#'+$(this).attr('rel')+'#', '');
+        } else {
+          parent.addClass('excluded');
+          val += '#'+$(this).attr('rel')+'#';
+        }
+        $("input[name=excluded]").val(val);
+        return false;
+      });
+      $(".mailto-button").click(function() {
+        $("form.search-form").attr('action', $(this).attr('href'));
+        $("form.search-form").attr('target', '_blank');
+        $("form.search-form").submit();
+        $("form.search-form").attr('action', '');
+        $("form.search-form").removeAttr('target');
+        return false;
+      });
+      $("#emailing-button").click(function() {
+        {% if contains_refuse_newsletter %}
+        var letsgo = confirm(
+          '{% trans "The search results contains contacts who are refusing the newsletter.\n\nContinue?" %}'
+        );
+        if (!letsgo) {
+          return false;
+        }
+        {% endif %}
+        $("form.search-form").colorboxSubmit({href: $(this).attr('href')});
+        $("form.search-form").attr('action', '');
+        return false;
+      });
+      
+      $("#xl-button").click(function() {
+        $("form.search-form").attr('action', $(this).attr('href'));
+        $("form.search-form").attr('target', '_blank');
+        $("form.search-form").submit();
+        $("form.search-form").attr('action', '');
+        $("form.search-form").removeAttr('target');
+        return false;
+      });
+      
+      $(".action-button").click(function() {
+        $("form.search-form").colorboxSubmit({href: $(this).attr('href')});
+        $("form.search-form").attr('action', '');
+        return false;
+      });
+      
+      $(document).on('click', ".pagination a", function() {
+        $("form.search-form").attr('action', $(this).attr('href'));
+        $("form.search-form").submit();
+        $("form.search-form").attr('action', '');
+        return false;
+      });
+      
+      var excluded = $("input[name=excluded]").val()
+      excluded = excluded.substring(1, excluded.length-1).split("##");
+      for (var i=0, n=excluded.length; i<n; i++) {
+        $('a.exclude-contact[rel='+excluded[i]+']').parent().addClass('excluded');
+      };
+    });
+  </script>
+{% else %}
+  {{ message }}
+{% endif %}
+
+{% endblock %}
+
+{% block section_buttons %}
+  
+{% if results %}
+<li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">{% trans "Mail to" %}</a></li>
+<li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">{% trans "BCC Mail to" %}</a></li>
+<li><a href="{% url "search_emailing" %}" id="emailing-button">{% trans "Mailing" %}</a></li>
+<li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">{% trans "Excel" %}</a></li>
+<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">{% trans "Create action" %}</a></li>
+<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">{% trans "Add to groups" %}</a></li>
+<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">{% trans "PDF" %}</a></li>
+
+{% if user.is_superuser %}<li><a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">{% trans "Contacts Admin" %}</a></li>{% endif %}
+{% endif %}
+{% endblock %}

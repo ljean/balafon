@@ -1,0 +1,52 @@
+{% load i18n %}
+<script>
+    $(function() {
+        if (Modernizr.touch) {
+            $("ul.nav > li").click(function() {
+                //force hover on touch device : tested with iOs
+            })
+        }
+    });
+</script>
+<div class="nav_header">
+    {% include "balafon/_header.html" %}
+    <ul class="nav">
+      <li>
+        <a>{% trans "View" %}</a>
+        <ul>
+          <li><a href="{% url "crm_view_entities_list" %}">{% trans "Contacts" %}</a></li>
+          <li><a href="{% url "crm_all_opportunities" %}">{% trans "Opportunities" %}</a></li>
+          <li><a href="{% url "crm_see_my_groups" %}">{% trans "Groups" %}</a></li>
+          <li><a href="{% url "emailing_newsletter_list" %}">{% trans "Mailings" %}</a></li>
+        </ul>
+      </li>
+      <li>
+        <a>{% trans "Add" %}</a>
+        <ul>
+        {% if BALAFON_NO_ENTITY_TYPE %}
+            <li><a href="{% url "crm_create_entity" 0 %}">{% trans "Entity" %}</a></li>
+        {% else %}
+        {% for entity_type in BALAFON_ENTITY_TYPES %}
+            <li><a href="{% url "crm_create_entity" entity_type.id %}">{{entity_type.name}}</a></li>
+        {% endfor %}
+        {% endif %}
+        {% if BALAFON_ALLOW_SINGLE_CONTACT %}
+            <li><a href="{% url "crm_add_single_contact" %}">{% trans "Single contact" %}</a></li>
+        {% endif %}
+        </ul>
+      </li>
+      <li><a href="{% url "search" %}">{% trans "Search" %}</a></li>
+      <li>
+        <a>{% trans "Account" %}</a>
+        <ul>
+          {%if BALAFON_SITE_URL %}<li><a href="{{ BALAFON_SITE_URL }}">{% trans "Back to site" %}</a></li>{% endif %}
+          <li><a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a></li>
+          <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
+          {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
+          {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">{% trans "Contacts import" %}</a></li>{% endif %}
+          {%if user.is_staff %}<li><a href="{% url "export_database_json" %}">{% trans "Export database" %}</a></li>{% endif %}
+        </ul>
+      </li>
+      <li><form method="POST" action="{% url "quick_search" %}">{% csrf_token %}{{quick_search_form.text}}</form></li>
+    </ul>
+</div>

@@ -1,0 +1,13 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_title %}{% trans "Emailing" %}{% endblock %}
+
+{% block document_title %}{% trans "Emailing" %}{% endblock %}
+{% block document_content %}
+    
+{% include "Emailing/_section_emailing.html" %}
+
+{% include "Emailing/_section_visitors.html" %}
+
+{% endblock %}

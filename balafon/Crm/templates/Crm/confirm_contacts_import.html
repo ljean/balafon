@@ -1,0 +1,175 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{block.super}}
+{{form.media}}
+<style>
+  /*.chzn-container-multi .chzn-choices .search-choice .search-choice-close {
+    height: 8px;
+  }
+  .chzn-container-multi .chzn-choices .search-field input {
+    height: 27px;
+  }
+  table.import-data {
+    font-size: x-small;
+  }
+  table.import-data td {
+    border: solid thin #aaa;
+  }*/
+  .exists {
+    background: #ccc;
+  }
+  .not-exists {
+    background: #f93;
+  }
+  .email-exists {
+    background: #39f;
+  }
+  .default-dep {
+    background: #f44;
+  }
+</style>
+{% endblock %}
+
+{% block document_content %}
+  <h2>{% trans "Confirm contacts import" %}</h2>
+  <form method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+    {% include "bs/form_fields.html" %}
+    
+    <div class="row">
+      <div class="col-md-12">
+        <div class="buttons">
+          <input class="btn btn-default" type="submit" value="{% trans "Preview"%}">
+          <input class="btn btn-primary" type="submit" name="create_contacts" value="{% trans "Import"%}">
+          <a class="btn btn-default" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+        </div>
+      </div>
+    </div>
+        
+    <div class="row">
+      <div class="col-md-12">
+      {% if not contacts %}
+      <div class="label label-warning">
+        {% blocktrans %}No new contacts to import ({{total_contacts }} in csv file){% endblocktrans %}
+      </div>
+      {% else %}
+      <div class="confirm-import-intro">
+        {% blocktrans %}It imports only contacts if their email doesn't already exists
+        ({{nb_contacts}} on {{total_contacts }} in csv file)<br/><br/>
+        <b>Caption:</b><br />
+        * Gray background : Already exists<br />
+        * Orange background : will be created<br />
+        * Red background : The city will be created with default department as parent<br />
+        * Blue background : The email is already known in the database<br />
+        {% endblocktrans %}
+      </div>
+      
+      <table class="table table-striped font-small ut-contacts">
+        <tr>
+          <th>{% trans "Entity" %}</th>
+          <th>{% trans "Entity type" %}</th>
+          <th>{% trans "Gender" %}</th>
+          <th>{% trans "Lastname" %}</th>
+          <th>{% trans "Firstname" %}</th>
+          <th>{% trans "Email" %}</th>
+          <th>{% trans "Entity city" %}</th>
+          <th>{% trans "Contact city" %}</th>
+          <th>{% trans "Entity groups" %}</th>
+          <th>{% trans "Contact groups" %}</th>
+          <th>{% trans "Roles" %}</th>
+        </tr>
+      {% for c in contacts %}
+        <tr>
+          {% if c.entity %}
+            <td class="{% if c.entity_exists %}exists{% else %}not-exists{% endif %}">{{c.entity}}</td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.entity_type %}
+            <td class="{% if c.entity_type_exists %}exists{% else %}not-exists{% endif %}">{{c.entity_type}}</td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          <td>{{c.get_gender_display|default:"&nbsp;"}}</td>
+          <td class="{% if c.contact_exists %}exists{% else %}not-exists{% endif %}">{{c.lastname|default:"&nbsp;"}}</td>
+          <td class="{% if c.contact_exists %}exists{% else %}not-exists{% endif %}">{{c.firstname|default:"&nbsp;"}}</td>
+          <td class="{% if c.email_exists %}email-exists{% endif %}">{{c.email|default:"&nbsp;"}}</td>
+          
+          {% if c.entity_city %}
+            {% if c.entity_city_exists %}
+              <td class="exists">{{c.entity_city}}</td>
+            {% else %}
+              {% if c.entity_zip_code %}
+                <td class="not-exists">{{c.entity_city}} ({{c.entity_zip_code|slice:":2"}})</td>
+              {% else %}
+                <td class="not-exists default-dep">{{c.entity_city}}</td>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.city %}
+            {% if c.city_exists %}
+              <td class="exists">{{c.city}}</td>
+            {% else %}
+              {% if c.zip_code %}
+                <td class="not-exists">{{c.city}} ({{c.zip_code|slice:":2"}})</td>
+              {% else %}
+                <td class="not-exists default-dep">{{c.city}}</td>
+              {% endif %}
+            {% endif %}
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+  
+          {% if c.entity_groups %}
+            <td>
+              {% for g in c.entity_groups %}
+              <span class="{% if g.exists %}exists{% else %}not-exists{% endif %}">
+                {{g.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.contact_groups %}
+            <td>
+              {% for g in c.contact_groups %}
+              <span class="{% if g.exists %}exists{% else %}not-exists{% endif %}">
+                {{g.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+          {% if c.roles %}
+            <td>
+              {% for r in c.roles %}
+              <span class="{% if r.exists %}exists{% else %}not-exists{% endif %}">
+                {{r.name}}
+              </span>
+              {% if not forloop.last %};{% endif %}
+              {% endfor %}
+            </td>
+          {% else %}
+            <td>&nbsp;</td>
+          {% endif %}
+          
+        </tr>
+      {% endfor %}
+      </table>
+    {% endif %}
+      </div>
+    </div>
+  </form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% load i18n balafon_utils %}
+<div class="dropdown btn-group pull-right">
+  <a class="btn btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+    <span class="glyphicon glyphicon-cog"></span>
+    {% trans "Update" %}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu text-right">
+      {% block action_buttons %}
+      {% include "Crm/_actions/_edit.html" %}
+      {% endblock %}
+  </ul>
+</div>
+

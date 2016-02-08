@@ -1,0 +1,81 @@
+{% extends "balafon/tab_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {% include "balafon/_calendar.html" with field="date" yearRange="c:c+2" %}
+  {% include "balafon/_calendar.html" with field="end_date" yearRange="c:c+2" %}
+<script>
+  $(function() {
+    var dont_change_status = true;
+    $("select#id_type").change(function() {
+      var dt = new Date().getTime();
+      $.ajax({
+          url: "{% url 'crm_get_action_status' %}?t="+$(this).val()+"&timestamp="+dt,
+          success: function(data){
+            var allowed_status = data.allowed_status;
+            var default_status = parseInt(data.default_status, 10);
+            $("select#id_status option").each(function(idx, elt) {
+              var elt_val = parseInt($(elt).val(), 10);
+              if (elt_val) {
+                if (allowed_status.indexOf(elt_val) >= 0) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
+              } else {
+                if (!default_status) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
+              }
+            });
+            if (default_status) {
+              $("select#id_status").val(default_status);
+            }
+            $("select#id_status option").trigger("chosen:updated");
+          }
+      });
+      if (!dont_change_status) {
+        $("select#id_status").val("");
+      }
+      dont_change_status = false;
+      return false;
+    });
+    $("select#id_type").change();
+  })
+</script>
+{% endblock %}
+
+{% block doc_header %}
+  {% if action %}
+  <h4>{{ form.title }}</h4>
+  {% else %}
+  <h4>{{ form.title }}</h4>
+  {% endif %}
+
+  {% if action.done %}
+  <div class="alert alert-warning">
+    <span class="glyphicon glyphicon-warning-sign"></span>
+    {% trans "This action has be done on" %} {{action.done_date}}
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block title %}{{ form.title }}{% endblock %}
+
+{% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_create_action" entity_id contact_id %}{% endif %}{% endblock %}
+
+
+{% block popup_buttons %}
+    <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}">
+    {% if action %}
+    <a class="btn btn-warning colorbox-form" href="{% url 'crm_delete_action' action.id %}">{% trans "Delete" %}</a>
+    {% endif %}
+    <a class="btn btn-default cancel_button" href="">{% trans "Cancel" %}</a>
+{% endblock %}
+
+{% block doc_footer %}
+  
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n favorite_tags %}
+
+{% block extra_title %}{% trans "Search" %} {{ search.name }}{{group.name}}{{opportunity.name}}{% endblock %}
+
+{% block extra_head %}
+    {{ block.super }}
+    {{ search_form.media }}
+{% endblock %}
+
+{% block document_title %}
+{% if group %}
+    {% trans "Contacts of group" %} <a href="{% url "crm_edit_group" group.id %}">{{group.name}}</a> {% favorite_item object=group %}
+{% else %}
+    {% if opportunity %}
+    {% trans "Contacts in oppportunity" %} <a href="{% url "crm_view_opportunity" opportunity.id %}">{{opportunity.name}} {% favorite_item object=opportunity %}</a>
+    {% else %}
+        {% trans "Search for contacts" %} {% if search %}: {{search.name}} {% favorite_item object=search %}{% endif %}
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+
+{% block document_content %}
+
+{% include "Search/_section_search_form.html" %}
+
+{% if results or message %}    
+{% include "Search/_section_search_results.html" %}
+{% endif %}
+
+{% endblock %}

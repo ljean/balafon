@@ -1,0 +1,16 @@
+{% load i18n balafon_utils %}
+<div class="label label-date {{ action|get_action_date_label }}">
+  {% if action.planned_date %}
+    {% if action.end_datetime %}
+      {% if action.show_duration %}
+        {{ action.planned_date|date:'d/m/Y H:i'|cut_null_hour }} - {{ action.duration }}
+      {% else %}
+        {{ action.planned_date|date:'d/m/Y H:i'|cut_null_hour }} - {{ action.end_datetime|date:'d/m/Y H:i'|cut_null_hour }}
+      {% endif %}
+    {% else %}
+      {{ action.planned_date|date:'d/m/Y H:i'|cut_null_hour }}
+    {% endif %}
+  {% else %}
+    {% trans "Not planned" %}
+  {% endif %}
+</div>&nbsp;

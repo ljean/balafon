@@ -1,0 +1,22 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block title %}{{action.subject}}{% endblock %}
+{% block form_url %}{% url "crm_do_action" action.id %}{% endblock %}
+
+{% block doc_header %}
+    {% if not action.done %}{# The done flag has been changed #}
+        <span class="glyphicon glyphicon-unchecked"></span> {% trans "Do you want to mark this action undone?" %}
+    {% else %}
+        <span class="glyphicon glyphicon-check"></span> {% trans "Do you want to mark this action done?" %}
+    {% endif %}
+    {% if action.in_charge and request.user != action.in_charge.user %}
+        <div style="margin-top: 5px;"><span class="label label-warning">
+            {% trans "You are not in charge of this action. Are you sure to continue?" %}
+        </span></div>
+    {% endif %}
+{% endblock %}
+
+{% block popup_buttons %}
+<a href="" class="btn btn-default cancel_button">{% trans "No" %}</a>
+<input class="btn btn-primary" type="submit" value="{% trans "Yes" %}">
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+  {% trans "Entities" %}
+{% endblock %}
+  
+{% block section_data %}
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>{% trans "Contacts" %}</th>
+    <th>{% trans "City" %}</th>
+  </tr>
+  {% for e in entities %}
+  <tr>
+    <td>
+      {% favorite_item object=e %}
+      <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
+    </td>
+    <td>
+      {% if e.main_contacts %}
+        {% for c in e.main_contacts %}
+          <a href="{% url "crm_view_contact" c.id%}">{{c.fullname}}</a><br/>
+        {% endfor %}
+      {% else %}
+        &nbsp;
+      {% endif %}
+    </td>
+    <td>
+      {{e.city.get_friendly_name|default:"&nbsp;"}}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
+
+{% block section_buttons %}
+{% endblock %}

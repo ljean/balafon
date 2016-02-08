@@ -1,0 +1,51 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n favorite_tags %}
+
+{% block section_title %}
+  {% trans "Newsletters" %}
+{% endblock %}
+  
+{% block section_data %}
+  
+  {% if newsletters %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <tr>
+          <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
+        </tr>
+      {% for newsletter in newsletters %}
+        <tr>
+          <td>
+            {% favorite_item object=newsletter %}
+            <a href="{{ newsletter.get_absolute_url }}">{{newsletter.subject}}</a>
+          </td>
+          <td>
+            {% if newsletter.emailing_set.count %}
+              {% for e in newsletter.emailing_set.all %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% favorite_item object=e %}
+                        <a href="{% url 'emailing_view' e.id %}">
+                            {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+                        </a>
+                    </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              &nbsp;
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+    {% include "coop_cms/_pagination.html" %}
+  {% else %}
+    {% trans "No newsletters" %}
+  {% endif %}
+{% endblock %}
+
+{% block section_buttons %}
+  <li><a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">{% trans "Add Newsletter" %}</a></li>
+  <li><a href="{% url "search" %}">{% trans "Add Sending" %}</a></li>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n floppyforms %}
+
+{% block extra_head %}
+  {{block.super}}
+  {{form.media}}
+  
+{% endblock %}
+
+{% block document_content %}
+  <div class="row"><div class="col-md-12">
+  <h2>{% trans "Import contacts" %}</h2>
+  
+  <form role="form" method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+      <div class="import-contact-intro">
+        {% url "crm_contacts_import_template" as template_url %}
+        {% blocktrans %}You can create contacts and entities by importing a csv file.
+        For example, the csv file can be created by exporting your address book in Thunderbird or Outlook.<br /><br />
+        Then you need to adapt the content of this file to match the import format.
+        Download this <a href="{{template_url}}">template file</a> to get the expected format.<br /><br />
+        Finally, update your file and define the settings for the import.
+        {% endblocktrans %}
+      </div>
+      
+      {% include "bs/form_fields.html" %}
+  
+    <div class="row">
+      <div class="col-md-6 col-md-offset-6">
+        <input class="btn btn-md btn-primary" type="submit" value="{% trans "Import"%}">
+        <a class="btn btn-md btn-default" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+      </div>
+    </div>
+  </form>
+  <script type="text/javascript"> $(".chzn-select").chosen();</script>
+  </div></div>
+{% endblock %}

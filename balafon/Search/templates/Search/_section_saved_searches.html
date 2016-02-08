@@ -1,0 +1,23 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils favorite_tags %}
+
+{% block section_title %}
+  {% trans "Saved searches" %}
+{% endblock %}
+  
+  
+{% block section_data %}
+<table class="table table-striped">
+{% for search in searches %}
+  <tr>
+    <td>{% favorite_item object=search %}
+    <span class="contenteditable inline-block" rel="{% url "auto_save_data" "search" "name" search.id %}" contenteditable="true">
+        {{search.name}}
+    </span>
+    <a class="pull-right" href="{% url "search" search.id %}"><span class="glyphicon glyphicon-search"></span></a>
+    </td>
+  </tr>
+{% endfor %}
+</table>
+{% include "coop_cms/_pagination.html" %}
+{% endblock %}

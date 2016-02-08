@@ -1,0 +1,19 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{block.super}}
+<script>
+  $(function() {
+      $("input[name='group_name']").autocomplete({
+          source: "{% url "crm_get_group_suggest_list" %}"//,
+      });
+  });
+  </script>
+{% endblock %}
+
+{% block title %}{% blocktrans %}Add {{contact.fullname}} to a group{% endblocktrans %}{% endblock %}
+
+{% block form_url %}{% url "crm_add_contact_to_group" contact.id %}{% endblock %}
+
+{% block form_ok %}{% trans "Ok" %}{% endblock %}

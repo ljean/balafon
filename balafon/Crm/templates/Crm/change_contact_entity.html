@@ -1,0 +1,60 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{block.super}}
+<script>
+  var enableEntityInput = function() {
+    $("input[name=entity_visible]").removeAttr("disabled");
+    $("input[name=entity_visible]").closest('tr').css("color", "#000");
+  }
+  
+  var disableEntityInput = function() {
+    $("input[name=entity_visible]").attr("disabled", "disabled");
+    $("input[name=entity_visible]").closest('tr').css("color", "#ccc");
+  }
+  
+  disableEntityInput();
+  $(function() {
+      $("select[name=option]").change(function() {
+        if ($(this).val() == '1') {
+          enableEntityInput();
+        } else {
+          disableEntityInput();
+        }
+      });
+  });
+</script>
+<style>
+  .my-warning {
+    padding: 5px;
+    background: #ccc;
+    max-width: 600px;
+    margin-bottom: 10px;
+  }
+  
+  .my-warning h3{
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block title %}{{contact.fullname}} - {% trans "Reassign entity" %} {% endblock %}
+
+{% block form_fields %}
+<div class="my-warning">
+  {% blocktrans %}
+  <h3>Warning: use if carefully!</h3>
+  <div>
+    Do not reassign a contact who move to another entity. You might lose the history of actions with this entity.<br /><br />
+    You should create a new contact in the other entity and then, you can check the `has left` option of the current contact.<br /><br />
+    The goal of reassigning is to fix errors: For example if you create an entity twice and want to merge the contacts into a single one.
+  </div>
+  {% endblocktrans %}
+</div>
+{{ block.super }}
+{% endblock %}
+
+{% block form_url %}{% url "crm_change_contact_entity" contact.id %}{% endblock %}
+
+{% block form_ok %}{% trans "Ok" %}{% endblock %}

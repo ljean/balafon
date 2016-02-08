@@ -1,0 +1,12 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block title %}{% trans "Confirm" %}{% endblock %}
+{% block form_url %}{{ action_url }}{% endblock %}
+{% block form_fields %}
+<div class="confirm-message">{{message}}</div>
+{{block.super}}
+{% endblock %}
+{% block popup_buttons %}
+<a href="" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="confirm" value="{% trans "Confirm" %}">
+{% endblock %}

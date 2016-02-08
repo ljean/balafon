@@ -1,0 +1,45 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+<script type="text/javascript">
+    $(document).bind('cbox_complete', function(){
+        $("input[name='export_to_pdf']").click(function() {
+            
+            $(document).find('form.pdf-iframe').remove();
+            $(document).find('iframe.pdf-iframe').remove();
+            
+            var origin_form = $(this).parents('form');
+            var form = origin_form.clone();
+            
+            $(document).find('body').append('<iframe class="pdf-iframe" name="download-pdf"></iframe>');
+            var iframe = $(document).find('iframe.pdf-iframe').hide();
+            
+            form.addClass("pdf-iframe");
+            form.attr('target', iframe.attr('name'));
+            $(document).find('body').append(form);
+            
+            form = $(document).find('form.pdf-iframe').hide();
+            $("input[name='export_to_pdf']").unbind('click');
+            
+            form.find("select").val(origin_form.find("select").val());
+            form.find("input[name='export_to_pdf']").click();
+            
+            $.colorbox.close();
+            
+            return false;
+        });
+    });
+</script>
+{% endblock %}
+
+{% block title %}{% trans "Export to PDF" %}{% endblock %}
+
+{% block form_url %}{% url "search_export_to_pdf" %}{% endblock %}
+
+{% block extra_form_args %}target="download_iframe"{% endblock %}
+
+{% block popup_buttons %}
+<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="export_to_pdf" value="{% trans "Generate" %}">
+{% endblock %}

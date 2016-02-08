@@ -1,0 +1,19 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n favorite_tags %}
+
+{% block extra_title %}{% trans "Favorites" %}{% endblock %}
+
+{% block document_content %}
+    {% if favs_by_type %}
+    {% for type, favs, template_name in favs_by_type %}
+        {% include template_name %}
+    {% endfor %}
+    {% else %}
+    <h2>{% trans "No favorites yet!" %}</h2>
+    {% blocktrans %}
+    <p>You can click on an empty star (<span class="glyphicon glyphicon-star-empty"></span>) to push the corresponding item on the favorites page.</p>
+    <p>Favorite items are shown with a full-color star (<span class="glyphicon glyphicon-star"></span>). Click on it when you want to remove the item from the favorites page.</p>
+    <p>Every user has its own favorites.</p>
+    {% endblocktrans %}
+    {% endif %}
+{% endblock %}

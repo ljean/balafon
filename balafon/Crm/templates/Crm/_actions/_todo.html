@@ -1,0 +1,13 @@
+{% load i18n balafon_utils %}
+<a href="{% if action.type.has_final_status %}{% url 'crm_update_action_status' action.id %}?done=1{% else %}{% url 'crm_do_action' action.id %}{% endif %}" class="colorbox-form">
+{% if not action.done %}
+    <span title="{% trans 'to do' %}" class="glyphicon glyphicon-unchecked"></span>
+{% else %}
+  <div class="done-action-flag">
+    <span class="glyphicon glyphicon-check"></span>
+    <span class="done-date">
+      <span class="glyphicon glyphicon-check"></span> {% trans "done on" %}<br />
+      {{action.done_date|date:'d/m/Y H:i'|cut_null_hour}}</span>
+  </div>
+{% endif %}
+</a>

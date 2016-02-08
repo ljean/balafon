@@ -1,0 +1,160 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{block.super}}
+<style>
+  .email-group {
+    padding: 5px 0;
+    background: #eee;
+  }
+  
+  .email-group:hover {
+    background: #ccc;
+  }
+  
+  .warning {
+    padding: 10px;
+    background: #fc6;
+    font-weight: bold;
+  }
+  
+  .email-group.checked, .email-group.checked:hover {
+    background: #444;
+  }
+  
+  .email-group a {
+    text-decoration: none;
+  }
+  
+  .clipboard-block {
+    margin: 15px 0;
+    width: 100%;
+  }
+  
+  .copy-to-clipboard {
+    font-size: 0.8em;
+    width: 100%;
+    text-align: right;
+    display: block;
+  }
+  
+  .clipboard-block .clipboard-value {
+    text-align: left;
+  }
+  
+</style>
+<script>
+  jQuery.fn.selectText = function(){
+      var doc = document;
+      var element = this[0];
+      console.log(this, element);
+      if (doc.body.createTextRange) {
+          var range = document.body.createTextRange();
+          range.moveToElementText(element);
+          range.select();
+      } else if (window.getSelection) {
+          var selection = window.getSelection();        
+          var range = document.createRange();
+          range.selectNodeContents(element);
+          selection.removeAllRanges();
+          selection.addRange(range);
+      }
+   };
+
+  $(function() {
+    $("a.check-on-click").click(function() {
+      $(this).parent().addClass("checked");
+      return true; //propagate event
+    })
+    
+    var replace_all = function(strVal, subStr, replaceWith) {
+      var cnt = 0;
+      while (strVal.indexOf(subStr) != -1) {
+        strVal = strVal.replace(subStr, replaceWith);
+        cnt++;
+      }
+      return strVal;
+    };
+    
+    $("a.copy-to-clipboard").click(function() {
+      var text = $(this).closest('.clipboard-block').find('.clipboard-value').text();
+      var sep = $(".clipboard-separators").val().replace("\\n", "<br />");
+      text = text.trim();
+      text = replace_all(text, "<", "&lt;");
+      text = replace_all(text, ">", "&gt;");
+      text = replace_all(text, "##", sep);
+      $(".clipboard").html(text);
+      $(".clipboard-div").show();
+      $(".clipboard").selectText();
+      return false;
+    });
+    
+    $("a.hide-clipboard").click(function() {
+      $(".clipboard-div").hide();
+      return false;
+    });
+    $(".clipboard-div").hide();
+  })
+</script>
+{% endblock %}
+
+{% block document_title %}
+{% trans "Mailto" %} {% if bcc %}{% trans "BCC" %}{% endif %}
+{% endblock %}
+
+{% block document_content %}
+<div class="pull-right" style="padding: 5px; border: solid 1px #888; color: #888; margin-top: -50px;">
+  {% trans "Clipboard separator"%}
+  <select class="clipboard-separators" style="display: inline-block;">
+    <option value=",">{% trans "Coma" %}</option>
+    <option value=" ">{% trans "Space" %}</option>
+    <option value="\n">{% trans "Line" %}</option>
+  </select>
+</div>
+
+<div class="warning">
+  <div class=row>
+    <div class="col-md-1" style="text-align: center;">
+      <span class="glyphicon glyphicon-exclamation-sign" style="font-size: 2.7em;"></span>
+    </div>
+    <div class="col-md-11">
+  {% blocktrans %}
+  If the number of email address exceeds {{nb_limit}}, there is a risk that your mail is considered as spam.
+  You may be blocked.<br />
+  Balafon recommends to send your message in several emails. Click on the links below for sending to each groups.
+  {% endblocktrans %}
+    </div>
+  </div>
+</div>
+  
+  
+<div class="clipboard-block">
+  <a href="" class="copy-to-clipboard">{% trans "Copy all to clipboard" %}</a>
+  <div class="clipboard-value" style="display: none;">
+    {% for emails in email_groups %}{{emails|join:"##"}}{% if not forloop.last %}##{% endif %}{% endfor %}
+  </div>
+  <div class="clipboard-div">
+    <b>{% trans "Copy to clipboard: Ctrl+C" %}</b>
+    <a class="hide-clipboard btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> {% trans "Close" %}</a>
+    <div>
+      <div contenteditable="true" class="clipboard" style="width: 100%; height: auto;"></div>
+    </div>
+  </div>
+  
+</div>
+
+{% for emails in email_groups %}
+<div class="clipboard-block">
+  <a href="" class="copy-to-clipboard">{% trans "Copy to clipboard" %}</a>
+  <div class="email-group">
+    <a class="check-on-click" href="mailto:{%if bcc %}?bcc={%endif%}{{emails|join:","}}">
+      {{emails|join:" "}}
+    </a>
+    <div class="clipboard-value" style="display: none;">
+      {{emails|join:"##"}}
+    </div>
+  </div>  
+</div>
+{% endfor %}
+{% endblock %}

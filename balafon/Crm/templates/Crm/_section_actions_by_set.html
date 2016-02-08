@@ -1,0 +1,40 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}
+  {% trans "Actions" %}
+{% endblock %}
+  
+{% block section_data %}
+  {% for set_id, set_title, actions, total_count in actions_by_set %}
+    <div class="row"><div class="col-md-12">
+    {% if set_title %}
+      <div class="section-action-set-title">
+      {{ set_title }}
+      </div>
+    {% endif %}
+    {% if total_count > actions.count %}
+        <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
+          <span class="glyphicon glyphicon-warning-sign"></span>
+          {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
+          <a class="btn btn-default btn-xs"
+             href="{% if contact %}{% url 'crm_view_contact_actions' contact.id set_id %}{% else %}{% url 'crm_view_entity_actions' entity.id set_id %}{% endif %}"
+          >
+            {% trans "View all" %}
+          </a>
+        </div>
+      {% endif %}
+    {% include "Crm/_actions_table.html" %}
+    </div></div>
+  {% endfor %}
+{% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
+
+{% block section_buttons %}
+  {% include "Crm/_actions_set_menu.html" %}
+  {% for action_type in addable_action_types %}
+  {% include "Crm/_actions_set_menu.html" %}
+  {% endfor %}
+{% endblock %}
+

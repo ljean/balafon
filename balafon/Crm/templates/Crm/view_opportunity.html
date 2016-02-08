@@ -1,0 +1,14 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_title %}{% trans "Opportunity" %} {{ opportunity.name }} {% endblock %}
+
+{% block document_content %}
+  
+{% include "Crm/_section_opportunity_info.html" %}
+
+{% include "Crm/_section_contacts.html" %}
+
+{% include "Crm/_section_actions_by_set.html" %}
+
+{% endblock %}

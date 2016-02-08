@@ -1,0 +1,28 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+
+{% block document_title %}{% trans "Quick search results for" %} '{{text}}'{% endblock %}
+{% block document_content %}
+
+{% if contacts %}    
+{% include "Search/_section_qs_contacts.html" %}
+{% endif %}
+
+{% if groups_by_name %}    
+{% include "Search/_section_qs_groups.html" with groups=groups_by_name %}
+{% endif %}
+
+{% if contacts_by_phone %}    
+{% include "Search/_section_qs_phones.html" with contacts_and_entities=contacts_by_phone %}
+{% endif %}
+
+{% if contacts_by_email %}    
+{% include "Search/_section_qs_emails.html" with contacts_and_entities=contacts_by_email %}
+{% endif %}
+
+{% if cities_by_name %}    
+{% include "Search/_section_qs_cities.html" with cities=cities_by_name %}
+{% endif %}
+
+{% endblock %}

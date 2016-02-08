@@ -1,0 +1,32 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n floppyforms %}
+
+{% block extra_head %}
+  {{block.super}}
+  {{form.media}}
+{% endblock %}
+
+{% block document_content %}
+  <div class="row"><div class="col-md-12">
+  <h2>{% trans "Unsubscribe contacts" %}</h2>
+  
+  <form role="form" method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
+      <div class="import-contact-intro">
+        {% blocktrans %}
+          Upload a csv file with email addresses per line for every contacts you want to unregister from
+          newlestters or any kind of subscriptions
+        {% endblocktrans %}
+      </div>
+      
+      {% include "bs/form_fields.html" %}
+  
+    <div class="row">
+      <div class="col-md-6 col-md-offset-6">
+        <input class="btn btn-md btn-primary" type="submit" value="{% trans "Import" %}">
+        <a class="btn btn-md btn-default" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+      </div>
+    </div>
+  </form>
+  <!--- <script type="text/javascript"> $(".chzn-select").chosen();</script>-->
+  </div></div>
+{% endblock %}

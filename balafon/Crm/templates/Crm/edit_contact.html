@@ -1,0 +1,73 @@
+{% extends "balafon/tab_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {% include "balafon/_calendar.html" with field="birth_date" yearRange="c-100:c" %}
+  <script>
+  var reloadSameAs = function () {
+    var elt = $("#id_same_as_suggestions");
+    var container = elt.closest('.form-group');
+    if (elt.length) {
+      container.hide();
+      $('#id_lastname, #id_firstname, #id_email').change(function() {
+        var url = '{% url "crm_same_as_suggestions" %}';
+        var data = {
+          lastname: $("#id_lastname").val(),
+          firstname: $("#id_firstname").val(),
+          email: $("#id_email").val()
+        };
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: data,
+          success: function (recvData) {
+            elt.empty(); // remove old options
+            elt.append($("<option></option>").attr("value", '').text(''));
+            for (var i= 0, l=recvData.length; i<l; i++){
+              var contact = recvData[i];
+              elt.append($("<option></option>").attr("value", contact.id).text(contact.fullname));
+            }
+            elt.trigger("chosen:updated");
+            if (recvData.length) {
+              container.show();
+              $.colorbox.resize();
+            } else {
+              container.hide();
+            }
+          },
+          dataType: 'json'
+        });
+      });
+    }
+  };
+  $(document).bind('cbox_complete', reloadSameAs);
+  </script>
+{% endblock %}
+
+{% block title %}{% if contact %}{% trans "Edit contact" %}{% else %}{% trans "Create contact" %}{% endif %}{% endblock %}
+
+{% block form_url %}{% if contact %}{% if go_to_entity %}{% url "crm_edit_contact_on_entity" contact.id %}{% else %}{% url "crm_edit_contact" contact.id %}{% endif %}{% else %}{% if entity %}{% url "crm_add_contact" entity.id %}{% else %}{% url "crm_add_single_contact" %}{% endif %}{% endif %}{% endblock %}
+
+{% block doc_header %}
+  <h2>
+    {% if contact %}
+    {{contact}}</h2>
+    {% else %}
+    {% if is_single_contact %}
+      {% trans "Create single contact" %}
+    {% else %}
+      {% trans "Create contact" %}
+    {% endif %}
+  {% endif %}
+  </h2>
+{% endblock %}
+  
+{% block popup_buttons %}
+    <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}" />
+    <a href="" class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
+{% endblock %}
+
+{% block doc_footer %}
+  
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+{% endblock %}
+{% block title %}{% trans "Clone action" %}{% endblock %}
+{% block form_url %}{% url "crm_clone_action" action.id %}{% endblock %}
+{% block doc_header %}
+{% if form.single_choice %}
+  {% blocktrans %}
+    <p>Do you want to duplicate this action as a new {{ action_type_name }}?</p>
+  {% endblocktrans %}
+{% else %}
+  {% blocktrans %}
+    <p>Do you want to duplicate this action? Select new type below:</p>
+  {% endblocktrans %}
+{% endif %}
+{% endblock %}

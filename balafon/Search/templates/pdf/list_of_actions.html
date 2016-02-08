@@ -1,0 +1,17 @@
+{% extends "pdf/base.html" %}
+{% load i18n balafon_pdf %}
+{% block extra_head %}
+{% endblock %}
+
+{% block content %}
+    <div class="actions">
+    {% for c in contacts %}
+        <h2>{{ c.fullname }}</h2>
+        <table>
+        {% for a in  c|get_actions:search_dict %}
+            <tr><td>{{a.planned_date}}</td><td>{{a.subject}}</td></tr>
+        {% endfor %}
+        </table>
+    {% endfor %}
+    </div>
+{% endblock %}

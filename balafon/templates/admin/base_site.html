@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'Django site admin' %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Django administration' %}</h1>
+{% endblock %}
+
+{% block userlinks %}
+/
+<a href="{% url "coop_cms_homepage" %}">{% trans "Site" %}</a> / 
+<a href="{% url "balafon_homepage" %}">Balafon</a> /
+{{ block.super }}
+{% endblock %}
+
+{% block nav-global %}
+{% endblock %}

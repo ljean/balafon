@@ -1,0 +1,95 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n thumbnail favorite_tags %}
+
+{% block section_header_extra_class %}main-section-header{% endblock %}
+
+{% block section_title %}
+<a class="header-link" href="{% url "crm_view_entity" entity.id %}">
+  <div class="logo" style="display: inline-block; vertical-align: middle;">
+    <span class="glyphicon glyphicon-tower"></span>
+    <div class="logo-container">
+      <img {{entity.get_logo_center_style}} src="{{entity.get_safe_logo}}"/>
+    </div>
+  </div>
+  <div style="display: inline-block; vertical-align: middle;">
+  {{entity.name}}
+</a>
+<div class="section-subtitle">{{entity.description}}</div>
+</div>
+{% endblock %}
+
+{% block section_data %}
+<div class="row">
+  <div class="col-md-4">
+    <table class="table">
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
+        {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% if entity.has_billing_address %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
+        {{entity.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% endif %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{entity.email}}">{{entity.email}}</a>
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{entity.phone}}
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Web Site' %}" class="glyphicon glyphicon-link"></span> {% if entity.website %}<a href="{{entity.website}}" target="_blank">{{entity.website}}</a>{% endif %}
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Fax' %}" class="glyphicon glyphicon-print"></span> {{entity.fax}}
+      </td></tr>
+    </table>
+  </div>
+  
+  <div class="col-md-6">
+    
+    <div class="note" style="margin-bottom: 5px;">
+      <span class="contenteditable" contenteditable="true" rel="{% url "auto_save_data" "entity" "notes" entity.id %}">
+        {{entity.notes|linebreaksbr|default:"&nbsp;"}}
+      </span>
+    </div>
+    
+    {% include "Crm/_entity_groups.html" %}
+    
+    {% with entity.get_custom_fields as custom_fields %}
+    {% if custom_fields %}
+        {% include "Crm/_custom_fields.html" with instance=entity  model="entity" %}
+    {% endif %}
+    {% endwith %}
+  </div>
+  
+  <div class="col-md-2">
+    <table class="table micro-table table-striped">
+      {% if entity.relationship_date %}
+        <tr><td><b>{% trans "Relationship" %}</b> {{entity.relationship_date|date:"d/m/Y"}}</td></tr>
+      {% endif %}
+      <tr><td><b>{% trans "ADD_DT" %}</b> {{entity.created|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>{% trans "UPD_DT" %}</b>
+          {{entity.modified|date:"d/m/Y"}}
+          {% if entity.last_modified_by %} {% trans "by" %} {{entity.last_modified_by}} {% endif %}
+      </td></tr>
+      {% if entity.type %}
+      <tr><td><b>{% trans "Type" %}</b> {{entity.type}}</td></tr> 
+      {% endif %}
+    </table>
+  </div>
+</div>  
+
+{% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
+
+{% block section_buttons %}
+  <li><a class="colorbox-form" href="{% url "crm_edit_entity" entity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "crm_delete_entity" entity.id%}">{% trans "Delete" %}</a></li>
+{% endblock %}
+
+{% block section_favorite %}
+  {% favorite_item object=entity %}
+{% endblock %}

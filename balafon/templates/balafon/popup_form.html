@@ -1,0 +1,45 @@
+{% extends "colorbox/popup_form_base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{ block.super }}
+{% block extra_script %}
+<link type="text/css" href="{{ STATIC_URL }}chosen/chosen-bootstrap.css" rel="Stylesheet" />
+<script>
+  $(document).bind('cbox_complete', function(){
+    $(document).unbind('cbox_complete');
+    try {
+        $(".chosen-select").chosen({disable_search: false, width: "100%"});
+    } catch(e) {
+        //silence
+    }
+
+  });
+</script>  
+{% endblock %}
+{% endblock %}
+
+{% block form_fields %}
+  <div class="popup-form-fields">
+  <div class="doc-header">
+  {% block doc_header %}
+  {% endblock %}
+  {% if form.errors %}
+  <div class="pull-right error-msg label label-danger">{% trans "The form is not valid." %}</div>
+  {% endif %}
+  </div>
+
+  {% if form.non_field_errors %}<div class="label label-danger">{{ form.non_field_errors }}</div>{% endif %}
+  {% for field in form %}
+    {% include "balafon/_field_form.html" %}
+  {% endfor %}
+  
+  {% block doc_footer %}
+  {% endblock %}
+  </div>
+{% endblock %}
+
+{% block popup_buttons %}
+<a href="" class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
+<input class="btn btn-primary" type="submit" value="{% block form_ok %}{% trans "Ok" %}{% endblock %}" />
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils favorite_tags thumbnail %}
+
+{% block section_header_extra_class %}main-section-header{% endblock %}
+
+{% block section_title %}
+<div class="row">
+  <div class="col-md-5">
+    <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">
+      <span class="glyphicon glyphicon-user"></span>
+      <div class="logo-container">
+        <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
+      </div>
+    </a>
+    <div style="display: inline-block; vertical-align: middle;">
+      <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">{{contact.fullname}}</a>
+      {% if contact.same_as %}
+        <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id contact.id %}"
+          title="{% trans 'Change priority order for contact' %}"
+        >
+          <span class="badge {% if 1 == contact.same_as_priority %}highlight{% endif %}">
+            {{ contact.same_as_priority }}
+          </span>
+        </a>
+      {% endif %}
+      {% if not contact.main_contact %}
+        <div class="label label-default">{% trans "secondary" %}</div> 
+      {% endif %}
+      
+      {% if contact.has_left %}
+        <div class="label label-warning">{% trans "has left" %}</div> 
+      {% endif %}
+    <div class="section-subtitle">{{contact.title}}</div>
+    </div>
+  </div>
+  <div class="col-md-2 text-center" style="vertical-align: middle; margin-top: 10px;">
+    {% if not contact.entity.is_single_contact %}
+      <span class="glyphicon glyphicon-chevron-right"></span>
+    {% endif %}
+  </div>
+  <div class="col-md-5">
+    {% if not contact.entity.is_single_contact %}
+    <div class="logo-container">
+      <img {{contact.entity.get_logo_center_style}} class="contact-entity-logo" src="{{contact.entity.get_safe_logo}}">
+    </div>
+    <div class="inline-block">
+      <a href="{% url 'crm_view_entity' contact.entity.id %}" class="contact-entity-info">
+        {{contact.entity}}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block section_data %}
+<div class="row">
+  <div class="col-md-4">
+    <table class="table">
+      {% if contact.birth_date %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Birth date' %}" class="glyphicon glyphicon-calendar"></span>
+        {{ contact.birth_date|date:"d/m/Y" }}
+      </td></tr>
+      {% endif %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
+        {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% if contact.has_billing_address %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
+        {{contact.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+      </td></tr>
+      {% endif %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Mobile' %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
+      </td></tr>
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
+      </td></tr>
+
+      {% with contact.get_roles as roles %}
+      {% if roles %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Roles' %}" class="glyphicon glyphicon-film"></span>
+        {{ roles|join:", " }}
+      </td></tr>
+      {% endif %}
+      {% endwith %}
+
+      {% if contact.favorite_language %}
+      <tr><td>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
+        {{contact.get_favorite_language_display}}
+      </td></tr>
+      {% endif %}
+    </table>
+  </div>
+  
+  <div class="col-md-6">
+    
+    <div class="note" style="margin-bottom: 5px;">
+      
+      <span class="contenteditable" contenteditable="true" rel="{% url 'auto_save_data' 'contact' 'notes' contact.id %}">
+        {{contact.notes|linebreaksbr|default:"&nbsp;"}}
+      </span>
+      
+      <!-- <span contenteditable=true>{{contact.notes|linebreaksbr|default:"&nbsp;"}}</span>-->
+    </div>
+    
+    {% include "Crm/_contact_groups.html" %}
+    
+    {% with contact.get_custom_fields as custom_fields %}
+    {% if custom_fields %}
+        {% include "Crm/_custom_fields.html" with instance=contact  model="contact" %}
+    {% endif %}
+    {% endwith %}
+    
+  </div>
+  
+  <div class="col-md-2">
+    <table class="table micro-table table-striped">
+      {% if contact.has_left %}
+      <tr><td colspan="2"><b>{% trans "This contact has left." %}</b></td></tr>
+      {% endif %}
+      <tr><td><b>{% trans "ADD_DT" %}</b> {{contact.created|date:"d/m/Y"}}</td></tr>
+      <tr><td><b>
+          {% trans "UPD_DT" %}</b>
+          {{contact.modified|date:"d/m/Y"}}
+          {% if contact.last_modified_by %} {% trans "by" %} {{contact.last_modified_by}} {% endif %}
+      </td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
+
+{% block section_buttons %}
+    <li><a class="colorbox-form" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
+    <li><a class="colorbox-form" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
+{% endblock %}
+
+{% block section_favorite %}
+  {% favorite_item object=contact %}
+{% endblock %}
+
+

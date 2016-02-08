@@ -1,0 +1,34 @@
+{% extends "registration/base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+{{block.super}}
+{% endblock %}
+
+{% block registration_content %}
+<h2>{% trans "Edit your profile" %}</h2>
+<form action="" method="POST" class="registration-form">{% csrf_token %}
+    {% if form.non_field_errors %}
+    {{form.non_field_errors}}
+    {% endif %}
+
+    {% for field in form %}
+      {% include "balafon/_field_form.html" with allow_required_sign=1 %}
+    {% endfor %}
+
+    <div class="row"><div class="col-sm-12">
+      <div class="help-block required">{% trans "* : Required fields" %}</div>
+    </div></div>
+
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-sm-9">
+            <a class="" href="{% url 'password_change' %}">{% trans "Change your password?" %}</a>
+        </div>
+        <div class="col-sm-3">
+          <input class="btn btn-primary pull-right" type="submit" value="{% trans 'Update' %}" />
+      </div>
+    </div>
+
+</form>
+ 
+{% endblock %}

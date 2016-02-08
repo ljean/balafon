@@ -1,0 +1,26 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}{% trans "City" %}{% endblock %}
+  
+{% block section_data %}
+<table class="table table-striped">
+  {% for city, entities_count, contacts_count in cities %}
+  <tr>
+    <td>{{city.name}}</td>
+    <td style="text-align: right;">
+      {% if entities_count == 1 %}{{entities_count}} {% trans "entity" %}{% endif %}
+      {% if entities_count > 1 %}{{entities_count}} {% trans "entities" %}{% endif %}
+      
+      {% if entities_count and contacts_count %} - {% endif %}
+      
+      {% if contacts_count == 1 %}{{contacts_count}} {% trans "contact" %}{% endif %}
+      {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% endif %}
+      
+      <a href="{% url "search_cities" city.id %}"><span class="glyphicon glyphicon-search"></span></a>
+      
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

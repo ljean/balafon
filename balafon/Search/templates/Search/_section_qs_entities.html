@@ -1,0 +1,16 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}{% trans "Entities" %}{% endblock %}
+  
+{% block section_data %}
+<table class="table table-striped">
+  {% for e in entities %}
+  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+    <td><a href="{% url "crm_view_entity" e.id %}">{{e}}</a></td>
+    <td>{{e.main_contacts|seq_to_br|default:"&nbsp;"}}</td>
+    <td>{{e.city|default:"&nbsp;"}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

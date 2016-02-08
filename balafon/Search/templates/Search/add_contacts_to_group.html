@@ -1,0 +1,62 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+  <style>
+    .chzn-container-multi .chzn-choices .search-choice .search-choice-close {
+      height: 8px;
+    }
+    .chzn-container-multi .chzn-choices .search-field input {
+      height: 27px;
+    }
+    .popup_buttons {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+    .info-msg {
+      padding: 20px 20px;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    .popup_form {
+      border: none;
+    }
+    
+    .popup_form td, .popup_form th{
+      padding-bottom: 10px;
+    }
+    
+    .popup_form input, .popup_form .helptext {
+      display: inline-block;
+    }
+    .popup_form br {
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+  $(document).bind('cbox_complete', function(){
+    $(".chzn-select").chosen();
+    $.colorbox.resize();
+    $.colorbox.resize({height: 350});
+  });
+  </script>
+{% endblock %}
+{% block title %}{% blocktrans %}Add  to group{% endblocktrans %}{% endblock %}
+
+{% block form_url %}{% url "search_add_contacts_to_group" %}{% endblock %}
+
+{% block form_fields %}
+  {{ block.super }}
+  <div class="info-msg">
+  {% blocktrans %}
+    Select groups in the existing ones.<br><br>
+    This allow to add contacts or entities (depending if checkbox is cheked or not) on the selected groups.
+  {% endblocktrans %}
+  </div>
+{% endblock %}
+
+{% block popup_buttons %}
+<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="add_to_group" value="{% trans "Add" %}">
+{% endblock %}

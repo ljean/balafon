@@ -1,0 +1,17 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Save search" %}{% endblock %}
+
+{% block extra_head %}
+<script>
+    $(document).bind('cbox_complete', function(){
+        $(document).unbind('cbox_complete');
+        var values = $("form#search_form").serializeForm();
+        $("#id_search_fields").val(values);
+    });
+</script>    
+{% endblock %}
+
+
+{% block form_url %}{% url "search_save" search_id|default:0 %}{% endblock %}

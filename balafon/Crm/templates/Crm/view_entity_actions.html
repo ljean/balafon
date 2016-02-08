@@ -1,0 +1,10 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block document_content %}
+  
+{% include "Crm/_section_entity_info.html" with groups=entity.group_set %}
+
+{% include "Crm/_section_actions_by_set.html" %}
+
+{% endblock %}

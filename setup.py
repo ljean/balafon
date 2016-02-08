@@ -8,7 +8,7 @@ except ImportError:
     ez_setup.use_setuptools()
     from setuptools import setup, find_packages
 
-VERSION = __import__('sanza').__version__
+VERSION = __import__('balafon').__version__
 
 setup(
     name='balafon',

@@ -1,0 +1,19 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}{% trans "Emails" %}{% endblock %}
+  
+{% block section_data %}
+<table class="table table-striped">
+  {% for c in contacts_and_entities %}
+  <tr>
+    <td>
+      {{ c.get_email }}
+    </td>
+    <td>
+      <a href="{{ c.get_absolute_url }}">{{c.fullname|default:c}}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

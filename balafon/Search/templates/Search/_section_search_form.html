@@ -1,0 +1,153 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n %}
+
+{% block section_title %}{% trans "Search criteria" %}{% endblock %}
+{% block section_data %}
+
+<div class="search-block-template" style="display: none">
+  <div class="search-block">
+    <div class="actions">
+      {{search_form.actions|safe}}
+    </div>
+    <div class="fields">
+    </div>
+  </div>
+</div>
+
+<form role="form" id="search_form" class="form-horizontal search-form" action="{% url 'search' %}" method="post">{% csrf_token %}
+  <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
+    <span class="glyphicon glyphicon-search"></span>
+    {% trans "Search" %}
+  </a>
+  <div class="cur-form">
+  {{search_form.as_html|safe}}
+  </div>
+  <div class="form">
+  </div>
+</form>
+
+<script>
+  $(function() {
+    var block_count = {{search_form.block_count|default:0}};
+    var field_count = {{search_form.field_count|default:0}};
+    
+    $(".cur-form select[name='field_choice']").chosen({width: "50%"});
+    
+    var add_block = function(no_remove) {
+      var gr = $(".form").append($(".search-block-template").html());
+      var new_name = "gr"+block_count;
+      gr.find('.search-block:last').attr("rel", new_name);
+      block_count += 1;
+      if (no_remove) {
+        gr.find('.remove-block').remove();
+      }
+      gr.find("select").chosen({width: "50%"});
+      return new_name;
+    }
+    
+    $(document).on('click', ".remove-field", function() {
+      $(this).closest(".field-form").remove();
+      return false;
+    });
+    
+    $(document).on('click', ".remove-block", function() {
+      $(this).parent().parent().remove();
+      return false;
+    });
+    
+    $(document).on('click', ".clear-block", function() {
+      $(this).parent().parent().find('.fields').remove();
+      $(this).parent().parent().append('<div class="fields"></div>')
+      return false;
+    });
+    
+    $(document).on('click', ".add-block", function() {
+      add_block();
+      return false;
+    });
+    
+    $(document).on('click', ".duplicate-block", function() {
+      var new_rel = add_block();
+      var rel = $(this).parent().parent().attr('rel');
+      var fields = $(this).parent().parent().find('.fields').html();
+      var reg=new RegExp("("+rel+"-_-)", "g");
+      fields = fields.replace(reg, new_rel+'-_-');
+      $('.search-block[rel="'+new_rel+'"] .fields').html(fields);
+      return false;
+    });
+    
+    if (block_count === 0) {
+      add_block(true);  
+    } else {
+      $(".form .actions").each(function() {
+        $(this).append($(".search-block-template").html());
+      });
+      $('.search-block[rel="gr0"]').find('.actions a.remove-block').remove();
+    }
+    
+    $(document).on('change', "select[name='field_choice']", function() {
+      var field_type = $(this).val();
+      var add_field_button = $(this).parent().find(".add-field");
+      if (field_type) {
+        add_field_button.css("color", "#000");
+      } else {
+        add_field_button.css("color", "#ccc");
+      }
+      return false;
+    });
+    $("select[name='field_choice']").trigger('change');
+  
+    $(document).on('click', ".add-field", function() {
+      var field_type = $(this).parent().find("select[name='field_choice']").val();
+      if (field_type) {
+        $.ajax({
+          url: field_type+'?block='+$(this).parent().parent().attr('rel')+"&count="+field_count,
+          context: $(this).parent(),
+          success: function(data){
+            field_count += 1;
+            $(this).parent().find(".fields").append(data.form);
+            $(this).parent().find(".fields").find(".chosen-select").chosen();
+          }
+        });
+      }
+      return false;
+    });
+    
+    $("#search-button").click(function() {
+      $("input[name=excluded]").val('');
+      $("form.search-form").submit();
+      return false;
+    })
+    
+    $(document).on('click', '.datepicker', function() {
+      $(this).datepicker({
+        dateFormat: 'dd/mm/yy',
+        dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
+        monthNames : {% trans "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']" %},
+        firstDay: 1,
+        changeYear: true,
+        showOn:'focus'
+      }).focus();
+    });
+    
+    $(document).on('change', '.datepicker', function() {
+      if ($(this).hasClass('from')) {
+        var to = $(this).parent().find(".to");
+        var input = $(this).parent().find("input[type=hidden]");
+        input.val($(this).val()+' '+to.val());
+      } else if ($(this).hasClass('to')) {
+        var from = $(this).parent().find(".from");
+        var input = $(this).parent().find("input[type=hidden]");
+        input.val(from.val()+' '+$(this).val());  
+      }
+    });
+    
+    $("input[name=name]").parent().hide();
+  });
+</script>
+
+{% endblock %}
+
+{% block section_buttons %}
+<li><a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form">{% trans "Save" %}</a></li>
+{% endblock %}

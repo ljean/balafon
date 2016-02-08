@@ -1,0 +1,46 @@
+{% load i18n balafon_utils %}
+
+{% if message %}
+## replaced by line feed
+{% trans "Message" %}
+-----------------
+{{ message }}
+{% endif %}
+
+##
+{% trans "Contact" %}
+-----------------
+{{contact.fullname|safe}}
+{{contact.get_full_address|safe}}
+{{contact.get_phones|seq_to_dash|safe}}
+{{contact.email|safe}}
+{% trans "View on Balafon" %}: http://{{site}}{% url "crm_view_contact" contact.id  %}
+
+{% with same_email=contact.get_same_email %}{% if same_email.count %}
+##
+{% trans "SameAs" %}
+-----------------
+{% trans "This email address is already used by" %}
+{% for same_contact in same_email.all %}
+ * {{ same_contact.fullname|safe }} {% if not same_contact.entity.is_single_contact %}{{ same_contact.entity }} {% endif %}http://{{site}}{% url "crm_view_contact" same_contact.id %}
+{% endfor %}
+{% endif %}{% endwith %}
+
+##
+{% trans "Groups" %}
+-----------------
+{% for gr in groups %}* {{gr}}
+{% endfor %}
+
+##
+{% trans "Actions" %}
+-----------------
+{% for action in actions %}* {{action}}
+{% endfor %}
+
+{% if contact.notes %}
+##
+{% trans "Comments" %}
+-----------------
+{{contact.notes|safe}}
+{% endif %}

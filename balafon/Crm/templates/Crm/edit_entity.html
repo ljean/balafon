@@ -1,0 +1,24 @@
+{% extends "balafon/tab_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {% include "balafon/_calendar.html" with field="relationship_date" yearRange="c-100:c" %}
+{% endblock %}
+
+{% block title %}{% if entity %}{% trans "Edit entity" %}{% else %}{% trans "Create entity" %}{% endif %}{% endblock %}
+
+{% block form_url %}{% if entity.id %}{% url "crm_edit_entity" entity.id %}{% else %}{% url "crm_create_entity" entity_type_id %}{% endif %}{% endblock %}
+
+{% block doc_header %}
+  {% if entity.id %}
+  <h2>{{entity}}</h2>
+  {% else %}
+  <h2>{% trans "Create entity" %}</h2>
+  {% endif %}
+{% endblock %}
+
+{% block popup_buttons %}
+  <input class="btn btn-md btn-primary" type="submit" value="{% trans "Save"%}" />
+  <a class="btn btn-md btn-default cancel_button" href="">{% trans "Cancel" %}</a>
+{% endblock %}

@@ -1,0 +1,83 @@
+<!DOCYTPE html>
+<html>
+<head>
+	{% load i18n static coop_navigation coop_utils coop_bar_tags thumbnail coop_edition balafon_utils %}
+	<meta charset="utf-8"/>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		
+	<title>{% block extra_title %}{% endblock %}</title>
+	<meta name="description" content="{% block description %}{% endblock %}">
+	
+	<!-- <link rel="shortcut icon" type="image/png" href="{{ STATIC_URL }}img/favicon.png" />-->
+
+    {% block jquery_declaration %}
+	{% include "coop_cms/_js_includes.html" %}
+	{% if_cms_edition %}
+		{% cms_form_media %}
+	{% endif %}
+	{% endblock %}
+	
+	{% coop_bar_headers %}
+
+	{% if_cms_edition %}
+	<script>
+	$(function(){
+		//move the form submit to the coop_bar
+		$("form#cms_form input[type='submit']").hide();
+		$('#coopbar_save').click(function(event) {
+			$("form#cms_form").submit();    
+			event.preventDefault();
+		});
+	})
+	</script>
+	{% endif %}
+	{% block extra_head %}
+	<style>
+		{% if not to_pdf %}
+		body {
+			background: #eee;
+		}
+		{% endif %}
+		.frame {
+			width: 900px;
+			margin: auto;
+			background: #fff;
+			padding: 10px;
+		}
+	</style>
+	{% endblock %}
+</head>
+<body>
+	{% include "coop_cms/_messages.html" %}
+	
+	{% block header %}
+	{% if not to_pdf %}
+		{% try_to_include "documents/_header.html" %}
+	{% endif %}
+	{% endblock %}
+
+	<div class="frame">
+		
+		<div class="document">
+			{% block document_wrapper %}
+			<div class="document-text">
+			{% block document %}
+			{% endblock %}
+			</div>
+			{% endblock %}
+		</div>
+	</div>
+	
+	{% block footer %}
+	{% if not to_pdf %}
+		{% try_to_include "documents/_footer.html" %}
+	{% endif %}
+	{% endblock %}
+
+{% if not to_pdf %}
+{% coop_bar %}
+{% endif %}
+
+</body>
+</html>

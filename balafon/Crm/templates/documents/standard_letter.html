@@ -1,0 +1,60 @@
+{% extends "documents/base.html" %}
+
+{% load i18n coop_edition balafon_utils %}
+
+{% block extra_head %}
+    {{ block.super }}
+<style>
+    .address {
+        width: 49.7%;
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    .contact-address{
+        float: right;
+    }
+    p {
+        page-break-inside: avoid;
+        text-align: justify;
+    }
+    .subject {
+        margin: 10px 0;
+    }
+</style>
+{% endblock %}
+
+{% block document %}
+<div class="address company-address">
+    {% block our_company %}
+        {% try_to_include "documents/_our_company.html" %}
+    {% endblock %}
+</div>
+
+<div class="address">
+    <div class="contact-address">
+{% for contact in object.action.contacts.all %}
+    {{ contact }}<br />
+    {{ contact.get_address }}<br />
+    {% if contact.get_address2 %} {{ contact.get_address2 }}<br />{% endif %}
+    {% if contact.get_address3 %}{{ contact.get_address3 }}<br />{% endif %}
+    {{ contact.get_zip_code }} {{ contact.get_city }} {{ contact.get_cedex|default:"" }}
+{% endfor %}
+    </div>
+</div>
+
+{% if object.action.subject %}
+<div class="subject">
+    Objet : {{ object.action.subject }}
+</div>
+{% endif %}
+
+{% cms_edit object %}
+
+<div>{{ object.content }}</div>
+
+{% end_cms_edit %}
+
+{% endblock %}

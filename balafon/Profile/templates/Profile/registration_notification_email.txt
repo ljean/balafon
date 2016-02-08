@@ -1,0 +1,9 @@
+{% load i18n balafon_utils %}
+
+{% trans "A new user has registred to" %} {{site}}
+
+{% trans "About this user" %}
+-----------------
+{{contact.fullname}}
+{{contact.email}}
+

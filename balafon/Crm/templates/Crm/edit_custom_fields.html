@@ -1,0 +1,26 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {% include "balafon/_calendar.html" %}
+  <style>
+    .popup-form-fields .row {
+      min-width: 700px;
+      padding: 5px;
+    }
+    .popup-form-fields .row:nth-child(even) {
+      background: #eee;
+    }
+
+  </style>
+{% endblock %}
+
+{% block title %}Edit '{{instance}}'{% endblock %}
+
+{% block form_url %}{% url "crm_edit_custom_fields" model_name instance.id %}{% endblock %}
+
+{% block popup_buttons %}
+  <input class="btn btn-md btn-primary" type="submit" value="{% trans 'Save' %}" />
+  <a class="btn btn-md btn-default cancel_button" href="">{% trans "Cancel" %}</a>
+{% endblock %}

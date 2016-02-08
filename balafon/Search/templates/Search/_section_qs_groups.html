@@ -1,0 +1,16 @@
+{% extends "balafon/_bs_section.html" %}
+{% load i18n balafon_utils %}
+
+{% block section_title %}{% trans "Group" %}{% endblock %}
+  
+{% block section_data %}
+<table class="table table-striped">
+  {% for g in groups %}
+  <tr>
+    <td><a href="{% url "search_group" g.id %}">{{g.name}}</a></td>
+    <td>{{g.description|default:"&nbsp;"}}</td>
+    <td>{{g.entities.count}} {% trans "entities" %} - {{g.contacts.count}} {% trans "contacts" %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

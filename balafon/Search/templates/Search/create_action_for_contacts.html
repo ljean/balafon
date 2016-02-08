@@ -1,0 +1,13 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  <link type="text/css" href="{{ STATIC_URL }}css/base/jquery-ui-1.9.2.css" rel="Stylesheet" />	
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.9.2.js"></script>
+  {% include "balafon/_calendar.html" with field="date" yearRange="c:c+2" colorbox="yes" %}
+{% endblock %}
+{% block title %}{% blocktrans %}Create actions for {{nb_contacts}} contacts{% endblocktrans %}{% endblock %}
+{% block form_url %}{% url "search_create_action_for_contacts" %}{% endblock %}
+{% block popup_buttons %}
+<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="create_actions" value="{% trans "Create" %}">
+{% endblock %}
