@@ -343,25 +343,27 @@ def export_contacts_as_excel(request):
         if search_form.is_valid():
             contacts = search_form.get_contacts()
             if not search_form.contacts_display:
-                #if the form alread has a sort criteria: don't sort again
+                # if the form already has a sort criteria: don't sort again
                 contacts.sort(key=lambda x: u"{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
             
-            #create the excel document
-            wb = xlwt.Workbook()
-            ws = wb.add_sheet('balafon')
+            # create the excel document
+            workbook = xlwt.Workbook()
+            worksheet = workbook.add_sheet('balafon')
 
-            fields = ['id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'job', 'role',
+            fields = [
+                'id', 'get_gender_display', 'lastname', 'firstname', 'title', 'get_entity_name', 'job', 'role',
                 'get_address', 'get_address2', 'get_address3', 'get_zip_code', 'get_cedex', 'get_city',
-                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date']
+                'get_foreign_country', 'mobile', 'get_phone', 'get_email', 'birth_date'
+            ]
             
-            #header
+            # header
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
-            #create a map of verbose name for each field
-            field_dict = dict([(f.name, _(f.verbose_name).capitalize()) for f in Contact._meta.fields])
+            # create a map of verbose name for each field
+            field_dict = dict([(field.name, _(field.verbose_name).capitalize()) for field in Contact._meta.fields])
             field_dict['foreign_country'] = _(u"Country")
             field_dict['entity_name'] = _(u"Entity")
             
-            #Add custom fields
+            # Add custom fields
             for cf in CustomField.objects.filter(export_order__gt=0).order_by('export_order'):
                 if cf.model == CustomField.MODEL_CONTACT:
                     fields.append('custom_field_'+cf.name)
@@ -370,29 +372,32 @@ def export_contacts_as_excel(request):
                     fields.append('entity_custom_field_'+cf.name)
                     field_dict['entity_custom_field_'+cf.name] = cf.label
             
-            for i, f in enumerate(fields):
-                if f[:4] == 'get_':
-                    f = f[4:]
-                    if f[-8:] == '_display':
-                        f = f[:-8]
-                #print the verbose name if exists, the field name if not
-                value = field_dict.get(f, f)
-                ws.write(0, i, value, header_style)
+            for index, field in enumerate(fields):
+                if field[:4] == 'get_':
+                    field = field[4:]
+                    if field[-8:] == '_display':
+                        field = field[:-8]
+                # print the verbose name if exists, the field name if not
+                value = field_dict.get(field, field)
+                worksheet.write(0, index, value, header_style)
             
             style = xlwt.Style.default_style
-            for i, c in enumerate(contacts):
-                for j, fn in enumerate(fields):
-                    f = getattr(c, fn)
-                    if callable(f):
-                        f = f()
-                    if fn == 'role':
-                        f = u", ".join([r.name for r in f.all()])
-                    if f:
-                        ws.write(i+1, j, unicode(f), style)
+            for index, contact in enumerate(contacts):
+                for index2, field_name in enumerate(fields):
+                    field = getattr(contact, field_name)
+
+                    if field_name == 'role':
+                        field = u", ".join([r.name for r in field.all()])
+
+                    elif callable(field):
+                        field = field()
+
+                    if field:
+                        worksheet.write(index+1, index2, unicode(field), style)
 
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('balafon')
-            wb.save(response)
+            workbook.save(response)
             return response
         else:
             logger.error(unicode(search_form.errors))
