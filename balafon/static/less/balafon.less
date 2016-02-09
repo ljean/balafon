@@ -1,4 +1,4 @@
-@border_color: #ccc;
+@border_color: #eee;
 @navbar_color: #428BCA;
 @navbar_border_color: #428BCA;
 @me_incharge_color: #4a4;
@@ -9,6 +9,7 @@
 @note_background: #fffa94;
 @navigation_tooltip_color: #444;
 @highlight_color: #fd4;
+@table_odd_color: #f8f8f8;
 
 html,
 body {
@@ -58,7 +59,7 @@ body {
 
 .row.section .section-data .table.table-striped > tbody > tr:nth-child(even) > td,
 .row.section .section-data .table.table-striped > tbody > tr:nth-child(even) > th {
-  background-color: #f8f8f8;
+  background-color: @table_odd_color;
 }
 .row.section .section-data .table.table-bordered > tbody > tr > th {
   color: #888;
@@ -69,7 +70,7 @@ body {
 }
 
 .row.section .section-data .table.table-bordered > tbody > tr:nth-child(even) > td {
-  background-color: #f8f8f8;
+  background-color: @table_odd_color;
 }
 
 .note {
@@ -788,7 +789,7 @@ ul.fielderror li {
 }
 
 table.with-odd-even tr.odd td {
-  background: #ddd;
+  background: @table_odd_color;
 }
 
 table.with-odd-even tr.even td {
@@ -834,7 +835,7 @@ table.with-odd-even tr.even td {
 }
 
 .statistics .row:nth-child(odd) {
-    background-color: #f8f8f8;
+    background-color: @table_odd_color;
 }
 
 ul.coop-cms_user-messages {
@@ -856,4 +857,11 @@ ul.coop-cms_user-messages {
 .btn-action-status {
     background: #ddd;
     font-weight: bold;
+}
+
+.label-action-who a{
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: middle;
+
 }

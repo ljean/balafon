@@ -2,7 +2,6 @@ html,
 body {
   height: 100%;
   /* The html and body elements cannot have any padding or margin. */
-
 }
 .version {
   font-size: 0.6em;
@@ -13,7 +12,7 @@ body {
   border-color: @navbar_border_color;
 }*/
 .row.section {
-  border: solid thin #cccccc;
+  border: solid thin #eee;
   padding: 2px;
   margin-bottom: 5px;
 }
@@ -91,7 +90,6 @@ body {
 }
 .actions .row {
   /*overflow: hidden;*/
-
   padding: 1px 0;
 }
 .actions .label {
@@ -108,7 +106,7 @@ body {
   color: #000;
 }
 .label-in-charge {
-  background: #888888;
+  background: #888;
   margin-right: 2px;
 }
 .label-date {
@@ -143,7 +141,7 @@ body {
   margin-top: 4px;
 }
 .label-in-charge.me-in-charge {
-  background: #44aa44;
+  background: #4a4;
 }
 .label-bigger {
   font-size: 1em;
@@ -244,8 +242,8 @@ body {
 }
 .section-header {
   padding: 5px;
-  background: #444444;
-  color: #ffffff;
+  background: #444;
+  color: #fff;
   font-weight: bold;
   font-size: 1.1em;
 }
@@ -270,12 +268,12 @@ body {
   font-weight: bold;
 }
 .badge.highlight {
-  background: #ffdd44;
+  background: #fd4;
   color: #000;
 }
 .contact-entity-info,
 .contact-entity-info:hover {
-  color: #dddddd;
+  color: #ddd;
 }
 .logo-container {
   display: inline-block;
@@ -296,13 +294,7 @@ li.quick-search-form {
   margin-top: 15px;
 }
 /* Large desktop */
-@media (min-width: 1200px) {
-  
-}
 /* Portrait tablet to landscape and desktop */
-@media (min-width: 768px) and (max-width: 979px) {
-  
-}
 /* Landscape phone to portrait tablet */
 @media (max-width: 767px) {
   li.quick-search-form {
@@ -311,9 +303,6 @@ li.quick-search-form {
   }
 }
 /* Landscape phones and down */
-@media (max-width: 480px) {
-  
-}
 .navbar img {
   background: #fff;
 }
@@ -621,7 +610,7 @@ ul.fielderror li {
   color: #c00;
 }
 table.with-odd-even tr.odd td {
-  background: #ddd;
+  background: #f8f8f8;
 }
 table.with-odd-even tr.even td {
   background: #fff;
@@ -665,10 +654,10 @@ ul.coop-cms_user-messages {
   z-index: 9999;
 }
 .nav .tooltip .tooltip-inner {
-  background-color: #444444;
+  background-color: #444;
 }
 .nav .tooltip .tooltip-arrow {
-  border-bottom-color: #444444;
+  border-bottom-color: #444;
 }
 .dropdown-menu {
   height: auto !important;
@@ -677,4 +666,9 @@ ul.coop-cms_user-messages {
 .btn-action-status {
   background: #ddd;
   font-weight: bold;
+}
+.label-action-who a {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: middle;
 }

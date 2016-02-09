@@ -8,6 +8,7 @@
 {% if same_as %}
   {% for same_as_contact in same_as %}
   {% with same_as_contact.has_left as has_left %}
+  {% spaceless %}
   <tr>
     <td>
       <a class="colorbox-form" href="{% url 'crm_make_main_contact' contact.id same_as_contact.id %}"
@@ -39,6 +40,7 @@
       </a>
     </td>
   </tr>
+  {% endspaceless %}
   {% endwith %}
   {% endfor %}
 {% endif %}

@@ -37,7 +37,7 @@
         {% with e.single_contact as c %}
         <td colspan="2">
           <span class="glyphicon glyphicon-user"></span>
-          <a href="{% url 'crm_view_contact' c.id %}">{{c.lastname|default:"?"}} {{c.firstname}}</a>
+          <a href="{% url 'crm_view_contact' c.id %}">{{c.fullname}}</a>
         </td>
       
         <td class="extra-data">{{c.city.get_friendly_name|default:"&nbsp;"}}</td>
