@@ -36,7 +36,7 @@ setup(
         'django-cors-headers',
     ],
     dependency_links=[
-        'git+https://github.com/ljean/coop_cms.git@78e84d710ca5f3d416f82503a7c30a6e006bca7f#egg=apidev_coop_cms-dev',
+        'git+https://github.com/ljean/coop_cms.git@0ba4fcbd0d8ff1d01617ceafc56d7175758bc966#egg=apidev_coop_cms-dev',
     ],
     long_description=open('README.rst').read(),
     url='https://github.com/ljean/balafon',
