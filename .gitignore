@@ -4,7 +4,6 @@
 *.tmproj
 *.egg-info
 /build
-/dist
 */.hg
 .hg*
 
