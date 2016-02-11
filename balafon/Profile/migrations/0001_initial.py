@@ -40,7 +40,6 @@ class Migration(migrations.Migration):
                 ('address3', models.CharField(default='', max_length=200, verbose_name='address 3', blank=True)),
                 ('cedex', models.CharField(default='', max_length=200, verbose_name='cedex', blank=True)),
                 ('subscriptions_ids', models.CharField(default=b'', max_length=100, blank=True)),
-                ('groups_ids', models.CharField(default=b'', max_length=100, blank=True)),
                 ('city', models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='City')),
                 ('contact', models.OneToOneField(null=True, default=None, blank=True, to='Crm.Contact')),
                 ('entity_type', models.ForeignKey(default=None, blank=True, to='Crm.EntityType', null=True, verbose_name='Entity type')),

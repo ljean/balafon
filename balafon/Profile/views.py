@@ -28,7 +28,7 @@ from balafon.utils import now_rounded
 @login_required 
 def edit_profile(request):
     try:
-        profile = request.user.get_profile()
+        profile = request.user.contactprofile
     except ContactProfile.DoesNotExist:
         raise Http404
 
@@ -56,7 +56,11 @@ def edit_profile(request):
 
 @login_required 
 def post_message(request):
-    profile = request.user.get_profile()
+    try:
+        profile = request.user.contactprofile
+    except ContactProfile.DoesNotExist:
+        raise Http404
+
     if not profile.contact:
         raise Http404
     
@@ -67,7 +71,7 @@ def post_message(request):
             
             message = form.cleaned_data['message']
             
-            #send message by email
+            # send message by email
             notification_email = getattr(settings, 'BALAFON_NOTIFICATION_EMAIL', '')
             if notification_email:
                 from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')

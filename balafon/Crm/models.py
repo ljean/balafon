@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """models"""
-#pylint: disable=model-no-explicit-unicode
+# pylint: disable=model-no-explicit-unicode
 
-from datetime import datetime
 import uuid
 import unicodedata
 from urlparse import urlparse
