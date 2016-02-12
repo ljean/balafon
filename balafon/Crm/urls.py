@@ -222,6 +222,7 @@ urlpatterns = [
         planning_views.NotPlannedActionArchiveView.as_view(),
         name="crm_actions_not_planned"
     ),
+    url(r'^go-to-planning-date/$', planning_views.go_to_planning_date, name='crm_go_to_planning_date'),
 
     # documents
     url(

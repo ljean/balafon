@@ -3,6 +3,7 @@
 
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+import json
 
 from django.core.urlresolvers import reverse
 
@@ -784,3 +785,169 @@ class PlanningRedirectView(BaseTestCase):
         now = datetime.now()
         redirect_url = reverse('crm_actions_of_day', args=[now.year, now.month, now.day]) + query_string
         self.assertTrue(response['Location'].find(redirect_url) >= 0)
+
+
+class GoToPlanningDateTest(BaseTestCase):
+    """It should return the url of given parameters"""
+
+    def test_404_on_get(self):
+        """It should return 404"""
+        url = reverse('crm_go_to_planning_date')
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+
+    def test_go_to_day(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'day',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 2, 14]) + '?filter=t2')
+
+    def test_go_to_day_september(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'day',
+            'planning_date': '2016-09-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 9, 14]) + '?filter=t2')
+
+    def test_go_to_day_december(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'day',
+            'planning_date': '2016-12-09',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 12, 9]) + '?filter=t2')
+
+    def test_go_to_month(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'month',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_month', args=[2016, 2]) + '?filter=t2')
+
+    def test_go_to_week(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'week',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_week', args=[2016, 6]) + '?filter=t2')
+
+    def test_go_to_week_no_filters(self):
+        """It should return url"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'week',
+            'planning_date': '2016-02-14',
+            'filters': '',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+
+        resp_data = json.loads(response.content)
+
+        self.assertEqual(resp_data['url'], reverse('crm_actions_of_week', args=[2016, 6]))
+
+    def test_go_to_invalid_type(self):
+        """It should return 404 error"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'blabla',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(404, response.status_code)
+
+    def test_go_to_invalid_date(self):
+        """It should return 404 error"""
+        url = reverse('crm_go_to_planning_date')
+
+        data = {
+            'planning_type': 'month',
+            'planning_date': 'blabla',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(404, response.status_code)
+
+    def test_go_to_anonymous(self):
+        """It should not be allowed"""
+        url = reverse('crm_go_to_planning_date')
+        self.client.logout()
+        data = {
+            'planning_type': 'month',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(302, response.status_code)
+
+    def test_go_to_not_allowed(self):
+        """It should not be allowed"""
+        url = reverse('crm_go_to_planning_date')
+        self.user.is_staff = False
+        self.user.save()
+
+        data = {
+            'planning_type': 'month',
+            'planning_date': '2016-02-14',
+            'filters': 't2',
+        }
+
+        response = self.client.post(url, data)
+        self.assertEqual(302, response.status_code)

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """display actions in different planning views"""
 
-from datetime import datetime
+from datetime import datetime, date
+import json
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.views.generic import RedirectView
 from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
 from django.utils.decorators import method_decorator
@@ -25,6 +26,7 @@ except ImportError:
 class ActionArchiveView(object):
     """view"""
     paginate_by = 50
+    planning_type = ''
 
     @method_decorator(user_passes_test(can_access))
     def dispatch(self, *args, **kwargs):
@@ -81,8 +83,6 @@ class ActionArchiveView(object):
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
 
-        #queryset, self.paginator = paginate(self.request, queryset, 50)
-
         return queryset
 
     def _get_allowed_status(self, action_types, selected_types):
@@ -135,8 +135,7 @@ class ActionArchiveView(object):
         context["action_types"] = action_types
         context["in_charge"] = in_charge
         context["action_status"] = action_status
-        #context['pages'] = self.paginator
-        #context['pages_count'] = self.paginator.num_pages if self.paginator else None
+        context["planning_type"] = self.planning_type
 
         return context
 
@@ -165,6 +164,7 @@ class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
     month_format = '%m'
     allow_future = True
     allow_empty = True
+    planning_type = 'month'
 
 
 class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
@@ -173,6 +173,7 @@ class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
     week_format = "%U"
     allow_future = True
     allow_empty = True
+    planning_type = 'week'
 
 
 class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
@@ -181,6 +182,7 @@ class ActionDayArchiveView(ActionArchiveView, DayArchiveView):
     allow_future = True
     allow_empty = True
     month_format = '%m'
+    planning_type = 'day'
 
 
 class NotPlannedActionArchiveView(ActionArchiveView, ListView):
@@ -224,3 +226,38 @@ class ThisMonthActionsView(RedirectView):
         now = datetime.now()
         self.url = reverse('crm_actions_of_month', args=[now.year, now.month])
         return super(ThisMonthActionsView, self).get_redirect_url(*args, **kwargs)
+
+
+@user_passes_test(can_access)
+def go_to_planning_date(request):
+    """returns the url for displaying date"""
+
+    if request.method != 'POST':
+        raise Http404
+
+    planning_type = request.POST.get('planning_type', '')
+    planning_date = request.POST.get('planning_date', '')
+    filters = request.POST.get('filters', '')
+
+    try:
+        planning_date = date(*[int(val) for val in planning_date.split('-')])
+    except ValueError:
+        raise Http404
+
+    url = ''
+    if planning_type == 'month':
+        url = reverse('crm_actions_of_month', args=[planning_date.year, planning_date.month])
+
+    elif planning_type == 'week':
+        url = reverse('crm_actions_of_week', args=[planning_date.year, int(planning_date.strftime("%W"))])
+
+    elif planning_type == 'day':
+        url = reverse('crm_actions_of_day', args=[planning_date.year, planning_date.month, planning_date.day])
+
+    if url:
+        if filters:
+            url += '?filter=' + filters
+        data = json.dumps({'url': url})
+        return HttpResponse(data, content_type='application/json')
+    else:
+        raise Http404

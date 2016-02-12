@@ -478,10 +478,11 @@ ul.chosen-choices .search-field input {
 .action-archive-filter h2 {
   vertical-align: top;
   font-size: 24px;
-  margin: 0 10px;
+  margin: 0;
   padding: 0;
-  margin-right: 50px;
-  min-width: 400px;
+}
+.action-archive-filter select.form-control + .chosen-container-multi .chosen-choices li.search-choice {
+  font-size: 12px;
 }
 .action-archive-filter select {
   vertical-align: top;

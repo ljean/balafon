@@ -10,7 +10,7 @@
         {% else %}
         $(".datepicker").datepicker({
         {% endif %}
-          dateFormat: 'dd/mm/yy',
+          dateFormat: '{{ dateFormat|default:"dd/mm/yy" }}',
           dayNamesMin : {% trans "['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" %},
           monthNames : {% spaceless%}
             ['{% trans "January" %}', '{% trans "February" %}', '{% trans "March" %}', '{% trans "April" %}',
