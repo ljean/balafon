@@ -47,7 +47,7 @@ class EmailField(forms.EmailField):
 
     def clean(self, value):
         super(EmailField, self).clean(value)
-        if User.objects.filter(email=value).count() > 0:
+        if User.objects.filter(email__iexact=value).count() > 0:
             raise forms.ValidationError(
                 _(u"This email is already registered. Use the 'forgot password' link on the login page")
             )
@@ -90,7 +90,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         super(UserRegistrationForm, self).__init__(*args, **kwargs)
 
         if 'gender' in self.fields:
-            #do not display Mrs and Mr
+            # do not display Mrs and Mr
             self.fields['gender'].choices = ((0, u'----------'), ) + Contact.GENDER_CHOICE[:2]
 
         if 'entity_type' in self.fields:

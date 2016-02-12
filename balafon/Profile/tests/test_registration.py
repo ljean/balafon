@@ -305,3 +305,31 @@ class RegisterTestCase(TestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.filter(email=data['email']).count(), 0)
+
+    def test_register_existing_email(self):
+        user = mommy.make(models.User, email='toto@toto.fr')
+        url = reverse('registration_register')
+        data = {
+            'email': 'toto@toto.fr',
+            'password1': 'ABC',
+            'password2': 'ABC',
+            'accept_termofuse': True,
+            'gender': 1,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.exclude(id=user.id).filter(email=data['email']).count(), 0)
+
+    def test_register_existing_email_different_cases(self):
+        user = mommy.make(models.User, email='toto@toto.fr')
+        url = reverse('registration_register')
+        data = {
+            'email': 'TOTO@TOTO.FR',
+            'password1': 'ABC',
+            'password2': 'ABC',
+            'accept_termofuse': True,
+            'gender': 1,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.exclude(id=user.id).filter(email=data['email']).count(), 0)
