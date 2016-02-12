@@ -69,36 +69,37 @@
 {% block document_content %}
 <div class="action-archive-filter">
   <div class="row" style="margin-bottom: 20px;">
-    <div class="col-md-1">
-      <a class="btn pull-left btn-default" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span class="glyphicon glyphicon-chevron-left"></span>
+    <div class="col-md-8">
+      <a class="btn btn-md btn-default" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-left"></span>
       </a>
-    </div>
-    <div class="col-md-6">
+      &nbsp;
+      <a class="btn btn-md btn-default" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-right"></span>
+      </a>
+      &nbsp;
       <h2 class="inline-block">
           {% block this_title %}{% endblock %}
       </h2>
     </div>
     <div class="col-md-4">
       {% if planning_type %}
-      <div style="display: inline-block;" class="pull-left">
-        <select class="planningTypeSelector form-control" style="vertical-align: top;">
-          <option value="day" {% if planning_type == "day" %}selected{%endif %}>{% trans "Day" %}</option>
-          <option value="week" {% if planning_type == "week" %}selected{%endif %}>{% trans "Week" %}</option>
-          <option value="month"{% if planning_type == "month" %}selected{%endif %}>{% trans "Month" %}</option>
-        </select>
-      </div>&nbsp;
-
-      <a class="btn btn-default datepicker-trigger" href="#">
-        <span class="glyphicon glyphicon-calendar"></span>
-      </a>
-      <input type="date" id="showOnButton" class="datepicker" style="width: 1px;" />
+      <div class="pull-right" style="padding: 0; margin: 0">
+        <div style="display: inline-block;" class="pull-left">
+          <select class="planningTypeSelector form-control" style="vertical-align: top;">
+            <option value="day" {% if planning_type == "day" %}selected{%endif %}>{% trans "Day" %}</option>
+            <option value="week" {% if planning_type == "week" %}selected{%endif %}>{% trans "Week" %}</option>
+            <option value="month"{% if planning_type == "month" %}selected{%endif %}>{% trans "Month" %}</option>
+          </select>
+        </div>
+        <div class="pull-left" style="margin-left: 5px;">
+          <a class="btn btn-default datepicker-trigger" href="#">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </a>
+          <input type="date" id="showOnButton" class="datepicker pull-right" style="width: 1px;" />
+        </div>
+      </div>
       {% endif %}
-    </div>
-    <div class="col-md-1">
-      <a class="btn btn-default pull-right" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span class="glyphicon glyphicon-chevron-right"></span>
-      </a>
     </div>
   </div>
   <div class="row">
