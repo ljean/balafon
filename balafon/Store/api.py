@@ -209,7 +209,7 @@ class CartView(APIView):
 
 
 class FavoriteView(APIView):
-    """post a cart"""
+    """manage favorite store items"""
     permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
@@ -218,7 +218,7 @@ class FavoriteView(APIView):
         favorite_serializer = serializers.FavoriteSerializer(data=request.data)
         if favorite_serializer.is_valid():
 
-            #Get Contact
+            # Get Contact
             try:
                 profile = ContactProfile.objects.get(user=request.user)
             except ContactProfile.DoesNotExist:
@@ -226,10 +226,10 @@ class FavoriteView(APIView):
 
             items_ids = [item_['id'] for item_ in favorite_serializer.validated_data['items']]
 
-            #Delete favorites which are not in the new list
+            # Delete favorites which are not in the new list
             request.user.favorite_set.exclude(id__in=items_ids).delete()
 
-            #create new favorite
+            # create new favorite
             for item_id in items_ids:
                 try:
                     item = StoreItem.objects.get(id=item_id)
@@ -253,7 +253,7 @@ class FavoriteView(APIView):
     def get(self, request):
         """return a new list of favorites"""
 
-        #Get Contact
+        # Get Contact
         try:
             profile = ContactProfile.objects.get(user=request.user)
             contact = profile.contact
@@ -263,3 +263,36 @@ class FavoriteView(APIView):
         favorites = self.request.user.favorite_set.all()
         favorites_serializer = serializers.FavoriteItemSerializer([fav.item for fav in favorites], many=True)
         return Response({'favorites': favorites_serializer.data})
+
+
+class LastSalesView(APIView):
+    """view last sales"""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        """return a new list of favorites"""
+
+        # Get Contact
+        try:
+            profile = ContactProfile.objects.get(user=request.user)
+            contact = profile.contact
+        except ContactProfile.DoesNotExist:
+            # TODO : Si non connecte : les meilleurs ventes? 
+            return PermissionDenied
+
+        # TODO : Unit testing
+
+        sale_items = SaleItem.objects.filter(
+            sale__action__contacts=contact
+        ).order_by('sale__action__planned_date', 'item__name')
+
+        # Avoid duplicates
+        already_in = set()
+        store_items = []
+        for sale_item in sale_items:
+            if sale_item.item and sale_item.item.id not in already_in:
+                already_in.add(sale_item.item.id)
+                store_items.append(sale_item.item)
+
+        last_sales_serializer = serializers.StoreItemSerializer(store_items, many=True)
+        return Response(last_sales_serializer.data)

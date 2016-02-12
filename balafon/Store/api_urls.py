@@ -6,7 +6,8 @@ from django.conf.urls import url, include
 from rest_framework import routers
 
 from balafon.Store.api import (
-    SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView
+    SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView,
+    LastSalesView
 )
 
 store_items_router = routers.DefaultRouter()
@@ -30,6 +31,12 @@ urlpatterns = [
         r'^api/favorites/$',
         FavoriteView.as_view(),
         name='store_favorites_api'
+    ),
+
+    url(
+        r'^api/last-sales/$',
+        LastSalesView.as_view(),
+        name='store_last_sales_api'
     ),
 
     url(r'^api/', include(store_items_router.urls)),
