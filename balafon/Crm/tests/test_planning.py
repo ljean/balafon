@@ -281,7 +281,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"u{0}".format(y.id) for y in [user_joe, user_jack]],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_type_filter(self):
@@ -312,7 +312,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             sorted([u"t{0}".format(y.id) for y in [action_type1, action_type2]]),
-            sorted([x["value"] for x in soup.select("select option[selected=selected]")])
+            sorted([x["value"] for x in soup.select("select.action-filter option[selected=selected]")])
         )
 
     def test_action_type_none(self):
@@ -339,7 +339,7 @@ class ActionArchiveTest(BaseTestCase):
         self.assertContains(response, action5.subject)
 
         soup = BeautifulSoup(response.content)
-        self.assertEqual(["t0"], [x["value"] for x in soup.select("select option[selected=selected]")])
+        self.assertEqual(["t0"], [x["value"] for x in soup.select("select.action-filter option[selected=selected]")])
 
     def test_type_none_and_defined(self):
         """view actions of the month action type some are set"""
@@ -367,7 +367,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"t0"] + [u"t{0}".format(y.id) for y in [action_type1,]],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_filter_invalid(self):
@@ -394,7 +394,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_filter_invalid_type(self):
@@ -410,7 +410,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_action_type_in_charge_filter(self):
@@ -442,7 +442,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_action_type_and_status(self):
@@ -484,7 +484,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"t{0}".format(action_type1.id)] + [u"s{0}".format(action_status2.id)],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
         self.assertEqual(
             [
@@ -492,7 +492,7 @@ class ActionArchiveTest(BaseTestCase):
                 u"t{0}".format(action_type2.id), u"t{0}".format(action_type1.id),
                 u"s{0}".format(action_status2.id), u"s{0}".format(action_status1.id)
             ],
-            [x["value"] for x in soup.select("select option")]
+            [x["value"] for x in soup.select("select.action-filter option")]
         )
 
     def test_action_type_and_not_managed_status(self):
@@ -529,11 +529,11 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"t{0}".format(action_type1.id)],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
         self.assertEqual(
             [u"t0", u"t{0}".format(action_type1.id), u"t{0}".format(action_type2.id)],
-            [x["value"] for x in soup.select("select option")]
+            [x["value"] for x in soup.select("select.action-filter option")]
         )
 
     def test_view_not_planned_action_anonymous(self):
@@ -585,7 +585,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_not_planned_type_in_charge_filter(self):
@@ -614,7 +614,7 @@ class ActionArchiveTest(BaseTestCase):
         soup = BeautifulSoup(response.content)
         self.assertEqual(
             [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
-            [x["value"] for x in soup.select("select option[selected=selected]")]
+            [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
     def test_view_action_final_status(self):
