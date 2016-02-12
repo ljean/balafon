@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
+
 from django.utils.translation import ugettext as _
 from coop_bar.utils import make_link
+
 
 def can_view(perm, object_names):
     def inner_decorator(func):
@@ -18,6 +19,7 @@ def can_view(perm, object_names):
 
 can_view_object = can_view('can_view', ['object'])
 
+
 @can_view_object
 def doc_to_pdf(request, context):
     obj = context.get("object", None)
@@ -26,9 +28,9 @@ def doc_to_pdf(request, context):
             return make_link(obj.get_pdf_url(), _(u'Pdf'), 'fugue/document-pdf.png',
                 classes=['icon', 'alert_on_click'])
 
+
 def load_commands(coop_bar):
     
     coop_bar.register([
         [doc_to_pdf],
     ])
-    

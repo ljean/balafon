@@ -10,15 +10,23 @@ from coop_bar.utils import make_link
 def balafon_homepage(request, context):
     """back to balafon homepage"""
     if request and request.user.is_authenticated() and request.user.is_staff:
-        return make_link(reverse("balafon_homepage"), _(u'Balafon'), 'fugue/table--arrow.png',
-            classes=['icon', 'alert_on_click'])
+        return make_link(
+            reverse("balafon_homepage"),
+            _(u'Balafon'),
+            'img/balafon-icon.png',
+            classes=['icon', 'alert_on_click']
+        )
 
 
 def back_to_newsletters(request, context):
     """back to balafon newsletters"""
     if request and request.user.is_authenticated() and request.user.is_staff:
-        return make_link(reverse("emailing_newsletter_list"), _(u'Back to newsletters'), 'fugue/table--arrow.png',
-            classes=['icon', 'alert_on_click'])
+        return make_link(
+            reverse("emailing_newsletter_list"),
+            _(u'Back to newsletters'),
+            'fugue/table--arrow.png',
+            classes=['icon', 'alert_on_click']
+        )
 
 
 def load_commands(coop_bar):
