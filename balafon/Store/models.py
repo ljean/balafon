@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """models"""
 
-import datetime
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 import os.path
 import traceback
@@ -201,7 +201,7 @@ class StoreItemCategory(models.Model):
         self.name = self.name.strip()
         ret = super(StoreItemCategory, self).save()
 
-        #Merge categories with same name
+        # Merge categories with same name
         siblings = StoreItemCategory.objects.filter(name=self.name, parent=self.parent).exclude(id=self.id)
         for sibling in siblings:
             for article in sibling.storeitem_set.all():
@@ -214,7 +214,7 @@ class StoreItemCategory(models.Model):
 
             sibling.delete()
 
-        #recalculate price for all articles in this category
+        # Recalculate price for all articles in this category
         for article in self.get_all_articles():
             article.calculate_price()
 
@@ -469,7 +469,7 @@ class StoreItem(models.Model):
         price_policy = self.price_policy.policy if self.price_policy else ''
         policy_parameters = self.price_policy.parameters if self.price_policy else ''
 
-        #look for actual policy price
+        # look for actual policy price
         if price_policy == 'from_category':
             category = self.category
             while price_policy == 'from_category':
@@ -606,7 +606,7 @@ class StoreItemImport(models.Model):
 
     def import_data(self):
         """import data from xls file"""
-        self.last_import_date = datetime.datetime.now()
+        self.last_import_date = datetime.now()
         self.import_error = u''
         self.error_message = u''
         self.is_successful = False

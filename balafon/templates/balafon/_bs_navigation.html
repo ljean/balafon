@@ -49,6 +49,14 @@
                 {% trans "Mailings" %}
               </a>
             </li>
+            {% if BALAFON_STORE_INSTALLED %}
+            <li>
+              <a href="{% url 'store_statistics_index' %}">
+                <span class="glyphicon glyphicon-piggy-bank"></span>
+                {% trans "Store statistics" %}
+              </a>
+            </li>
+            {% endif %}
           </ul>
         </li>
         <li class="dropdown">

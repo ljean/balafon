@@ -15,7 +15,7 @@ from balafon.utils import Utf8JSONRenderer
 from balafon.Crm.models import Action
 from balafon.Crm.serializers import ActionSerializer
 from balafon.Store.models import Discount, Sale, SaleItem, VatRate, StoreManagementActionType
-from balafon.Store.serializers import DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer
+from balafon.Store.api.serializers import DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer
 
 
 class SalesDocumentViewMixin(object):

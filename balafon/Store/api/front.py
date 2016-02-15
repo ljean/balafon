@@ -15,7 +15,8 @@ from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
     Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint
 )
-from balafon.Store import serializers, settings
+from balafon.Store import settings
+from balafon.Store.api import serializers
 from balafon.Store.settings import get_cart_type_name
 from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user
 

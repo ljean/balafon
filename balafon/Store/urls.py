@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """urls"""
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from balafon.Store.views.sales_documents import (
     SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView
 )
+from balafon.Store.views.statistics import StaticticsIndexView
 from balafon.Store.views.xls_export import StockXlsView, StockAlertXlsView, StoreXlsCatalogueView
 
 
@@ -40,4 +41,11 @@ urlpatterns = [
         StoreXlsCatalogueView.as_view(),
         name=r'store_xls_catalogue'
     ),
+
+    url(
+        r'statistics/index$',
+        StaticticsIndexView.as_view(),
+        name=r'store_statistics_index'
+    )
+
 ]

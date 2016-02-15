@@ -164,3 +164,21 @@ class FavoriteItemSerializer(serializers.Serializer):
 
 class FavoriteSerializer(serializers.Serializer):
     items = FavoriteItemSerializer(many=True)
+
+
+class ValueSerializer(serializers.Serializer):
+    """a value"""
+    value = serializers.DecimalField(max_digits=9, decimal_places=2)
+
+
+class SalesStatisticSerializer(serializers.Serializer):
+    """Serialize"""
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    icon = serializers.CharField(required=False)
+    values = ValueSerializer(many=True)
+
+
+class DateSerializer(serializers.Serializer):
+    """a value"""
+    date = serializers.DateTimeField()

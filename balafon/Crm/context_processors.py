@@ -30,6 +30,7 @@ def crm(request):
         'BALAFON_ENTITY_TYPES': EntityType.objects.all(),
         'BALAFON_MULTI_USER': getattr(settings, 'BALAFON_MULTI_USER', True),
         'BALAFON_EMAIL_LOGIN': ('balafon.Profile.backends.EmailModelBackend' in settings.AUTHENTICATION_BACKENDS),
+        'BALAFON_STORE_INSTALLED': 'balafon.Store' in settings.INSTALLED_APPS,
         'NOW': datetime.now(),
         'is_allowed_homepage': is_allowed_homepage(request.path),
         'addable_action_types': ActionType.objects.filter(set__isnull=False),

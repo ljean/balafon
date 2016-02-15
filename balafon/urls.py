@@ -115,7 +115,7 @@ if 'balafon.Profile' in settings.INSTALLED_APPS:
 if 'balafon.Store' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns('',
         url(r'^store/', include('balafon.Store.urls')),
-        url(r'^store/', include('balafon.Store.api_urls'))
+        url(r'^store/', include('balafon.Store.api.urls'))
     )
 
 
