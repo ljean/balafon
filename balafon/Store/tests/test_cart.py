@@ -47,7 +47,7 @@ class CartTest(BaseTestCase):
     def test_post_cart(self):
         """It should create a new sale and action"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -112,7 +112,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_notes(self):
         """It should create a new sale and action"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -170,7 +170,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_long_notes(self):
         """It should create a new sale and action"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -228,7 +228,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_notes_several_lines(self):
         """It should create a new sale and action"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -286,7 +286,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_update_stock(self):
         """It should create a new sale and action and update the stock"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -351,7 +351,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_not_available(self):
         """It should create a new sale and ignore articles which are not available"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -410,7 +410,7 @@ class CartTest(BaseTestCase):
     def test_post_cart_empty(self):
         """It should create a new sale and ignore articles which are not available"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -452,7 +452,7 @@ class CartTest(BaseTestCase):
     def test_cart_when_deleted_article(self):
         """The cart should not be removed if store_item is deleted"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 
@@ -487,7 +487,7 @@ class CartTest(BaseTestCase):
     def test_cart_with_discount(self):
         """The cart should take account discount into account"""
 
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
 

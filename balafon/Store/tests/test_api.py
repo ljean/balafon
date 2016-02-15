@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from datetime import datetime, timedelta
 import logging
 
 from django.contrib.auth.models import User
@@ -10,6 +11,8 @@ from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from balafon.Crm.models import Action, Contact
+from balafon.Profile.utils import create_profile_contact
 from balafon.Store import models
 
 
@@ -315,6 +318,8 @@ class FavoriteApiTest(BaseTestCase):
         store_item1 = mommy.make(models.StoreItem)
         store_item2 = mommy.make(models.StoreItem)
 
+        create_profile_contact(self.user)
+
         url = reverse('store_favorites_api')
 
         response = self.client.get(url, format='json')
@@ -339,6 +344,8 @@ class FavoriteApiTest(BaseTestCase):
         store_item1 = mommy.make(models.StoreItem)
         store_item2 = mommy.make(models.StoreItem)
         store_item3 = mommy.make(models.StoreItem)
+
+        create_profile_contact(self.user)
 
         mommy.make(models.Favorite, user=self.user, item=store_item1)
         mommy.make(models.Favorite, user=self.user, item=store_item2)
@@ -366,6 +373,8 @@ class FavoriteApiTest(BaseTestCase):
         store_item2 = mommy.make(models.StoreItem)
         store_item3 = mommy.make(models.StoreItem)
 
+        create_profile_contact(self.user)
+
         url = reverse('store_favorites_api')
 
         data = {
@@ -385,6 +394,8 @@ class FavoriteApiTest(BaseTestCase):
         store_item1 = mommy.make(models.StoreItem)
         store_item2 = mommy.make(models.StoreItem)
         store_item3 = mommy.make(models.StoreItem)
+
+        create_profile_contact(self.user)
 
         url = reverse('store_favorites_api')
 
@@ -411,6 +422,8 @@ class FavoriteApiTest(BaseTestCase):
         """It should delete all favorites"""
         store_item1 = mommy.make(models.StoreItem)
         store_item2 = mommy.make(models.StoreItem)
+
+        create_profile_contact(self.user)
 
         url = reverse('store_favorites_api')
 
@@ -455,3 +468,130 @@ class FavoriteApiTest(BaseTestCase):
         self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item1).count())
         self.assertEqual(1, models.Favorite.objects.filter(user=self.user, item=store_item2).count())
         self.assertEqual(0, models.Favorite.objects.filter(user=self.user, item=store_item3).count())
+
+
+class LastSalesApiTest(BaseTestCase):
+    """Test that we get last sales for the current user"""
+
+    def test_view_empty_list(self):
+        """It should return empty list"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+
+        profile = create_profile_contact(self.user)
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        items = response.data
+        self.assertEqual(len(items), 0)
+
+    def test_view_last_sales_only_one(self):
+        """It should return one store item"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        mommy.make(models.StoreItem)
+
+        self.user.first_name = u'John'
+        self.user.last_name = u'Doe'
+        self.user.save()
+
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        action = mommy.make(Action, planned_date=datetime.now())
+        action.contacts.add(contact)
+        action.save()
+
+        sale = mommy.make(models.Sale, action=action)
+
+        mommy.make(models.SaleItem, sale=sale, item=store_item1, quantity=1)
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        items = response.data
+        self.assertEqual(len(items), 1)
+
+        self.assertEqual(items[0]['id'], store_item1.id)
+        self.assertEqual(items[0]['name'], store_item1.name)
+
+    def test_view_last_sales_only_two_sales(self):
+        """It should return three store item"""
+
+        store_item1 = mommy.make(models.StoreItem, name=u'Orange')
+        store_item2 = mommy.make(models.StoreItem, name=u'Banana')
+        store_item3 = mommy.make(models.StoreItem, name=u'Apple')
+        store_item4 = mommy.make(models.StoreItem)
+
+        self.user.first_name = u'John'
+        self.user.last_name = u'Doe'
+        self.user.save()
+
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        other_contact = mommy.make(Contact)
+
+        action1 = mommy.make(Action, planned_date=datetime.now())
+        action1.contacts.add(contact)
+        action1.save()
+        sale1 = mommy.make(models.Sale, action=action1)
+        mommy.make(models.SaleItem, sale=sale1, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale1, item=store_item2, quantity=5)
+
+        action2 = mommy.make(Action, planned_date=datetime.now() - timedelta(days=30))
+        action2.contacts.add(contact)
+        action2.save()
+        sale2 = mommy.make(models.Sale, action=action2)
+        mommy.make(models.SaleItem, sale=sale2, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale2, item=store_item3, quantity=2)
+
+        action3 = mommy.make(Action, planned_date=datetime.now())
+        action3.contacts.add(other_contact)
+        action3.save()
+        sale3 = mommy.make(models.Sale, action=action3)
+        mommy.make(models.SaleItem, sale=sale3, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale3, item=store_item4, quantity=2)
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        items = response.data
+        self.assertEqual(len(items), 3)
+
+        self.assertEqual(items[0]['id'], store_item2.id)
+        self.assertEqual(items[0]['name'], store_item2.name)
+
+        self.assertEqual(items[1]['id'], store_item1.id)
+        self.assertEqual(items[1]['name'], store_item1.name)
+
+        self.assertEqual(items[2]['id'], store_item3.id)
+        self.assertEqual(items[2]['name'], store_item3.name)
+
+    def test_view_anonymous(self):
+        """It should return http error"""
+
+        create_profile_contact(self.user)
+
+        self.client.logout()
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertTrue(response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED))
+
+    def test_view_no_profile(self):
+        """It should return http error"""
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertTrue(response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED))

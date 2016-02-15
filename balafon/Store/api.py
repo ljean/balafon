@@ -208,7 +208,23 @@ class CartView(APIView):
             )
 
 
-class FavoriteView(APIView):
+class ProfileAPIView(APIView):
+    """base class"""
+
+    def get_profile(self, request):
+        """return a valid profile"""
+        # Get Contact
+        try:
+            profile = ContactProfile.objects.get(user=request.user)
+            if not profile.contact:
+                raise PermissionDenied
+            return profile
+
+        except ContactProfile.DoesNotExist:
+            raise PermissionDenied
+
+
+class FavoriteView(ProfileAPIView):
     """manage favorite store items"""
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -218,11 +234,8 @@ class FavoriteView(APIView):
         favorite_serializer = serializers.FavoriteSerializer(data=request.data)
         if favorite_serializer.is_valid():
 
-            # Get Contact
-            try:
-                profile = ContactProfile.objects.get(user=request.user)
-            except ContactProfile.DoesNotExist:
-                raise PermissionDenied
+            # Check that the user has a valid profile
+            self.get_profile(request)
 
             items_ids = [item_['id'] for item_ in favorite_serializer.validated_data['items']]
 
@@ -253,38 +266,27 @@ class FavoriteView(APIView):
     def get(self, request):
         """return a new list of favorites"""
 
-        # Get Contact
-        try:
-            profile = ContactProfile.objects.get(user=request.user)
-            contact = profile.contact
-        except ContactProfile.DoesNotExist:
-            return PermissionDenied
+        # Check that the user has a valid profile
+        self.get_profile(request)
 
         favorites = self.request.user.favorite_set.all()
         favorites_serializer = serializers.FavoriteItemSerializer([fav.item for fav in favorites], many=True)
         return Response({'favorites': favorites_serializer.data})
 
 
-class LastSalesView(APIView):
+class LastSalesView(ProfileAPIView):
     """view last sales"""
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
-        """return a new list of favorites"""
+        """return a last items bought by the user"""
 
-        # Get Contact
-        try:
-            profile = ContactProfile.objects.get(user=request.user)
-            contact = profile.contact
-        except ContactProfile.DoesNotExist:
-            # TODO : Si non connecte : les meilleurs ventes? 
-            return PermissionDenied
-
-        # TODO : Unit testing
+        # Check that the user has a valid profile
+        profile = self.get_profile(request)
 
         sale_items = SaleItem.objects.filter(
-            sale__action__contacts=contact
-        ).order_by('sale__action__planned_date', 'item__name')
+            sale__action__contacts=profile.contact
+        ).order_by('-sale__action__planned_date', 'item__name')
 
         # Avoid duplicates
         already_in = set()
@@ -295,4 +297,5 @@ class LastSalesView(APIView):
                 store_items.append(sale_item.item)
 
         last_sales_serializer = serializers.StoreItemSerializer(store_items, many=True)
+
         return Response(last_sales_serializer.data)

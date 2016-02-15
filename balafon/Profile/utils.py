@@ -45,12 +45,12 @@ def create_profile_contact(user):
 
             entity = Entity(
                 name=profile.entity_name if profile else user.username,
-                is_single_contact=(entity_type == None) and crm_settings.ALLOW_SINGLE_CONTACT,
-                type = entity_type
+                is_single_contact=(entity_type is None) and crm_settings.ALLOW_SINGLE_CONTACT,
+                type=entity_type
             )
             
             entity.save()
-            #This create a default contact
+            # This create a default contact
             contact = entity.default_contact
 
         if warn_duplicates:
