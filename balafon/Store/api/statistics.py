@@ -4,6 +4,7 @@
 from decimal import Decimal
 from datetime import date, datetime, time, timedelta
 
+from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404
 
 from rest_framework import permissions
@@ -167,3 +168,21 @@ class SalesByItemOfTagView(SalesStatisticsBaseView):
     def get_object_icon(self, obj):
         """return object name"""
         return obj.category.icon if obj.category else ''
+
+
+class TotalSalesView(SalesStatisticsBaseView):
+    """get sales by items of tag"""
+
+    def get_objects(self, **kwargs):
+        """return list of objects (a line of the statistic array)"""
+        class Obj(object):
+            id = 1
+            name = _(u'Total')
+            icon = u'piggy-bank'
+        return [Obj()]
+
+    def get_object_sale_items(self, obj, date_from, date_to):
+        """return sales for an objects for the given period (a cell of the statistic array)"""
+        return super(TotalSalesView, self).get_object_sale_items(
+            obj, date_from, date_to
+        )

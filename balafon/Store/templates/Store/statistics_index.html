@@ -7,6 +7,13 @@
   table.table td, table.table th{
     font-size: 0.7em;
   }
+  .title h2 {
+    margin: 0;
+    font-size: 1.5em;
+  }
+  th {
+    text-align: center;
+  }
 </style>
 <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
 <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/moment/moment.js"></script>
@@ -30,6 +37,7 @@
       NO_ITEMS: 'No items',
       STATS_BY_CATEGORY: 'Monthly sales (No VAT) by category',
       STATS_BY_TAG: 'Monthly sales (No VAT) by tag',
+      STATS_TOTAL:  'Total monthly sales (No VAT)',
       TOTAL: 'Total',
       '': ''
     });
@@ -42,6 +50,7 @@
       NO_ITEMS: 'Aucun élément',
       STATS_BY_CATEGORY: 'Chiffre d\'affaires mensuel (HT) par catégorie',
       STATS_BY_TAG: 'Chiffre d\'affaires mensuel (HT) par tag',
+      STATS_TOTAL: 'Chiffre d\'affaires mensuel (HT) total',
       TOTAL: 'Total',
       '': ''
     });
@@ -64,7 +73,7 @@
       }
 
       $scope.fromDate = new Date($scope.toDate.getFullYear(), 0, 1);
-      $scope.toDate = new Date();
+      $scope.toDate = new Date($scope.toDate.getFullYear(), 11, 31);
       $scope.selectedYear = $scope.toDate.getFullYear();
 
       var sumArray = function(array) {
@@ -113,6 +122,17 @@
         });
       };
 
+      $scope.loadTotalSalesStatistics = function () {
+        $scope.loading = true;
+        $scope.currentItem = null;
+        $scope.mode = 'total';
+        var url = buildUrl('/store/api/stats/total-sales/');
+        $http.get(url).success(function(respData) {
+          copyData(respData);
+          $scope.loading = false;
+        });
+      };
+
       $scope.loadItemStatistics = function(item) {
         $scope.loading = true;
         $scope.currentItem = item;
@@ -141,16 +161,15 @@
         return $scope.mode === 'tags';
       };
 
+      $scope.isTotal = function () {
+        return $scope.mode === 'total';
+      };
+
       $scope.yearChanged = function() {
         //January the 1st
         $scope.fromDate = new Date($scope.selectedYear, 0, 1);
-        var now = new Date();
-        if (now.getFullYear() === $scope.selectedYear) {
-          $scope.toDate = now;
-        } else {
-          //December 31st
-          $scope.toDate = new Date($scope.selectedYear, 11, 31);
-        }
+        //December 31st
+        $scope.toDate = new Date($scope.selectedYear, 11, 31);
 
         //refresh
         if ($scope.isCategories()) {
@@ -158,12 +177,14 @@
         }
         else if ($scope.isTags()) {
           $scope.loadTagsStatistics();
+        } else if ($scope.isTotal()) {
+          $scope.loadTotalSalesStatistics();
         } else {
           $scope.loadItemStatistics($scope.currentItem());
         }
       };
 
-      $scope.loadCategoriesStatistics();
+      $scope.loadTotalSalesStatistics();
 
     }]
   );
@@ -178,14 +199,29 @@
     <div ng-controller="storeStatsCtrl" class="container-fluid">
 
       <div class="row" style="margin-bottom: 10px;">
-        <div class="col-md-12">
-
+        <div class="col-md-6">
+          <div class="title">
+            <h2 ng-show="mode==='total'"> {{ 'STATS_TOTAL' | translate }} </h2>
+            <h2 ng-show="mode==='categories'"> {{ 'STATS_BY_CATEGORY' | translate }} </h2>
+            <h2 ng-show="mode==='tags'"> {{ 'STATS_BY_TAG' | translate }} </h2>
+            <h2 ng-show="mode===''">
+              <span ng-show="currentItem.icon" class="glyphicon glyphicon-{{ currentItem.icon }}"></span>
+              <span ng-hide="currentItem.icon" class="glyphicon glyphicon-tag"></span>
+              {{ currentItem.name }}
+            </h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+        <select class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
+        </select>
+        </div>
+        <div class="col-md-3">
           <div class="btn-group pull-right" role="group" aria-label="...">
-
-            <select class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
-
-            </select>
-
+            <button type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-default': !isTotal()}"
+              ng-click="loadTotalSalesStatistics()"
+            >
+              {{ 'TOTAL' | translate }}
+            </button>
             <button type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-default': !isCategories()}"
               ng-click="loadCategoriesStatistics()"
             >
@@ -198,16 +234,6 @@
             </button>
           </div>
         </div>
-
-
-        <h2 ng-show="mode==='categories'"> {{ 'STATS_BY_CATEGORY' | translate }} </h2>
-        <h2 ng-show="mode==='tags'"> {{ 'STATS_BY_TAG' | translate }} </h2>
-        <h2 ng-show="mode===''">
-          <span ng-show="currentItem.icon" class="glyphicon glyphicon-{{ currentItem.icon }}"></span>
-          <span ng-hide="currentItem.icon" class="glyphicon glyphicon-tag"></span>
-          {{ currentItem.name }}
-        </h2>
-
       </div>
 
       <div class="alert alert-info" ng-show="loading">
@@ -216,7 +242,7 @@
       <table class="table table-striped table-bordered" ng-show="statistics.length && !loading">
         <tr>
           <th>&nbsp;</th>
-          <th ng-repeat="month_date in months">{{ month_date.date | date : 'MM/yyyy' }}</th>
+          <th ng-repeat="month_date in months">{{ month_date.date | date : 'MMM' }}</th>
           <th>{{ 'TOTAL' | translate }}</th>
         </tr>
         <tr ng-repeat="statistic in statistics | orderBy:'-total_amount' ">

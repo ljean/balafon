@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 
 from balafon.Store.models import Sale
 
+
 class StaticticsIndexView(TemplateView):
     template_name = "Store/statistics_index.html"
 

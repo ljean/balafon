@@ -7,6 +7,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from model_mommy import mommy
 from rest_framework import status
@@ -445,4 +446,70 @@ class SalesByCategoryTest(BaseTestCase):
         self.assertEqual(
             [dict(ordered_dict) for ordered_dict in article1_data['values']],
             [{'value': '10.00'}, {'value': '0.00'}, {'value': '0.00'}]
+        )
+
+    def test_total_sales(self):
+        """It should return all sales data"""
+
+        vat = mommy.make(models.VatRate, rate=Decimal(10))
+
+        category1 = mommy.make(models.StoreItemCategory, icon='test')
+        category2 = mommy.make(models.StoreItemCategory, icon='test')
+
+        article1 = mommy.make(models.StoreItem, category=category1, pre_tax_price=Decimal(10), vat_rate=vat)
+        article2 = mommy.make(models.StoreItem, category=category1, pre_tax_price=Decimal(10), vat_rate=vat)
+        article3 = mommy.make(models.StoreItem, category=category2, pre_tax_price=Decimal(5), vat_rate=vat)
+
+        sale1 = mommy.make(models.Sale)
+        sale1.action.planned_date = datetime(2016, 1, 5, 12, 0)
+        sale1.save()
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article1, pre_tax_price=article1.pre_tax_price, quantity=1, vat_rate=vat
+        )
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article2, pre_tax_price=article2.pre_tax_price, quantity=2, vat_rate=vat
+        )
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article3, pre_tax_price=article3.pre_tax_price, quantity=1, vat_rate=vat
+        )
+
+        sale2 = mommy.make(models.Sale)
+        sale2.action.planned_date = datetime(2016, 1, 12, 12, 0)
+        sale2.save()
+        mommy.make(
+            models.SaleItem, sale=sale2, item=article2, pre_tax_price=article2.pre_tax_price, quantity=1, vat_rate=vat
+        )
+        mommy.make(
+            models.SaleItem, sale=sale2, item=article3, pre_tax_price=article3.pre_tax_price, quantity=4, vat_rate=vat
+        )
+
+        sale3 = mommy.make(models.Sale)
+        sale3.action.planned_date = datetime(2016, 2, 5, 12, 0)
+        sale3.save()
+        mommy.make(
+            models.SaleItem, sale=sale3, item=article1, pre_tax_price=article1.pre_tax_price, quantity=5, vat_rate=vat
+        )
+
+        url = reverse('store_stats_total_sales', args=[2016, 1, 2016, 3])
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data['data']
+        months = response.data['months']
+
+        self.assertEqual(len(months), 3)
+        self.assertEqual(
+            [dict(ordered_dict) for ordered_dict in months],
+            self._get_dates([date(2016, 1, 1), date(2016, 2, 1), date(2016, 3, 1)])
+        )
+
+        total_data = data[0]
+
+        self.assertEqual(total_data['id'], 1)
+        self.assertEqual(total_data['name'], _(u'Total'))
+        self.assertEqual(total_data['icon'], 'piggy-bank')
+        self.assertEqual(
+            [dict(ordered_dict) for ordered_dict in total_data['values']],
+            [{'value': '65.00'}, {'value': '50.00'}, {'value': '0.00'}]
         )
