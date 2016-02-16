@@ -1,4 +1,4 @@
-sanza-crm
+balafon
 ===============================================
 * `Overview`_
 * `Quick start`_
@@ -12,14 +12,14 @@ sanza-crm
 Overview
 ------------------------------------
 
-sanza-crm moto is Organize > Target > Communicate. It helps you to work with your contacts in your day-to-day work
+balafon moto is Organize > Target > Communicate. It helps you to work with your contacts in your day-to-day work
 
 .. _quick-start:
 
 Quick start
 -----------
 
-Python 2.6+, Django 1.4+ required
+Python 2.6+, Django 1.6+ required
 
 
 License

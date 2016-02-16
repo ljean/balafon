@@ -1,3 +1,3 @@
-recursive-include sanza *.html *.json *.js *.css *.png *.jpg *.gif *.po *.mo *.txt *.eot *.svg *.ttf *.woff
-recursive-include sanza *.
+recursive-include balafon *.html *.json *.js *.css *.png *.jpg *.gif *.po *.mo *.txt *.eot *.svg *.ttf *.woff
+recursive-include balafon *.
 include README.rst
