@@ -652,7 +652,7 @@ class StoreItemImport(models.Model):
                 ]
 
                 if not any(raw_values):
-                    #blank lines
+                    # blank lines
                     continue
 
                 if row_index in category_lines:
@@ -662,8 +662,7 @@ class StoreItemImport(models.Model):
                 store_item = StoreItem(supplier=self.supplier)
                 properties = []
 
-                #for all fields
-                #for field, raw_value in zip(fields, raw_values):
+                # for all fields
                 for index, field in enumerate(fields):
 
                     if index < len(raw_values):
@@ -672,7 +671,7 @@ class StoreItemImport(models.Model):
                         raw_value = None
 
                     if field in fields_conversion:
-                        #call the function associated with this field
+                        # call the function associated with this field
                         value = fields_conversion[field](raw_value)
                         if value:
                             setattr(store_item, field, value)
@@ -683,12 +682,12 @@ class StoreItemImport(models.Model):
                         except (ValueError, InvalidOperation):
                             setattr(store_item, field, Decimal(0))
                     else:
-                        #for extra fields : create a property (once the object has been saved)
+                        # for extra fields : create a property (once the object has been saved)
                         if raw_value:
                             properties.append((field, raw_value))
 
                 if not store_item.name:
-                    #empty line : ignore
+                    # empty line : ignore
                     continue
 
                 if ('brand' not in fields or not store_item.brand) and self.default_brand:
@@ -991,7 +990,7 @@ def create_action_sale(sender, instance, created, **kwargs):
     action = instance
     if action.type and StoreManagementActionType.objects.filter(action_type=action.type).exists():
         try:
-            #It would raise exception if sale doesn't exist
+            # It would raise exception if sale doesn't exist
             action.sale
         except Sale.DoesNotExist:
             Sale.objects.create(action=action)

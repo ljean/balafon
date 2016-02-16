@@ -109,13 +109,27 @@ class SalesByCategoryView(SalesStatisticsBaseView):
 
     def get_objects(self, **kwargs):
         """return list of objects (a line of the statistic array)"""
-        return list(StoreItemCategory.objects.all())
+        return list(StoreItemCategory.objects.filter(parent__isnull=False))
 
     def get_object_sale_items(self, obj, date_from, date_to):
         """return sales for an objects for the given period (a cell of the statistic array)"""
         return super(SalesByCategoryView, self).get_object_sale_items(
             obj, date_from, date_to
         ).filter(item__category=obj)
+
+
+class SalesByFamilyView(SalesStatisticsBaseView):
+    """sales statistics by family"""
+
+    def get_objects(self, **kwargs):
+        """return list of objects (a line of the statistic array)"""
+        return list(StoreItemCategory.objects.filter(parent__isnull=True))
+
+    def get_object_sale_items(self, obj, date_from, date_to):
+        """return sales for an objects for the given period (a cell of the statistic array)"""
+        return super(SalesByFamilyView, self).get_object_sale_items(
+            obj, date_from, date_to
+        ).filter(item__category__parent=obj)
 
 
 class SalesByTagView(SalesStatisticsBaseView):
@@ -130,6 +144,21 @@ class SalesByTagView(SalesStatisticsBaseView):
         return super(SalesByTagView, self).get_object_sale_items(
             obj, date_from, date_to
         ).filter(item__tags=obj)
+
+
+class SalesByItemOfFamilyView(SalesStatisticsBaseView):
+    """get sales by items of category"""
+
+    def get_objects(self, **kwargs):
+        """return list of objects (a line of the statistic array)"""
+        category = get_object_or_404(StoreItemCategory, id=kwargs['category_id'])
+        return list(StoreItemCategory.objects.filter(parent=category))
+
+    def get_object_sale_items(self, obj, date_from, date_to):
+        """return sales for an objects for the given period (a cell of the statistic array)"""
+        return super(SalesByItemOfFamilyView, self).get_object_sale_items(
+            obj, date_from, date_to
+        ).filter(item__category=obj)
 
 
 class SalesByItemOfCategoryView(SalesStatisticsBaseView):

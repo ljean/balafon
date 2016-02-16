@@ -10,7 +10,8 @@ from balafon.Store.api.front import (
     LastSalesView
 )
 from balafon.Store.api.statistics import (
-    SalesByCategoryView, SalesByTagView, SalesByItemOfCategoryView, SalesByItemOfTagView, TotalSalesView
+    SalesByCategoryView, SalesByFamilyView, SalesByTagView, SalesByItemOfCategoryView, SalesByItemOfFamilyView,
+    SalesByItemOfTagView, TotalSalesView
 )
 
 store_items_router = routers.DefaultRouter()
@@ -49,6 +50,12 @@ urlpatterns = [
     ),
 
     url(
+        r'^api/stats/sales-by-family/(?P<from_year>\d+)-(?P<from_month>\d+)/(?P<to_year>\d+)-(?P<to_month>\d+)/$',
+        SalesByFamilyView.as_view(),
+        name='store_stats_sales_by_family'
+    ),
+
+    url(
         r'^api/stats/sales-by-tag/(?P<from_year>\d+)-(?P<from_month>\d+)/(?P<to_year>\d+)-(?P<to_month>\d+)/$',
         SalesByTagView.as_view(),
         name='store_stats_sales_by_tag'
@@ -66,6 +73,13 @@ urlpatterns = [
         '-(?P<to_month>\d+)/$',
         SalesByItemOfTagView.as_view(),
         name='store_stats_sales_by_item_of_tag'
+    ),
+
+    url(
+        r'^api/stats/sales-by-item-family/(?P<category_id>\d+)/(?P<from_year>\d+)-(?P<from_month>\d+)/(?P<to_year>\d+)'
+        r'-(?P<to_month>\d+)/$',
+        SalesByItemOfFamilyView.as_view(),
+        name='store_stats_sales_by_item_of_family'
     ),
 
     url(

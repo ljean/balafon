@@ -31,11 +31,13 @@
 
     $translateProvider.translations('en', {
       BY_CATEGORY: 'By Category',
+      BY_FAMILY: 'By Family',
       BY_TAG: 'By Tag',
       CATEGORY: 'Category',
       LOADING: 'loading',
       NO_ITEMS: 'No items',
       STATS_BY_CATEGORY: 'Monthly sales (No VAT) by category',
+      STATS_BY_FAMILY: 'Monthly sales (No VAT) by family',
       STATS_BY_TAG: 'Monthly sales (No VAT) by tag',
       STATS_TOTAL:  'Total monthly sales (No VAT)',
       TOTAL: 'Total',
@@ -44,11 +46,13 @@
 
     $translateProvider.translations('fr', {
       BY_CATEGORY: 'Par Catégorie',
+      BY_FAMILY: 'Par Famille',
       BY_TAG: 'Par Tag',
       CATEGORY: 'Catégorie',
       LOADING: 'Chargement en cours',
       NO_ITEMS: 'Aucun élément',
       STATS_BY_CATEGORY: 'Chiffre d\'affaires mensuel (HT) par catégorie',
+      STATS_BY_FAMILY: 'Chiffre d\'affaires mensuel (HT) par famille',
       STATS_BY_TAG: 'Chiffre d\'affaires mensuel (HT) par tag',
       STATS_TOTAL: 'Chiffre d\'affaires mensuel (HT) total',
       TOTAL: 'Total',
@@ -111,6 +115,19 @@
         });
       };
 
+      $scope.loadFamiliesStatistics = function () {
+        $scope.loading = true;
+        $scope.currentItem = null;
+        $scope.mode = 'families';
+
+        var url = buildUrl('/store/api/stats/sales-by-family/');
+
+        $http.get(url).success(function(respData) {
+          copyData(respData);
+          $scope.loading = false;
+        });
+      };
+
       $scope.loadTagsStatistics = function () {
         $scope.loading = true;
         $scope.currentItem = null;
@@ -142,7 +159,10 @@
           url = '/store/api/stats/sales-by-item-cat/' + item.id + '/';
         } else if ($scope.mode === 'tags') {
           url = '/store/api/stats/sales-by-item-tag/' + item.id + '/';
+        } else if ($scope.mode === 'families') {
+          url = '/store/api/stats/sales-by-item-family/' + item.id + '/';
         }
+
         if (url) {
           url = buildUrl(url);
           $scope.mode = '';
@@ -155,6 +175,10 @@
 
       $scope.isCategories = function () {
         return $scope.mode === 'categories';
+      };
+
+      $scope.isFamilies = function () {
+        return $scope.mode === 'families';
       };
 
       $scope.isTags = function () {
@@ -177,6 +201,8 @@
         }
         else if ($scope.isTags()) {
           $scope.loadTagsStatistics();
+        } else if ($scope.isFamilies()) {
+          $scope.loadFamiliesStatistics();
         } else if ($scope.isTotal()) {
           $scope.loadTotalSalesStatistics();
         } else {
@@ -199,10 +225,11 @@
     <div ng-controller="storeStatsCtrl" class="container-fluid">
 
       <div class="row" style="margin-bottom: 10px;">
-        <div class="col-md-6">
+        <div class="col-md-5">
           <div class="title">
             <h2 ng-show="mode==='total'"> {{ 'STATS_TOTAL' | translate }} </h2>
             <h2 ng-show="mode==='categories'"> {{ 'STATS_BY_CATEGORY' | translate }} </h2>
+            <h2 ng-show="mode==='families'"> {{ 'STATS_BY_FAMILY' | translate }} </h2>
             <h2 ng-show="mode==='tags'"> {{ 'STATS_BY_TAG' | translate }} </h2>
             <h2 ng-show="mode===''">
               <span ng-show="currentItem.icon" class="glyphicon glyphicon-{{ currentItem.icon }}"></span>
@@ -211,23 +238,28 @@
             </h2>
           </div>
         </div>
-        <div class="col-md-3">
-        <select class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
+        <div class="col-md-2">
+        <select ng-disabled="loading" class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
         </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-5">
           <div class="btn-group pull-right" role="group" aria-label="...">
-            <button type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-default': !isTotal()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-default': !isTotal()}"
               ng-click="loadTotalSalesStatistics()"
             >
               {{ 'TOTAL' | translate }}
             </button>
-            <button type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-default': !isCategories()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-default': !isFamilies()}"
+              ng-click="loadFamiliesStatistics()"
+            >
+              {{ 'BY_FAMILY' | translate }}
+            </button>
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-default': !isCategories()}"
               ng-click="loadCategoriesStatistics()"
             >
               {{ 'BY_CATEGORY' | translate }}
             </button>
-            <button type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-default': !isTags()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-default': !isTags()}"
               ng-click="loadTagsStatistics()"
             >
               {{ 'BY_TAG' | translate }}
@@ -249,8 +281,8 @@
           <td>
             <span ng-show="statistic.icon" class="glyphicon glyphicon-{{ statistic.icon }}"></span>
             <span ng-hide="statistic.icon" class="glyphicon glyphicon-tag"></span>
-            <a href ng-show="mode" ng-click="loadItemStatistics(statistic)">{{ statistic.name }}</a>
-            <span ng-hide="mode">{{ statistic.name }}</span>
+            <a href ng-show="mode && mode!=='total'" ng-click="loadItemStatistics(statistic)">{{ statistic.name }}</a>
+            <span ng-show="!mode || mode==='total'">{{ statistic.name }}</span>
           </td>
           <td style="text-align: right" ng-repeat="item in statistic.values">
             <span ng-show="item.value > 0">{{item.value}}</span>
