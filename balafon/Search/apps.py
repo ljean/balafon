@@ -4,11 +4,12 @@ app configuration
 """
 
 from django import VERSION
+from django.utils.translation import ugettext_lazy as _
+
 
 if VERSION > (1, 7, 0):
     from django.apps import AppConfig
 
     class BalafonAppConfig(AppConfig):
         name = 'balafon.Search'
-        verbose_name = "Balafon Search"
-
+        verbose_name = _(u"Balafon Search")

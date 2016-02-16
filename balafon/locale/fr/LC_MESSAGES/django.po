@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-12 16:10+0100\n"
+"POT-Creation-Date: 2016-02-16 07:51+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,10 @@ msgstr "Oui"
 #: Search/forms.py:583
 msgid "No"
 msgstr "Non"
+
+#: Crm/apps.py:15
+msgid "Balafon CRM"
+msgstr "Balafon - Annuaire"
 
 #: Crm/coop_bar_cfg.py:28
 msgid "Pdf"
@@ -163,7 +167,7 @@ msgstr ""
 #: Crm/forms/base.py:203 Crm/forms/base.py:218 Crm/forms/base.py:229
 #: Crm/search_forms.py:155 Crm/templates/Crm/_section_all_entities.html:22
 #: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:333
-#: Profile/forms.py:23 Profile/forms.py:77 Profile/models.py:30
+#: Profile/forms.py:23 Profile/forms.py:77 Profile/models.py:34
 #: Search/templates/Search/_section_qs_cities.html:4
 #: Search/templates/Search/_section_qs_contacts.html:10
 msgid "City"
@@ -239,11 +243,11 @@ msgstr "Photo"
 msgid "Select the roles played by the contact in his entity"
 msgstr "Choisissez les rôles joués par le contact au sein de l'entité"
 
-#: Crm/forms/contacts.py:114 Crm/models.py:575 Profile/models.py:18
+#: Crm/forms/contacts.py:114 Crm/models.py:575 Profile/models.py:22
 msgid "Mr"
 msgstr "M."
 
-#: Crm/forms/contacts.py:115 Crm/models.py:576 Profile/models.py:19
+#: Crm/forms/contacts.py:115 Crm/models.py:576 Profile/models.py:23
 msgid "Mrs"
 msgstr "Mme"
 
@@ -338,7 +342,7 @@ msgstr "Logo"
 
 #: Crm/forms/entities.py:102 Crm/models.py:1541 Crm/search_forms.py:1409
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Search/views.py:364
-#: config.py:43 templates/balafon/_bs_navigation.html:60
+#: config.py:43 templates/balafon/_bs_navigation.html:68
 #: templates/balafon/_navigation.html:27
 msgid "Entity"
 msgstr "Entité"
@@ -503,19 +507,19 @@ msgstr "type de rue"
 msgid "street types"
 msgstr "types de rue"
 
-#: Crm/models.py:207 Crm/models.py:219 Profile/models.py:40
+#: Crm/models.py:207 Crm/models.py:219 Profile/models.py:44
 msgid "address"
 msgstr "adresse"
 
-#: Crm/models.py:208 Crm/models.py:220 Profile/models.py:41
+#: Crm/models.py:208 Crm/models.py:220 Profile/models.py:45
 msgid "address 2"
 msgstr "adresse 2"
 
-#: Crm/models.py:209 Crm/models.py:221 Profile/models.py:42
+#: Crm/models.py:209 Crm/models.py:221 Profile/models.py:46
 msgid "address 3"
 msgstr "adresse 3"
 
-#: Crm/models.py:212 Crm/models.py:224 Profile/models.py:43
+#: Crm/models.py:212 Crm/models.py:224 Profile/models.py:47
 msgid "cedex"
 msgstr "cedex"
 
@@ -540,7 +544,7 @@ msgstr "description"
 msgid "relationship date"
 msgstr "date de mise en relation"
 
-#: Crm/models.py:302 Crm/models.py:601 Profile/models.py:37
+#: Crm/models.py:302 Crm/models.py:601 Profile/models.py:41
 msgid "phone"
 msgstr "téléphone"
 
@@ -645,11 +649,11 @@ msgstr "Rôles"
 msgid "title"
 msgstr "titre"
 
-#: Crm/models.py:585 Profile/models.py:32
+#: Crm/models.py:585 Profile/models.py:36
 msgid "last name"
 msgstr "nom"
 
-#: Crm/models.py:586 Profile/models.py:33
+#: Crm/models.py:586 Profile/models.py:37
 msgid "first name"
 msgstr "prénom"
 
@@ -661,7 +665,7 @@ msgstr "surnom"
 msgid "photo"
 msgstr "photo"
 
-#: Crm/models.py:590 Profile/models.py:35
+#: Crm/models.py:590 Profile/models.py:39
 msgid "birth date"
 msgstr "date de naissance"
 
@@ -687,7 +691,7 @@ msgstr ""
 msgid "email verified"
 msgstr "email vérifié"
 
-#: Crm/models.py:602 Profile/models.py:38
+#: Crm/models.py:602 Profile/models.py:42
 msgid "mobile"
 msgstr "portable"
 
@@ -1186,7 +1190,7 @@ msgstr "import de contacts"
 msgid "contact imports"
 msgstr "imports de contacts"
 
-#: Crm/search_forms.py:22 Profile/models.py:26
+#: Crm/search_forms.py:22 Profile/models.py:30
 msgid "Entity name"
 msgstr "Nom de l'entité"
 
@@ -1315,7 +1319,7 @@ msgid "Action by status"
 msgstr "Action par état"
 
 #: Crm/search_forms.py:557 Crm/templates/Crm/confirm_contacts_import.html:71
-#: Profile/models.py:27
+#: Profile/models.py:31
 msgid "Entity type"
 msgstr "Type d'entité"
 
@@ -1674,7 +1678,7 @@ msgstr "Actions"
 #: Crm/templates/Crm/_section_opportunities.html:47
 #: Crm/templates/Crm/edit_group.html:210
 #: Search/templates/Search/add_contacts_to_group.html:61
-#: templates/balafon/_bs_navigation.html:55
+#: templates/balafon/_bs_navigation.html:63
 #: templates/balafon/_navigation.html:24
 msgid "Add"
 msgstr "Ajouter"
@@ -1844,41 +1848,41 @@ msgstr "Identique à"
 msgid "Add relationship"
 msgstr "Ajouter une relation"
 
-#: Crm/templates/Crm/action_archive_base.html:86
-msgid "Filter by"
-msgstr "Filtrer par"
-
-#: Crm/templates/Crm/action_archive_base.html:88
-msgid "Action types"
-msgstr "Types d'action"
-
-#: Crm/templates/Crm/action_archive_base.html:89
-msgid "No type"
-msgstr "Sans type"
-
-#: Crm/templates/Crm/action_archive_base.html:96
-msgid "Action status"
-msgstr "statut d'une action"
-
-#: Crm/templates/Crm/action_archive_base.html:102
-msgid "In charge"
-msgstr "En charge"
-
-#: Crm/templates/Crm/action_archive_base.html:115
+#: Crm/templates/Crm/action_archive_base.html:90
 msgid "Day"
 msgstr "Jour"
 
-#: Crm/templates/Crm/action_archive_base.html:116
+#: Crm/templates/Crm/action_archive_base.html:91
 msgid "Week"
 msgstr "Semaine"
 
-#: Crm/templates/Crm/action_archive_base.html:117
+#: Crm/templates/Crm/action_archive_base.html:92
 msgid "Month"
 msgstr "Mois"
 
+#: Crm/templates/Crm/action_archive_base.html:107
+msgid "Filter by"
+msgstr "Filtrer par"
+
+#: Crm/templates/Crm/action_archive_base.html:109
+msgid "Action types"
+msgstr "Types d'action"
+
+#: Crm/templates/Crm/action_archive_base.html:110
+msgid "No type"
+msgstr "Sans type"
+
+#: Crm/templates/Crm/action_archive_base.html:117
+msgid "Action status"
+msgstr "statut d'une action"
+
+#: Crm/templates/Crm/action_archive_base.html:123
+msgid "In charge"
+msgstr "En charge"
+
 #: Crm/templates/Crm/action_archive_not_planned.html:5
 #: Crm/templates/Crm/action_archive_not_planned.html:13
-#: templates/balafon/_bs_navigation.html:108
+#: templates/balafon/_bs_navigation.html:116
 msgid "Not planned actions"
 msgstr "Actions non plannifiées"
 
@@ -1983,7 +1987,7 @@ msgstr "Prévisualiser"
 #: Crm/templates/Crm/edit_opportunity.html:21
 #: Crm/templates/Crm/new_contacts_import.html:30
 #: Crm/templates/Crm/unsubscribe_contacts_import.html:26
-#: Emailing/models.py:107
+#: Emailing/models.py:111
 #: Emailing/templates/Emailing/confirm_send_mail.html:10
 #: Emailing/templates/Emailing/update_emailing.html:20
 #: Search/templates/Search/add_contacts_to_group.html:60
@@ -2029,7 +2033,7 @@ msgstr ""
 "        * Bleu : L'email est déjà connu dans la base de données<br />\n"
 "        "
 
-#: Crm/templates/Crm/confirm_contacts_import.html:72 Profile/models.py:31
+#: Crm/templates/Crm/confirm_contacts_import.html:72 Profile/models.py:35
 msgid "Gender"
 msgstr "civilité"
 
@@ -2401,6 +2405,10 @@ msgstr ""
 "{0}: Voulez-vous changer l'ordre de priorité des contacts identiques pour "
 "cette personne? (1 est la priorité la plus haute)"
 
+#: Emailing/apps.py:15
+msgid "Balafon Emailing"
+msgstr "Balafon: Newsletters"
+
 #: Emailing/coop_bar_cfg.py:15 Emailing/views.py:443
 msgid "Balafon"
 msgstr "Balafon"
@@ -2498,7 +2506,7 @@ msgstr "Ce champ est requis"
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
-#: Emailing/forms.py:343 Emailing/forms.py:515 Emailing/models.py:152
+#: Emailing/forms.py:343 Emailing/forms.py:515 Emailing/models.py:161
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:5
 #: Emailing/tests/test_actions.py:20 Emailing/tests/test_actions.py:31
 #: Profile/views.py:99
@@ -2559,49 +2567,67 @@ msgstr "Envoi en cours"
 msgid "Sent"
 msgstr "Envoyé"
 
-#: Emailing/models.py:59
+#: Emailing/models.py:47 Emailing/templates/Emailing/view_emailing.html:4
+#: Emailing/templates/Emailing/view_emailing.html:6 Emailing/utils.py:127
+#: config.py:105
+msgid "Emailing"
+msgstr "Emailing"
+
+#: Emailing/models.py:48
+msgid "Emailings"
+msgstr "Emailings"
+
+#: Emailing/models.py:63
 msgid "scheduling date"
 msgstr "date programmé de l'envoi"
 
-#: Emailing/models.py:60
+#: Emailing/models.py:64
 msgid "sending date"
 msgstr "date d'envoi"
 
-#: Emailing/models.py:64
+#: Emailing/models.py:68
 msgid "language"
 msgstr "langue"
 
-#: Emailing/models.py:70
+#: Emailing/models.py:74
 msgid "From email"
 msgstr "Expéditeur"
 
-#: Emailing/models.py:76
+#: Emailing/models.py:80
 msgid "emailing"
 msgstr "emailing"
 
-#: Emailing/models.py:77
+#: Emailing/models.py:81
 msgid "emailings"
 msgstr "emailings"
 
-#: Emailing/models.py:83 Emailing/models.py:87 Emailing/models.py:92
+#: Emailing/models.py:87 Emailing/models.py:91 Emailing/models.py:96
 msgid "{0} - {1}"
 msgstr "{0} - {1}"
 
-#: Emailing/models.py:85
+#: Emailing/models.py:89
 msgid " - {0} recipients"
 msgstr " - {0} destinataires"
 
-#: Emailing/models.py:90
+#: Emailing/models.py:94
 msgid " - {0}/{1} sent"
 msgstr " - {0}/{1} envoyés"
 
-#: Emailing/models.py:94
+#: Emailing/models.py:98
 msgid " - {0} sent"
 msgstr " - {0} envoyés"
 
-#: Emailing/models.py:103
+#: Emailing/models.py:107
 msgid "Send"
 msgstr "Envoyer"
+
+#: Emailing/models.py:137
+msgid "Magic link"
+msgstr "Lien magique"
+
+#: Emailing/models.py:138
+msgid "Magic links"
+msgstr "Liens magiques"
 
 #: Emailing/search_forms.py:34
 msgid "Unknown emailing"
@@ -2909,12 +2935,6 @@ msgstr ""
 msgid "Update emailing"
 msgstr "Mise à jour d'un emailing"
 
-#: Emailing/templates/Emailing/view_emailing.html:4
-#: Emailing/templates/Emailing/view_emailing.html:6 Emailing/utils.py:127
-#: config.py:105
-msgid "Emailing"
-msgstr "Emailing"
-
 #: Emailing/utils.py:206
 msgid "Subscribe to {0}"
 msgstr "S'inscrire à {0}"
@@ -2981,6 +3001,10 @@ msgstr ""
 msgid "Need to verify the email address"
 msgstr "vérifier votre adresse email"
 
+#: Profile/apps.py:15
+msgid "Balafon Profile"
+msgstr "Balafon: Profils"
+
 #: Profile/forms.py:52
 msgid ""
 "This email is already registered. Use the 'forgot password' link on the "
@@ -2991,7 +3015,7 @@ msgstr ""
 
 #: Profile/forms.py:59 ci/drone_project/templates/registration/login.html:20
 #: ci/semaphore_project/templates/registration/login.html:20
-#: templates/balafon/_bs_navigation.html:141
+#: templates/balafon/_bs_navigation.html:149
 #: templates/balafon/_navigation.html:44
 msgid "Password"
 msgstr "Mot de passe"
@@ -3028,9 +3052,25 @@ msgstr "Votre message"
 msgid "Message is too long"
 msgstr "Message trop long"
 
-#: Profile/models.py:29
+#: Profile/models.py:18
+msgid "Contact profile"
+msgstr "Profil d'un contact"
+
+#: Profile/models.py:19
+msgid "Contact profiles"
+msgstr "Profils de contact"
+
+#: Profile/models.py:33
 msgid "Zip code"
 msgstr "Code postal"
+
+#: Profile/models.py:79
+msgid "Category permission"
+msgstr "Permission par categorie"
+
+#: Profile/models.py:80
+msgid "Category permissions"
+msgstr "Permissions par categorie"
 
 #: Profile/templates/Profile/edit_profile.html:9
 msgid "Edit your profile"
@@ -3161,6 +3201,10 @@ msgstr "Votre profil a été mis à jour."
 msgid "New message on web site"
 msgstr "Nouveau message depuis le site"
 
+#: Search/apps.py:15
+msgid "Balafon Search"
+msgstr "Balafon: Recherche"
+
 #: Search/forms.py:49
 msgid "Quick search"
 msgstr "Recherche rapide"
@@ -3287,7 +3331,7 @@ msgid "Emails"
 msgstr "Emails"
 
 #: Search/templates/Search/_section_saved_searches.html:5
-#: templates/balafon/_bs_navigation.html:87
+#: templates/balafon/_bs_navigation.html:95
 msgid "Saved searches"
 msgstr "Recherches enregistrées"
 
@@ -3297,7 +3341,7 @@ msgstr "Critère de recherche"
 
 #: Search/templates/Search/_section_search_form.html:20
 #: Search/templates/Search/search.html:4
-#: templates/balafon/_bs_navigation.html:79
+#: templates/balafon/_bs_navigation.html:87
 #: templates/balafon/_navigation.html:38
 msgid "Search"
 msgstr "Recherche"
@@ -3580,28 +3624,38 @@ msgstr ""
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
-#: Store/api.py:110
+#: Store/api/front.py:111
 msgid "You don't have a valid profile"
 msgstr "Votre profil d'utilisateur n'est pas valide"
 
-#: Store/api.py:116
+#: Store/api/front.py:117
 msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
 
-#: Store/api.py:129 Store/templates/Store/cart_root_email.html:39
+#: Store/api/front.py:130 Store/templates/Store/cart_root_email.html:39
 #: Store/tests/test_cart.py:151 Store/tests/test_cart.py:209
 #: Store/tests/test_cart.py:267
 msgid "Notes"
 msgstr "Notes"
 
-#: Store/api.py:160
+#: Store/api/front.py:161
 msgid "{0} is currently not available. It has been removed from your cart"
 msgstr ""
 "{0} n'est pas disponible actuellement. Il a été supprimé de votre panier."
 
-#: Store/api.py:186
+#: Store/api/front.py:187
 msgid "Your cart is empty. Your articles are not available"
 msgstr "Votre panier est vide."
+
+#: Store/api/statistics.py:180 Store/templates/Store/cart_root_email.html:55
+#: Store/templates/Store/cart_root_email.html:68
+#: Store/tests/test_statistics.py:510
+msgid "Total"
+msgstr "Total"
+
+#: Store/apps.py:15
+msgid "Balafon Store"
+msgstr "Balafon: Boutique"
 
 #: Store/forms.py:44
 msgid "{0} is not a valid decimal"
@@ -4080,11 +4134,6 @@ msgstr "Prix"
 msgid "Quantity"
 msgstr "Quantité"
 
-#: Store/templates/Store/cart_root_email.html:55
-#: Store/templates/Store/cart_root_email.html:68
-msgid "Total"
-msgstr "Total"
-
 #: Store/templates/admin/Store/storeitem/change_list.html:7
 #: Store/templates/admin/Store/storeitemcategory/change_form.html:7
 #: Store/views/xls_export.py:68
@@ -4162,7 +4211,7 @@ msgstr "Pages d'accueil utilisateur"
 msgid "Menu"
 msgstr "Menu"
 
-#: Users/models.py:72 templates/balafon/_bs_navigation.html:92
+#: Users/models.py:72 templates/balafon/_bs_navigation.html:100
 msgid "Planning"
 msgstr "Planning"
 
@@ -4250,11 +4299,11 @@ msgstr "Une erreur est survenue"
 
 #: ci/drone_project/settings.py:46 ci/semaphore_project/settings.py:47
 msgid "English"
-msgstr ""
+msgstr "Anglais"
 
 #: ci/drone_project/settings.py:47 ci/semaphore_project/settings.py:48
 msgid "Français"
-msgstr ""
+msgstr "Français"
 
 #: ci/drone_project/templates/registration/logged_out.html:3
 #: ci/semaphore_project/templates/registration/logged_out.html:3
@@ -4381,7 +4430,7 @@ msgstr "Modifications"
 msgid "Same as"
 msgstr "Même personne"
 
-#: config.py:121 templates/balafon/_bs_navigation.html:146
+#: config.py:121 templates/balafon/_bs_navigation.html:154
 #: templates/balafon/_navigation.html:45
 msgid "Admin"
 msgstr "Admin"
@@ -4455,56 +4504,60 @@ msgstr "balafon"
 msgid "Mailings"
 msgstr "Mailings"
 
-#: templates/balafon/_bs_navigation.html:73
+#: templates/balafon/_bs_navigation.html:56
+msgid "Store statistics"
+msgstr "Statistiques Boutique"
+
+#: templates/balafon/_bs_navigation.html:81
 #: templates/balafon/_navigation.html:34
 msgid "Single contact"
 msgstr "Particulier"
 
-#: templates/balafon/_bs_navigation.html:83
+#: templates/balafon/_bs_navigation.html:91
 msgid "New search"
 msgstr "Nouvelle recherche"
 
-#: templates/balafon/_bs_navigation.html:96
+#: templates/balafon/_bs_navigation.html:104
 msgid "Monthly actions"
 msgstr "Planning mensuel"
 
-#: templates/balafon/_bs_navigation.html:100
+#: templates/balafon/_bs_navigation.html:108
 msgid "Weekly actions"
 msgstr "Planning hebdomadaire"
 
-#: templates/balafon/_bs_navigation.html:104
+#: templates/balafon/_bs_navigation.html:112
 msgid "Daily actions"
 msgstr "Planning journalier"
 
-#: templates/balafon/_bs_navigation.html:129
+#: templates/balafon/_bs_navigation.html:137
 #: templates/balafon/_navigation.html:40
 msgid "Account"
 msgstr "Compte"
 
-#: templates/balafon/_bs_navigation.html:133
+#: templates/balafon/_bs_navigation.html:141
 #: templates/balafon/_navigation.html:42
 msgid "Back to site"
 msgstr "Retour au site"
 
-#: templates/balafon/_bs_navigation.html:137
+#: templates/balafon/_bs_navigation.html:145
 #: templates/balafon/_navigation.html:43
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: templates/balafon/_bs_navigation.html:150
+#: templates/balafon/_bs_navigation.html:158
 #: templates/balafon/_navigation.html:46
 msgid "Contacts import"
 msgstr "Import de contacts"
 
-#: templates/balafon/_bs_navigation.html:154
+#: templates/balafon/_bs_navigation.html:162
 msgid "Unsubscribe emails"
 msgstr "Désinscriptions de contacts"
 
-#: templates/balafon/_bs_navigation.html:166
+#: templates/balafon/_bs_navigation.html:174
 msgid "Make this homepage"
 msgstr "Faire de cette page, votre page d'accueil"
 
-#: templates/balafon/_bs_navigation.html:173
+#: templates/balafon/_bs_navigation.html:181
 msgid "This page can not be set as homepage"
 msgstr "Cette page ne peut pas être définie comme page d'accueil"
 
@@ -4628,9 +4681,6 @@ msgstr "Format RGB (exemple (#123456) attendu"
 
 #~ msgid "More info at"
 #~ msgstr "Plus d'information sur"
-
-#~ msgid "Emailings"
-#~ msgstr "Emailings"
 
 #~ msgid "Accept"
 #~ msgstr "Accepter"
@@ -4844,9 +4894,6 @@ msgstr "Format RGB (exemple (#123456) attendu"
 
 #~ msgid "Organize > Target > Communicate"
 #~ msgstr "Organiser > Cibler > Communiquer"
-
-#~ msgid "balafon CRM"
-#~ msgstr "balafon"
 
 #~ msgid "New contact"
 #~ msgstr "Nouveau contact"

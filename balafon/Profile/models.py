@@ -4,15 +4,19 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import signals
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 from coop_cms.models import ArticleCategory
-from registration import get_version as get_registration_version
 
 from balafon.Crm.models import Contact, Group, City, EntityType
 
 
 class ContactProfile(models.Model):
+    """Info creating a contact from registration"""
+
+    class Meta:
+        verbose_name = _(u'Contact profile')
+        verbose_name_plural = _(u'Contact profiles')
     
     GENDER_CHOICE = (
         (Contact.GENDER_MALE, _(u'Mr')),
@@ -64,11 +68,17 @@ def create_profile(sender, instance, signal, created, **kwargs):
     if created_profile:
         ContactProfile(user=instance).save()
 
-if "balafon.Profile" in settings.INSTALLED_APPS: # and get_registration_version() < "2.0.0":
+if "balafon.Profile" in settings.INSTALLED_APPS:
     signals.post_save.connect(create_profile, sender=User)
 
 
 class CategoryPermission(models.Model):
+    """Permissions on category"""
+
+    class Meta:
+        verbose_name = _(u'Category permission')
+        verbose_name_plural = _(u'Category permissions')
+
     category = models.OneToOneField(ArticleCategory)
     can_view_groups = models.ManyToManyField(
         Group, blank=True, default=None, related_name="can_view_perm"

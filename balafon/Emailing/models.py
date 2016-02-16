@@ -43,6 +43,10 @@ class Emailing(TimeStampedModel):
         (STATUS_SENT, _(u'Sent')),
     )
 
+    class Meta:
+        verbose_name = _(u'Emailing')
+        verbose_name_plural = _(u'Emailings')
+
     subscription_type = models.ForeignKey(SubscriptionType)
     newsletter = models.ForeignKey(Newsletter) 
     send_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_to_be_received")
@@ -128,6 +132,11 @@ class Emailing(TimeStampedModel):
 
 class MagicLink(models.Model):
     """A tracking link"""
+
+    class Meta:
+        verbose_name = _(u'Magic link')
+        verbose_name_plural = _(u'Magic links')
+
     emailing = models.ForeignKey(Emailing)
     url = models.URLField(max_length=500)
     visitors = models.ManyToManyField(Contact, blank=True)
