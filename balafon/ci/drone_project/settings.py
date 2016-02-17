@@ -210,6 +210,7 @@ INSTALLED_APPS = (
     'coop_bar',
     'coop_cms.apps.basic_cms',
     'coop_cms.apps.email_auth',
+    'coop_cms.apps.coop_bootstrap',
 
     # balafon
     'balafon',
