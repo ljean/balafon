@@ -27,7 +27,7 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
         fieldsets = [
             ('name', {
                 'fields': [
-                    'type', 'name', 'description', 'relationship_date''website', 'email', 'phone', 'fax'
+                    'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax'
                 ],
                 'legend': _(u'Name')
             }),
