@@ -311,7 +311,8 @@ class Certificate(models.Model):
 
     @property
     def image(self):
-        return self.logo.url
+        if self.logo:
+            return self.logo.url
 
     class Meta:
         verbose_name = _(u"certificate")
