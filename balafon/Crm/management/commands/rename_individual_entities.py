@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.core.management.base import BaseCommand
-from balafon.Crm import models
-from datetime import date
-from balafon.Crm.settings import ALLOW_SINGLE_CONTACT
 from django.conf import settings
+from django.core.management.base import BaseCommand
+
+from balafon.Crm import models
+from balafon.Crm.settings import ALLOW_SINGLE_CONTACT
 
 
 class Command(BaseCommand):
@@ -20,10 +20,10 @@ class Command(BaseCommand):
         
         individual_entity_id = getattr(settings, 'BALAFON_INDIVIDUAL_ENTITY_ID', 1)
         
-        for e in models.Entity.objects.filter(type__id=individual_entity_id):
-            e.name = u"{0.lastname} {0.firstname}".format(e.default_contact).strip().upper()
-            e.save()
+        for entity in models.Entity.objects.filter(type__id=individual_entity_id):
+            entity.name = u"{0.lastname} {0.firstname}".format(entity.default_contact).strip().upper()
+            entity.save()
         
             if verbose:
-                print e.name
+                print entity.name
         print models.Entity.objects.filter(type__id=individual_entity_id).count(), "entities have been renamed"
