@@ -1,0 +1,81 @@
+{% extends "pdf/base.html" %}
+{% load i18n %}
+{% block extra_head %}
+<style>
+    @page {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    .contacts {
+        padding: 0;
+        margin: 0;
+        display: block;
+    }
+    .line {
+        display: block;
+        margin: 0;
+        padding: 0;
+        height: 0;
+        width: 0;
+        height: 42mm;
+        width: 210mm;
+    }
+    .header, .footer {
+        height: 2mm;
+        width: 210mm;
+    }
+    .cell {
+        display: inline-block;
+        width: 69mm;
+        height: 42mm;
+        margin: 0;
+        text-align: left;
+        vertical-align: middle;
+        font-family: Arial;
+        font-size: 12px;
+    }
+    
+    .cell-content {
+        margin-top: 10mm;
+        margin-left: 10mm;
+    }
+    
+    .line .cell {
+        margin-right: 1mm
+    }
+    .line .cell:nth-of-type(3) {
+        width: 67mm;
+        margin-left: 0mm;
+    }
+    .warning {
+        color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="contacts">
+    {% for c in contacts %}
+        {% if forloop.counter0 == 0 %}
+            <div class="header">&nbsp;</div>
+        {% endif %}
+        {% if forloop.counter0 == 0 or forloop.counter0|divisibleby:3 %}
+            <div class="line">
+        {% endif %}
+                <div class="cell"><div class="cell-content">
+                    {% block cell_content %}{% include "pdf/_contact_address.html" %}{% endblock %}
+                </div></div>
+        {% if forloop.counter|divisibleby:3 %}
+            </div>
+        {% endif %}
+        {% if forloop.counter|divisibleby:21 %}
+            <div class="footer">&nbsp;</div>
+            <div class="header">&nbsp;</div>
+        {% endif %}
+    {% endfor %}
+    </div>
+{% endblock %}

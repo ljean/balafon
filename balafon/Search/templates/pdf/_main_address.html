@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if c %}
     {% if not c.entity.is_single_contact %}<div class="name">{{ c.entity.name }}</div>{% endif %}
-    <div class="fullname">{{ c.fullname }}</div>
+    {% if c.entity.is_single_contact %}<div class="fullname">{{ c.fullname }}</div>{% endif %}
     {% if c.get_full_address %}
         {% with c.get_city as city %}
         <div class="address">{{ c.get_address }}</div>
