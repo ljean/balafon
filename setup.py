@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'django >= 1.6, <1.10',
         'djangorestframework',
-        'apidev-coop_cms >= 1.1.4',
+        'apidev-coop_cms >= 1.1.9',
         'beautifulsoup4',
         'BeautifulSoup',
         'django-wkhtmltopdf',
@@ -35,9 +35,6 @@ setup(
         'django-tastypie',
         'django-cors-headers',
     ],
-    #dependency_links=[
-    #    'git+https://github.com/ljean/coop_cms.git@0ba4fcbd0d8ff1d01617ceafc56d7175758bc966#egg=apidev_coop_cms-dev',
-    #],
     long_description=open('README.rst').read(),
     url='https://github.com/ljean/balafon',
     classifiers=[
@@ -53,4 +50,3 @@ setup(
         'Topic :: Office/Business',
     ],
 )
-
