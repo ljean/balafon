@@ -183,7 +183,7 @@ class NewNewsletterForm(forms.Form):
         return u''
 
 
-class EmailSubscribeForm(forms.ModelForm):
+class EmailSubscribeForm(BetterBsModelForm):
     """Register to an emailing with just email address"""
     email = forms.EmailField(
         required=True, label="",
