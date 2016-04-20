@@ -212,3 +212,9 @@ admin.site.register(models.SubscriptionType)
 admin.site.register(models.TeamMember)
 
 admin.site.register(models.StreetType)
+
+
+class SpecialCasesCitiesAdmin(admin.ModelAdmin):
+    list_display = ['city', 'oldname', 'possibilities', 'change_validated']
+
+admin.site.register(models.SpecialCasesCities, SpecialCasesCitiesAdmin)

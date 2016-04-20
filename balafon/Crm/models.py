@@ -1650,3 +1650,10 @@ class ContactsImport(TimeStampedModel):
     class Meta:
         verbose_name = _(u'contact import')
         verbose_name_plural = _(u'contact imports')
+
+
+class SpecialCasesCities(models.Model):
+    city = models.ForeignKey(City)
+    oldname = models.CharField(max_length=100, default="None")
+    possibilities = models.CharField(max_length=500)
+    change_validated = models.CharField(max_length=3, default=0)
