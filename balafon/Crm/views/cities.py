@@ -56,6 +56,7 @@ def get_cities(request):
     #subscribe form : no login required
     term = request.GET.get('term')
     country_id = request.GET.get('country', None)
+    zipcode = request.GET.get('zipcode', None)
     if country_id == 'undefined':
         # javascript none
         country_id = 0
@@ -65,14 +66,26 @@ def get_cities(request):
 
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
 
-    if country_id is None:
-        cities_queryset = models.City.objects.filter(name__icontains=term)[:10]
-    else:
-        if country_id == 0 or country_id == default_country.id:
-            cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]
+    if len(zipcode) != 5 and len(zipcode) != 2:
+        zipcode = None
+        
+    if zipcode is None:
+        if country_id is None:
+            cities_queryset = models.City.objects.filter(name__icontains=term)[:10]
         else:
-            cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]
+            if country_id == 0 or country_id == default_country.id:
+                cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]
+            else:
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]
+    else:
+        if country_id is None:
+            cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode)[:10]
+        else:
+            if country_id == 0 or country_id == default_country.id:
+                cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode).exclude(parent__code='')[:10]
+            else:
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, zip_code__icontains=zipcode)[:10]
 
-    cities = [{'id': city.id, 'name': city.name} for city in cities_queryset]
+    cities = [{'id': city.id, 'name': city.name, 'district_id': city.district_id} for city in cities_queryset]
 
     return HttpResponse(json.dumps(cities), 'application/json')

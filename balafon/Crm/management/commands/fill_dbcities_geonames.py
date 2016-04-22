@@ -44,7 +44,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
             else:
                 print("\t[0] : No match")
                 temp = x.possibilities.split("|")
-                count = 1
+                count = 0
                 for p in temp:
                     count += 1
                     print("\t[" + `count` + "] : " + p)
@@ -59,7 +59,6 @@ def manage_spe_cases():       #Change the name of the special cases cities
                     x.save()
                 else:
                     print("No modification\n\n")
-                    x.delete()
         except UnicodeEncodeError:
             print("Error unknown character - try changing name in admin")
             pass
@@ -84,7 +83,7 @@ def fill_db():
                 tab = dict_dept.get(dept)
                 tab.append(cname)
             zone = Zone.objects.get(name = dept)
-            new=City(name=cname, parent=zone)
+            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1])
             new.save()
             print("[added]  " + cname)
             
@@ -116,35 +115,75 @@ def fill_db():
                             special_cases(c, possibilities)
                             print("City added to \'Special Cases\'")
             except TypeError:
-                        print("TypeError")
-                        pass
+                print("TypeError")
+                pass
             except UnicodeEncodeError:
                 special_cases(c,"")
                 pass
+            except AttributeError:
+                pass    
         
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=City.objects.all()
+    cities=City.objects.exclude(parent__type__name='Pays')
     prec=City(name="", parent=None)
     for c in cities:
         try:
-            if c.id != prec.id and remove_accents(c.name.lower()) == remove_accents(prec.name.lower()) and c.parent==prec.parent:
-                contacts = Contact.objects.filter(city=c)
+            if c.district_id == "999":
+                if len(c.parent.code) == 2:
+                    c.district_id = c.parent.code + "0"
+                elif len(c.parent.code) == 3:
+                    c.dsitrict_id = c.parent.code
+                c.save()
+            if remove_accents(c.name.lower()) == remove_accents(prec.name.lower()) and c.parent==prec.parent:
+                if c.district_id[2] != "0" and prec.district_id[2] == "0":
+                    rightcity = c
+                    wrongcity = prec
+                else:
+                    rightcity = prec
+                    wrongcity = c       
+                contacts = Contact.objects.filter(city=wrongcity)
                 for o in contacts:
-                    o.city = prec
+                    o.city = rightcity
                     o.save()
-                entities = Entity.objects.filter(city=c)
+                entities = Entity.objects.filter(city=wrongcity)
                 for e in entities:
-                    e.city = prec
+                    e.city = rightcity
                     e.save()
-                c.delete()
-                print("[deleted]  " + c.name)
+                wrongcity.delete()
+                print("[deleted]  " + wrongcity.name)
             prec=c
         except ValueError:
-                pass
-    
-    
+            pass
+        except AssertionError:
+            pass
+        
+        
+def update_zip_code():      #Give a zip code to cities that don't have one
+    cities = City.objects.filter(zip_code="00000")
+    for c in cities:
+        try:
+            haschanged = 0
+            contacts = Contact.objects.filter(city=c)
+            if not contacts:
+                print("\n")
+            else:
+                contacts[0].city.zip_code = contacts[0].zip_code
+                contacts[0].city.save()
+                print("[saved] " + contacts[0].zip_code + "  " + contacts[0].city.name)
+                haschanged = 1
+            if haschanged == 0:
+                entities = Entity.objects.filter(city=c)
+                if not entities:
+                    print("\n")
+                else:
+                    entities[0].city.zip_code = entities[0].zip_code
+                    entities[0].city.save()
+                    print("[saved] " + entities[0].zip_code + "  " + entities[0].city.name)
+        except UnicodeEncodeError:
+            print("Unicode Error")
+            pass
 
 class Command(BaseCommand):
     
@@ -157,7 +196,8 @@ class Command(BaseCommand):
             print("\t[1] Fill the database from \'fixtures/GeoNames_f.txt\'")
             print("\t[2] Manage special cases")
             print("\t[3] Update contacts and entities and delete cities appearing twice or more")
-            print("\t[4] Run all\n\n")
+            print("\t[4] Update the zip code of all cities")
+            print("\t[5] Run all\n\n")
             
             choose = int(raw_input("Enter the value of action : "))
             if choose == 0:
@@ -169,7 +209,10 @@ class Command(BaseCommand):
             elif choose == 3:
                 update_doubles()
             elif choose == 4:
+                update_zip_code()
+            elif choose == 5:
                 fill_db()
                 manage_spe_cases()
                 update_doubles()
+                update_zip_code()
                 return

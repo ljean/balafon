@@ -29,7 +29,7 @@ class HasParentFilter(admin.SimpleListFilter):
 
 class ZoneAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['name', 'parent', 'type']
+    list_display = ['code', 'name', 'parent', 'type']
     ordering = ['type', 'name']
     list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']
@@ -122,7 +122,7 @@ class GroupInline(admin.TabularInline):
 
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['__unicode__', 'parent']
+    list_display = ['__unicode__', 'zip_code', 'parent', 'latitude', 'longitude']
     search_fields = ['name']
     ordering = ['name']
     list_filter = [HasParentFilter, 'parent', ]

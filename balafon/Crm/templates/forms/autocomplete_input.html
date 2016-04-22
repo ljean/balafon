@@ -26,7 +26,7 @@ $(function() {
                     var items = [];
                     $.each(data, function(i, val){
                         name_to_id[val.name] = val.id; //store in local dict
-                        items.push(val.name);
+                        {% block list_display %}items.push(val.name);{% endblock %}
                     });
                     add(items);
                 }
@@ -34,16 +34,17 @@ $(function() {
         },
 		//when the item is selected : get the value
         select: function(event, ui) {
-            var id = name_to_id[ui.item.value]; //get id from local dict
+            {% block get_real_value %}var id = name_to_id[ui.item.value];{% endblock %} //get id from local dict
             if (!id) {
-                id = ui.item.value;
+                {% block get_real_value_if %}id = ui.item.value;{% endblock %}
             }
             $("input[name={{name}}]").val(id);
-			      $("input[name={{name}}_visible]").attr('value', ui.item.value);
+			    {% block display_real_value %}$("input[name={{name}}_visible]").attr('value', ui.item.value);{% endblock %}
         }
     });
     $("input[name={{name}}_visible]").change(function() {
 		var value = $(this).val();
+		{% block change_value_city %}{% endblock %}
         $.ajax({
 			url: "{% block get_id_url %}{% endblock %}?name="+value,
 			success: function(data){

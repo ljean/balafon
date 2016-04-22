@@ -514,7 +514,6 @@ FR	77970	Jouy-le-Châtel	Ile-de-France	11	Seine-et-Marne	77	Arrondissement de Pro
 FR	77990	Le Mesnil-Amelot	Ile-de-France	11	Seine-et-Marne	77	Arrondissement de Meaux	771	49.0179	2.5942	5
 FR	77990	Mauregard	Ile-de-France	11	Seine-et-Marne	77	Arrondissement de Meaux	771	49.0342	2.5806	5
 FR	78000	Versailles	Ile-de-France	11	Yvelines	78	Arrondissement de Versailles	784	48.8	2.1333	5
-FR	78078 CITYSSIMO	Saint-Quentin-en-Yvelines	Ile-de-France	11	Yvelines	78			48.7732	2.0191	5
 FR	78100	Saint-Germain-en-Laye	Ile-de-France	11	Yvelines	78	Arrondissement de Saint-Germain-en-Laye	783	48.9	2.0833	5
 FR	78110	Le Vésinet	Ile-de-France	11	Yvelines	78	Arrondissement de Saint-Germain-en-Laye	783	48.8928	2.1331	5
 FR	78111	Dammartin-en-Serve	Ile-de-France	11	Yvelines	78	Arrondissement de Mantes-la-Jolie	781	48.9032	1.6195	5
