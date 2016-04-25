@@ -164,9 +164,9 @@ class ImportFileTest(BaseTestCase):
         self.test_create_contacts_import("contacts2.csv")
         url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
 
-        subscription_types = (
-            mommy.make(models.SubscriptionType), mommy.make(models.SubscriptionType),
-        )
+        newsletter_1 = mommy.make(models.SubscriptionType, name="Newsletter 1")
+        newsletter_2 = mommy.make(models.SubscriptionType, name="Newsletter 2")
+        newsletter_3 = mommy.make(models.SubscriptionType, name="Newsletter 3")
 
         data = {
             'import_file': '',
@@ -182,7 +182,7 @@ class ImportFileTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(2, models.Contact.objects.count())
+        self.assertEqual(3, models.Contact.objects.count())
 
         contact_fr = models.Contact.objects.get(lastname="Oui")
         self.assertEqual(contact_fr.favorite_language, "fr")
@@ -190,20 +190,177 @@ class ImportFileTest(BaseTestCase):
         contact_en = models.Contact.objects.get(lastname="No")
         self.assertEqual(contact_en.favorite_language, "en")
 
-        for subscription_type in subscription_types:
-            self.assertEqual(
-                0,
-                models.Subscription.objects.filter(subscription_type=subscription_type, contact=contact_en).count()
-            )
+        contact_en_yes = models.Contact.objects.get(lastname="Yes")
+        self.assertEqual(contact_en_yes.favorite_language, "en")
 
-            self.assertEqual(
-                1,
-                models.Subscription.objects.filter(subscription_type=subscription_type, contact=contact_fr).count()
-            )
-            subscription = models.Subscription.objects.filter(
-                subscription_type=subscription_type, contact=contact_fr
-            ).all()[0]
-            self.assertEqual(subscription.accept_subscription, True)
+        # Contact 1
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_fr).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_1, contact=contact_fr).accept_subscription
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_fr).count()
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_fr).count()
+        )
+
+        # Contact 2
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_en).count()
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_en).count()
+        )
+
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_en).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_3, contact=contact_en).accept_subscription
+        )
+
+        # Contact 3
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_en_yes).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_1, contact=contact_en_yes).accept_subscription
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_en_yes).count()
+        )
+
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_en_yes).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_3, contact=contact_en_yes).accept_subscription
+        )
+
+    def test_confirm_import_existing_subscriptions(self):
+        """view confirm contact : existing subscriptions should not be updated"""
+        self.test_confirm_import_subscriptions()
+        url = reverse('crm_confirm_contacts_import', args=[self.contacts_import.id])
+
+        newsletter_1 = models.SubscriptionType.objects.get(name="Newsletter 1")
+        newsletter_2 = models.SubscriptionType.objects.get(name="Newsletter 2")
+        newsletter_3 = models.SubscriptionType.objects.get(name="Newsletter 3")
+
+        # Force subscription to be not accepted
+        contact_fr = models.Contact.objects.get(lastname="Oui")
+        subscription = models.Subscription.objects.get(subscription_type=newsletter_1, contact=contact_fr)
+        subscription.accept_subscription = False
+        subscription.save()
+
+        data = {
+            'import_file': '',
+            'name': '',
+            'encoding': 'utf-8',
+            'separator': ';',
+            'entity_type': '',
+            'groups': [],
+            'entity_name_from_email': False,
+            'default_department': '',
+            'create_contacts': 'yes'
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(3, models.Contact.objects.count())
+
+        contact_fr = models.Contact.objects.get(lastname="Oui")
+        self.assertEqual(contact_fr.favorite_language, "fr")
+
+        contact_en = models.Contact.objects.get(lastname="No")
+        self.assertEqual(contact_en.favorite_language, "en")
+
+        contact_en_yes = models.Contact.objects.get(lastname="Yes")
+        self.assertEqual(contact_en_yes.favorite_language, "en")
+
+        # Contact 1
+        # This one should be false because already existing
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_fr).count()
+        )
+        self.assertEqual(
+            False,
+            models.Subscription.objects.get(subscription_type=newsletter_1, contact=contact_fr).accept_subscription
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_fr).count()
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_fr).count()
+        )
+
+        # Contact 2
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_en).count()
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_en).count()
+        )
+
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_en).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_3, contact=contact_en).accept_subscription
+        )
+
+        # Contact 3
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_1, contact=contact_en_yes).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_1, contact=contact_en_yes).accept_subscription
+        )
+
+        self.assertEqual(
+            0,
+            models.Subscription.objects.filter(subscription_type=newsletter_2, contact=contact_en_yes).count()
+        )
+
+        self.assertEqual(
+            1,
+            models.Subscription.objects.filter(subscription_type=newsletter_3, contact=contact_en_yes).count()
+        )
+        self.assertEqual(
+            True,
+            models.Subscription.objects.get(subscription_type=newsletter_3, contact=contact_en_yes).accept_subscription
+        )
 
     def test_confirm_import_anonymous(self):
         """check no import if user is anonymous"""
@@ -466,7 +623,7 @@ class ImportTemplateTest(BaseTestCase):
 
         fields = [
             'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job', 'notes',
-            'role', 'accept_newsletter', 'accept_3rdparty', 'entity', 'entity.type',
+            'role', 'entity', 'entity.type',
             'entity.description', 'entity.website', 'entity.email', 'entity.phone',
             'entity.fax', 'entity.notes', 'entity.address', 'entity.address2', 'entity.address3',
             'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
@@ -483,3 +640,79 @@ class ImportTemplateTest(BaseTestCase):
 
         for field in [custom_fields[1], custom_fields[4]]:
             self.assertTrue(field not in cols)
+
+    def test_template_with_subscriptions(self):
+        """test that subscriptions are part of the template"""
+
+        subscriptions = [
+            models.SubscriptionType.objects.create(
+                name='Newsletter 1'
+            ),
+            models.SubscriptionType.objects.create(
+                name='Newsletter 2'
+            ),
+        ]
+
+        url = reverse('crm_contacts_import_template')
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], 'text/csv')
+
+        self.assertEqual(response.content.count('\n'), 1)
+        pos = response.content.find('\n')
+        line = response.content[:pos]
+        cols = [x.strip('"') for x in line.split(";")]
+
+        fields = [
+            'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job', 'notes',
+            'role', 'accept_newsletter_1', 'accept_newsletter_2', 'entity', 'entity.type',
+            'entity.description', 'entity.website', 'entity.email', 'entity.phone',
+            'entity.fax', 'entity.notes', 'entity.address', 'entity.address2', 'entity.address3',
+            'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
+            'address3', 'city', 'cedex', 'zip_code', 'country', 'entity.groups', 'groups', 'favorite_language',
+            'title', 'birth_date'
+        ]
+
+        for i, field in enumerate(fields):
+            self.assertEqual(cols[i], field)
+
+    def test_template_with_custom_fields_and_sbscriptions(self):
+        """test template is ok when having custom fields and subscriptions"""
+
+        subscriptions = [
+            models.SubscriptionType.objects.create(
+                name='Newsletter 1'
+            ),
+        ]
+
+        custom_field = models.CustomField.objects.create(
+            name='siret', label='SIRET', model=models.CustomField.MODEL_ENTITY, import_order=1
+        )
+
+        url = reverse('crm_contacts_import_template')
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], 'text/csv')
+
+        self.assertEqual(response.content.count('\n'), 1)
+        pos = response.content.find('\n')
+        line = response.content[:pos]
+        cols = [x.strip('"') for x in line.split(";")]
+
+        fields = [
+            'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job', 'notes',
+            'role', 'accept_newsletter_1', 'entity', 'entity.type',
+            'entity.description', 'entity.website', 'entity.email', 'entity.phone',
+            'entity.fax', 'entity.notes', 'entity.address', 'entity.address2', 'entity.address3',
+            'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country', 'address', 'address2',
+            'address3', 'city', 'cedex', 'zip_code', 'country', 'entity.groups', 'groups', 'favorite_language',
+            'title', 'birth_date'
+        ]
+
+        for i, field in enumerate(fields):
+            self.assertEqual(cols[i], field)
+        start_index_for_custom_fields = len(fields)
+
+        self.assertEqual(cols[start_index_for_custom_fields], unicode(custom_field))

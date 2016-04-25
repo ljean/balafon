@@ -13,6 +13,7 @@ from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 
 from balafon.Crm import models, forms
@@ -72,6 +73,10 @@ def _fill_contact_data(fields, row):
             contact_data[field] = True if contact_data[field] else False
 
     return contact_data
+
+
+def _get_subcription_field_name(subscription_type):
+    return 'accept_' + slugify(subscription_type.name).replace('-', '_')
 
 
 def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
@@ -210,8 +215,14 @@ def get_imports_fields():
     fields = [
         'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job',
         'notes', 'role',
-        'accept_newsletter', 'accept_3rdparty',
-        'entity', 'entity.type', 'entity.description', 'entity.website', 'entity.email',
+    ]
+
+    for subscription_type in models.SubscriptionType.objects.all():
+        fields += [
+            _get_subcription_field_name(subscription_type)
+        ]
+
+    fields += [    'entity', 'entity.type', 'entity.description', 'entity.website', 'entity.email',
         'entity.phone', 'entity.fax', 'entity.notes',
         'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
@@ -397,12 +408,13 @@ def _set_subscriptions(contact, contact_data):
     for subscription_type in models.SubscriptionType.objects.all():
 
         try:
-            #if the subscription exist : keep it as it is
+            # if the subscription exist : keep it as it is
             models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
 
         except models.Subscription.DoesNotExist:
-            #if it doesn't exist and that the accept_newsletter is True in file create it
-            if contact_data['accept_newsletter']:
+            # if it doesn't exist and that the corresponding cell is True in file, create it
+            field_name = _get_subcription_field_name(subscription_type)
+            if contact_data[field_name]:
                 models.Subscription.objects.create(
                     contact=contact,
                     subscription_type=subscription_type,
