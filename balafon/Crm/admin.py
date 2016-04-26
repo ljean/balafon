@@ -214,7 +214,7 @@ admin.site.register(models.TeamMember)
 admin.site.register(models.StreetType)
 
 
-class SpecialCasesCitiesAdmin(admin.ModelAdmin):
+class SpecialCaseCityAdmin(admin.ModelAdmin):
     list_display = ['city', 'oldname', 'possibilities', 'change_validated']
 
-admin.site.register(models.SpecialCasesCities, SpecialCasesCitiesAdmin)
+admin.site.register(models.SpecialCaseCity, SpecialCaseCityAdmin)

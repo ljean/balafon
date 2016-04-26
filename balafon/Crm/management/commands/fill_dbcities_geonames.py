@@ -8,7 +8,7 @@ from balafon.Crm.models import City
 from balafon.Crm.models import Zone
 from balafon.Crm.models import Contact
 from balafon.Crm.models import Entity
-from balafon.Crm.models import SpecialCasesCities
+from balafon.Crm.models import SpecialCaseCity
 
 from django.core.management.base import BaseCommand
 
@@ -27,12 +27,12 @@ def remove_accents(txt):
 
 
 def special_cases(city, txt):
-    ct = SpecialCasesCities(city=city, oldname=city.name, possibilities=txt, change_validated="no")
+    ct = SpecialCaseCity(city=city, oldname=city.name, possibilities=txt, change_validated="no")
     ct.save()
 
 
 def manage_spe_cases():       #Change the name of the special cases cities            
-    spe_cases = SpecialCasesCities.objects.filter(change_validated="no")
+    spe_cases = SpecialCaseCity.objects.filter(change_validated="no")
     for x in spe_cases:
         try:
             print(x.city.name.encode('utf-8'))
@@ -41,6 +41,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
                 x.city.name = new_name;
                 x.city.save()
                 x.change_validated = "yes"
+                x.save()
             else:
                 print("\t[0] : No match")
                 temp = x.possibilities.split("|")

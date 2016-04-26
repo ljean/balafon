@@ -154,8 +154,8 @@ class City(BaseZone):
     """city"""
     
     district_id = models.CharField(max_length=3, default="999")
-    latitude = models.FloatField(default=48.8534)
-    longitude = models.FloatField(default=2.3488)
+    latitude = models.FloatField(default=0)
+    longitude = models.FloatField(default=0)
     zip_code = models.CharField(max_length=20, default="00000")
     
     groups = models.ManyToManyField(
@@ -1658,8 +1658,13 @@ class ContactsImport(TimeStampedModel):
         verbose_name_plural = _(u'contact imports')
 
 
-class SpecialCasesCities(models.Model):
+class SpecialCaseCity(models.Model):
     city = models.ForeignKey(City)
-    oldname = models.CharField(max_length=100, default="None")
-    possibilities = models.CharField(max_length=500)
-    change_validated = models.CharField(max_length=3, default=0)
+    oldname = models.CharField(_(u'old name'), max_length=100, default="None")
+    possibilities = models.CharField(_(u'possibilities'), max_length=500)
+    change_validated = models.CharField(_(u'change validated'), max_length=3, default=0)
+    
+    class Meta:
+        verbose_name = _(u'special case city')
+        verbose_name_plural = _(u'special case cities')
+        ordering = ['city']

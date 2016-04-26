@@ -66,7 +66,7 @@ def get_cities(request):
 
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
 
-    if len(zipcode) != 5 and len(zipcode) != 2:
+    if zipcode != None and len(zipcode) != 5 and len(zipcode) != 2:
         zipcode = None
         
     if zipcode is None:

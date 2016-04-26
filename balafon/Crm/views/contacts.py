@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
@@ -292,3 +292,12 @@ def select_contact_and_redirect(request, view_name, template_name, choices=None)
         {'form': form, 'post_url': post_url},
         context_instance=RequestContext(request)
     )
+
+
+@user_passes_test(can_access)
+@popup_redirect
+def display_map(request, contact_id):
+    contact = models.Contact.objects.get(id=contact_id)
+    latitude = contact.city.latitude
+    longitude = contact.city.longitude
+    return render(request, 'Crm/display_map.html', {'latitude': latitude, 'longitude': longitude})

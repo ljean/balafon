@@ -1,0 +1,44 @@
+<html>
+<head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css">
+<style>
+#map {
+       width: 800px;
+       height: 500px;
+       border: 2px solid black;
+     }
+</style>
+    
+<script>
+$(document).bind('cbox_complete', function init() {
+       
+      // Création d'un objet map
+      var element = document.getElementById('map');
+      while (element.firstChild) {
+       element.removeChild(element.firstChild);
+      }
+      var map = new OpenLayers.Map('map');
+
+
+      // Ajout d'un calque en utilisant le rendu par défaut
+      map.addLayer( new OpenLayers.Layer.OSM() );
+
+      var projFrom = new OpenLayers.Projection("EPSG:4326");
+      var projTo = new OpenLayers.Projection("EPSG:900913");
+      var center = new OpenLayers.LonLat();
+      var cproj = center.transform(projFrom, projTo);
+
+      // Positionnement de la carte sur le point central
+      map.setCenter(cproj, 15);
+})
+
+       </script>
+</head>
+
+<body>
+       
+       <div id="map"></div>
+
+</body>
+</html>
