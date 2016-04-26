@@ -182,11 +182,11 @@ class CreateEntityTest(BaseTestCase):
         entity_type = mommy.make(models.EntityType)
         url = reverse('crm_create_entity', args=[2222]).replace("2222", "aaa")
         response = self.client.get(url)
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(response.status_code, 404)
         self.assertEqual(models.Entity.objects.count(), 0)
 
         response = self.client.post(url, data={'name': "ABC", "type": 2222})
-        self.assertEqual(404, response.status_code)
+        self.assertTrue(response.status_code in [404, 405])
         self.assertEqual(models.Entity.objects.count(), 0)
 
         url = reverse('crm_create_entity', args=[entity_type.id])
