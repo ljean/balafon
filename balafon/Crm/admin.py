@@ -125,7 +125,7 @@ class CityAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'zip_code', 'parent', 'latitude', 'longitude']
     search_fields = ['name']
     ordering = ['name']
-    list_filter = [HasParentFilter, 'parent', ]
+    list_filter = [HasParentFilter, 'parent__type', 'parent']
     raw_id_fields = ('groups',)
 
 admin.site.register(models.City, CityAdmin)

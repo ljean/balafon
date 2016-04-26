@@ -128,7 +128,7 @@ class BaseZone(NamedElement):
 
 
 class Zone(BaseZone):
-    """A zone is a group of cities : departements, region, ciuntry..."""
+    """A zone is a group of cities : departements, region, country..."""
     type = models.ForeignKey(ZoneType)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
     
