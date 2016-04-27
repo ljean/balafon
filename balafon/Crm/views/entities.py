@@ -10,7 +10,7 @@ from django.contrib.messages import warning
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
@@ -263,3 +263,15 @@ def select_entity_and_redirect(request, view_name, template_name):
         {'form': form},
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+@popup_redirect
+def display_map(request, entity_id):
+    return render(request, 'Crm/display_map_entity.html', {'entity': entity_id})
+
+def get_addr(request):
+    identity = request.GET.get('term')
+    entity = models.Entity.objects.get(id=identity)
+    address = entity.address
+    city = entity.city.name
+    return HttpResponse(json.dumps({'address': address, 'city': city}), 'application/json')

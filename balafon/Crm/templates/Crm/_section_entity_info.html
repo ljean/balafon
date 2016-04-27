@@ -25,6 +25,7 @@
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
         {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span><a class="colorbox-form" href="{% url 'crm_display_map_entity' entity.id %}">  Voir carte</a>
       </td></tr>
       {% if entity.has_billing_address %}
       <tr><td>

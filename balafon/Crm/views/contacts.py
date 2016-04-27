@@ -297,7 +297,16 @@ def select_contact_and_redirect(request, view_name, template_name, choices=None)
 @user_passes_test(can_access)
 @popup_redirect
 def display_map(request, contact_id):
-    contact = models.Contact.objects.get(id=contact_id)
-    latitude = contact.city.latitude
-    longitude = contact.city.longitude
-    return render(request, 'Crm/display_map.html', {'latitude': latitude, 'longitude': longitude})
+    return render(request, 'Crm/display_map_contact.html', {'contact': contact_id})
+
+def get_addr(request):
+    idcontact = request.GET.get('term')
+    contact = models.Contact.objects.get(id=idcontact)
+    if contact.city != None:
+        address = contact.address
+        city = contact.city.name
+    else:
+        address = contact.entity.address
+        city = contact.entity.city.name
+    return HttpResponse(json.dumps({'address': address, 'city': city}), 'application/json')
+        
