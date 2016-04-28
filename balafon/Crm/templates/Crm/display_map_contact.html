@@ -23,13 +23,21 @@ $(document).bind('cbox_complete', function() {
        var contact_id = String({{ contact }});
        console.log(contact_id);
        
+       address = "";
+       
        $.ajax({
               url: "http://localhost:8000/fr/crm/contact/getaddr/?term="+contact_id,
               success: function(data) {
-                     var address = "";
-                     if (data.address && data.city) {
-                            address = data.address + ", " + data.city;
+                     var address = data.address
+                     if (data.address2) {
+                            address = address + " " + data.address2;
                      }
+                     if (data.address3) {
+                            address = address + " " + data.address3;
+                     }
+                     address = address + ", " + data.city;
+                     latitude = data.latitude;
+                     longitude = data.longitude;
                      
                      address = address.split(" ").join("+");
                      console.log(address);
@@ -37,28 +45,42 @@ $(document).bind('cbox_complete', function() {
                      $.ajax({
                             url: "http://nominatim.openstreetmap.org/search?q="+address+"&format=jsonv2",
                             success: function(data) {
-                                   lat = data[0].boundingbox[0];
-                                   lon = data[0].boundingbox[2];
+                                   var map = new OpenLayers.Map('map');
+                                   if (data != "undefined") {
+                                          lat = data[0].lat;
+                                          lon = data[0].lon;
+                                          
+                                          // Ajout d'un calque en utilisant le rendu par défaut
+                                          map.addLayer( new OpenLayers.Layer.OSM() );
+                                          var markers = new OpenLayers.Layer.Markers( "Markers" );
+                                          map.addLayer(markers);
                                    
-                                   var map = new OpenLayers.Map('map');                                          
-                                   // Ajout d'un calque en utilisant le rendu par défaut
-                                   map.addLayer( new OpenLayers.Layer.OSM() );
-                                   var markers = new OpenLayers.Layer.Markers( "Markers" );
-                                   map.addLayer(markers);
-                            
+                                          
+                                          var projFrom = new OpenLayers.Projection("EPSG:4326");
+                                          var projTo = new OpenLayers.Projection("EPSG:900913");
+                                          var center = new OpenLayers.LonLat(lon,lat);
+                                          var cproj = center.transform(projFrom, projTo);
+                                          var size = new OpenLayers.Size(21,25);
+                                          var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+                                          var icon = new OpenLayers.Icon('http://openlayers.org/api/img/marker.png', size, offset);
+                                          markers.addMarker(new OpenLayers.Marker(cproj,icon));
+                                          
+                                          // Positionnement de la carte sur le point central
+                                          map.setCenter(cproj, 17);
+                                   }
                                    
-                                   var projFrom = new OpenLayers.Projection("EPSG:4326");
-                                   var projTo = new OpenLayers.Projection("EPSG:900913");
-                                   var center = new OpenLayers.LonLat(lon,lat);
-                                   var cproj = center.transform(projFrom, projTo);
-                                   var size = new OpenLayers.Size(21,25);
-                                   var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
-                                   var icon = new OpenLayers.Icon('http://www.pubzi.com/f/lg-Green-Map-Marker.png', size, offset);
-                                   markers.addMarker(new OpenLayers.Marker(cproj,icon));
-                            
+                                   else {
+                                          
+                                          map.addLayer( new OpenLayers.Layer.OSM() );
+                                          var projFrom = new OpenLayers.Projection("EPSG:4326");
+                                          var projTo = new OpenLayers.Projection("EPSG:900913");
+                                          var center = new OpenLayers.LonLat(longitude,latitude);
+                                          var cproj = center.transform(projFrom, projTo);
+                                          
+                                          // Positionnement de la carte sur le point central
+                                          map.setCenter(cproj, 14);
+                                   }
                                    
-                                   // Positionnement de la carte sur le point central
-                                   map.setCenter(cproj, 17);
                                    
                             }
                      });

@@ -273,5 +273,10 @@ def get_addr(request):
     identity = request.GET.get('term')
     entity = models.Entity.objects.get(id=identity)
     address = entity.address
+    latitude = entity.city.latitude
+    longitude = entity.city.longitude
     city = entity.city.name
-    return HttpResponse(json.dumps({'address': address, 'city': city}), 'application/json')
+    address2 = entity.address2
+    address3 = entity.address3
+    
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'address2': address2, 'address3': address3, 'latitude': latitude, 'longitude': longitude}), 'application/json')

@@ -303,10 +303,20 @@ def get_addr(request):
     idcontact = request.GET.get('term')
     contact = models.Contact.objects.get(id=idcontact)
     if contact.city != None:
+        latitude = contact.city.latitude
+        longitude = contact.city.longitude
         address = contact.address
         city = contact.city.name
+        address2 = contact.address2
+        address3 = contact.address3
+        
     else:
+        latitude = contact.entity.city.latitude
+        longitude = contact.entity.city.longitude
         address = contact.entity.address
         city = contact.entity.city.name
-    return HttpResponse(json.dumps({'address': address, 'city': city}), 'application/json')
+        address2 = contact.entity.address2
+        address3 = contact.entity.address3
+        
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'address2': address2, 'address3': address3, 'latitude': latitude, 'longitude': longitude}), 'application/json')
         
