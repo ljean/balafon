@@ -270,13 +270,21 @@ def display_map(request, entity_id):
     return render(request, 'Crm/display_map_entity.html', {'entity': entity_id})
 
 def get_addr(request):
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
     identity = request.GET.get('term')
     entity = models.Entity.objects.get(id=identity)
-    address = entity.address
+    address = ""
+    for stype in street_type:
+        if stype in entity.address:
+            address = entity.address
+        elif stype in entity.address2:
+            address = entity.address2
+        elif stype in entity.address3:
+            address = entity.address3
+    if address == "":
+        address = entity.address
     latitude = entity.city.latitude
     longitude = entity.city.longitude
     city = entity.city.name
-    address2 = entity.address2
-    address3 = entity.address3
     
-    return HttpResponse(json.dumps({'address': address, 'city': city, 'address2': address2, 'address3': address3, 'latitude': latitude, 'longitude': longitude}), 'application/json')
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')

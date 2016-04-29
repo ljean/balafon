@@ -20,7 +20,7 @@ $(document).bind('cbox_complete', function() {
               element.removeChild(element.firstChild);
        }
        
-       var contact_id = String({{ contact }});
+       var contact_id = "{{ contact }}";
        console.log(contact_id);
        
        address = "";
@@ -28,12 +28,8 @@ $(document).bind('cbox_complete', function() {
        $.ajax({
               url: "http://localhost:8000/fr/crm/contact/getaddr/?term="+contact_id,
               success: function(data) {
-                     var address = data.address
-                     if (data.address2) {
-                            address = address + " " + data.address2;
-                     }
-                     if (data.address3) {
-                            address = address + " " + data.address3;
+                     if (data.address) {
+                            var address = data.address
                      }
                      address = address + ", " + data.city;
                      latitude = data.latitude;
@@ -46,7 +42,7 @@ $(document).bind('cbox_complete', function() {
                             url: "http://nominatim.openstreetmap.org/search?q="+address+"&format=jsonv2",
                             success: function(data) {
                                    var map = new OpenLayers.Map('map');
-                                   if (data != "undefined") {
+                                   if (data[0] != null) {
                                           lat = data[0].lat;
                                           lon = data[0].lon;
                                           

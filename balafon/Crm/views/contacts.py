@@ -300,23 +300,37 @@ def display_map(request, contact_id):
     return render(request, 'Crm/display_map_contact.html', {'contact': contact_id})
 
 def get_addr(request):
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
     idcontact = request.GET.get('term')
     contact = models.Contact.objects.get(id=idcontact)
+    address = ""
     if contact.city != None:
         latitude = contact.city.latitude
         longitude = contact.city.longitude
-        address = contact.address
+        for stype in street_type:
+            if stype in contact.address:
+                address = contact.address
+            elif stype in contact.address2:
+                address = contact.address2
+            elif stype in contact.address3:
+                address = contact.address3
+        if address == "":
+            address = contact.address
         city = contact.city.name
-        address2 = contact.address2
-        address3 = contact.address3
         
     else:
         latitude = contact.entity.city.latitude
         longitude = contact.entity.city.longitude
-        address = contact.entity.address
+        for stype in street_type:
+            if stype in contact.entity.address:
+                address = contact.entity.address
+            elif stype in contact.entity.address2:
+                address = contact.entity.address2
+            elif stype in contact.entity.address3:
+                address = contact.entity.address3
+        if address == "":
+            address = contact.entity.address
         city = contact.entity.city.name
-        address2 = contact.entity.address2
-        address3 = contact.entity.address3
         
-    return HttpResponse(json.dumps({'address': address, 'city': city, 'address2': address2, 'address3': address3, 'latitude': latitude, 'longitude': longitude}), 'application/json')
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
         
