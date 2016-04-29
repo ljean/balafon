@@ -21,12 +21,21 @@
     }
   </style>
   <script>
+    function strToListValue(listValue) {
+      if (listValue) {
+        return listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+      } else {
+        return [];
+      }
+    }
+
     /**
       * add an id to a list
       */
     function addIdToList(listValue, newId) {
       //list is s string '[1,2] --> addIdToList('1,2'], 3) should return '[1,2,3]'
-      var ids = listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+      var ids = strToListValue(listValue);
+      //look for existing id
       for(var i=0; i<ids.length; i++) {
         ids[i] = parseInt(ids[i], 10);
         if (newId === ids[i]) {
@@ -42,7 +51,7 @@
       */
     function removeFromList(listValue, idToRemove) {
       //list is s string '[1,2,3] --> addIdToList('1,2,3'], 3) should return '[1,3]'
-      var ids = listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+      var ids = strToListValue(listValue);
       var newList = [];
       for(var i=0; i<ids.length; i++) {
         ids[i] = parseInt(ids[i], 10);
@@ -60,13 +69,13 @@
         '"></span></a> ';
       var dataType = 'data-type="'+member.type+'" data-id="'+ member.id +'"';
 
-      $(".new-members-list").append(
-        '<span class="label label-member label-new-member">' +
+      var html = '<span class="label label-member label-new-member">' +
         typeIcon +
         member.name +
         ' <a class="remove-me" href '+dataType+'><span class="glyphicon glyphicon-remove"></span></a> ' +
-        '</span>&nbsp;'
-      );
+        '</span>&nbsp;';
+
+      $(".new-members-list").append(html);
     };
 
     function addMember(member_type, member_id, existing) {
@@ -163,6 +172,9 @@
           <p>
           {% if members_count %}
             {{ members_count }} {% if members_count > 1 %}{% trans "members" %}{% else %}{% trans "member" %}{% endif %}
+          {% else %}
+            {% trans "No members" %}
+          {% endif %}
             <div class="new-members-list" style="margin: 20px 0;">
               {% for member in members %}
                 {% spaceless %}<span class="label label-member existing">
@@ -187,9 +199,7 @@
                 {% trans "The members with dark red background will be removed if you save the group" %}
               </div>
             </div>
-          {% else %}
-            {% trans "No members" %}
-          {% endif %}
+
           </p>
 
           <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
