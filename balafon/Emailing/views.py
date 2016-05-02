@@ -225,9 +225,10 @@ def unregister_contact(request, emailing_id, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     try:
         emailing = models.Emailing.objects.get(id=emailing_id)
+        my_company = emailing.subscription_type.name
     except models.Emailing.DoesNotExist:
         emailing = None
-    my_company = settings.BALAFON_MY_COMPANY
+        my_company = settings.BALAFON_MY_COMPANY
     
     if request.method == "POST":
         if 'unregister' in request.POST:
@@ -312,7 +313,13 @@ def view_emailing_online_lang(request, emailing_id, contact_uuid, lang):
 def subscribe_done(request, contact_uuid):
     """display a thank-you message after emailing subscription"""
     contact = get_object_or_404(Contact, uuid=contact_uuid)
-    my_company = settings.BALAFON_MY_COMPANY
+    subscription_type_names = [
+        subscription.subscription_type.name for subscription in contact.subscription_set.all()
+    ]
+    if subscription_type_names:
+        my_company = u', '.join(subscription_type_names)
+    else:
+        my_company = settings.BALAFON_MY_COMPANY
     
     return render_to_response(
         'Emailing/public/subscribe_done.html',
@@ -327,7 +334,11 @@ def subscribe_done(request, contact_uuid):
 def subscribe_error(request, contact_uuid):
     """display an error message if emailing subscription fails"""
     contact = get_object_or_404(Contact, uuid=contact_uuid)
-    my_company = settings.BALAFON_MY_COMPANY
+    subscription_type_names = [
+        subscription.subscription_type.name for subscription in contact.subscription_set.all()
+        ]
+    if subscription_type_names:
+        my_company = u', '.join(subscription_type_names)
     
     return render_to_response(
         'Emailing/public/subscribe_error.html',
@@ -342,7 +353,13 @@ def subscribe_error(request, contact_uuid):
 def email_verification(request, contact_uuid):
     """handle click on verification link in email verification email"""
     contact = get_object_or_404(Contact, uuid=contact_uuid)
-    my_company = settings.BALAFON_MY_COMPANY
+    subscription_type_names = [
+        subscription.subscription_type.name for subscription in contact.subscription_set.all()
+        ]
+    if subscription_type_names:
+        my_company = u', '.join(subscription_type_names)
+    else:
+        my_company = settings.BALAFON_MY_COMPANY
     
     contact.email_verified = True
     contact.save()
@@ -432,7 +449,10 @@ class SubscribeView(View):
         if form.is_valid():
             contact = form.save(request)
             try:
-                send_verification_email(contact)
+                subscription_types = [
+                    subscription.subscription_type for subscription in contact.subscription_set.all()
+                ]
+                send_verification_email(contact, subscription_types)
                 return HttpResponseRedirect(self.get_success_url(contact))
             except EmailSendError:
                 except_text = 'send_verification_email'

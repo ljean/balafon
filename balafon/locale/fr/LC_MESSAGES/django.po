@@ -2843,9 +2843,9 @@ msgid "Unregister"
 msgstr "Se désinscrire"
 
 #: Emailing/templates/Emailing/public/unregister_confirm.html:7
-msgid "<h1>Are you sure to unregister from our mailing-list?</h1>"
+msgid "Are you sure to unregister from our mailing-list?"
 msgstr ""
-"<h1>Etes vous sûr de vous désinscrire de notre liste de diffusion?</h1>"
+"Etes vous sûr de vous désinscrire de notre liste de diffusion?"
 
 #: Emailing/templates/Emailing/public/unregister_done.html:5
 msgid ""

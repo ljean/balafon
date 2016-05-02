@@ -4,7 +4,8 @@
 {% block title %}{% trans "Unregister" %}{% endblock %}
 
 {% block custom_content %}
-  {% blocktrans %}<h1>Are you sure to unregister from our mailing-list?</h1>{% endblocktrans %}
+  <h1>{{ my_company }}</h1>
+  <h3>{% blocktrans %}Are you sure to unregister from our mailing-list?{% endblocktrans %}</h3>
   <form method="post" action="">{% csrf_token %}
     {{form.as_p}}
     <input type="submit" name="unregister" value="{% trans "Yes" %}">

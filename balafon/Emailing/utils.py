@@ -68,7 +68,7 @@ def get_emailing_context(emailing, contact):
         'MEDIA_URL': settings.MEDIA_URL,
         'STATIC_URL': settings.STATIC_URL,
         'SITE_PREFIX': emailing.get_domain_url_prefix(),
-        'my_company': settings.BALAFON_MY_COMPANY,
+        'my_company': emailing.subscription_type.name,
         'unregister_url': unregister_url,
         'contact': contact,
         'emailing': emailing,
@@ -258,15 +258,21 @@ def send_notification_email(request, contact, actions, message):
                 )
 
 
-def send_verification_email(contact):
+def send_verification_email(contact, subscription_types=None):
     """send an email to subscriber for checking his email"""
 
     if contact.email:
+
+        if subscription_types:
+            my_company = u', '.join([subscription_type.name for subscription_type in subscription_types])
+        else:
+            my_company = settings.BALAFON_MY_COMPANY
+
         data = {
             'contact': contact,
             'verification_url': reverse('emailing_email_verification', args=[contact.uuid]),
             'site': Site.objects.get_current(),
-            'my_company': mark_safe(settings.BALAFON_MY_COMPANY),
+            'my_company': mark_safe(my_company),
         }
         the_template = get_template('Emailing/subscribe_verification_email.txt')
         content = the_template.render(Context(data))
