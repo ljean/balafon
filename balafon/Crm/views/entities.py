@@ -269,6 +269,7 @@ def select_entity_and_redirect(request, view_name, template_name):
 def display_map(request, entity_id):
     return render(request, 'Crm/display_map_entity.html', {'entity': entity_id})
 
+
 def get_addr(request):
     street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "impasse","Impasse"]
     identity = request.GET.get('term')
@@ -286,5 +287,18 @@ def get_addr(request):
     latitude = entity.city.latitude
     longitude = entity.city.longitude
     city = entity.city.name
+    lat = entity.latitude
+    lon = entity.longitude
     
-    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude, 'lat': lat, 'lon': lon}), 'application/json')
+
+
+def put_coords(request):
+    entity_id = request.GET.get('ent')
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    entity = models.Entity.objects.get(id=entity_id)
+    entity.latitude = lat
+    entity.longitude = lon
+    entity.save()
+    return HttpResponse(json.dumps({'latitude': lat, 'longitude': lon}), 'application/json')

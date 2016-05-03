@@ -214,6 +214,9 @@ class AddressModel(LastModifiedModel):
     address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
     address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
     address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+    
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
     zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')

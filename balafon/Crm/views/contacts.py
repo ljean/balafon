@@ -307,6 +307,8 @@ def get_addr(request):
     if contact.city != None:
         latitude = contact.city.latitude
         longitude = contact.city.longitude
+        lat = contact.latitude
+        lon = contact.longitude
         for stype in street_type:
             if stype in contact.address:
                 address = contact.address
@@ -321,6 +323,8 @@ def get_addr(request):
     else:
         latitude = contact.entity.city.latitude
         longitude = contact.entity.city.longitude
+        lat = contact.entity.latitude
+        lon = contact.entity.longitude
         for stype in street_type:
             if stype in contact.entity.address:
                 address = contact.entity.address
@@ -332,5 +336,20 @@ def get_addr(request):
             address = contact.entity.address
         city = contact.entity.city.name
         
-    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
-        
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude, 'lat': lat, 'lon': lon}), 'application/json')
+
+
+def put_coords(request):
+    contact_id = request.GET.get('ent')
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    contact = models.Contact.objects.get(id=contact_id)
+    if contact.city != None:
+        contact.latitude = lat
+        contact.longitude = lon
+        contact.save()
+    else:
+        contact.entity.latitude = lat
+        contact.entity.longitude = lon
+        contact.entity.save()
+    return HttpResponse(json.dumps({'latitude': lat, 'longitude': lon}), 'application/json')

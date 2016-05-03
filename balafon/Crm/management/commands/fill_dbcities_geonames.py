@@ -154,7 +154,9 @@ def update_doubles():       #Update contacts and entities and remove the cities 
                     e.save()
                 wrongcity.delete()
                 print("[deleted]  " + wrongcity.name)
-            prec=c
+                prec = rightcity
+            else:
+                prec = c
         except ValueError:
             pass
         except AssertionError:
@@ -215,5 +217,5 @@ class Command(BaseCommand):
                 fill_db()
                 manage_spe_cases()
                 update_zip_code()
-                update_doubles()                
+                update_doubles()
                 return

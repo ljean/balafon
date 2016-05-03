@@ -96,7 +96,7 @@ class SubscriptionInline(admin.TabularInline):
 
 class ContactAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['lastname', 'firstname', 'entity', 'city']
+    list_display = ['lastname', 'firstname', 'entity', 'city', 'latitude', 'longitude']
     search_fields = ['lastname']
     raw_id_admin = ('entity',)
     inlines = (SubscriptionInline,)
@@ -133,7 +133,7 @@ admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ('name', 'type', 'city')
+    list_display = ('name', 'type', 'city', 'latitude', 'longitude')
     search_fields = ['name']
 
 admin.site.register(models.Entity, EntityAdmin)
