@@ -4,6 +4,7 @@
 from decimal import Decimal
 from datetime import date, datetime, time, timedelta
 
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404
 
@@ -129,7 +130,7 @@ class SalesByFamilyView(SalesStatisticsBaseView):
         """return sales for an objects for the given period (a cell of the statistic array)"""
         return super(SalesByFamilyView, self).get_object_sale_items(
             obj, date_from, date_to
-        ).filter(item__category__parent=obj)
+        ).filter(Q(item__category__parent=obj) | Q(item__category=obj))
 
 
 class SalesByTagView(SalesStatisticsBaseView):

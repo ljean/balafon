@@ -459,6 +459,70 @@ class SalesByCategoryTest(BaseTestCase):
             [{'value': '9.00'}, {'value': '0.00'}, {'value': '0.00'}]
         )
 
+    def test_one_sale_family_and_category(self):
+        """It should return all sales data"""
+
+        vat = mommy.make(models.VatRate, rate=Decimal(10))
+
+        family1 = mommy.make(models.StoreItemCategory, parent=None)
+        family2 = mommy.make(models.StoreItemCategory, parent=None)
+        category1 = mommy.make(models.StoreItemCategory, parent=family1)
+        category2 = mommy.make(models.StoreItemCategory, parent=family1)
+        category3 = mommy.make(models.StoreItemCategory, parent=family2)
+
+        article1 = mommy.make(models.StoreItem, category=family1, pre_tax_price=Decimal(1), vat_rate=vat)
+        article2 = mommy.make(models.StoreItem, category=category2, pre_tax_price=Decimal(2), vat_rate=vat)
+        article3 = mommy.make(models.StoreItem, category=category3, pre_tax_price=Decimal(3), vat_rate=vat)
+
+        sale1 = mommy.make(models.Sale)
+        sale1.action.planned_date = datetime(2016, 1, 5, 12, 0)
+        sale1.save()
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article1, pre_tax_price=article1.pre_tax_price, quantity=1, vat_rate=vat
+        )
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article2, pre_tax_price=article2.pre_tax_price, quantity=2, vat_rate=vat
+        )
+        mommy.make(
+            models.SaleItem, sale=sale1, item=article3, pre_tax_price=article3.pre_tax_price, quantity=3, vat_rate=vat
+        )
+
+        url = reverse('store_stats_sales_by_family', args=[2016, 1, 2016, 3])
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.data['data']
+        months = response.data['months']
+
+        self.assertEqual(len(months), 3)
+        self.assertEqual(
+            [dict(ordered_dict) for ordered_dict in months],
+            self._get_dates([date(2016, 1, 1), date(2016, 2, 1), date(2016, 3, 1)])
+        )
+
+        self.assertEqual(len(data), 2)
+
+        data = sorted(data, key=lambda cat: cat['id'])
+        family1_data = data[0]
+        family2_data = data[1]
+
+        self.assertEqual(family1_data['id'], family1.id)
+        self.assertEqual(family1_data['name'], family1.name)
+        self.assertEqual(family1_data['icon'], family1.icon)
+        self.assertEqual(
+            [dict(ordered_dict) for ordered_dict in family1_data['values']],
+            [{'value': '5.00'}, {'value': '0.00'}, {'value': '0.00'}]
+        )
+
+        self.assertEqual(family2_data['id'], family2.id)
+        self.assertEqual(family2_data['name'], family2.name)
+        self.assertEqual(family2_data['icon'], family2.icon)
+        self.assertEqual(
+            [dict(ordered_dict) for ordered_dict in family2_data['values']],
+            [{'value': '9.00'}, {'value': '0.00'}, {'value': '0.00'}]
+        )
+
     def test_one_sale_family_item(self):
         """It should return all sales data"""
 
