@@ -86,6 +86,8 @@ class CartTest(BaseTestCase):
         self.assertEqual(action.detail, '')
         self.assertEqual(action.planned_date, data['purchase_datetime'])
 
+        self.assertEqual(action.sale.analysis_code, models.SaleAnalysisCode.objects.get(name='Internet'))
+
         self.assertEqual(action.sale.saleitem_set.count(), 2)
         self.assertEqual(action.sale.saleitem_set.all()[0].item, store_item1)
         self.assertEqual(action.sale.saleitem_set.all()[0].text, store_item1.name)

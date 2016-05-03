@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 from balafon.Crm.models import Action, ActionType
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
-    Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint
+    Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint,
+    SaleAnalysisCode
 )
 from balafon.Store import settings
 from balafon.Store.api import serializers
@@ -139,6 +140,8 @@ class CartView(APIView):
             )
             action.contacts.add(contact)
             action.save()
+
+            action.sale.analysis_code = SaleAnalysisCode.objects.get_or_create(name=u"Internet")[0]
 
             action.sale.delivery_point = delivery_point
             action.sale.save()
