@@ -153,10 +153,11 @@ class Zone(BaseZone):
 class City(BaseZone):
     """city"""
     
-    district_id = models.CharField(max_length=3, default="999")
-    latitude = models.FloatField(default=0)
-    longitude = models.FloatField(default=0)
-    zip_code = models.CharField(max_length=20, default="00000")
+    district_id = models.CharField(max_length=3, null=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+    zip_code = models.CharField(max_length=20, null=True)
+    geonames_valid = models.BooleanField(default=False)
     
     groups = models.ManyToManyField(
         Zone, blank=True, verbose_name=_(u'group'), related_name='city_groups_set'

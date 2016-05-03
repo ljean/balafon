@@ -270,7 +270,7 @@ def display_map(request, entity_id):
     return render(request, 'Crm/display_map_entity.html', {'entity': entity_id})
 
 def get_addr(request):
-    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "impasse","Impasse"]
     identity = request.GET.get('term')
     entity = models.Entity.objects.get(id=identity)
     address = ""

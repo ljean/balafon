@@ -84,7 +84,7 @@ def fill_db():
                 tab = dict_dept.get(dept)
                 tab.append(cname)
             zone = Zone.objects.get(name = dept)
-            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1])
+            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
             new.save()
             print("[added]  " + cname)
             
@@ -96,7 +96,7 @@ def fill_db():
                     name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
                     cname1 = remove_accents(c.name.lower())
                     tab1 = dict_dept.get(c.parent.name)
-                    matches = difflib.get_close_matches(cname1, tab1)
+                    matches = difflib.get_close_matches(cname1, tab1,3,0.5)
                     for m in matches:
                         if remove_accents(m.lower()) == cname1:
                             print("Change saved : " + c.name + " ---> " + m)
@@ -127,7 +127,7 @@ def fill_db():
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=City.objects.exclude(parent__type__name='Pays')
+    cities=City.objects.exclude(parent__type__name='Pays').order_by("name", "parent")
     prec=City(name="", parent=None)
     for c in cities:
         try:
@@ -138,7 +138,7 @@ def update_doubles():       #Update contacts and entities and remove the cities 
                     c.dsitrict_id = c.parent.code
                 c.save()
             if remove_accents(c.name.lower()) == remove_accents(prec.name.lower()) and c.parent==prec.parent:
-                if c.district_id[2] != "0" and prec.district_id[2] == "0":
+                if c.geonames_valid and not prec.geonames_valid:
                     rightcity = c
                     wrongcity = prec
                 else:
@@ -214,6 +214,6 @@ class Command(BaseCommand):
             elif choose == 5:
                 fill_db()
                 manage_spe_cases()
-                update_doubles()
                 update_zip_code()
+                update_doubles()                
                 return

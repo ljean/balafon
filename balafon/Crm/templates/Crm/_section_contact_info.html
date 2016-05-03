@@ -66,7 +66,8 @@
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
         {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
-        <br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span><a class="colorbox-form" href="{% url 'crm_display_map_contact' contact.id %}">  Voir carte</a>
+        {% if not contact.city.geonames_valid and not contact.entity.city.geonames_valid %}<span class="glyphicon glyphicon-warning-sign" title="{% trans 'City not found' %}"></span>
+        {% elif contact.address or contact.entity.address %}<a class="colorbox-form" href="{% url 'crm_display_map_contact' contact.id %}"><span class="glyphicon glyphicon-map-marker" title="{% trans 'See on map' %}"></span></a>{% endif %}
       </td></tr>
       {% if contact.has_billing_address %}
       <tr><td>

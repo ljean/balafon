@@ -48,7 +48,7 @@ $(function() {
         $.ajax({
 			url: "{% block get_id_url %}{% endblock %}?name="+value,
 			success: function(data){
-		        if (data.id) {
+		        if (data.id != value) {
                     $('input[name={{name}}]').val(data.id);
                 } else {
                     $('input[name={{name}}]').val(value);

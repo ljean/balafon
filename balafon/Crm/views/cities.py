@@ -65,26 +65,23 @@ def get_cities(request):
         country_id = int(country_id)
 
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
-
-    if zipcode != None and len(zipcode) != 5 and len(zipcode) != 2:
-        zipcode = None
         
     if zipcode is None:
         if country_id is None:
-            cities_queryset = models.City.objects.filter(name__icontains=term)[:10]
+            cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True)[:10]
         else:
             if country_id == 0 or country_id == default_country.id:
-                cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True).exclude(parent__code='')[:10]
             else:
-                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
     else:
         if country_id is None:
-            cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode)[:10]
+            cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True)[:10]
         else:
             if country_id == 0 or country_id == default_country.id:
-                cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode).exclude(parent__code='')[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True).exclude(parent__code='')[:10]
             else:
-                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, zip_code__icontains=zipcode)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, zip_code__icontains=zipcode, geonames_valid=True)[:10]
 
     cities = [{'id': city.id, 'name': city.name, 'district_id': city.district_id} for city in cities_queryset]
 
