@@ -271,7 +271,7 @@ def display_map(request, entity_id):
 
 
 def get_addr(request):
-    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "impasse","Impasse"]
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "impasse","Impasse", "montée".decode('utf8'), "Montée".decode('utf8'), "coursière".decode('utf8'), "Coursière".decode('utf8'), "lotissement", "Lotissement"]
     identity = request.GET.get('term')
     entity = models.Entity.objects.get(id=identity)
     address = ""

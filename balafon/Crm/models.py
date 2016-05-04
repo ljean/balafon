@@ -344,6 +344,14 @@ class Entity(AddressModel):
             self.name = u"{0} {1}".format(contact.lastname, contact.firstname).lower()
             #don't put *args, *kwargs -> it may cause integrity error
             super(Entity, self).save()
+        if self.old_address != self.address:
+            self.latitude = None
+            self.longitude = None
+            super(Entity, self).save()
+            
+    def __init__(self, *args, **kwargs):
+        super(Entity, self).__init__(*args, **kwargs)
+        self.old_address = self.address
     
     def __unicode__(self):
         return self.name
@@ -630,6 +638,10 @@ class Contact(AddressModel):
     favorite_language = models.CharField(
         _("favorite language"), max_length=10, default="", blank=True, choices=settings.get_language_choices()
     )
+    
+    def __init__(self, *args, **kwargs):
+        super(Contact, self).__init__(*args, **kwargs)
+        self.old_address = self.address
 
     def get_view_url(self):
         if self.entity.is_single_contact:
@@ -958,6 +970,11 @@ class Contact(AddressModel):
         if self.entity.is_single_contact:
             #force the entity name for ordering
             self.entity.save()
+            
+        if self.old_address != self.address:
+            self.latitude = None
+            self.longitude= None
+            super(Contact, self).save()
             
     class Meta:
         verbose_name = _(u'contact')

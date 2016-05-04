@@ -76,7 +76,7 @@ $(document).bind('cbox_complete', function() {
                                                         $.ajax({
                                                                url: "http://localhost:8000/fr/crm/entity/putcoords/?ent="+entity_id+"&lat="+lat+"&lon="+lon,
                                                                success: function(data) {
-
+                                                                      console.log("Success!")
                                                                }
                                                         })
                                                         

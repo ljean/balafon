@@ -300,7 +300,7 @@ def display_map(request, contact_id):
     return render(request, 'Crm/display_map_contact.html', {'contact': contact_id})
 
 def get_addr(request):
-    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "montée".decode('utf8'), "Montée".decode('utf8'), "coursière".decode('utf8'), "Coursière".decode('utf8'), "lotissement", "Lotissement"]
     idcontact = request.GET.get('term')
     contact = models.Contact.objects.get(id=idcontact)
     address = ""
