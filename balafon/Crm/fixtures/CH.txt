@@ -4246,10 +4246,6 @@ CH	8475	Ossingen	Kanton Zürich	ZH	Bezirk Andelfingen	102	Ossingen	37	47.6113	8.7
 CH	8476	Unterstammheim	Kanton Zürich	ZH	Bezirk Andelfingen	102	Unterstammheim	42	47.6476	8.7897	6
 CH	8477	Oberstammheim	Kanton Zürich	ZH	Bezirk Andelfingen	102	Ober-Stammheim	36	47.6284	8.8048	6
 CH	8478	Thalheim an der Thur	Kanton Zürich	ZH	Bezirk Andelfingen	102	Thalheim an der Thur	39	47.582	8.7453	6
-CH	8058	Zürich	Kanton Zürich	ZH	Bezirk Bülach	103	Kloten	62	47.4535	8.561	4
-CH	8059	Zürich 59 Exchange Office	Kanton Zürich	ZH	Bezirk Bülach	103	Kloten	62	47.458	8.5853	4
-CH	8060	Zürich	Kanton Zürich	ZH	Bezirk Bülach	103	Kloten	62	47.458	8.5853	4
-CH	8065	Zürich	Kanton Zürich	ZH	Bezirk Bülach	103	Opfikon	66	47.3667	8.55	4
 CH	8152	Glattbrugg	Kanton Zürich	ZH	Bezirk Bülach	103	Opfikon	66	47.4326	8.561	6
 CH	8152	Opfikon	Kanton Zürich	ZH	Bezirk Bülach	103	Opfikon	66	47.431	8.5816	6
 CH	8152	Glattpark (Opfikon)	Kanton Zürich	ZH	Bezirk Bülach	103	Opfikon	66	47.4209	8.5632	6
@@ -4474,26 +4470,10 @@ CH	8545	Rickenbach Sulz	Kanton Zürich	ZH	Bezirk Winterthur	110	Rickenbach (ZH)	2
 CH	8545	Rickenbach ZH	Kanton Zürich	ZH	Bezirk Winterthur	110	Rickenbach (ZH)	225	47.5541	8.7956	6
 CH	8546	Menzengrüt	Kanton Zürich	ZH	Bezirk Winterthur	110	Wiesendangen	229	47.5489	8.8173	6
 CH	8548	Ellikon an der Thur	Kanton Zürich	ZH	Bezirk Winterthur	110	Ellikon an der Thur	218	47.5625	8.8272	6
-CH	8010	Zürich BZ Annahme	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich Briefzentrum	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich BZ FP	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich Kanton Annahme	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich-Mülligen SPS AG	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich CS Annahme	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich BZ Brieflklinik	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich Helsana Annahme	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich BZI DE	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8010	Zürich-Mülligen BZI	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8011	Zürich Mülligen SC	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.395	8.4488	4
-CH	8012	Zürich	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.395	8.4488	4
-CH	8015	Zürich 15	Kanton Zürich	ZH	Bezirk Dietikon	111	Schlieren	247	47.3667	8.55	4
-CH	8080	Zürich PV	Kanton Zürich	ZH	Bezirk Dietikon	111	Weiningen (ZH)	251	47.4201	8.4303	4
 CH	8102	Oberengstringen	Kanton Zürich	ZH	Bezirk Dietikon	111	Oberengstringen	245	47.4113	8.465	6
 CH	8103	Unterengstringen	Kanton Zürich	ZH	Bezirk Dietikon	111	Unterengstringen	249	47.4112	8.4444	6
 CH	8104	Weiningen ZH	Kanton Zürich	ZH	Bezirk Dietikon	111	Weiningen (ZH)	251	47.4223	8.4376	6
 CH	8142	Uitikon Waldegg	Kanton Zürich	ZH	Bezirk Dietikon	111	Uitikon	248	47.3667	8.4548	6
-CH	8901	Urdorf RRD	Kanton Zürich	ZH	Bezirk Dietikon	111	Urdorf	250	47.3457	8.4525	4
 CH	8902	Urdorf	Kanton Zürich	ZH	Bezirk Dietikon	111	Urdorf	250	47.3821	8.4239	6
 CH	8903	Birmensdorf ZH	Kanton Zürich	ZH	Bezirk Dietikon	111	Birmensdorf (ZH)	242	47.352	8.4396	6
 CH	8904	Aesch ZH	Kanton Zürich	ZH	Bezirk Dietikon	111	Aesch (ZH)	241	47.3355	8.4355	6
@@ -4504,71 +4484,6 @@ CH	8954	Geroldswil	Kanton Zürich	ZH	Bezirk Dietikon	111	Geroldswil	244	47.4229	8
 CH	8955	Oetwil an der Limmat	Kanton Zürich	ZH	Bezirk Dietikon	111	Oetwil an der Limmat	246	47.4295	8.3929	6
 CH	8970	Urdorf Exchange	Kanton Zürich	ZH	Bezirk Dietikon	111	Urdorf	250	47.3798	8.4224	4
 CH	8000	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8001	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.372	8.5413	6
-CH	8002	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3606	8.5325	6
-CH	8003	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3726	8.5161	6
-CH	8004	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.378	8.5234	6
-CH	8005	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3868	8.5207	6
-CH	8006	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3858	8.5432	6
-CH	8008	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3536	8.5614	6
-CH	8016	Zürich 16 Zustellung	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8020	Zürich 1	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8021	Zürich 1	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8021	Zürich 1 Sihlpost	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8022	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3674	8.5374	4
-CH	8023	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3748	8.5381	4
-CH	8024	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8026	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8027	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8030	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8031	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8032	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.5644	6
-CH	8033	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3836	8.548	4
-CH	8034	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8036	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8036	Zürich Corona	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8037	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3985	8.5243	6
-CH	8038	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3416	8.5369	6
-CH	8039	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8040	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3802	8.5068	4
-CH	8041	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3361	8.5156	6
-CH	8042	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8044	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3804	8.5728	6
-CH	8045	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3516	8.5057	6
-CH	8046	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.4222	8.5083	6
-CH	8047	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3739	8.487	6
-CH	8048	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3868	8.4839	6
-CH	8049	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.4087	8.5004	6
-CH	8050	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.4119	8.5508	6
-CH	8051	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3996	8.5788	6
-CH	8052	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.4245	8.5406	6
-CH	8053	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3613	8.5974	6
-CH	8055	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3642	8.4903	6
-CH	8057	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3999	8.5474	6
-CH	8059	Zürich 59 Ausland	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3828	8.5307	4
-CH	8061	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8063	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3666	8.497	4
-CH	8064	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3987	8.4852	6
-CH	8066	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8068	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8070	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8071	Zürich CS PZ	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8074	Zürich Voice Publishing	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3828	8.5307	4
-CH	8075	Zürich Benissimo spezial	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8080	Zürich West SPS	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.4201	8.4303	4
-CH	8080	Zürich 80	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8081	Zürich Helsana	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8085	Zürich Versicherung	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8086	Zürich Reader's Digest	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8087	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8088	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8090	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8091	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8092	Zürich ETH-Zentrum	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8093	Zürich ETH-Hönggerberg	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8096	Zürich IBRS local	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3828	8.5307	4
-CH	8098	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	8099	Zürich Sonderdienste	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
 CH	6713	Malvaglia						5050	46.4162	9.0394	6
 CH	6714	Semione						5050	46.3966	8.9508	6
 CH	6721	Ludiano						5050	46.4209	8.9515	6

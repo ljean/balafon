@@ -1499,7 +1499,7 @@ class Geographic50SearchForm(BaseCitySearchForm):
         field = forms.ModelChoiceField(
             queryset,
             label=_(u'Around'),
-            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city of the wanted district'), 'size': '80'})
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
         )
         self._add_field(field)
 
@@ -1525,7 +1525,7 @@ class Geographic25SearchForm(BaseCitySearchForm):
         field = forms.ModelChoiceField(
             queryset,
             label=_(u'Around'),
-            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city of the wanted district'), 'size': '80'})
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
         )
         self._add_field(field)
 
@@ -1551,7 +1551,7 @@ class Geographic100SearchForm(BaseCitySearchForm):
         field = forms.ModelChoiceField(
             queryset,
             label=_(u'Around'),
-            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city of the wanted district'), 'size': '80'})
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
         )
         self._add_field(field)
 

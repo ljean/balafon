@@ -36,7 +36,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
     spe_cases = SpecialCaseCity.objects.filter(change_validated="no")
     for x in spe_cases:
         try:
-            print(x.city.name.encode('utf-8'))
+            print(x.city.name.encode('utf8'))
             if x.possibilities == "":
                 new_name = raw_input("Error - Write the name to set for this city :")
                 x.city.name = new_name;
@@ -68,7 +68,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
 
 def fill_db():
     dict_dept = {}
-    cities = list(City.objects.all())
+    cities = list(City.objects.filter(parent__name='Suisse')
     
     #Add all the cities from GeoNames in the database
     
@@ -85,16 +85,17 @@ def fill_db():
             else:
                 tab = dict_dept.get(dept)
                 tab.append(cname)
-            zoned = Zone.objects.get(name=dept)
-            zoner = Zone.objects.get(name=reg)
-            zonec = Zone.objects.get(name="Suisse")
-            if zoner == None:
-                zone = Zone(name=reg, type=ZoneType.objects.get(name="Région".decode("utf8")), parent=zonec)
-                zone.save()
-            if zoned == None:
-                zone = Zone(name=dept, type=ZoneType.objects.get(name="Département".decode("utf8")), parent=zoner)
-                zone.save()
-                zoned=zone
+            zonec = Zone.objects.get(name='Suisse')
+            if len(Zone.objects.filter(name=reg)) > 0:
+                zoner = Zone.objects.filter(name=reg)[0]
+            else:
+                zoner = Zone(name=reg, type=ZoneType.objects.get(name="Région".decode('utf8')), parent=zonec, code=words[4])
+                zoner.save()
+            if len(Zone.objects.filter(name=dept)) > 0:
+                zoned = Zone.objects.filter(name=dept)[0]
+            else:
+                zoned = Zone(name=dept, type=ZoneType.objects.get(name="Département".decode('utf8')), parent=zoner, code=words[6])
+                zoned.save()
             new=City(name=cname, parent=zoned, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
             new.save()
             print("[added]  " + cname)
@@ -138,7 +139,7 @@ def fill_db():
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=City.objects.exclude(parent__type__name='Pays').order_by("name", "parent")
+    cities=City.objects.filter(parent__name='Suisse').order_by("name", "parent")
     prec=City(name="", parent=None)
     for c in cities:
         try:
@@ -210,8 +211,8 @@ class Command(BaseCommand):
             print("\t[1] Fill the database from \'fixtures/GeoNames_f.txt\'")
             print("\t[2] Manage special cases")
             print("\t[3] Update contacts and entities and delete cities appearing twice or more")
-            print("\t[4] Update the zip code of all cities")
-            print("\t[5] Run all\n\n")
+            print("\t[4] Run all")
+            print("\t[5] Update the zip code of all cities\n\n")
             
             choose = int(raw_input("Enter the value of action : "))
             if choose == 0:
@@ -222,11 +223,10 @@ class Command(BaseCommand):
                 manage_spe_cases()
             elif choose == 3:
                 update_doubles()
-            elif choose == 4:
-                update_zip_code()
             elif choose == 5:
+                update_zip_code()
+            elif choose == 4:
                 fill_db()
                 manage_spe_cases()
                 update_zip_code()
-                update_doubles()
                 return
