@@ -9,13 +9,14 @@ from balafon.Crm.models import Zone
 from balafon.Crm.models import Contact
 from balafon.Crm.models import Entity
 from balafon.Crm.models import SpecialCaseCity
+from balafon.Crm.models import ZoneType
 
 from django.core.management.base import BaseCommand
 
 
 def remove_accents(txt):
-    ch1 = "àâçéèêëîïôùûüÿ-".decode("utf8")
-    ch2 = "aaceeeeiiouuuy "
+    ch1 = "àâäçéèêëîïôöùûüÿ-".decode("utf8")
+    ch2 = "aaaceeeeiioouuuy "
     s = ""
     for c in txt:
         i = ch1.find(c)
@@ -35,24 +36,31 @@ def manage_spe_cases():       #Change the name of the special cases cities
     spe_cases = SpecialCaseCity.objects.filter(change_validated="no")
     for x in spe_cases:
         try:
-            print(x.city.name)
-            print("\t[0] : No match")
-            temp = x.possibilities.split("|")
-            count = 0
-            for p in temp:
-                count += 1
-                print("\t[" + `count` + "] : " + p)
-            choice = -1
-            while choice > count or choice < 0:
-                choice = int(raw_input("\nWrite the value of the corresponding name : "))
-            if choice > 0:
-                x.city.name = temp[choice - 1]
+            print(x.city.name.encode('utf-8'))
+            if x.possibilities == "":
+                new_name = raw_input("Error - Write the name to set for this city :")
+                x.city.name = new_name;
                 x.city.save()
-                print("\nName changed to : " + temp[choice - 1] + "\n\n")
                 x.change_validated = "yes"
                 x.save()
             else:
-                print("No modification\n\n")
+                print("\t[0] : No match")
+                temp = x.possibilities.split("|")
+                count = 0
+                for p in temp:
+                    count += 1
+                    print("\t[" + `count` + "] : " + p)
+                choice = -1
+                while choice > count or choice < 0:
+                    choice = int(raw_input("\nWrite the value of the corresponding name : "))
+                if choice > 0:
+                    x.city.name = temp[choice - 1]
+                    x.city.save()
+                    print("\nName changed to : " + temp[choice - 1] + "\n\n")
+                    x.change_validated = "yes"
+                    x.save()
+                else:
+                    print("No modification\n\n")
         except UnicodeEncodeError:
             print("Error unknown character - try changing name in admin")
             pass
@@ -64,11 +72,12 @@ def fill_db():
     
     #Add all the cities from GeoNames in the database
     
-    with codecs.open("dev/balafon/balafon/Crm/fixtures/GeoNames_f.txt","r","latin-1") as file1:
+    with codecs.open("dev/balafon/balafon/Crm/fixtures/CH.txt","r","latin-1") as file1:
         for l in file1:
             words = l.split("\t")
             cname = words[2]
             dept = words[5]
+            reg = words[3]
             if dict_dept.get(dept) == None:
                 dict_dept[dept] = []
                 tab = dict_dept.get(dept)
@@ -76,8 +85,17 @@ def fill_db():
             else:
                 tab = dict_dept.get(dept)
                 tab.append(cname)
-            zone = Zone.objects.get(name = dept)
-            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
+            zoned = Zone.objects.get(name=dept)
+            zoner = Zone.objects.get(name=reg)
+            zonec = Zone.objects.get(name="Suisse")
+            if zoner == None:
+                zone = Zone(name=reg, type=ZoneType.objects.get(name="Région".decode("utf8")), parent=zonec)
+                zone.save()
+            if zoned == None:
+                zone = Zone(name=dept, type=ZoneType.objects.get(name="Département".decode("utf8")), parent=zoner)
+                zone.save()
+                zoned=zone
+            new=City(name=cname, parent=zoned, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
             new.save()
             print("[added]  " + cname)
             
@@ -85,7 +103,7 @@ def fill_db():
     if not cities == False:
         for c in cities:
             try:
-                if c.parent.type.name != 'Pays':
+                if c.parent.name == 'Suisse':
                     name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
                     cname1 = remove_accents(c.name.lower())
                     tab1 = dict_dept.get(c.parent.name)
@@ -106,8 +124,7 @@ def fill_db():
                             possibilities = ""
                             for e in matches:
                                 possibilities = possibilities + e + "|"
-                            if possibilities != "":
-                                special_cases(c, possibilities)
+                            special_cases(c, possibilities)
                             print("[Special Cases] " + c.name)
             except TypeError:
                 print("TypeError")
@@ -172,7 +189,9 @@ def update_zip_code():      #Give a zip code to cities that don't have one
                 haschanged = 1
             if haschanged == 0:
                 entities = Entity.objects.filter(city=c)
-                if entities:
+                if not entities:
+                    print("\n")
+                else:
                     entities[0].city.zip_code = entities[0].zip_code
                     entities[0].city.save()
                     print("[saved] " + entities[0].zip_code + "  " + entities[0].city.name)

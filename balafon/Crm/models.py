@@ -153,7 +153,7 @@ class Zone(BaseZone):
 class City(BaseZone):
     """city"""
     
-    district_id = models.CharField(max_length=3, null=True)
+    district_id = models.CharField(max_length=10, null=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
     zip_code = models.CharField(max_length=20, null=True)
