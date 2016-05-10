@@ -104,7 +104,7 @@ def fill_db():
                     name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
                     cname1 = remove_accents(c.name.lower())
                     tab1 = dict_dept.get(c.parent.name)
-                    matches = difflib.get_close_matches(cname1, tab1,3,0.5)
+                    matches = difflib.get_close_matches(cname1, tab1,5,0.5)
                     for m in matches:
                         if remove_accents(m.lower()) == cname1:
                             print("[saved] " + c.name + " ---> " + m)
@@ -178,9 +178,7 @@ def update_zip_code():      #Give a zip code to cities that don't have one
         try:
             haschanged = 0
             contacts = Contact.objects.filter(city=c)
-            if not contacts:
-                print("\n")
-            else:
+            if contacts:
                 contacts[0].city.zip_code = contacts[0].zip_code
                 contacts[0].city.save()
                 print("[saved] " + contacts[0].zip_code + "  " + contacts[0].city.name)

@@ -1130,13 +1130,6 @@ CH	1695	Estavayer-le-Gibloux	Canton de Fribourg	FR	District de la Sarine	1004	Le
 CH	1695	Rueyres-St-Laurent	Canton de Fribourg	FR	District de la Sarine	1004	Le Glèbe	2223	46.7165	7.0394	6
 CH	1696	Vuisternens-en-Ogoz	Canton de Fribourg	FR	District de la Sarine	1004	Vuisternens-en-Ogoz	2231	46.7041	7.0579	6
 CH	1700	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8043	7.1667	6
-CH	1701	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
-CH	1702	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8067	7.1614	4
-CH	1704	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
-CH	1705	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
-CH	1707	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
-CH	1708	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
-CH	1709	Fribourg	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.8	7.15	4
 CH	1720	Corminboeuf	Canton de Fribourg	FR	District de la Sarine	1004	Corminboeuf	2183	46.8041	7.0985	6
 CH	1720	Chésopelloz	Canton de Fribourg	FR	District de la Sarine	1004	Chésopelloz	2179	46.8059	7.0769	6
 CH	1722	Bourguillon	Canton de Fribourg	FR	District de la Sarine	1004	Fribourg	2196	46.7982	7.1742	6
@@ -1548,12 +1541,6 @@ CH	6562	Soazza	Kanton Graubünden	GR	Distretto di Moesa	1828	Soazza	3823	46.3501	
 CH	6563	Mesocco	Kanton Graubünden	GR	Distretto di Moesa	1828	Mesocco	3822	46.4023	9.2213	6
 CH	6565	San Bernardino	Kanton Graubünden	GR	Distretto di Moesa	1828	Mesocco	3822	46.4676	9.1804	6
 CH	7000	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.8535	9.5309	6
-CH	7001	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.85	9.5	4
-CH	7002	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.8449	9.5317	4
-CH	7003	Chur Postauto GR Reg. Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.85	9.5	4
-CH	7004	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.85	9.5	4
-CH	7006	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.85	9.5	4
-CH	7007	Chur	Kanton Graubünden	GR	Bezirk Plessur	1829	Chur	3901	46.85	9.5	4
 CH	7026	Maladers	Kanton Graubünden	GR	Bezirk Plessur	1829	Maladers	3926	46.8438	9.5699	6
 CH	7027	Castiel	Kanton Graubünden	GR	Bezirk Plessur	1829	Castiel	3923	46.8496	9.6158	6
 CH	7027	Calfreisen	Kanton Graubünden	GR	Bezirk Plessur	1829	Calfreisen	3922	46.8574	9.6019	6
@@ -1940,12 +1927,6 @@ CH	2149	Champ-du-Moulin	Canton de Neuchâtel	NE	District de Boudry	2401	Brot-Dess
 CH	2149	Brot-Dessous	Canton de Neuchâtel	NE	District de Boudry	2401	Brot-Dessous	6405	46.963	6.7548	6
 CH	2300	La Cibourg	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1165	6.8758	6
 CH	2300	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1109	6.8293	6
-CH	2301	La Chx-de-F. Combe-à-l'Ours	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
-CH	2301	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
-CH	2302	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
-CH	2303	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
-CH	2304	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
-CH	2306	La Chaux-de-Fonds	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.1333	6.85	4
 CH	2314	La Sagne NE	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Sagne	6423	47.0343	6.8001	6
 CH	2322	Le Crêt-du-Locle	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	La Chaux-de-Fonds	6421	47.0794	6.7802	6
 CH	2325	Les Planchettes	Canton de Neuchâtel	NE	District de la Chaux-de-Fonds	2402	Les Planchettes	6422	47.1073	6.7686	6
@@ -2049,30 +2030,6 @@ CH	6388	Grafenort	Kanton Obwalden	OW	Obwalden	600	Engelberg	1402	46.8622	8.3712	
 CH	6390	Engelberg	Kanton Obwalden	OW	Obwalden	600	Engelberg	1402	46.8166	8.4335	6
 CH	6391	Engelberg	Kanton Obwalden	OW	Obwalden	600	Engelberg	1402	46.8197	8.4341	4
 CH	9000	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4236	9.3622	6
-CH	9001	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4231	9.3733	4
-CH	9001	St. Gallen Postauto SG-Azel	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9004	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9006	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9007	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9008	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4418	9.3918	6
-CH	9009	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9010	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4422	9.3717	6
-CH	9011	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4148	9.3998	6
-CH	9012	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4103	9.3617	6
-CH	9013	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9014	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4091	9.3355	6
-CH	9015	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4056	9.3093	6
-CH	9016	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4415	9.4141	6
-CH	9020	St. Gallen KC PKGK 5	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9020	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9022	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9023	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4221	9.3755	4
-CH	9024	St. Gallen Presse-Serv.Güll	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9025	St. Gallen Quelle	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9026	St. Gallen Künzler AG	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9027	St. Gallen Mona Versand	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9028	St. Gallen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
-CH	9029	St. Gallen Sonderdienste	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	St. Gallen	3203	47.4667	9.4	4
 CH	9030	Abtwil SG	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	Gaiserwald	3442	47.4274	9.3146	6
 CH	9030	St. Josefen	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	Gaiserwald	3442	47.4254	9.3386	6
 CH	9032	Engelburg	Kanton St. Gallen	SG	Wahlkreis St. Gallen	1721	Gaiserwald	3442	47.4419	9.3349	6
@@ -2287,14 +2244,6 @@ CH	8242	Bibern SH	Kanton Schaffhausen	SH	Bezirk Reiat	1402	Thayngen	2920	47.7699
 CH	8242	Hofen SH	Kanton Schaffhausen	SH	Bezirk Reiat	1402	Thayngen	2920	47.7812	8.6769	6
 CH	8243	Altdorf SH	Kanton Schaffhausen	SH	Bezirk Reiat	1402	Thayngen	2920	47.7872	8.6578	6
 CH	8200	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7151	8.622	6
-CH	8201	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7	8.6333	4
-CH	8202	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7	8.6333	4
-CH	8203	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.6993	8.6612	6
-CH	8204	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7	8.6333	4
-CH	8205	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7	8.6333	4
-CH	8207	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7253	8.6558	6
-CH	8208	Schaffhausen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7118	8.6356	6
-CH	8210	Schaffhausen Dist Ba	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7157	8.6411	4
 CH	8212	Neuhausen am Rheinfall	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Neuhausen am Rheinfall	2937	47.6786	8.5983	6
 CH	8222	Beringen	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Beringen	2932	47.6983	8.5759	6
 CH	8231	Hemmental	Kanton Schaffhausen	SH	Bezirk Schaffhausen	1403	Schaffhausen	2939	47.7391	8.5739	6
@@ -2316,22 +2265,12 @@ CH	8216	Oberhallau	Kanton Schaffhausen	SH	Bezirk Unterklettgau	1406	Oberhallau	2
 CH	8217	Wilchingen	Kanton Schaffhausen	SH	Bezirk Unterklettgau	1406	Wilchingen	2974	47.6665	8.458	6
 CH	8218	Osterfingen	Kanton Schaffhausen	SH	Bezirk Unterklettgau	1406	Wilchingen	2974	47.6573	8.5016	6
 CH	8219	Trasadingen	Kanton Schaffhausen	SH	Bezirk Unterklettgau	1406	Trasadingen	2973	47.669	8.4252	6
-CH	4611	Härkingen Scanning-Center	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
-CH	4620	Härkingen Dist Ba	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.2867	7.7767	4
-CH	4620	Härkingen Paketzentrum	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.2867	7.7767	4
-CH	4621	Härkingen SPS AG	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
-CH	4621	Härkingen Briefzentrum	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
-CH	4621	Härkingen BZ FP	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
-CH	4621	Härkingen BZ Briefklinik	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
-CH	4621	Härkingen SPS DO	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3046	7.8214	4
 CH	4622	Egerkingen	Kanton Solothurn	SO	Bezirk Gäu	1101	Egerkingen	2401	47.3256	7.7972	6
 CH	4623	Neuendorf	Kanton Solothurn	SO	Bezirk Gäu	1101	Neuendorf	2404	47.2966	7.8005	6
-CH	4624	Härkingen	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3052	7.8208	6
+CH	4620	Härkingen	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3052	7.8208	6
 CH	4625	Oberbuchsiten	Kanton Solothurn	SO	Bezirk Gäu	1101	Oberbuchsiten	2406	47.3126	7.7599	6
 CH	4626	Niederbuchsiten	Kanton Solothurn	SO	Bezirk Gäu	1101	Niederbuchsiten	2405	47.2881	7.7782	6
 CH	4628	Wolfwil	Kanton Solothurn	SO	Bezirk Gäu	1101	Wolfwil	2408	47.2693	7.798	6
-CH	4630	Härkingen CALL	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3667	7.8833	4
-CH	4640	Härkingen ST PP 1	Kanton Solothurn	SO	Bezirk Gäu	1101	Härkingen	2402	47.3271	7.8604	4
 CH	4702	Oensingen	Kanton Solothurn	SO	Bezirk Gäu	1101	Oensingen	2407	47.2903	7.7185	6
 CH	4703	Kestenholz	Kanton Solothurn	SO	Bezirk Gäu	1101	Kestenholz	2403	47.2775	7.7553	6
 CH	4710	Balsthal	Kanton Solothurn	SO	Bezirk Thal	1102	Balsthal	2422	47.3129	7.708	6
@@ -2459,11 +2398,6 @@ CH	5012	Schönenwerd	Kanton Solothurn	SO	Bezirk Olten	1108	Schönenwerd	2583	47.37
 CH	5014	Gretzenbach	Kanton Solothurn	SO	Bezirk Olten	1108	Gretzenbach	2576	47.3511	7.9987	6
 CH	5746	Walterswil SO	Kanton Solothurn	SO	Bezirk Olten	1108	Walterswil (SO)	2585	47.329	7.9681	6
 CH	4500	Solothurn	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2081	7.5283	6
-CH	4501	Solothurn 1 Annahme	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2333	7.5167	4
-CH	4501	Solothurn	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2333	7.5167	4
-CH	4502	Solothurn	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2333	7.5167	4
-CH	4503	Solothurn	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2333	7.5167	4
-CH	4509	Solothurn	Kanton Solothurn	SO	Bezirk Solothurn	1109	Solothurn	2601	47.2333	7.5167	4
 CH	4204	Himmelried	Kanton Solothurn	SO	Bezirk Thierstein	1110	Himmelried	2618	47.4241	7.5935	6
 CH	4208	Nunningen	Kanton Solothurn	SO	Bezirk Thierstein	1110	Nunningen	2621	47.4007	7.6132	6
 CH	4226	Breitenbach	Kanton Solothurn	SO	Bezirk Thierstein	1110	Breitenbach	2613	47.4045	7.5505	6
@@ -3893,11 +3827,6 @@ CH	3934	Zeneggen	Canton du Valais	VS	Bezirk Visp	2313	Zeneggen	6299	46.2719	7.86
 CH	3937	Baltschieder	Canton du Valais	VS	Bezirk Visp	2313	Baltschieder	6281	46.3429	7.8713	6
 CH	6300	Zugerberg	Kanton Zug	ZG	Zug	900	Zug	1711	47.1667	8.5167	4
 CH	6300	Zug	Kanton Zug	ZG	Zug	900	Zug	1711	47.1686	8.5145	6
-CH	6301	Zug	Kanton Zug	ZG	Zug	900	Zug	1711	47.1667	8.5167	4
-CH	6302	Zug	Kanton Zug	ZG	Zug	900	Zug	1711	47.1667	8.5167	4
-CH	6303	Zug	Kanton Zug	ZG	Zug	900	Zug	1711	47.1667	8.5167	4
-CH	6304	Zug	Kanton Zug	ZG	Zug	900	Zug	1711	47.1983	8.5289	4
-CH	6304	Zug Bahnhof SBB	Kanton Zug	ZG	Zug	900	Zug	1711	47.1983	8.5289	4
 CH	6310	Zug Sonderdienste	Kanton Zug	ZG	Zug	900	Zug	1711	47.1433	8.5533	4
 CH	6312	Steinhausen	Kanton Zug	ZG	Zug	900	Steinhausen	1708	47.1988	8.4864	6
 CH	6313	Menzingen	Kanton Zug	ZG	Zug	900	Menzingen	1704	47.1704	8.5983	6
