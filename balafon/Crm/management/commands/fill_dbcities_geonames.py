@@ -35,24 +35,39 @@ def manage_spe_cases():       #Change the name of the special cases cities
     spe_cases = SpecialCaseCity.objects.filter(change_validated="no")
     for x in spe_cases:
         try:
-            print(x.city.name)
+            if x.possibilities == "":
+                x.delete()
+                pass
+            print(x.city.name.encode('utf8'))
             print("\t[0] : No match")
             temp = x.possibilities.split("|")
             count = 0
-            for p in temp:
-                count += 1
-                print("\t[" + `count` + "] : " + p)
+            if len(temp) == 1:
+                print("\t[1] : " + x.possibilities)
+                count = 1
+            else:
+                for i in range (1,len(temp)):
+                    count += 1
+                    print("\t[" + `i` + "] : " + temp[i])
             choice = -1
             while choice > count or choice < 0:
                 choice = int(raw_input("\nWrite the value of the corresponding name : "))
             if choice > 0:
-                x.city.name = temp[choice - 1]
-                x.city.save()
-                print("\nName changed to : " + temp[choice - 1] + "\n\n")
-                x.change_validated = "yes"
-                x.save()
+                if len(temp) == 1:
+                    x.city.name = temp[choice-1]
+                    x.city.save()
+                    print("\nName changed to : " + temp[choice-1] + "\n\n")
+                    x.change_validated = "yes"
+                    x.save()
+                else:
+                    x.city.name = temp[choice]
+                    x.city.save()
+                    print("\nName changed to : " + temp[choice] + "\n\n")
+                    x.change_validated = "yes"
+                    x.save()
             else:
                 print("No modification\n\n")
+                x.delete()
         except UnicodeEncodeError:
             print("Error unknown character - try changing name in admin")
             pass
@@ -105,7 +120,7 @@ def fill_db():
                         elif len(matches) > 1:
                             possibilities = ""
                             for e in matches:
-                                possibilities = possibilities + e + "|"
+                                possibilities = possibilities + "|" + e 
                             if possibilities != "":
                                 special_cases(c, possibilities)
                             print("[Special Cases] " + c.name)

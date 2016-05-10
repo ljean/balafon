@@ -29,7 +29,7 @@ class HasParentFilter(admin.SimpleListFilter):
 
 class ZoneAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['code', 'name', 'parent', 'type']
+    list_display = ['id', 'code', 'name', 'parent', 'type']
     ordering = ['type', 'name']
     list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']

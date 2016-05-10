@@ -381,22 +381,7 @@ CH	2748	Souboz	Kanton Bern	BE	Jura bernois	241	Souboz	712	47.2723	7.256	6
 CH	2748	Les Ecorcheresses	Kanton Bern	BE	Jura bernois	241	Souboz	712	47.2835	7.2841	6
 CH	2762	Roches BE	Kanton Bern	BE	Jura bernois	241	Roches (BE)	704	47.3037	7.3891	6
 CH	2827	Schelten	Kanton Bern	BE	Jura bernois	241	Schelten	708	47.3355	7.555	6
-CH	2500	Biel/Bienne 4	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
 CH	2500	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 1 Annahme	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 7	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 1 Zustellung	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 8	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 6	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 1	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 3	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2500	Biel/Bienne 10	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1324	7.2441	4
-CH	2501	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1504	7.247	4
-CH	2502	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.143	7.2468	6
-CH	2503	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1311	7.2519	6
-CH	2504	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1582	7.2831	6
-CH	2505	Biel/Bienne	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1342	7.2188	6
-CH	2510	Biel/Bienne Dist Ba	Kanton Bern	BE	Biel/Bienne	242	Biel/Bienne	371	47.1213	7.1486	4
 CH	2512	Tüscherz-Alfermée	Kanton Bern	BE	Biel/Bienne	242	Twann-Tüscherz	756	47.1233	7.1986	6
 CH	2513	Twann	Kanton Bern	BE	Biel/Bienne	242	Twann-Tüscherz	756	47.1073	7.1626	6
 CH	2514	Ligerz	Kanton Bern	BE	Biel/Bienne	242	Ligerz	740	47.0885	7.1376	6
@@ -544,8 +529,6 @@ CH	3324	Mötschwil	Kanton Bern	BE	Emmental	245	Mötschwil	416	47.0479	7.5688	6
 CH	3325	Hettiswil b. Hindelbank	Kanton Bern	BE	Emmental	245	Krauchthal	414	47.0256	7.5564	6
 CH	3326	Krauchthal	Kanton Bern	BE	Emmental	245	Krauchthal	414	47.0041	7.5663	6
 CH	3400	Burgdorf	Kanton Bern	BE	Emmental	245	Burgdorf	404	47.0576	7.6178	6
-CH	3401	Burgdorf	Kanton Bern	BE	Emmental	245	Burgdorf	404	47.05	7.6167	4
-CH	3402	Burgdorf	Kanton Bern	BE	Emmental	245	Burgdorf	404	47.05	7.6167	4
 CH	3412	Heimiswil	Kanton Bern	BE	Emmental	245	Heimiswil	407	47.0538	7.6629	6
 CH	3413	Kaltacker	Kanton Bern	BE	Emmental	245	Heimiswil	407	47.0728	7.6871	6
 CH	3414	Oberburg	Kanton Bern	BE	Emmental	245	Oberburg	418	47.0211	7.6097	6
@@ -609,58 +592,7 @@ CH	6197	Schangnau	Kanton Bern	BE	Emmental	245	Schangnau	906	46.8126	7.8765	6
 CH	1595	Clavaleyres	Kanton Bern	BE	Bern-Mittleland	246	Clavaleyres	661	46.8982	7.0932	6
 CH	1738	Sangernboden	Kanton Bern	BE	Bern-Mittleland	246	Guggisberg	852	46.7075	7.3738	6
 CH	1797	Münchenwiler	Kanton Bern	BE	Bern-Mittleland	246	Münchenwiler	669	46.9098	7.1255	6
-CH	3000	Bern Brünnen	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 14	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 77 SBV	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 71 CS PZ	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 60 UPD	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 6	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 1 Schanzenpost	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 23	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 8	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 22	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 65 SBB	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 15	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern Radio Schweiz	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 5	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 21	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9509	7.4463	4
-CH	3000	Bern 90	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 25	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 13	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern Postauto BE-FB-SO	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 7 Bärenplatz	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 22 Kaserne	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 94 UBS	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 9	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3000	Bern 31	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3001	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.947	7.4405	4
-CH	3002	Bern Postfinance	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3003	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3003	Bern 3 Nationalrat	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3003	Bern 3 Ständerat	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3004	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9805	7.452	6
-CH	3005	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9394	7.4499	6
-CH	3006	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9458	7.4713	6
-CH	3007	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.939	7.435	6
-CH	3008	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9451	7.4139	6
-CH	3010	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9471	7.4244	6
-CH	3011	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9504	7.4549	6
-CH	3012	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9616	7.426	6
-CH	3013	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9562	7.4462	6
-CH	3014	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9622	7.4584	6
-CH	3015	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9402	7.4855	6
-CH	3017	Bern Zustellung	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9476	7.4065	4
-CH	3018	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9339	7.3891	6
-CH	3019	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.931	7.3479	6
-CH	3020	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9371	7.3209	6
-CH	3024	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3027	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9558	7.3873	6
-CH	3029	Bern Entris	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9476	7.4065	4
-CH	3030	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3030	Bern Logistikcenter	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3030	Bern KC PK 4	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
-CH	3030	Bern KC PK 5	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9167	7.4667	4
+CH	3000	Bern	Kanton Bern	BE	Bern-Mittleland	246	Bern	351	46.9805	7.452	6
 CH	3032	Hinterkappelen	Kanton Bern	BE	Bern-Mittleland	246	Wohlen bei Bern	360	46.9672	7.3802	6
 CH	3033	Wohlen b. Bern	Kanton Bern	BE	Bern-Mittleland	246	Wohlen bei Bern	360	46.9737	7.351	6
 CH	3034	Murzelen	Kanton Bern	BE	Bern-Mittleland	246	Wohlen bei Bern	360	46.9762	7.3116	6
@@ -815,14 +747,6 @@ CH	3672	Aeschlen b. Oberdiessbach	Kanton Bern	BE	Bern-Mittleland	246	Oberdiessba
 CH	3673	Linden	Kanton Bern	BE	Bern-Mittleland	246	Linden	614	46.8488	7.6837	6
 CH	3674	Bleiken b. Oberdiessbach	Kanton Bern	BE	Bern-Mittleland	246	Bleiken bei Oberdiessbach	604	46.8168	7.6402	6
 CH	3600	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.7554	7.6236	6
-CH	3601	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.75	7.6167	4
-CH	3602	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.75	7.6167	4
-CH	3603	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.762	7.6001	6
-CH	3604	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.7405	7.6207	6
-CH	3605	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.75	7.6167	4
-CH	3607	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.75	7.6167	4
-CH	3608	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.7399	7.5988	6
-CH	3609	Thun	Kanton Bern	BE	Thun	247	Thun	942	46.75	7.6167	4
 CH	3612	Steffisburg	Kanton Bern	BE	Thun	247	Steffisburg	939	46.7827	7.6383	6
 CH	3613	Steffisburg	Kanton Bern	BE	Thun	247	Steffisburg	939	46.771	7.6145	6
 CH	3614	Unterlangenegg	Kanton Bern	BE	Thun	247	Unterlangenegg	945	46.8	7.6919	6
@@ -1056,72 +980,7 @@ CH	4437	Waldenburg	Kanton Basel-Landschaft	BL	Bezirk Waldenburg	1305	Waldenburg	
 CH	4438	Langenbruck	Kanton Basel-Landschaft	BL	Bezirk Waldenburg	1305	Langenbruck	2888	47.3577	7.769	6
 CH	4457	Diegten	Kanton Basel-Landschaft	BL	Bezirk Waldenburg	1305	Diegten	2884	47.4093	7.8133	6
 CH	4458	Eptingen	Kanton Basel-Landschaft	BL	Bezirk Waldenburg	1305	Eptingen	2885	47.3795	7.8169	6
-CH	4000	Basel Postauto Nordwestschw	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4000	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5842	7.5876	4
-CH	4000	Basel Dist Ba	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4000	Basel 2 Zustellung	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4001	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5564	7.5889	6
-CH	4002	Basel Logistikzentrum	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5488	7.5904	4
-CH	4002	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5488	7.5904	4
-CH	4002	Basel 2 Annahme	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5488	7.5904	4
-CH	4003	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5592	7.5788	4
-CH	4004	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4005	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5623	7.5946	4
-CH	4007	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4008	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4009	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4010	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5528	7.5929	4
-CH	4011	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4012	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4013	Basel Voltaplatz	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4013	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4015	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4016	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4017	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4018	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4019	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4020	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4024	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4025	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4030	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4031	Basel Universitätsspital	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4032	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4033	Basel Novartis Campus	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4034	Basel 34 Breite	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5577	7.5936	4
-CH	4035	Basel 35 Bäumlihof	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5577	7.5936	4
-CH	4039	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4041	Basel UBS	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5577	7.5936	4
-CH	4051	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5542	7.5867	6
-CH	4052	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5474	7.6074	6
-CH	4052	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5225	7.5962	6
-CH	4053	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5383	7.601	6
-CH	4054	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5505	7.5689	6
-CH	4055	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5637	7.564	6
-CH	4056	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5696	7.5735	6
-CH	4057	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5761	7.5999	6
-CH	4058	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5662	7.6154	6
-CH	4059	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5316	7.5934	6
-CH	4065	Basel SBB Cargo AG	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5617	7.6067	4
-CH	4070	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4075	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4078	Basel Reader's Digest	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5617	7.6067	4
-CH	4080	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4081	Basel SPI AS1	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4082	Basel SPI AS2	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4083	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4084	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4085	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4086	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4087	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4088	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4089	Basel SPILOG	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4089	Basel SPI GLS Retour	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4091	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4092	Basel SPI AS 22	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4093	Basel SPI AS 23	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4094	Basel SPI AS 24	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4095	Basel SPI AS 25	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
-CH	4096	Basel SPI AS 26	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5667	7.6	4
+CH	4000	Basel	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Basel	2701	47.5592	7.5788	4
 CH	4125	Riehen	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Riehen	2703	47.5805	7.653	6
 CH	4126	Bettingen	Kanton Basel-Stadt	BS	Basel-Stadt	1200	Bettingen	2702	47.5714	7.6753	6
 CH	1410	Prévondavaux	Canton de Fribourg	FR	District de la Broye	1001	Prévondavaux	2038	46.7316	6.8033	6
@@ -1411,68 +1270,7 @@ CH	1624	Progens	Canton de Fribourg	FR	District de la Veveyse	1007	La Verrerie	23
 CH	1699	Pont (Veveyse)	Canton de Fribourg	FR	District de la Veveyse	1007	Le Flon	2337	46.5923	6.8546	6
 CH	1699	Bouloz	Canton de Fribourg	FR	District de la Veveyse	1007	Le Flon	2337	46.6152	6.8914	6
 CH	1699	Porsel	Canton de Fribourg	FR	District de la Veveyse	1007	Le Flon	2337	46.599	6.8796	6
-CH	1200	Genève Dist Ba	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève Centre logistique	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 11	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 19	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 18	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 8	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 2 Distribution	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 6	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 4	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 28 Balexert	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève Les Acacias	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 3	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 26	Canton de Genève	GE	Geneva	2500	Lancy	6628	46.2	6.1667	4
-CH	1200	Genève 7	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 2 Transit	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 20	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 21	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 12	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 2 Cornavin Dépôt	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 17	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1200	Genève 1	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
 CH	1200	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2095	6.1438	4
-CH	1200	Genève 13	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2	6.1667	4
-CH	1201	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2103	6.1464	6
-CH	1202	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2214	6.1431	6
-CH	1203	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2086	6.1236	6
-CH	1204	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2024	6.145	6
-CH	1205	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.1952	6.1436	6
-CH	1206	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.1872	6.1588	6
-CH	1207	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2058	6.1619	6
-CH	1208	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.1994	6.1659	6
-CH	1209	Genève	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2218	6.1244	6
-CH	1211	Genève 14	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 5	Canton de Genève	GE	Geneva	2500	Le Grand-Saconnex	6623	46.2111	6.1028	4
-CH	1211	Genève 7	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 10	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 19	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 5 Dépôt	Canton de Genève	GE	Geneva	2500	Le Grand-Saconnex	6623	46.2111	6.1028	4
-CH	1211	Genève 94 UBS	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 22	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 20	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 26 Caserne	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 70	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 11	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 6	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 4	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 26	Canton de Genève	GE	Geneva	2500	Lancy	6628	46.2111	6.1028	4
-CH	1211	Genève 3	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 13	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 27	Canton de Genève	GE	Geneva	2500	Pregny-Chambésy	6634	46.2111	6.1028	4
-CH	1211	Genève 2 Swisscom	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 23	Canton de Genève	GE	Geneva	2500	Meyrin	6630	46.2111	6.1028	4
-CH	1211	Genève 8	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 21	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 71 CS CP	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 73	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 28	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 2	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 12	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 17	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 1	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
-CH	1211	Genève 84 Votations	Canton de Genève	GE	Geneva	2500	Genève	6621	46.2111	6.1028	4
 CH	1212	Grand-Lancy	Canton de Genève	GE	Geneva	2500	Lancy	6628	46.1793	6.1187	6
 CH	1213	Petit-Lancy	Canton de Genève	GE	Geneva	2500	Lancy	6628	46.193	6.1158	6
 CH	1213	Onex	Canton de Genève	GE	Geneva	2500	Onex	6631	46.1847	6.0993	6
@@ -2019,42 +1817,10 @@ CH	6289	Hämikon	Kanton Luzern	LU	Amt Hochdorf	302	Hitzkirch	1030	47.2435	8.2881	
 CH	6289	Müswangen	Kanton Luzern	LU	Amt Hochdorf	302	Hitzkirch	1030	47.2401	8.2985	6
 CH	6294	Ermensee	Kanton Luzern	LU	Amt Hochdorf	302	Ermensee	1025	47.2248	8.2367	6
 CH	6295	Mosen	Kanton Luzern	LU	Amt Hochdorf	302	Hitzkirch	1030	47.2416	8.228	6
-CH	6000	Luzern 1 PF	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 2 Universität	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern Altstadt	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 11	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
 CH	6000	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0559	8.3105	4
-CH	6000	Luzern 30 AAL	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern Bahnhof SBB	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 10	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 14	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern Zustellung	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 31	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern Kaserne	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern Postauto Zentralschw	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 15	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 6	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 16	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 1 Annahme	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 7	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6000	Luzern 4	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6002	Luzern Uni PG	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0596	8.306	4
-CH	6002	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0596	8.306	4
-CH	6003	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0501	8.297	6
-CH	6004	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0603	8.2986	6
-CH	6005	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0342	8.3178	6
-CH	6005	St. Niklausen LU	Kanton Luzern	LU	Amt Luzern	303	Horw	1058	47.0833	8.2667	4
-CH	6006	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0585	8.3337	6
-CH	6007	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6008	Luzern UBS	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0833	8.2667	4
-CH	6009	Luzern	Kanton Luzern	LU	Amt Luzern	303	Kriens	1059	47.0833	8.2667	4
 CH	6010	Kriens	Kanton Luzern	LU	Amt Luzern	303	Kriens	1059	47.0164	8.2684	6
-CH	6010	Kriens	Kanton Luzern	LU	Amt Luzern	303	Kriens	1059	46.9793	8.2555	6
-CH	6011	Kriens	Kanton Luzern	LU	Amt Luzern	303	Kriens	1059	47.0333	8.2833	4
 CH	6012	Obernau	Kanton Luzern	LU	Amt Luzern	303	Kriens	1059	47.0288	8.2374	6
 CH	6013	Eigenthal	Kanton Luzern	LU	Amt Luzern	303	Schwarzenberg	1066	46.9964	8.2144	6
-CH	6014	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0567	8.2446	6
-CH	6015	Luzern	Kanton Luzern	LU	Amt Luzern	303	Luzern	1061	47.0638	8.2775	6
 CH	6030	Ebikon	Kanton Luzern	LU	Amt Luzern	303	Ebikon	1054	47.0809	8.3425	6
 CH	6031	Ebikon	Kanton Luzern	LU	Amt Luzern	303	Ebikon	1054	47.0833	8.3333	4
 CH	6033	Buchrain	Kanton Luzern	LU	Amt Luzern	303	Buchrain	1052	47.102	8.3468	6
@@ -2196,16 +1962,6 @@ CH	2406	Le Brouillet	Canton de Neuchâtel	NE	District du Locle	2403	La Brévine	64
 CH	2414	Le Cerneux-Péquignot	Canton de Neuchâtel	NE	District du Locle	2403	Le Cerneux-Péquignot	6434	47.013	6.6702	6
 CH	2416	Les Brenets	Canton de Neuchâtel	NE	District du Locle	2403	Les Brenets	6431	47.0751	6.7243	6
 CH	2000	Neuchâtel	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47.0009	6.9274	6
-CH	2001	Neuchâtel 1 Dépôt	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2001	Neuchâtel 1	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2002	Neuchâtel 2	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2003	Neuchâtel 3	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2004	Neuchâtel 4	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2006	Neuchâtel 6	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2007	Neuchâtel 7	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2008	Neuchâtel	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2009	Neuchâtel 9	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47	6.9667	4
-CH	2010	Neuchâtel OFS	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	46.95	6.85	4
 CH	2067	Chaumont	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Neuchâtel	6458	47.0355	6.9638	6
 CH	2068	Hauterive NE	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Hauterive (NE)	6454	47.0166	6.9687	6
 CH	2072	St-Blaise	Canton de Neuchâtel	NE	District de Neuchâtel	2404	Saint-Blaise	6459	47.0374	7.0021	6
@@ -3598,29 +3354,7 @@ CH	1462	Yvonand	Canton de Vaud	VD	District du Jura-Nord vaudois	2224	Yvonand	593
 CH	1463	Rovray	Canton de Vaud	VD	District du Jura-Nord vaudois	2224	Rovray	5928	46.7875	6.7672	6
 CH	1464	Chavannes-le-Chêne	Canton de Vaud	VD	District du Jura-Nord vaudois	2224	Chavannes-le-Chêne	5907	46.7801	6.7802	6
 CH	1464	Chêne-Pâquier	Canton de Vaud	VD	District du Jura-Nord vaudois	2224	Chêne-Pâquier	5908	46.7655	6.771	6
-CH	1000	Lausanne 26	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5534	6.6971	6
 CH	1000	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5291	6.6524	4
-CH	1000	Lausanne 27	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5417	6.6815	6
-CH	1000	Lausanne 25	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5737	6.6987	6
-CH	1001	Lausanne PF 331-140	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5224	6.6303	4
-CH	1001	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5224	6.6303	4
-CH	1001	Lausanne Sozialberatung	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5224	6.6303	4
-CH	1001	Lausanne PF 331-120	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5224	6.6303	4
-CH	1001	Lausanne Arc Jurassien	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5224	6.6303	4
-CH	1002	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5195	6.6322	4
-CH	1003	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.52	6.63	6
-CH	1004	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5285	6.6187	6
-CH	1005	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5199	6.6425	6
-CH	1006	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5112	6.6371	6
-CH	1007	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5177	6.609	6
-CH	1008	Jouxtens-Mézery	Canton de Vaud	VD	District de Lausanne	2225	Jouxtens-Mézery	5585	46.553	6.5956	6
-CH	1010	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5362	6.6589	6
-CH	1011	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5256	6.6429	6
-CH	1012	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5263	6.657	6
-CH	1014	Lausanne Adm cant VD	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5333	6.6667	4
-CH	1017	Lausanne Charles Veillon SA	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5333	6.6667	4
-CH	1018	Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5388	6.6286	6
-CH	1019	Lausanne Services spéciaux	Canton de Vaud	VD	District de Lausanne	2225	Lausanne	5586	46.5218	6.633	4
 CH	1032	Romanel-sur-Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Romanel-sur-Lausanne	5592	46.5639	6.608	6
 CH	1033	Cheseaux-sur-Lausanne	Canton de Vaud	VD	District de Lausanne	2225	Cheseaux-sur-Lausanne	5582	46.5825	6.596	6
 CH	1039	Cheseaux Polyval	Canton de Vaud	VD	District de Lausanne	2225	Cheseaux-sur-Lausanne	5582	46.5845	6.5955	4
@@ -4426,17 +4160,6 @@ CH	8352	Elsau	Kanton Zürich	ZH	Bezirk Winterthur	110	Elsau	219	47.5022	8.8048	6
 CH	8353	Elgg	Kanton Zürich	ZH	Bezirk Winterthur	110	Elgg	217	47.4901	8.8614	6
 CH	8354	Hofstetten ZH	Kanton Zürich	ZH	Bezirk Winterthur	110	Hofstetten (ZH)	222	47.4747	8.8506	6
 CH	8400	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.4916	8.7295	6
-CH	8401	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5	8.75	4
-CH	8402	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5	8.75	4
-CH	8404	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5075	8.7592	6
-CH	8404	Reutlingen (Winterthur)	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5277	8.7505	6
-CH	8404	Stadel (Winterthur)	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5382	8.7652	6
-CH	8405	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.4776	8.7783	6
-CH	8406	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.4832	8.7006	6
-CH	8408	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5077	8.6833	6
-CH	8409	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5098	8.7814	6
-CH	8410	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5	8.75	4
-CH	8411	Winterthur	Kanton Zürich	ZH	Bezirk Winterthur	110	Winterthur	230	47.5	8.75	4
 CH	8412	Riet (Neftenbach)	Kanton Zürich	ZH	Bezirk Winterthur	110	Neftenbach	223	47.5372	8.6889	6
 CH	8412	Hünikon (Neftenbach)	Kanton Zürich	ZH	Bezirk Winterthur	110	Neftenbach	223	47.5541	8.6631	6
 CH	8412	Aesch (Neftenbach)	Kanton Zürich	ZH	Bezirk Winterthur	110	Neftenbach	223	47.544	8.6788	6
@@ -4484,9 +4207,3 @@ CH	8954	Geroldswil	Kanton Zürich	ZH	Bezirk Dietikon	111	Geroldswil	244	47.4229	8
 CH	8955	Oetwil an der Limmat	Kanton Zürich	ZH	Bezirk Dietikon	111	Oetwil an der Limmat	246	47.4295	8.3929	6
 CH	8970	Urdorf Exchange	Kanton Zürich	ZH	Bezirk Dietikon	111	Urdorf	250	47.3798	8.4224	4
 CH	8000	Zürich	Kanton Zürich	ZH	Bezirk Zürich	112	Zürich	261	47.3667	8.55	4
-CH	6713	Malvaglia						5050	46.4162	9.0394	6
-CH	6714	Semione						5050	46.3966	8.9508	6
-CH	6721	Ludiano						5050	46.4209	8.9515	6
-CH	6911	Campione d'Italia						7301	45.9681	8.971	4
-CH	8238	Büsingen						7101	47.6964	8.6876	4
-CH	9489	Schaan Log						7005	47.1333	9.5167	4

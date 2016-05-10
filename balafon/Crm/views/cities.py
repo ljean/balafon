@@ -73,7 +73,12 @@ def get_cities(request):
             if country_id == 0 or country_id == default_country.id:
                 cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True).exclude(parent__code='')[:10]
             else:
-                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__parent__id=country_id, geonames_valid=True)[:10]
+                if not cities_queryset:
+                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
+                if not cities_queryset:
+                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
+                    
     else:
         if country_id is None:
             cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True)[:10]
@@ -81,8 +86,12 @@ def get_cities(request):
             if country_id == 0 or country_id == default_country.id:
                 cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True).exclude(parent__code='')[:10]
             else:
-                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, zip_code__icontains=zipcode, geonames_valid=True)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__parent__id=country_id, zip_code__icontains=zipcode, geonames_valid=True)[:10]
+                if not cities_queryset:
+                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
+                if not cities_queryset:
+                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
 
-    cities = [{'id': city.id, 'name': city.name, 'district_id': city.district_id} for city in cities_queryset]
+    cities = [{'id': city.id, 'name': city.name, 'zip_code': city.zip_code} for city in cities_queryset]
 
     return HttpResponse(json.dumps(cities), 'application/json')

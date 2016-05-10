@@ -37,30 +37,24 @@ def manage_spe_cases():       #Change the name of the special cases cities
     for x in spe_cases:
         try:
             print(x.city.name.encode('utf8'))
-            if x.possibilities == "":
-                new_name = raw_input("Error - Write the name to set for this city :")
-                x.city.name = new_name;
+            print("\t[0] : No match")
+            temp = x.possibilities.split("|")
+            count = 0
+            for p in temp:
+                count += 1
+                print("\t[" + `count` + "] : " + p)
+            choice = -1
+            while choice > count or choice < 0:
+                choice = int(raw_input("\nWrite the value of the corresponding name : "))
+            if choice > 0:
+                x.city.name = temp[choice]
                 x.city.save()
+                print("\nName changed to : " + temp[choice] + "\n\n")
                 x.change_validated = "yes"
                 x.save()
             else:
-                print("\t[0] : No match")
-                temp = x.possibilities.split("|")
-                count = 0
-                for p in temp:
-                    count += 1
-                    print("\t[" + `count` + "] : " + p)
-                choice = -1
-                while choice > count or choice < 0:
-                    choice = int(raw_input("\nWrite the value of the corresponding name : "))
-                if choice > 0:
-                    x.city.name = temp[choice - 1]
-                    x.city.save()
-                    print("\nName changed to : " + temp[choice - 1] + "\n\n")
-                    x.change_validated = "yes"
-                    x.save()
-                else:
-                    print("No modification\n\n")
+                print("No modification\n\n")
+                x.delete()
         except UnicodeEncodeError:
             print("Error unknown character - try changing name in admin")
             pass
@@ -68,7 +62,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
 
 def fill_db():
     dict_dept = {}
-    cities = list(City.objects.filter(parent__name='Suisse')
+    cities = list(City.objects.filter(parent__name='Suisse'))
     
     #Add all the cities from GeoNames in the database
     
@@ -124,12 +118,9 @@ def fill_db():
                         elif len(matches) > 1:
                             possibilities = ""
                             for e in matches:
-                                possibilities = possibilities + e + "|"
+                                possibilities = possibilities + "|" + e
                             special_cases(c, possibilities)
                             print("[Special Cases] " + c.name)
-            except TypeError:
-                print("TypeError")
-                pass
             except UnicodeEncodeError:
                 special_cases(c,"")
                 pass
@@ -139,7 +130,7 @@ def fill_db():
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=City.objects.filter(parent__name='Suisse').order_by("name", "parent")
+    cities=City.objects.filter(parent__parent__parent__name='Suisse').order_by("name", "parent")
     prec=City(name="", parent=None)
     for c in cities:
         try:
