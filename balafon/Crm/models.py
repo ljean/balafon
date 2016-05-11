@@ -880,6 +880,20 @@ class Contact(AddressModel):
         return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
 
     @property
+    def display_name(self):
+        """fullname"""
+        if not (self.firstname or self.lastname):
+            if self.email:
+                return self.email.strip()
+            else:
+                return u"< {0} >".format(__(u"Unknown")).strip()
+
+        if (not self.firstname) or (not self.lastname):
+            return _(u"{0.lastname}{0.firstname}").format(self).strip()
+
+        return _(u"{0.lastname} {0.firstname}").format(self).strip()
+
+    @property
     def full_address(self):
         """address for custom templating in newsletter"""
         fields = self.get_address_fields()

@@ -37,7 +37,7 @@
         {% with e.single_contact as c %}
         <td colspan="2">
           <span class="glyphicon glyphicon-user"></span>
-          <a href="{% url 'crm_view_contact' c.id %}">{{c.lastname}} {{c.firstname}}</a>
+          <a href="{% url 'crm_view_contact' c.id %}">{{c.display_name }}</a>
         </td>
       
         <td class="extra-data">{{c.city.get_friendly_name|default:"&nbsp;"}}</td>
@@ -63,7 +63,7 @@
               {% endif %}
             </td>
             
-            <td><a href="{% url "crm_view_contact" c.id %}">{{c.lastname}} {{c.firstname}}</a></td>
+            <td><a href="{% url "crm_view_contact" c.id %}">{{c.display_name}}</a></td>
             
             <td class="extra-data">{{c.get_city.get_friendly_name|default:"&nbsp;"}}</td>
             <td class="extra-data">{{c.get_phones|seq_to_br|default:"&nbsp;"}}</td>
