@@ -70,9 +70,9 @@ class BetterBsForm(forms.Form, BootstrapableMixin):
         self._bs_patch_field_class()
         for field in self.fields.values():
             if field.widget.__class__.__name__ == forms.Select().__class__.__name__:
-                klass = field.widget.attrs.get("class", "")
-                if not "chosen-select" in klass:
-                    field.widget.attrs["class"] = klass + " chosen-select"
+                field_class = field.widget.attrs.get("class", "")
+                if not "chosen-select" in field_class:
+                    field.widget.attrs["class"] = field_class + " chosen-select"
 
 
 class BetterBsModelForm(forms.ModelForm, BootstrapableMixin):  # (BetterModelForm):
