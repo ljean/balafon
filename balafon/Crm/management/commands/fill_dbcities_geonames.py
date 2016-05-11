@@ -75,7 +75,7 @@ def manage_spe_cases():       #Change the name of the special cases cities
 
 def fill_db():
     dict_dept = {}
-    cities = list(City.objects.all())
+    cities = list(City.objects.filter(parent__parent__parent__name='France'))
     
     #Add all the cities from GeoNames in the database
     
@@ -104,7 +104,7 @@ def fill_db():
                     name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
                     cname1 = remove_accents(c.name.lower())
                     tab1 = dict_dept.get(c.parent.name)
-                    matches = difflib.get_close_matches(cname1, tab1,5,0.5)
+                    matches = difflib.get_close_matches(cname1, tab1,5,0.6)
                     for m in matches:
                         if remove_accents(m.lower()) == cname1:
                             print("[saved] " + c.name + " ---> " + m)
@@ -136,7 +136,7 @@ def fill_db():
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=City.objects.exclude(parent__type__name='Pays').order_by("name", "parent")
+    cities=City.objects.filter(parent__parent__parent__name='France').order_by("name", "parent")
     prec=City(name="", parent=None)
     for c in cities:
         try:

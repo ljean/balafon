@@ -76,8 +76,11 @@ def manage_spe_cases():       #Change the name of the special cases cities
 
 def fill_db(file_name, country_name):
     dict_dept = []
-    cities = list(City.objects.filter(geonames_valid=False))
-    
+    cities = list(City.objects.filter(parent__name=country_name))
+    cities2 = list(City.objects.filter(parent__parent__name=country_name))
+    cities3 = list(City.objects.filter(parent__parent__parent__name=country_name))
+    cities.extend(cities2)
+    cities.extend(cities3)
     #Add all the cities from GeoNames in the database
     
     with codecs.open("dev/balafon/balafon/Crm/fixtures/" + file_name,"r","latin-1") as file1:
@@ -115,7 +118,7 @@ def fill_db(file_name, country_name):
         try:
             name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
             cname1 = remove_accents(c.name.lower())
-            matches = difflib.get_close_matches(cname1, dict_dept,5,0.5)
+            matches = difflib.get_close_matches(cname1, dict_dept,5,0.6)
             for m in matches:
                 if remove_accents(m.lower()) == cname1:
                     print("[saved] " + c.name + " ---> " + m)
@@ -144,9 +147,11 @@ def fill_db(file_name, country_name):
         
 def update_doubles(country_name):       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=list(City.objects.filter(parent__name=country_name).order_by("name", "parent"))
-    cities2=list(City.objects.filter(parent__parent__parent__name=country_name).order_by("name", "parent"))
+    cities=list(City.objects.filter(parent__name=country_name).order_by("parent", "name"))
+    cities2=list(City.objects.filter(parent__parent__parent__name=country_name).order_by("parent", "name"))
+    cities3=list(City.objects.filter(parent__parent__name=country_name).order_by("parent", "name"))
     cities.extend(cities2)
+    cities.extend(cities3)
     prec=City(name="", parent=None)
     for c in cities:
         try:
