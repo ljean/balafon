@@ -3,9 +3,6 @@
 
 {% block extra_head %}
 <style>
-  #id_email {
-    width: 200px;
-  }
   ul.errorlist {
     list-style: none;
     margin: 0;
@@ -39,10 +36,12 @@
   
 {% block content %}
   {{ block.super }}
-  <form method="post" action="{% url 'emailing_email_subscribe_newsletter' %}">{% csrf_token %}
+  <form class="form" method="post" action="{% url 'emailing_email_subscribe_newsletter' %}">{% csrf_token %}
     {% block customize_form %}
       {{form.as_p}}
-    {% endblock %}  
+    {% endblock %}
+    {% block submit_button %}
     <input style="display: none;" type="submit" value="{% trans "Ok" %}">
+    {% endblock %}
   </form>
 {% endblock %}

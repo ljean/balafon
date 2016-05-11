@@ -1,0 +1,9 @@
+{% extends "Emailing/public/subscribe_email_base.html" %}{% load i18n %}
+{% block customize_form %}
+<ul>
+  {{form.as_ul}}
+</ul>
+{% endblock %}
+{% block submit_button %}
+<input type="submit" class="btn btn-primary" value="{% trans "Ok" %}">
+{% endblock %}
