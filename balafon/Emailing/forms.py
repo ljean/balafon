@@ -426,7 +426,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         entity = self._dehtmled_field("entity")
         if entity_type:
             if not entity:
-                raise ValidationError(ugettext(u"{0}: Please enter a name".format(entity_type)))
+                raise ValidationError(u"{0}: {1}".format(entity_type.name, ugettext(u"Please enter a name")))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
             entity = u' '.join([x for x in data if x]).strip().upper()
