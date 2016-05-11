@@ -364,7 +364,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         self.fields['email'].required = True
         #self.fields['lastname'].required = True
         
-        #Do not display (Mrs and M) gender on subscribe form
+        # Do not display (Mrs and M) gender on subscribe form
         self.fields['gender'].choices = self.fields['gender'].choices[:3]
 
         entity_types_choices = []
