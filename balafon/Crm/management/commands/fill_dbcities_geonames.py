@@ -92,7 +92,7 @@ def fill_db():
                 tab = dict_dept.get(dept)
                 tab.append(cname)
             zone = Zone.objects.get(name = dept)
-            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
+            new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True, country='France')
             new.save()
             print("[added]  " + cname)
             
@@ -196,6 +196,18 @@ def update_zip_code():      #Give a zip code to cities that don't have one
 class Command(BaseCommand):
     
     def handle(self, *args, **options):
+        
+        print("Updating database, please wait ...\n\n")
+        for m in City.objects.filter(country=None):
+            if m.parent.type.name == 'Pays':
+                m.country = m.parent.name
+                m.save()
+            elif m.parent.parent.type.name == 'Pays':
+                m.country = m.parent.parent.name
+                m.save()
+            elif m.parent.parent.parent.type.name == 'Pays':
+                m.country = m.parent.parent.parent.name
+                m.save()
         
         choose = -1
         while choose != 0:        

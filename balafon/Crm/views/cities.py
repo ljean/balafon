@@ -65,33 +65,45 @@ def get_cities(request):
         country_id = int(country_id)
 
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
-        
+    
     if zipcode is None:
-        if country_id is None:
+        zipcode='0'
+    
+    if zipcode == '0':
+        if country_id == 0 or country_id is None:
             cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True)[:10]
         else:
-            if country_id == 0 or country_id == default_country.id:
-                cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True).exclude(parent__code='')[:10]
+            if country_id == default_country.id:
+                cities_queryset = models.City.objects.filter(name__icontains=term, geonames_valid=True, parent__parent__parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset1 = models.City.objects.filter(name__icontains=term, geonames_valid=True, parent__parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset2 = models.City.objects.filter(name__icontains=term, geonames_valid=True, parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset.extend(cities_queryset1)
+                cities_queryset.extend(cities_queryset2)
             else:
                 cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__parent__id=country_id, geonames_valid=True)[:10]
-                if not cities_queryset:
-                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
-                if not cities_queryset:
-                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
-                    
+                cities_queryset1 = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset1 = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset.extend(cities_queryset1)
+                cities_queryset.extend(cities_queryset2)
     else:
-        if country_id is None:
+        if country_id == 0 or country_id is None:
             cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True)[:10]
         else:
-            if country_id == 0 or country_id == default_country.id:
-                cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True).exclude(parent__code='')[:10]
+            if country_id == default_country.id:
+                cities_queryset = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True, parent__parent__parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset1 = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True, parent__parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset2 = models.City.objects.filter(name__icontains=term, zip_code__icontains=zipcode, geonames_valid=True, parent__id=country_id).exclude(parent__code='')[:10]
+                cities_queryset.extend(cities_queryset1)
+                cities_queryset.extend(cities_queryset2)
             else:
                 cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__parent__id=country_id, zip_code__icontains=zipcode, geonames_valid=True)[:10]
-                if not cities_queryset:
-                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
-                if not cities_queryset:
-                    cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id, geonames_valid=True)[:10]
+                cities_queryset.extend(cities_queryset1)
+                cities_queryset.extend(cities_queryset2)
+                
+    
 
-    cities = [{'id': city.id, 'name': city.name, 'zip_code': city.zip_code} for city in cities_queryset]
+    cities = [{'id': city.id, 'name': city.name, 'zip_code': city.zip_code, 'country': city.country} for city in cities_queryset]
 
     return HttpResponse(json.dumps(cities), 'application/json')

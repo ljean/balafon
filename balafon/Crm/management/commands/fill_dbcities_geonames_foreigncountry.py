@@ -1,8 +1,10 @@
 # coding: utf8
 
-
 import codecs
 import difflib
+import os
+import urllib
+import zipfile
 
 from balafon.Crm.models import City
 from balafon.Crm.models import Zone
@@ -37,7 +39,6 @@ def manage_spe_cases():       #Change the name of the special cases cities
     for x in spe_cases:
         try:
             if x.possibilities == "":
-                x.delete()
                 pass
             print(x.city.name.encode('utf8'))
             print("\t[0] : No match")
@@ -74,51 +75,69 @@ def manage_spe_cases():       #Change the name of the special cases cities
             pass
 
 
-def fill_db(file_name, country_name):
-    dict_dept = []
-    cities = list(City.objects.filter(parent__name=country_name))
-    cities2 = list(City.objects.filter(parent__parent__name=country_name))
-    cities3 = list(City.objects.filter(parent__parent__parent__name=country_name))
-    cities.extend(cities2)
-    cities.extend(cities3)
-    #Add all the cities from GeoNames in the database
+def fill_db(cntry, country_name):
     
-    with codecs.open("dev/balafon/balafon/Crm/fixtures/" + file_name,"r","latin-1") as file1:
+    #Add all the cities from GeoNames in the database
+        
+    
+    with codecs.open("dev/balafon/balafon/Crm/fixtures/" + cntry + ".txt","r","utf8") as file1:
         for l in file1:
             try:
                 words = l.split("\t")
                 cname = words[2]
                 dept = words[5]
                 reg = words[3]
-                dict_dept.append(cname)
-                if len(Zone.objects.filter(name=country_name)) > 0:
-                    zonec = Zone.objects.filter(name=country_name)[0]
+                if len(Zone.objects.filter(name=country_name, type=ZoneType.objects.get(name="Pays"))) > 0:
+                    zonec = Zone.objects.filter(name=country_name, type=ZoneType.objects.get(name="Pays"))[0]
                 else:
                     zonec = Zone(name=country_name, type=ZoneType.objects.get(name="Pays"))
                     zonec.save()
-                if len(Zone.objects.filter(name=reg)) > 0:
-                    zoner = Zone.objects.filter(name=reg)[0]
+                if reg != "":
+                    if len(Zone.objects.filter(name=reg, type=ZoneType.objects.get(name="Région".decode('utf8')))) > 0:
+                        zoner = Zone.objects.filter(name=reg, type=ZoneType.objects.get(name="Région".decode('utf8')))[0]
+                    else:
+                        zoner = Zone(name=reg, type=ZoneType.objects.get(name="Région".decode('utf8')), parent=zonec, code=words[4])
+                        zoner.save()
                 else:
-                    zoner = Zone(name=reg, type=ZoneType.objects.get(name="Région".decode('utf8')), parent=zonec, code=words[4])
-                    zoner.save()
-                if len(Zone.objects.filter(name=dept)) > 0:
-                    zoned = Zone.objects.filter(name=dept)[0]
+                    zoner = zonec
+                if dept != '':
+                    if len(Zone.objects.filter(name=dept, type=ZoneType.objects.get(name="Département".decode('utf8')))) > 0:
+                        zoned = Zone.objects.filter(name=dept, type=ZoneType.objects.get(name="Département".decode('utf8')))[0]
+                    else:
+                        zoned = Zone(name=dept, type=ZoneType.objects.get(name="Département".decode('utf8')), parent=zoner, code=words[6])
+                        zoned.save()
                 else:
-                    zoned = Zone(name=dept, type=ZoneType.objects.get(name="Département".decode('utf8')), parent=zoner, code=words[6])
-                    zoned.save()
-                new=City(name=cname, parent=zoned, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True)
+                    zoned = zoner
+                new=City(name=cname, parent=zoned, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True, country=country_name)
                 new.save()
                 print("[added]  " + cname)
             except UnicodeEncodeError:
                 print("Error " + words[1])
                 pass
-            
+    
+    
+def update_existingdb(country_name):
     #Modify city names (already in the database) to correspond to GeoNames ones
+    cities = list(City.objects.filter(parent__name=country_name, geonames_valid=False))
+    cities2 = list(City.objects.filter(parent__parent__name=country_name, geonames_valid=False))
+    cities3 = list(City.objects.filter(parent__parent__parent__name=country_name, geonames_valid=False))
+    cities.extend(cities2)
+    cities.extend(cities3)
+    
+    rightcities = list(City.objects.filter(parent__name=country_name, geonames_valid=True))
+    rightcities2 = list(City.objects.filter(parent__parent__name=country_name, geonames_valid=True))
+    rightcities3 = list(City.objects.filter(parent__parent__parent__name=country_name, geonames_valid=True))
+    rightcities.extend(rightcities2)
+    rightcities.extend(rightcities3)
+    rcities = []
+    for i in rightcities:
+        rcities.append(i.name)
+    
     for c in cities:
         try:
             name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
             cname1 = remove_accents(c.name.lower())
-            matches = difflib.get_close_matches(cname1, dict_dept,5,0.6)
+            matches = difflib.get_close_matches(cname1, rcities, cutoff=0.5)
             for m in matches:
                 if remove_accents(m.lower()) == cname1:
                     print("[saved] " + c.name + " ---> " + m)
@@ -130,7 +149,7 @@ def fill_db(file_name, country_name):
                     print("No result found")
                 elif len(matches) == 1:
                     special_cases(c, matches[0])
-                    print("[Special Cases] " + c.name)
+                    print("[Special Cases] --- " + c.name)
                 elif len(matches) > 1:
                     possibilities = ""
                     for e in matches:
@@ -147,9 +166,9 @@ def fill_db(file_name, country_name):
         
 def update_doubles(country_name):       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=list(City.objects.filter(parent__name=country_name).order_by("parent", "name"))
-    cities2=list(City.objects.filter(parent__parent__parent__name=country_name).order_by("parent", "name"))
-    cities3=list(City.objects.filter(parent__parent__name=country_name).order_by("parent", "name"))
+    cities=list(City.objects.filter(parent__name=country_name).order_by("name", "parent",  "zip_code"))
+    cities2=list(City.objects.filter(parent__parent__parent__name=country_name).order_by( "name", "parent","zip_code"))
+    cities3=list(City.objects.filter(parent__parent__name=country_name).order_by("name", "parent", "zip_code"))
     cities.extend(cities2)
     cities.extend(cities3)
     prec=City(name="", parent=None)
@@ -212,33 +231,75 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         
-        print("\n\nDownload the file of the corresponding country from \'http://download.geonames.org/export/zip/\' and put it in balafon/Crm/fixtures\n")
-        file_name = raw_input("Enter the name of the file :\n")
-        country_name = raw_input("\nEnter the name of the country :\n")
+        print("Updating database, please wait ...\n\n")
+        for m in City.objects.filter(country=None):
+            if m.parent.type.name == 'Pays':
+                m.country = m.parent.name
+                m.save()
+            elif m.parent.parent.type.name == 'Pays':
+                m.country = m.parent.parent.name
+                m.save()
+            elif m.parent.parent.parent.type.name == 'Pays':
+                m.country = m.parent.parent.parent.name
+                m.save()
+        
+        cntry = ''
+        while cntry == '':
+            country_name = raw_input("\nEnter the name of the country :\n")
+            if country_name == 'Italie':
+                cntry = 'IT'
+            elif country_name == 'Royaume-Uni':
+                cntry = 'GB'
+            elif country_name == 'Espagne':
+                cntry = 'ES'
+            elif country_name == 'Allemagne':
+                cntry = 'DE'
+            elif country_name == 'Belgique':
+                cntry = 'BE'
+            elif country_name == 'Luxembourg':
+                cntry = 'LU'
+            elif country_name == 'Suisse':
+                cntry = 'CH'
+            else:
+                print("Unknown name")
+
+        urllib.urlretrieve('http://download.geonames.org/export/zip/' + cntry + '.zip', '/Users/Maxence/Documents/' + cntry + '.zip')
+        zfile = zipfile.ZipFile('/Users/Maxence/Documents/' + cntry + '.zip','r')
+        for i in zfile.namelist():
+            if i== cntry + '.txt':
+                data = zfile.read(i)                   ## lecture du fichier compresse 
+                fp = open('dev/balafon/balafon/Crm/fixtures/' + cntry + '.txt', "wb")  ## creation en local du nouveau fichier 
+                fp.write(data)                         ## ajout des donnees du fichier compresse dans le fichier local 
+                fp.close() 
+        zfile.close()
+        os.remove('/Users/Maxence/Documents/' + cntry + '.zip')
         
         choose = -1
         while choose != 0:        
             print("\nChoose the action :")
             print("\t[0] Quit")
-            print("\t[1] Fill the database from \'fixtures/GeoNames_f.txt\'")
+            print("\t[1] Fill the database from \'fixtures/" + cntry + ".txt\'")
             print("\t[2] Manage special cases")
             print("\t[3] Update contacts and entities and delete cities appearing twice or more")
-            print("\t[4] Run all")
-            print("\t[5] Update the zip code of all cities\n\n")
+            print("\t[4] Update existing cities")
+            print("\t[5] Run all")
+            print("\t[6] Update zip code of all cities\n\n")
             
             choose = int(raw_input("Enter the value of action : "))
-            if choose == 0:
-                return
-            elif choose == 1:
-                fill_db(file_name, country_name)
+            if choose == 1:
+                fill_db(cntry, country_name)
             elif choose == 2:
                 manage_spe_cases()
             elif choose == 3:
                 update_doubles(country_name)
-            elif choose == 5:
-                update_zip_code()
             elif choose == 4:
-                fill_db(file_name, country_name)
+                update_existingdb(country_name)
+            elif choose == 5:
+                fill_db(cntry, country_name)
+                update_doubles(country_name)
+                update_existingdb(country_name)
                 manage_spe_cases()
                 update_doubles(country_name)
                 return
+            elif choose == 6:
+                update_zip_code()

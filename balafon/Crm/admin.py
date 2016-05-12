@@ -122,10 +122,10 @@ class GroupInline(admin.TabularInline):
 
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['__unicode__', 'zip_code', 'parent', 'latitude', 'longitude', 'geonames_valid']
+    list_display = ['__unicode__', 'zip_code', 'parent', 'latitude', 'longitude', 'geonames_valid', 'country']
     search_fields = ['name']
     ordering = ['name']
-    list_filter = [HasParentFilter, 'parent__type', 'parent']
+    list_filter = [HasParentFilter, 'parent__type', 'parent', 'country']
     raw_id_fields = ('groups',)
 
 admin.site.register(models.City, CityAdmin)
@@ -216,5 +216,7 @@ admin.site.register(models.StreetType)
 
 class SpecialCaseCityAdmin(admin.ModelAdmin):
     list_display = ['city', 'oldname', 'possibilities', 'change_validated']
+    list_filter = ['change_validated']
+    search_fields = ['city__name']
 
 admin.site.register(models.SpecialCaseCity, SpecialCaseCityAdmin)

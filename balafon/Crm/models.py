@@ -158,6 +158,7 @@ class City(BaseZone):
     longitude = models.FloatField(null=True)
     zip_code = models.CharField(max_length=20, null=True)
     geonames_valid = models.BooleanField(default=False)
+    country = models.CharField(max_length=50, null=True)
     
     groups = models.ManyToManyField(
         Zone, blank=True, verbose_name=_(u'group'), related_name='city_groups_set'
