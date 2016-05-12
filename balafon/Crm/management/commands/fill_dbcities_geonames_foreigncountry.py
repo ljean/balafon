@@ -81,6 +81,10 @@ def fill_db(cntry, country_name):
         
     
     with codecs.open("dev/balafon/balafon/Crm/fixtures/" + cntry + ".txt","r","utf8") as file1:
+        nbcities = 0
+        count = 0
+        for l in file1:
+            nbcities += 1
         for l in file1:
             try:
                 words = l.split("\t")
@@ -110,7 +114,9 @@ def fill_db(cntry, country_name):
                     zoned = zoner
                 new=City(name=cname, parent=zoned, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True, country=country_name)
                 new.save()
-                print("[added]  " + cname)
+                count += 1
+                if count % 500 == 0:
+                    print(count + "/" + nbcities)
             except UnicodeEncodeError:
                 print("Error " + words[1])
                 pass
@@ -118,17 +124,9 @@ def fill_db(cntry, country_name):
     
 def update_existingdb(country_name):
     #Modify city names (already in the database) to correspond to GeoNames ones
-    cities = list(City.objects.filter(parent__name=country_name, geonames_valid=False))
-    cities2 = list(City.objects.filter(parent__parent__name=country_name, geonames_valid=False))
-    cities3 = list(City.objects.filter(parent__parent__parent__name=country_name, geonames_valid=False))
-    cities.extend(cities2)
-    cities.extend(cities3)
+    cities = list(City.objects.filter(country=country_name, geonames_valid=False))
     
-    rightcities = list(City.objects.filter(parent__name=country_name, geonames_valid=True))
-    rightcities2 = list(City.objects.filter(parent__parent__name=country_name, geonames_valid=True))
-    rightcities3 = list(City.objects.filter(parent__parent__parent__name=country_name, geonames_valid=True))
-    rightcities.extend(rightcities2)
-    rightcities.extend(rightcities3)
+    rightcities = list(City.objects.filter(country=country_name, geonames_valid=True))
     rcities = []
     for i in rightcities:
         rcities.append(i.name)
@@ -166,11 +164,7 @@ def update_existingdb(country_name):
         
 def update_doubles(country_name):       #Update contacts and entities and remove the cities appearing twice or more
         
-    cities=list(City.objects.filter(parent__name=country_name).order_by("name", "parent",  "zip_code"))
-    cities2=list(City.objects.filter(parent__parent__parent__name=country_name).order_by( "name", "parent","zip_code"))
-    cities3=list(City.objects.filter(parent__parent__name=country_name).order_by("name", "parent", "zip_code"))
-    cities.extend(cities2)
-    cities.extend(cities3)
+    cities=list(City.objects.filter(country=country_name).order_by('name', 'parent', 'zip_code'))
     prec=City(name="", parent=None)
     for c in cities:
         try:
@@ -180,7 +174,7 @@ def update_doubles(country_name):       #Update contacts and entities and remove
                 elif len(c.parent.code) == 3:
                     c.district_id = c.parent.code
                 c.save()
-            if remove_accents(c.name.lower()) == remove_accents(prec.name.lower()):
+            if remove_accents(c.name.lower()) == remove_accents(prec.name.lower()) and (c.parent == prec.parent or c.parent.name == prec.country or c.country == prec.parent.name) :
                 if c.geonames_valid and not prec.geonames_valid:
                     rightcity = c
                     wrongcity = prec

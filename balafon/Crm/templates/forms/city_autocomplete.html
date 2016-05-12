@@ -10,8 +10,13 @@ if (zipcode == '') {
 {% endblock %}
 {% block extra_filter %}+"&country="+country_id+"&zipcode="+zipcode{% endblock %}
 {% block get_id_url %}{% url "crm_get_city_id" %}{% endblock %}
-{% block list_display %}{% if val.country == 'France' %} items.push(val.name + " (" + val.zip_code.substring(0,2) + ")");
-{% else %} items.push(val.name + " (" + val.country.substring(0,2) + ")");
+{% block list_display %}
+if (val.country == "France") {
+    items.push(val.name + " (" + val.zip_code.substring(0,2) + ")");
+}
+else {
+    items.push(val.name + " (" + val.country.substring(0,2) + ")");
+}
 {% endblock %}
 {% block get_real_value %}
 realvalue = ui.item.value.substring(0,ui.item.value.length-5);

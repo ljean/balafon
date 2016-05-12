@@ -36,7 +36,6 @@ def manage_spe_cases():       #Change the name of the special cases cities
     for x in spe_cases:
         try:
             if x.possibilities == "":
-                x.delete()
                 pass
             print(x.city.name.encode('utf8'))
             print("\t[0] : No match")
@@ -80,6 +79,10 @@ def fill_db():
     #Add all the cities from GeoNames in the database
     
     with codecs.open("dev/balafon/balafon/Crm/fixtures/GeoNames_f.txt","r","latin-1") as file1:
+        nbcities = 0
+        count = 0
+        for l in file1:
+            nbcities += 1
         for l in file1:
             words = l.split("\t")
             cname = words[2]
@@ -94,44 +97,45 @@ def fill_db():
             zone = Zone.objects.get(name = dept)
             new=City(name=cname, parent=zone, district_id=words[8], latitude=float(words[9]), longitude=float(words[10]), zip_code=words[1], geonames_valid=True, country='France')
             new.save()
-            print("[added]  " + cname)
+            count += 1
+            if count % 500 == 0:
+                print(count + "/" + nbcities)
             
     #Modify city names (already in the database) to correspond to GeoNames ones
-    if not cities == False:
-        for c in cities:
-            try:
-                if c.parent.type.name != 'Pays':
-                    name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
-                    cname1 = remove_accents(c.name.lower())
-                    tab1 = dict_dept.get(c.parent.name)
-                    matches = difflib.get_close_matches(cname1, tab1,5,0.6)
-                    for m in matches:
-                        if remove_accents(m.lower()) == cname1:
-                            print("[saved] " + c.name + " ---> " + m)
-                            c.name = m
-                            c.save()
-                            name_changed = 1
-                    if name_changed == 0:
-                        if len(matches) == 0:
-                            print("No result found")
-                        elif len(matches) == 1:
-                            special_cases(c, matches[0])
-                            print("[Special Cases] " + c.name)
-                        elif len(matches) > 1:
-                            possibilities = ""
-                            for e in matches:
-                                possibilities = possibilities + "|" + e 
-                            if possibilities != "":
-                                special_cases(c, possibilities)
-                            print("[Special Cases] " + c.name)
-            except TypeError:
-                print("TypeError")
-                pass
-            except UnicodeEncodeError:
-                special_cases(c,"")
-                pass
-            except AttributeError:
-                pass    
+    for c in cities:
+        try:
+            if c.parent.type.name != 'Pays':
+                name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
+                cname1 = remove_accents(c.name.lower())
+                tab1 = dict_dept.get(c.parent.name)
+                matches = difflib.get_close_matches(cname1, tab1,cutoff=0.5)
+                for m in matches:
+                    if remove_accents(m.lower()) == cname1:
+                        print("[saved] " + c.name + " ---> " + m)
+                        c.name = m
+                        c.save()
+                        name_changed = 1
+                if name_changed == 0:
+                    if len(matches) == 0:
+                        print("No result found")
+                    elif len(matches) == 1:
+                        special_cases(c, matches[0])
+                        print("[Special Cases] " + c.name)
+                    elif len(matches) > 1:
+                        possibilities = ""
+                        for e in matches:
+                            possibilities = possibilities + "|" + e 
+                        if possibilities != "":
+                            special_cases(c, possibilities)
+                        print("[Special Cases] " + c.name)
+        except TypeError:
+            print("TypeError")
+            pass
+        except UnicodeEncodeError:
+            special_cases(c,"")
+            pass
+        except AttributeError:
+            pass    
         
         
 def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
@@ -197,7 +201,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
         
-        print("Updating database, please wait ...\n\n")
+        print("\n\nUpdating database, please wait ...\n\n")
         for m in City.objects.filter(country=None):
             if m.parent.type.name == 'Pays':
                 m.country = m.parent.name
