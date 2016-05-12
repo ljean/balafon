@@ -132,6 +132,14 @@ def update_existingdb(country_name):
         rcities.append(i.name)
     
     for c in cities:
+        if City.objects.filter(parent=c.parent, geonames_valid=True):
+            rightcities = City.objects.filter(parent=c.parent, geonames_valid=True)
+            rcities = []
+            count = 0
+            for i in rightcities:
+                rcities.append(i.name)
+                count += 1
+            print(count)
         try:
             name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
             cname1 = remove_accents(c.name.lower())
@@ -254,6 +262,8 @@ class Command(BaseCommand):
                 cntry = 'LU'
             elif country_name == 'Suisse':
                 cntry = 'CH'
+            elif country_name == 'France':
+                cntry = 'FR'
             else:
                 print("Unknown name")
 
