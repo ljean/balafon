@@ -24,7 +24,7 @@ $(document).bind('cbox_complete', function() {
        console.log(entity_id);
        
        $.ajax({
-              url: "http://localhost:8000/fr/crm/entity/getaddr/?term="+entity_id,
+              url: "/fr/crm/entity/getaddr/?term="+entity_id,
               success: function(data) {
                      if (data.address) {
                             var address = data.address

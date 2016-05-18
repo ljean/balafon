@@ -7,13 +7,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Crm', '0022_auto_20160421_1057'),
+        ('Emailing', '0001_initial'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='city',
-            name='district_id',
-            field=models.CharField(default=999, max_length=3),
+        migrations.AlterModelOptions(
+            name='magiclink',
+            options={'verbose_name': 'Magic link', 'verbose_name_plural': 'Magic links'},
         ),
     ]

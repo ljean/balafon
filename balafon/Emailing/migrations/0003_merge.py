@@ -7,12 +7,9 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Crm', '0015_auto_20160419_1632'),
+        ('Emailing', '0002_auto_20160418_1646'),
+        ('Emailing', '0002_auto_20160518_1009'),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='specialcasescities',
-            name='old_name',
-        ),
     ]

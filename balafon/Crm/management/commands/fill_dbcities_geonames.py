@@ -1,8 +1,8 @@
-# coding: utf8
-
+# -*- coding: utf-8 -*-
 
 import codecs
 import difflib
+import os.path
 
 from balafon.Crm.models import City
 from balafon.Crm.models import Zone
@@ -27,24 +27,26 @@ def remove_accents(txt):
 
 
 def special_cases(city, txt):
-    ct = SpecialCaseCity(city=city, oldname=city.name, possibilities=txt, change_validated="no")
-    ct.save()
+    special_case = SpecialCaseCity(city=city, oldname=city.name, possibilities=txt, change_validated="no")
+    special_case.save()
 
 
-def manage_spe_cases():       #Change the name of the special cases cities            
+def manage_spe_cases():
+    """Change the name of the special cases cities"""
+
     spe_cases = SpecialCaseCity.objects.filter(change_validated="no")
-    for x in spe_cases:
+    for spe_case in spe_cases:
         try:
-            print(x.city.name.encode('utf-8'))
-            if x.possibilities == "":
+            print(spe_case.city.name.encode('utf-8'))
+            if spe_case.possibilities == "":
                 new_name = raw_input("Error - Write the name to set for this city :")
-                x.city.name = new_name;
-                x.city.save()
-                x.change_validated = "yes"
-                x.save()
+                spe_case.city.name = new_name
+                spe_case.city.save()
+                spe_case.change_validated = "yes"
+                spe_case.save()
             else:
                 print("\t[0] : No match")
-                temp = x.possibilities.split("|")
+                temp = spe_case.possibilities.split("|")
                 count = 0
                 for p in temp:
                     count += 1
@@ -53,13 +55,14 @@ def manage_spe_cases():       #Change the name of the special cases cities
                 while choice > count or choice < 0:
                     choice = int(raw_input("\nWrite the value of the corresponding name : "))
                 if choice > 0:
-                    x.city.name = temp[choice - 1]
-                    x.city.save()
+                    spe_case.city.name = temp[choice - 1]
+                    spe_case.city.save()
                     print("\nName changed to : " + temp[choice - 1] + "\n\n")
-                    x.change_validated = "yes"
-                    x.save()
+                    spe_case.change_validated = "yes"
+                    spe_case.save()
                 else:
                     print("No modification\n\n")
+
         except UnicodeEncodeError:
             print("Error unknown character - try changing name in admin")
             pass
@@ -69,14 +72,16 @@ def fill_db():
     dict_dept = {}
     cities = list(City.objects.all())
     
-    #Add all the cities from GeoNames in the database
-    
-    with codecs.open("dev/balafon/balafon/Crm/fixtures/GeoNames_f.txt","r","latin-1") as file1:
+    # Add all the cities from GeoNames in the database
+    app_dir_name = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    geonames_file_name = os.path.join(app_dir_name, 'fixtures/GeoNames_f.txt')
+
+    with codecs.open(geonames_file_name, "r", "latin-1") as file1:
         for l in file1:
             words = l.split("\t")
             cname = words[2]
             dept = words[5]
-            if dict_dept.get(dept) == None:
+            if dict_dept.get(dept) is None:
                 dict_dept[dept] = []
                 tab = dict_dept.get(dept)
                 tab.append(cname)
@@ -88,7 +93,7 @@ def fill_db():
             new.save()
             print("[added]  " + cname)
             
-    #Modify city names (already in the database) to correspond to GeoNames ones
+    # Modify city names (already in the database) to correspond to GeoNames ones
     if not cities == False:
         for c in cities:
             try:
@@ -125,25 +130,26 @@ def fill_db():
                 pass    
         
         
-def update_doubles():       #Update contacts and entities and remove the cities appearing twice or more
+def update_doubles():
+    """Update contacts and entities and remove the cities appearing twice or more"""
         
-    cities=City.objects.exclude(parent__type__name='Pays')
-    prec=City(name="", parent=None)
-    for c in cities:
+    cities = City.objects.exclude(parent__type__name='Pays')
+    prec = City(name="", parent=None)
+    for city in cities:
         try:
-            if c.district_id == "999":
-                if len(c.parent.code) == 2:
-                    c.district_id = c.parent.code + "0"
-                elif len(c.parent.code) == 3:
-                    c.dsitrict_id = c.parent.code
-                c.save()
-            if remove_accents(c.name.lower()) == remove_accents(prec.name.lower()) and c.parent==prec.parent:
-                if c.district_id[2] != "0" and prec.district_id[2] == "0":
-                    rightcity = c
+            if city.district_id == "999":
+                if len(city.parent.code) == 2:
+                    city.district_id = city.parent.code + "0"
+                elif len(city.parent.code) == 3:
+                    city.dsitrict_id = city.parent.code
+                city.save()
+            if remove_accents(city.name.lower()) == remove_accents(prec.name.lower()) and city.parent == prec.parent:
+                if city.district_id[2] != "0" and prec.district_id[2] == "0":
+                    rightcity = city
                     wrongcity = prec
                 else:
                     rightcity = prec
-                    wrongcity = c       
+                    wrongcity = city
                 contacts = Contact.objects.filter(city=wrongcity)
                 for o in contacts:
                     o.city = rightcity
@@ -154,14 +160,15 @@ def update_doubles():       #Update contacts and entities and remove the cities 
                     e.save()
                 wrongcity.delete()
                 print("[deleted]  " + wrongcity.name)
-            prec=c
+            prec=city
         except ValueError:
             pass
         except AssertionError:
             pass
         
         
-def update_zip_code():      #Give a zip code to cities that don't have one
+def update_zip_code():
+    """Give a zip code to cities that don't have one"""
     cities = City.objects.filter(zip_code="00000")
     for c in cities:
         try:
@@ -186,12 +193,16 @@ def update_zip_code():      #Give a zip code to cities that don't have one
             print("Unicode Error")
             pass
 
+
 class Command(BaseCommand):
-    
+    """Command class"""
+
     def handle(self, *args, **options):
+        """called when command is executed"""
         
         choose = -1
         while choose != 0:        
+
             print("Choose the action :")
             print("\t[0] Quit")
             print("\t[1] Fill the database from \'fixtures/GeoNames_f.txt\'")
@@ -201,19 +212,22 @@ class Command(BaseCommand):
             print("\t[5] Run all\n\n")
             
             choose = int(raw_input("Enter the value of action : "))
-            if choose == 0:
-                return
-            elif choose == 1:
+
+            if choose == 1:
                 fill_db()
+
             elif choose == 2:
                 manage_spe_cases()
+
             elif choose == 3:
                 update_doubles()
+
             elif choose == 4:
                 update_zip_code()
+
             elif choose == 5:
                 fill_db()
                 manage_spe_cases()
                 update_doubles()
                 update_zip_code()
-                return
+                break
