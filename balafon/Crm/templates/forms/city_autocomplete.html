@@ -3,6 +3,19 @@
 {% block get_list_url %}{% url "crm_get_cities" %}{% endblock %}
 {% block extra_filter_value %}
 country_id = $('select[name=country]').val();
+zipcode = $('input[name=zip_code]').val();
 {% endblock %}
-{% block extra_filter %}+"&country="+country_id{% endblock %}
+{% block extra_filter %}+"&country="+country_id+"&zipcode="+zipcode{% endblock %}
 {% block get_id_url %}{% url "crm_get_city_id" %}{% endblock %}
+{% block list_display %}items.push(val.name + " (" + val.district_id.substring(0,2) + ")");{% endblock %}
+{% block get_real_value %}
+realvalue = ui.item.value.substring(0,ui.item.value.length-5);
+var id = name_to_id[realvalue];
+{% endblock %}
+{% block get_real_value_if %}id = ui.item.value.substring(0,ui.item.value.length-5);{% endblock %}
+{% block display_real_value %}$("input[name={{name}}_visible]").attr('value', ui.item.value.substring(0,ui.item.value.length-5));{% endblock %}
+{% block change_value_city %}
+if (value.charAt(value.length-1) == ")" && value.charAt(value.length-4) == "(" ) {
+	value = value.substring(0,value.length-5)
+}
+{% endblock %}

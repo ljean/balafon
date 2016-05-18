@@ -29,7 +29,7 @@ class HasParentFilter(admin.SimpleListFilter):
 
 class ZoneAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['name', 'parent', 'type']
+    list_display = ['code', 'name', 'parent', 'type']
     ordering = ['type', 'name']
     list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']
@@ -96,7 +96,7 @@ class SubscriptionInline(admin.TabularInline):
 
 class ContactAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['lastname', 'firstname', 'entity']
+    list_display = ['lastname', 'firstname', 'entity', 'city']
     search_fields = ['lastname']
     raw_id_admin = ('entity',)
     inlines = (SubscriptionInline,)
@@ -122,10 +122,10 @@ class GroupInline(admin.TabularInline):
 
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['__unicode__', 'parent']
+    list_display = ['__unicode__', 'zip_code', 'parent', 'latitude', 'longitude']
     search_fields = ['name']
     ordering = ['name']
-    list_filter = [HasParentFilter, 'parent', ]
+    list_filter = [HasParentFilter, 'parent__type', 'parent']
     raw_id_fields = ('groups',)
 
 admin.site.register(models.City, CityAdmin)
@@ -133,7 +133,7 @@ admin.site.register(models.City, CityAdmin)
 
 class EntityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ('name', 'type')
+    list_display = ('name', 'type', 'city')
     search_fields = ['name']
 
 admin.site.register(models.Entity, EntityAdmin)
@@ -212,3 +212,9 @@ admin.site.register(models.SubscriptionType)
 admin.site.register(models.TeamMember)
 
 admin.site.register(models.StreetType)
+
+
+class SpecialCaseCityAdmin(admin.ModelAdmin):
+    list_display = ['city', 'oldname', 'possibilities', 'change_validated']
+
+admin.site.register(models.SpecialCaseCity, SpecialCaseCityAdmin)

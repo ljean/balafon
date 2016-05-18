@@ -95,22 +95,35 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
                 logger_message = u"{0} different zones for '{1}'".format(country_count, country)
                 logger.warning(logger_message)
     else:
+        if len(zip_code) == 5:
+            zipc = zip_code
+        else:
+            zipc = None
         code = zip_code[:2] or default_department
         try:
             parent = models.Zone.objects.get(code=code)
         except models.Zone.DoesNotExist:
             parent = None
-    
-    queryset = models.City.objects.filter(parent=parent)
-    queryset = filter_icontains_unaccent(queryset, '"Crm_city"."name"', city_name)
-    cities_count = queryset.count()
-    if cities_count:
-        if cities_count > 1:
-            logger_message = u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent)
-            logger.warning(logger_message)
-        return queryset[0]
-    else:
-        return models.City.objects.create(name=city_name, parent=parent)
+            
+    if zipc:
+        queryset = models.City.objects.filter(zip_code=zipc)
+        for elem in queryset:
+            if elem.name.lower() == city_name.lower():
+                return elem
+    else:    
+        queryset = models.City.objects.filter(parent=parent)
+        queryset = filter_icontains_unaccent(queryset, '"Crm_city"."name"', city_name)
+        cities_count = queryset.count()
+        if cities_count:
+            if cities_count > 1:
+                logger_message = u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent)
+                logger.warning(logger_message)
+                for element in queryset:
+                    if len(element.name) == len(city_name):
+                        return element
+            return queryset[0]
+        else:
+            return models.City.objects.create(name=city_name, parent=parent)
 
 
 def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):

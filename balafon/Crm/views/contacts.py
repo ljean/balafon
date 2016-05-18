@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
@@ -292,3 +292,45 @@ def select_contact_and_redirect(request, view_name, template_name, choices=None)
         {'form': form, 'post_url': post_url},
         context_instance=RequestContext(request)
     )
+
+
+@user_passes_test(can_access)
+@popup_redirect
+def display_map(request, contact_id):
+    return render(request, 'Crm/display_map_contact.html', {'contact': contact_id})
+
+def get_addr(request):
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
+    idcontact = request.GET.get('term')
+    contact = models.Contact.objects.get(id=idcontact)
+    address = ""
+    if contact.city != None:
+        latitude = contact.city.latitude
+        longitude = contact.city.longitude
+        for stype in street_type:
+            if stype in contact.address:
+                address = contact.address
+            elif stype in contact.address2:
+                address = contact.address2
+            elif stype in contact.address3:
+                address = contact.address3
+        if address == "":
+            address = contact.address
+        city = contact.city.name
+        
+    else:
+        latitude = contact.entity.city.latitude
+        longitude = contact.entity.city.longitude
+        for stype in street_type:
+            if stype in contact.entity.address:
+                address = contact.entity.address
+            elif stype in contact.entity.address2:
+                address = contact.entity.address2
+            elif stype in contact.entity.address3:
+                address = contact.entity.address3
+        if address == "":
+            address = contact.entity.address
+        city = contact.entity.city.name
+        
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
+        

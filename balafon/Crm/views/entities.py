@@ -10,7 +10,7 @@ from django.contrib.messages import warning
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 
@@ -263,3 +263,28 @@ def select_entity_and_redirect(request, view_name, template_name):
         {'form': form},
         context_instance=RequestContext(request)
     )
+
+@user_passes_test(can_access)
+@popup_redirect
+def display_map(request, entity_id):
+    return render(request, 'Crm/display_map_entity.html', {'entity': entity_id})
+
+def get_addr(request):
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
+    identity = request.GET.get('term')
+    entity = models.Entity.objects.get(id=identity)
+    address = ""
+    for stype in street_type:
+        if stype in entity.address:
+            address = entity.address
+        elif stype in entity.address2:
+            address = entity.address2
+        elif stype in entity.address3:
+            address = entity.address3
+    if address == "":
+        address = entity.address
+    latitude = entity.city.latitude
+    longitude = entity.city.longitude
+    city = entity.city.name
+    
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
