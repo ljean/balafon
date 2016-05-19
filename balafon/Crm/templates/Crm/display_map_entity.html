@@ -38,10 +38,16 @@ $(document).bind('cbox_complete', function() {
                                    markers.addMarker(new OpenLayers.Marker(cproj,icon));
                                    map.setCenter(cproj, 17);
                             }
-                            else if (data.address) {
-                                   var address = data.address
-                            
-                                   address = address + ", " + data.city;
+                            else {
+                                   if (data.address) {
+                                          var address = data.address
+                                          address = address + ", " + data.city;
+                                   }
+                                   else {
+                                          address = data.city
+                                   }
+                                   city = data.city
+                                   
                                    latitude = data.latitude;
                                    longitude = data.longitude;
                                    
@@ -52,6 +58,7 @@ $(document).bind('cbox_complete', function() {
                                           success: function(data) {
                                                         
                                                  if (data[0] != null) {
+                                                 
                                                         lat = data[0].lat;
                                                         lon = data[0].lon;
                                                         

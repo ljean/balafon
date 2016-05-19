@@ -63,7 +63,9 @@ def get_cities(request):
 
     if country_id is not None:
         country_id = int(country_id)
-        country_name = models.Zone.objects.get(id=country_id)
+        if country_id != 0:
+            country = models.Zone.objects.get(id=country_id)
+            country_name = country.name
 
     default_country = models.Zone.objects.get(name=get_default_country(), parent__isnull=True)
     

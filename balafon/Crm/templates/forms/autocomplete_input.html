@@ -44,7 +44,7 @@ $(function() {
     });
     $("input[name={{name}}_visible]").change(function() {
 		var value = $(this).val();
-		{% block change_value_city %}{% endblock %}
+		{% block change_value %}{% endblock %}
         $.ajax({
 			url: "{% block get_id_url %}{% endblock %}?name="+value,
 			success: function(data){

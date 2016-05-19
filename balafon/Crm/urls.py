@@ -26,9 +26,9 @@ urlpatterns = [
     url(r'^entity-name/(?P<entity_id>.+)/$', entities.get_entity_name, name='crm_get_entity_name'),
     url(r'^entities/list/$', entities.get_entities, name='crm_get_entities'),
     url(r'^entity-id/$', entities.get_entity_id, name='crm_get_entity_id'),
-    url(r'^entity/map/(?P<entity_id>\d+)/$', entities.display_map, name='crm_display_map_entity'),
-    url(r'^entity/getaddr/$', entities.get_addr, name='crm_get_addr_entity'),
-    url(r'^entity/putcoords/$', entities.put_coords, name='crm_put_coords_entity'),
+    url(r'^map/(?P<entity_id>\d+)/$', entities.display_map, name='crm_display_map'),
+    url(r'^getaddr/$', entities.get_addr, name='crm_get_addr'),
+    url(r'^putcoords/$', entities.put_coords, name='crm_put_coords'),
 
     # contacts
     url(r'^add-contact/(?P<entity_id>\d+)/$', contacts.add_contact, name='crm_add_contact'),
@@ -57,9 +57,6 @@ urlpatterns = [
     url(r'^contact-name/(?P<contact_id>.+)/$', contacts.get_contact_name, name='crm_get_contact_name'),
     url(r'^contacts/list/$', contacts.get_contacts, name='crm_get_contacts'),
     url(r'^contact-id/$', contacts.get_contact_id, name='crm_get_contact_id'),
-    url(r'^contact/map/(?P<contact_id>\d+)/$', contacts.display_map, name='crm_display_map_contact'),
-    url(r'^contact/getaddr/$', contacts.get_addr, name='crm_get_addr_contact'),
-    url(r'^contact/putcoords/$', contacts.put_coords, name='crm_put_coords_contact'),
 
     # actions
     url(

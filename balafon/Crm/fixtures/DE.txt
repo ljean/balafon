@@ -13416,9 +13416,9 @@ DE	01067	Dresden Friedrichstadt	Sachsen	SN		00	Dresden, Stadt	14612	51.0587	13.7
 DE	01069	Dresden	Sachsen	SN		00	Dresden, Stadt	14612	51.043	13.7373	
 DE	01097	Dresden	Sachsen	SN		00	Dresden, Stadt	14612	51.0714	13.7399	
 DE	01099	Dresden	Sachsen	SN		00	Dresden, Stadt	14612	51.0783	13.8051	
+DE	01108	Weixdorf	Sachsen	SN		00	Dresden, Stadt	14612	51.1481	13.7983	
 DE	01108	Marsdorf	Sachsen	SN		00	Dresden, Stadt	14612	51.1634	13.7666	
 DE	01108	Dresden	Sachsen	SN		00	Dresden, Stadt	14612	51.1557	13.7825	
-DE	01108	Weixdorf	Sachsen	SN		00	Dresden, Stadt	14612	51.1481	13.7983	
 DE	01109	Dresden	Sachsen	SN		00	Dresden, Stadt	14612	51.1164	13.7468	
 DE	01109	Hellerau	Sachsen	SN		00	Dresden, Stadt	14612	51.1167	13.75	
 DE	01109	Wilschdorf	Sachsen	SN		00	Dresden, Stadt	14612	51.122	13.7218	
@@ -15465,10 +15465,10 @@ DE	04618	Frohnsdorf	Thüringen	TH		00	Altenburger Land	16077	50.9359	12.5858
 DE	04618	Ziegelheim	Thüringen	TH		00	Altenburger Land	16077	50.9259	12.5534	
 DE	04618	Langenleuba-Niederhain	Thüringen	TH		00	Altenburger Land	16077	50.9591	12.5958	
 DE	04626	Göllnitz	Thüringen	TH		00	Altenburger Land	16077	50.9473	12.3243	
-DE	04626	Altkirchen	Thüringen	TH		00	Altenburger Land	16077	50.942	12.3506	
+DE	04626	Heukewalde	Thüringen	TH		00	Altenburger Land	16077	50.8384	12.2724	
 DE	04626	Dobitschen	Thüringen	TH		00	Altenburger Land	16077	50.956	12.2817	
 DE	04626	Nöbdenitz	Thüringen	TH		00	Altenburger Land	16077	50.8771	12.2849	
-DE	04626	Heukewalde	Thüringen	TH		00	Altenburger Land	16077	50.8384	12.2724	
+DE	04626	Altkirchen	Thüringen	TH		00	Altenburger Land	16077	50.942	12.3506	
 DE	04626	Vollmershain	Thüringen	TH		00	Altenburger Land	16077	50.8552	12.2884	
 DE	04626	Jonaswalde	Thüringen	TH		00	Altenburger Land	16077	50.8392	12.2879	
 DE	04626	Drogen	Thüringen	TH		00	Altenburger Land	16077	50.9176	12.3163	
@@ -15553,11 +15553,11 @@ DE	07381	Oberoppurg	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.7	11.6833
 DE	07387	Krölpa	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6833	11.5333	
 DE	07387	Lausnitz bei Pößneck	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6667	11.5	
 DE	07389	Grobengereuth	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6667	11.6667	
-DE	07389	Knau	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.7333	
+DE	07389	Schmorda	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.5833	
 DE	07389	Gertewitz	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6833	11.65	
 DE	07389	Quaschwitz	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6833	11.7	
 DE	07389	Gössitz	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6167	11.5833	
-DE	07389	Schmorda	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.5833	
+DE	07389	Knau	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.7333	
 DE	07389	Keila	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.6667	
 DE	07389	Ranis	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.65	11.55	
 DE	07389	Bucha	Thüringen	TH		00	Saale-Orla-Kreis	16075	50.6333	11.7	
@@ -15823,9 +15823,9 @@ DE	36433	Moorgrund	Thüringen	TH		00	Wartburgkreis	16063	50.85	10.2833
 DE	36448	Bad Liebenstein	Thüringen	TH		00	Wartburgkreis	16063	50.8167	10.3667	
 DE	36448	Schweina	Thüringen	TH		00	Wartburgkreis	16063	50.8333	10.3333	
 DE	36448	Steinbach	Thüringen	TH		00	Wartburgkreis	16063	50.8333	10.3667	
-DE	36452	Brunnhartshausen	Thüringen	TH		00	Wartburgkreis	16063	50.6833	10.1167	
-DE	36452	Andenhausen	Thüringen	TH		00	Wartburgkreis	16063	50.6667	10.0667	
 DE	36452	Fischbach/Rhön	Thüringen	TH		00	Wartburgkreis	16063	50.65	10.15	
+DE	36452	Andenhausen	Thüringen	TH		00	Wartburgkreis	16063	50.6667	10.0667	
+DE	36452	Brunnhartshausen	Thüringen	TH		00	Wartburgkreis	16063	50.6833	10.1167	
 DE	36452	Kaltenlengsfeld	Thüringen	TH		00	Wartburgkreis	16063	50.65	10.2	
 DE	36452	Zella	Thüringen	TH		00	Wartburgkreis	16063	50.6667	10.1167	
 DE	36452	Empfertshausen	Thüringen	TH		00	Wartburgkreis	16063	50.6667	10.1	
@@ -15911,9 +15911,9 @@ DE	37339	Teistungen	Thüringen	TH		00	Eichsfeld	16061	51.4499	10.3433
 DE	37339	Brehme	Thüringen	TH		00	Eichsfeld	16061	51.5	10.3667	
 DE	37345	Stöckey	Thüringen	TH		00	Eichsfeld	16061	51.5333	10.5	
 DE	37345	Weißenborn-Lüderode	Thüringen	TH		00	Eichsfeld	16061	51.5333	10.4167	
-DE	37345	Neustadt	Thüringen	TH		00	Eichsfeld	16061	51.4667	10.4667	
-DE	37345	Jützenbach	Thüringen	TH		00	Eichsfeld	16061	51.5167	10.3667	
 DE	37345	Zwinge	Thüringen	TH		00	Eichsfeld	16061	51.55	10.3833	
+DE	37345	Jützenbach	Thüringen	TH		00	Eichsfeld	16061	51.5167	10.3667	
+DE	37345	Neustadt	Thüringen	TH		00	Eichsfeld	16061	51.4667	10.4667	
 DE	37345	Bischofferode	Thüringen	TH		00	Eichsfeld	16061	51.5	10.45	
 DE	37345	Holungen	Thüringen	TH		00	Eichsfeld	16061	51.4833	10.3833	
 DE	37345	Großbodungen	Thüringen	TH		00	Eichsfeld	16061	51.4667	10.5	
@@ -16196,11 +16196,11 @@ DE	99438	Buchfart	Thüringen	TH		00	Weimarer Land	16071	50.9167	11.3333
 DE	99438	Oettern	Thüringen	TH		00	Weimarer Land	16071	50.9333	11.35	
 DE	99438	Bad Berka	Thüringen	TH		00	Weimarer Land	16071	50.9	11.2833	
 DE	99438	Troistedt	Thüringen	TH		00	Weimarer Land	16071	50.9333	11.25	
-DE	99439	Vippachedelhausen	Thüringen	TH		00	Weimarer Land	16071	51.0833	11.2	
-DE	99439	Hottelstedt	Thüringen	TH		00	Weimarer Land	16071	51.0333	11.2333	
-DE	99439	Heichelheim	Thüringen	TH		00	Weimarer Land	16071	51.05	11.3167	
-DE	99439	Schwerstedt	Thüringen	TH		00	Weimarer Land	16071	51.0667	11.2833	
 DE	99439	Wohlsborn	Thüringen	TH		00	Weimarer Land	16071	51.0333	11.3667	
+DE	99439	Hottelstedt	Thüringen	TH		00	Weimarer Land	16071	51.0333	11.2333	
+DE	99439	Vippachedelhausen	Thüringen	TH		00	Weimarer Land	16071	51.0833	11.2	
+DE	99439	Schwerstedt	Thüringen	TH		00	Weimarer Land	16071	51.0667	11.2833	
+DE	99439	Heichelheim	Thüringen	TH		00	Weimarer Land	16071	51.05	11.3167	
 DE	99439	Ettersburg	Thüringen	TH		00	Weimarer Land	16071	51.05	11.2833	
 DE	99439	Berlstedt	Thüringen	TH		00	Weimarer Land	16071	51.0667	11.25	
 DE	99439	Krautheim	Thüringen	TH		00	Weimarer Land	16071	51.0833	11.3	
@@ -16368,9 +16368,9 @@ DE	99826	Mihla	Thüringen	TH		00	Wartburgkreis	16063	51.0833	10.3333
 DE	99830	Treffurt	Thüringen	TH		00	Wartburgkreis	16063	51.1311	10.2272	
 DE	99831	Creuzburg	Thüringen	TH		00	Wartburgkreis	16063	51.05	10.25	
 DE	99831	Ifta	Thüringen	TH		00	Wartburgkreis	16063	51.0667	10.1833	
-DE	99834	Lauchröden	Thüringen	TH		00	Wartburgkreis	16063	50.9833	10.1667	
-DE	99834	Gerstungen	Thüringen	TH		00	Wartburgkreis	16063	50.9667	10.0667	
 DE	99834	Unterellen	Thüringen	TH		00	Wartburgkreis	16063	50.9667	10.15	
+DE	99834	Gerstungen	Thüringen	TH		00	Wartburgkreis	16063	50.9667	10.0667	
+DE	99834	Lauchröden	Thüringen	TH		00	Wartburgkreis	16063	50.9833	10.1667	
 DE	99834	Oberellen	Thüringen	TH		00	Wartburgkreis	16063	50.95	10.1833	
 DE	99837	Dankmarshausen	Thüringen	TH		00	Wartburgkreis	16063	50.9333	10.0167	
 DE	99837	Großensee	Thüringen	TH		00	Wartburgkreis	16063	50.9333	9.9667	
