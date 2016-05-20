@@ -80,11 +80,12 @@ def fill_db(cntry, country_name):
     #Add all the cities from GeoNames in the database
         
     
-    with codecs.open("dev/balafon/balafon/Crm/fixtures/" + cntry + ".txt","r","utf8") as file1:
+    with open("dev/balafon/balafon/Crm/fixtures/" + cntry + ".txt","r") as file1:
         nbcities = 0
-        count = 0
-        for l in file1:
+        for line in file1:
             nbcities += 1
+    with codecs.open("dev/balafon/balafon/Crm/fixtures/" + cntry + ".txt","r","utf8") as file1:
+        count = 0
         for l in file1:
             try:
                 words = l.split("\t")
@@ -116,7 +117,7 @@ def fill_db(cntry, country_name):
                 new.save()
                 count += 1
                 if count % 500 == 0:
-                    print(count + "/" + nbcities)
+                    print(`count` + "/" + `nbcities`)
             except UnicodeEncodeError:
                 print("Error " + words[1])
                 pass
@@ -138,8 +139,6 @@ def update_existingdb(country_name):
             count = 0
             for i in rightcities:
                 rcities.append(i.name)
-                count += 1
-            print(count)
         try:
             name_changed = 0        #Detect if the city name has already changed (0 if not / 1 if it changed)
             cname1 = remove_accents(c.name.lower())

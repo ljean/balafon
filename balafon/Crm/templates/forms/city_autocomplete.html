@@ -24,7 +24,7 @@ var id = name_to_id[realvalue];
 {% endblock %}
 {% block get_real_value_if %}id = ui.item.value.substring(0,ui.item.value.length-5);{% endblock %}
 {% block display_real_value %}$("input[name={{name}}_visible]").attr('value', ui.item.value.substring(0,ui.item.value.length-5));{% endblock %}
-{% block change_value_city %}
+{% block change_value %}
 if (value.charAt(value.length-1) == ")" && value.charAt(value.length-4) == "(" ) {
 	value = value.substring(0,value.length-5)
 }

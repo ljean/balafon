@@ -26,7 +26,7 @@
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
         {{entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
         {% if not entity.city.geonames_valid %}<span class="glyphicon glyphicon-warning-sign" title="{% trans 'City not found' %}"></span>
-        {% else %}<a class="colorbox-form" href="{% url 'crm_display_map_entity' entity.id %}"><span class="glyphicon glyphicon-map-marker" title="{% trans 'See on map' %}"></span></a> {% endif %}
+        {% else %}<a class="colorbox-form" href="{% url 'crm_display_map' entity.id %}?type=e"><span class="glyphicon glyphicon-map-marker" title="{% trans 'See on map' %}"></span></a> {% endif %}
       </td></tr>
       {% if entity.has_billing_address %}
       <tr><td>
