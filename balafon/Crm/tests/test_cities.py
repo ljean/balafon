@@ -84,10 +84,10 @@ class CitiesSuggestListTestCase(BaseTestCase):
         self.assertContains(response, name)
 
     def test_city_in_default_country(self):
-        c1 = mommy.make(models.City, name="ABC", parent=self.parent)
-        c2 = mommy.make(models.City, name="ABD", parent=self.parent)
-        c3 = mommy.make(models.City, name="XYZ", parent=self.parent)
-        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country)
+        c1 = mommy.make(models.City, name="ABC", parent=self.parent, geonames_valid=True)
+        c2 = mommy.make(models.City, name="ABD", parent=self.parent, geonames_valid=True)
+        c3 = mommy.make(models.City, name="XYZ", parent=self.parent, geonames_valid=True)
+        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country, geonames_valid=True)
 
         response = self.client.get(reverse('crm_get_cities')+'?term=a&country=0')
         self.assertEqual(200, response.status_code)
@@ -97,10 +97,10 @@ class CitiesSuggestListTestCase(BaseTestCase):
         self.assertNotContains(response, c4.name)
 
     def test_city_in_foreign_country(self):
-        c1 = mommy.make(models.City, name="ABC", parent=self.parent)
-        c2 = mommy.make(models.City, name="ABD", parent=self.parent)
-        c3 = mommy.make(models.City, name="XYZ", parent=self.parent)
-        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country)
+        c1 = mommy.make(models.City, name="ABC", parent=self.parent, geonames_valid=True)
+        c2 = mommy.make(models.City, name="ABD", parent=self.parent, geonames_valid=True)
+        c3 = mommy.make(models.City, name="XYZ", parent=self.parent, geonames_valid=True)
+        c4 = mommy.make(models.City, name="ABE", parent=self.foreign_country, geonames_valid=True)
 
         response = self.client.get(reverse('crm_get_cities')+'?term=a&country={0}'.format(
             self.foreign_country.id))

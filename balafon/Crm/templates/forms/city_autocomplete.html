@@ -4,10 +4,20 @@
 {% block extra_filter_value %}
 country_id = $('select[name=country]').val();
 zipcode = $('input[name=zip_code]').val();
+if (zipcode == '') {
+    zipcode = '0';
+}
 {% endblock %}
 {% block extra_filter %}+"&country="+country_id+"&zipcode="+zipcode{% endblock %}
 {% block get_id_url %}{% url "crm_get_city_id" %}{% endblock %}
-{% block list_display %}items.push(val.name + " (" + val.district_id.substring(0,2) + ")");{% endblock %}
+{% block list_display %}
+if (val.country == "France") {
+    items.push(val.name + " (" + val.zip_code.substring(0,2) + ")");
+}
+else {
+    items.push(val.name + " (" + val.country.substring(0,2) + ")");
+}
+{% endblock %}
 {% block get_real_value %}
 realvalue = ui.item.value.substring(0,ui.item.value.length-5);
 var id = name_to_id[realvalue];

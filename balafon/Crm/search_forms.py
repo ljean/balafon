@@ -1465,3 +1465,116 @@ class SortContacts(SearchFieldForm):
         """filter the final results"""
         callback = getattr(self, '_sort_by_{0}'.format(self.value), None)
         return sorted(contacts, key=callback)
+
+
+class DistrictSearchForm(BaseCitySearchForm):
+    """by district"""
+    name = 'dictrict'
+    label = _(u'District')
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCitySearchForm, self).__init__(*args, **kwargs)
+        queryset = models.City.objects.order_by('name')
+        field = forms.ModelChoiceField(
+            queryset,
+            label=self.label,
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter a city of the wanted district'), 'size': '80'})
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        city = models.City.objects.get(id=self.value)
+        return Q(entity__city__district_id=city.district_id)
+
+
+class Geographic50SearchForm(BaseCitySearchForm):
+    """within 50 kilometers"""
+    name = 'geographic50'
+    label = _(u'50km around ...')
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCitySearchForm, self).__init__(*args, **kwargs)
+        queryset = models.City.objects.order_by('name')
+        field = forms.ModelChoiceField(
+            queryset,
+            label=_(u'Around'),
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        city = models.City.objects.get(id=self.value)
+        lat = city.latitude
+        lon = city.longitude
+        latmax = lat + (50/1.112) * 0.01
+        latmin = lat - (50/1.112) * 0.01
+        lonmax = lon + 50 * 0.01
+        lonmin = lon - 50 * 0.01
+        return (Q(entity__city__latitude__lt=latmax) & Q(entity__city__latitude__gt=latmin) & Q(entity__city__longitude__lt=lonmax) & Q(entity__city__longitude__gt=lonmin))
+    
+class Geographic25SearchForm(BaseCitySearchForm):
+    """within 25 kilometers"""
+    name = 'geographic25'
+    label = _(u'25km around ...')
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCitySearchForm, self).__init__(*args, **kwargs)
+        queryset = models.City.objects.order_by('name')
+        field = forms.ModelChoiceField(
+            queryset,
+            label=_(u'Around'),
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        city = models.City.objects.get(id=self.value)
+        lat = city.latitude
+        lon = city.longitude
+        latmax = lat + (25/1.112) * 0.01
+        latmin = lat - (25/1.112) * 0.01
+        lonmax = lon + 25 * 0.01
+        lonmin = lon - 25 * 0.01
+        return (Q(entity__city__latitude__lt=latmax) & Q(entity__city__latitude__gt=latmin) & Q(entity__city__longitude__lt=lonmax) & Q(entity__city__longitude__gt=lonmin))
+    
+class Geographic100SearchForm(BaseCitySearchForm):
+    """within 100 kilometers"""
+    name = 'geographic100'
+    label = _(u'100km around ...')
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCitySearchForm, self).__init__(*args, **kwargs)
+        queryset = models.City.objects.order_by('name')
+        field = forms.ModelChoiceField(
+            queryset,
+            label=_(u'Around'),
+            widget=CityNoCountryAutoComplete(attrs={'placeholder': _(u'Enter the city to search around'), 'size': '80'})
+        )
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        city = models.City.objects.get(id=self.value)
+        lat = city.latitude
+        lon = city.longitude
+        latmax = lat + (100/1.112) * 0.01
+        latmin = lat - (100/1.112) * 0.01
+        lonmax = lon + 100 * 0.01
+        lonmin = lon - 100 * 0.01
+        return (Q(entity__city__latitude__lt=latmax) & Q(entity__city__latitude__gt=latmin) & Q(entity__city__longitude__lt=lonmax) & Q(entity__city__longitude__gt=lonmin))
+
+
+class GeonamesValidForm(YesNoSearchFieldForm):
+    """by is geonames valid"""
+    name = 'is_geonames_valid'
+    label = _(u'Is valid with GeoNames?')
+        
+    def get_lookup(self):
+        """lookup"""
+        if not self.is_yes():
+            return Q(entity__city__geonames_valid=False)
+        else:
+            return Q(entity__city__geonames_valid=True)

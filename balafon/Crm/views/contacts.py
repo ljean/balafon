@@ -300,13 +300,15 @@ def display_map(request, contact_id):
     return render(request, 'Crm/display_map_contact.html', {'contact': contact_id})
 
 def get_addr(request):
-    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place"]
+    street_type = ["route", "rue", "chemin", "allée".decode('utf8'), "boulevard", "avenue", "place", "Route", "Rue", "Chemin", "Allée".decode('utf8'), "Boulevard", "Avenue", "Place", "montée".decode('utf8'), "Montée".decode('utf8'), "coursière".decode('utf8'), "Coursière".decode('utf8'), "lotissement", "Lotissement"]
     idcontact = request.GET.get('term')
     contact = models.Contact.objects.get(id=idcontact)
     address = ""
     if contact.city != None:
         latitude = contact.city.latitude
         longitude = contact.city.longitude
+        lat = contact.latitude
+        lon = contact.longitude
         for stype in street_type:
             if stype in contact.address:
                 address = contact.address
@@ -321,6 +323,8 @@ def get_addr(request):
     else:
         latitude = contact.entity.city.latitude
         longitude = contact.entity.city.longitude
+        lat = contact.entity.latitude
+        lon = contact.entity.longitude
         for stype in street_type:
             if stype in contact.entity.address:
                 address = contact.entity.address
@@ -332,5 +336,20 @@ def get_addr(request):
             address = contact.entity.address
         city = contact.entity.city.name
         
-    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude}), 'application/json')
-        
+    return HttpResponse(json.dumps({'address': address, 'city': city, 'latitude': latitude, 'longitude': longitude, 'lat': lat, 'lon': lon}), 'application/json')
+
+
+def put_coords(request):
+    contact_id = request.GET.get('ent')
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    contact = models.Contact.objects.get(id=contact_id)
+    if contact.city != None:
+        contact.latitude = lat
+        contact.longitude = lon
+        contact.save()
+    else:
+        contact.entity.latitude = lat
+        contact.entity.longitude = lon
+        contact.entity.save()
+    return HttpResponse(json.dumps({'latitude': lat, 'longitude': lon}), 'application/json')
