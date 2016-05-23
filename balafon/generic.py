@@ -5,12 +5,26 @@
 from datetime import date, datetime
 import xlwt
 
+from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.dateformat import DateFormat
+from django.utils.decorators import method_decorator
 from django.views.generic import View
+from django.views.generic.edit import FormView
+
+from colorbox.decorators import popup_redirect
 
 from balafon.permissions import can_access
+
+
+class StaffPopupFormView(FormView):
+    """A base class for Popup form view"""
+
+    @method_decorator(user_passes_test(can_access))
+    @method_decorator(popup_redirect)
+    def dispatch(self, *args, **kwargs):
+        return super(StaffPopupFormView, self).dispatch(*args, **kwargs)
 
 
 class XlsExportView(View):

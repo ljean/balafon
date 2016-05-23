@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from datetime import datetime, date, time
+from bs4 import BeautifulSoup
+from datetime import datetime, date, time, timedelta
 from decimal import Decimal
 import logging
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from balafon.Crm.models import ActionType
 from balafon.Store import models
 
 
@@ -651,7 +654,7 @@ class SalesByCategoryTest(BaseTestCase):
     def test_total_sales(self):
         """It should return all sales data"""
 
-        code_internet = mommy.make(models.SaleAnalysisCode, name=u'Internet')
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
@@ -722,7 +725,7 @@ class SalesByCategoryTest(BaseTestCase):
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
-        code_internet = mommy.make(models.SaleAnalysisCode, name=u'Internet')
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
         code_shop = mommy.make(models.SaleAnalysisCode, name=u'Shop')
 
         family = mommy.make(models.StoreItemCategory, parent=None)
@@ -796,3 +799,155 @@ class SalesByCategoryTest(BaseTestCase):
             [dict(ordered_dict) for ordered_dict in total_data['values']],
             [{'value': '0.00'}, {'value': '50.00'}, {'value': '0.00'}]
         )
+
+
+class ExtraSaleTest(TestCase):
+    """Test that it is possible to add 'extra-sales'"""
+
+    def setUp(self):
+        logging.disable(logging.CRITICAL)
+        self.user = User.objects.create(username="toto", is_active=True, is_staff=True)
+        self.user.set_password("abc")
+        self.user.save()
+        self._login()
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
+
+    def _login(self):
+        self.client.login(username="toto", password="abc")
+
+    def test_add_extra_sale(self):
+        """add an extra sale"""
+        url = reverse('store_add_extra_sale')
+
+        redirect_url = reverse('store_statistics_index')
+
+        action_type = mommy.make(ActionType)
+        vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        analysis_code = mommy.make(models.SaleAnalysisCode, action_type=action_type)
+
+        data = {
+            'analysis_code': analysis_code.id,
+            'amount': '1000.50',
+            'date': date.today() + timedelta(1),
+            'vat_rate': vat_rate.id,
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(redirect_url),
+            response.content
+        )
+
+        self.assertEqual(models.Sale.objects.count(), 1)
+        sale = models.Sale.objects.all()[0]
+
+        self.assertEqual(sale.analysis_code, analysis_code)
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        sale_item = sale.saleitem_set.all()[0]
+        self.assertEqual(sale_item.vat_rate, vat_rate)
+        self.assertEqual(sale_item.pre_tax_price, Decimal(data['amount']))
+        self.assertEqual(sale.action.type, action_type)
+        self.assertEqual(sale.action.planned_date.date(), data['date'])
+
+    def test_view_add_extra_sale(self):
+        """add an extra sale"""
+        url = reverse('store_add_extra_sale')
+
+        action_type = mommy.make(ActionType)
+        mommy.make(models.VatRate, rate=Decimal(10))
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        mommy.make(models.SaleAnalysisCode, action_type=action_type)
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Sale.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('select#id_vat_rate option')), 1)
+        self.assertEqual(len(soup.select('select#id_analysis_code option')), 1)
+
+    def test_view_add_extra_sale_several_codes(self):
+        """add an extra sale"""
+        url = reverse('store_add_extra_sale')
+
+        action_type = mommy.make(ActionType)
+        action_type2 = mommy.make(ActionType)
+        mommy.make(models.VatRate, rate=Decimal(10))
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        mommy.make(models.SaleAnalysisCode, action_type=action_type)
+        mommy.make(models.SaleAnalysisCode, action_type=None)
+        mommy.make(models.SaleAnalysisCode, action_type=action_type2)
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Sale.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('select#id_vat_rate option')), 1)
+        self.assertEqual(len(soup.select('select#id_analysis_code option')), 1)
+
+    def test_add_extra_sale_non_staff(self):
+        """add an extra sale : non staff -> not allowed"""
+
+        self.user.is_staff = False
+        self.user.save()
+
+        url = reverse('store_add_extra_sale')
+        auth_url = reverse("auth_login")
+
+        action_type = mommy.make(ActionType)
+        vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        analysis_code = mommy.make(models.SaleAnalysisCode, action_type=action_type)
+
+        data = {
+            'analysis_code': analysis_code.id,
+            'amount': '1000.50',
+            'date': date.today() + timedelta(1),
+            'vat_rate': vat_rate.id,
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertRedirects(response, auth_url + '?next=' + url)
+
+        self.assertEqual(models.Sale.objects.count(), 0)
+
+    def test_add_extra_sale_anonymous(self):
+        """add an extra sale: anonymous -> not allowed"""
+
+        self.client.logout()
+
+        url = reverse('store_add_extra_sale')
+        auth_url = reverse("auth_login")
+
+        action_type = mommy.make(ActionType)
+        vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        analysis_code = mommy.make(models.SaleAnalysisCode, action_type=action_type)
+
+        data = {
+            'analysis_code': analysis_code.id,
+            'amount': '1000.50',
+            'date': date.today() + timedelta(1),
+            'vat_rate': vat_rate.id,
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertRedirects(response, auth_url + '?next=' + url)
+
+        self.assertEqual(models.Sale.objects.count(), 0)
+
+
+
+

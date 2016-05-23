@@ -6,7 +6,7 @@ from django.conf.urls import url
 from balafon.Store.views.sales_documents import (
     SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView
 )
-from balafon.Store.views.statistics import StaticticsIndexView
+from balafon.Store.views.statistics import StaticticsIndexView, AddExtraSaleView
 from balafon.Store.views.xls_export import StockXlsView, StockAlertXlsView, StoreXlsCatalogueView
 
 
@@ -43,9 +43,14 @@ urlpatterns = [
     ),
 
     url(
-        r'statistics/index$',
+        r'statistics/index/$',
         StaticticsIndexView.as_view(),
         name=r'store_statistics_index'
-    )
+    ),
 
+    url(
+        'statistics/add-extra-sale/$',
+        AddExtraSaleView.as_view(),
+        name=r'store_add_extra_sale'
+    )
 ]

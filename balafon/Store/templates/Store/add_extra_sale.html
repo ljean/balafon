@@ -1,0 +1,12 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+  {% include "balafon/_calendar.html" with field="date" yearRange="c-1:c+1" %}
+  </script>
+{% endblock %}
+{% block title %}{% trans 'Add extra sale' %}{% endblock %}
+{% block form_url %}{% url 'store_add_extra_sale' %}{% endblock %}
+{% block doc_header %}
+  {{ message }}
+{% endblock %}

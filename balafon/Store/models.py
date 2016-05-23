@@ -766,13 +766,14 @@ class DeliveryPoint(models.Model):
 class SaleAnalysisCode(models.Model):
     """Where to get a sale"""
     name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    action_type = models.ForeignKey(ActionType, verbose_name=_(u'action type'), default=None, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u"Delivery point")
-        verbose_name_plural = _(u"Delivery points")
+        verbose_name = _(u"Analysis code")
+        verbose_name_plural = _(u"Analysis codes")
         ordering = ('name',)
 
 

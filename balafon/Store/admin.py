@@ -298,3 +298,9 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_filter = ('item__category', 'user')
 
 admin.site.register(models.Favorite, FavoriteAdmin)
+
+
+class SaleAnalysisCodeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'action_type')
+
+admin.site.register(models.SaleAnalysisCode, SaleAnalysisCodeAdmin)
