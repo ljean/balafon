@@ -903,7 +903,7 @@ class ExtraSaleTest(TestCase):
         self.user.save()
 
         url = reverse('store_add_extra_sale')
-        auth_url = reverse("auth_login")
+        auth_url = reverse("auth_login")[3:]
 
         action_type = mommy.make(ActionType)
         vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
@@ -918,7 +918,8 @@ class ExtraSaleTest(TestCase):
         }
 
         response = self.client.post(url, data=data)
-        self.assertRedirects(response, auth_url + '?next=' + url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].find(auth_url) > 0)
 
         self.assertEqual(models.Sale.objects.count(), 0)
 
@@ -928,7 +929,7 @@ class ExtraSaleTest(TestCase):
         self.client.logout()
 
         url = reverse('store_add_extra_sale')
-        auth_url = reverse("auth_login")
+        auth_url = reverse("auth_login")[3:]
 
         action_type = mommy.make(ActionType)
         vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
@@ -944,7 +945,8 @@ class ExtraSaleTest(TestCase):
 
         response = self.client.post(url, data=data)
 
-        self.assertRedirects(response, auth_url + '?next=' + url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response['Location'].find(auth_url) > 0)
 
         self.assertEqual(models.Sale.objects.count(), 0)
 
