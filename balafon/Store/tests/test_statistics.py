@@ -946,6 +946,7 @@ class ExtraSaleTest(TestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 302)
+        print auth_url, response['Location']
         self.assertTrue(response['Location'].find(auth_url) > 0)
 
         self.assertEqual(models.Sale.objects.count(), 0)
