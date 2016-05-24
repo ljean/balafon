@@ -763,16 +763,33 @@ class DeliveryPoint(models.Model):
         ordering = ('name',)
 
 
+class SaleAnalysisCode(models.Model):
+    """Where to get a sale"""
+    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    action_type = models.ForeignKey(ActionType, verbose_name=_(u'action type'), default=None, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _(u"Analysis code")
+        verbose_name_plural = _(u"Analysis codes")
+        ordering = ('name',)
+
+
 class Sale(models.Model):
     """A sale"""
-    action = models.OneToOneField(Action)
+    action = models.OneToOneField(Action, verbose_name=_(u"action"))
     delivery_point = models.ForeignKey(
         DeliveryPoint, default=None, blank=True, null=True, verbose_name=_(u"delivery point")
+    )
+    analysis_code = models.ForeignKey(
+        SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_(u"analysis code")
     )
 
     def vat_total_amounts(self):
         """returns amount of VAT by VAT rate"""
-        #caluclaute price for each VAT rate
+        # calculate price for each VAT rate
         total_by_vat = {}
         for sale_item in self.saleitem_set.all():
             if sale_item.vat_rate:
@@ -780,7 +797,7 @@ class Sale(models.Model):
                     total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price()
                 else:
                     total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price()
-        #returns vat rate in order
+        # returns vat rate in order
         vat_totals = []
         for vat_rate in sorted(VatRate.objects.all(), key=lambda _vat: _vat.rate):
             if vat_rate.id in total_by_vat:

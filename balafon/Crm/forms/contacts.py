@@ -467,13 +467,17 @@ class ContactsImportConfirmForm(ContactsImportForm):
     default_department = forms.ChoiceField(
         required=False,
         label=_(u'Default department'),
-        choices=([('', '')]+[(zone.code, zone.name) for zone in models.Zone.objects.filter(type__type='department')]),
         help_text=_(u'The city in red will be created with this department as parent')
     )
 
     class Meta(ContactsImportForm.Meta):
         """from model"""
         fields = ('encoding', 'separator', 'entity_type', 'groups', 'entity_name_from_email', )
+
+    def __init__(self, *args, **kwargs):
+        super(ContactsImportConfirmForm, self).__init__(*args, **kwargs)
+        zone_tuples = [(zone.code, zone.name) for zone in models.Zone.objects.filter(type__type='department')]
+        self.fields['default_department'].choices = [('', '')] + zone_tuples
 
     def clean_default_department(self):
         """validation"""

@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from balafon.Store.models import (
-    SaleItem, StoreItem, StoreItemCategory, StoreItemTag
+    SaleItem, StoreItem, StoreItemCategory, StoreItemTag, SaleAnalysisCode
 )
 from balafon.Store.api import serializers
 
@@ -205,14 +205,17 @@ class TotalSalesView(SalesStatisticsBaseView):
 
     def get_objects(self, **kwargs):
         """return list of objects (a line of the statistic array)"""
-        class Obj(object):
-            id = 1
-            name = _(u'Total')
-            icon = u'piggy-bank'
-        return [Obj()]
+        return SaleAnalysisCode.objects.all()
+
+    def get_object_icon(self, obj):
+        """return object name"""
+        return u'piggy-bank'
 
     def get_object_sale_items(self, obj, date_from, date_to):
         """return sales for an objects for the given period (a cell of the statistic array)"""
+
         return super(TotalSalesView, self).get_object_sale_items(
             obj, date_from, date_to
-        )
+        ).filter(sale__analysis_code=obj)
+
+
