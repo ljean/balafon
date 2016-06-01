@@ -48,6 +48,10 @@ class NamedElement(models.Model):
 class LastModifiedModel(TimeStampedModel):
     """track the user who last modified an object"""
 
+    created_by = models.ForeignKey(
+        User, default=None, blank=True, null=True, verbose_name=_(u"created by"), related_name='+',
+    )
+
     last_modified_by = models.ForeignKey(
         User, default=None, blank=True, null=True, verbose_name=_(u"last modified by")
     )
@@ -61,9 +65,14 @@ class LastModifiedModel(TimeStampedModel):
             request = RequestManager().get_request()
             if request.user.is_authenticated():
                 # object can be modified by anonymous user : subscription page for example, view magic-link ...
-                self.last_modified_by = request.user
+                current_user = request.user
         except (RequestNotFound, AttributeError):
-            pass
+            current_user = None
+
+        if not self.id:
+            self.created_by = current_user
+        self.last_modified_by = current_user
+
         return super(LastModifiedModel, self).save(*args, **kwargs)
 
 

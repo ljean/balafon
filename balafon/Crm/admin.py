@@ -4,6 +4,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models
 
 
@@ -155,8 +156,17 @@ class ActionAdmin(admin.ModelAdmin):
     ]
     search_fields = ['subject', 'number']
     list_filter = ['type', 'status', 'done', 'opportunity']
-    readonly_fields = ['created']
+    readonly_fields = ['created', 'modified', 'created_by', 'last_modified_by']
     date_hierarchy = 'created'
+    raw_id_fields = ['contacts', 'entities',]
+
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name in self.raw_id_fields:
+            kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.rel, self.admin_site)
+        else:
+            return super(ActionAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+        kwargs.pop('request')
+        return db_field.formfield(**kwargs)
 
 admin.site.register(models.Action, ActionAdmin)
 
