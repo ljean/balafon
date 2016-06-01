@@ -96,8 +96,8 @@ class SubscriptionInline(admin.TabularInline):
 
 class ContactAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['lastname', 'firstname', 'entity']
-    search_fields = ['lastname']
+    list_display = ['lastname', 'firstname', 'entity', 'email']
+    search_fields = ['lastname', 'email']
     raw_id_admin = ('entity',)
     inlines = (SubscriptionInline,)
 
@@ -150,8 +150,13 @@ admin.site.register(models.Opportunity, OpportunityAdmin)
 
 class ActionAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['subject']
-    search_fields = ['subject']
+    list_display = [
+        'id', 'planned_date', 'created', 'subject', 'type', 'status', 'done', 'opportunity', 'number', 'amount'
+    ]
+    search_fields = ['subject', 'number']
+    list_filter = ['type', 'status', 'done', 'opportunity']
+    readonly_fields = ['created']
+    date_hierarchy = 'created'
 
 admin.site.register(models.Action, ActionAdmin)
 
@@ -179,7 +184,14 @@ class ContactCustomFieldValueAdmin(admin.ModelAdmin):
 admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin)
 
 admin.site.register(models.ContactsImport)
-admin.site.register(models.ActionSet)
+
+
+class ActionSetAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['name', 'ordering']
+    list_editable = ['ordering']
+
+admin.site.register(models.ActionSet, ActionSetAdmin)
 
 
 class ActionStatusAdmin(admin.ModelAdmin):
@@ -207,8 +219,18 @@ class RelationshipAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Relationship, RelationshipAdmin)
 
-admin.site.register(models.SubscriptionType)
 
-admin.site.register(models.TeamMember)
+class SubscriptionTypeAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['name', 'site']
+
+admin.site.register(models.SubscriptionType, SubscriptionTypeAdmin)
+
+class TeamMemberAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['name', 'user', 'active']
+    list_filter = ['active']
+
+admin.site.register(models.TeamMember, TeamMemberAdmin)
 
 admin.site.register(models.StreetType)

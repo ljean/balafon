@@ -91,14 +91,17 @@ class SaleItemInline(admin.TabularInline):
     """display property on the store item"""
     model = models.SaleItem
     fields = (
-        'text', 'item', 'quantity', 'pre_tax_price', 'discount', 'discount_price', 'vat_rate', 'order_index',
+        'text', 'item', 'quantity', 'pre_tax_price', 'discount', 'calculate_discount', 'vat_rate', 'order_index',
         'is_blank',
     )
+    readonly_fields = ('calculate_discount', )
 
 
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'action')
+    list_display = ('__unicode__', 'creation_date', 'analysis_code', )
+    readonly_fields = ('creation_date', )
     inlines = (SaleItemInline, )
+    list_filter = ('analysis_code', )
 
 admin.site.register(models.Sale, SaleAdmin)
 

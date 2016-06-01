@@ -818,12 +818,24 @@ class Sale(models.Model):
             total += sale_item.pre_tax_total_price()
         return total
 
+    @property
+    def creation_date(self):
+        return self.action.created
+    creation_date.fget.short_description = _(u'Creation date')
+
     class Meta:
         verbose_name = _(u"Sale")
         verbose_name_plural = _(u"Sales")
+        ordering = ['-action__created']
 
     def __unicode__(self):
-        return unicode(self.action)
+        contacts = u', '.join([unicode(item) for item in self.action.contacts.all()])
+        entities = u', '.join([unicode(item) for item in self.action.entities.all()])
+        customers = u', '.join([item for item in (contacts, entities) if item])
+        if customers:
+            return u'{0} - {1}'.format(self.action.planned_date.date(), customers)
+        else:
+            return u'{0}'.format(self.action.planned_date.date())
 
     def clone(self, new_sale):
         """clone a sale: clone its items"""
