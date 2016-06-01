@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 """admin"""
 
-import xlwt
-
 from django import forms
 from django.db.models import CharField
 from django.contrib import admin
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.messages import success, error
-from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
