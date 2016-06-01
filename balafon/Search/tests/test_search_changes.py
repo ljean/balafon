@@ -51,7 +51,7 @@ class ModificationBySearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, contact1.email)
@@ -95,7 +95,7 @@ class ModificationBySearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(1, len(soup.select('.field-error')))
 
         self.assertNotContains(response, contact1.email)
@@ -138,7 +138,7 @@ class ModificationBySearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, contact1.email)
@@ -183,7 +183,7 @@ class ModificationBySearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, contact1.email)
@@ -228,13 +228,12 @@ class ModificationBySearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, contact1.email)
         self.assertContains(response, contact2.email)
         self.assertNotContains(response, contact3.email)
-
 
 
 class ModificationDateSearchTest(BaseTestCase):
@@ -271,7 +270,7 @@ class ModificationDateSearchTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup4(response.content, 'html.parser')
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, contact1.lastname)

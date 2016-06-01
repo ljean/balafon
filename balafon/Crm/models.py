@@ -69,9 +69,10 @@ class LastModifiedModel(TimeStampedModel):
         except (RequestNotFound, AttributeError):
             current_user = None
 
-        if not self.id:
-            self.created_by = current_user
-        self.last_modified_by = current_user
+        if current_user:
+            if not self.id:
+                self.created_by = current_user
+            self.last_modified_by = current_user
 
         return super(LastModifiedModel, self).save(*args, **kwargs)
 
