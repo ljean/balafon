@@ -170,7 +170,7 @@ class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
 class ActionWeekArchiveView(ActionArchiveView, WeekArchiveView):
     """view"""
     date_field = "planned_date"
-    week_format = "%U"
+    week_format = "%W"
     allow_future = True
     allow_empty = True
     planning_type = 'week'
