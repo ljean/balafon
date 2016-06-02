@@ -45,14 +45,14 @@
             </li>
             <li>
               <a href="{% url 'emailing_newsletter_list' %}">
-                <span class="glyphicon glyphicon-send"></span>
+                <span class="glyphicon glyphicon-open-file"></span>
                 {% trans "Mailings" %}
               </a>
             </li>
             {% if BALAFON_STORE_INSTALLED %}
             <li>
               <a href="{% url 'store_statistics_index' %}">
-                <span class="glyphicon glyphicon-piggy-bank"></span>
+                <span class="glyphicon glyphicon-equalizer"></span>
                 {% trans "Store statistics" %}
               </a>
             </li>
@@ -112,7 +112,7 @@
               {% trans "Daily actions" %}
             </a></li>
             <li><a href="{% url 'crm_actions_not_planned' %}">
-              <span class="glyphicon glyphicon-calendar"></span>
+              <span class="glyphicon glyphicon-fire"></span>
               {% trans "Not planned actions" %}
             </a></li>
           </ul>

@@ -103,13 +103,22 @@ class Emailing(TimeStampedModel):
         """what to to next"""
         action = ""
         if self.status == Emailing.STATUS_EDITING:
-            action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
-                ugettext(u'Send'), reverse("emailing_confirm_send_mail", args=[self.id])
-            )
+            action = '''
+                <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
+                '''.format(
+                    ugettext(u'Send'),
+                    reverse("emailing_confirm_send_mail", args=[self.id]),
+                    'ok-circle'
+                )
         if self.status == Emailing.STATUS_SCHEDULED:
-            action = '<a class="colorbox-form action-button" href="{1}">{0}</a>'.format(
-                ugettext(u'Cancel'), reverse("emailing_cancel_send_mail", args=[self.id])
-            )
+            action = '''
+                <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
+                '''.format(
+                    ugettext(u'Cancel'),
+                    reverse("emailing_cancel_send_mail", args=[self.id]),
+                    'remove-circle'
+                )
+
         return mark_safe(action)
 
     def get_domain_url_prefix(self):

@@ -5,6 +5,9 @@
 
 {% block document_content %}
     {% if favs_by_type %}
+      <h4>
+      <span class="glyphicon glyphicon-star"></span> {% trans "Favorites" %}
+      </h4>
     {% for type, favs, template_name in favs_by_type %}
         {% include template_name %}
     {% endfor %}

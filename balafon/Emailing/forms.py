@@ -18,6 +18,7 @@ from captcha.fields import CaptchaField
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
 from coop_cms.utils import dehtml
+from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
 import floppyforms as forms
 
 from balafon.Crm import settings as crm_settings
@@ -29,12 +30,12 @@ from balafon.Emailing.utils import create_subscription_action, send_notification
 from balafon.Emailing import settings as emailing_settings
 
 
-class UnregisterForm(forms.Form):
+class UnregisterForm(BsForm):
     """User wants to unregister from emailing"""
     reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
 
 
-class UpdateEmailingForm(forms.ModelForm):
+class UpdateEmailingForm(BsModelForm):
     """form for editing an existing emailing"""
 
     class Meta:
@@ -48,7 +49,7 @@ class UpdateEmailingForm(forms.ModelForm):
         self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
 
         newsletter_choices = [(newsletter.id, newsletter.subject) for newsletter in Newsletter.objects.all()]
-        self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
+        self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices, attrs={'class': 'form-control'})
 
         if not getattr(settings, 'BALAFON_EMAILING_SENDER_CHOICES', None):
             self.fields["from_email"].widget = forms.HiddenInput()
@@ -59,10 +60,10 @@ class UpdateEmailingForm(forms.ModelForm):
             self.fields["lang"].widget = forms.HiddenInput()
         else:
             language_choices = crm_settings.get_language_choices(_(u"Favorite language of the contact"))
-            self.fields["lang"].widget = forms.Select(choices=language_choices)
+            self.fields["lang"].widget = forms.Select(choices=language_choices, attrs={'class': 'form-control'})
 
 
-class NewEmailingForm(forms.Form):
+class NewEmailingForm(BsForm):
     """Form for creating a new emailing"""
 
     subscription_type = forms.IntegerField(label=_(u"Subscription Type"))
@@ -83,23 +84,31 @@ class NewEmailingForm(forms.Form):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         super(NewEmailingForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
 
-        newsletter_choices = [(0, ugettext(u'-- New --'))] + [(n.id, n.subject) for n in Newsletter.objects.all()]
-        self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices)
+        newsletter_choices = [
+            (0, ugettext(u'-- New --'))
+        ] + [
+            (newsletter.id, newsletter.subject) for newsletter in Newsletter.objects.all().order_by('-id')
+        ]
+        self.fields["newsletter"].widget = forms.Select(choices=newsletter_choices, attrs={'class': 'form-control'})
 
-        subscription_choices = [(n.id, n.name) for n in SubscriptionType.objects.all()]
-        self.fields["subscription_type"].widget = forms.Select(choices=subscription_choices)
+        subscription_choices = [(subscription.id, subscription.name) for subscription in SubscriptionType.objects.all()]
+        self.fields["subscription_type"].widget = forms.Select(
+            choices=subscription_choices, attrs={'class': 'form-control'}
+        )
 
         if len(settings.LANGUAGES) < 2:
             self.fields['lang'].widget = forms.HiddenInput()
 
         if getattr(settings, 'BALAFON_EMAILING_SENDER_CHOICES', None):
-            self.fields['from_email'].widget = forms.Select(choices=settings.BALAFON_EMAILING_SENDER_CHOICES)
+            self.fields['from_email'].widget = forms.Select(
+                choices=settings.BALAFON_EMAILING_SENDER_CHOICES, attrs={'class': 'form-control'}
+            )
         else:
             self.fields['from_email'].widget = forms.HiddenInput()
 
@@ -125,7 +134,7 @@ class NewEmailingForm(forms.Form):
             raise ValidationError(ugettext(u"Please select a valid subscription"))
 
 
-class NewNewsletterForm(forms.Form):
+class NewNewsletterForm(BsForm):
     """Create a new newsletter"""
     subject = forms.CharField(
         label=_(u"Subject"),
@@ -151,22 +160,22 @@ class NewNewsletterForm(forms.Form):
         """
         url = self.cleaned_data['source_url']
         if url:
-            #Check in config if the url match with something allowed
+            # Check in config if the url match with something allowed
             newsletter_sources = getattr(settings, 'BALAFON_NEWSLETTER_SOURCES', ())
             for (regex, selector, post_processor) in newsletter_sources:
                 if re.match(regex, url):
                     try:
-                        #if so get the content
+                        # if so get the content
                         html = urllib2.urlopen(url).read()
-                        #and extract the selector content as initial content for the newsletter
+                        # and extract the selector content as initial content for the newsletter
                         soup = BeautifulSoup(html, "html.parser")
                         content = u''.join([unicode(tag) for tag in soup.select(selector)])
                         if post_processor:
-                            #import the post_processor function
+                            # import the post_processor function
                             module_name, processor_name = post_processor.rsplit('.', 1)
                             module = import_module(module_name)
                             post_processor_func = getattr(module, processor_name)
-                            #call the post_processor and update the content
+                            # call the post_processor and update the content
                             content = post_processor_func(content)
                         self.source_content = content
                         return url
@@ -439,23 +448,23 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return dehtml(value, **kwargs)
         
     def clean_lastname(self):
-        """valiadate lastname"""
+        """validate lastname"""
         return self._dehtmled_field("lastname")
     
     def clean_firstname(self):
-        """valiadate firstname"""
+        """validate firstname"""
         return self._dehtmled_field("firstname")
     
     def clean_phone(self):
-        """valiadate phone"""
+        """validate phone"""
         return self._dehtmled_field("phone")
     
     def clean_mobile(self):
-        """valiadate mobile phone"""
+        """validate mobile phone"""
         return self._dehtmled_field("mobile")
     
     def clean_address(self):
-        """valiadate address"""
+        """validate address"""
         return self._dehtmled_field("address")
     
     def clean_address2(self):
@@ -463,18 +472,18 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return self._dehtmled_field("address2")
     
     def clean_address3(self):
-        """valiadate address line 3"""
+        """validate address line 3"""
         return self._dehtmled_field("address3")
     
     def clean_message(self):
-        """valiadate message"""
+        """validate message"""
         message = self._dehtmled_field("message", allow_spaces=True)
         if len(message) > 10000:
             raise ValidationError(ugettext(u"Your message is too long"))
         return message
     
     def clean_groups(self):
-        """valiadate groups"""
+        """validate groups"""
         try:
             groups = [Group.objects.get(id=group_id) for group_id in self.cleaned_data['groups']]
         except Group.DoesNotExist:
@@ -482,7 +491,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return groups
     
     def clean_action_types(self):
-        """valiadate action types"""
+        """validate action types"""
         try:
             action_types = [ActionType.objects.get(id=at_id) for at_id in self.cleaned_data['action_types']]
         except ActionType.DoesNotExist:
@@ -496,10 +505,10 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         contact.city = self.cleaned_data['city']
         contact.favorite_language = self.cleaned_data.get('favorite_language', '')
         contact.save()
-        #delete unknown contacts for the current entity
+        # delete unknown contacts for the current entity
         contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
         
-        #force also the city on the entity
+        # force also the city on the entity
         contact.entity.city = contact.city
 
         groups = self.cleaned_data['groups']
@@ -539,7 +548,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             action.save()
             actions.append(action)
             
-        #send an email
+        # send an email
         send_notification_email(request, contact, actions, message)
         
         return contact
@@ -611,14 +620,14 @@ class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
         contact.entity = self.get_entity()
         contact.favorite_language = self.cleaned_data.get('favorite_language', '')
         contact.save()
-        #delete unknown contacts for the current entity
+        # delete unknown contacts for the current entity
         contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
 
         subscriptions = self._save_subscription_types(contact)
         if subscriptions:
             create_subscription_action(contact, subscriptions)
 
-        #send an email
+        # send an email
         send_notification_email(request, contact, [], '')
 
         return contact

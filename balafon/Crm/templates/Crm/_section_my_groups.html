@@ -2,7 +2,7 @@
 {% load i18n favorite_tags %}
 
 {% block section_title %}
-    {% trans "Groups" %}
+    <span class="glyphicon glyphicon-certificate"></span> {% trans "Groups" %}
 {% endblock %}
   
 {% block section_data %}
@@ -32,7 +32,7 @@
             <span class="glyphicon glyphicon-cog"></span> {% trans "Edit" %}
         </a>
         <a href="{% url 'search_group' g.id %}" class="btn btn-xs btn-default pull-right" style="margin: 0 5px;">
-          <span class="glyphicon glyphicon-search"></span> {% trans "View" %}
+          <span class="glyphicon glyphicon-search"></span> {% trans "Search" %}
         </a>
       </td>
     </tr>

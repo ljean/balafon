@@ -2,31 +2,37 @@
 {% load i18n favorite_tags %}
 
 {% block section_title %}
-  {% trans "Newsletters" %}
+    <span class="glyphicon glyphicon-open-file"></span>
+{% trans "Newsletters" %}
 {% endblock %}
   
 {% block section_data %}
   
   {% if newsletters %}
-    <div class="table-responsive">
+    <div class="">
       <table class="table table-striped">
         <tr>
-          <th>{% trans "Newsletter" %}</th><th>{% trans "Sending" %}</th>
+          <th><span class="glyphicon glyphicon-file"></span> {% trans "Newsletter" %}</th>
+          <th><span class="glyphicon glyphicon-open-file"></span> {% trans "Sending" %}</th>
         </tr>
       {% for newsletter in newsletters %}
         <tr>
           <td>
             {% favorite_item object=newsletter %}
-            <a href="{{ newsletter.get_absolute_url }}">{{newsletter.subject}}</a>
+            {{newsletter.subject}}
+            <a class="btn btn-xs btn-default" href="{{ newsletter.get_absolute_url }}">
+              <span class="glyphicon glyphicon-eye-open"></span> {% trans "View" %}
+            </a>
           </td>
           <td>
             {% if newsletter.emailing_set.count %}
               {% for e in newsletter.emailing_set.all %}
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         {% favorite_item object=e %}
-                        <a href="{% url 'emailing_view' e.id %}">
-                            {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+                        {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
+                        <a class="btn btn-xs btn-default" href="{% url 'emailing_view' e.id %}">
+                          <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
                         </a>
                     </div>
                 </div>
@@ -45,7 +51,15 @@
   {% endif %}
 {% endblock %}
 
+{% block section_menu_name %}
+  <span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}
+{% endblock %}
+
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">{% trans "Add Newsletter" %}</a></li>
-  <li><a href="{% url "search" %}">{% trans "Add Sending" %}</a></li>
+  <li><a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">
+    <span class="glyphicon glyphicon-file"></span> {% trans "New Newsletter" %}
+  </a></li>
+  <li><a href="{% url "search" %}">
+    <span class="glyphicon glyphicon-open-file"></span> {% trans "New Sending" %}
+  </a></li>
 {% endblock %}

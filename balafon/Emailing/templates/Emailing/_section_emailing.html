@@ -2,8 +2,8 @@
 {% load i18n favorite_tags %}
 
 {% block section_title %}
-  <span class="glyphicon glyphicon-send"></span>
-  <h4 class="inline-block"> {% trans "Sending" %}: {{ emailing.newsletter.subject }}</h4>
+  <h4 class="inline-block"><span class="glyphicon glyphicon-open-file"></span>
+ {% trans "Sending" %}: {{ emailing.newsletter.subject }}</h4>
 {% endblock %}
   
 {% block section_data %}
@@ -35,11 +35,18 @@
   </div>
 {% endblock %}
 
+{% block section_menu_name %}
+  <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
+{% endblock %}
+
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url 'emailing_update_emailing' emailing.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form" href="{% url 'emailing_update_emailing' emailing.id %}">
+    <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+  </a></li>
   <li>{{ emailing.next_action }}</li>
-  <li><a class="colorbox-form" href="{% url 'emailing_delete' emailing.id %}">{% trans "Delete" %}</a></li>
-  <li><a href="{% url 'emailing_newsletter_list' %}">{% trans "Back" %}</a></li>
+  <li><a class="colorbox-form" href="{% url 'emailing_delete' emailing.id %}">
+    <span class="glyphicon glyphicon-remove"></span> {% trans "Delete" %}
+  </a></li>
 {% endblock %}
 
 {% block section_favorite %}
