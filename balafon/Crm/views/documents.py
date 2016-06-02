@@ -77,7 +77,8 @@ class ActionDocumentPdfView(PDFTemplateView):
                 return template_name
             except TemplateDoesNotExist:
                 pass
-        return ""
+
+        return None
 
     def render_to_response(self, context, **response_kwargs):
         """render"""
@@ -95,6 +96,7 @@ class ActionDocumentPdfView(PDFTemplateView):
         context['to_pdf'] = True
         context['object'] = doc
         self.template_name = doc.template
+
         pdf_options_dict = getattr(settings, 'BALAFON_PDF_OPTIONS', None)
         if pdf_options_dict is None:
             pdf_options = {'margin-top': 0, 'margin-bottom': 0, 'margin-right': 0, 'margin-left': 0, }
