@@ -886,9 +886,9 @@ class Contact(AddressModel):
             title = u''
         
         if (not self.firstname) or (not self.lastname):
-            return _(u"{1}{0.firstname}{0.lastname}").format(self, title).strip()
+            return u"{1}{0.firstname}{0.lastname}".format(self, title).strip()
 
-        return _(u"{1}{0.firstname} {0.lastname}").format(self, title).strip()
+        return u"{1}{0.firstname} {0.lastname}".format(self, title).strip()
 
     @property
     def display_name(self):
@@ -900,9 +900,9 @@ class Contact(AddressModel):
                 return u"< {0} >".format(__(u"Unknown")).strip()
 
         if (not self.firstname) or (not self.lastname):
-            return _(u"{0.lastname}{0.firstname}").format(self).strip()
+            return u"{0.lastname}{0.firstname}".format(self).strip()
 
-        return _(u"{0.lastname} {0.firstname}").format(self).strip()
+        return u"{0.lastname} {0.firstname}".format(self).strip()
 
     @property
     def full_address(self):
