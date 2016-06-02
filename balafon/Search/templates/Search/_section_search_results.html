@@ -80,7 +80,7 @@
     {% endfor %}
   {% endif %}
   </table>
-  {% include "coop_cms/_pagination.html" %}
+  {% include "coop_cms/_pagination.html" with disable_js_patches=1 %}
   <script>
     $(function() {
       $(document).on('click', 'a.exclude-contact', function() {
@@ -97,6 +97,7 @@
         $("input[name=excluded]").val(val);
         return false;
       });
+
       $(".mailto-button").click(function() {
         $("form.search-form").attr('action', $(this).attr('href'));
         $("form.search-form").attr('target', '_blank');
@@ -105,6 +106,7 @@
         $("form.search-form").removeAttr('target');
         return false;
       });
+
       $("#emailing-button").click(function() {
         {% if contains_refuse_newsletter %}
         var letsgo = confirm(
@@ -134,7 +136,7 @@
         return false;
       });
       
-      $(document).on('click', ".pagination a", function() {
+      $(document).on('click', "ul.pagination a", function() {
         $("form.search-form").attr('action', $(this).attr('href'));
         $("form.search-form").submit();
         $("form.search-form").attr('action', '');
@@ -144,7 +146,9 @@
       var excluded = $("input[name=excluded]").val()
       excluded = excluded.substring(1, excluded.length-1).split("##");
       for (var i=0, n=excluded.length; i<n; i++) {
-        $('a.exclude-contact[rel='+excluded[i]+']').parent().addClass('excluded');
+        if (excluded[i]) {
+          $('a.exclude-contact[rel=' + excluded[i] + ']').parent().addClass('excluded');
+        }
       };
     });
   </script>
