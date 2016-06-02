@@ -621,7 +621,7 @@ class SearchActionBaseMixin(object):
         return ordered_contacts
 
 
-class SearchActionForm(forms.Form, SearchActionBaseMixin):
+class SearchActionForm(BsForm, SearchActionBaseMixin):
     """Base class for any views which needs to get extra information for handling results"""
     contacts = forms.CharField(widget=forms.HiddenInput())
     
@@ -660,11 +660,13 @@ class PdfTemplateForm(SearchActionForm):
             label=_(u'template'),
             help_text=_(u'Select the type of document to generate')
         )
+        self.fields['template'].widget.attrs.update({'class': 'form-control'})
         
         extra_fields = getattr(settings, 'BALAFON_PDF_FORM_EXTRA_FIELDS', None)
         if extra_fields:
             for field_name, field_label, initial_value in extra_fields:
                 self.fields[field_name] = forms.CharField(label=field_label, initial=initial_value)
+                self.fields[field_name].widget.attrs.update({'class': 'form-control'})
        
     def patch_context(self, context):
         """
