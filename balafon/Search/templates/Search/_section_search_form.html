@@ -148,6 +148,14 @@
 
 {% endblock %}
 
+{% block section_menu_name %}
+  <span class="glyphicon glyphicon-floppy-saved"></span> {% trans "Save" %}
+{% endblock %}
+
 {% block section_buttons %}
-<li><a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form">{% trans "Save" %}</a></li>
+<li>
+  <a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form">
+    <span class="glyphicon glyphicon-floppy-saved"></span> {% trans "Search" %}
+  </a>
+</li>
 {% endblock %}
