@@ -1,5 +1,6 @@
 {% load i18n balafon_utils %}
-<div class="label label-date {{ action|get_action_date_label }}">
+<div class="label label-date {{ action|get_action_date_label }}"
+     data-toggle="tooltip" data-placement="top" title="{% trans 'Creation date' %}: {{ action.created|date:'d/m/Y H:i' }}">
   {% if action.planned_date %}
     {% if action.end_datetime %}
       {% if action.show_duration %}
