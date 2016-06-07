@@ -2,10 +2,9 @@
 <div class="row">
   <div class="col-md-12">
     <div
-       class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if action.done %}done{% endif %} {% if action.planned_date|is_today %}due-today{% endif %} {% if action.in_charge != None and action.in_charge.user != user %}not-my-action{% endif %}">
-
+       class="action {% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if action.done %}done{% endif %} {% if action.planned_date|is_today %}due-today{% endif %} {% if action.in_charge != None and action.in_charge.user != user %}not-my-action{% endif %}"
+    >
       <div class="row">
-
         <div class="col-md-7">
           <div class="row">
             <div class="col-md-12">
@@ -57,9 +56,8 @@
           {% include "Crm/_actions/_in_charge.html" %}
           {% endblock %}
           </div>
-
         </div>
-        
+
       </div>
     </div>
   </div>
