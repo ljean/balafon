@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """miscellaneous searches"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
-from datetime import date, timedelta
 from unittest import skipIf
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -21,7 +20,7 @@ class SearchTest(BaseTestCase):
         """test view search and field choice is populated"""
         response = self.client.get(reverse('search'))
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertTrue(len(soup.select("#id_field_choice option")) > 0)
 
     def test_view_anonymous(self):
@@ -414,8 +413,8 @@ class SameAsTest(BaseTestCase):
         self.assertNotContains(response, contact1.email)
 
 
-class HasAddressTest(BaseTestCase):
-    """test has address"""
+class HasCityAndZipTest(BaseTestCase):
+    """test has city and zip"""
 
     def _make_contact(self, name, city, zip_code):
         """make a contact"""
@@ -449,7 +448,7 @@ class HasAddressTest(BaseTestCase):
         )
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual(0, len(BeautifulSoup4(response.content).select('.field-error')))
+        self.assertEqual(0, len(BeautifulSoup(response.content).select('.field-error')))
 
         if has_address:
             self.assertContains(response, entity1.name)
@@ -512,7 +511,7 @@ class HasAddressTest(BaseTestCase):
         )
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual(0, len(BeautifulSoup4(response.content).select('.field-error')))
+        self.assertEqual(0, len(BeautifulSoup(response.content).select('.field-error')))
 
         if has_address:
             self.assertContains(response, entity1.name)
@@ -564,7 +563,162 @@ class HasAddressTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(0, len(soup.select('.field-error')))
+
+        if has_address:
+            self.assertNotContains(response, entity1.name)
+            self.assertNotContains(response, contact1.lastname)
+
+            self.assertNotContains(response, entity2.name)
+            self.assertNotContains(response, contact2.lastname)
+        else:
+            self.assertContains(response, entity1.name)
+            self.assertContains(response, contact1.lastname)
+
+            self.assertContains(response, entity2.name)
+            self.assertContains(response, contact2.lastname)
+
+    def test_has_no_address_entity(self):
+        """has no address: entities"""
+        self.test_has_address_entity(False)
+
+    def test_has_no_address_contact(self):
+        """has no address contacts"""
+        self.test_has_address_contact(False)
+
+    def test_has_no_address_mix(self):
+        """has no address contacts and entites"""
+        self.test_has_address_mix(False)
+
+
+class HasAddressTest(BaseTestCase):
+    """test has address"""
+
+    def _make_contact(self, name, city, zip_code, address=''):
+        """make a contact"""
+        entity = mommy.make(models.Entity, address=address, city=city, zip_code=zip_code)
+        contact = entity.default_contact
+        contact.lastname = name
+        contact.main_contact = True
+        contact.has_left = False
+        contact.save()
+        return entity, contact
+
+    def test_has_address_entity(self, has_address=True):
+        """has address on entity"""
+
+        city1 = mommy.make(models.City, name="ZooPark")
+        mommy.make(models.City, name="VodooPark")
+
+        entity1, contact1 = self._make_contact("ABCD", city1, "44444", '123 something street')
+
+        contact5 = mommy.make(models.Contact, entity=entity1, lastname="QRST")
+
+        entity2, contact2 = self._make_contact("EFGH", city1, "44444")
+        contact2.address = '124 something street'
+        contact2.save()
+
+        entity3, contact3 = self._make_contact("IJKL", city1, "44444", '')
+
+        entity4, contact4 = self._make_contact("MNOP", None, "", '')
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-has_address-_-0": 1 if has_address else 0}
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(0, len(BeautifulSoup(response.content).select('.field-error')))
+
+        if has_address:
+            self.assertContains(response, entity1.name)
+            self.assertContains(response, contact1.lastname)
+            self.assertContains(response, contact5.lastname)
+
+            self.assertNotContains(response, entity2.name)
+            self.assertNotContains(response, contact2.lastname)
+
+            self.assertNotContains(response, entity3.name)
+            self.assertNotContains(response, contact3.lastname)
+
+            self.assertNotContains(response, entity4.name)
+            self.assertNotContains(response, contact4.lastname)
+        else:
+            self.assertNotContains(response, entity1.name)
+            self.assertNotContains(response, contact1.lastname)
+            self.assertNotContains(response, contact5.lastname)
+
+            self.assertContains(response, entity2.name)
+            self.assertContains(response, contact2.lastname)
+
+            self.assertContains(response, entity3.name)
+            self.assertContains(response, contact3.lastname)
+
+            self.assertContains(response, entity4.name)
+            self.assertContains(response, contact4.lastname)
+
+    def test_has_address_contact(self, has_address=True):
+        """has address on contacts"""
+
+        city1 = mommy.make(models.City, name="ZooPark")
+        mommy.make(models.City, name="VodooPark")
+
+        entity1, contact1 = self._make_contact("ABCD", None, "")
+        contact1.city = city1
+        contact1.zip_code = "44444"
+        contact1.address = "123 something street"
+        contact1.save()
+
+        contact5 = mommy.make(models.Contact, entity=entity1, lastname="QRST")
+
+        entity2, contact2 = self._make_contact("EFGH", None, "")
+        contact2.city = city1
+        contact2.zip_code = "4444"
+        contact2.save()
+
+        entity3, contact3 = self._make_contact("IJKL", None, "44444")
+        contact3.city = city1
+        contact3.zip_code = "44444"
+        contact3.save()
+
+        entity4, contact4 = self._make_contact("MNOP", None, "")
+        contact4.city = None
+        contact4.zip_code = ""
+        contact4.save()
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-has_address-_-0": 1 if has_address else 0}
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(0, len(BeautifulSoup(response.content).select('.field-error')))
+
+    def test_has_address_mix(self, has_address=True):
+        """has address contacts and entities"""
+
+        city1 = mommy.make(models.City, name="ZooPark")
+        mommy.make(models.City, name="VodooPark")
+
+        entity1, contact1 = self._make_contact("ABCD", city1, "44444")
+        contact1.city = None
+        contact1.address = "123 something street"
+        contact1.save()
+
+        entity2, contact2 = self._make_contact("EFGH", None, "", '123 something street')
+        contact2.city = city1
+        contact2.zip_code = ""
+        contact2.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-has_address-_-0": 1 if has_address else 0}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         if has_address:

@@ -37,6 +37,7 @@ SEARCH_FORMS = [
             search_forms.HasCityAndZipcodeForm,
             search_forms.ZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
             search_forms.EntityZoneGroupSearchForm if (settings.ZONE_GROUP_SEARCH) else None,
+            search_forms.HasAddresseForm,
             search_forms.AddressSearchForm,
         ],
     ), (

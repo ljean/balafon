@@ -384,6 +384,22 @@ class HasCityAndZipcodeForm(YesNoSearchFieldForm):
             return has_address
         else:
             return ~has_address
+
+
+class HasAddresseForm(YesNoSearchFieldForm):
+    """by has city and address"""
+    name = 'has_address'
+    label = _(u'Has address?')
+
+    def get_lookup(self):
+        """lookup"""
+        contact_has_address = ~Q(zip_code='') & Q(city__isnull=False) & ~Q(address='')
+        entity_has_address = ~Q(entity__zip_code='') & Q(entity__city__isnull=False) & ~Q(entity__address='')
+        has_address = contact_has_address | entity_has_address
+        if self.is_yes():
+            return has_address
+        else:
+            return ~has_address
             
 
 class ActionInProgressForm(YesNoSearchFieldForm):
