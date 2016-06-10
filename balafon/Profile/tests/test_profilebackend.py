@@ -71,7 +71,7 @@ class ProfileBackendTest(TestCase):
         user = self._create_user()
         contact1 = mommy.make(models.Contact, email=user.email)
         contact2 = mommy.make(models.Contact, email=user.email)
-        #remove default contacts
+        # remove default contacts
         contact1.entity.contact_set.exclude(id=contact1.id).delete()
         contact2.entity.contact_set.exclude(id=contact2.id).delete()
 

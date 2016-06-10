@@ -22,10 +22,11 @@ class EmailModelBackend(ModelBackend):
             
         except User.DoesNotExist:
             return None
+
         except User.MultipleObjectsReturned:
-            for u in User.objects.filter(email=username.strip()):
-                if u.check_password(password):
-                    return u
+            for _user in User.objects.filter(email=email.strip()):
+                if _user.check_password(password):
+                    return _user
             return None
 
 
