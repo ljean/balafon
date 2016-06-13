@@ -46,7 +46,7 @@ def format_context(text, data):
 def get_emailing_context(emailing, contact):
     """get context for emailing: user,...."""
     data = dict(contact.__dict__)
-    for field in ('gender_name', 'city_name', 'entity_name', 'full_address', 'fullname'):
+    for field in ('gender_name', 'gender_dear', 'city_name', 'entity_name', 'full_address', 'fullname'):
         data[field] = getattr(contact, field)
     
     # clone the object: Avoid overwriting {tags} for ever
@@ -98,7 +98,7 @@ def patch_emailing_html(html_text, emailing, contact):
 
     for link in links:
         if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
-            #mailto, internal links, 'unregister' and 'view online' are not magic
+            # mailto, internal links, 'unregister' and 'view online' are not magic
             if len(link) < 500:
 
                 magic_links = MagicLink.objects.filter(emailing=emailing, url=link)
@@ -107,13 +107,11 @@ def patch_emailing_html(html_text, emailing, contact):
                 else:
                     magic_link = magic_links[0]
 
-                #magic_link = MagicLink.objects.get_or_create(emailing=emailing, url=link)[0]
-
                 view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
                 magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
                 html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
             else:
-                if not 'test' in sys.argv:
+                if 'test' not in sys.argv:
                     logger.warning(
                         "magic link size is greater than 500 ({0}) : {1}".format(len(link), link)
                     )
@@ -287,7 +285,7 @@ def send_verification_email(contact, subscription_types=None):
         )
         try:
             email.send()
-        except Exception, msg:  # pylint: disable=broad-except
+        except Exception as msg:  # pylint: disable=broad-except
             raise EmailSendError(unicode(msg))
         return True
     return False
@@ -338,7 +336,7 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
     if permanent:
         all_contacts = list(contacts)
         for entity in entities:
-            #for entities with the given email: Add the contacts with no email (by default the entity email is used)
+            # for entities with the given email: Add the contacts with no email (by default the entity email is used)
             all_contacts.extend(entity.contact_set.filter(email=""))
 
         for contact in all_contacts:

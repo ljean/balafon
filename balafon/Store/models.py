@@ -981,6 +981,7 @@ class SaleItem(models.Model):
         return Decimal("{0:.2f}".format(round(discount_price, 2)))
 
 
+
 def update_action_amount(sale_item, delete_me=False):
     """update the corresponding action amount """
     action = sale_item.sale.action

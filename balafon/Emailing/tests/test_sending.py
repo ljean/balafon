@@ -1036,7 +1036,7 @@ class CustomTemplateTest(BaseTestCase):
         )
 
         content = '''
-        <h2>Hello #!-gender_name-!# #!-firstname-!# #!-lastname-!#</h2>
+        <h2>Hello #!-gender_dear-!# #!-gender_name-!# #!-firstname-!# #!-lastname-!#</h2>
         Email: #!-email-!#
         Addresse: #!-address-!# #!-zip_code-!# #!-city_name-!#
         Address: #!-full_address-!#
@@ -1071,7 +1071,7 @@ class CustomTemplateTest(BaseTestCase):
 
         emailing = Emailing.objects.get(id=emailing.id)
 
-        #check emailing status
+        # check emailing status
         self.assertEqual(emailing.status, Emailing.STATUS_SENT)
         self.assertNotEqual(emailing.sending_dt, None)
         self.assertEqual(emailing.send_to.count(), 0)
@@ -1092,8 +1092,8 @@ class CustomTemplateTest(BaseTestCase):
         self.assertEqual(email.subject, 'Hello John')
 
         fields = (
-            'firstname', 'lastname', 'gender_name', 'email', 'city_name', 'address', 'zip_code', 'full_address',
-            'entity_name'
+            'firstname', 'lastname', 'gender_dear', 'gender_name', 'email', 'city_name', 'address', 'zip_code',
+            'full_address', 'entity_name'
         )
         for field_name in fields:
             self.assertTrue(email.body.find(getattr(contact, field_name)) >= 0)

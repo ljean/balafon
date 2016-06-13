@@ -933,6 +933,20 @@ class Contact(AddressModel):
                 return unicode(name)  # lazy translation must be converted in unicode
         return u''
 
+    @property
+    def gender_dear(self):
+        """return male/female version of Dear"""
+        if self.gender == Contact.GENDER_MALE:
+            return __(u'Dear (male)')
+
+        elif self.gender == Contact.GENDER_FEMALE:
+            return __(u'Dear (male)')
+
+        elif self.gender == Contact.GENDER_COUPLE:
+            return __(u'Dear (couple)')
+
+        return u''
+
     def set_custom_field(self, field_name, value, is_link=False):
         """set the value of a custom field"""
         field, is_new = CustomField.objects.get_or_create(model=CustomField.MODEL_CONTACT, name=field_name)
