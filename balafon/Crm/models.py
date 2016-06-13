@@ -23,7 +23,7 @@ from django.template import TemplateDoesNotExist, Context
 from django.template.loader import get_template
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext as __
+from django.utils.translation import ugettext
 
 from coop_cms.utils import RequestManager, RequestNotFound, dehtml
 from django_extensions.db.models import TimeStampedModel
@@ -129,10 +129,7 @@ class BaseZone(NamedElement):
         return self.name
 
     def __unicode__(self):
-        #Conf49 : No department code in the excel export
-        #if self.parent and self.parent.code:
-        #    return u"{0} ({1})".format(self.name, self.parent.code)
-        return self.name    
+        return self.name
     
     class Meta:
         abstract = True
@@ -878,7 +875,7 @@ class Contact(AddressModel):
             if self.email:
                 return self.email.strip()
             else:
-                return u"< {0} >".format(__(u"Unknown")).strip()
+                return u"< {0} >".format(ugettext(u"Unknown")).strip()
         
         if self.gender and self.lastname:
             title = u'{0} '.format(self.get_gender_display())
@@ -897,7 +894,7 @@ class Contact(AddressModel):
             if self.email:
                 return self.email.strip()
             else:
-                return u"< {0} >".format(__(u"Unknown")).strip()
+                return u"< {0} >".format(ugettext(u"Unknown")).strip()
 
         if (not self.firstname) or (not self.lastname):
             return u"{0.lastname}{0.firstname}".format(self).strip()
@@ -937,13 +934,13 @@ class Contact(AddressModel):
     def gender_dear(self):
         """return male/female version of Dear"""
         if self.gender == Contact.GENDER_MALE:
-            return __(u'Dear (male)')
+            return ugettext(u'Dear (male)')
 
         elif self.gender == Contact.GENDER_FEMALE:
-            return __(u'Dear (male)')
+            return ugettext(u'Dear (female)')
 
         elif self.gender == Contact.GENDER_COUPLE:
-            return __(u'Dear (couple)')
+            return ugettext(u'Dears (couple)')
 
         return u''
 
@@ -1268,7 +1265,7 @@ class ActionType(NamedElement):
                 ActionMenu.create_action_menu(
                     action_type=self,
                     view_name='crm_clone_action',
-                    label=__('Duplicate'),
+                    label=ugettext('Duplicate'),
                     icon='duplicate',
                     a_attrs='class="colorbox-form"'
                 )
@@ -1525,7 +1522,7 @@ class Action(LastModifiedModel):
         if self.uuid and hasattr(self, 'sale'):
             try:
                 url = reverse('store_view_sales_document_public', args=[self.uuid])
-                body = __(u"Here is a link to your {0}: {1}{2}").format(
+                body = ugettext(u"Here is a link to your {0}: {1}{2}").format(
                     self.type.name,
                     "http://" + Site.objects.get_current().domain,
                     url
