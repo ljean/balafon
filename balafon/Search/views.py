@@ -217,12 +217,12 @@ def get_field(request, name):
         raise Http404
     try:
         form_class = get_field_form(name)
-        t = Template('{{form.as_it_is}}')
-        c = Context({'form': form_class(block, count)})
-        return HttpResponse(json.dumps({'form': t.render(c)}), content_type="application/json")
+        the_template = Template('{{form.as_it_is}}')
+        the_context = Context({'form': form_class(block, count)})
+        return HttpResponse(json.dumps({'form': the_template.render(the_context)}), content_type="application/json")
     except KeyError:
         raise Http404
-    except Exception, msg:
+    except Exception as msg:
         logger.exception("get_field")
         raise
 
@@ -231,15 +231,13 @@ def get_field(request, name):
 def mailto_contacts(request, bcc):
     """Open the mail client in order to send email to contacts"""
     if request.method == "POST":
-        nb_limit = getattr(settings, 'BALAFON_MAILTO_LIMIT', 25)
+        nb_limit = getattr(settings, 'BALAFON_MAILTO_LIMIT', 25) or 25
         search_form = SearchForm(request.POST)
         if search_form.is_valid():
             emails = search_form.get_contacts_emails()
             if emails:
-                if len(emails)>nb_limit:
+                if len(emails) > nb_limit:
                     if getattr(settings, 'BALAFON_MAILTO_LIMIT_AS_TEXT', False):
-                        #conf49 : La poste required only ' ' as separator
-                        #return HttpResponse(',\r\n'.join(emails), mimetype='text/plain')
                         return HttpResponse(', '.join(emails), content_type='text/plain')
                     else:
                         index_from, email_groups = 0, []
