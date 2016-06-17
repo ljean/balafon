@@ -890,16 +890,16 @@ class Contact(AddressModel):
     @property
     def display_name(self):
         """fullname"""
-        if not (self.firstname or self.lastname):
-            if self.email:
-                return self.email.strip()
+        firstname = self.firstname.strip()
+        lastname = self.lastname.strip()
+        email = self.email.strip()
+        if not (firstname or lastname):
+            if email:
+                return email
             else:
                 return u"< {0} >".format(ugettext(u"Unknown")).strip()
 
-        if (not self.firstname) or (not self.lastname):
-            return u"{0.lastname}{0.firstname}".format(self).strip()
-
-        return u"{0.lastname} {0.firstname}".format(self).strip()
+        return u"{0} {1}".format(lastname, firstname).strip()
 
     @property
     def full_address(self):
