@@ -944,6 +944,7 @@ class SaleItem(models.Model):
             self.text = ''
             self.vat_rate = None
 
+        self.calculate_discount()
         return super(SaleItem, self).save(*args, **kwargs)
 
     def clone(self, new_sale):
@@ -972,7 +973,6 @@ class SaleItem(models.Model):
                     better_discount = discount
         if better_discount != self.discount:
             self.discount = better_discount
-            super(SaleItem, self).save()
 
         if self.quantity:
             discount_price = max_discount / self.quantity

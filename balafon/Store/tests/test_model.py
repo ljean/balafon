@@ -747,6 +747,74 @@ class SaleDiscountTest(TestCase):
         self.assertEqual(sale_item.vat_price(), Decimal('1.6'))
         self.assertEqual(sale_item.total_vat_price(), Decimal('4.8'))
 
+    def test_calculate_discount_on_item_saved(self):
+        """It should recalculate discount when item is saved"""
+        vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
+
+        tag = mommy.make(models.StoreItemTag, name="vrac")
+
+        discount = mommy.make(
+            models.Discount, name=u'-10% à partir de 3 Kg', rate=Decimal("10"), quantity=Decimal("3"), active=True
+        )
+        discount.tags.add(tag)
+        discount.save()
+
+        item1 = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item1.tags.add(tag)
+        item1.save()
+
+        item2 = mommy.make(models.StoreItem, pre_tax_price=Decimal("10"), vat_rate=vat_rate)
+        item2.tags.add(tag)
+        item2.save()
+
+        sale = mommy.make(models.Sale)
+
+        sale_item1 = mommy.make(
+            models.SaleItem, quantity=3, item=item1, pre_tax_price=item1.pre_tax_price, vat_rate=item1.vat_rate,
+            sale=sale
+        )
+
+        self.assertEqual(sale.saleitem_set.count(), 1)
+        self.assertEqual(Decimal("27"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("32.4"), sale.vat_incl_total_price())
+
+        sale_item1 = models.SaleItem.objects.get(id=sale_item1.id)
+        self.assertEqual(sale_item1.discount, discount)
+        self.assertEqual(sale_item1.unit_price(), Decimal('9'))
+        self.assertEqual(sale_item1.vat_incl_price(), Decimal('10.8'))
+        self.assertEqual(sale_item1.vat_price(), Decimal('1.8'))
+        self.assertEqual(sale_item1.total_vat_price(), Decimal('5.4'))
+
+        sale_item2 = mommy.make(
+            models.SaleItem, quantity=1, item=item1, pre_tax_price=item2.pre_tax_price, vat_rate=item2.vat_rate,
+            sale=sale
+        )
+
+        self.assertEqual(sale.saleitem_set.count(), 2)
+        self.assertEqual(Decimal("37"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("44.4"), sale.vat_incl_total_price())
+
+        sale_item2 = models.SaleItem.objects.get(id=sale_item2.id)
+        self.assertEqual(sale_item2.discount, None)
+        self.assertEqual(sale_item2.unit_price(), Decimal('10'))
+        self.assertEqual(sale_item2.vat_incl_price(), Decimal('12'))
+        self.assertEqual(sale_item2.vat_price(), Decimal('2'))
+        self.assertEqual(sale_item2.total_vat_price(), Decimal('2'))
+
+        sale_item2.quantity = 3
+        sale_item2.save()
+        sale_item2 = models.SaleItem.objects.get(id=sale_item2.id)
+        self.assertEqual(sale_item2.discount, discount)
+        self.assertEqual(sale_item2.unit_price(), Decimal('9'))
+        self.assertEqual(sale_item2.vat_incl_price(), Decimal('10.8'))
+        self.assertEqual(sale_item2.vat_price(), Decimal('1.8'))
+        self.assertEqual(sale_item2.total_vat_price(), Decimal('5.4'))
+
+        sale = models.Sale.objects.get(id=sale.id)
+        self.assertEqual(sale.saleitem_set.count(), 2)
+        self.assertEqual(Decimal("54"), sale.pre_tax_total_price())
+        self.assertEqual(Decimal("64.8"), sale.vat_incl_total_price())
+
 
 class StoreItemDiscountTest(TestCase):
     """It should return the list of discounts associated with an item"""
