@@ -10,12 +10,28 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.dateformat import DateFormat
 from django.utils.decorators import method_decorator
-from django.views.generic import View
+from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import FormView
 
 from colorbox.decorators import popup_redirect
 
 from balafon.permissions import can_access
+
+
+class StaffTemplateView(TemplateView):
+    """A base class for Template view"""
+
+    @method_decorator(user_passes_test(can_access))
+    def dispatch(self, *args, **kwargs):
+        return super(StaffTemplateView, self).dispatch(*args, **kwargs)
+
+
+class StaffListView(ListView):
+    """A base class for List view"""
+
+    @method_decorator(user_passes_test(can_access))
+    def dispatch(self, *args, **kwargs):
+        return super(StaffListView, self).dispatch(*args, **kwargs)
 
 
 class StaffPopupFormView(FormView):
