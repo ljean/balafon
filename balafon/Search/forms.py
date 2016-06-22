@@ -362,7 +362,9 @@ class SearchForm(forms.Form):
                     global_post_processors.append(form.global_post_process)
 
             if has_action_forms:
-                contacts_set = contacts_set.filter(Q(action=actions_set) | Q(entity__action=actions_set)).distinct()
+                contacts_set = contacts_set.filter(
+                    Q(action__in=actions_set) | Q(entity__action__in=actions_set)
+                ).distinct()
 
             for post_processor in post_processors:
                 contacts_set = post_processor(contacts_set)
