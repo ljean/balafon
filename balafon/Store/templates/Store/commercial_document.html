@@ -348,8 +348,9 @@
             return translate('ERROR');
           }
           return value;
+        } else {
+          return $scope.getItemPreTaxPrice(item);
         }
-        return "";
       };
 
       $scope.getTotalPreTaxPrice = function() {
