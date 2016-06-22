@@ -5,12 +5,11 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
-from bs4 import BeautifulSoup
-
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models

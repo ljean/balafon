@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """test search forms of the emailing module"""
 
-from bs4 import BeautifulSoup
 from datetime import datetime
 import json
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models

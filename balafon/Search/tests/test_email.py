@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by email"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
-
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -33,7 +32,7 @@ class EmailSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, entity1.name)
@@ -62,7 +61,7 @@ class EmailSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(1, len(soup.select('.field-error')))
 
         self.assertNotContains(response, entity1.name)
@@ -89,7 +88,7 @@ class EmailSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertNotContains(response, entity1.name)
@@ -120,7 +119,7 @@ class EmailSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertNotContains(response, entity1.name)
@@ -151,7 +150,7 @@ class EmailSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertNotContains(response, entity1.name)

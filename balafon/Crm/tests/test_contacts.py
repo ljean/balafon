@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from bs4 import BeautifulSoup
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models

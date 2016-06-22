@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can create an emailing from search results"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
 from unittest import skipIf
 
 from django.conf import settings
@@ -9,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from coop_cms.models import Newsletter
-
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -39,7 +38,7 @@ class CreateEmailingTest(BaseTestCase):
         url = reverse('search_emailing')
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         node = soup.select("#id_from_email")[0]
         self.assertEqual("hidden", node["type"])
@@ -63,7 +62,7 @@ class CreateEmailingTest(BaseTestCase):
         url = reverse('search_emailing')
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         nodes = soup.select("#id_from_email option")
         self.assertEqual(2, len(nodes))
@@ -335,7 +334,7 @@ class CreateEmailingTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(1, len(soup.select("select#id_lang")))
 
     @override_settings(LANGUAGES=[('fr', 'Francais')])
@@ -354,7 +353,7 @@ class CreateEmailingTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select("select#id_lang")))
         self.assertEqual(1, len(soup.select("#id_lang")))
         self.assertEqual("hidden", soup.select("#id_lang")[0]["type"])

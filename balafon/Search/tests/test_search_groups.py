@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """test we can search by groups"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
-
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -703,7 +702,7 @@ class MultiGroupSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertNotEqual([], soup.select('.field-error'))
 
         self.assertNotContains(response, entity1.name)
@@ -723,7 +722,7 @@ class MultiGroupSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertNotEqual([], soup.select('.field-error'))
 
         self.assertNotContains(response, entity1.name)
@@ -739,7 +738,7 @@ class MultiGroupSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertNotEqual([], soup.select('.field-error'))
 
     def test_search_none_groups_no_choice(self):
@@ -755,7 +754,7 @@ class MultiGroupSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertNotEqual([], soup.select('.field-error'))
 
         self.assertNotContains(response, entity1.name)
@@ -794,7 +793,7 @@ class MultiGroupSearchTest(BaseTestCase):
         )
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual([], BeautifulSoup4(response.content).select('.field-error'))
+        self.assertEqual([], BeautifulSoup(response.content).select('.field-error'))
 
         self.assertNotContains(response, entity1.name)
         self.assertNotContains(response, contact1a.lastname)
@@ -838,7 +837,7 @@ class MultiGroupSearchTest(BaseTestCase):
         )
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual([], BeautifulSoup4(response.content).select('.field-error'))
+        self.assertEqual([], BeautifulSoup(response.content).select('.field-error'))
 
         self.assertContains(response, entity1.name)
         self.assertContains(response, contact1a.lastname)
@@ -882,7 +881,7 @@ class MultiGroupSearchTest(BaseTestCase):
         )
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual([], BeautifulSoup4(response.content).select('.field-error'))
+        self.assertEqual([], BeautifulSoup(response.content).select('.field-error'))
 
         self.assertContains(response, entity1.name)
         self.assertContains(response, contact1a.lastname)

@@ -5,7 +5,6 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
-from bs4 import BeautifulSoup
 from decimal import Decimal
 from datetime import datetime, timedelta
 import json
@@ -14,6 +13,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """test we can save a search"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
 import json
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -26,7 +26,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select("#id_name")), 1)
         self.assertEqual(soup.select("#id_name")[0]["value"], "ABC")
 
@@ -41,7 +41,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select("#id_name")), 1)
         self.assertEqual(len(soup.select("#id_search_id")), 1)
         self.assertEqual(soup.select("#id_name")[0].get("value", ""), "")
@@ -104,7 +104,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         self.assertEqual(soup.select("input[name=gr0-_-group-_-0]")[0]["value"], unicode(group1.id))
 
@@ -127,7 +127,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
         self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
@@ -153,7 +153,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
         self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
@@ -179,7 +179,7 @@ class SearchSaveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
 
         nodes = soup.select("select[name=gr0-_-all_groups-_-0] option")
         self.assertEqual([int(n["value"]) for n in nodes], [group1.id, group3.id, group2.id])
@@ -363,7 +363,7 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(Search.objects.count(), 0)
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select(".field-error")), 1)
         self.assertEqual(len(soup.select("#id_name .field-error")), 1)
 
@@ -391,7 +391,7 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.name, data["name"])
         self.assertEqual(search_1.searchgroup_set.count(), 0)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select(".field-error")), 1)
         self.assertEqual(len(soup.select("#id_name .field-error")), 1)
 

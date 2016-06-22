@@ -2,11 +2,11 @@
 """test search actions"""
 #pylint: disable=too-many-locals
 
-from bs4 import BeautifulSoup as BeautifulSoup4
 from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -375,7 +375,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, entity1.name)
@@ -436,7 +436,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, entity1.name)
@@ -500,7 +500,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -566,7 +566,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -657,7 +657,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, contact1.lastname)
@@ -735,7 +735,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -795,7 +795,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -859,7 +859,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -920,7 +920,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -981,7 +981,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -1045,7 +1045,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -1109,7 +1109,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
@@ -1174,7 +1174,7 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         self.assertEqual([], list(soup.select(".field-error")))
 
         self.assertContains(response, entity1.name)
