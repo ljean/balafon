@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """test we can search contacts by action"""
 
-from bs4 import BeautifulSoup as BeautifulSoup4
-
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
-from balafon.Crm import models
 
+from balafon.Crm import models
 from balafon.Search.tests import BaseTestCase
 
 
@@ -39,7 +38,7 @@ class ActionForContactsTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        soup = BeautifulSoup4(response.content)
+        soup = BeautifulSoup(response.content)
         id_contacts = soup.select('input#id_contacts')
         self.assertEqual(1, len(id_contacts))
 
@@ -176,3 +175,56 @@ class ActionForContactsTest(BaseTestCase):
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
         self.assertEqual(models.Action.objects.count(), 0)
+
+    def test_post_create_actions_default_status(self):
+        """test create actions for contact"""
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = entity1.default_contact
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = entity2.default_contact
+        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        contact3 = entity3.default_contact
+
+        action_type = mommy.make(models.ActionType)
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_type.allowed_status.add(action_status1)
+        action_type.allowed_status.add(action_status2)
+        action_type.default_status = action_status2
+        action_type.save()
+
+        data = {
+            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'date': '',
+            'time': '',
+            'type': action_type.id,
+            'subject': 'test',
+            'in_charge': '',
+            'detail': '',
+            'planned_date': '',
+            'opportunity': '',
+            'create_actions': '',
+        }
+
+        url = reverse('search_create_action_for_contacts')
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, '<script>$.colorbox.close();')
+
+        self.assertEqual(models.Action.objects.count(), 2)
+
+        self.assertEqual(models.Action.objects.filter(contacts=contact1).count(), 1)
+        self.assertEqual(models.Action.objects.filter(contacts=contact2).count(), 1)
+        self.assertEqual(models.Action.objects.filter(contacts=contact3).count(), 0)
+
+        action1 = models.Action.objects.filter(contacts=contact1)[0]
+        action2 = models.Action.objects.filter(contacts=contact2)[0]
+
+        self.assertNotEqual(action1.id, action2.id)
+
+        for action in (action1, action2):
+            self.assertEqual(action.contacts.count(), 1)
+            self.assertEqual(action.subject, data['subject'])
+            self.assertEqual(action.type, action_type)
+            self.assertEqual(action.status, action_status2)

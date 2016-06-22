@@ -411,10 +411,13 @@ def create_action_for_contacts(request):
             if form.is_valid():
                 contacts = form.get_contacts()
                 for contact in contacts:
-                    #create actions
+                    # create actions for each contact
                     kwargs = dict(form.cleaned_data)
-                    for k in ('date', 'time', 'contacts'): del kwargs[k]
+                    for key in ('date', 'time', 'contacts'):
+                        del kwargs[key]
                     action = Action.objects.create(**kwargs)
+                    if action.type and action.type.default_status:
+                        action.status = action.type.default_status
                     action.contacts.add(contact)
                     action.save()
                 messages.add_message(
