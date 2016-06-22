@@ -228,3 +228,49 @@ class ActionForContactsTest(BaseTestCase):
             self.assertEqual(action.subject, data['subject'])
             self.assertEqual(action.type, action_type)
             self.assertEqual(action.status, action_status2)
+
+    def test_post_create_actions_opportunity(self):
+        """test create actions for contact"""
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = entity1.default_contact
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = entity2.default_contact
+        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        contact3 = entity3.default_contact
+
+        opportunity = mommy.make(models.Opportunity)
+
+        data = {
+            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'date': '',
+            'time': '',
+            'type': '',
+            'subject': 'test',
+            'in_charge': '',
+            'detail': '',
+            'planned_date': '',
+            'opportunity': opportunity.id,
+            'create_actions': '',
+        }
+
+        url = reverse('search_create_action_for_contacts')
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, '<script>$.colorbox.close();')
+
+        self.assertEqual(models.Action.objects.count(), 2)
+
+        self.assertEqual(models.Action.objects.filter(contacts=contact1).count(), 1)
+        self.assertEqual(models.Action.objects.filter(contacts=contact2).count(), 1)
+        self.assertEqual(models.Action.objects.filter(contacts=contact3).count(), 0)
+
+        action1 = models.Action.objects.filter(contacts=contact1)[0]
+        action2 = models.Action.objects.filter(contacts=contact2)[0]
+
+        self.assertNotEqual(action1.id, action2.id)
+
+        for action in (action1, action2):
+            self.assertEqual(action.contacts.count(), 1)
+            self.assertEqual(action.subject, data['subject'])
+            self.assertEqual(action.opportunity, opportunity)

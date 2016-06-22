@@ -406,10 +406,11 @@ class ActionInProgressForm(YesNoSearchFieldForm):
     """by action in progress"""
     name = 'action'
     label = _(u'Action in progress')
-    
+    is_action_form = True
+
     def get_queryset(self, queryset):
         """queryset"""
-        q_objs = Q(entity__action__done=False) | Q(action__done=False)
+        q_objs = Q(done=False)
         if self.is_yes():
             return queryset.filter(q_objs)
         else:
@@ -434,81 +435,60 @@ class ActionByDoneDate(TwoDatesForm):
     """by action done between two dates"""
     name = 'action_by_done_date'
     label = _(u'Action by done date')
+    is_action_form = True
         
     def get_lookup(self):
         """lookup"""
         datetime1, datetime2 = self._get_datetimes()
-        return (
-            (Q(action__done_date__gte=datetime1) & Q(action__done_date__lte=datetime2)) |
-            (Q(entity__action__done_date__gte=datetime1) & Q(entity__action__done_date__lte=datetime2))
-        )
+        return Q(done_date__gte=datetime1) & Q(done_date__lte=datetime2)
 
 
 class ActionByPlannedDate(TwoDatesForm):
     """by action planned between two dates"""
     name = 'action_by_planned_date'
     label = _(u'Action by planned date')
+    is_action_form = True
     
     def get_lookup(self):
         """lookup"""
         datetime1, datetime2 = self._get_datetimes()
         
         start_after_end_before = Q(
-            action__end_datetime__isnull=True
+            end_datetime__isnull=True
         ) & Q(
-            action__planned_date__gte=datetime1
+            planned_date__gte=datetime1
         ) & Q(
-            action__planned_date__lte=datetime2
+            planned_date__lte=datetime2
         )
 
         start_before_end_after = Q(
-            action__end_datetime__isnull=False
+            end_datetime__isnull=False
         ) & Q(
-            action__planned_date__lte=datetime2
+            planned_date__lte=datetime2
         ) & Q(
-            action__end_datetime__gte=datetime1
-        )
-        
-        entity_start_after_end_before = Q(
-            entity__action__end_datetime__isnull=True
-        ) & Q(
-            entity__action__planned_date__gte=datetime1
-        ) & Q(
-            entity__action__planned_date__lte=datetime2
+            end_datetime__gte=datetime1
         )
 
-        entity_start_before_end_after = Q(
-            entity__action__end_datetime__isnull=False
-        ) & Q(
-            entity__action__planned_date__lte=datetime2
-        ) & Q(
-            entity__action__end_datetime__gte=datetime1
-        )
-        
-        return (
-            start_after_end_before | start_before_end_after |
-            entity_start_after_end_before | entity_start_before_end_after
-        )
+        return start_after_end_before | start_before_end_after
 
 
 class ActionByStartDate(TwoDatesForm):
     """By action started between two dates"""
     name = 'action_by_start_date'
     label = _(u'Action by start date')
+    is_action_form = True
     
     def get_lookup(self):
         """lookup"""
         datetime1, datetime2 = self._get_datetimes()
-        return (
-            (Q(action__planned_date__gte=datetime1) & Q(action__planned_date__lte=datetime2)) |
-            (Q(entity__action__planned_date__gte=datetime1) & Q(entity__action__planned_date__lte=datetime2))
-        )
+        return Q(planned_date__gte=datetime1) & Q(planned_date__lte=datetime2)
 
 
 class ActionByUser(SearchFieldForm):
     """by user in charge of an action"""
     name = 'action_by_user'
     label = _(u'Action by user')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(ActionByUser, self).__init__(*args, **kwargs)
@@ -518,13 +498,14 @@ class ActionByUser(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(action__in_charge=self.value) | Q(entity__action__in_charge=self.value)
+        return Q(in_charge=self.value)
 
 
 class ActionGteAmount(SearchFieldForm):
     """by action with amount greater than a value"""
     name = 'action_gte_amount'
     label = _(u'Action with amount greater or equal to')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(ActionGteAmount, self).__init__(*args, **kwargs)
@@ -533,13 +514,14 @@ class ActionGteAmount(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(action__amount__gte=self.value) | Q(entity__action__amount__gte=self.value)
+        return Q(amount__gte=self.value)
 
 
 class ActionLtAmount(SearchFieldForm):
     """by action with amount less than a value"""
     name = 'action_lt_amount'
     label = _(u'Action with amount less than')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(ActionLtAmount, self).__init__(*args, **kwargs)
@@ -548,13 +530,14 @@ class ActionLtAmount(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(action__amount__lt=self.value) | Q(entity__action__amount__lt=self.value)
+        return Q(amount__lt=self.value)
 
 
 class ActionStatus(SearchFieldForm):
     """by action status"""
     name = 'action_status'
-    label = _(u'Action by status')
+    label = _(u'Contacts with action of status')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(ActionStatus, self).__init__(*args, **kwargs)
@@ -564,7 +547,24 @@ class ActionStatus(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(action__status=self.value) | Q(entity__action__status=self.value)
+        return Q(status=self.value)
+
+
+class ActionWithoutStatus(SearchFieldForm):
+    """by action status"""
+    name = 'action_without_status'
+    label = _(u'Contacts without action of status')
+    is_action_form = True
+
+    def __init__(self, *args, **kwargs):
+        super(ActionWithoutStatus, self).__init__(*args, **kwargs)
+        queryset = models.ActionStatus.objects.all()
+        field = forms.ModelChoiceField(queryset, label=self.label)
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        return ~Q(status=self.value)
 
 
 class TypeSearchForm(SearchFieldForm):
@@ -901,7 +901,8 @@ class ActionTypeSearchForm(SearchFieldForm):
     """by type of action"""
     name = 'action_type'
     label = _(u'Action type')
-    
+    is_action_form = True
+
     def __init__(self, *args, **kwargs):
         super(ActionTypeSearchForm, self).__init__(*args, **kwargs)
         queryset = models.ActionType.objects.all().order_by('name')
@@ -910,14 +911,15 @@ class ActionTypeSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(entity__action__type=self.value) | Q(action__type=self.value)
+        return Q(type=self.value)
 
 
 class ActionNameSearchForm(SearchFieldForm):
     """by subject of action"""
     name = 'action_name'
     label = _(u'Action subject')
-    
+    is_action_form = True
+
     def __init__(self, *args, **kwargs):
         super(ActionNameSearchForm, self).__init__(*args, **kwargs)
         field = forms.CharField(
@@ -928,7 +930,7 @@ class ActionNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        return Q(entity__action__subject__icontains=self.value) | Q(action__subject__icontains=self.value)
+        return Q(subject__icontains=self.value)
 
 
 class RelationshipDateForm(TwoDatesForm):
@@ -1019,6 +1021,7 @@ class OpportunitySearchForm(SearchFieldForm):
     """by opportunity"""
     name = 'opportunity'
     label = _(u'Opportunity')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(OpportunitySearchForm, self).__init__(*args, **kwargs)
@@ -1028,13 +1031,14 @@ class OpportunitySearchForm(SearchFieldForm):
     
     def get_lookup(self):
         """lookup"""
-        return Q(action__opportunity__id=self.value) | Q(entity__action__opportunity__id=self.value)
+        return Q(opportunity__id=self.value)
         
 
 class OpportunityNameSearchForm(SearchFieldForm):
     """by opportunity name"""
     name = 'opportunity_name'
     label = _(u'Opportunity name')
+    is_action_form = True
     
     def __init__(self, *args, **kwargs):
         super(OpportunityNameSearchForm, self).__init__(*args, **kwargs)
@@ -1046,9 +1050,7 @@ class OpportunityNameSearchForm(SearchFieldForm):
         
     def get_lookup(self):
         """lookup"""
-        queryset1 = Q(action__opportunity__name__icontains=self.value)
-        queryset2 = Q(entity__action__opportunity__name__icontains=self.value)
-        return queryset1 | queryset2
+        return Q(opportunity__name__icontains=self.value)
 
 
 class NoSameAsForm(YesNoSearchFieldForm):

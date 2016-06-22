@@ -7,6 +7,7 @@ import importlib
 import json
 
 from django import VERSION as DJANGO_VERSION
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
@@ -195,6 +196,7 @@ class SearchForm(forms.Form):
                         data[key] = self._str_to_list(search_field.value)
                     else:
                         data[key] = search_field.value
+
         if data:
             for key in data:
                 if hasattr(data, 'getlist'):
@@ -204,9 +206,9 @@ class SearchForm(forms.Form):
                 else:
                     value = data.get(key)
                 try:
-                    #extract search fields
+                    # extract search fields
                     group, field, fid = key.split('-_-')
-                    #will raise an except for city visible field --> ignore this field
+                    # will raise an except for city visible field --> ignore this field
                     fid = int(fid)
                     if group not in self._forms:
                         self._forms[group] = []
@@ -216,7 +218,7 @@ class SearchForm(forms.Form):
                     self._forms[group].append(form)
                 except ValueError:
                     pass
-            #sort forms of a group according to their id
+            # sort forms of a group according to their id
             for form in self._forms.values():
                 form.sort(key=lambda field_: field_.count)
     
@@ -339,20 +341,29 @@ class SearchForm(forms.Form):
         for key in keys:
             post_processors = []
             contacts_set = Contact.objects.all()
-            
+            actions_set = Action.objects.all()
+            has_action_forms = False
+
             if not ('secondary_contact' in [form.name for form in self._forms[key]]):
                 contacts_set = contacts_set.filter(main_contact=True)
             
             for form in self._forms[key]:
-                
-                contacts_set = form.get_queryset(contacts_set)
-                
+
+                if not form.is_action_form:
+                    contacts_set = form.get_queryset(contacts_set)
+                else:
+                    has_action_forms = True
+                    actions_set = form.get_queryset(actions_set)
+
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
                     
                 if hasattr(form, 'global_post_process'):
                     global_post_processors.append(form.global_post_process)
 
+            if has_action_forms:
+                contacts_set = contacts_set.filter(Q(action=actions_set) | Q(entity__action=actions_set))
+                
             for post_processor in post_processors:
                 contacts_set = post_processor(contacts_set)
                 
@@ -361,7 +372,7 @@ class SearchForm(forms.Form):
         for global_post_processor in global_post_processors:
             contacts = global_post_processor(contacts)
 
-        #Just for compatibility
+        # Just for compatibility
         queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name=u'Newsletter')
         if queryset.count():
             for contact in contacts:
@@ -470,7 +481,8 @@ class SearchFieldForm(BsForm):
     """Base class for search forms"""
     contacts_display = False
     multi_values = False
-    
+    is_action_form = False
+
     def __init__(self, block, count, data=None, *args, **kwargs):
         self.block = block
         self.count = count

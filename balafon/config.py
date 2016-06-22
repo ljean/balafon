@@ -96,6 +96,7 @@ SEARCH_FORMS = [
             search_forms.ActionByStartDate,
             search_forms.ActionByUser,
             search_forms.ActionStatus,
+            search_forms.ActionWithoutStatus,
             search_forms.ActionLtAmount,
             search_forms.ActionGteAmount,
             search_forms.HasAction,

@@ -317,10 +317,10 @@ class ActionSearchTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
 
-        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, entity1.name)
         self.assertNotContains(response, contact1.lastname)
         self.assertNotContains(response, contact3.lastname)
-        self.assertContains(response, contact6.lastname)
+        self.assertNotContains(response, contact6.lastname)
 
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
@@ -331,7 +331,7 @@ class ActionSearchTest(BaseTestCase):
         self.assertContains(response, entity4.name)
         self.assertContains(response, contact5.lastname)
 
-        self.assertContains(response, contact7.lastname)
+        self.assertNotContains(response, contact7.lastname)
 
     def test_search_has_action(self):
         """search contacts with actions"""
@@ -1192,3 +1192,209 @@ class ActionSearchTest(BaseTestCase):
         self.assertNotContains(response, contact5.lastname)
 
         self.assertNotContains(response, contact7.lastname)
+
+    def test_search_action_without_status(self):
+        """search by action status"""
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+
+        status1 = mommy.make(models.ActionStatus)
+        status2 = mommy.make(models.ActionStatus)
+
+        action = mommy.make(models.Action, status=status1)
+        action.contacts.add(contact1)
+        action.contacts.add(contact3)
+        action.save()
+
+        action = mommy.make(models.Action, status=status1)
+        action.entities.add(entity2)
+        action.save()
+
+        action = mommy.make(models.Action, status=status2)
+        action.contacts.add(contact5)
+        action.save()
+
+        action = mommy.make(models.Action)
+        action.entities.add(entity3)
+        action.save()
+
+        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+
+        url = reverse('search')
+
+        data = {"gr0-_-action_without_status-_-0": status1.id}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual([], list(soup.select(".field-error")))
+
+        self.assertNotContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertNotContains(response, contact6.lastname)
+
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+
+        self.assertContains(response, entity4.name)
+        self.assertContains(response, contact5.lastname)
+
+        self.assertNotContains(response, contact7.lastname)
+
+    def test_search_action_multi_criteria(self):
+        """search by action status"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+
+        type1 = mommy.make(models.ActionType)
+        type2 = mommy.make(models.ActionType)
+
+        status1 = mommy.make(models.ActionStatus)
+        status2 = mommy.make(models.ActionStatus)
+
+        action1 = mommy.make(models.Action, type=type1, status=status1, planned_date=datetime(2016, 6, 21))
+        action1.contacts.add(contact1)
+        action1.save()
+
+        action2 = mommy.make(models.Action, type=type2, status=status1, planned_date=datetime(2016, 6, 21))
+        action2.contacts.add(contact2)
+        action2.save()
+
+        action3 = mommy.make(models.Action, type=type1, status=status1, planned_date=datetime(2015, 6, 21))
+        action3.contacts.add(contact3)
+        action3.save()
+
+        url = reverse('search')
+
+        data = {
+            "gr0-_-action_status-_-0": status1.id,
+            "gr0-_-action_type-_-1": type1.id,
+            "gr0-_-action_by_planned_date-_-2": u"15/06/2016 22/06/2016"
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual([], list(soup.select(".field-error")))
+
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+
+    def test_search_action_multi_criteria_without_status(self):
+        """search by action status"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname=u"MNOP", main_contact=True, has_left=False)
+
+        type1 = mommy.make(models.ActionType)
+        type2 = mommy.make(models.ActionType)
+
+        status1 = mommy.make(models.ActionStatus)
+        status2 = mommy.make(models.ActionStatus)
+
+        action1 = mommy.make(models.Action, type=type1, status=status1)
+        action1.contacts.add(contact1)
+        action1.save()
+
+        action2 = mommy.make(models.Action, type=type2, status=status2)
+        action2.contacts.add(contact2)
+        action2.save()
+
+        action3 = mommy.make(models.Action, type=type1, status=status2)
+        action3.contacts.add(contact3)
+        action3.save()
+
+        action4 = mommy.make(models.Action, type=type1, status=None)
+        action4.contacts.add(contact4)
+        action4.save()
+
+        url = reverse('search')
+
+        data = {
+            "gr0-_-action_without_status-_-0": status1.id,
+            "gr0-_-action_type-_-1": type1.id,
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual([], list(soup.select(".field-error")))
+
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertContains(response, contact4.lastname)
+
+    def test_search_action_multi_group(self):
+        """search by action status"""
+        contact1 = mommy.make(models.Contact, lastname=u"ABCDEF", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname=u"EFGHIJ", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname=u"IJKLMN", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname=u"MNOPQR", main_contact=True, has_left=False)
+
+        type1 = mommy.make(models.ActionType)
+        type2 = mommy.make(models.ActionType)
+
+        status1 = mommy.make(models.ActionStatus)
+        status2 = mommy.make(models.ActionStatus)
+
+        action1 = mommy.make(models.Action, type=type1, status=status1, planned_date=datetime(2016, 6, 21))
+        action1.contacts.add(contact1)
+        action1.save()
+
+        action2 = mommy.make(models.Action, type=type2, status=status1, planned_date=datetime(2016, 6, 21))
+        action2.contacts.add(contact2)
+        action2.save()
+
+        action3 = mommy.make(models.Action, type=type1, status=status1, planned_date=datetime(2015, 6, 21))
+        action3.contacts.add(contact3)
+        action3.save()
+
+        action4 = mommy.make(models.Action, type=type1, status=status1, planned_date=datetime(2014, 6, 21))
+        action4.contacts.add(contact4)
+        action4.save()
+
+        url = reverse('search')
+
+        data = {
+            "gr0-_-action_status-_-0": status1.id,
+            "gr0-_-action_type-_-1": type1.id,
+            "gr0-_-action_by_planned_date-_-2": u"15/06/2016 22/06/2016",
+            "gr1-_-action_status-_-0": status1.id,
+            "gr1-_-action_type-_-1": type1.id,
+            "gr1-_-action_by_planned_date-_-2": u"15/06/2015 22/06/2015"
+        }
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+        self.assertEqual([], list(soup.select(".field-error")))
+
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertNotContains(response, contact4.lastname)
