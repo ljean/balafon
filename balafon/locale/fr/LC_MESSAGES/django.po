@@ -4093,7 +4093,7 @@ msgstr "propriété"
 
 #: Store/models.py:747
 msgid "Store item: property values"
-msgstr "valeurs d'une proroété"
+msgstr "valeurs d'une proriété"
 
 #: Store/models.py:761 Store/templates/Store/cart_root_email.html:31
 msgid "Delivery point"
