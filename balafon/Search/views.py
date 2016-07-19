@@ -600,7 +600,8 @@ def export_to_pdf(request):
                         filename='balafon.pdf',
                         template_name=template_name,
                         request=request,
-                        cmd_options=cmd_options)
+                        cmd_options=cmd_options
+                    )
                     return pdf_view.render_to_response(context)
 
                 else:

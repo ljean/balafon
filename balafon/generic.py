@@ -5,6 +5,7 @@
 from datetime import date, datetime
 import xlwt
 
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -14,6 +15,7 @@ from django.views.generic import ListView, TemplateView, View
 from django.views.generic.edit import FormView
 
 from colorbox.decorators import popup_redirect
+from wkhtmltopdf.views import PDFTemplateView
 
 from balafon.permissions import can_access
 
@@ -32,6 +34,22 @@ class StaffListView(ListView):
     @method_decorator(user_passes_test(can_access))
     def dispatch(self, *args, **kwargs):
         return super(StaffListView, self).dispatch(*args, **kwargs)
+
+
+class StaffPDFTemplateView(PDFTemplateView):
+    """A base class for Pdf reports"""
+    def __init__(self, *args, **kwargs):
+        super(StaffPDFTemplateView, self).__init__(*args, **kwargs)
+
+        pdf_options = getattr(settings, 'BALAFON_PDF_OPTIONS', None)
+        if pdf_options is None:
+            self.cmd_options = {'margin-top': 0, 'margin-bottom': 0, 'margin-right': 0, 'margin-left': 0, }
+        else:
+            self.cmd_options = pdf_options.get(self.template_name, {})
+
+    @method_decorator(user_passes_test(can_access))
+    def dispatch(self, *args, **kwargs):
+        return super(StaffPDFTemplateView, self).dispatch(*args, **kwargs)
 
 
 class StaffPopupFormView(FormView):
