@@ -455,7 +455,7 @@ class StoreItem(models.Model):
         """
         alert_text = ""
         if self.has_stock_threshold_alert():
-            alert_text = u'<img src="{0}store/img/warning-sign" />'.format(settings.STATIC_URL)
+            alert_text = u'<img src="{0}store/img/warning-sign.png" />'.format(settings.STATIC_URL)
         return u"{0} {1}".format(
             self.stock_threshold if self.stock_threshold is not None else "",
             alert_text
@@ -979,7 +979,6 @@ class SaleItem(models.Model):
         else:
             discount_price = Decimal(0)
         return Decimal("{0:.2f}".format(round(discount_price, 2)))
-
 
 
 def update_action_amount(sale_item, delete_me=False):
