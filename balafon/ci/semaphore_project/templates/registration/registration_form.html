@@ -1,0 +1,46 @@
+{% extends "registration/base.html" %}{% load i18n coop_utils %}
+
+{% block extra_head %}
+{{ block.super }}
+<style>
+	.no_backgd input {
+		margin-right: 20px;
+	}
+	
+	.error {
+		color: red;
+		font-weight: bold;
+	}
+</style>
+{% endblock %}
+
+{% block registration_content %}
+<div class="row"><div class="col-md-6">
+<div class="pull-right">{% trans "* : required field" %}</div>
+
+<h2>{% trans "Registration" %}</h2>
+
+<form action="{% url 'registration_register' %}" method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        {{form.non_field_errors}}
+        {% endif %}
+
+        {% for field in form %}
+          {% include "_field.html" with show_label=True %}
+        {% endfor %}
+
+        <a style="display: block; color: #fff; text-decoration: underline; margin-top: -20px" href="{% article_link 'Terms of use' %}" target="_blank">
+            {% trans "Terms of use" %}
+        </a>
+
+        <div class="row"><div class="col-md-12" style="margin-top: 20px;">
+            <a class="btn btn-default" href="{% url 'django.contrib.auth.views.login' %}">
+                {% trans "Go back to login page" %}
+            </a>
+            <input class="btn btn-primary" type="submit" value="{% trans 'Register' %}" />
+        </div></div>
+    </form>
+</div></div>
+{% endblock %}

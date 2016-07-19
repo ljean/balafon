@@ -55,35 +55,17 @@ urlpatterns += localized_patterns('',
         name="auto_save_data"
     ),
     url(r'^emailing/', include('balafon.Emailing.urls')),
-    url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
 )
-
-
-if 'djrill' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'^mandrill/', include('djrill.urls')),
-    ]
-
-
-if 'captcha' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'^captcha/', include('captcha.urls')),
-    ]
-
-
-if 'balafon.Apis' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'', include('balafon.Apis.urls')),
-    ]
-
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns('',
-        url(r'^accounts/', include('coop_cms.apps.email_auth.urls'))
+        url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
+        url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
+        url(r'^accounts/', include('django.contrib.auth.urls'))
     )
 
 else:
+
     urlpatterns += localized_patterns('',
         url(
             r'^accounts/login/$',
@@ -104,6 +86,23 @@ else:
         ),
         url(r'^accounts/', include('django.contrib.auth.urls'))
     )
+
+if 'djrill' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^mandrill/', include('djrill.urls')),
+    ]
+
+
+if 'captcha' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^captcha/', include('captcha.urls')),
+    ]
+
+
+if 'balafon.Apis' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'', include('balafon.Apis.urls')),
+    ]
 
 
 if 'balafon.Profile' in settings.INSTALLED_APPS:

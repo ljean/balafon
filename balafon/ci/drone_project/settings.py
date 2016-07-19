@@ -225,7 +225,6 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
 )
 
-
 if (len(sys.argv) > 1) and (not sys.argv[1] in ('makemigrations', 'schemamigration', 'datamigration')):
     INSTALLED_APPS = (
         'modeltranslation',
@@ -233,6 +232,11 @@ if (len(sys.argv) > 1) and (not sys.argv[1] in ('makemigrations', 'schemamigrati
 
 if len(sys.argv) > 1 and 'test' == sys.argv[1]:
     INSTALLED_APPS = INSTALLED_APPS + ('coop_cms.apps.test_app',)
+
+if len(sys.argv) > 2 and 'test' == sys.argv[1] and sys.argv[2].find('coop_cms.apps.email_auth') == 0:
+    installed_apps = list(INSTALLED_APPS)
+    installed_apps.remove('balafon.Profile')
+    INSTALLED_APPS = tuple(installed_apps)
 
 import warnings
 warnings.filterwarnings('ignore', r"django.contrib.localflavor is deprecated")

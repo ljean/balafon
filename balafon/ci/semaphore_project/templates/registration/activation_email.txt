@@ -1,0 +1,13 @@
+{% load i18n %}
+{% blocktrans %}
+Hello,
+You have requested to create an account on {{site}}.
+We are happy to welcome you on the site. We hope you will enjoy it.
+
+In order to finish the account creation, please confirm your email address by visiting the following url:
+{% endblocktrans %}
+http://{{site}}{% url "registration_activate" activation_key=activation_key %}
+
+{% blocktrans %}
+If you did not request this account creation, please ignore this email.
+{% endblocktrans %}
