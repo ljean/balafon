@@ -221,6 +221,23 @@ class StoreItemAdmin(admin.ModelAdmin):
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
     raw_id_fields = ['tags', 'certificates']
     inlines = [StoreItemPropertyValueInline]
+    fieldsets = (
+        (_(u'General'), {
+            'fields': ('name', 'available', 'category', 'brand', 'certificates', 'tags', )
+        }),
+        (_(u'Price'), {
+            'fields': ('vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', )
+        }),
+        (_(u'Supplier'), {
+            'fields': ('supplier', 'reference', )
+        }),
+        (_(u'Stock'), {
+            'fields': ('stock_count', 'stock_threshold', 'stock_threshold_alert', )
+        }),
+        (_(u'Import'), {
+            'fields': ('imported_by', )
+        }),
+    )
     list_per_page = 500
     save_as = True
 
