@@ -60,9 +60,12 @@ urlpatterns += localized_patterns('',
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns('',
         url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
-        url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
-        url(r'^accounts/', include('django.contrib.auth.urls'))
     )
+
+    if 'registration' in settings.INSTALLED_APPS and 'balafon.Profile' not in settings.INSTALLED_APPS:
+        urlpatterns += localized_patterns('',
+            url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
+        )
 
 else:
 
@@ -84,8 +87,11 @@ else:
             {'password_reset_form': BsPasswordResetForm},
             name='password_reset'
         ),
-        url(r'^accounts/', include('django.contrib.auth.urls'))
     )
+
+urlpatterns += localized_patterns('',
+    url(r'^accounts/', include('django.contrib.auth.urls'))
+)
 
 if 'djrill' in settings.INSTALLED_APPS:
     urlpatterns += [
