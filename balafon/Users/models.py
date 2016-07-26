@@ -110,8 +110,14 @@ class CustomMenuItem(models.Model):
     icon = models.CharField(max_length=20, verbose_name=_(u"icon"), blank=True, default="")
     url = models.CharField(max_length=100, verbose_name=_(u"url"), default='', blank=True)
     reverse = models.CharField(max_length=100, verbose_name=_(u"reverse"), default='', blank=True)
+    reverse_kwargs = models.CharField(
+        max_length=100, verbose_name=_(u"reverse_kwargs"), default='', blank=True,
+        help_text=_(u'kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 ')
+    )
     order_index = models.IntegerField(default=0)
-    only_for_users = models.ManyToManyField(User, blank=True, verbose_name=_(u"only for users"))
+    only_for_users = models.ManyToManyField(
+        User, blank=True, verbose_name=_(u"only for users"), limit_choices_to={'is_staff': True}
+    )
     attributes = models.CharField(max_length=100, verbose_name=_(u"attributes"), default="", blank=True)
 
     class Meta:
@@ -130,13 +136,25 @@ class CustomMenuItem(models.Model):
         if self.url:
             url = self.url
         elif self.reverse:
+            reverse_kwargs = {}
+            if self.reverse_kwargs:
+                args_keywords = self.reverse_kwargs.split(',')
+                for arg_keyword in args_keywords:
+                    if ':' in arg_keyword:
+                        slices = arg_keyword.split(':')
+                        keyword = slices[0]
+                        default_value = ":".join(slices[1:])
+                    else:
+                        keyword = arg_keyword
+                        default_value = None
+                    reverse_kwargs[keyword] = kwargs.get(keyword, default_value)
             try:
                 query_string = ''
                 request = RequestManager().get_request()
                 if request:
                     query_string = request.META['QUERY_STRING'] or ''
                 try:
-                    url = reverse(self.reverse, args=args, kwargs=kwargs) + "?" + query_string
+                    url = reverse(self.reverse, kwargs=reverse_kwargs) + "?" + query_string
                 except TypeError:
                     pass
             except NoReverseMatch:

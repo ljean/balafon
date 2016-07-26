@@ -671,7 +671,13 @@ class CustomMenuTestCase(BaseTestCase):
     def test_view_custom_menu_reverse(self):
         """It should display custom menu"""
         menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
-        menu_item = mommy.make(CustomMenuItem, parent=menu, label="MON ELEMENT", reverse='crm_actions_of_day')
+        menu_item = mommy.make(
+            CustomMenuItem,
+            parent=menu,
+            label="MON ELEMENT",
+            reverse='crm_actions_of_day',
+            reverse_kwargs='year,month,day'
+        )
 
         response = self.client.get(reverse("balafon_homepage"), follow=True)
         self.assertEqual(200, response.status_code)
@@ -681,13 +687,97 @@ class CustomMenuTestCase(BaseTestCase):
 
         today = date.today()
         response = self.client.get(
-            reverse("crm_actions_of_day", args=[today.year, today.month, today.day]),
+            reverse("crm_actions_of_day", kwargs={'year': today.year, 'month': today.month, 'day': today.day}),
             follow=True
         )
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, menu.label)
         self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_reverse_more_kwargs(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
+        menu_item = mommy.make(
+            CustomMenuItem,
+            parent=menu,
+            label="MON ELEMENT",
+            reverse='crm_actions_of_month',
+            reverse_kwargs='year,month'
+        )
+
+        response = self.client.get(reverse("balafon_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+
+        today = date.today()
+        response = self.client.get(
+            reverse("crm_actions_of_day", kwargs={'year': today.year, 'month': today.month, 'day': today.day}),
+            follow=True
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+    def test_view_custom_menu_reverse_missing_kwargs(self):
+        """It should not display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
+        menu_item = mommy.make(
+            CustomMenuItem,
+            parent=menu,
+            label="MON ELEMENT",
+            reverse='crm_actions_of_day',
+            reverse_kwargs='year,month,day'
+        )
+
+        response = self.client.get(reverse("balafon_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+
+        today = date.today()
+        response = self.client.get(
+            reverse("crm_actions_of_month", kwargs={'year': today.year, 'month': today.month}),
+            follow=True
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, menu.label)
+        self.assertNotContains(response, menu_item.label)
+
+    def test_view_custom_menu_reverse_missing_kwargs_defaults(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
+        menu_item = mommy.make(
+            CustomMenuItem,
+            parent=menu,
+            label="MON ELEMENT",
+            reverse='crm_actions_of_day',
+            reverse_kwargs='year:2015,month:1,day:1'
+        )
+
+        response = self.client.get(reverse("balafon_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+
+        today = date.today()
+        response = self.client.get(
+            reverse("crm_actions_of_month", kwargs={'year': today.year, 'month': today.month}),
+            follow=True
+        )
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+        self.assertContains(
+            response, reverse("crm_actions_of_day", kwargs={'year': today.year, 'month': today.month, 'day': 1})
+        )
 
     def test_view_custom_menu_empty(self):
         """It should nor display the menu"""
