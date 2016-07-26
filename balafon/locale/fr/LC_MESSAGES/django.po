@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-22 21:59+0200\n"
+"POT-Creation-Date: 2016-07-26 12:19+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1529,7 +1529,8 @@ msgstr "Exclure"
 
 #: Crm/search_forms.py:1159 Crm/templates/Crm/confirm_contacts_import.html:44
 #: Crm/templates/Crm/new_contacts_import.html:29
-#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:265
+#: Crm/templates/Crm/unsubscribe_contacts_import.html:25 Store/admin.py:237
+#: Store/admin.py:282
 msgid "Import"
 msgstr "Import"
 
@@ -3150,6 +3151,8 @@ msgid "About this user"
 msgstr "A propos de cet utilisateur"
 
 #: Profile/templates/registration/activate.html:3
+#: ci/drone_project/templates/registration/activate.html:3
+#: ci/semaphore_project/templates/registration/activate.html:3
 msgid "Activate"
 msgstr "Activer"
 
@@ -3186,6 +3189,8 @@ msgstr ""
 "suivante:\n"
 
 #: Profile/templates/registration/activation_email.txt:11
+#: ci/drone_project/templates/registration/activation_email.txt:11
+#: ci/semaphore_project/templates/registration/activation_email.txt:11
 msgid ""
 "\n"
 "If you did not request this account creation, please ignore this email.\n"
@@ -3194,14 +3199,20 @@ msgstr ""
 "Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet email.\n"
 
 #: Profile/templates/registration/activation_email_subject.txt:2
+#: ci/drone_project/templates/registration/activation_email_subject.txt:2
+#: ci/semaphore_project/templates/registration/activation_email_subject.txt:2
 msgid "Account activation"
 msgstr "Activation de compte"
 
 #: Profile/templates/registration/registration_complete.html:3
+#: ci/drone_project/templates/registration/registration_complete.html:3
+#: ci/semaphore_project/templates/registration/registration_complete.html:3
 msgid "Registration complete"
 msgstr "Inscription terminée"
 
 #: Profile/templates/registration/registration_complete.html:4
+#: ci/drone_project/templates/registration/registration_complete.html:6
+#: ci/semaphore_project/templates/registration/registration_complete.html:6
 msgid ""
 "\n"
 "We sent you an email. It will help you to activate your account.\n"
@@ -3210,10 +3221,14 @@ msgstr ""
 "Nous vous avons envoyé un email. Il vous permettra d'activer votre compte.\n"
 
 #: Profile/templates/registration/registration_form.html:12
+#: ci/drone_project/templates/registration/registration_form.html:21
+#: ci/semaphore_project/templates/registration/registration_form.html:21
 msgid "Registration"
 msgstr "Inscription"
 
 #: Profile/templates/registration/registration_form.html:28
+#: ci/drone_project/templates/registration/registration_form.html:42
+#: ci/semaphore_project/templates/registration/registration_form.html:42
 msgid "Register"
 msgstr "S'inscrire"
 
@@ -3659,12 +3674,30 @@ msgstr "Catégorie"
 msgid "Certificate"
 msgstr "Certification"
 
-#: Store/admin.py:254
+#: Store/admin.py:225
+msgid "General"
+msgstr "Général"
+
+#: Store/admin.py:228 Store/templates/Store/cart_root_email.html:53
+msgid "Price"
+msgstr "Prix"
+
+#: Store/admin.py:231 Store/models.py:300 Store/models.py:366
+#: Store/models.py:553
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#: Store/admin.py:234 Store/views/xls_export.py:18
+#: Store/views/xls_export.py:39
+msgid "Stock"
+msgstr "Stock"
+
+#: Store/admin.py:271
 msgid "The file {0} has been properly imported : {1} items have been created"
 msgstr ""
 "Le fichier {0} a été correctement importé : {1} article(s) ont été créé(s)"
 
-#: Store/admin.py:261
+#: Store/admin.py:278
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
@@ -3896,10 +3929,6 @@ msgstr "Marque"
 #: Store/models.py:285
 msgid "Brands"
 msgstr "Marques"
-
-#: Store/models.py:300 Store/models.py:366 Store/models.py:553
-msgid "Supplier"
-msgstr "Fournisseur"
 
 #: Store/models.py:301
 msgid "Suppliers"
@@ -4186,10 +4215,6 @@ msgstr "Article"
 msgid "Reference"
 msgstr "Référence"
 
-#: Store/templates/Store/cart_root_email.html:53
-msgid "Price"
-msgstr "Prix"
-
 #: Store/templates/Store/cart_root_email.html:54
 msgid "Quantity"
 msgstr "Quantité"
@@ -4216,10 +4241,6 @@ msgstr "Export des manquants en stock"
 #: Store/utils.py:21
 msgid "New cart purchased on store"
 msgstr "Nouvelle commande sur le site"
-
-#: Store/views/xls_export.py:18 Store/views/xls_export.py:39
-msgid "Stock"
-msgstr "Stock"
 
 #: Store/views/xls_export.py:80
 msgid "Category"
@@ -4304,18 +4325,27 @@ msgid "reverse"
 msgstr "nom de la vue"
 
 #: Users/models.py:114
+msgid "reverse_kwargs"
+msgstr "arguments de la vue"
+
+#: Users/models.py:115
+msgid ""
+"kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 "
+msgstr "arguments (et éventuellement valeurs par défaut) par nom pour construire l'url via le reverse. Exemple year,month:1,day:1"
+
+#: Users/models.py:119
 msgid "only for users"
 msgstr "seulement pour les utilisateurs"
 
-#: Users/models.py:115
+#: Users/models.py:121
 msgid "attributes"
 msgstr "attributs"
 
-#: Users/models.py:118
+#: Users/models.py:124
 msgid "Custom menu item"
 msgstr "Élément de menu personnalisé"
 
-#: Users/models.py:119
+#: Users/models.py:125
 msgid "Custom menu items"
 msgstr "Éléments de menu personnalisé"
 
@@ -4361,13 +4391,59 @@ msgstr "Objet invalide"
 msgid "An error occured"
 msgstr "Une erreur est survenue"
 
-#: ci/drone_project/settings.py:46 ci/semaphore_project/settings.py:47
+#: ci/drone_project/settings.py:46 ci/semaphore_project/settings.py:46
 msgid "English"
 msgstr "Anglais"
 
-#: ci/drone_project/settings.py:47 ci/semaphore_project/settings.py:48
+#: ci/drone_project/settings.py:47 ci/semaphore_project/settings.py:47
 msgid "Français"
 msgstr "Français"
+
+#: ci/drone_project/templates/registration/activation_complete.html:3
+#: ci/semaphore_project/templates/registration/activation_complete.html:3
+msgid "Votre demande de création de compte a été prise en compte!"
+msgstr ""
+
+#: ci/drone_project/templates/registration/activation_complete.html:5
+#: ci/semaphore_project/templates/registration/activation_complete.html:5
+msgid "Vous pouvez à présent vous connecter"
+msgstr ""
+
+#: ci/drone_project/templates/registration/activation_complete.html:6
+#: ci/drone_project/templates/registration/login.html:3
+#: ci/drone_project/templates/registration/login.html:26
+#: ci/drone_project/templates/registration/password_reset_complete.html:5
+#: ci/drone_project/templates/registration/password_reset_form.html:13
+#: ci/semaphore_project/templates/registration/activation_complete.html:6
+#: ci/semaphore_project/templates/registration/login.html:3
+#: ci/semaphore_project/templates/registration/login.html:26
+#: ci/semaphore_project/templates/registration/password_reset_complete.html:5
+#: ci/semaphore_project/templates/registration/password_reset_form.html:13
+#: templates/registration/login.html:4 templates/registration/login.html:34
+#: templates/registration/password_reset_complete.html:5
+#: templates/registration/password_reset_form.html:30
+msgid "Login"
+msgstr "Connexion"
+
+#: ci/drone_project/templates/registration/activation_email.txt:2
+#: ci/semaphore_project/templates/registration/activation_email.txt:2
+msgid ""
+"\n"
+"Hello,\n"
+"You have requested to create an account on %(site)s.\n"
+"We are happy to welcome you on the site. We hope you will enjoy it.\n"
+"\n"
+"In order to finish the account creation, please confirm your email address "
+"by visiting the following url:\n"
+msgstr ""
+"\n"
+"Bonjour,\n"
+"Vous avez souhaité créer un compte sur %(site)s.\n"
+"Nous sommes heureux de vous accueillir sur le site. Nous espérons que vous "
+"l'aimerez.\n"
+"\n"
+"Afin de finir la création du compte, merci de l'activer en visitant l'url "
+"suivante:\n"
 
 #: ci/drone_project/templates/registration/logged_out.html:3
 #: ci/semaphore_project/templates/registration/logged_out.html:3
@@ -4386,20 +4462,6 @@ msgstr "Vous allez être redirigé vers"
 #: templates/500.html:19 templates/registration/logged_out.html:5
 msgid "homepage"
 msgstr "page d'accueil"
-
-#: ci/drone_project/templates/registration/login.html:3
-#: ci/drone_project/templates/registration/login.html:26
-#: ci/drone_project/templates/registration/password_reset_complete.html:5
-#: ci/drone_project/templates/registration/password_reset_form.html:13
-#: ci/semaphore_project/templates/registration/login.html:3
-#: ci/semaphore_project/templates/registration/login.html:26
-#: ci/semaphore_project/templates/registration/password_reset_complete.html:5
-#: ci/semaphore_project/templates/registration/password_reset_form.html:13
-#: templates/registration/login.html:4 templates/registration/login.html:34
-#: templates/registration/password_reset_complete.html:5
-#: templates/registration/password_reset_form.html:30
-msgid "Login"
-msgstr "Connexion"
 
 #: ci/drone_project/templates/registration/login.html:5
 #: ci/semaphore_project/templates/registration/login.html:5
@@ -4481,6 +4543,21 @@ msgstr "Un email vous a été envoyé"
 #: templates/registration/password_reset_done.html:5
 msgid "It contains the procedure to reset the password."
 msgstr "Il contient la procédure de réinitialisation du mot de passe"
+
+#: ci/drone_project/templates/registration/registration_form.html:19
+#: ci/semaphore_project/templates/registration/registration_form.html:19
+msgid "* : required field"
+msgstr "* : Champs requis"
+
+#: ci/drone_project/templates/registration/registration_form.html:35
+#: ci/semaphore_project/templates/registration/registration_form.html:35
+msgid "Terms of use"
+msgstr "Accepter les conditions d'utilisation"
+
+#: ci/drone_project/templates/registration/registration_form.html:40
+#: ci/semaphore_project/templates/registration/registration_form.html:40
+msgid "Go back to login page"
+msgstr "Retour à la page de connexion"
 
 #: config.py:25
 msgid "Location"
