@@ -20,20 +20,19 @@ from coop_cms.models import Newsletter
 from coop_cms.utils import paginate
 from wkhtmltopdf.views import PDFTemplateView
 
-from balafon.permissions import can_access
+from balafon.permissions import can_access, is_admin
 from balafon.utils import logger, log_error, HttpResponseRedirectMailtoAllowed
-from balafon.Crm.models import Entity, Contact, Group, Action, Opportunity, City, CustomField
+from balafon.Crm.models import Entity, Contact, Group, Action, Opportunity, City, CustomField, Subscription
 from balafon.Crm import settings as crm_settings
 from balafon.Emailing.models import Emailing
 from balafon.Emailing.forms import NewEmailingForm
 from balafon.Search.models import Search
 from balafon.Search.forms import (
     ActionForContactsForm, FieldChoiceForm, GroupForContactsForm, QuickSearchForm, PdfTemplateForm, SearchForm,
-    SearchNameForm, get_field_form, ContactsAdminForm
+    SearchNameForm, get_field_form, SubscribeContactsAdminForm, PrintLabelsPdfForm
 )
 
 
-#@transaction.commit_manually
 def filter_icontains_unaccent(queryset, field, text):
     if crm_settings.is_unaccent_filter_supported():
         queryset = queryset.extra(
@@ -512,61 +511,85 @@ def add_contacts_to_group(request):
     raise Http404
 
 
-@user_passes_test(can_access)
+@user_passes_test(is_admin)
 @popup_close
-def contacts_admin(request):
+def subscribe_contacts_admin(request):
     
     if not request.user.is_superuser:
         raise PermissionDenied
     
     try:
         if request.method == "POST":
-            if "contacts_admin" in request.POST:
-                form = ContactsAdminForm(request.POST)
+            if "subscribe_contacts_admin" in request.POST:
+                form = SubscribeContactsAdminForm(request.POST)
                 if form.is_valid():
                     nb_contacts = 0
                     contacts = form.get_contacts()
-                    subscribe = form.cleaned_data['subscribe_newsletter']
-                    for c in contacts:
-                        if c.accept_newsletter != subscribe:
-                            c.accept_newsletter = subscribe
-                            c.save()
+                    subscription_type = form.cleaned_data['subscription_type']
+                    subscribe = form.cleaned_data['subscribe']
+
+                    for contact in contacts:
+
+                        if subscribe:
+                            subscription, created = Subscription.objects.get_or_create(
+                                contact=contact, subscription_type=subscription_type
+                            )
+                        else:
+                            created = False
+                            try:
+                                subscription = Subscription.objects.get(
+                                    contact=contact, subscription_type=subscription_type
+                                )
+                            except Subscription.DoesNotExist:
+                                subscription = None
+
+                        if created or (subscription and subscribe != subscription.accept_subscription):
+                            subscription.accept_subscription = subscribe
+                            subscription.save()
                             nb_contacts += 1
+
                     if subscribe:
-                        messages.add_message(request, messages.SUCCESS,
-                            _(u"{0} contacts have subscribe to the newsletter".format(nb_contacts)))
+                        messages.add_message(
+                            request,
+                            messages.SUCCESS,
+                            _(u"{0} contacts have subscribe to the newsletter".format(nb_contacts))
+                        )
                     else:
-                        messages.add_message(request, messages.SUCCESS,
-                            _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts)))
+                        messages.add_message(
+                            request,
+                            messages.SUCCESS,
+                            _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts))
+                        )
+
                     return None  # popup_close will return js code to close the popup
                 else:
-                    return render_to_response(
-                        'Search/contacts_admin_form.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                    return render(
+                        request,
+                        'Search/subscribe_contacts_admin_form.html',
+                        {'form': form}
                     )
             else:
                 search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     if contacts:
-                        form = ContactsAdminForm(initial={'contacts': contacts})
-                        return render_to_response(
-                            'Search/contacts_admin_form.html',
-                            {'form': form},
-                            context_instance=RequestContext(request)
+                        form = SubscribeContactsAdminForm(initial={'contacts': contacts})
+                        return render(
+                            request,
+                            'Search/subscribe_contacts_admin_form.html',
+                            {'form': form}
                         )
                     else:
                         return render_to_response(
                             'balafon/message_dialog.html',
                             {
-                                'title': _('Contacts admin'),
+                                'title': _('Subscribe contacts admin'),
                                 'message': _(u'The search results contains no contacts')
                             },
                             context_instance=RequestContext(request)
                         )
-    except Exception, msg:
-        logger.exception("contacts_admin")
+    except Exception:
+        logger.exception("search_subscribe_contacts_admin")
         raise
     raise Http404
 

@@ -6,16 +6,12 @@ from itertools import chain
 import importlib
 import json
 
-from django import VERSION as DJANGO_VERSION
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-if DJANGO_VERSION >= (1, 8, 0):
-    from django.forms.utils import flatatt
-else:
-    from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.template import Context
 from django.template.loader import get_template
 from django.utils.encoding import smart_unicode
@@ -192,7 +188,6 @@ class SearchForm(forms.Form):
                 for search_field in group.searchfield_set.all():
                     key = '-_-'.join((group.name, search_field.field, str(search_field.count or len(data))))
                     if search_field.is_list:
-                        #data[key] = json.loads(f.value) # doesn't work :(
                         data[key] = self._str_to_list(search_field.value)
                     else:
                         data[key] = search_field.value
@@ -500,7 +495,7 @@ class SearchFieldForm(BsForm):
         
     def _get_field_name(self):
         """return field name"""
-        return self.block+'-_-'+self.name+'-_-'+unicode(self.count)
+        return self.block + '-_-' + self.name + '-_-' + unicode(self.count)
         
     def _add_field(self, field):
         """adda field"""
@@ -645,9 +640,25 @@ class SearchActionForm(BsForm, SearchActionBaseMixin):
         self._post_init(initial_contacts)
 
 
-class ContactsAdminForm(SearchActionForm):
+class SubscribeContactsAdminForm(SearchActionForm):
     """This form is used for superuser forcing newsletter subscription"""
-    subscribe_newsletter = forms.BooleanField(required=False)
+    subscription_type = forms.ChoiceField(required=True)
+    subscribe = forms.BooleanField(
+        required=False, label=_(u'Subscribe'), help_text=_(u'It will subscribe/unsubscribe all selected contacts')
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(SubscribeContactsAdminForm, self).__init__(*args, **kwargs)
+        self.fields['subscription_type'].choices = [
+            (subscription_type.id, subscription_type.name)
+            for subscription_type in SubscriptionType.objects.all()
+        ]
+
+    def clean_subscription_type(self):
+        try:
+            return SubscriptionType.objects.get(id=self.cleaned_data['subscription_type'])
+        except SubscriptionType.DoesNotExist:
+            raise ValidationError(_(u'Unknown subscription type'))
 
 
 class PdfTemplateForm(SearchActionForm):

@@ -1,0 +1,8 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block title %}{% blocktrans %}Subscribe Contacts Admin{% endblocktrans %}{% endblock %}
+{% block form_url %}{% url "search_subscribe_contacts_admin" %}{% endblock %}
+{% block popup_buttons %}
+<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<input type="submit" name="subscribe_contacts_admin" value="{% trans "Ok" %}">
+{% endblock %}

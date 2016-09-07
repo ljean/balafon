@@ -188,8 +188,7 @@
 <li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">
   <span class="glyphicon glyphicon-print"></span> {% trans "PDF" %}
 </a></li>
-
-{% if user.is_superuser %}<li><a href="{% url "search_contacts_admin" %}" class="action-button" class="colorbox-form">
+{% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="action-button" class="colorbox-form">
   <span class="glyphicon glyphicon-flash"></span> {% trans "Contacts Admin" %}
 </a></li>{% endif %}
 {% endif %}

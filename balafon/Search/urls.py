@@ -20,6 +20,6 @@ urlpatterns = [
     url(r'^as-excel/$', views.export_contacts_as_excel, name='search_export_contacts_as_excel'),
     url(r'^create-actions/$', views.create_action_for_contacts, name='search_create_action_for_contacts'),
     url(r'^add-contacts-to-group/$', views.add_contacts_to_group, name='search_add_contacts_to_group'),
-    url(r'^contacts-admin/$', views.contacts_admin, name='search_contacts_admin'),
+    url(r'^subscribe-contacts-admin/$', views.subscribe_contacts_admin, name='search_subscribe_contacts_admin'),
     url(r'^export_to_pdf/$', views.export_to_pdf, name='search_export_to_pdf'),
 ]
