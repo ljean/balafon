@@ -62,7 +62,7 @@ def get_emailing_context(emailing, contact):
     newsletter.content = html_content
 
     context_dict = {
-        'title': newsletter.subject,
+        'title': dehtml(newsletter.subject).replace('\n', ''),
         'newsletter': newsletter,
         'by_email': True,
         'MEDIA_URL': settings.MEDIA_URL,
@@ -176,7 +176,7 @@ def send_newsletter(emailing, max_nb):
             )
             email.attach_alternative(html_text, "text/html")
             if is_mandrill_used():
-                email.tags = [unicode(emailing.id), contact.uuid]
+                email.tags = [u'{0}'.format(emailing.id), contact.uuid]
             emails.append(email)
             
             # create action

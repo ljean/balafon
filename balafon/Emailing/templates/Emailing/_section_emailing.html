@@ -1,9 +1,9 @@
 {% extends "balafon/_bs_section.html" %}
-{% load i18n favorite_tags %}
+{% load i18n favorite_tags coop_utils %}
 
 {% block section_title %}
   <h4 class="inline-block"><span class="glyphicon glyphicon-open-file"></span>
- {% trans "Sending" %}: {{ emailing.newsletter.subject }}</h4>
+ {% trans "Sending" %}: {{ emailing.newsletter.subject|dehtml }}</h4>
 {% endblock %}
   
 {% block section_data %}
@@ -13,7 +13,7 @@
           <div class="row">
               <div class="col-md-12">{% trans "Newsletter" %}:
                   <a href="{{emailing.newsletter.get_absolute_url }}">
-                      {{ emailing.newsletter.subject }}
+                      {{ emailing.newsletter.subject|dehtml }}
                   </a>
                   {% favorite_item object=emailing.newsletter %}
               </div>
