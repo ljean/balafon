@@ -293,7 +293,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
     def test_render_template(self):
         """make sure render do not fail"""
         for i in xrange(5):
-            mommy.make_one(User)
+            mommy.make(User)
         
         template = Template(self._template_content())
         
@@ -310,7 +310,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         """render for anonymous"""
         self.client.logout()
         for i in xrange(5):
-            mommy.make_one(User)
+            mommy.make(User)
         
         template = Template(self._template_content())
         
@@ -326,7 +326,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
     def test_post_not_logged(self):
         """post favorite update for anonymous"""
         self.client.logout()
-        user = mommy.make_one(User)
+        user = mommy.make(User)
         data = {
             'content_type': ContentType.objects.get_for_model(User).id,
             'object_id': user.id, 
@@ -342,7 +342,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
     def test_post_add(self):
         """post add favorite"""
         logged_user = self.user
-        faved_user = mommy.make_one(User)
+        faved_user = mommy.make(User)
         
         data = {
             'content_type': ContentType.objects.get_for_model(User).id,
@@ -364,7 +364,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         """post remove favorite"""
 
         logged_user = self.user
-        faved_user = mommy.make_one(User)
+        faved_user = mommy.make(User)
         
         user_ct = ContentType.objects.get_for_model(User)
         Favorite.objects.create(
@@ -402,7 +402,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
     def test_post_wrong_ct(self):
         """post wrong content type"""
 
-        faved_user = mommy.make_one(User)
+        faved_user = mommy.make(User)
         
         data = {
             'content_type': 55555,
@@ -432,8 +432,8 @@ class ListFavoritesTestCase(BaseTestCase):
     def test_list(self):
         """view list"""
         logged_user = self.user
-        faved_users = [mommy.make_one(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        not_faved_users = [mommy.make_one(User, username='NOT-{0}'.format(i)) for i in xrange(5)]
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
+        not_faved_users = [mommy.make(User, username='NOT-{0}'.format(i)) for i in xrange(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         for user in faved_users:
@@ -449,9 +449,9 @@ class ListFavoritesTestCase(BaseTestCase):
     def test_someone_else_list(self):
         """do not see someone else list"""
         logged_user = self.user
-        other_user = mommy.make_one(User)
-        faved_users = [mommy.make_one(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        not_my_faved_users = [mommy.make_one(User, username='OTHER-{0}'.format(i)) for i in xrange(5)]
+        other_user = mommy.make(User)
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
+        not_my_faved_users = [mommy.make(User, username='OTHER-{0}'.format(i)) for i in xrange(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         
@@ -472,8 +472,8 @@ class ListFavoritesTestCase(BaseTestCase):
     def test_list_different_cts(self):
         """different contentypes in list"""
         logged_user = self.user
-        faved_users = [mommy.make_one(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        faved_groups = [mommy.make_one(Group, name='group-{0}'.format(i)) for i in xrange(5)]
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
+        faved_groups = [mommy.make(Group, name='group-{0}'.format(i)) for i in xrange(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         group_ct = ContentType.objects.get_for_model(Group)
