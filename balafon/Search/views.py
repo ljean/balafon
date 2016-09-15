@@ -11,7 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.template import RequestContext, Context, Template
 from django.utils.translation import ugettext as _
 
@@ -327,7 +327,7 @@ def create_emailing(request):
                         {'form': form},
                         context_instance=RequestContext(request)
                     )
-    except Exception, msg:
+    except Exception as msg:
         logger.exception("create_emailing")
         raise
     raise Http404
@@ -505,7 +505,7 @@ def add_contacts_to_group(request):
                             },
                             context_instance=RequestContext(request)
                         )
-    except Exception, msg:
+    except Exception as msg:
         logger.exception("add_contacts_to_group")
         raise
     raise Http404
@@ -580,13 +580,13 @@ def subscribe_contacts_admin(request):
                             {'form': form}
                         )
                     else:
-                        return render_to_response(
+                        return render(
+                            request,
                             'balafon/message_dialog.html',
                             {
                                 'title': _('Subscribe contacts admin'),
                                 'message': _(u'The search results contains no contacts')
-                            },
-                            context_instance=RequestContext(request)
+                            }
                         )
     except Exception:
         logger.exception("search_subscribe_contacts_admin")
@@ -644,7 +644,7 @@ def export_to_pdf(request):
                         {'form': form},
                         context_instance=RequestContext(request)
                     )
-    except Exception, msg:
+    except Exception as msg:
         logger.exception("export_to_pdf")
         raise
     raise Http404
