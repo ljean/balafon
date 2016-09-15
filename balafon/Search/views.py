@@ -29,7 +29,7 @@ from balafon.Emailing.forms import NewEmailingForm
 from balafon.Search.models import Search
 from balafon.Search.forms import (
     ActionForContactsForm, FieldChoiceForm, GroupForContactsForm, QuickSearchForm, PdfTemplateForm, SearchForm,
-    SearchNameForm, get_field_form, SubscribeContactsAdminForm, PrintLabelsPdfForm
+    SearchNameForm, get_field_form, SubscribeContactsAdminForm
 )
 
 
