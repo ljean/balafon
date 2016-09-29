@@ -111,7 +111,7 @@ class ActionArchiveView(object):
                 if action_type.id in selected_types:
                     setattr(action_type, 'selected', True)
 
-            #list of unique action status sorted by name
+            # list of unique action status sorted by name
             action_status = self._get_allowed_status(action_types, selected_types)
 
             if 0 in selected_types:
