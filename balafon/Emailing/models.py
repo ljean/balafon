@@ -134,7 +134,7 @@ class Emailing(TimeStampedModel):
         
     def save(self, *args, **kwargs):
         """save"""
-        if self.status == Emailing.STATUS_SENT and self.sending_dt == None:
+        if self.status == Emailing.STATUS_SENT and self.sending_dt is None:
             self.sending_dt = datetime.now()
         return super(Emailing, self).save(*args, **kwargs)
 
