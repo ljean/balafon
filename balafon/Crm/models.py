@@ -1431,7 +1431,7 @@ class Action(LastModifiedModel):
 
     def get_action_number(self):
         if self.type and self.number:
-            return u'{0} {1}'.format(self.type.name, self.number)
+            return _(u'{0} N° {1}').format(self.type.name, self.number)
         return ''
 
     def get_menus(self):
