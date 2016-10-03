@@ -672,6 +672,8 @@
           {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
             <span class="glyphicon glyphicon-download-alt"></span> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
         </div>
+
+        {% endverbatim %}{% block extra_badges %}{% endblock %}{% verbatim %}
       </div>
 
       <div class="content">
