@@ -215,15 +215,18 @@ class StoreItemAdmin(admin.ModelAdmin):
         'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
     ]
     ordering = ['name']
-    list_filter = ['available', 'price_class', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter]
+    list_filter = [
+        'available', 'price_class', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter,
+        'only_for_groups',
+    ]
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
     readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
-    raw_id_fields = ['tags', 'certificates']
+    raw_id_fields = ['tags', 'certificates', 'only_for_groups']
     inlines = [StoreItemPropertyValueInline]
     fieldsets = (
         (_(u'General'), {
-            'fields': ('name', 'available', 'category', 'brand', 'certificates', 'tags', )
+            'fields': ('name', 'available', 'category', 'brand', 'certificates', 'tags', 'only_for_groups')
         }),
         (_(u'Price'), {
             'fields': ('vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', 'price_class', )

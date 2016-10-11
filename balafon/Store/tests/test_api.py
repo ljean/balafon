@@ -59,6 +59,112 @@ class StoreItemApiTest(BaseTestCase):
         self.assertEqual(item2['id'], store_item2.id)
         self.assertEqual(item2['name'], store_item2.name)
 
+    def test_view_store_items_profile(self):
+        """It should return all"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem)
+
+        url = reverse('store_store-items-list')
+
+        create_profile_contact(self.user)
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 2)
+
+        data = sorted(response.data, key=lambda item_: item_['id'])
+        item1 = data[0]
+        item2 = data[1]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+        self.assertEqual(item2['id'], store_item2.id)
+        self.assertEqual(item2['name'], store_item2.name)
+
+    def test_view_store_items_only_for_group(self):
+        """It should return items if only_for_groups is empty or user contact is member of one of the groups"""
+
+        group1 = mommy.make(models.Group)
+        group2 = mommy.make(models.Group)
+        group3 = mommy.make(models.Group)
+
+        profile = create_profile_contact(self.user)
+
+        group1.contacts.add(profile.contact)
+        group1.save()
+        group2.entities.add(profile.contact.entity)
+        group2.save()
+
+        store_item1 = mommy.make(models.StoreItem)
+
+        store_item2 = mommy.make(models.StoreItem)
+        store_item2.only_for_groups.add(group1)
+        store_item2.save()
+
+        store_item3 = mommy.make(models.StoreItem)
+        store_item3.only_for_groups.add(group2)
+        store_item3.save()
+
+        store_item4 = mommy.make(models.StoreItem)
+        store_item4.only_for_groups.add(group1)
+        store_item4.only_for_groups.add(group2)
+        store_item4.only_for_groups.add(group3)
+        store_item4.save()
+
+        store_item5 = mommy.make(models.StoreItem)
+        store_item5.only_for_groups.add(group3)
+        store_item5.save()
+
+        url = reverse('store_store-items-list')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 4)
+
+        data = sorted(response.data, key=lambda item_: item_['id'])
+        item1 = data[0]
+        item2 = data[1]
+        item3 = data[2]
+        item4 = data[3]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+        self.assertEqual(item2['id'], store_item2.id)
+        self.assertEqual(item2['name'], store_item2.name)
+        self.assertEqual(item3['id'], store_item3.id)
+        self.assertEqual(item3['name'], store_item3.name)
+        self.assertEqual(item4['id'], store_item4.id)
+        self.assertEqual(item4['name'], store_item4.name)
+
+    def test_view_store_items_anonymous_only_for_group(self):
+        """It should return items if only_for_groups is empty or user contact is member of one of the groups"""
+
+        group1 = mommy.make(models.Group)
+
+        self.client.logout()
+
+        store_item1 = mommy.make(models.StoreItem)
+
+        store_item2 = mommy.make(models.StoreItem)
+        store_item2.only_for_groups.add(group1)
+        store_item2.save()
+
+        url = reverse('store_store-items-list')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+
+        data = sorted(response.data, key=lambda item_: item_['id'])
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
     def test_view_store_items_category(self):
         """It should return only items of category"""
 

@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _, ugettext
 
-from balafon.Crm.models import Action, ActionMenu, ActionStatus, ActionType
+from balafon.Crm.models import Action, ActionMenu, ActionStatus, ActionType, Group
 from balafon.Crm.signals import action_cloned
 
 
@@ -366,6 +366,10 @@ class StoreItem(models.Model):
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
     price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_(u"price class"))
     certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_(u"certificate"))
+    only_for_groups = models.ManyToManyField(
+        Group, blank=True, verbose_name=_(u"only for groups"),
+        help_text=_(u'If defined, only members of these groups will be able to see the item')
+    )
 
     class Meta:
         verbose_name = _(u"Store item")

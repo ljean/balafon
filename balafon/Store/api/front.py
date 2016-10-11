@@ -3,6 +3,7 @@
 
 from decimal import Decimal
 
+from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
 
@@ -56,6 +57,25 @@ class StoreItemViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """returns objects"""
+        contact = None
+        try:
+            if self.request.user.is_authenticated():
+                profile = ContactProfile.objects.get(user=self.request.user)
+                contact = profile.contact
+        except ContactProfile.DoesNotExist:
+            pass
+
+        if contact:
+            # The contact exists : show items with a only_for_groups if contact is member of one of the groups
+            self.queryset = self.queryset.filter(
+                Q(only_for_groups=None) |
+                Q(only_for_groups__contacts=contact) |
+                Q(only_for_groups__entities=contact.entity)
+            ).distinct()
+        else:
+            # The contact doesn't exist : Don't show items with a only_for_groups
+            self.queryset = self.queryset.filter(only_for_groups=None)
+
         name = self.request.GET.get('name', None)
         if name:
             return self.queryset.filter(name__icontains=name)[:20]
