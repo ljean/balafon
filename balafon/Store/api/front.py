@@ -23,12 +23,23 @@ from balafon.Store.settings import get_cart_type_name
 from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user
 
 
+class CanAccessStorePermission(permissions.BasePermission):
+    """Define who can access the store"""
+
+    def has_permission(self, request, view):
+        """check permission"""
+
+        # Allow authenticated users
+        if request.user.is_authenticated():
+            return True
+
+        # Allow anonymous user if settings
+        return settings.is_public_api_allowed()
+
+
 def get_public_api_permissions():
     """get public api permissions"""
-    if settings.is_public_api_allowed():
-        return [permissions.IsAuthenticatedOrReadOnly]
-    else:
-        return [permissions.IsAuthenticated]
+    return [CanAccessStorePermission]
 
 
 class SaleItemViewSet(viewsets.ModelViewSet):

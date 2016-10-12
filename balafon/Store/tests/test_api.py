@@ -6,6 +6,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from model_mommy import mommy
 from rest_framework import status
@@ -139,6 +140,7 @@ class StoreItemApiTest(BaseTestCase):
         self.assertEqual(item4['id'], store_item4.id)
         self.assertEqual(item4['name'], store_item4.name)
 
+    @override_settings(BALAFON_STORE_ALLOW_PUBLIC_API=True)
     def test_view_store_items_anonymous_only_for_group(self):
         """It should return items if only_for_groups is empty or user contact is member of one of the groups"""
 
@@ -164,6 +166,25 @@ class StoreItemApiTest(BaseTestCase):
 
         self.assertEqual(item1['id'], store_item1.id)
         self.assertEqual(item1['name'], store_item1.name)
+
+    @override_settings(BALAFON_STORE_ALLOW_PUBLIC_API=False)
+    def test_view_store_items_anonymous_forbidden(self):
+        """Anonymous user should not be allowed"""
+
+        group1 = mommy.make(models.Group)
+
+        self.client.logout()
+
+        store_item1 = mommy.make(models.StoreItem)
+
+        store_item2 = mommy.make(models.StoreItem)
+        store_item2.only_for_groups.add(group1)
+        store_item2.save()
+
+        url = reverse('store_store-items-list')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_view_store_items_category(self):
         """It should return only items of category"""
