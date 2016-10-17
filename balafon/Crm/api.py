@@ -4,20 +4,21 @@
 from datetime import date, datetime, time
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
 from rest_framework import generics, viewsets
 from rest_framework.exceptions import ParseError, PermissionDenied
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView, Response
 
-from balafon.Crm.models import Action, ActionType, ActionStatus, Contact, TeamMember
+from balafon.Crm.models import Action, ActionType, ActionStatus, Contact, TeamMember, Entity
 from balafon.Crm import serializers
 
 
 class ContactViewSet(viewsets.ReadOnlyModelViewSet):
     """returns contacts for autocomplete"""
-
+    permission_classes = [IsAdminUser, ]
     queryset = Contact.objects.all()
     serializer_class = serializers.ContactSerializer
 
@@ -29,8 +30,47 @@ class ContactViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset
 
 
+class ContactsOrEntitiesView(APIView):
+    """returns contacts or entity for autocomplete"""
+
+    queryset = Contact.objects.all()
+    serializer_class = serializers.ContactSerializer
+    permission_classes = [IsAdminUser, ]
+
+    def get(self, request):
+        """returns """
+        name = self.request.GET.get('name', None)
+        contacts_and_entities = []
+        if name:
+            contacts = Contact.objects.filter(lastname__istartswith=name)[:10]
+            contact_type = ContentType.objects.get_for_model(Contact)
+            entity_type = ContentType.objects.get_for_model(Entity)
+            for contact in contacts:
+                city = contact.get_city
+                contacts_and_entities.append({
+                    'id': contact.id,
+                    'name': contact.fullname,
+                    'type': contact_type.id,
+                    'city': city.get_friendly_name() if city else '',
+                })
+
+            entities = Entity.objects.filter(name__istartswith=name, is_single_contact=False)[:10]
+            for entity in entities:
+                city = entity.city
+                contacts_and_entities.append({
+                    'id': entity.id,
+                    'name': entity.name,
+                    'type': entity_type.id,
+                    'city': city.get_friendly_name() if city else '',
+                })
+
+        contacts_and_entities = sorted(contacts_and_entities, key=lambda elt: elt['name'])[:10]
+        return Response(contacts_and_entities)
+
+
 class ListActionsView(generics.ListAPIView):
     """update an action date"""
+    permission_classes = [IsAdminUser, ]
     model = Action
     serializer_class = serializers.ActionSerializer
 
@@ -122,6 +162,7 @@ class UpdateActionDateView(generics.UpdateAPIView):
     """update an action date"""
     model = Action
     serializer_class = serializers.ActionUpdateDateSerializer
+    permission_classes = [IsAdminUser, ]
 
     def get_queryset(self):
         return self.model.objects.filter(pk=self.kwargs['pk'])
@@ -168,6 +209,7 @@ class EditActionMixin(object):
 
 class UpdateActionView(EditActionMixin, generics.UpdateAPIView):
     """update an action"""
+    permission_classes = [IsAdminUser, ]
     model = Action
     serializer_class = serializers.ActionUpdateSerializer
     contacts = None
@@ -188,6 +230,7 @@ class UpdateActionView(EditActionMixin, generics.UpdateAPIView):
 
 class CreateActionView(EditActionMixin, generics.CreateAPIView):
     """create an action"""
+    permission_classes = [IsAdminUser, ]
     model = Action
     serializer_class = serializers.ActionUpdateSerializer
     contacts = None
@@ -207,6 +250,7 @@ class CreateActionView(EditActionMixin, generics.CreateAPIView):
 class DeleteActionView(generics.DestroyAPIView):
     """delete an action"""
     model = Action
+    permission_classes = [IsAdminUser, ]
 
     def get_queryset(self):
         return self.model.objects.filter(pk=self.kwargs['pk'])
@@ -220,4 +264,3 @@ class AboutMeView(generics.ListAPIView):
 
     def get_queryset(self):
         return self.model.objects.filter(id=self.request.user.id)
-

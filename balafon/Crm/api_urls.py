@@ -8,7 +8,7 @@ from rest_framework import routers
 
 from balafon.Crm.api import (
     UpdateActionDateView, CreateActionView, DeleteActionView, UpdateActionView, ContactViewSet, ListActionsView,
-    ListTeamMemberActionsView, AboutMeView
+    ListTeamMemberActionsView, AboutMeView, ContactsOrEntitiesView
 )
 
 router = routers.DefaultRouter()
@@ -26,4 +26,5 @@ urlpatterns = [
         r'^api/list-team-member-actions/$', ListTeamMemberActionsView.as_view(), name="crm_api_list_team_member_actions"
     ),
     url(r'^api/about-me/$', AboutMeView.as_view(), name="crm_api_about_me"),
+    url(r'^api/contacts-or-entities/$', ContactsOrEntitiesView.as_view(), name="crm_api_contacts_or_entities"),
 ]
