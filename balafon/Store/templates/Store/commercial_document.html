@@ -370,7 +370,8 @@
         var sum = 0;
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
           if (!$scope.app.sale_items[i].is_blank) {
-            sum += $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
+            var value = $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
+            sum += Math.round(value * 100, 2) / 100;
           }
         }
         if (isNaN(sum)) {
