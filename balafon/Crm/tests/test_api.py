@@ -116,7 +116,7 @@ class ContactOrEntityTest(APITestCase):
         """can't access"""
         url = reverse('crm_api_contacts_or_entities') + "?name=A"
         response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertTrue(response.status_code in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
 
     def test_api_not_admin(self):
         """can't access"""
