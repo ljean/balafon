@@ -164,10 +164,10 @@ class EmailingSearchTest(BaseTestCase):
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
         emailing2 = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
-        contact4 = self._new_contact("MNOP")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
+        contact4 = self._new_contact(u"MNOPmnop")
 
         emailing.sent_to.add(contact1)
         emailing.send_to.add(contact2)
@@ -193,9 +193,9 @@ class EmailingSearchTest(BaseTestCase):
         """search contacts who opened the emailing"""
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
 
         emailing.sent_to.add(contact1)
         emailing.send_to.add(contact2)
@@ -219,9 +219,9 @@ class EmailingSearchTest(BaseTestCase):
 
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
 
         emailing.sent_to.add(contact1)
         emailing.send_to.add(contact2)
@@ -243,9 +243,9 @@ class EmailingSearchTest(BaseTestCase):
         """search all contacts in the emailing"""
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
 
         emailing.sent_to.add(contact1)
         emailing.send_to.add(contact2)
@@ -267,12 +267,12 @@ class EmailingSearchTest(BaseTestCase):
         """search contacts with bounce"""
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
-        contact4 = self._new_contact("MNOP")
-        contact5 = self._new_contact("QRST")
-        contact6 = self._new_contact("UVWX")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
+        contact4 = self._new_contact(u"MNOPmnop")
+        contact5 = self._new_contact(u"QRSTqrst")
+        contact6 = self._new_contact(u"UVWXuvwx")
 
         for contact in (contact1, contact2, contact3, contact4, contact5, contact6):
             emailing.sent_to.add(contact)
@@ -304,9 +304,9 @@ class EmailingSearchTest(BaseTestCase):
         """search contacts with several bounces"""
         emailing = mommy.make(Emailing, status=Emailing.STATUS_SENDING)
 
-        contact1 = self._new_contact("ABCD")
-        contact2 = self._new_contact("EFGH")
-        contact3 = self._new_contact("IJKL")
+        contact1 = self._new_contact(u"ABCDabcd")
+        contact2 = self._new_contact(u"EFGHefg")
+        contact3 = self._new_contact(u"IJKLijkl")
 
         for contact in (contact1, contact2, contact3, ):
             emailing.sent_to.add(contact)
