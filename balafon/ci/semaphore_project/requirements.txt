@@ -1,2 +1,2 @@
 psycopg2
-django-modeltranslation==0.11
+django-modeltranslation==0.12
