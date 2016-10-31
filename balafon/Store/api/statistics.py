@@ -4,8 +4,8 @@
 from decimal import Decimal
 from datetime import date, datetime, time, timedelta
 
+from django.conf import settings
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 from django.shortcuts import get_object_or_404
 
 from rest_framework import permissions
@@ -63,7 +63,7 @@ class SalesStatisticsBaseView(APIView):
         return SaleItem.objects.filter(
             sale__action__planned_date__gte=date_from,
             sale__action__planned_date__lt=date_to,
-        )
+        ).exclude(sale__analysis_code__isnull=True)
 
     def get_object_name(self, obj):
         """return object name"""
