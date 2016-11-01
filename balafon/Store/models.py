@@ -898,7 +898,7 @@ class SaleItem(models.Model):
 
     def vat_incl_price(self):
         """VAT inclusive price"""
-        return self.unit_price() + self.vat_price()
+        return round(self.unit_price() + self.vat_price(), 2)
 
     def total_vat_price(self):
         """VAT price * quantity"""

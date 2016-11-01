@@ -292,8 +292,7 @@
 
         $scope.formErrors = $scope.isFormInvalid(item);
         if (!$scope.formErrors) {
-          var url = '/store/api/'+$scope.app.action.id+'/sales-items/';
-          $log.debug('>>>> POST', item.id);
+          var url = '/store/api/' + $scope.app.action.id + '/sales-items/';
           var httpMethod = $http.post;
           if (item.id) {
             url += item.id + '/';
@@ -314,7 +313,6 @@
             if (item.id === 0) {
               item.id = respData.id;
             }
-            $log.debug('>>>>', item.text, item.unit_price);
             getItemData(item);
             $scope.editBackup = null;
             $scope.switchOffEditMode();
@@ -343,7 +341,7 @@
 
       $scope.getItemTaxInclPrice = function(item) {
         if (item.vat_rate !== null) {
-          var value = $scope.getItemPreTaxPrice(item) * (100 + item.vat_rate.rate) / 100;
+          var value = item.quantity * Math.round(item.unit_price * (100 + item.vat_rate.rate)) / 100;
           if (isNaN(value)) {
             return translate('ERROR');
           }
