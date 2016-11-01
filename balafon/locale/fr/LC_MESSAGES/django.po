@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-01 23:24+0100\n"
+"POT-Creation-Date: 2016-11-02 00:31+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -964,7 +964,7 @@ msgstr "Etats définis"
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: Crm/models.py:1288 Store/models.py:773
+#: Crm/models.py:1288 Crm/models.py:1693 Store/models.py:773
 msgid "action type"
 msgstr "type d'action"
 
@@ -1041,7 +1041,7 @@ msgstr "priorité haute"
 
 #: Crm/models.py:1357 Crm/templates/Crm/_section_actions.html:29
 #: Crm/templates/Crm/_section_actions.html:33
-#: Crm/templates/Crm/_section_actions.html:37 Crm/views/actions.py:399
+#: Crm/templates/Crm/_section_actions.html:37 Crm/views/actions.py:400
 #: Store/models.py:786
 msgid "action"
 msgstr "action"
@@ -1050,7 +1050,7 @@ msgstr "action"
 msgid "actions"
 msgstr "actions"
 
-#: Crm/models.py:1360
+#: Crm/models.py:1360 Crm/models.py:1696
 msgid "subject"
 msgstr "sujet"
 
@@ -1216,6 +1216,22 @@ msgstr "import de contacts"
 #: Crm/models.py:1688
 msgid "contact imports"
 msgstr "imports de contacts"
+
+#: Crm/models.py:1694
+msgid "carbon copy"
+msgstr "copie cachée"
+
+#: Crm/models.py:1696
+msgid "Use action subject if empty"
+msgstr "Utilise le sujet de l'action si vide"
+
+#: Crm/models.py:1698
+msgid "body template"
+msgstr "Corps (Template)"
+
+#: Crm/models.py:1704 Crm/models.py:1705
+msgid "Mailto settings"
+msgstr "Mailto"
 
 #: Crm/search_forms.py:22 Profile/models.py:30
 msgid "Entity name"
@@ -1708,8 +1724,8 @@ msgid "Open"
 msgstr "Ouvrir"
 
 #: Crm/templates/Crm/_section_actions.html:11
-#: Crm/templates/Crm/_section_actions_by_set.html:5 Crm/views/actions.py:154
-#: Crm/views/actions.py:189
+#: Crm/templates/Crm/_section_actions_by_set.html:5 Crm/views/actions.py:155
+#: Crm/views/actions.py:190
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:36
 #: config.py:89
 msgid "Actions"
@@ -2339,19 +2355,19 @@ msgstr ""
 msgid "2 days 2:27"
 msgstr "2 jours 2:27"
 
-#: Crm/views/actions.py:154 Crm/views/actions.py:189
+#: Crm/views/actions.py:155 Crm/views/actions.py:190
 msgid "Other kind of actions"
 msgstr "Autres types d'action"
 
-#: Crm/views/actions.py:331
+#: Crm/views/actions.py:332
 msgid "Are you sure to delete this action?"
 msgstr "Etes-vous sur de supprimer cette action?"
 
-#: Crm/views/actions.py:399
+#: Crm/views/actions.py:400
 msgid "Reassign {0}"
 msgstr "Réaffecter {0}"
 
-#: Crm/views/actions.py:451 Crm/views/actions.py:502
+#: Crm/views/actions.py:452 Crm/views/actions.py:503
 msgid "Do you to remove {0} from this action?"
 msgstr "Voulez vous supprimer {0} de cette action?"
 
@@ -4819,8 +4835,3 @@ msgstr "Erreur"
 msgid "RGB format (e.g. #123456) expected"
 msgstr "Format RGB (exemple (#123456) attendu"
 
-#~ msgid "Contacts admin"
-#~ msgstr "Administration des contacts"
-
-#~ msgid "Action by status"
-#~ msgstr "Action par état"

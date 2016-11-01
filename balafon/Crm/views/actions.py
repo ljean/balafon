@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, render, get_object_or_404
-from django.template import RequestContext
+from django.template import RequestContext, Template, Context
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_reload, popup_close
@@ -19,6 +19,7 @@ from balafon.Crm.signals import action_cloned
 from balafon.Crm.views.contacts import select_contact_and_redirect
 from balafon.Crm.utils import get_actions_by_set
 from balafon.permissions import can_access
+from balafon.utils import HttpResponseRedirectMailtoAllowed
 
 
 @user_passes_test(can_access)
@@ -584,3 +585,29 @@ def update_action_status(request, action_id):
         'Crm/popup_update_action_status.html',
         context,
     )
+
+
+@user_passes_test(can_access)
+def mailto_action(request, action_id):
+    """Open the mail client in order to send email to action contacts"""
+
+    action = get_object_or_404(models.Action, id=action_id)
+    mailto_settings = get_object_or_404(models.MailtoSettings, action_type=action.type)
+
+    emails = [contact.get_email for contact in action.contacts.all()]
+    emails += [entity.email for entity in action.entities.all()]
+
+    template_text = Template(mailto_settings.body_template)
+    body = template_text.render(Context({'action': action, 'settings': mailto_settings}))
+
+    # Remove duplicates and empty and soty in alphabetical order
+    emails = list(sorted(set([email for email in emails if email])))
+
+    mailto = u'mailto:'
+    if mailto_settings.bcc:
+        mailto += '?bcc='
+    mailto += ','.join(emails)
+    mailto += "&" if mailto_settings.bcc else "?"
+    mailto += 'subject={0}'.format(mailto_settings.subject or action.subject)
+    mailto += '&body={0}'.format(body)
+    return HttpResponseRedirectMailtoAllowed(mailto)

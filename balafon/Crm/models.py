@@ -234,7 +234,7 @@ class AddressModel(LastModifiedModel):
         City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set'
     )
 
-    #These fields are just kept for editing the address field
+    # These fields are just kept for editing the address field
     billing_street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
     billing_street_type = models.ForeignKey(
         StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'),
@@ -1686,3 +1686,20 @@ class ContactsImport(TimeStampedModel):
     class Meta:
         verbose_name = _(u'contact import')
         verbose_name_plural = _(u'contact imports')
+
+
+class MailtoSettings(models.Model):
+    """make possible to send emails to actions contacts via mailto"""
+    action_type = models.OneToOneField(ActionType, verbose_name=_(u"action type"))
+    bcc = models.BooleanField(default=False, verbose_name=_(u"carbon copy"))
+    subject = models.CharField(
+        verbose_name=_(u"subject"), default="", max_length=100, blank=True, help_text=_(u"Use action subject if empty")
+    )
+    body_template = models.TextField(verbose_name=_(u"body template"), default="", blank=True)
+
+    def __unicode__(self):
+        return u'{0}'.format(self.action_type)
+
+    class Meta:
+        verbose_name = _(u'Mailto settings')
+        verbose_name_plural = _(u'Mailto settings')

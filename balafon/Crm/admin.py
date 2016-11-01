@@ -244,3 +244,11 @@ class TeamMemberAdmin(admin.ModelAdmin):
 admin.site.register(models.TeamMember, TeamMemberAdmin)
 
 admin.site.register(models.StreetType)
+
+
+class MailtoSettingsAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['action_type', 'subject', 'bcc']
+
+
+admin.site.register(models.MailtoSettings, MailtoSettingsAdmin)

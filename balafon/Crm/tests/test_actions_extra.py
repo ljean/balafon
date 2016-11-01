@@ -721,3 +721,162 @@ class CloneActionTest(BaseTestCase):
         action_type_1.save()
 
         self.assertEqual(0, models.ActionMenu.objects.count())
+
+
+class MailtoActionTest(BaseTestCase):
+    """Send email to action contacts"""
+
+    def test_mailto_action_contact(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=Hello")
+
+    def test_mailto_action_entity(self):
+        """send email to the ony entity"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+        entity = mommy.make(models.Entity, email="toto@toto.fr")
+        action.entities.add(entity)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=Hello")
+
+    def test_mailto_action_several(self):
+        """send email to the several contacts"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+
+        entity = mommy.make(models.Entity, email="entity@toto.fr")
+
+        contact1 = mommy.make(models.Contact, email="toto@toto.fr")
+        contact2 = mommy.make(models.Contact, email="c2@toto.fr")
+        contact3 = mommy.make(models.Contact, entity=entity, email="")
+        contact4 = mommy.make(models.Contact, entity=entity, email="c3@toto.fr")
+        contact5 = mommy.make(models.Contact)
+        contact6 = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact1)
+        action.contacts.add(contact2)
+        action.contacts.add(contact3)
+        action.contacts.add(contact4)
+        action.contacts.add(contact5)
+        action.contacts.add(contact6)
+
+        entity = mommy.make(models.Entity, email="blabla@toto.fr")
+        action.entities.add(entity)
+
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response['Location'],
+            "mailto:blabla@toto.fr,c2@toto.fr,c3@toto.fr,entity@toto.fr,toto@toto.fr?subject=Test&body=Hello"
+        )
+
+    def test_mailto_action_bcc(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", bcc=True, action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:?bcc=toto@toto.fr&subject=Test&body=Hello")
+
+    def test_mailto_action_subject(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", subject=u"Subject", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Subject&body=Hello")
+
+    def test_mailto_action_body(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello {{ action.subject }}", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=Hello%20Test")
+
+    def test_mailto_action_no_settings(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_mailto_action_invalid_action(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id + 1])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
