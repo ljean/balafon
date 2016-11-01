@@ -37,9 +37,8 @@ class ContactsOrEntitiesView(APIView):
     serializer_class = serializers.ContactSerializer
     permission_classes = [IsAdminUser, ]
 
-    def get(self, request):
-        """returns """
-        name = self.request.GET.get('name', None)
+    def get_matching_items(self, name):
+        """return list of contacts"""
         contacts_and_entities = []
         if name:
             contacts = Contact.objects.filter(lastname__istartswith=name)[:10]
@@ -63,9 +62,12 @@ class ContactsOrEntitiesView(APIView):
                     'type': entity_type.id,
                     'city': city.get_friendly_name() if city else '',
                 })
+        return sorted(contacts_and_entities, key=lambda elt: elt['name'])[:10]
 
-        contacts_and_entities = sorted(contacts_and_entities, key=lambda elt: elt['name'])[:10]
-        return Response(contacts_and_entities)
+    def get(self, request):
+        """returns """
+        name = self.request.GET.get('name', None)
+        return Response(self.get_matching_items(name))
 
 
 class ListActionsView(generics.ListAPIView):
