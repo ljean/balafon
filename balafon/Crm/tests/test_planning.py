@@ -536,6 +536,58 @@ class ActionArchiveTest(BaseTestCase):
             [x["value"] for x in soup.select("select.action-filter option")]
         )
 
+    def test_action_type_ordering_asc(self):
+        """view actions of the month incharge filter"""
+        now = datetime(2016, 10, 10, 12, 0)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=now + timedelta(days=1))
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=now + timedelta(days=2))
+        action3 = mommy.make(models.Action, subject="#ACT3#", planned_date=now - timedelta(days=1))
+        action4 = mommy.make(models.Action, subject="#ACT4#", planned_date=now - timedelta(days=3))
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=now)
+
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=o1"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        actions = [
+            action4, action3, action5, action1, action2
+        ]
+
+        subjects = [action.subject for action in actions]
+        for subject in subjects:
+            self.assertContains(response, subject)
+        pos = [response.content.find(subject) for subject in subjects]
+        self.assertEqual(pos, list(sorted(pos)))
+
+    def test_action_type_ordering_desc(self):
+        """view actions of the month incharge filter"""
+        now = datetime(2016, 10, 10, 12, 0)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=now + timedelta(days=1))
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=now + timedelta(days=2))
+        action3 = mommy.make(models.Action, subject="#ACT3#", planned_date=now - timedelta(days=1))
+        action4 = mommy.make(models.Action, subject="#ACT4#", planned_date=now - timedelta(days=3))
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=now)
+
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=o0"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        actions = [
+            action2, action1, action5, action3, action4
+        ]
+
+        subjects = [action.subject for action in actions]
+        for subject in subjects:
+            self.assertContains(response, subject)
+        pos = [response.content.find(subject) for subject in subjects]
+        self.assertEqual(pos, list(sorted(pos)))
+
     def test_view_not_planned_action_anonymous(self):
         """make sure not display for anonymous users"""
         mommy.make(models.Action, subject="#ACT1#")

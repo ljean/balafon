@@ -83,6 +83,13 @@ class ActionArchiveView(object):
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
 
+            # Ordering
+            actions_ordering = values_dict.get("o", [1])
+            if actions_ordering == [0]:
+                queryset = queryset.order_by("-planned_date", "-id")
+            elif actions_ordering == [1]:
+                queryset = queryset.order_by("planned_date", "id")
+
         return queryset
 
     def _get_allowed_status(self, action_types, selected_types):
@@ -102,6 +109,7 @@ class ActionArchiveView(object):
         action_status = []
         in_charge = get_in_charge_users()
         values = self.request.GET.get("filter", None)
+        ordering = "asc"
         if values and values != "null":
             context["filter"] = values
             values_dict = self._get_selection(values)
@@ -127,6 +135,12 @@ class ActionArchiveView(object):
                 if status.id in selected_status:
                     setattr(status, 'selected', True)
 
+            actions_ordering = values_dict.get("o", [1])
+            if actions_ordering == [0]:
+                ordering = "desc"
+            elif actions_ordering == [1]:
+                ordering = "asc"
+
         if HAS_CUSTOM_MENU:
             context['planning_custom_menus'] = [
                 menu for menu in CustomMenu.objects.filter(position=CustomMenu.POSITION_PLANNING) if menu.get_children()
@@ -136,6 +150,7 @@ class ActionArchiveView(object):
         context["in_charge"] = in_charge
         context["action_status"] = action_status
         context["planning_type"] = self.planning_type
+        context["ordering"] = ordering
 
         return context
 

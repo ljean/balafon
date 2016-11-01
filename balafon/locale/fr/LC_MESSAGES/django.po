@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-11 23:24+0200\n"
+"POT-Creation-Date: 2016-11-01 23:24+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1908,37 +1908,45 @@ msgstr "Identique à"
 msgid "Add relationship"
 msgstr "Ajouter une relation"
 
-#: Crm/templates/Crm/action_archive_base.html:90
+#: Crm/templates/Crm/action_archive_base.html:114
 msgid "Day"
 msgstr "Jour"
 
-#: Crm/templates/Crm/action_archive_base.html:91
+#: Crm/templates/Crm/action_archive_base.html:115
 msgid "Week"
 msgstr "Semaine"
 
-#: Crm/templates/Crm/action_archive_base.html:92
+#: Crm/templates/Crm/action_archive_base.html:116
 msgid "Month"
 msgstr "Mois"
 
-#: Crm/templates/Crm/action_archive_base.html:107
+#: Crm/templates/Crm/action_archive_base.html:131
 msgid "Filter by"
 msgstr "Filtrer par"
 
-#: Crm/templates/Crm/action_archive_base.html:109
+#: Crm/templates/Crm/action_archive_base.html:133
 msgid "Action types"
 msgstr "Types d'action"
 
-#: Crm/templates/Crm/action_archive_base.html:110
+#: Crm/templates/Crm/action_archive_base.html:134
 msgid "No type"
 msgstr "Sans type"
 
-#: Crm/templates/Crm/action_archive_base.html:117
+#: Crm/templates/Crm/action_archive_base.html:141
 msgid "Action status"
 msgstr "statut d'une action"
 
-#: Crm/templates/Crm/action_archive_base.html:123
+#: Crm/templates/Crm/action_archive_base.html:147
 msgid "In charge"
 msgstr "En charge"
+
+#: Crm/templates/Crm/action_archive_base.html:158
+msgid "Ascending"
+msgstr "Croissant"
+
+#: Crm/templates/Crm/action_archive_base.html:159
+msgid "Descending"
+msgstr "Décroissant"
 
 #: Crm/templates/Crm/action_archive_not_planned.html:5
 #: Crm/templates/Crm/action_archive_not_planned.html:13
@@ -3716,26 +3724,26 @@ msgstr ""
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
-#: Store/api/front.py:132
+#: Store/api/front.py:143
 msgid "You don't have a valid profile"
 msgstr "Votre profil d'utilisateur n'est pas valide"
 
-#: Store/api/front.py:138
+#: Store/api/front.py:149
 msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
 
-#: Store/api/front.py:151 Store/templates/Store/cart_root_email.html:39
+#: Store/api/front.py:162 Store/templates/Store/cart_root_email.html:39
 #: Store/tests/test_cart.py:153 Store/tests/test_cart.py:211
 #: Store/tests/test_cart.py:269
 msgid "Notes"
 msgstr "Notes"
 
-#: Store/api/front.py:184
+#: Store/api/front.py:195
 msgid "{0} is currently not available. It has been removed from your cart"
 msgstr ""
 "{0} n'est pas disponible actuellement. Il a été supprimé de votre panier."
 
-#: Store/api/front.py:210
+#: Store/api/front.py:221
 msgid "Your cart is empty. Your articles are not available"
 msgstr "Votre panier est vide."
 
@@ -4007,7 +4015,9 @@ msgstr "Seulement pour les groupes"
 
 #: Store/models.py:371
 msgid "If defined, only members of these groups will be able to see the item"
-msgstr "Si défini, seuls les membres de ces groupes peuvent voir l'article. Si vide, l'article est visible par tous"
+msgstr ""
+"Si défini, seuls les membres de ces groupes peuvent voir l'article. Si vide, "
+"l'article est visible par tous"
 
 #: Store/models.py:375
 msgid "Store item"

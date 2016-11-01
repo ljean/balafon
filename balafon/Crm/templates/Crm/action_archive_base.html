@@ -7,9 +7,33 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}chosen/chosen.css" type="text/css" />
 <script>
     $(function() {
+
+        var changeFilter = function(values, orderValue) {
+          var filterValues = '';
+          if (values) {
+            filterValues = values;
+          }
+          if (values && orderValue) {
+            filterValues += ",";
+          }
+          if (orderValue) {
+            filterValues += orderValue;
+          }
+
+          window.location = "{% block this_url %}{% endblock%}?filter=" + filterValues;
+        };
+
         $("select.filter").change(function() {
             var values = $(this).val();
-            window.location = "{% block this_url %}{% endblock%}?filter="+values;
+            var orderValue = $("select.action-order").val();
+            changeFilter(values, orderValue);
+            return false;
+        });
+
+        $("select.action-order").change(function() {
+            var values = $("select.filter").val();
+            var orderValue = $("select.action-order").val();
+            changeFilter(values, orderValue);
             return false;
         });
         
@@ -103,7 +127,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-8">
       <select class="form-control action-filter chosen-select filter inline-block" multiple="" data-placeholder="{% trans 'Filter by' %}">
           {% if action_types %}
           <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
@@ -127,6 +151,12 @@
               </option>
           {% endfor %}
           </optgroup>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-control action-order">
+        <option value="o1" {% if ordering == 'asc' %}selected="selected"{% endif %}>{% trans "Ascending" %}</option>
+        <option value="o0" {% if ordering == 'desc' %}selected="selected"{% endif %}>{% trans "Descending" %}</option>
       </select>
     </div>
     <div class="col-md-2">
