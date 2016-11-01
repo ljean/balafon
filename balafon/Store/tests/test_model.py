@@ -1091,3 +1091,40 @@ class MailtoActionTest(TestCase):
             action.mail_to,
             u'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body={0}'.format(body)
         )
+
+
+class SaleItemOrderTest(TestCase):
+    """It should increment the order correctly"""
+
+    def test_default(self):
+        """It should be 1"""
+        sale = mommy.make(models.Sale)
+        item = mommy.make(models.SaleItem, sale=sale, pre_tax_price="10")
+        self.assertEqual(1, item.order_index)
+
+    def test_zero(self):
+        """It should be 1"""
+        sale = mommy.make(models.Sale)
+        item = mommy.make(models.SaleItem, sale=sale, order_index=0, pre_tax_price="10")
+        self.assertEqual(1, item.order_index)
+
+    def test_max(self):
+        """It should be max + 1"""
+        sale = mommy.make(models.Sale)
+        mommy.make(models.SaleItem, sale=sale, order_index=10, pre_tax_price="10")
+        item = mommy.make(models.SaleItem, sale=sale, pre_tax_price="10")
+        self.assertEqual(11, item.order_index)
+
+    def test_value(self):
+        """It should be the given value"""
+        sale = mommy.make(models.Sale)
+        item = mommy.make(models.SaleItem, sale=sale, order_index=5, pre_tax_price="10")
+        self.assertEqual(5, item.order_index)
+
+    def test_max_other(self):
+        """It should be 1 (max of the sale)"""
+        sale = mommy.make(models.Sale)
+        other_sale = mommy.make(models.Sale)
+        mommy.make(models.SaleItem, sale=other_sale, order_index=10, pre_tax_price="10")
+        item = mommy.make(models.SaleItem, sale=sale, pre_tax_price="10")
+        self.assertEqual(1, item.order_index)

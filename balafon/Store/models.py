@@ -8,7 +8,7 @@ import traceback
 import xlrd
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -939,7 +939,10 @@ class SaleItem(models.Model):
 
     def save(self, *args, **kwargs):
         if self.order_index == 0:
-            self.order_index = SaleItem.objects.filter(sale=self.sale).count() + 1
+            max_value = SaleItem.objects.filter(sale=self.sale).aggregate(
+                max_value=Max('order_index')
+            )['max_value'] or 0
+            self.order_index = max_value + 1
 
         if self.is_blank:
             self.pre_tax_price = Decimal(0)
