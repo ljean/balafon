@@ -254,6 +254,50 @@ class ViewCommercialDocumentTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
+    def test_view_public_pdf(self):
+        """It should display item text"""
+
+        action_type = mommy.make(ActionType, generate_uuid=True)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type)
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        action.contacts.add(contact1)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+        self.client.logout()
+
+        mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+
+        url = reverse('store_view_sales_document_pdf_public', args=[action.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+    def test_view_public_pdf_invalid_uuid(self):
+        """It should display item text"""
+
+        action_type = mommy.make(ActionType, generate_uuid=False)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type)
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        action.contacts.add(contact1)
+        action.save()
+
+        self.assertEqual(action.uuid, '')
+        self.client.logout()
+
+        dummy_uuid = 'xxxxxxxxxxxxx'
+        url = reverse('store_view_sales_document_public', args=[dummy_uuid])
+
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+
+        url = url.replace(dummy_uuid, '')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
 
 class ActionMailtoTest(BaseTestCase):
     """It should generate mailto properly"""

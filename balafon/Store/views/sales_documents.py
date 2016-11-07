@@ -7,7 +7,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 from django.views.generic import TemplateView
+
 
 from balafon.permissions import can_access
 from balafon.settings import get_pdf_view_base_class
@@ -22,6 +24,7 @@ class SalesDocumentViewMixin(object):
     """display sales document: to be inherited in TemplateView and PdfTemplateView"""
     action = None
     is_public = False
+    is_pdf = False
     template_name = "Store/commercial_document.html"
 
     def dispatch(self, *args, **kwargs):
@@ -137,6 +140,10 @@ class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
         'margin-right': 0,
     }
 
+    def get_filename(self):
+        action = self.get_action()
+        return '{0}.pdf'.format(slugify(action.type.name) if action.type else 'document')
+
     def get_context_data(self, **kwargs):
         """get context data"""
         context = super(SalesDocumentPdfView, self).get_context_data(**kwargs)
@@ -158,5 +165,15 @@ class SalesDocumentPublicView(SalesDocumentViewMixin, TemplateView):
     """display sales document as pdf"""
     is_pdf = False
     is_public = True
+    cmd_options = {
+        'javascript-delay': 1000,
+        'margin-top': 0,
+        'margin-bottom': 0,
+        'margin-left': 0,
+        'margin-right': 0,
+    }
 
 
+class SalesDocumentPublicPdfView(SalesDocumentPdfView):
+    """display sales document as pdf"""
+    is_public = True

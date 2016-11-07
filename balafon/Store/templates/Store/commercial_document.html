@@ -668,7 +668,17 @@
         </div>
 
         <div class="badge">
-          {% endverbatim %}<a href="{% url 'store_view_sales_document_pdf' action.id %}">{% verbatim %}
+          {% endverbatim %}
+            {% if user.is_staff %}
+              <a href="{% url 'store_view_sales_document_pdf' action.id %}">
+            {% else %}
+              {% if action.uuid %}
+              <a href="{% url 'store_view_sales_document_pdf_public' action.uuid %}">
+              {% else %}
+              <a ng-show="false">
+              {% endif %}
+            {% endif %}
+            {% verbatim %}
             <span class="glyphicon glyphicon-download-alt"></span> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
         </div>
 
