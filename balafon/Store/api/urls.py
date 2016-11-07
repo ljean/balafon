@@ -5,6 +5,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
+from balafon.Store.api.documents import SaleVatTotalsView
 from balafon.Store.api.front import (
     SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView,
     LastSalesView
@@ -86,6 +87,12 @@ urlpatterns = [
         r'^api/stats/total-sales/(?P<from_year>\d+)-(?P<from_month>\d+)/(?P<to_year>\d+)-(?P<to_month>\d+)/$',
         TotalSalesView.as_view(),
         name='store_stats_total_sales'
+    ),
+
+    url(
+        r'^api/documents/sale-vat-total/(?P<sale_id>\d+)/$',
+        SaleVatTotalsView.as_view(),
+        name='store_documents_sale_vat_total'
     ),
 
     url(r'^api/', include(store_items_router.urls)),

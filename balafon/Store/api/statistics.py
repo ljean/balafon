@@ -4,23 +4,18 @@
 from decimal import Decimal
 from datetime import date, datetime, time, timedelta
 
-from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from rest_framework import permissions
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from balafon.Store.models import (
     SaleItem, StoreItem, StoreItemCategory, StoreItemTag, SaleAnalysisCode
 )
-from balafon.Store.api import serializers
+from balafon.Store.api import get_staff_api_permissions, serializers
 
-
-def get_staff_api_permissions():
-    """get public api permissions"""
-    return [permissions.IsAdminUser]
 
 
 class SalesStatisticsBaseView(APIView):

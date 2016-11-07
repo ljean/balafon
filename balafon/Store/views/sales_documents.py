@@ -17,7 +17,9 @@ from balafon.utils import Utf8JSONRenderer
 from balafon.Crm.models import Action
 from balafon.Crm.serializers import ActionSerializer
 from balafon.Store.models import Discount, Sale, SaleItem, VatRate, StoreManagementActionType
-from balafon.Store.api.serializers import DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer
+from balafon.Store.api.serializers import (
+    DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer, VatTotalSerializer
+)
 
 
 class SalesDocumentViewMixin(object):
@@ -72,6 +74,9 @@ class SalesDocumentViewMixin(object):
         sale_serializer = SaleSerializer(sale)
         sale_data = Utf8JSONRenderer().render(sale_serializer.data)
 
+        vat_total_serializer = VatTotalSerializer(sale.vat_total_amounts(), many=True)
+        vat_total_data = Utf8JSONRenderer().render(vat_total_serializer.data)
+
         sale_items_serializer = SaleItemSerializer(self.get_sale_items(), many=True)
         sale_items_data = Utf8JSONRenderer().render(sale_items_serializer.data)
 
@@ -94,6 +99,7 @@ class SalesDocumentViewMixin(object):
             isPublic: {5},
             isReadOnly: {6},
             discounts: {7},
+            vat_totals: {8}
         }};""".format(
             action_data,
             sale_items_data,
@@ -102,7 +108,8 @@ class SalesDocumentViewMixin(object):
             'true' if self.is_pdf else 'false',
             'true' if self.is_public else 'false',
             'true' if is_read_only else 'false',
-            discounts_data
+            discounts_data,
+            vat_total_data
         )
         return context
 

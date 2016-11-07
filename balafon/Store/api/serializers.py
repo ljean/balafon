@@ -40,6 +40,12 @@ class VatRateSerializer(serializers.ModelSerializer):
         fields = ('id', 'rate', 'name', 'is_default')
         
 
+class VatTotalSerializer(serializers.Serializer):
+    """json serializer"""
+    vat_rate = VatRateSerializer(read_only=True)
+    amount = serializers.DecimalField(max_digits=9, decimal_places=2)
+
+
 class BrandSerializer(serializers.ModelSerializer):
     """json serializer"""
     class Meta:

@@ -18,6 +18,7 @@
     });
 
     {{ DJANGO_APP|safe }}
+    var saleVatTotalUrl = '{% url "store_documents_sale_vat_total" action.sale.id %}';
 
     var app = angular.module('commercialDocApp', ['ui.bootstrap', 'pascalprecht.translate']);
 
@@ -53,7 +54,8 @@
         SEND_BY_MAIL: 'Send by email',
         READ_ONLY: 'Read_only',
         DOWNLOAD_AS_PDF: 'Download as PDF',
-        EDIT_ORDER: 'Change order'
+        EDIT_ORDER: 'Change order',
+        VAT: 'VAT'
       });
 
       $translateProvider.translations('fr', {
@@ -84,7 +86,8 @@
         SEND_BY_MAIL: 'Envoyer par email',
         READ_ONLY: 'Lecture seule',
         DOWNLOAD_AS_PDF: 'Télécharger en PDF',
-        EDIT_ORDER: 'Changer l\'ordre'
+        EDIT_ORDER: 'Changer l\'ordre',
+        VAT: 'TVA'
       });
       $translateProvider.preferredLanguage('{{ LANGUAGE_CODE }}');
       $translateProvider.useSanitizeValueStrategy('escape');
@@ -139,6 +142,13 @@
         $scope.changeOrder = true;
       };
 
+      $scope.updateVatTotals = function() {
+        $scope.app.vat_totals = [];
+        $http.get(saleVatTotalUrl).success(function(respData) {
+          $scope.app.vat_totals = respData.vat_totals;
+        });
+      };
+
       $scope.addItem = function(item, isBlank) {
         $scope.editMode = true;
         $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
@@ -167,10 +177,11 @@
           $scope.editBackup = JSON.parse(JSON.stringify($scope.app.sale_items));
           $scope.app.sale_items.splice(index, 1);
           $scope.editedLines.splice(index, 1);
-          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id+'/';
+          var url = '/store/api/' + $scope.app.action.id + '/sales-items/' + item.id + '/';
           $http.delete(url).success(function() {
             $scope.formErrors = '';
             $scope.editBackup = null;
+            $scope.updateVatTotals();
           }).error(function() {
             $scope.formErrors = translate('AN_ERROR_OCCURED');
             $scope.app.sale_items = $scope.editBackup;
@@ -269,7 +280,7 @@
       };
 
       var getItemData = function(item) {
-        var url = '/store/api/' +$scope.app.action.id + '/sales-items/' + item.id + '/';
+        var url = '/store/api/' + $scope.app.action.id + '/sales-items/' + item.id + '/';
         $http.get(url).success(function(respData) {
           item.text = respData.text;
           item.vat_rate = respData.vat_rate;
@@ -279,6 +290,9 @@
           item.is_blank = respData.is_blank;
           item.quantity = respData.quantity;
           item.item = respData.item;
+
+          $scope.updateVatTotals();
+
         });
       };
 
@@ -349,6 +363,18 @@
         } else {
           return $scope.getItemPreTaxPrice(item);
         }
+      };
+
+      $scope.getVatTotalAmount = function() {
+        var sum = 0;
+        for (var i = 0, l = $scope.app.vat_totals.length; i < l; i++) {
+          sum += parseFloat($scope.app.vat_totals[i].amount);
+        }
+
+        if (isNaN(sum)) {
+          return translate('ERROR');
+        }
+        return sum;
       };
 
       $scope.getTotalPreTaxPrice = function() {
@@ -887,6 +913,20 @@
                     <td></td>
                     <td class="number">{{ getTotalTaxInclPrice() | number:2 }} €</td>
                   </tr>
+
+                  <tr class="tr-row" ng-show="!editMode && app.vat_totals.length">
+                    <th colspan="5">{{ "VAT" | translate }}</th>
+                    <th class="number">{{ 'TOTAL' | translate }}</th>
+                  </tr>
+                  <tr class="tr-row" ng-repeat="vat_total in app.vat_totals" ng-show="!editMode && vat_total.amount != 0">
+                    <td colspan="5">{{ vat_total.vat_rate.name }}</td>
+                    <td class="number">{{ vat_total.amount| number:2 }} €</td>
+                  </tr>
+                  <tr class="results tr-row" ng-show="!editMode && app.vat_totals.length">
+                    <td colspan="5">{{ 'TOTAL' | translate }} {{ "VAT" | translate }}</td>
+                    <td class="number">{{ getVatTotalAmount() | number:2 }} €</td>
+                  </tr>
+
                 </table>
                 </form>
               </div></div>
@@ -908,6 +948,12 @@
                 </div>
               </div></div>
             </div>
+          </div>
+
+          <div ng-show="app.vat_totals.length" class="vat-total">
+            <table class="table">
+
+            </table>
           </div>
 
           <div class="doc-footer">
