@@ -62,7 +62,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         action_type_name = ''
         is_amount_calculated = False
         if instance:
-            #If a type is already defined and belongs to a set
+            # If a type is already defined and belongs to a set
             if instance.type and instance.type.set:
                 action_type = instance.type
             if instance.type:
@@ -70,7 +70,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 action_type_name = instance.type.name
                 self.calculated_amount = instance.amount
         else:
-            #if initial value is provided (from url)
+            # if initial value is provided (from url)
             action_type = kwargs.get('initial', {}).get('type', None)
             if action_type:
                 is_amount_calculated = action_type.is_amount_calculated
