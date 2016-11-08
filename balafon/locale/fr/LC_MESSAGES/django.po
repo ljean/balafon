@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-02 00:31+0100\n"
+"POT-Creation-Date: 2016-11-08 09:38+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgstr "Balafon - Annuaire"
 msgid "Pdf"
 msgstr "Pdf"
 
-#: Crm/forms/actions.py:24 Crm/models.py:1361 Search/forms.py:722
+#: Crm/forms/actions.py:24 Crm/models.py:1369 Search/forms.py:722
 msgid "planned date"
 msgstr "date prévue"
 
@@ -49,7 +49,7 @@ msgstr "date prévue"
 msgid "planned time"
 msgstr "heure prévue"
 
-#: Crm/forms/actions.py:27 Crm/models.py:1381
+#: Crm/forms/actions.py:27 Crm/models.py:1389
 msgid "end date"
 msgstr "date de fin"
 
@@ -266,7 +266,7 @@ msgstr "Le contact n'existe pas"
 
 #: Crm/forms/contacts.py:253 Crm/forms/contacts.py:258
 #: Crm/forms/contacts.py:340 Crm/forms/contacts.py:374
-#: Crm/forms/contacts.py:392 Crm/models.py:1578 Crm/search_forms.py:1428
+#: Crm/forms/contacts.py:392 Crm/models.py:1586 Crm/search_forms.py:1428
 #: Crm/templates/Crm/_section_contacts.html:12 Emailing/forms.py:542
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:11
 msgid "Contact"
@@ -341,7 +341,7 @@ msgstr "Veuillez entrer un code valide"
 msgid "Logo"
 msgstr "Logo"
 
-#: Crm/forms/entities.py:102 Crm/models.py:1577 Crm/search_forms.py:1427
+#: Crm/forms/entities.py:102 Crm/models.py:1585 Crm/search_forms.py:1427
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Search/views.py:361
 #: config.py:44 templates/balafon/_bs_navigation.html:68
 #: templates/balafon/_navigation.html:27
@@ -460,7 +460,7 @@ msgstr "Affiché sur le formulaire d'inscription"
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:107 Crm/models.py:1672
+#: Crm/models.py:107 Crm/models.py:1680
 msgid "entity type"
 msgstr "type d'entité"
 
@@ -533,7 +533,7 @@ msgid "street number"
 msgstr "numéro de rue"
 
 #: Crm/models.py:303 Crm/models.py:551 Crm/models.py:1018 Crm/models.py:1048
-#: Crm/models.py:1115 Crm/models.py:1296 Crm/models.py:1581 Crm/models.py:1665
+#: Crm/models.py:1115 Crm/models.py:1296 Crm/models.py:1589 Crm/models.py:1673
 #: Search/models.py:18 Search/models.py:33 Store/models.py:96
 #: Store/models.py:123 Store/models.py:138 Store/models.py:226
 #: Store/models.py:243 Store/models.py:281 Store/models.py:342
@@ -577,7 +577,7 @@ msgstr "est un particulier"
 msgid "entity"
 msgstr "entité"
 
-#: Crm/models.py:495 Crm/models.py:1379
+#: Crm/models.py:495 Crm/models.py:1387
 #: Crm/templates/Crm/_section_my_groups.html:23
 #: Search/templates/Search/_section_qs_cities.html:13
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -740,7 +740,7 @@ msgstr "Chers"
 msgid "contact"
 msgstr "contact"
 
-#: Crm/models.py:990 Crm/models.py:1378
+#: Crm/models.py:990 Crm/models.py:1386
 #: Crm/templates/Crm/_section_my_groups.html:24
 #: Search/templates/Search/_section_qs_cities.html:18
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -784,7 +784,7 @@ msgstr "Couleur de fond"
 msgid "Background color. Must be a rgb code. For example: #000000"
 msgstr "Couleur de fond. Doit-être un code RGB par exemple #000000"
 
-#: Crm/models.py:1082 Crm/models.py:1676
+#: Crm/models.py:1082 Crm/models.py:1684
 msgid "groups"
 msgstr "groupes"
 
@@ -812,7 +812,7 @@ msgstr "moyenne"
 msgid "high"
 msgstr "haute"
 
-#: Crm/models.py:1118 Crm/models.py:1363
+#: Crm/models.py:1118 Crm/models.py:1371
 msgid "detail"
 msgstr "détail"
 
@@ -820,7 +820,7 @@ msgstr "détail"
 msgid "probability"
 msgstr "probabilité"
 
-#: Crm/models.py:1123 Crm/models.py:1372
+#: Crm/models.py:1123 Crm/models.py:1380
 msgid "amount"
 msgstr "montant"
 
@@ -836,11 +836,11 @@ msgstr "date de début"
 msgid "closing date"
 msgstr "date de fin"
 
-#: Crm/models.py:1131 Crm/models.py:1369
+#: Crm/models.py:1131 Crm/models.py:1377
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: Crm/models.py:1161 Crm/models.py:1365
+#: Crm/models.py:1161 Crm/models.py:1373
 msgid "opportunity"
 msgstr "dossier"
 
@@ -848,7 +848,7 @@ msgstr "dossier"
 msgid "opportunities"
 msgstr "dossiers"
 
-#: Crm/models.py:1167 Crm/models.py:1177 Crm/models.py:1585
+#: Crm/models.py:1167 Crm/models.py:1177 Crm/models.py:1593
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
@@ -964,7 +964,7 @@ msgstr "Etats définis"
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: Crm/models.py:1288 Crm/models.py:1693 Store/models.py:773
+#: Crm/models.py:1288 Crm/models.py:1701 Store/models.py:773
 msgid "action type"
 msgstr "type d'action"
 
@@ -1002,7 +1002,7 @@ msgstr "nom de la vue"
 msgid "icon"
 msgstr "icone"
 
-#: Crm/models.py:1313 Crm/models.py:1582 Store/models.py:504
+#: Crm/models.py:1313 Crm/models.py:1590 Store/models.py:504
 #: Users/models.py:75 Users/models.py:109
 msgid "label"
 msgstr "libellé"
@@ -1027,163 +1027,167 @@ msgstr "menu d'actions"
 msgid "action menus"
 msgstr "menus d'actions"
 
-#: Crm/models.py:1351
+#: Crm/models.py:1335
+msgid "Only for status"
+msgstr "Seulement à l'état"
+
+#: Crm/models.py:1359
 msgid "low priority"
 msgstr "priorité basse"
 
-#: Crm/models.py:1352
+#: Crm/models.py:1360
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: Crm/models.py:1353
+#: Crm/models.py:1361
 msgid "high priority"
 msgstr "priorité haute"
 
-#: Crm/models.py:1357 Crm/templates/Crm/_section_actions.html:29
+#: Crm/models.py:1365 Crm/templates/Crm/_section_actions.html:29
 #: Crm/templates/Crm/_section_actions.html:33
 #: Crm/templates/Crm/_section_actions.html:37 Crm/views/actions.py:400
 #: Store/models.py:786
 msgid "action"
 msgstr "action"
 
-#: Crm/models.py:1358
+#: Crm/models.py:1366
 msgid "actions"
 msgstr "actions"
 
-#: Crm/models.py:1360 Crm/models.py:1696
+#: Crm/models.py:1368 Crm/models.py:1704
 msgid "subject"
 msgstr "sujet"
 
-#: Crm/models.py:1364
+#: Crm/models.py:1372
 msgid "priority"
 msgstr "priorité"
 
-#: Crm/models.py:1366
+#: Crm/models.py:1374
 msgid "done"
 msgstr "réalisé"
 
-#: Crm/models.py:1367
+#: Crm/models.py:1375
 msgid "done date"
 msgstr "date de réalisation"
 
-#: Crm/models.py:1368
+#: Crm/models.py:1376
 msgid "in charge"
 msgstr "en charge"
 
-#: Crm/models.py:1370
+#: Crm/models.py:1378
 msgid "archived"
 msgstr "archivé"
 
-#: Crm/models.py:1375
+#: Crm/models.py:1383
 msgid "number"
 msgstr "numéro"
 
-#: Crm/models.py:1375
+#: Crm/models.py:1383
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: Crm/models.py:1382 Store/admin.py:31
+#: Crm/models.py:1390 Store/admin.py:31
 msgid "parent"
 msgstr "parent"
 
-#: Crm/models.py:1401
+#: Crm/models.py:1409
 msgid "{0} days {1}:{2:02}"
 msgstr "{0} jours {1}:{2:02}"
 
-#: Crm/models.py:1434
+#: Crm/models.py:1442
 msgid "{0} N° {1}"
 msgstr "{0} N° {1}"
 
-#: Crm/models.py:1525 Store/tests/test_model.py:1024
-#: Store/tests/test_model.py:1084 Store/tests/test_views.py:346
+#: Crm/models.py:1533 Store/tests/test_model.py:1024
+#: Store/tests/test_model.py:1084 Store/tests/test_views.py:390
 msgid "Here is a link to your {0}: {1}{2}"
 msgstr "Voici un lien vers votre {0}: {1}{2}"
 
-#: Crm/models.py:1542
+#: Crm/models.py:1550
 msgid "content"
 msgstr "contenu"
 
-#: Crm/models.py:1544 Search/forms.py:685
+#: Crm/models.py:1552 Search/forms.py:685
 msgid "template"
 msgstr "Modèle"
 
-#: Crm/models.py:1583
+#: Crm/models.py:1591
 msgid "model"
 msgstr "modèle"
 
-#: Crm/models.py:1584
+#: Crm/models.py:1592
 msgid "widget"
 msgstr "widget"
 
-#: Crm/models.py:1586
+#: Crm/models.py:1594
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: Crm/models.py:1587
+#: Crm/models.py:1595
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: Crm/models.py:1588
+#: Crm/models.py:1596
 msgid "is link"
 msgstr "est un lien"
 
-#: Crm/models.py:1591
+#: Crm/models.py:1599
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: Crm/models.py:1601 Crm/models.py:1608
+#: Crm/models.py:1609 Crm/models.py:1616
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: Crm/models.py:1602
+#: Crm/models.py:1610
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:1609 Search/models.py:47 Store/models.py:747
+#: Crm/models.py:1617 Search/models.py:47 Store/models.py:747
 msgid "value"
 msgstr "valeur"
 
-#: Crm/models.py:1612
+#: Crm/models.py:1620
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: Crm/models.py:1613
+#: Crm/models.py:1621
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: Crm/models.py:1622
+#: Crm/models.py:1630
 msgid "entity custom field value"
 msgstr "cal"
 
-#: Crm/models.py:1623
+#: Crm/models.py:1631
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: Crm/models.py:1634
+#: Crm/models.py:1642
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: Crm/models.py:1635
+#: Crm/models.py:1643
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: Crm/models.py:1656 Search/templates/Search/mailto_groups.html:110
+#: Crm/models.py:1664 Search/templates/Search/mailto_groups.html:110
 msgid "Coma"
 msgstr "Virgule"
 
-#: Crm/models.py:1657
+#: Crm/models.py:1665
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: Crm/models.py:1661
+#: Crm/models.py:1669
 msgid "import file"
 msgstr "fichier d'import"
 
-#: Crm/models.py:1662
+#: Crm/models.py:1670
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: Crm/models.py:1666
+#: Crm/models.py:1674
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -1191,45 +1195,45 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:1668 Store/models.py:362
+#: Crm/models.py:1676 Store/models.py:362
 msgid "imported by"
 msgstr "importé par"
 
-#: Crm/models.py:1673
+#: Crm/models.py:1681
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: Crm/models.py:1677
+#: Crm/models.py:1685
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: Crm/models.py:1680
+#: Crm/models.py:1688
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: Crm/models.py:1687
+#: Crm/models.py:1695
 msgid "contact import"
 msgstr "import de contacts"
 
-#: Crm/models.py:1688
+#: Crm/models.py:1696
 msgid "contact imports"
 msgstr "imports de contacts"
 
-#: Crm/models.py:1694
+#: Crm/models.py:1702
 msgid "carbon copy"
 msgstr "copie cachée"
 
-#: Crm/models.py:1696
+#: Crm/models.py:1704
 msgid "Use action subject if empty"
 msgstr "Utilise le sujet de l'action si vide"
 
-#: Crm/models.py:1698
+#: Crm/models.py:1706
 msgid "body template"
 msgstr "Corps (Template)"
 
-#: Crm/models.py:1704 Crm/models.py:1705
+#: Crm/models.py:1712 Crm/models.py:1713
 msgid "Mailto settings"
 msgstr "Mailto"
 
@@ -4834,4 +4838,3 @@ msgstr "Erreur"
 #: utils.py:80
 msgid "RGB format (e.g. #123456) expected"
 msgstr "Format RGB (exemple (#123456) attendu"
-

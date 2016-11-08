@@ -1319,12 +1319,20 @@ class ActionMenu(models.Model):
         help_text=_(u'Example: class="colorbox-form" for colorbos display')
     )
     order_index = models.IntegerField(default=0, verbose_name=_(u"order_index"))
-    only_for_status = models.ManyToManyField(ActionStatus, blank=True)
+    only_for_status = models.ManyToManyField(ActionStatus, blank=True, verbose_name=_(u'Only for status'))
 
     class Meta:
         verbose_name = _(u'action menu')
         verbose_name_plural = _(u'action menus')
         ordering = ['order_index']
+
+    def only_for_status_str(self):
+        """returns status as string for admin"""
+        all_status = list(self.only_for_status.all())
+        if all_status:
+            return u', '.join([status.name for status in all_status])
+        return u""
+    only_for_status_str.short_description = _(u'Only for status')
 
     @classmethod
     def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs=''):

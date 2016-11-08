@@ -340,3 +340,17 @@ class UpdateActionStatusForm(forms.ModelForm):
         if len(allowed_status) > 0 and status not in allowed_status:
             raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         return status
+
+
+class ActionMenuAdminForm(forms.ModelForm):
+    """form limit the status if instance is selected"""
+
+    def __init__(self, *args, **kwargs):
+        """constructor"""
+        super(ActionMenuAdminForm, self).__init__(*args, **kwargs)
+
+        instance = kwargs.get('instance', None)
+
+        if instance and instance.action_type and instance.action_type.allowed_status.count():
+            # limit choice of status to the allowed status of the action type
+            self.fields['only_for_status'].queryset = instance.action_type.allowed_status.all()

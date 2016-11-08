@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models
-
+from balafon.Crm.forms.actions import ActionMenuAdminForm
 
 class HasParentFilter(admin.SimpleListFilter):
     """filter items to know if they have a parent"""
@@ -48,7 +48,17 @@ admin.site.register(models.SameAs, SameAsAdmin)
 
 
 admin.site.register(models.OpportunityType)
-admin.site.register(models.ActionMenu)
+
+
+class ActionMenuAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['action_type', 'view_name', 'label', 'icon', 'a_attrs', 'order_index', 'only_for_status_str']
+    list_filter = ['action_type', ]
+    list_editable = ['order_index', ]
+    search_fields = ['label', ]
+    form = ActionMenuAdminForm
+
+admin.site.register(models.ActionMenu, ActionMenuAdmin)
 
 
 class EntityTypeAdmin(admin.ModelAdmin):
