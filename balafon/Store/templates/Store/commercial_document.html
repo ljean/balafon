@@ -273,7 +273,7 @@
             no_quantity: item.no_quantity,
             order_index: item.order_index
           };
-          var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
+          var url = '/store/api/' + $scope.app.action.id + '/sales-items/' + item.id + '/';
           $http.put(url, postData).success(function (respData) {
             pushData(); //update next one
           }).error(function (response) {
