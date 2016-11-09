@@ -838,8 +838,8 @@ class Sale(models.Model):
         ordering = ['-action__created']
 
     def __unicode__(self):
-        contacts = u', '.join([unicode(item) for item in self.action.contacts.all()])
-        entities = u', '.join([unicode(item) for item in self.action.entities.all()])
+        contacts = u', '.join([u'{0}'.format(item) for item in self.action.contacts.all()])
+        entities = u', '.join([u'{0}'.format(item) for item in self.action.entities.all()])
         customers = u', '.join([item for item in (contacts, entities) if item])
         if customers:
             return u'{0} - {1}'.format(self.action.planned_date.date(), customers)
