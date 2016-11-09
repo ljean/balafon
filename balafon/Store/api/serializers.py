@@ -41,6 +41,7 @@ class VatRateSerializer(serializers.ModelSerializer):
 class VatTotalSerializer(serializers.Serializer):
     """json serializer"""
     vat_rate = VatRateSerializer(read_only=True)
+    pre_tax_total = serializers.DecimalField(max_digits=9, decimal_places=2)
     amount = serializers.DecimalField(max_digits=9, decimal_places=2)
 
 

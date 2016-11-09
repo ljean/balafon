@@ -800,17 +800,26 @@ class Sale(models.Model):
         """returns amount of VAT by VAT rate"""
         # calculate price for each VAT rate
         total_by_vat = {}
+        pre_tax_by_vat = {}
         for sale_item in self.saleitem_set.all():
             if sale_item.vat_rate:
                 if sale_item.vat_rate.id in total_by_vat:
                     total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price(round_value=False)
+                    pre_tax_by_vat[sale_item.vat_rate.id] += sale_item.pre_tax_total_price(round_value=False)
                 else:
                     total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price(round_value=False)
+                    pre_tax_by_vat[sale_item.vat_rate.id] = sale_item.pre_tax_total_price(round_value=False)
         # returns vat rate in order
         vat_totals = []
         for vat_rate in sorted(VatRate.objects.all(), key=lambda _vat: _vat.rate):
             if vat_rate.id in total_by_vat:
-                vat_totals.append({'vat_rate': vat_rate, 'amount': round_currency(total_by_vat[vat_rate.id])})
+                vat_totals.append(
+                    {
+                        'vat_rate': vat_rate,
+                        'pre_tax_total': round_currency(pre_tax_by_vat[vat_rate.id]),
+                        'amount': round_currency(total_by_vat[vat_rate.id])
+                    }
+                )
         return vat_totals
 
     def vat_incl_total_price(self):
@@ -907,11 +916,10 @@ class SaleItem(models.Model):
         else:
             return _(u"Sale item not set")
 
-    def vat_incl_price(self):
+    def vat_incl_price(self, round_value=True):
         """VAT inclusive price"""
-        return Decimal("{0:.2f}".format(
-            round(self.unit_price() + self.vat_price(), 2)
-        ))
+        value = self.unit_price() + self.vat_price()
+        return round_currency(value) if round_value else value
 
     def total_vat_price(self, round_value=True):
         """VAT price * quantity"""
@@ -937,18 +945,18 @@ class SaleItem(models.Model):
         value = self.pre_tax_price * self.quantity
         return round_currency(value) if round_value else value
 
-    def pre_tax_total_price(self):
+    def pre_tax_total_price(self, round_value=False):
         """VAT inclusive price"""
         if self.is_blank:
             return Decimal(0)
-        return self.unit_price() * self.quantity
+        return self.unit_price(round_value=round_value) * self.quantity
 
-    def unit_price(self):
+    def unit_price(self, round_value=False):
         """pre tax price with discount"""
         if self.is_blank:
             return Decimal(0)
         unit_price = self.pre_tax_price - self.calculate_discount()
-        return Decimal("{0:.2f}".format(round(unit_price, 2)))
+        return round_currency(unit_price) if round_value else unit_price
 
     def save(self, *args, **kwargs):
         if self.order_index == 0:
@@ -998,7 +1006,7 @@ class SaleItem(models.Model):
             discount_price = max_discount / self.quantity
         else:
             discount_price = Decimal(0)
-        return Decimal("{0:.2f}".format(round(discount_price, 2)))
+        return round_currency(discount_price)
 
 
 def update_action_amount(sale_item, delete_me=False):
