@@ -889,6 +889,9 @@ class SaleItem(models.Model):
         default=False, verbose_name=_(u'is blank'), help_text=_(u'displayed as an empty line')
     )
     discount = models.ForeignKey(Discount, blank=True, null=True, default=None)
+    no_quantity = models.BooleanField(
+        default=False, verbose_name=_(u'no_quantity'), help_text=_(u'quantity and unit price are not shown on bill')
+    )
 
     class Meta:
         verbose_name = _(u"Sale item")

@@ -22,8 +22,6 @@ class StoreItemCategorySerializer(serializers.ModelSerializer):
     get_articles_count = serializers.IntegerField(read_only=True)
     get_children_count = serializers.IntegerField(read_only=True)
 
-    #parent = serializers.CharField(read_only=True)
-
     class Meta:
         model = StoreItemCategory
         fields = ('id', 'name', "icon", "get_path_name", "parent", "get_articles_count", "get_children_count")
@@ -133,7 +131,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'is_blank',
-            'discount', 'unit_price'
+            'discount', 'unit_price', 'no_quantity',
         )
 
 

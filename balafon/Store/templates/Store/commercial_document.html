@@ -270,6 +270,7 @@
             quantity: item.quantity,
             item: item.item,
             is_blank: item.is_blank,
+            no_quantity: item.no_quantity,
             order_index: item.order_index
           };
           var url = '/store/api/'+$scope.app.action.id+'/sales-items/'+item.id;
@@ -847,6 +848,7 @@
                           <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
                             <span class="glyphicon glyphicon-search"></span>
                           </a>
+                          <input type="checkbox" ng-model="item.no_quantity">
                       </div>
                       <input
                         class="form-control inline"
@@ -863,7 +865,9 @@
                         name="text"
                         ng-show="editedLines[$index] && !changeOrder"></textarea>
                     </td>
-                    <td class="number" ng-if="!item.is_blank">
+                    <td ng-if="!item.is_blank && item.no_quantity">&nbsp;</td>
+                    <td ng-if="!item.is_blank && item.no_quantity">&nbsp;</td>
+                    <td class="number" ng-if="!item.is_blank && !item.no_quantity">
                       <span ng-hide="editedLines[$index] && !changeOrder">
                         {{ getUnitPrice(item) | number:2 }} €
                       </span>
@@ -880,7 +884,7 @@
                         </span>
                       </span>
                     </td>
-                    <td class="number" ng-if="!item.is_blank">
+                    <td class="number" ng-if="!item.is_blank && !item.no_quantity">
                       <span ng-hide="editedLines[$index] && !changeOrder">{{ item.quantity | number }}</span>
                       <input
                         class="form-control"
