@@ -96,6 +96,7 @@ class SaleItemInline(admin.TabularInline):
 class SaleAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'creation_date', 'analysis_code', )
     readonly_fields = ('creation_date', )
+    search_fields = ('action__contacts__lastname', 'action__entities__name', )
     inlines = (SaleItemInline, )
     list_filter = ('analysis_code', )
 
