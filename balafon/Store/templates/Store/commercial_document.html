@@ -353,13 +353,18 @@
         return value;
       };
 
-      $scope.getItemTaxInclPrice = function(item) {
+      $scope.getItemTaxInclPrice = function(item, noRound) {
         if (item.vat_rate !== null) {
-          var value = item.quantity * Math.round(item.unit_price * (100 + item.vat_rate.rate)) / 100;
+          var value = item.quantity * item.unit_price * (100 + item.vat_rate.rate) / 100;
           if (isNaN(value)) {
             return translate('ERROR');
           }
-          return value;
+          if (noRound) {
+            return value;
+          } else {
+            return Math.round(value * 100) / 100;
+          }
+
         } else {
           return $scope.getItemPreTaxPrice(item);
         }
@@ -394,14 +399,14 @@
         var sum = 0;
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
           if (!$scope.app.sale_items[i].is_blank) {
-            var value = $scope.getItemTaxInclPrice($scope.app.sale_items[i]);
-            sum += Math.round(value * 100, 2) / 100;
+            var value = $scope.getItemTaxInclPrice($scope.app.sale_items[i], true);
+            sum += value;
           }
         }
         if (isNaN(sum)) {
           return translate('ERROR');
         }
-        return sum;
+        return Math.round(sum * 100) / 100;
       };
 
       $scope.switchOffEditMode();
@@ -887,7 +892,7 @@
                        ></select>
                     </td>
                     <td class="number" ng-if="!item.is_blank">
-                      <span>{{ getItemTaxInclPrice(item) | number:2 }} €</span>
+                      <span>{{ getItemTaxInclPrice(item, false) | number:2 }} €</span>
                     </td>
                   </tr>
 
