@@ -890,7 +890,10 @@ class SaleItem(models.Model):
     )
     discount = models.ForeignKey(Discount, blank=True, null=True, default=None)
     no_quantity = models.BooleanField(
-        default=False, verbose_name=_(u'no_quantity'), help_text=_(u'quantity and unit price are not shown on bill')
+        default=False, verbose_name=_(u'no quantity'), help_text=_(u'quantity and unit price are not shown on bill')
+    )
+    is_discount = models.BooleanField(
+        default=False, verbose_name=_(u'is discount'), help_text=_(u'added after total on the bill')
     )
 
     class Meta:

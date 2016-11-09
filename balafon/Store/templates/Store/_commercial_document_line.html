@@ -1,0 +1,120 @@
+{% verbatim %}
+<td colspan="6" ng-if="item.is_blank">
+  <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+    <div class="show-on-hover">
+      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+        <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+      </a>
+      <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+        <span class="glyphicon glyphicon-trash"></span>
+      </a>
+    </div>
+  </div>
+  <input
+    class="form-control"
+    type="number"
+    ng-model="item.order_index"
+    ng-show="editedLines[$index] && changeOrder"
+    name=order_index
+  />
+</td>
+
+<td class="cell-label" ng-if="!item.is_blank" colspan="{{ item.is_discount?5:1 }}">
+  <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+    <div class="show-on-hover">
+      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+        <span class="glyphicon glyphicon-sort-by-order-alt"></span>
+      </a>
+      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+      <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+        <span class="glyphicon glyphicon-trash"></span>
+      </a>
+    </div>
+  </div>
+  <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="pull-right">
+      <input type="hidden" name="item" ng-model="item.item" />
+      <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
+        <span class="glyphicon glyphicon-search"></span>
+      </a>
+  </div>
+  <input
+    class="form-control inline"
+    type="number"
+    ng-model="item.order_index"
+    ng-show="editedLines[$index] && changeOrder"
+    name=order_index
+  />
+  <span ng-hide="editedLines[$index] && !changeOrder">
+    {{ item.text }}<span ng-show="item.is_discount"> - {{ 'PRE_TAX_PRICE' | translate }}</span>
+  </span>
+  <textarea
+    class="form-control"
+    ng-model="item.text"
+    required="required"
+    name="text"
+    ng-show="editedLines[$index] && !changeOrder">
+  </textarea>
+  <div ng-show="allowEdit && editedLines[$index]">{{ 'NO_QUANTITY' | translate }} <input type="checkbox" ng-model="item.no_quantity"></div>
+  <div ng-show="allowEdit && editedLines[$index]">{{ 'DISCOUNT' | translate }} <input type="checkbox" ng-model="item.is_discount"></div>
+</td>
+
+<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
+
+<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
+
+<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
+  <span ng-hide="editedLines[$index] && !changeOrder">
+    {{ getUnitPrice(item) | number:2 }} €
+  </span>
+  <input
+    class="form-control"
+    required="required"
+    type="number"
+    ng-model="item.pre_tax_price"
+    ng-show="editedLines[$index] && !changeOrder"
+  />
+  <span ng-show="item.discount">
+    <span class="label label-warning" title="{{ item.discount.name }}" data-toggle="tooltip">
+      {{ item.discount.display_name }}
+    </span>
+  </span>
+</td>
+
+<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
+  <span ng-hide="editedLines[$index] && !changeOrder">{{ item.quantity | number }}</span>
+  <input
+    class="form-control"
+    required="required"
+    type="number"
+    step="any"
+    min="0"
+    ng-model="item.quantity"
+    ng-show="editedLines[$index] && !changeOrder"
+    name="quantity"
+  />
+</td>
+
+<td class="number" ng-if="!item.is_blank && !item.is_discount">
+  <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>
+</td>
+
+<td class="number" ng-if="!item.is_blank && !item.is_discount">
+  <span ng-hide="editedLines[$index] && !changeOrder">{{ item.vat_rate.name }}</span>
+  <select
+    class="form-control"
+    ng-model="item.vat_rate"
+    ng-options="vat_rate as vat_rate.name for vat_rate in app.vat_rates track by vat_rate.id"
+    ng-show="editedLines[$index] && !changeOrder"
+    required="required"
+   ></select>
+</td>
+<td class="number" ng-if="!item.is_blank && !item.is_discount">
+  <span>{{ getItemTaxInclPrice(item, false) | number:2 }} €</span>
+</td>
+
+<td class="number" ng-if="item.is_discount">
+  <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>
+</td>
+{% endverbatim %}

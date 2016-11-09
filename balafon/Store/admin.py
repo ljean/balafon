@@ -88,7 +88,7 @@ class SaleItemInline(admin.TabularInline):
     model = models.SaleItem
     fields = (
         'text', 'item', 'quantity', 'pre_tax_price', 'discount', 'calculate_discount', 'vat_rate', 'order_index',
-        'is_blank', 'no_quantity'
+        'is_blank', 'no_quantity', 'is_discount',
     )
     readonly_fields = ('calculate_discount', )
 
