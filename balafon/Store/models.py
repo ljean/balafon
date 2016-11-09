@@ -19,6 +19,11 @@ from balafon.Crm.models import Action, ActionMenu, ActionStatus, ActionType, Gro
 from balafon.Crm.signals import action_cloned
 
 
+def round_currency(value):
+    """round a value witrh two digits"""
+    return Decimal("{0:.2f}".format(round(value, 2)))
+
+
 class StoreManagementActionType(models.Model):
     """
     Define if an action type is linked to the store.
@@ -798,14 +803,14 @@ class Sale(models.Model):
         for sale_item in self.saleitem_set.all():
             if sale_item.vat_rate:
                 if sale_item.vat_rate.id in total_by_vat:
-                    total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price()
+                    total_by_vat[sale_item.vat_rate.id] += sale_item.total_vat_price(round_value=False)
                 else:
-                    total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price()
+                    total_by_vat[sale_item.vat_rate.id] = sale_item.total_vat_price(round_value=False)
         # returns vat rate in order
         vat_totals = []
         for vat_rate in sorted(VatRate.objects.all(), key=lambda _vat: _vat.rate):
             if vat_rate.id in total_by_vat:
-                vat_totals.append({'vat_rate': vat_rate, 'amount': total_by_vat[vat_rate.id]})
+                vat_totals.append({'vat_rate': vat_rate, 'amount': round_currency(total_by_vat[vat_rate.id])})
         return vat_totals
 
     def vat_incl_total_price(self):
@@ -902,29 +907,29 @@ class SaleItem(models.Model):
             round(self.unit_price() + self.vat_price(), 2)
         ))
 
-    def total_vat_price(self):
+    def total_vat_price(self, round_value=True):
         """VAT price * quantity"""
-        return self.quantity * self.vat_price()
+        return self.quantity * self.vat_price(round_value=round_value)
 
-    def vat_price(self):
+    def vat_price(self, round_value=True):
         """VAT price"""
         if self.is_blank:
             return Decimal(0)
         vat_rate = self.vat_rate.rate if self.vat_rate else Decimal(0)
-        return Decimal("{0:.2f}".format(
-            round(self.unit_price() * (vat_rate / Decimal(100)), 2)
-        ))
+
+        value = self.unit_price() * (vat_rate / Decimal(100))
+        return round_currency(value) if round_value else value
 
     def vat_incl_total_price(self):
         """VAT inclusive price"""
         return self.vat_incl_price() * self.quantity
 
-    def raw_total_price(self):
+    def raw_total_price(self, round_value=True):
         """VAT inclusive price"""
         if self.is_blank:
             return Decimal(0)
         value = self.pre_tax_price * self.quantity
-        return Decimal("{0:.2f}".format(round(value, 2)))
+        return round_currency(value) if round_value else value
 
     def pre_tax_total_price(self):
         """VAT inclusive price"""
