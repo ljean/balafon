@@ -16,10 +16,6 @@ from balafon.Store.models import StoreManagementActionType, PricePolicy, StoreIt
 class StoreManagementActionTypeAdminForm(forms.ModelForm):
     """admin form"""
 
-    class Meta:
-        model = StoreManagementActionType
-        fields = ['action_type', 'template_name', 'show_amount_as_pre_tax', 'readonly_status']
-
     def __init__(self, *args, **kwargs):
         super(StoreManagementActionTypeAdminForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id and self.instance.action_type:

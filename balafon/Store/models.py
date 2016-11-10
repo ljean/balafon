@@ -45,6 +45,10 @@ class StoreManagementActionType(models.Model):
         ActionStatus, blank=True, verbose_name=_(u'readonly status'),
         help_text=_(u'When action has one of these status, it is not possible to modify a commercial document')
     )
+    references_text = models.TextField(
+        blank=True, default="", verbose_name=_(u"references text"),
+        help_text=_(u"this text will be added at the bottom of the commercial document")
+    )
 
     class Meta:
         verbose_name = _(u"Store management action type")
@@ -795,6 +799,16 @@ class Sale(models.Model):
     analysis_code = models.ForeignKey(
         SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_(u"analysis code")
     )
+
+    def get_references_text(self):
+        """This text will be added at the bottom of the commercial document"""
+        text = u""
+        if self.action and self.action.type:
+            try:
+                text = StoreManagementActionType.objects.get(action_type=self.action.type).references_text
+            except StoreManagementActionType.DoesNotExist:
+                pass
+        return text
 
     def vat_total_amounts(self):
         """returns amount of VAT by VAT rate"""

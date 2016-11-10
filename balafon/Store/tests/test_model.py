@@ -1128,3 +1128,28 @@ class SaleItemOrderTest(TestCase):
         mommy.make(models.SaleItem, sale=other_sale, order_index=10, pre_tax_price="10")
         item = mommy.make(models.SaleItem, sale=sale, pre_tax_price="10")
         self.assertEqual(1, item.order_index)
+
+
+class SaleReferenceText(TestCase):
+    """It should increment the order correctly"""
+
+    def test_empty(self):
+        """It should be empty"""
+        action_type = mommy.make(ActionType)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        action = mommy.make(Action, type=action_type)
+
+        self.assertNotEqual(action.sale, None)
+        self.assertEqual(action.sale.get_references_text(), "")
+
+    def test_value(self):
+        """It should be empty"""
+        action_type = mommy.make(ActionType)
+        references_text = "<p>Hello</p>"
+        mommy.make(models.StoreManagementActionType, action_type=action_type, references_text=references_text)
+
+        action = mommy.make(Action, type=action_type)
+
+        self.assertNotEqual(action.sale, None)
+        self.assertEqual(action.sale.get_references_text(), references_text)

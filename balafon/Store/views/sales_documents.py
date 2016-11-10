@@ -89,6 +89,8 @@ class SalesDocumentViewMixin(object):
         context['action'] = action
         context['is_read_only'] = is_read_only
         context['is_pdf'] = self.is_pdf
+        context["references_text"] = sale.get_references_text()
+
         context['DJANGO_APP'] = """
         var DJANGO_APP = {{
             action: {0},
