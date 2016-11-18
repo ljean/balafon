@@ -15,8 +15,10 @@ def get_cart_type_name():
     return getattr(settings, 'BALAFON_STORE_CART_TYPE', _(u'Cart'))
 
 
-def get_cart_confirmation_subject():
+def get_cart_confirmation_subject(profile, action):
     """returns true if an anonymous can view some data : products, categories, tags"""
-    return getattr(settings, 'BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT', _(u'Purchasing confirmation'))
-
-
+    subject = getattr(settings, 'BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT', _(u'Purchasing confirmation'))
+    if callable(subject):
+        return subject(profile, action)
+    else:
+        return subject

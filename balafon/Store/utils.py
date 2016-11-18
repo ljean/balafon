@@ -47,15 +47,13 @@ def confirm_cart_to_user(profile, action):
     """send message by email"""
 
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
-    subject = get_cart_confirmation_subject()
-
+    subject = get_cart_confirmation_subject(profile, action)
 
     data = {
         'profile': profile,
         'action': action,
         'subject': subject,
     }
-
 
     the_template = get_template('Store/cart_confirmation_email.html')
     html_text = the_template.render(Context(data))
