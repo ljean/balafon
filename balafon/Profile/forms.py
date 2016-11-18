@@ -17,7 +17,7 @@ from balafon.settings import has_entity_on_registration_form, get_registration_a
 
 
 class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
-    
+    """A form for updating user profile"""
     city = forms.CharField(
         required=False,
         label=_(u'City'),
@@ -44,7 +44,7 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
 
 class EmailField(forms.EmailField):
-
+    """This field avoid duplicate emails"""
     def clean(self, value):
         super(EmailField, self).clean(value)
         if User.objects.filter(email__iexact=value).count() > 0:
@@ -55,7 +55,7 @@ class EmailField(forms.EmailField):
 
 
 class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
-
+    """A form for creating a new account on a website"""
     email = EmailField(required=True, label=_(u"Email"), widget=forms.TextInput())
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
@@ -110,7 +110,6 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
                     termsofuse_url
                 )
             )
-
         self._add_subscription_types_field()
 
     def clean_entity(self, ):
@@ -164,7 +163,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
 
 class MinimalUserRegistrationForm(UserRegistrationForm):
-
+    """A form for creating a new account on a website. Keep it minimal"""
     class Meta:
         model = ContactProfile
         fields = (
@@ -182,6 +181,7 @@ class MinimalUserRegistrationForm(UserRegistrationForm):
 
 
 class MessageForm(forms.Form):
+    """A form for sending a message to web site owner"""
     message = forms.CharField(
         required=True,
         widget=forms.Textarea(attrs={'placeholder': _(u"Your message"),})
