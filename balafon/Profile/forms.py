@@ -49,12 +49,13 @@ class EmailField(forms.EmailField):
         super(EmailField, self).clean(value)
         if User.objects.filter(email__iexact=value).count() > 0:
             raise forms.ValidationError(
-                _(u"This email is already registered. Use the 'forgot password' link on the login page")
+                ugettext(u"This email is already registered. Use the 'forgot password' link on the login page")
             )
         return value
 
 
 class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
+
     email = EmailField(required=True, label=_(u"Email"), widget=forms.TextInput())
     password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
     password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
@@ -94,7 +95,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             self.fields['gender'].choices = ((0, u'----------'), ) + Contact.GENDER_CHOICE[:2]
 
         if 'entity_type' in self.fields:
-            self.fields['entity_type'].choices = [(0, _(u'Individual'))]+[
+            self.fields['entity_type'].choices = [(0, ugettext(u'Individual'))]+[
                 (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
             ]
         if not has_entity_on_registration_form():
@@ -138,7 +139,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         password1 = self.cleaned_data.get('password1', "")
         password2 = self.cleaned_data.get('password2', "")
         if password1 and (password1 != password2):
-            raise forms.ValidationError(_(u'Passwords are not the same'))
+            raise forms.ValidationError(ugettext(u'Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
 
     def save(self, commit=True):
@@ -189,5 +190,5 @@ class MessageForm(forms.Form):
     def clean_message(self):
         message = self.cleaned_data['message']
         if len(message) > 10000:
-            raise forms.ValidationError(_(u'Message is too long'))
+            raise forms.ValidationError(ugettext(u'Message is too long'))
         return message
