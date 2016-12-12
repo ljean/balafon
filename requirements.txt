@@ -4,7 +4,7 @@ beautifulsoup4
 django-extensions
 django-pagination
 model-mommy
-apidev-coop_cms
+apidev-coop_cms >= 1.1.9, <1.2
 django-wkhtmltopdf
 django-form-utils
 xlwt==0.7.5
