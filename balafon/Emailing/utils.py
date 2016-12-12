@@ -169,11 +169,12 @@ def send_newsletter(emailing, max_nb):
 
             email = EmailMultiAlternatives(
                 context['title'],
-                text,
+                force_line_max_length(text),
                 from_email,
                 [contact.get_email_address()],
                 headers=headers
             )
+            html_text = force_line_max_length(html_text, max_length_per_line=400, dont_cut_in_quotes=True)
             email.attach_alternative(html_text, "text/html")
             if is_mandrill_used():
                 email.tags = [u'{0}'.format(emailing.id), contact.uuid]
@@ -366,3 +367,34 @@ def get_language():
     """wrap the django get_language and make sure: we return 2 chars"""
     lang = django_get_language()
     return lang[:2]
+
+
+def force_line_max_length(text, max_length_per_line=400, dont_cut_in_quotes=True):
+    """returns same text with end of lines inserted if lien length is greater than 400 chars"""
+    out_text = ""
+    for line in text.split(u"\n"):
+
+        if len(line) < max_length_per_line:
+            out_text += line + u"\n"
+        else:
+            words = []
+            line_length = 0
+            quotes_count = 0
+            for word in line.split(u" "):
+                if word:
+                    words.append(word)
+                    quotes_count += word.count(u'"')
+                    line_length += len(word) + 1
+                    in_quotes = (quotes_count % 2) == 1  # If there are not an even number we may be inside a ""
+                    if line_length > max_length_per_line:
+                        if not (not dont_cut_in_quotes and in_quotes):
+                            # Line is more than allowed length for a line. Enter a end line character
+                            out_line = u" ".join(words)
+                            out_text += out_line + u"\n"
+                            words = []
+                            line_length = 0
+            if words:
+                out_line = u" ".join(words)
+                out_text += out_line + u"\n"
+
+    return out_text[:-1]   # Remove the last "\n"
