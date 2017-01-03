@@ -1,0 +1,26 @@
+{% extends "balafon/bs_base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+  {{block.super}}
+  {{form.media}}
+  
+{% endblock %}
+
+{% block document_content %}
+  <div class="row"><div class="col-md-12">
+  <h2>{% trans "Import stock" %}</h2>
+  
+  <form role="form" method="POST" action="{% url 'store_import_stock' %}" enctype="multipart/form-data">{% csrf_token %}
+
+    {% include "bs/form_fields.html" %}
+  
+    <div class="row">
+      <div class="col-md-6 col-md-offset-6">
+        <input class="btn btn-md btn-primary" type="submit" value="{% trans 'Import' %}">
+        <a class="btn btn-md btn-default" href="{% url 'admin:Store_storeitem_changelist' %}">{% trans "Cancel" %}</a>
+      </div>
+    </div>
+  </form>
+  </div></div>
+{% endblock %}

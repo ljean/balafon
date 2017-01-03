@@ -7,7 +7,7 @@ from balafon.Store.views.sales_documents import (
     SalesDocumentView, SalesDocumentPdfView, SalesDocumentPublicView, SalesDocumentPublicPdfView
 )
 from balafon.Store.views.statistics import StaticticsIndexView, AddExtraSaleView
-from balafon.Store.views.xls_export import StockXlsView, StockAlertXlsView, StoreXlsCatalogueView
+from balafon.Store.views.xls_export import StockXlsView, StockAlertXlsView, StoreXlsCatalogueView, StockImportView
 
 
 urlpatterns = [
@@ -58,5 +58,11 @@ urlpatterns = [
         'statistics/add-extra-sale/$',
         AddExtraSaleView.as_view(),
         name=r'store_add_extra_sale'
-    )
+    ),
+
+    url(
+        r"^admin/import-stock/$",
+        StockImportView.as_view(),
+        name='store_import_stock'
+    ),
 ]

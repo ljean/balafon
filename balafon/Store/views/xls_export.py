@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+import xlrd
 import xlwt
 
+from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.views.generic import FormView
 
 from balafon.generic import XlsExportView
+from balafon.Store.forms import StockImportForm
 from balafon.Store.models import StoreItem
+from balafon.Store.utils import to_decimal
 
 
 class XlsBaseView(XlsExportView):
@@ -100,3 +105,40 @@ class StoreXlsCatalogueView(XlsBaseView):
                     [certificate.name for certificate in store_item.certificates.all()]
                 )
             )
+
+
+class StockImportView(FormView):
+    """Import purchase price, stock and threshold of store items from Excel file"""
+    form_class = StockImportForm
+    template_name = "Store/import_stock.html"
+    success_url = reverse_lazy('admin:Store_storeitem_changelist')
+
+    def _get_value(self, value):
+        if value is None or value == '':
+            return None
+        return to_decimal(value)
+
+    def form_valid(self, form):
+        """Process the file"""
+
+        xls_file = form.cleaned_data['xls_file']
+
+        workbook = xlrd.open_workbook(file_contents=xls_file.read())
+
+        worksheet = workbook.sheet_by_index(0)
+
+        for row in range(1, worksheet.nrows):
+            item_id = worksheet.cell(rowx=row, colx=0).value
+            if item_id:
+                try:
+                    store_item = StoreItem.objects.get(id=int(item_id))
+                except (StoreItem.DoesNotExist, ValueError):
+                    store_item = None
+
+                if store_item:
+                    store_item.purchase_price = self._get_value(worksheet.cell(rowx=row, colx=3).value)
+                    store_item.stock_count = self._get_value(worksheet.cell(rowx=row, colx=4).value)
+                    store_item.stock_threshold = self._get_value(worksheet.cell(rowx=row, colx=5).value)
+                    store_item.save()
+
+        return super(StockImportView, self).form_valid(form)

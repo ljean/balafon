@@ -105,3 +105,12 @@ class AddExtraSaleForm(BetterBsForm):
             return VatRate.objects.get(id=vat_rate_id)
         except VatRate.DoesNotExist:
             forms.ValidationError(ugettext(u'Invalid analysis code'))
+
+
+class StockImportForm(BetterBsForm):
+    """A form for importing stock values from Excel"""
+
+    xls_file = forms.FileField(
+        label=_(u'Excel file'),
+        help_text=_(u'Same format than the export file. It will update the purchase price, stock count and threshold')
+    )

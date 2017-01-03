@@ -13,7 +13,12 @@
         </a>
     </li>
     <li>
-        <a href="{% url 'store_store_item_admin_export_alert' %}" class="grp-state-focus">{% trans "Export missing Stock" %}</a>
+        <a href="{% url 'store_store_item_admin_export_alert' %}" class="grp-state-focus">
+          {% trans "Export missing Stock" %}
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'store_import_stock' %}" class="grp-state-focus">{% trans "Import stock" %}</a>
     </li>
 
 {% endblock %}
