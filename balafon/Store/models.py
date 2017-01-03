@@ -17,11 +17,8 @@ from django.utils.translation import ugettext_lazy as _, ugettext
 
 from balafon.Crm.models import Action, ActionMenu, ActionStatus, ActionType, Group
 from balafon.Crm.signals import action_cloned
+from balafon.Store.utils import round_currency
 
-
-def round_currency(value):
-    """round a value witrh two digits"""
-    return Decimal("{0:.2f}".format(round(value, 2)))
 
 
 class StoreManagementActionType(models.Model):
@@ -279,9 +276,7 @@ class Discount(models.Model):
     def calculate_discount(self, sale_item):
         """calculate a discount on a sale item"""
         if sale_item.quantity >= self.quantity:
-            return Decimal("{0:.2f}".format(
-                round(sale_item.raw_total_price() * self.rate / Decimal(100), 2)
-            ))
+            return round_currency(sale_item.raw_total_price() * self.rate / Decimal(100))
         return None
 
 

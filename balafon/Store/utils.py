@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+from decimal import Decimal
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template import Context
@@ -71,3 +73,13 @@ def confirm_cart_to_user(profile, action):
         email.send()
     except Exception:
         logger.exception("confirm_cart_to_user")
+
+
+def to_decimal(value):
+    """convert to Decimal"""
+    return Decimal("{0:.2f}".format(value))
+
+
+def round_currency(value):
+    """round a value with two digits"""
+    return to_decimal(round(value, 2))
