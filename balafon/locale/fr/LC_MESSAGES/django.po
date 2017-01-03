@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 10:20+0100\n"
+"POT-Creation-Date: 2017-01-03 09:29+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgstr "Type invalide"
 
 #: Crm/forms/base.py:127 Crm/forms/base.py:204 Crm/forms/base.py:230
 #: Crm/search_forms.py:147 Emailing/forms.py:343 Profile/forms.py:24
-#: Profile/forms.py:78
+#: Profile/forms.py:79
 msgid "Enter a city"
 msgstr "Entrez une ville"
 
@@ -168,7 +168,7 @@ msgstr ""
 #: Crm/forms/base.py:203 Crm/forms/base.py:218 Crm/forms/base.py:229
 #: Crm/search_forms.py:155 Crm/templates/Crm/_section_all_entities.html:23
 #: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:342
-#: Profile/forms.py:23 Profile/forms.py:77 Profile/models.py:34
+#: Profile/forms.py:23 Profile/forms.py:78 Profile/models.py:34
 #: Search/templates/Search/_section_qs_cities.html:4
 #: Search/templates/Search/_section_qs_contacts.html:10
 msgid "City"
@@ -212,7 +212,8 @@ msgstr "Sélectionnez les rôles de ce contact"
 #: Crm/models.py:39 Crm/search_forms.py:1426
 #: Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:12 Search/forms.py:806
-#: Store/models.py:336 Store/models.py:419 Store/views/xls_export.py:80
+#: Store/models.py:336 Store/models.py:419 Store/views/xls_export.py:38
+#: Store/views/xls_export.py:85
 msgid "Name"
 msgstr "Nom"
 
@@ -1452,7 +1453,7 @@ msgstr "Rôle du contact"
 #: Crm/templates/Crm/_section_contacts.html:13
 #: Crm/templates/Crm/_section_entity_info.html:36
 #: Crm/templates/Crm/confirm_contacts_import.html:75 Emailing/forms.py:199
-#: Emailing/forms.py:366 Emailing/forms.py:594 Profile/forms.py:58
+#: Emailing/forms.py:366 Emailing/forms.py:594 Profile/forms.py:59
 #: Search/templates/Search/_section_qs_contacts.html:10
 #: ci/drone_project/templates/registration/login.html:16
 #: ci/semaphore_project/templates/registration/login.html:16
@@ -2583,7 +2584,7 @@ msgstr "Vous devez cocher au moins une des inscriptions"
 msgid "This field is required"
 msgstr "Ce champ est requis"
 
-#: Emailing/forms.py:348 Profile/forms.py:65
+#: Emailing/forms.py:348 Profile/forms.py:66
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
@@ -2600,7 +2601,7 @@ msgstr ""
 "Entrez le texte affiché sur l'image afin que nous vérifions que vous n'êtes "
 "pas un robot de spam"
 
-#: Emailing/forms.py:382 Profile/forms.py:97
+#: Emailing/forms.py:382 Profile/forms.py:98
 msgid "Individual"
 msgstr "Particulier"
 
@@ -3092,26 +3093,26 @@ msgstr ""
 "Cette adresse email est déjà inscrite. Utilisez le lien \"Mot de passe "
 "oublié' sur la page de login."
 
-#: Profile/forms.py:59 ci/drone_project/templates/registration/login.html:20
+#: Profile/forms.py:60 ci/drone_project/templates/registration/login.html:20
 #: ci/semaphore_project/templates/registration/login.html:20
 #: templates/balafon/_bs_navigation.html:149
 #: templates/balafon/_navigation.html:44
 msgid "Password"
 msgstr "Mot de passe"
 
-#: Profile/forms.py:60
+#: Profile/forms.py:61
 msgid "Repeat your password"
 msgstr "Confirmez le mot de passe"
 
-#: Profile/forms.py:71
+#: Profile/forms.py:72
 msgid "Accept terms of use"
 msgstr "Accepter les conditions d'utilisation"
 
-#: Profile/forms.py:72
+#: Profile/forms.py:73
 msgid "Check for accepting the terms of use"
 msgstr "Cocher la case pour accepter les conditions d'utilisation"
 
-#: Profile/forms.py:108
+#: Profile/forms.py:109
 msgid "Accept <a href=\"{0}\">terms of use</a>"
 msgstr "Accepter <a href=\"{0}\">les conditions d'utilisation</a>"
 
@@ -3127,11 +3128,11 @@ msgstr "type d'entité inconnu"
 msgid "Passwords are not the same"
 msgstr "Les mots de passe sont différents"
 
-#: Profile/forms.py:186
+#: Profile/forms.py:187
 msgid "Your message"
 msgstr "Votre message"
 
-#: Profile/forms.py:192
+#: Profile/forms.py:193
 msgid "Message is too long"
 msgstr "Message trop long"
 
@@ -3730,8 +3731,7 @@ msgstr "Prix"
 msgid "Supplier"
 msgstr "Fournisseur"
 
-#: Store/admin.py:238 Store/views/xls_export.py:18
-#: Store/views/xls_export.py:39
+#: Store/admin.py:238 Store/views/xls_export.py:33
 msgid "Stock"
 msgstr "Stock"
 
@@ -3753,8 +3753,8 @@ msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
 
 #: Store/api/front.py:162 Store/templates/Store/cart_root_email.html:39
-#: Store/tests/test_cart.py:153 Store/tests/test_cart.py:211
-#: Store/tests/test_cart.py:269
+#: Store/tests/test_cart.py:298 Store/tests/test_cart.py:356
+#: Store/tests/test_cart.py:414
 msgid "Notes"
 msgstr "Notes"
 
@@ -3973,7 +3973,7 @@ msgid "Discounts"
 msgstr "Réductions"
 
 #: Store/models.py:293 Store/templates/Store/cart_root_email.html:51
-#: Store/views/xls_export.py:80
+#: Store/views/xls_export.py:85
 msgid "Brand"
 msgstr "Marque"
 
@@ -3989,7 +3989,7 @@ msgstr "Fournisseurs"
 msgid "certificate"
 msgstr "certification"
 
-#: Store/models.py:328 Store/views/xls_export.py:80
+#: Store/models.py:328 Store/views/xls_export.py:86
 msgid "certificates"
 msgstr "certifications"
 
@@ -4055,11 +4055,11 @@ msgstr "article"
 msgid "Store items"
 msgstr "articles"
 
-#: Store/models.py:396 Store/views/xls_export.py:80
+#: Store/models.py:396 Store/views/xls_export.py:85
 msgid "VAT inclusive price"
 msgstr "Prix TTC"
 
-#: Store/models.py:477
+#: Store/models.py:477 Store/views/xls_export.py:38
 msgid "Stock threshold"
 msgstr "Seuil du stock"
 
@@ -4290,7 +4290,7 @@ msgstr "Ajouter une vente 'hors-site'"
 msgid "Store_item"
 msgstr "Article"
 
-#: Store/templates/Store/cart_root_email.html:52 Store/views/xls_export.py:80
+#: Store/templates/Store/cart_root_email.html:52 Store/views/xls_export.py:85
 msgid "Reference"
 msgstr "Référence"
 
@@ -4305,7 +4305,7 @@ msgstr "Total"
 
 #: Store/templates/admin/Store/storeitem/change_list.html:7
 #: Store/templates/admin/Store/storeitemcategory/change_form.html:7
-#: Store/views/xls_export.py:68
+#: Store/views/xls_export.py:73
 msgid "Catalogue"
 msgstr "Catalogue"
 
@@ -4321,9 +4321,25 @@ msgstr "Export des manquants en stock"
 msgid "New cart purchased on store"
 msgstr "Nouvelle commande sur le site"
 
-#: Store/views/xls_export.py:80
+#: Store/views/xls_export.py:38
+msgid "Id"
+msgstr "Id"
+
+#: Store/views/xls_export.py:38 Store/views/xls_export.py:85
 msgid "Category"
 msgstr "Catégorie"
+
+#: Store/views/xls_export.py:38
+msgid "Purchase price"
+msgstr "Prix d'achat"
+
+#: Store/views/xls_export.py:38
+msgid "Stock count"
+msgstr "Nombre en stock"
+
+#: Store/views/xls_export.py:39
+msgid "Value"
+msgstr "Valeur"
 
 #: Users/apps.py:15
 msgid "Balafon Users"
