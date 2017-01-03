@@ -20,7 +20,6 @@ from balafon.Crm.signals import action_cloned
 from balafon.Store.utils import round_currency
 
 
-
 class StoreManagementActionType(models.Model):
     """
     Define if an action type is linked to the store.
