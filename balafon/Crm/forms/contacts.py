@@ -37,7 +37,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         """form is defined from model"""
         model = models.Contact
         fields = (
-            'gender', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
+            'gender', 'gender_title', 'lastname', 'firstname', 'birth_date', 'title', 'role', 'job',
             'email', 'phone', 'mobile', 'favorite_language',
             'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city', 'cedex', 'country',
             'main_contact', 'email_verified', 'has_left', 'accept_notifications', 'photo',
@@ -53,7 +53,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         fieldsets = [
             ('name', {
                 'fields': [
-                    'gender', 'lastname', 'firstname', 'email', 'same_as_suggestions', 'phone', 'mobile'
+                    'gender', 'gender_title', 'lastname', 'firstname', 'email', 'same_as_suggestions', 'phone', 'mobile'
                 ],
                 'legend': _(u'Name')
             }),

@@ -507,6 +507,26 @@ class EditContactTest(BaseTestCase):
         for field in ('lastname', 'firstname'):
             self.assertEqual(getattr(contact, field), data[field])
 
+    def test_edit_contact_custom_gender(self):
+        """view edit contact form"""
+
+        contact = mommy.make(models.Contact)
+        url = reverse('crm_edit_contact', args=[contact.id])
+
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'gender_title': "Princess",
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(200, response.status_code)
+        contact = models.Contact.objects.get(id=contact.id)
+
+        for field in data:
+            self.assertEqual(getattr(contact, field), data[field])
+        self.assertEqual(contact.get_gender_text(), data['gender_title'])
+
     def test_edit_contact_anonymous(self):
         """view edit contact form"""
         self.client.logout()

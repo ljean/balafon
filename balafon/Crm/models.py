@@ -589,6 +589,10 @@ class Contact(AddressModel):
     role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_(u'Roles'))
     
     gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
+    gender_title = models.CharField(
+        max_length=50, verbose_name=_(u'gender title'), default=u'', blank=True,
+        help_text=_(u'Overwrites gender if defined')
+    )
     title = models.CharField(_(u'title'), max_length=200, blank=True, default=u'')
     lastname = models.CharField(_(u'last name'), max_length=200, blank=True, default=u'', db_index=True)
     firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
@@ -871,6 +875,13 @@ class Contact(AddressModel):
         if self.entity.is_single_contact:
             return fullname
         return u"{0} ({1})".format(fullname, self.entity.name)
+
+    def get_gender_text(self):
+        if self.gender_title:
+            return self.gender_title
+        elif self.gender:
+            return self.get_gender_display()
+        return ""
             
     @property
     def fullname(self):
@@ -882,7 +893,7 @@ class Contact(AddressModel):
                 return u"< {0} >".format(ugettext(u"Unknown")).strip()
         
         if self.gender and self.lastname:
-            title = u'{0} '.format(self.get_gender_display())
+            title = u'{0} '.format(self.get_gender_text())
         else:
             title = u''
         
