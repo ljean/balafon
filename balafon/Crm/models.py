@@ -274,7 +274,7 @@ class AddressModel(LastModifiedModel):
             return [field for field in fields if field]
         return []
 
-    def get_billing_address(self):
+    def get_billing_full_address(self):
         """join address fields"""
         billing_address = u' '.join(self.get_billing_address_fields())
         if not billing_address:
@@ -653,7 +653,7 @@ class Contact(AddressModel):
             Used to handle relationships and reverse relationships in a same list
             """
             def __init__(self, id_, contact, type_, type_name):
-                self.id = id_ #pylint: disable=invalid-name
+                self.id = id_  # pylint: disable=invalid-name
                 self.contact = contact
                 self.type = type_
                 self.type_name = type_name
@@ -797,6 +797,10 @@ class Contact(AddressModel):
         """url to contact page"""
         return reverse('crm_view_contact', args=[self.id])
 
+    def has_address(self):
+        """returns True if address field is set"""
+        return self.address.strip() != ''
+
     def get_address_fields(self):
         """get address fields: address, zip, city..."""
         fields = super(Contact, self).get_address_fields()
@@ -813,13 +817,13 @@ class Contact(AddressModel):
         elif not self.entity.is_single_contact:
             return self.entity.get_country()
 
-    def get_billing_address(self):
+    def get_billing_full_address(self):
         """billing address"""
-        billing_address = super(Contact, self).get_billing_address()
+        billing_address = super(Contact, self).get_billing_full_address()
         if billing_address:
             return billing_address
         elif not self.entity.is_single_contact:
-            return self.entity.get_billing_address()
+            return self.entity.get_billing_full_address()
 
     def get_foreign_country(self):
         """country if different from default"""
