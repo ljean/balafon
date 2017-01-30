@@ -315,6 +315,34 @@ class EntityRegionSearchForm(ZoneSearchForm):
         return Q(entity__city__parent__parent__id=self.value)
 
 
+class LargeRegionSearchForm(ZoneSearchForm):
+    """by region"""
+    name = 'large_region'
+    label = _(u'Large Regions')
+
+    def get_lookup(self):
+        """lookup"""
+        qobj1 = Q(city__parent__parent__groups__id=self.value)
+
+        qobj2 = Q(
+            city__isnull=True
+        ) & Q(
+            entity__city__parent__parent__groups__id=self.value
+        )
+
+        return qobj1 | qobj2
+
+
+class EntityLargeRegionSearchForm(ZoneSearchForm):
+    """by region of teh entity"""
+    name = 'entity_large_region'
+    label = _(u'Entity Large Regions')
+
+    def get_lookup(self):
+        """queryset"""
+        return Q(entity__city__parent__parent__groups__id=self.value)
+
+
 class CountrySearchForm(ZoneSearchForm):
     """by country"""
     name = 'country'

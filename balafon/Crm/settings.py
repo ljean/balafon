@@ -16,6 +16,8 @@ OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT = getattr(project_settings, 'OPPORTUNITY_DI
 
 ZONE_GROUP_SEARCH = getattr(project_settings, 'BALAFON_ZONE_GROUP_SEARCH', False)
 
+LARGE_REGION_SEARCH = getattr(project_settings, 'BALAFON_LARGE_REGION_SEARCH', False)
+
 
 def get_default_country():
     """returns configured default coutry or 'France'"""

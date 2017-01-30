@@ -136,9 +136,12 @@ class BaseZone(NamedElement):
 
 
 class Zone(BaseZone):
-    """A zone is a group of cities : departements, region, ciuntry..."""
+    """A zone is a group of cities : departements, region, country..."""
     type = models.ForeignKey(ZoneType)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
+    groups = models.ManyToManyField(
+        "Zone", blank=True, verbose_name=_(u'parent groups'), related_name='children_groups_set'
+    )
     
     def is_country(self):
         """is this zone corrspond to top-most: country"""

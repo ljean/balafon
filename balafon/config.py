@@ -30,6 +30,8 @@ SEARCH_FORMS = [
             search_forms.EntityDepartmentSearchForm,
             search_forms.RegionSearchForm,
             search_forms.EntityRegionSearchForm,
+            search_forms.LargeRegionSearchForm if (settings.LARGE_REGION_SEARCH) else None,
+            search_forms.EntityLargeRegionSearchForm if (settings.LARGE_REGION_SEARCH) else None,
             search_forms.CountrySearchForm,
             search_forms.EntityCountrySearchForm,
             search_forms.ZipCodeSearchForm,
