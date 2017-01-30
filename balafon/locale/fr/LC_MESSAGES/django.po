@@ -3038,7 +3038,7 @@ msgstr "Votre message n'a pas pu être envoyé"
 
 #: Emailing/utils.py:282
 msgid "Verification of your email address"
-msgstr "Vérification de votre adresse email"
+msgstr "Vérification de votre adresse e-mail"
 
 #: Emailing/views.py:76
 msgid "Are you sure to delete '{0.newsletter.subject}' {1}?"
