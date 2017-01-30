@@ -16,6 +16,8 @@ class Command(BaseCommand):
         for region in models.Zone.objects.filter(type__type='region'):
             print region.name
 
+        print '**********'
+
         large_region_type = models.ZoneType.objects.get_or_create(name=u'Grandes régions', type=u'large_region')[0]
 
         mapping = [
@@ -42,10 +44,11 @@ class Command(BaseCommand):
             )[0]
 
             for child_region_name in child_region_names:
-                child_region = models.Zone.objects.get(
-                    name=child_region_name, type__type='region'
-                )
-                child_region.groups.add(large_region)
-                child_region.save()
-
-
+                try:
+                    child_region = models.Zone.objects.get(
+                        name=child_region_name, type__type='region'
+                    )
+                    child_region.groups.add(large_region)
+                    child_region.save()
+                except models.Zone.DoesNotExist:
+                    print "#", child_region_name, "missing"
