@@ -242,9 +242,11 @@ admin.site.register(models.Relationship, RelationshipAdmin)
 
 class SubscriptionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['name', 'site']
+    list_display = ['name', 'site', 'order_index']
+    list_editable = ['order_index']
 
 admin.site.register(models.SubscriptionType, SubscriptionTypeAdmin)
+
 
 class TeamMemberAdmin(admin.ModelAdmin):
     """custom admin view"""

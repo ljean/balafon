@@ -1032,6 +1032,7 @@ class SubscriptionType(models.Model):
     """Subscription type: a mailing list for example"""
     name = models.CharField(max_length=100, verbose_name=_(u"name"))
     site = models.ForeignKey(Site, blank=True, null=True)
+    order_index = models.IntegerField(default=0, verbose_name=_(u"order index"))
 
     def __unicode__(self):
         return self.name
@@ -1039,6 +1040,7 @@ class SubscriptionType(models.Model):
     class Meta:
         verbose_name = _(u'Subscription type')
         verbose_name_plural = _(u'Subscription types')
+        ordering = (u'order_index', )
 
 
 class Subscription(models.Model):
