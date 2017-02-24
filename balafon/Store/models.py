@@ -576,7 +576,7 @@ class StoreItemImport(models.Model):
 
     def _to_string(self, raw_value):
         """to string"""
-        return unicode(raw_value)
+        return u'{0}'.format(raw_value)
 
     def _to_brand(self, raw_value):
         """convert string to brand"""
@@ -646,7 +646,7 @@ class StoreItemImport(models.Model):
             else:
                 category_lines = []
             last_category = u''
-            for row_index in xrange(sheet.nrows):
+            for row_index in range(sheet.nrows):
 
                 if self.ignore_first_line and row_index == 0:
                     #ignore
