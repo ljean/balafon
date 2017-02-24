@@ -382,12 +382,33 @@ class StoreItem(models.Model):
     def __unicode__(self):
         return u'{0} > {1}{2}'.format(self.category, self.name, u' ({0})'.format(self.brand) if self.brand else '')
 
+    def _to_decimal(self, value):
+        return Decimal("{0:.2f}".format(value, 2))
+
+    def _to_vat_incl(self, value):
+        if self.vat_rate:
+            vat_value = self.vat_rate.rate
+        else:
+            vat_value = 0
+        return self._to_decimal(value * (1 + vat_value / 100))
+
     def vat_incl_price(self):
         """VAT inclusive price"""
-        return Decimal("{0:.2f}".format(
-            round(self.pre_tax_price * (1 + self.vat_rate.rate / 100), 2)
-        ))
+        return self._to_vat_incl(self.pre_tax_price)
     vat_incl_price.short_description = _(u"VAT inclusive price")
+
+    def vat_incl_price_with_alert(self):
+        """VAT inclusive price"""
+        price = self.vat_incl_price()
+        calculated_pre_tax_price = self.get_calculated_price()
+        if calculated_pre_tax_price is not None:
+            calculated_price = self._to_vat_incl(calculated_pre_tax_price)
+            if calculated_price != price:
+                return u'{0} <div style="color:red">Attention! calcul = {1}</div>'.format(price, calculated_price)
+        return u'{0}'.format(price)
+
+    vat_incl_price_with_alert.short_description = _(u"VAT inclusive price")
+    vat_incl_price_with_alert.allow_tags = True
 
     def get_admin_link(self):
         try:
@@ -471,7 +492,7 @@ class StoreItem(models.Model):
     stock_threshold_alert.short_description = _(u"Stock threshold")
     stock_threshold_alert.allow_tags = True
 
-    def calculate_price(self):
+    def get_calculated_price(self):
         """calculate article price according to the defined policy"""
 
         price_policy = self.price_policy.policy if self.price_policy else ''
@@ -491,7 +512,13 @@ class StoreItem(models.Model):
                     category = category.parent
 
         if price_policy == 'multiply_purchase_by_ratio' and self.purchase_price is not None:
-            self.pre_tax_price = self.purchase_price * Decimal(policy_parameters)
+            return self.purchase_price * Decimal(policy_parameters)
+
+    def calculate_price(self):
+        """calculate article price according to the defined policy"""
+        calculated_price = self.get_calculated_price()
+        if calculated_price is not None:
+            self.pre_tax_price = calculated_price
             super(StoreItem, self).save()
 
     def save(self, *args, **kwargs):
