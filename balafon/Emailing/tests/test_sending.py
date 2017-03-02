@@ -270,10 +270,10 @@ class SendEmailingTest(BaseTestCase):
         content += '<a href="mailto:me@me.{0}">mailme</a><a href="#art1">internal link</a></p>'
 
         newsletter_data = {
-            'subject_'+origin_lang: 'This is the {0} subject'.format(origin_lang),
-            'subject_'+trans_lang: 'This is the {0} subject'.format(trans_lang),
-            'content_'+origin_lang: content.format(origin_lang),
-            'content_'+trans_lang: content.format(trans_lang),
+            'subject_' + origin_lang: 'This is the {0} subject'.format(origin_lang),
+            'subject_' + trans_lang: 'This is the {0} subject'.format(trans_lang),
+            'content_' + origin_lang: content.format(origin_lang),
+            'content_' + trans_lang: content.format(trans_lang),
             'template': 'test/newsletter_contact.html'
         }
 
@@ -303,7 +303,7 @@ class SendEmailingTest(BaseTestCase):
 
         activate(origin_lang)
 
-        #check emailing status
+        # check emailing status
         self.assertEqual(emailing.status, Emailing.STATUS_SENT)
         self.assertNotEqual(emailing.sending_dt, None)
         self.assertEqual(emailing.send_to.count(), 0)
@@ -337,12 +337,13 @@ class SendEmailingTest(BaseTestCase):
 
             self.assertEqual(email.subject, newsletter_data['subject_'+contact_lang])
             self.assertTrue(email.body.find(entity.name) >= 0)
-            #print email.body
+            # print email.body
             self.assertEqual(email.extra_headers.get('Reply-To', ''), '')
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
                 '<{0}>, <mailto:{1}?subject=unsubscribe>'.format(unsubscribe_url, email.from_email)
             )
+
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
 
@@ -350,15 +351,15 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.{0}".format(contact_lang)) > 0)
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
-            #check magic links
+            # check magic links
             self.assertTrue(MagicLink.objects.count() > 0)
 
-            #check an action has been created
+            # check an action has been created
             contact = models.Contact.objects.get(id=contact.id)
             self.assertEqual(contact.action_set.count(), 1)
             self.assertEqual(contact.action_set.all()[0].subject, email.subject)
@@ -407,7 +408,7 @@ class SendEmailingTest(BaseTestCase):
 
         emailing = Emailing.objects.get(id=emailing.id)
 
-        #check emailing status
+        # check emailing status
         self.assertEqual(emailing.status, Emailing.STATUS_SENT)
         self.assertNotEqual(emailing.sending_dt, None)
         self.assertEqual(emailing.send_to.count(), 0)
@@ -448,16 +449,16 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
 
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("mailto:me@me.fr") > 0)
 
-            #Check mailto links are not magic
+            # Check mailto links are not magic
             self.assertTrue(email.alternatives[0][0].find("#art1") > 0)
 
-            #check magic links
+            # check magic links
             self.assertTrue(MagicLink.objects.count() > 0)
 
-            #check an action has been created
+            # check an action has been created
             c = models.Contact.objects.get(id=contact.id)
             self.assertEqual(c.action_set.count(), 1)
             self.assertEqual(c.action_set.all()[0].subject, email.subject)

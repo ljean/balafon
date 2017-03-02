@@ -16,7 +16,7 @@
         {% coop_piece_of_html "newsletter_header" %}
         </div>
         
-        <div class="hello">{{contact.entity}}</div>
+        <div class="hello">{{ contact.fullname }} - {{ contact.entity.name }}</div>
         <div class="date">{% now "j F Y"%}</div>
         
         <div id="content">{{newsletter.content}}</div>
