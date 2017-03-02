@@ -16,6 +16,7 @@ from captcha.models import CaptchaStore
 from model_mommy import mommy
 
 from balafon.Crm import models
+from balafon.Crm.signals import new_subscription
 
 
 @override_settings(BALAFON_SUBSCRIBE_ENABLED=True)
@@ -546,7 +547,8 @@ class SubscribeTest(TestCase):
         self.assertEqual(contact.firstname, data['firstname'])
 
         subscription_newsletter = models.Subscription.objects.get(
-            contact=contact, subscription_type=newsletter_subscription)
+            contact=contact, subscription_type=newsletter_subscription
+        )
         self.assertEqual(subscription_newsletter.accept_subscription, accept_newsletter)
         if accept_newsletter:
             self.assertEqual(subscription_newsletter.subscription_date.date(), date.today())
@@ -554,7 +556,8 @@ class SubscribeTest(TestCase):
             self.assertEqual(subscription_newsletter.subscription_date, None)
 
         subscription_3rdparty = models.Subscription.objects.get(
-            contact=contact, subscription_type=third_party_subscription)
+            contact=contact, subscription_type=third_party_subscription
+        )
         self.assertEqual(subscription_3rdparty.accept_subscription, accept_3rdparty)
         if accept_3rdparty:
             self.assertEqual(subscription_3rdparty.subscription_date.date(), date.today())
@@ -679,5 +682,28 @@ class SubscribeTest(TestCase):
 
         self.assertEqual(models.Contact.objects.count(), 0)
 
-        #email verification
+        # email verification
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_accept_newsletter_signal(self):
+        """subscribe and accept some subscribtions"""
+
+        def add_to_group_callback(sender, instance, contact, **kwargs):
+            group = models.Group.objects.get_or_create(name=instance.subscription_type.name)[0]
+            group.contacts.add(contact)
+            group.save()
+
+        new_subscription.connect(add_to_group_callback, sender=models.Subscription)
+
+        self.test_accept_newsletter(accept_newsletter=True, accept_3rdparty=False)
+
+        self.assertEqual(1, models.Contact.objects.count())
+        contact = models.Contact.objects.all()[0]
+
+        # Check the callbacks have been called
+        self.assertEqual(models.Group.objects.count(), 1)
+        group = models.Group.objects.get(name=u'newsletter')
+        self.assertEqual(group.entities.count(), 0)
+        self.assertEqual(list(group.contacts.all()), [contact])
+
+        new_subscription.disconnect(add_to_group_callback, sender=models.Subscription)

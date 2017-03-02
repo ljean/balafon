@@ -31,6 +31,7 @@ from balafon.utils import logger
 from balafon.utils import now_rounded
 from balafon.Crm.forms import ConfirmForm
 from balafon.Crm.models import Contact, Action, ActionType, Subscription
+from balafon.Crm.signals import new_subscription
 from balafon.Emailing import models, forms
 from balafon.Emailing.settings import (
     is_subscribe_enabled, is_email_subscribe_enabled, get_subscription_form
@@ -449,16 +450,20 @@ class SubscribeView(View):
         if form.is_valid():
             contact = form.save(request)
             try:
-                subscription_types = [
-                    subscription.subscription_type for subscription in contact.subscription_set.all()
-                ]
+                subscription_queryset = contact.subscription_set.filter(accept_subscription=True)
+
+                subscription_types = []
+                for subscription in subscription_queryset:
+                    new_subscription.send(sender=Subscription, instance=subscription, contact=contact)
+                    subscription_types.append(subscription.subscription_type)
+
                 send_verification_email(contact, subscription_types)
                 return HttpResponseRedirect(self.get_success_url(contact))
             except EmailSendError:
                 except_text = 'send_verification_email'
                 logger.exception(except_text)
                 
-                #create action
+                # create action
                 detail = _(u"An error occurred while verifying the email address of this contact.")
                 fix_action = ActionType.objects.get_or_create(name=_(u'Balafon'))[0]
                 action = Action.objects.create(

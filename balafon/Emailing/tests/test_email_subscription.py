@@ -15,7 +15,7 @@ from django.utils.translation import activate
 from model_mommy import mommy
 
 from balafon.Crm import models
-
+from balafon.Crm.signals import new_subscription
 
 @override_settings(BALAFON_EMAIL_SUBSCRIBE_ENABLED=True)
 class SubscribeTest(TestCase):
@@ -496,3 +496,69 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Contact.objects.count(), 0)
 
         self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(BALAFON_DEFAULT_SUBSCRIPTION_TYPE=None)
+    def test_email_subscribe_signal(self):
+        """test email subscription when no type is configured"""
+        url = reverse("emailing_email_subscribe_newsletter")
+
+        def add_to_group_callback(sender, instance, contact, **kwargs):
+            group = models.Group.objects.get_or_create(name=instance.subscription_type.name)[0]
+            group.contacts.add(contact)
+            group.save()
+
+        new_subscription.connect(add_to_group_callback, sender=models.Subscription)
+
+        site1 = Site.objects.get_current()
+        site2 = mommy.make(Site)
+
+        subscription_type1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        subscription_type2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        subscription_type3 = mommy.make(models.SubscriptionType, name="def", site=site2)
+
+        data = {
+            'email': 'pdupond@apidev.fr',
+        }
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+
+        contact = models.Contact.objects.all()[0]
+
+        self.assertNotEqual(contact.uuid, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
+
+        self.assertEqual(contact.email, data['email'])
+
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email])
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = verification_email.message().as_string().decode('utf-8')
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
+        # Not an Error message
+        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+
+        for subscription_type in (subscription_type1, subscription_type2):
+            subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(subscription.accept_subscription, True)
+            self.assertEqual(subscription.subscription_date.date(), date.today())
+
+        for subscription_type in (subscription_type3, ):
+            queryset = models.Subscription.objects.filter(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(0, queryset.count())
+
+        # Check the callbacks have been called
+        self.assertEqual(models.Group.objects.count(), 2)
+        for subscription_type in (subscription_type1, subscription_type2, ):
+            group = models.Group.objects.get(name=subscription_type.name)
+            self.assertEqual(group.entities.count(), 0)
+            self.assertEqual(list(group.contacts.all()), [contact])
+
+        new_subscription.disconnect(add_to_group_callback, sender=models.Subscription)
+
