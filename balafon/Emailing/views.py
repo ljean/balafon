@@ -418,13 +418,16 @@ class SubscribeView(View):
     def get_error_url(self, contact):
         """where to redirect on error"""
         return reverse('emailing_subscribe_error', args=[contact.uuid])
-    
+
+    def get_context_data(self, **kwargs):
+        return {}
+
     def _display_form(self, form):
         """display form"""
         context_data = {
             'form': form,
         }
-            
+        context_data.update(self.get_context_data())
         return render(
             self.request,
             self.get_template(),
@@ -434,7 +437,7 @@ class SubscribeView(View):
     def get(self, request, *args, **kwargs):
         """HTTP GET: display form"""
         form_class = self.get_form_class()
-        form = form_class()
+        form = form_class(**self.get_form_kwargs())
         return self._display_form(form)
 
     def get_form_kwargs(self):
@@ -500,7 +503,14 @@ class EmailSubscribeView(SubscribeView):
         form_kwargs = super(EmailSubscribeView, self).get_form_kwargs(*args, **kwargs)
         form_kwargs['subscription_type'] = self.kwargs.get('subscription_type', None)
         return form_kwargs
-    
+
+    def get_context_data(self, **kwargs):
+        subscription_type_id = self.kwargs.get('subscription_type', None)
+        if subscription_type_id:
+            return {'action_url': reverse('emailing_email_subscribe_subscription', args=[subscription_type_id])}
+        else:
+            return {'action_url': reverse('emailing_email_subscribe_newsletter')}
+
     def get_form_class(self):
         """form class"""
         return forms.EmailSubscribeForm
