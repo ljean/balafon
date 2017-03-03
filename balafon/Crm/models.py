@@ -326,7 +326,7 @@ class Entity(AddressModel):
     def save(self, *args, **kwargs):
         """save"""
 
-        #add http if missing in website url
+        # add http if missing in website url
         if self.website:
             parsing = urlparse(self.website)
             if not parsing.scheme:
@@ -516,14 +516,14 @@ class SameAs(models.Model):
 
     def __unicode__(self):
         return _(u"Same As: {0}").format(
-            [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')]
+            [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')]
         )
 
     def priority_contact(self):
         """Th econtact with priority 1"""
         try:
             return u"{0}".format(
-                [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
+                [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
             )
         except IndexError:
             return ""
@@ -533,7 +533,7 @@ class SameAs(models.Model):
         """all contacts except the 1st one"""
         try:
             return u"{0}".format(
-                [unicode(contact) for contact in self.contact_set.order_by('same_as_priority')][1:]
+                [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][1:]
             )
         except IndexError:
             return ""

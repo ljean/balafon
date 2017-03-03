@@ -84,7 +84,7 @@ class NewEmailingForm(BsForm):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
+            initial_contacts = u';'.join([u'{0}'.format(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         super(NewEmailingForm, self).__init__(*args, **kwargs)
         if initial_contacts:
@@ -169,7 +169,7 @@ class NewNewsletterForm(BsForm):
                         html = urllib2.urlopen(url).read()
                         # and extract the selector content as initial content for the newsletter
                         soup = BeautifulSoup(html, "html.parser")
-                        content = u''.join([unicode(tag) for tag in soup.select(selector)])
+                        content = u''.join([u'{0}'.format(tag) for tag in soup.select(selector)])
                         if post_processor:
                             # import the post_processor function
                             module_name, processor_name = post_processor.rsplit('.', 1)
@@ -179,7 +179,7 @@ class NewNewsletterForm(BsForm):
                             content = post_processor_func(content)
                         self.source_content = content
                         return url
-                    except Exception, msg:
+                    except Exception as msg:
                         raise ValidationError(msg)
             raise ValidationError(ugettext(u"The url is not allowed"))
         return u''
@@ -222,7 +222,7 @@ class EmailSubscribeForm(BetterBsModelForm):
             entity_type = EntityType.objects.get(id=et_id)
             contact.entity = Entity.objects.create(name=contact.email, type=entity_type)
         contact.save()
-        #delete unknown contacts for the current entity
+        # delete unknown contacts for the current entity
         contact.entity.contact_set.exclude(id=contact.id).delete()
 
         queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
