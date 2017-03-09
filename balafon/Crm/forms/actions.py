@@ -11,7 +11,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms as forms
 
-from coop_cms.forms import AlohaEditableModelForm
+from coop_cms.forms.base import InlineHtmlEditableModelForm
 
 from balafon.Crm import models
 from balafon.Crm.forms.base import BetterBsModelForm, FormWithFieldsetMixin
@@ -213,7 +213,7 @@ class ActionTypeForm(forms.ModelForm):
         )
 
 
-class ActionDocumentForm(AlohaEditableModelForm):
+class ActionDocumentForm(InlineHtmlEditableModelForm):
     """Action document form"""
     class Meta:
         model = models.ActionDocument
