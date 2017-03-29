@@ -70,10 +70,27 @@ class SubscribeTest(TestCase):
 
     def test_view_subscribe_newsletter(self):
         """view email subscription page"""
-        url = reverse("emailing_subscribe_newsletter")
+        url = reverse("emailing_email_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 0)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(1, len(soup.select('form')))
+        form = soup.select('form')[0]
+        self.assertEqual(form['action'], url)
+
+    def test_view_subscribe_newsletter_by_id(self):
+        """view email subscription page"""
+        site1 = Site.objects.get_current()
+        subscription_type1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        url = reverse("emailing_email_subscribe_subscription", args=[subscription_type1.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(1, len(soup.select('form')))
+        form = soup.select('form')[0]
+        self.assertEqual(form['action'], url)
         
     @override_settings(BALAFON_DEFAULT_SUBSCRIPTION_TYPE=None)
     def test_email_subscribe_newsletter(self):
@@ -251,7 +268,7 @@ class SubscribeTest(TestCase):
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
-        #Not an Error message
+        # Not an Error message
         self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
 
         for subscription_type in (subscription_type1, ):

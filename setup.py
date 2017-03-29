@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'django >= 1.6, <1.10',
         'djangorestframework',
-        'apidev-coop_cms >= 1.1.9, <1.2',
+        'apidev-coop_cms >= 1.2',
         'beautifulsoup4',
         'BeautifulSoup',
         'django-wkhtmltopdf',

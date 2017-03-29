@@ -36,7 +36,7 @@
   
 {% block content %}
   {{ block.super }}
-  <form class="form" method="post" action="{% url 'emailing_email_subscribe_newsletter' %}">{% csrf_token %}
+  <form class="form" method="post" action="{{ action_url }}">{% csrf_token %}
     {% block customize_form %}
       {{form.as_p}}
     {% endblock %}
