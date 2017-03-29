@@ -62,7 +62,7 @@ class SaleItemViewSet(viewsets.ModelViewSet):
 
 class StoreItemViewSet(viewsets.ModelViewSet):
     """returns sales items"""
-    queryset = StoreItem.objects.all()
+    queryset = StoreItem.objects.filter(published=True)
     serializer_class = serializers.StoreItemSerializer
     permission_classes = get_public_api_permissions()
 
@@ -305,7 +305,10 @@ class FavoriteView(ProfileAPIView):
         self.get_profile(request)
 
         favorites = self.request.user.favorite_set.all()
-        favorites_serializer = serializers.FavoriteItemSerializer([fav.item for fav in favorites], many=True)
+        favorites_serializer = serializers.FavoriteItemSerializer(
+            [fav.item for fav in favorites if fav.item.published],
+            many=True
+        )
         return Response({'favorites': favorites_serializer.data})
 
 
@@ -327,7 +330,7 @@ class LastSalesView(ProfileAPIView):
         already_in = set()
         store_items = []
         for sale_item in sale_items:
-            if sale_item.item and sale_item.item.id not in already_in:
+            if sale_item.item and sale_item.item.published and sale_item.item.id not in already_in:
                 already_in.add(sale_item.item.id)
                 store_items.append(sale_item.item)
 

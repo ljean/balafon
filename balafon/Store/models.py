@@ -366,6 +366,7 @@ class StoreItem(models.Model):
     )
     price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
     available = models.BooleanField(default=True, verbose_name=_(u'Available'))
+    published = models.BooleanField(default=True, verbose_name=_(u'Published'))
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
     price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_(u"price class"))
     certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_(u"certificate"))

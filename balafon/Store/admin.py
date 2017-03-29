@@ -21,7 +21,7 @@ class StoreItemInline(admin.TabularInline):
     model = models.StoreItem
     fields = (
         'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price',
-        'vat_rate', 'vat_incl_price_with_alert', 'available', 'stock_count', 'stock_threshold_alert'
+        'vat_rate', 'vat_incl_price_with_alert', 'available', 'published', 'stock_count', 'stock_threshold_alert'
     )
     readonly_fields = ['get_admin_link', 'stock_threshold_alert', 'vat_incl_price_with_alert', ]
 
@@ -213,11 +213,11 @@ class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'fullname', 'brand', 'category', 'vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price',
-        'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available'
+        'vat_incl_price', 'stock_count', 'stock_threshold_alert', 'available', 'published',
     ]
     ordering = ['name']
     list_filter = [
-        'available', 'price_class', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter,
+        'published', 'available', 'price_class', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter,
         'only_for_groups',
     ]
     list_editable = ['available']
@@ -227,10 +227,14 @@ class StoreItemAdmin(admin.ModelAdmin):
     inlines = [StoreItemPropertyValueInline]
     fieldsets = (
         (_(u'General'), {
-            'fields': ('name', 'available', 'category', 'brand', 'certificates', 'tags', 'only_for_groups')
+            'fields': (
+                'name', 'published', 'available', 'category', 'brand', 'certificates', 'tags', 'only_for_groups',
+            )
         }),
         (_(u'Price'), {
-            'fields': ('vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', 'price_class', )
+            'fields': (
+                'vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', 'price_class',
+            )
         }),
         (_(u'Supplier'), {
             'fields': ('supplier', 'reference', )

@@ -201,6 +201,22 @@ class ViewCommercialDocumentTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, item.text)
 
+    def test_view_unpublished_item(self):
+        """It should display item text"""
+
+        store_item = mommy.make(models.StoreItem, published=False)
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type)
+
+        item = mommy.make(
+            models.SaleItem, sale=action.sale, item=store_item, text=u'Promo été', quantity=1, pre_tax_price=10
+        )
+
+        url = reverse('store_view_sales_document', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, item.text)
+
     def test_view_public(self):
         """It should display item text"""
 
