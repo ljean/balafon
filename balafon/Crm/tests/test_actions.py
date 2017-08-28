@@ -530,7 +530,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(errors), 4)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
@@ -578,7 +578,7 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(errors), 2)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
