@@ -415,9 +415,6 @@ class EditActionTest(BaseTestCase):
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
-        errors = BeautifulSoup(response.content).select('#id_end_date .field-error')
-        self.assertEqual(len(errors), 1)
-
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
 
@@ -439,9 +436,6 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
         errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
-
-        errors = BeautifulSoup(response.content).select('#id_end_date .field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
@@ -467,9 +461,6 @@ class EditActionTest(BaseTestCase):
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
-        errors = BeautifulSoup(response.content).select('#id_end_time .field-error')
-        self.assertEqual(len(errors), 1)
-
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
 
@@ -491,9 +482,6 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
         errors = BeautifulSoup(response.content).select('.field-error')
-        self.assertEqual(len(errors), 1)
-
-        errors = BeautifulSoup(response.content).select('#id_end_time .field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
@@ -519,9 +507,6 @@ class EditActionTest(BaseTestCase):
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
-        errors = BeautifulSoup(response.content).select('#id_end_time .field-error')
-        self.assertEqual(len(errors), 1)
-
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
 
@@ -544,7 +529,7 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
 
-        errors = BeautifulSoup(response.content).select('#id_date .field-error')
+        errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
@@ -568,7 +553,7 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
 
-        errors = BeautifulSoup(response.content).select('#id_time .field-error')
+        errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
@@ -592,7 +577,7 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
 
-        errors = BeautifulSoup(response.content).select('#id_end_date .field-error')
+        errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
@@ -616,7 +601,7 @@ class EditActionTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(200, response.status_code)
 
-        errors = BeautifulSoup(response.content).select('#id_end_time .field-error')
+        errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)

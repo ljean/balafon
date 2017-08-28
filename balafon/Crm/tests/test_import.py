@@ -580,7 +580,7 @@ class UnsubscribeImportFileTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         soup = BeautifulSoup(response.content)
-        self.assertEqual(len(soup.select("#id_input_file .label-danger")), 1)
+        self.assertEqual(len(soup.select(".label-danger")), 1)
 
 
 class ImportTemplateTest(BaseTestCase):
