@@ -392,7 +392,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         
         data = {
             'content_type': user_ct.id,
-            'object_id': 1111, 
+            'object_id': 1111111,
         }
         response = self.client.post(reverse('users_toggle_favorite'), data)
         self.assertEqual(200, response.status_code)

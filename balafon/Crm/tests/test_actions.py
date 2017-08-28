@@ -280,8 +280,6 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         errors = BeautifulSoup(response.content).select('.field-error')
         self.assertEqual(len(errors), 1)
-        errors = BeautifulSoup(response.content).select('#id_time .field-error')
-        self.assertEqual(len(errors), 1)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.subject, "AAA")
