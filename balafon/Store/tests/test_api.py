@@ -60,6 +60,25 @@ class StoreItemApiTest(BaseTestCase):
         self.assertEqual(item2['id'], store_item2.id)
         self.assertEqual(item2['name'], store_item2.name)
 
+    def test_view_store_items_published(self):
+        """It should return only if published"""
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem, published=False)
+
+        url = reverse('store_store-items-list')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(len(response.data), 1)
+
+        data = sorted(response.data, key=lambda item_: item_['id'])
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+        self.assertEqual(item1['name'], store_item1.name)
+
     def test_view_store_items_profile(self):
         """It should return all"""
 
@@ -494,6 +513,34 @@ class FavoriteApiTest(BaseTestCase):
         self.assertEqual(item1['id'], store_item1.id)
         self.assertEqual(item2['id'], store_item2.id)
 
+    def test_view_favorites_unpublished(self):
+        """It should return favorites"""
+        other_user = mommy.make(models.User)
+
+        store_item1 = mommy.make(models.StoreItem)
+        store_item2 = mommy.make(models.StoreItem, published=False)
+        store_item3 = mommy.make(models.StoreItem)
+
+        create_profile_contact(self.user)
+
+        mommy.make(models.Favorite, user=self.user, item=store_item1)
+        mommy.make(models.Favorite, user=self.user, item=store_item2)
+        mommy.make(models.Favorite, user=other_user, item=store_item3)
+        mommy.make(models.Favorite, user=other_user, item=store_item1)
+
+        url = reverse('store_favorites_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        favorites = response.data['favorites']
+        self.assertEqual(len(favorites), 1)
+
+        data = sorted(favorites, key=lambda item_: item_['id'])
+        item1 = data[0]
+
+        self.assertEqual(item1['id'], store_item1.id)
+
     def test_add_favorites(self):
         """It should add a favorite"""
         store_item1 = mommy.make(models.StoreItem)
@@ -647,6 +694,58 @@ class LastSalesApiTest(BaseTestCase):
 
         self.assertEqual(items[0]['id'], store_item1.id)
         self.assertEqual(items[0]['name'], store_item1.name)
+
+    def test_view_last_sales_not_published(self):
+        """It should return one store item"""
+
+        store_item1 = mommy.make(models.StoreItem, name=u'Orange')
+        store_item2 = mommy.make(models.StoreItem, name=u'Banana')
+        store_item3 = mommy.make(models.StoreItem, name=u'Apple', published=False)
+        store_item4 = mommy.make(models.StoreItem)
+
+        self.user.first_name = u'John'
+        self.user.last_name = u'Doe'
+        self.user.save()
+
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+
+        other_contact = mommy.make(Contact)
+
+        action1 = mommy.make(Action, planned_date=datetime.now())
+        action1.contacts.add(contact)
+        action1.save()
+        sale1 = mommy.make(models.Sale, action=action1)
+        mommy.make(models.SaleItem, sale=sale1, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale1, item=store_item2, quantity=5)
+
+        action2 = mommy.make(Action, planned_date=datetime.now() - timedelta(days=30))
+        action2.contacts.add(contact)
+        action2.save()
+        sale2 = mommy.make(models.Sale, action=action2)
+        mommy.make(models.SaleItem, sale=sale2, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale2, item=store_item3, quantity=2)
+
+        action3 = mommy.make(Action, planned_date=datetime.now())
+        action3.contacts.add(other_contact)
+        action3.save()
+        sale3 = mommy.make(models.Sale, action=action3)
+        mommy.make(models.SaleItem, sale=sale3, item=store_item1, quantity=1)
+        mommy.make(models.SaleItem, sale=sale3, item=store_item4, quantity=2)
+
+        url = reverse('store_last_sales_api')
+
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        items = response.data
+        self.assertEqual(len(items), 2)
+
+        self.assertEqual(items[0]['id'], store_item2.id)
+        self.assertEqual(items[0]['name'], store_item2.name)
+
+        self.assertEqual(items[1]['id'], store_item1.id)
+        self.assertEqual(items[1]['name'], store_item1.name)
 
     def test_view_last_sales_only_two_sales(self):
         """It should return three store item"""
