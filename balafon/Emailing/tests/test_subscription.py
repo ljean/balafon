@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """test subscription"""
 
+import os
 from bs4 import BeautifulSoup
 from datetime import date
 
@@ -12,7 +13,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
-from captcha.models import CaptchaStore
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -28,6 +28,9 @@ class SubscribeTest(TestCase):
         self._lang = settings.LANGUAGES[0][0]
         activate(self._lang)
 
+        if settings.BALAFON_USE_RECAPTCHA:
+            os.environ['RECAPTCHA_TESTING'] = 'True'
+
         if not getattr(settings, 'BALAFON_ALLOW_SINGLE_CONTACT', True):
             settings.BALAFON_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
 
@@ -36,6 +39,9 @@ class SubscribeTest(TestCase):
     def tearDown(self):
         """after each test"""
         activate(self._lang)
+
+        if settings.BALAFON_USE_RECAPTCHA:
+            os.environ['RECAPTCHA_TESTING'] = 'False'
 
     def test_view_subscribe_newsletter(self):
         """view subscription page"""
@@ -430,14 +436,19 @@ class SubscribeTest(TestCase):
 
     def _patch_with_captcha(self, url, data):
         """path form data with captcha"""
-        self.failUnlessEqual(CaptchaStore.objects.count(), 0)
-        self.client.get(url)
-        self.failUnlessEqual(CaptchaStore.objects.count(), 1)
-        captcha = CaptchaStore.objects.all()[0]
-        data.update({
-            'captcha_0': captcha.hashkey,
-            'captcha_1': captcha.response
-        })
+        if settings.BALAFON_USE_RECAPTCHA:
+            data.update({'recaptcha_response_field': 'PASSED'})
+
+        else:
+            from captcha.models import CaptchaStore
+            self.failUnlessEqual(CaptchaStore.objects.count(), 0)
+            self.client.get(url)
+            self.failUnlessEqual(CaptchaStore.objects.count(), 1)
+            captcha = CaptchaStore.objects.all()[0]
+            data.update({
+                'captcha_0': captcha.hashkey,
+                'captcha_1': captcha.response
+            })
 
     def test_view_subscribe_with_types(self):
         """view subscribe page"""

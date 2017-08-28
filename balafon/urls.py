@@ -99,7 +99,7 @@ if 'djrill' in settings.INSTALLED_APPS:
     ]
 
 
-if 'captcha' in settings.INSTALLED_APPS:
+if 'captcha' in settings.INSTALLED_APPS and not settings.BALAFON_USE_RECAPTCHA:
     urlpatterns += [
         url(r'^captcha/', include('captcha.urls')),
     ]

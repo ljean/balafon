@@ -13,14 +13,13 @@ from django.contrib.sites.models import Site
 from django.utils.timezone import now as dt_now
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from captcha.fields import CaptchaField
-
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
 from coop_cms.utils import dehtml
 from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
 import floppyforms as forms
 
+from balafon.settings import get_captcha_field
 from balafon.Crm import settings as crm_settings
 from balafon.Crm.forms import ModelFormWithCity, BetterBsModelForm
 from balafon.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType, SubscriptionType, Subscription
@@ -350,7 +349,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
-    captcha = CaptchaField(help_text=_(u"Make sure you are a human"))
+    captcha = get_captcha_field()
     favorite_language = forms.CharField(required=False, widget=forms.HiddenInput())
 
     class Meta:

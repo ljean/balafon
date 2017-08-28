@@ -3,6 +3,7 @@
 
 from django.conf import settings
 from django.views.generic import TemplateView
+from django.utils.translation import ugettext as _
 
 from coop_cms.settings import load_class
 from wkhtmltopdf.views import PDFTemplateView
@@ -72,3 +73,13 @@ def has_entity_on_registration_form():
 def get_registration_accept_terms_of_use_link():
     """returns a link for the use of terms"""
     return getattr(settings, 'BALAFON_REGISTRATION_ACCEPT_USE_OF_TERMS_LINK', '')
+
+
+def get_captcha_field():
+    """return the captcha field to use"""
+    if getattr(settings, 'BALAFON_USE_RECAPTCHA', False):
+        from captcha.fields import ReCaptchaField
+        return ReCaptchaField()
+    else:
+        from captcha.fields import CaptchaField as SimpleCaptchaField
+        return SimpleCaptchaField(help_text=_(u"Make sure you are a human"))
