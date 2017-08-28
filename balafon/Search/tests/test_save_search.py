@@ -365,7 +365,6 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(Search.objects.count(), 0)
         soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select(".field-error")), 1)
-        self.assertEqual(len(soup.select("#id_name .field-error")), 1)
 
     def test_already_existing_name(self):
         """save search with an existing name"""
@@ -393,7 +392,6 @@ class SearchSaveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select(".field-error")), 1)
-        self.assertEqual(len(soup.select("#id_name .field-error")), 1)
 
     def test_save_existing_search(self):
         """save an existing search"""

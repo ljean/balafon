@@ -152,7 +152,7 @@ SOUTH_TESTS_MIGRATE = False
 
 LOCALE_REDIRECT_PERMANENT = False
 
-HT_LINK_MODELS = ('basic_cms.Article', )
+COOP_HTML_EDITOR_LINK_MODELS = ('basic_cms.Article', )
 COOP_CMS_ARTICLE_LOGO_SIZE = "950x250"
 COOP_CMS_NEWSLETTER_TEMPLATES = (
     ('basic_newsletter.html', 'Basic'),
