@@ -75,6 +75,11 @@ def get_registration_accept_terms_of_use_link():
     return getattr(settings, 'BALAFON_REGISTRATION_ACCEPT_USE_OF_TERMS_LINK', '')
 
 
+def is_simple_captcha_used():
+    """is old simple captcha used"""
+    return not getattr(settings, 'BALAFON_USE_RECAPTCHA', False)
+
+
 def get_captcha_field():
     """return the captcha field to use"""
     if getattr(settings, 'BALAFON_USE_RECAPTCHA', False):
