@@ -84,7 +84,7 @@ def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
     name = u"< {0} >".format(_(u"Unknown"))
     email_providers = (
         'free', 'gmail', 'yahoo', 'yahoo.co', 'wanadoo', 'orange', 'sfr', 'laposte',
-        'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live', 'ymail',
+        'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live', 'ymail', 'outlook',
     )
     if not contact_data['entity']:
         entity = u''
@@ -93,7 +93,6 @@ def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
             if res:
                 regex_value = res.groups(0)
                 name, entity = regex_value[0], regex_value[1]
-                #email = u'{0}@{1}.{2}'.format(name, entity, ext)
                 if entity in email_providers:
                     entity = ""
         contact_data['entity'] = entity
