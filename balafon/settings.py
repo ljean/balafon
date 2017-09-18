@@ -82,9 +82,25 @@ def is_simple_captcha_used():
 
 def get_captcha_field():
     """return the captcha field to use"""
-    if getattr(settings, 'BALAFON_USE_RECAPTCHA', False):
-        from captcha.fields import ReCaptchaField
-        return ReCaptchaField()
+
+    default_field = 'captcha.fields.CaptchaField' if is_simple_captcha_used() else 'captcha.fields.ReCaptchaField'
+
+    captcha_field = load_class('BALAFON_CAPTCHA_FIELD', default_field)
+    captcha_widget = load_class('BALAFON_CAPTCHA_WIDGET', '')
+    captcha_help_text = getattr(settings, 'BALAFON_CAPTCHA_HELP_TEXT', _(u"Make sure you are a human"))
+
+    # django-recaptcha2
+    # BALAFON_CAPTCHA_FIELD = 'snowpenguin.django.recaptcha2.fields.ReCaptchaField'
+    # BALAFON_CAPTCHA_WIDGET = 'snowpenguin.django.recaptcha2.widgets.ReCaptchaWidget'
+
+    # django-recaptcha
+    # BALAFON_CAPTCHA_FIELD = 'captcha.fields.ReCaptchaField'
+
+    # django-simple-captcha
+    # BALAFON_CAPTCHA_FIELD = 'captcha.fields.CaptchaField'
+    # BALAFON_HELP_TEXT = _(u"Make sure you are a human")
+
+    if captcha_widget:
+        return captcha_field(widget=captcha_widget, help_text=captcha_help_text)
     else:
-        from captcha.fields import CaptchaField as SimpleCaptchaField
-        return SimpleCaptchaField(help_text=_(u"Make sure you are a human"))
+        return captcha_field(help_text=captcha_help_text)
