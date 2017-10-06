@@ -864,8 +864,8 @@ class Sale(models.Model):
         """return total price of the command"""
         total = Decimal(0)
         for sale_item in self.saleitem_set.all():
-            total += sale_item.vat_incl_total_price()
-        return total
+            total += sale_item.vat_incl_total_price(round_value=False)
+        return round_currency(total)
 
     def pre_tax_total_price(self):
         """return total price of the command"""
@@ -956,7 +956,7 @@ class SaleItem(models.Model):
 
     def vat_incl_price(self, round_value=True):
         """VAT inclusive price"""
-        value = self.unit_price() + self.vat_price()
+        value = self.unit_price() + self.vat_price(round_value=round_value)
         return round_currency(value) if round_value else value
 
     def total_vat_price(self, round_value=True):
@@ -972,9 +972,9 @@ class SaleItem(models.Model):
         value = self.unit_price() * (vat_rate / Decimal(100))
         return round_currency(value) if round_value else value
 
-    def vat_incl_total_price(self):
+    def vat_incl_total_price(self, round_value=True):
         """VAT inclusive price"""
-        return self.vat_incl_price() * self.quantity
+        return self.vat_incl_price(round_value=round_value) * self.quantity
 
     def raw_total_price(self, round_value=True):
         """VAT inclusive price"""
@@ -1062,8 +1062,9 @@ def update_action_amount(sale_item, delete_me=False):
         if show_amount_as_pre_tax:
             total_amount += item.pre_tax_total_price()
         else:
-            total_amount += item.vat_incl_total_price()
-    action.amount = total_amount
+            value = item.vat_incl_total_price(round_value=False)
+            total_amount += value
+    action.amount = round_currency(total_amount)
     action.save()
 
 
