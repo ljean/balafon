@@ -114,8 +114,8 @@ class StoreItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreItem
         fields = (
-            'id', 'name', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference', 'tags',
-            'available', 'unit', 'public_properties', 'discounts', 'price_class', 'certificates',
+            'id', 'name', 'origin', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference',
+            'tags', 'available', 'unit', 'public_properties', 'discounts', 'price_class', 'certificates',
         )
 
 

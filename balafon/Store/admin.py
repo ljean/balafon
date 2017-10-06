@@ -228,7 +228,8 @@ class StoreItemAdmin(admin.ModelAdmin):
     fieldsets = (
         (_(u'General'), {
             'fields': (
-                'name', 'published', 'available', 'category', 'brand', 'certificates', 'tags', 'only_for_groups',
+                'name', 'origin', 'published', 'available', 'category', 'brand', 'certificates', 'tags',
+                'only_for_groups',
             )
         }),
         (_(u'Price'), {

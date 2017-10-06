@@ -286,6 +286,7 @@ class Brand(models.Model):
     class Meta:
         verbose_name = _(u"Brand")
         verbose_name_plural = _(u"Brands")
+        ordering = [u'name']
 
     def __unicode__(self):
         return self.name
@@ -374,6 +375,7 @@ class StoreItem(models.Model):
         Group, blank=True, verbose_name=_(u"only for groups"),
         help_text=_(u'If defined, only members of these groups will be able to see the item')
     )
+    origin = models.CharField(max_length=50, blank=True, default="", verbose_name=_(u'Origine'))
 
     class Meta:
         verbose_name = _(u"Store item")
