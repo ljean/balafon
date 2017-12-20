@@ -5,7 +5,9 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import logging
 import urlparse
+from importlib import import_module
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
@@ -84,3 +86,17 @@ def validate_rgb(value):
 class Utf8JSONRenderer(JSONRenderer):
     """Utf-8 support"""
     ensure_ascii = False
+
+
+def load_from_module(settings_key, default_value):
+    """returns the form to be used for creating a new article"""
+    full_class_name = getattr(settings, settings_key, '') or default_value
+    if full_class_name:
+        try:
+            module_name, obj_name = full_class_name.rsplit('.', 1)
+        except ValueError:
+            raise ImportError("Unable to import {0}: full path is required".format(full_class_name))
+        module = import_module(module_name)
+        obj = getattr(module, obj_name)
+        return obj
+    return None

@@ -19,9 +19,8 @@ from balafon.Store.models import (
 )
 from balafon.Store import settings
 from balafon.Store.api import serializers
-from balafon.Store.settings import get_cart_type_name
-from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user
-
+from balafon.Store.settings import get_cart_type_name, get_cart_processed_callback
+from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user, logger
 
 class CanAccessStorePermission(permissions.BasePermission):
     """Define who can access the store"""
@@ -209,10 +208,10 @@ class CartView(APIView):
                         vat_rate=store_item.vat_rate,
                         pre_tax_price=store_item.pre_tax_price,
                         text=store_item.name,
-                        order_index=index+1
+                        order_index=index + 1
                     )
 
-            #Done
+            # Done
             if is_empty:
                 action.delete()
 
@@ -224,6 +223,14 @@ class CartView(APIView):
             else:
 
                 action.sale.save()
+
+                # TODO : TEST ME
+                on_cart_processed = get_cart_processed_callback()
+                if on_cart_processed:
+                    try:
+                        on_cart_processed(action)
+                    except Exception as err:
+                        logger.error(u'{0}'.format(err))
 
                 confirm_cart_to_user(profile, action)
                 notify_cart_to_admin(profile, action)

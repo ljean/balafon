@@ -4,6 +4,8 @@
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from ..utils import load_from_module
+
 
 def is_public_api_allowed():
     """returns true if an anonymous can view some data : products, categories, tags"""
@@ -22,3 +24,11 @@ def get_cart_confirmation_subject(profile, action):
         return subject(profile, action)
     else:
         return subject
+
+
+def get_cart_processed_callback():
+    """
+    returns a callback defined in BALAFON_CART_PROCESSED_CALLBACK
+    This function should take an action has argument
+    """
+    return load_from_module('BALAFON_CART_PROCESSED_CALLBACK', None)
