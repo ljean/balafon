@@ -224,13 +224,9 @@ class CartView(APIView):
 
                 action.sale.save()
 
-                # TODO : TEST ME
                 on_cart_processed = get_cart_processed_callback()
                 if on_cart_processed:
-                    try:
-                        on_cart_processed(action)
-                    except Exception as err:
-                        logger.error(u'{0}'.format(err))
+                    on_cart_processed(action)
 
                 confirm_cart_to_user(profile, action)
                 notify_cart_to_admin(profile, action)
