@@ -3,6 +3,8 @@
 
 import os.path
 import sys
+import warnings
+
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -173,7 +175,7 @@ BALAFON_MY_COMPANY = "Apidev"
 BALAFON_AS_HOMEPAGE = False
 BALAFON_NOTIFICATION_EMAIL = 'ljean@apidev.fr'
 BALAFON_UNACCENT_FILTER_SUPPORT = True
-BALAFON_USE_RECAPTCHA = True
+BALAFON_USE_RECAPTCHA = False
 
 LOGIN_REDIRECT_URL = "/"
 
@@ -240,7 +242,6 @@ if len(sys.argv) > 2 and 'test' == sys.argv[1] and sys.argv[2].find('coop_cms.ap
     installed_apps.remove('balafon.Profile')
     INSTALLED_APPS = tuple(installed_apps)
 
-import warnings
 warnings.filterwarnings('ignore', r"django.contrib.localflavor is deprecated")
 
 LOGGING = {
