@@ -2,11 +2,13 @@
 """admin"""
 
 from django.contrib import admin
+from django.contrib.messages import success, error
 from django.utils.translation import ugettext_lazy as _
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models
 from balafon.Crm.forms.actions import ActionMenuAdminForm
+
 
 class HasParentFilter(admin.SimpleListFilter):
     """filter items to know if they have a parent"""
@@ -78,6 +80,47 @@ class ZoneTypeAdmin(admin.ModelAdmin):
 admin.site.register(models.ZoneType, ZoneTypeAdmin)
 
 
+def initialize_status2(modeladmin, request, queryset):
+    for action_type in queryset:
+        if action_type.default_status2:
+            actions_queryset = action_type.action_set.filter(status2__isnull=True)
+            actions_count = actions_queryset.count()
+            actions_queryset.update(status2=action_type.default_status2)
+            success(
+                request,
+                _(u"initialize {0} actions of type '{1}' with status2 '{2}'").format(
+                    actions_count, action_type.name, action_type.default_status2.name
+                )
+            )
+        else:
+            error(
+                request,
+                _(u"No default status2 for actions type '{0}'").format(action_type.name)
+            )
+initialize_status2.short_description = _("Initialize status2 to default if Null")
+
+
+
+def reset_status2(modeladmin, request, queryset):
+    for action_type in queryset:
+        if action_type.default_status2:
+            actions_queryset = action_type.action_set.filter(status2=action_type.default_status2)
+            actions_count = actions_queryset.count()
+            actions_queryset.update(status2=None)
+            success(
+                request,
+                _(u"reset {0} actions of type '{1}'").format(
+                    actions_count, action_type.name
+                )
+            )
+        else:
+            error(
+                request,
+                _(u"No default status2 for actions type '{0}'").format(action_type.name)
+            )
+reset_status2.short_description = _("Reset status2 to Null")
+
+
 class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -88,7 +131,9 @@ class ActionTypeAdmin(admin.ModelAdmin):
         'set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template',
         'hide_contacts_buttons',
     ]
-    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons',]
+    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons', ]
+    actions = [initialize_status2, reset_status2]
+
 
 admin.site.register(models.ActionType, ActionTypeAdmin)
 
@@ -253,7 +298,9 @@ class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ['name', 'user', 'active']
     list_filter = ['active']
 
+
 admin.site.register(models.TeamMember, TeamMemberAdmin)
+
 
 admin.site.register(models.StreetType)
 
