@@ -608,7 +608,7 @@ def update_action_status(request, action_id, status2=False):
 
     return render(
         request,
-        'Crm/popup_update_action_status.html',
+        'Crm/popup_update_action_status{0}.html'.format('2' if status2 else ''),
         context,
     )
 
