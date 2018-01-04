@@ -232,6 +232,11 @@ class StoreItemAdmin(admin.ModelAdmin):
                 'only_for_groups',
             )
         }),
+        (_(u'Info'), {
+            'fields': (
+                'image', 'description',
+            )
+        }),
         (_(u'Price'), {
             'fields': (
                 'vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', 'price_class',

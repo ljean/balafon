@@ -15,8 +15,11 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext_lazy as _, ugettext
 
+from sorl.thumbnail import default as sorl_thumbnail
+
 from balafon.Crm.models import Action, ActionMenu, ActionStatus, ActionType, Group
 from balafon.Crm.signals import action_cloned
+from balafon.Store.settings import get_thumbnail_crop, get_thumbnail_size, get_image_crop, get_image_size
 from balafon.Store.utils import round_currency
 
 
@@ -149,6 +152,9 @@ class StoreItemCategory(models.Model):
         related_name="subcategories_set"
     )
     price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
+    default_image = models.ImageField(
+        upload_to='storeitemcats', blank=True, default=None, null=True, verbose_name=_(u'image')
+    )
 
     class Meta:
         verbose_name = _(u"Store item category")
@@ -376,6 +382,8 @@ class StoreItem(models.Model):
         help_text=_(u'If defined, only members of these groups will be able to see the item')
     )
     origin = models.CharField(max_length=50, blank=True, default="", verbose_name=_(u'Origine'))
+    image = models.ImageField(upload_to='storeitems', blank=True, default=None, null=True, verbose_name=_(u'image'))
+    description = models.TextField(blank=True, verbose_name=_(u'description'), default="")
 
     class Meta:
         verbose_name = _(u"Store item")
@@ -523,6 +531,24 @@ class StoreItem(models.Model):
         if calculated_price is not None:
             self.pre_tax_price = calculated_price
             super(StoreItem, self).save()
+
+    def as_thumbnail(self):
+        size = get_thumbnail_size()
+        crop = get_thumbnail_crop()
+        image = self.image
+        if not image:
+            image = self.category.default_image
+        if image:
+            return sorl_thumbnail.backend.get_thumbnail(image.file, size, crop=crop).url
+
+    def as_image(self):
+        size = get_image_size()
+        crop = get_image_crop()
+        image = self.image
+        if not image:
+            image = self.category.default_image
+        if image:
+            return sorl_thumbnail.backend.get_thumbnail(image.file, size, crop=crop).url
 
     def save(self, *args, **kwargs):
         self.name = self.name.strip()

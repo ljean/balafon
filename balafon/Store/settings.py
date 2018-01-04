@@ -32,3 +32,31 @@ def get_cart_processed_callback():
     This function should take an action has argument
     """
     return load_from_module('BALAFON_CART_PROCESSED_CALLBACK', None)
+
+
+def get_thumbnail_size():
+    """
+    returns size of image when displayed as thumbnail
+    """
+    return getattr(settings, 'BALAFON_STORE_THUMBNAIL_SIZE', "64x64")
+
+
+def get_thumbnail_crop():
+    """
+    returns size of image when displayed as thumbnail
+    """
+    return getattr(settings, 'BALAFON_STORE_THUMBNAIL_CROP', "center")
+
+
+def get_image_size():
+    """
+    returns size of image when displayed as thumbnail
+    """
+    return getattr(settings, 'BALAFON_STORE_IMAGE_SIZE', "300")
+
+
+def get_image_crop():
+    """
+    returns size of image when displayed as thumbnail
+    """
+    return getattr(settings, 'BALAFON_STORE_IMAGE_CROP', None)

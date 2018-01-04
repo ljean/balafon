@@ -116,6 +116,7 @@ class StoreItemSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'origin', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference',
             'tags', 'available', 'unit', 'public_properties', 'discounts', 'price_class', 'certificates',
+            'as_thumbnail', 'as_image', 'description',
         )
 
 
