@@ -106,10 +106,13 @@ class ActionTypeSerializer(serializers.ModelSerializer):
     """action type serializer"""
     allowed_status = ActionStatusSerializer(many=True, read_only=True)
     default_status = ActionStatusSerializer(read_only=True)
+    default_status2 = ActionStatusSerializer(read_only=True)
 
     class Meta:
         model = ActionType
-        fields = ('id', 'name', 'allowed_status', 'default_status', 'order_index', )
+        fields = (
+            'id', 'name', 'allowed_status', 'default_status', 'allowed_status2', 'default_status2', 'order_index',
+        )
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -122,7 +125,7 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = (
-            'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime', 'type', 'status',
+            'id', 'contacts', 'entities', 'subject', 'planned_date', 'end_datetime', 'type', 'status', 'status2',
             'in_charge', 'detail', 'last_modified_by', 'modified', 'get_action_number', 'mail_to'
         )
 
@@ -151,4 +154,6 @@ class ActionUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ('contacts', 'planned_date', 'end_datetime', 'subject', 'in_charge', 'detail', 'type', 'status', )
+        fields = (
+            'contacts', 'planned_date', 'end_datetime', 'subject', 'in_charge', 'detail', 'type', 'status', 'status2',
+        )

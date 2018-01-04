@@ -89,8 +89,10 @@ urlpatterns = [
     ),
     url(r'^create-action/(?P<entity_id>\d+)/(?P<contact_id>\d+)/$', actions.create_action, name='crm_create_action'),
     url(r'allowed-action-status/$', actions.get_action_status, name="crm_get_action_status"),
+    url(r'allowed-action-status2/$', actions.get_action_status2, name="crm_get_action_status2"),
     url(r'^clone-action/(?P<action_id>\d+)/$', actions.clone_action, name='crm_clone_action'),
     url(r'^update-action-status/(?P<action_id>\d+)/$', actions.update_action_status, name='crm_update_action_status'),
+    url(r'^update-action-status2/(?P<action_id>\d+)/$', actions.update_action_status2, name='crm_update_action_status2'),
     url(r'^reassign-action/(?P<action_id>\d+)/$', actions.reassign_action, name='crm_reassign_action'),
     url(r'^mailto-action/(?P<action_id>\d+)/$', actions.mailto_action, name='crm_mailto_action'),
 

@@ -43,6 +43,26 @@ def get_action_status(request):
 
 
 @user_passes_test(can_access)
+def get_action_status2(request):
+    """view"""
+    try:
+        action_type_id = int(request.GET.get("t", 0))
+    except ValueError:
+        raise Http404
+
+    default_status = 0
+    if action_type_id:
+        action_type = get_object_or_404(models.ActionType, id=action_type_id)
+        allowed_status = [s.id for s in action_type.allowed_status2.all()]
+        if action_type.default_status2:
+            default_status = action_type.default_status2.id
+    else:
+        allowed_status = []
+    json_response = json.dumps({'allowed_status2': allowed_status, 'default_status2': default_status})
+    return HttpResponse(json_response, content_type="application/json")
+
+
+@user_passes_test(can_access)
 def view_all_contact_actions(request, contact_id, action_set_id):
     """view"""
     contact = get_object_or_404(models.Contact, id=contact_id)
@@ -211,8 +231,8 @@ def view_contact_actions(request, contact_id, set_id):
 @popup_redirect
 def create_action(request, entity_id, contact_id):
     """view"""
-    #entity_id or contact_id can be 0
-    #add from menu -> both are 0 / add from contact -> entity_id = 0 / add from entity -> contact_id = 0
+    # entity_id or contact_id can be 0
+    # add from menu -> both are 0 / add from contact -> entity_id = 0 / add from entity -> contact_id = 0
     contact_id = int(contact_id)
     entity_id = int(entity_id)
     contact = get_object_or_404(models.Contact, id=contact_id) if contact_id else None
@@ -551,15 +571,20 @@ def clone_action(request, action_id):
 
 @user_passes_test(can_access)
 @popup_close
-def update_action_status(request, action_id):
+def update_action_status(request, action_id, status2=False):
     """change the action status"""
 
     action = get_object_or_404(models.Action, id=action_id)
+    form_class = forms.UpdateActionStatus2Form if status2 else forms.UpdateActionStatusForm
 
     if request.method == 'POST':
-        form = forms.UpdateActionStatusForm(request.POST, instance=action)
+
+        form = form_class(request.POST, instance=action)
         if form.is_valid():
-            action.status = form.cleaned_data['status']
+            if status2:
+                action.status2 = form.cleaned_data['status2']
+            else:
+                action.status = form.cleaned_data['status']
             action.save()
 
             return None
@@ -569,11 +594,12 @@ def update_action_status(request, action_id):
         # show a final status has default value
         on_do = request.GET.get('done', None)
         if on_do and action.type:
-            final_status = action.type.allowed_status.filter(is_final=True)
-            if final_status.count():
-                action.status = final_status[0]
+            if not status2:
+                final_status = action.type.allowed_status.filter(is_final=True)
+                if final_status.count():
+                    action.status = final_status[0]
 
-        form = forms.UpdateActionStatusForm(instance=action)
+        form = form_class(instance=action)
 
     context = {
         'form': form,
@@ -585,6 +611,10 @@ def update_action_status(request, action_id):
         'Crm/popup_update_action_status.html',
         context,
     )
+
+
+def update_action_status2(request, action_id):
+    return update_action_status(request, action_id, True)
 
 
 @user_passes_test(can_access)

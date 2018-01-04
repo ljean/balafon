@@ -33,7 +33,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         """form from model"""
         model = models.Action
         fields = (
-            'type', 'subject', 'date', 'time', 'status', 'in_charge', 'detail',
+            'type', 'subject', 'date', 'time', 'status', 'status2', 'in_charge', 'detail',
             'amount', 'number', 'planned_date', 'end_date', 'end_time', 'end_datetime', 'opportunity'
         )
         fieldsets = [
@@ -44,7 +44,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 ],
                 'legend': _(u'Summary')
             }),
-            ('type', {'fields': ['type', 'status', 'amount', 'number'], 'legend': _(u'Type')}),
+            ('type', {'fields': ['type', 'status', 'status2', 'amount', 'number'], 'legend': _(u'Type')}),
             ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
         ]
         help_texts = {
@@ -102,6 +102,13 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 (status.id, status.name) for status in instance.type.allowed_status.all()
             ]
 
+        if instance and instance.id and instance.type and instance.type.allowed_status2.count():
+            # let javascript disable the blank value if default_status2
+            choices = [('', "---------")]
+            self.fields['status2'].choices = choices + [
+                (status.id, status.name) for status in instance.type.allowed_status2.all()
+            ]
+
         self.fields['opportunity'].widget = forms.HiddenInput()
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols': '72'})
 
@@ -127,6 +134,19 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         status = self.cleaned_data['status']
         if type_of:
             allowed_status = ([] if type_of.default_status else [None]) + list(type_of.allowed_status.all())
+            if len(allowed_status) > 0 and status not in allowed_status:
+                raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+        else:
+            if status:
+                raise ValidationError(ugettext(u"Please select a type before defining the status"))
+        return status
+
+    def clean_status2(self):
+        """status validation"""
+        type_of = self.cleaned_data['type']
+        status = self.cleaned_data['status2']
+        if type_of:
+            allowed_status = ([] if type_of.default_status2 else [None]) + list(type_of.allowed_status2.all())
             if len(allowed_status) > 0 and status not in allowed_status:
                 raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         else:
@@ -209,7 +229,7 @@ class ActionTypeForm(forms.ModelForm):
             'subscribe_form', 'set', 'last_number', 'number_auto_generated', 'default_template', 'allowed_status',
             'default_status', 'is_editable', 'action_template', 'order_index', 'is_amount_calculated',
             'next_action_types', 'not_assigned_when_cloned', 'generate_uuid', 'hide_contacts_buttons',
-            'mail_to_subject',
+            'mail_to_subject', 'allowed_status2', 'default_status2',
         )
 
 
@@ -337,6 +357,36 @@ class UpdateActionStatusForm(forms.ModelForm):
         status = self.cleaned_data['status']
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status else [None]) + list(action_type.allowed_status.all())
+        if len(allowed_status) > 0 and status not in allowed_status:
+            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+        return status
+
+
+class UpdateActionStatus2Form(forms.ModelForm):
+    """form changing the status"""
+
+    class Meta:
+        """form from model"""
+        model = models.Action
+        fields = (
+            'status2',
+        )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        super(UpdateActionStatus2Form, self).__init__(*args, **kwargs)
+
+        if instance and instance.id and instance.type and instance.type.allowed_status2.count():
+            # let javascript disable the blank value if default_status2
+            self.fields['status2'].choices = [
+                (status.id, status.name) for status in instance.type.allowed_status2.all()
+            ]
+
+    def clean_status2(self):
+        """status validation"""
+        status = self.cleaned_data['status2']
+        action_type = self.instance.type
+        allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
             raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         return status

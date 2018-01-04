@@ -45,7 +45,7 @@ class EditActionTest(BaseTestCase):
 
         data = {
             'subject': "tested", 'type': "", 'date': "", 'time': "",
-            'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'status': "", 'status2': "", 'in_charge': "", 'opportunity': "", 'detail':"",
             'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
             'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False
         }
@@ -75,6 +75,23 @@ class EditActionTest(BaseTestCase):
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
+    def test_allowed_status2(self):
+        """get allowed status"""
+        action_type = mommy.make(models.ActionType)
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        mommy.make(models.ActionStatus)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)+"&timestamp=777"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([action_status1.id, action_status2.id], data['allowed_status2'])
+        self.assertEqual(0, data['default_status2'])
+
     def test_allowed_status_default_value(self):
         """allowed status with default value"""
         action_type = mommy.make(models.ActionType)
@@ -93,6 +110,24 @@ class EditActionTest(BaseTestCase):
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status'])
         self.assertEqual(action_status2.id, data['default_status'])
 
+    def test_allowed_status_default_value2(self):
+        """allowed status with default value"""
+        action_type = mommy.make(models.ActionType)
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        mommy.make(models.ActionStatus)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.default_status2 = action_status2
+        action_type.save()
+
+        url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)+"&timestamp=777"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([action_status1.id, action_status2.id], data['allowed_status2'])
+        self.assertEqual(action_status2.id, data['default_status2'])
+
     def test_no_allowed_status(self):
         """test no allowed status"""
         action_type = mommy.make(models.ActionType)
@@ -104,6 +139,17 @@ class EditActionTest(BaseTestCase):
         self.assertEqual([], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
+    def test_no_allowed_status2(self):
+        """test no allowed status"""
+        action_type = mommy.make(models.ActionType)
+
+        url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status2'])
+        self.assertEqual(0, data['default_status2'])
+
     def test_allowed_status_no_type(self):
         """test allowed status no type"""
         url = reverse("crm_get_action_status")+"?t="+str(0)
@@ -113,15 +159,36 @@ class EditActionTest(BaseTestCase):
         self.assertEqual([], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
+    def test_allowed_status2_no_type(self):
+        """test allowed status no type"""
+        url = reverse("crm_get_action_status2") + "?t=" + str(0)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual([], data['allowed_status2'])
+        self.assertEqual(0, data['default_status2'])
+
     def test_allowed_status_unknown_type(self):
         """test allowed status unknown type"""
         url = reverse("crm_get_action_status")+"?t=100"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_allowed_status2_unknown_type(self):
+        """test allowed status unknown type"""
+        url = reverse("crm_get_action_status2")+"?t=100"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_allowed_status_invalid_type(self):
         """test allowed status invalid type"""
         url = reverse("crm_get_action_status")+"?t=toto"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_allowed_status2_invalid_type(self):
+        """test allowed status invalid type"""
+        url = reverse("crm_get_action_status2")+"?t=toto"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -137,7 +204,7 @@ class EditActionTest(BaseTestCase):
 
         data = {
             'subject': "tested", 'type': "", 'date': "", 'time': "",
-            'status': "", 'in_charge': "", 'opportunity': "", 'detail':"",
+            'status': "", 'status2': "", 'in_charge': "", 'opportunity': "", 'detail':"",
             'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
             'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False
         }
@@ -175,6 +242,40 @@ class EditActionTest(BaseTestCase):
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "", 'time': "",
             'status': action_status3.id, 'in_charge': "", 'opportunity': "", 'detail': "",
+            'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
+            'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False
+        }
+
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 1)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.subject, "not tested")
+
+    def test_edit_action_status2_not_allowed(self):
+        """edit action status not allowed"""
+        action_type = mommy.make(models.ActionType)
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        entity = mommy.make(models.Entity)
+        action = mommy.make(models.Action, subject="not tested", type=action_type, status=action_status1)
+        action.entities.add(entity)
+        action.save()
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        data = {
+            'subject': "tested", 'type': action_type.id, 'date': "", 'time': "", 'status': '',
+            'status2': action_status3.id, 'in_charge': "", 'opportunity': "", 'detail': "",
             'priority': models.Action.PRIORITY_MEDIUM, 'amount': 0, 'number': 0,
             'done': False, 'display_on_board': False, 'planned_date': "", 'archived': False
         }
@@ -1601,7 +1702,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertContains(response, action_status2.name)
         self.assertNotContains(response, action_status3.name)
 
-        #show a final status has selected item
+        # show a final status has selected item
         self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
         self.assertEqual(action_status2.name, soup.select("#id_status option[selected=selected]")[0].text)
 
@@ -1804,6 +1905,275 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertEqual(action.done, True)
 
         action.status = action_status2
+        action.save()
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.done, False)
+
+
+class UpdateActionStatus2Test(BaseTestCase):
+    """Can update status2"""
+
+    def test_view_update_action_status2(self):
+        """it should display form"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(2, len(soup.select("#id_status2 option")))
+        self.assertContains(response, action_status1.name)
+        self.assertContains(response, action_status2.name)
+        self.assertNotContains(response, action_status3.name)
+
+        self.assertEqual(0, len(soup.select("#id_status2 option[selected=selected]")))
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, None)
+
+    def test_view_update_action_status2_existing(self):
+        """it should display form"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, status2=action_status1)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(2, len(soup.select("#id_status2 option")))
+        self.assertContains(response, action_status1.name)
+        self.assertContains(response, action_status2.name)
+        self.assertNotContains(response, action_status3.name)
+
+        self.assertEqual(1, len(soup.select("#id_status2 option[selected=selected]")))
+        self.assertEqual(action_status1.name, soup.select("#id_status2 option[selected=selected]")[0].text)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, action_status1)
+
+    def test_update_action_status2(self):
+        """it should change status"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status2.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            '<script>$.colorbox.close(); window.location=window.location;</script>',
+            response.content
+        )
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, action_status2)
+
+    def test_update_action_status2_invalid(self):
+        """it should show error"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status3.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotEqual(
+            '<script>$.colorbox.close(); window.location=window.location;</script>',
+            response.content
+        )
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, None)
+
+    def test_update_action_status2_existing(self):
+        """it should change status"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, status=action_status1)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status2.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(
+            '<script>$.colorbox.close(); window.location=window.location;</script>',
+            response.content
+        )
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, action_status2)
+
+    def test_update_action_status2_existing_invalid(self):
+        """it should show error"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, status2=action_status1)
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status3.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(200, response.status_code)
+        self.assertNotEqual(
+            '<script>$.colorbox.close(); window.location=window.location;</script>',
+            response.content
+        )
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, action_status1)
+
+    def test_update_action_status2_anonymous(self):
+        """it should show error"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type)
+
+        self.client.logout()
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status2.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, None)
+
+    def test_update_action_status2_denied(self):
+        """it should show error"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type)
+
+        self.user.is_staff = False
+        self.user.save()
+
+        url = reverse('crm_update_action_status2', args=[action.id])
+
+        data = {
+            'status2': action_status2.id
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status2, None)
+
+    def test_save_final_status2(self):
+        """status2 don't change the done flag"""
+
+        action_status1 = mommy.make(models.ActionStatus, is_final=True)
+        action_status2 = mommy.make(models.ActionStatus, is_final=False)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status2.add(action_status1)
+        action_type.allowed_status2.add(action_status2)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, done=False)
+
+        action.status2 = action_status1
+        action.save()
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.done, False)
+
+        action.status2 = action_status2
         action.save()
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.done, False)

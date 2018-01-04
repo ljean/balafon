@@ -8,6 +8,7 @@
 <script>
   $(function() {
     var dont_change_status = true;
+    var dont_change_status2 = true;
     $("select#id_type").change(function() {
       var dt = new Date().getTime();
       $.ajax({
@@ -37,10 +38,41 @@
             $("select#id_status option").trigger("chosen:updated");
           }
       });
+      $.ajax({
+          url: "{% url 'crm_get_action_status2' %}?t="+$(this).val()+"&timestamp="+dt,
+          success: function(data){
+            var allowed_status = data.allowed_status2;
+            var default_status = parseInt(data.default_status2, 10);
+            $("select#id_status2 option").each(function(idx, elt) {
+              var elt_val = parseInt($(elt).val(), 10);
+              if (elt_val) {
+                if (allowed_status.indexOf(elt_val) >= 0) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
+              } else {
+                if (!default_status) {
+                  $(elt).removeAttr("disabled");
+                } else {
+                  $(elt).attr("disabled", "disabled");
+                }
+              }
+            });
+            if (default_status) {
+              $("select#id_status2").val(default_status);
+            }
+            $("select#id_status2 option").trigger("chosen:updated");
+          }
+      });
       if (!dont_change_status) {
         $("select#id_status").val("");
       }
+      if (!dont_change_status2) {
+        $("select#id_status2").val("");
+      }
       dont_change_status = false;
+      dont_change_status2 = false;
       return false;
     });
     $("select#id_type").change();

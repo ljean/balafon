@@ -1245,6 +1245,15 @@ class ActionType(NamedElement):
         help_text=_(u'Default status for actions of this type'),
         related_name='type_default_status_set'
     )
+    allowed_status2 = models.ManyToManyField(
+        ActionStatus, blank=True, default=None, help_text=_(u'Action of this type allow the given status'),
+        related_name="type_status2_set"
+    )
+    default_status2 = models.ForeignKey(
+        ActionStatus, blank=True, default=None, null=True,
+        help_text=_(u'Default status for actions of this type'),
+        related_name='type_default_status2_set'
+    )
     is_editable = models.BooleanField(
         _(u'is editable'),
         default=True,
@@ -1292,7 +1301,7 @@ class ActionType(NamedElement):
             else:
                 ActionMenu.objects.filter(action_type=self, view_name='crm_clone_action').delete()
 
-            #update action uuid if needed
+            # update action uuid if needed
             for action in self.action_set.all():
                 if self.generate_uuid:
                     if not action.uuid:
@@ -1403,6 +1412,7 @@ class Action(LastModifiedModel):
         _(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.')
     )
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
+    status2 = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='status2_set')
     contacts = models.ManyToManyField(Contact, blank=True, default=None, verbose_name=_(u'contacts'))
     entities = models.ManyToManyField(Entity, blank=True, default=None, verbose_name=_(u'entities'))
     favorites = GenericRelation(Favorite)
@@ -1485,7 +1495,7 @@ class Action(LastModifiedModel):
         elif self.done_date and not self.done:
             self.done_date = None
             
-        #generate number automatically based on action type
+        # generate number automatically based on action type
         if self.number == 0 and self.type and self.type.number_auto_generated:
             self.number = self.type.last_number = self.type.last_number + 1
             self.type.save()
@@ -1522,6 +1532,7 @@ class Action(LastModifiedModel):
             setattr(new_action, attr, getattr(self, attr))
         new_action.type = new_type
         new_action.status = new_type.default_status
+        new_action.status2 = new_type.default_status2
         new_action.save()
 
         for contact in self.contacts.all():
@@ -1731,3 +1742,4 @@ class MailtoSettings(models.Model):
     class Meta:
         verbose_name = _(u'Mailto settings')
         verbose_name_plural = _(u'Mailto settings')
+

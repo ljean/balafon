@@ -5,7 +5,7 @@ import floppyforms as forms
 
 from balafon.Crm.forms.actions import (
     ActionForm, ActionDocumentForm, ActionDoneForm, ActionTypeForm, CloneActionForm, SelectOpportunityForm,
-    OpportunityForm, OpportunityStatusForm, UpdateActionStatusForm
+    OpportunityForm, OpportunityStatusForm, UpdateActionStatusForm, UpdateActionStatus2Form
 )
 from balafon.Crm.forms.base import BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity
 from balafon.Crm.forms.contacts import (

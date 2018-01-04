@@ -15,4 +15,13 @@
     {{action.status}}
   </a>&nbsp;
 {% endif %}
+{% if action.status2 %}
+  <a
+    href="{% url 'crm_update_action_status2' action.id %}"
+    class="colorbox-form btn btn-xs btn-default btn-action-status"
+    style="{{ action.status2.style }}"
+  >
+    {{action.status2}}
+  </a>&nbsp;
+{% endif %}
 {% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}
