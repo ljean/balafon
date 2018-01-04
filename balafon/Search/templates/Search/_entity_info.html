@@ -1,0 +1,38 @@
+{% load i18n balafon_utils %}
+{% if not entity.single_contact %}
+  <td><a href="{{entity.get_absolute_url}}">{{entity.name}}</a>
+  {% if entity.is_empty %}
+    <td class="empty-entity">
+      {% trans "No contacts !!" %}
+    </td>
+  {% else %}
+    <td>
+  {% endif %}
+{% else %}
+  <td colspan=2>
+{% endif %}
+
+{% with entity.search_contacts as contacts %}
+{% if contacts %}
+  <table class="table contact-table table-striped font-small">
+  {% for contact in contacts %}
+      <tr>
+      <td>
+        <a href="{{contact.get_absolute_url}}">{{contact.fullname}}</a>&nbsp;{{ contact.get_roles|seq_to_dash }}&nbsp;</a>
+        {% if contact.get_email %}<a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>{% endif %}
+        {% if contact.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+      </td>
+      <td>
+      <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{contact.id}}">
+        <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+        <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+      </a>
+      </td>
+      </tr>
+  {% endfor %}
+  </table>
+{% else %}
+  &nbsp;
+{% endif %}
+{% endwith %}
+</td>

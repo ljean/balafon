@@ -1,0 +1,17 @@
+{% load i18n balafon_utils %}
+<td{% if contact.entity.is_single_contact %} colspan=2{%endif%}>
+  <a href="{{contact.get_absolute_url}}">{{contact.fullname}}</a>&nbsp;{{ contact.get_roles|seq_to_dash }}&nbsp;</a>
+  {% if contact.get_email %}<a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>{% endif %}
+  {% if contact.has_left %}<div class="label label-warning">{% trans "has left" %}</div>{% endif %}
+</td>
+{% if not contact.entity.is_single_contact %}
+  <td>
+    <a href="{{contact.entity.get_absolute_url}}">{{contact.entity.name}}</a>
+  </td>
+{% endif %}
+<td>
+  <a class="link-warning exclude-contact pull-right" href="" class="" rel="{{contact.id}}">
+    <span class="exclude-btn"><span class="glyphicon glyphicon-remove-sign"></span> {% trans "exclude" %}</span>
+    <span class="include-btn"><span class="glyphicon glyphicon-plus-sign"></span> {% trans "include" %}</span>
+  </a>
+</td>
