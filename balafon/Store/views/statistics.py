@@ -2,27 +2,30 @@
 
 """a simple store"""
 
-from datetime import datetime, date, time
+from datetime import datetime, time
 from decimal import Decimal
 
 from django.core.urlresolvers import reverse_lazy
-from django.views.generic import TemplateView
 
-from balafon.generic import StaffPopupFormView
+from balafon.generic import StaffPopupFormView, StaffTemplateView
 from balafon.Crm.models import Action
 from balafon.Store.forms import AddExtraSaleForm
 from balafon.Store.models import Sale, SaleItem
 
 
-class StaticticsIndexView(TemplateView):
+class StaticticsIndexView(StaffTemplateView):
     template_name = "Store/statistics_index.html"
 
     def get_context_data(self, **kwargs):
         context_data = super(StaticticsIndexView, self).get_context_data(**kwargs)
 
-        first_sale = Sale.objects.all().order_by('action__planned_date')[0]
+        try:
+            first_sale = Sale.objects.all().order_by('action__planned_date')[0]
+            from_year = first_sale.action.planned_date.year
+        except IndexError:
+            from_year = datetime.now().year
 
-        context_data['from_year'] = first_sale.action.planned_date.year
+        context_data['from_year'] = from_year
 
         return context_data
 

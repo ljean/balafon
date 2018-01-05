@@ -1069,3 +1069,44 @@ class ExtraSaleTest(TestCase):
         self.assertTrue(response['Location'].find(auth_url) >= 0)
 
         self.assertEqual(models.Sale.objects.count(), 0)
+
+
+class StatIndexTest(TestCase):
+    """Test that it is possible to view stats index"""
+
+    def setUp(self):
+        logging.disable(logging.CRITICAL)
+
+    def _create_user(self, is_staff=True):
+        self.user = User.objects.create(username="toto", is_active=True, is_staff=is_staff)
+        self.user.set_password("abc")
+        self.user.save()
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
+
+    def _login(self):
+        self.client.login(username="toto", password="abc")
+
+    def test_view_as_staff(self):
+        """view as staff"""
+        self._create_user()
+        self._login()
+        url = reverse('store_statistics_index')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_as_std(self):
+        """view as staff"""
+        self._create_user(is_staff=False)
+        self._login()
+        url = reverse('store_statistics_index')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_view_as_anonymous(self):
+        """view as staff"""
+        self._create_user()
+        url = reverse('store_statistics_index')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
