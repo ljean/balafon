@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
-VERSION = "3.3.33"
+VERSION = "3.3.34"
 __version__ = VERSION
 
 default_app_config = 'balafon.apps.BalafonAppConfig'
