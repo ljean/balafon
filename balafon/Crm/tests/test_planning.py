@@ -100,7 +100,7 @@ class ActionArchiveTest(BaseTestCase):
         self.client.logout()
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
@@ -114,7 +114,7 @@ class ActionArchiveTest(BaseTestCase):
         self.user.save()
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url)
         login_url = reverse('django.contrib.auth.views.login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
@@ -129,7 +129,7 @@ class ActionArchiveTest(BaseTestCase):
         action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=None)
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, action1.subject)
@@ -683,7 +683,7 @@ class ActionArchiveTest(BaseTestCase):
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, action1.subject)
@@ -707,7 +707,7 @@ class ActionArchiveTest(BaseTestCase):
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), type=action_type)
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, action1.subject)
@@ -725,7 +725,7 @@ class ActionArchiveTest(BaseTestCase):
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), status=status1)
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, action1.subject)
@@ -750,7 +750,7 @@ class ActionArchiveTest(BaseTestCase):
         action1.save()
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, action1.subject)
@@ -783,13 +783,14 @@ class ActionArchiveTest(BaseTestCase):
         action1.save()
 
         now = datetime.now()
-        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%U")])
+        url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, action1.subject)
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select(".action")), 1)
+
+        self.assertContains(response, action1.subject)
 
         urls = (
             reverse('crm_add_contact_to_action', args=[action1.id]),
