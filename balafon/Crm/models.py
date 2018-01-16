@@ -5,6 +5,7 @@
 import uuid
 import unicodedata
 from urlparse import urlparse
+from datetime import datetime
 
 from django import VERSION as DJANGO_VERSION
 from django.db import models
@@ -1277,6 +1278,7 @@ class ActionType(NamedElement):
         max_length=100, default='', blank=True, verbose_name=_(u'Subject of email'),
         help_text=_(u'This would be used as subject when sending the action by email')
     )
+    track_status = models.BooleanField(default=False)
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1310,7 +1312,6 @@ class ActionType(NamedElement):
                     if action.uuid:
                         action.uuid = ''
                         action.save()  # force uuid to be empty
-
         return ret
     
     class Meta:
@@ -1419,6 +1420,7 @@ class Action(LastModifiedModel):
     end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
     parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
+    previous_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='+')
     
     def __unicode__(self):
         return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
@@ -1500,6 +1502,15 @@ class Action(LastModifiedModel):
             self.number = self.type.last_number = self.type.last_number + 1
             self.type.save()
 
+        created_track = None
+        if self.status and self.type and self.type.track_status:
+            if self.previous_status != self.status:
+                created_track = ActionStatusTrack(
+                    status=self.status,
+                    datetime=datetime.now()
+                )
+                self.previous_status = self.status
+
         ret = super(Action, self).save(*args, **kwargs)
 
         if self.type:
@@ -1514,6 +1525,10 @@ class Action(LastModifiedModel):
             if not self.type.generate_uuid and self.uuid:
                 self.uuid = ''
                 super(Action, self).save()
+
+        if created_track is not None:
+            created_track.action = self
+            created_track.save()
 
         return ret
 
@@ -1743,3 +1758,16 @@ class MailtoSettings(models.Model):
         verbose_name = _(u'Mailto settings')
         verbose_name_plural = _(u'Mailto settings')
 
+
+class ActionStatusTrack(models.Model):
+    action = models.ForeignKey(Action)
+    status = models.ForeignKey(ActionStatus)
+    datetime = models.DateTimeField()
+
+    def __unicode__(self):
+        return u'{0} / {1}'.format(self.action, self.status)
+
+    class Meta:
+        verbose_name = _(u'Action state track')
+        verbose_name_plural = _(u'Action state tracks')
+        ordering = ('-datetime', )

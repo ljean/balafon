@@ -27,6 +27,14 @@
 </li>
 {% endif %}
 
+{% if action.type.track_status %}
+<li>
+  <a href="{% url 'crm_status_track' action.id %}" class="colorbox-form">
+    <span class="glyphicon glyphicon-road"></span> {% trans "Status track" %}
+  </a>
+</li>
+{% endif %}
+
 {% for menu in action.get_menus %}
   {% include "Crm/_actions/_menu_item.html" %}
 {% endfor %}

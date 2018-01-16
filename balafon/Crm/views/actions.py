@@ -641,3 +641,24 @@ def mailto_action(request, action_id):
     mailto += 'subject={0}'.format(mailto_settings.subject or action.subject)
     mailto += '&body={0}'.format(body)
     return HttpResponseRedirectMailtoAllowed(mailto)
+
+
+@user_passes_test(can_access)
+@popup_close
+def view_status_track(request, action_id):
+    """change the action status"""
+
+    action = get_object_or_404(models.Action, id=action_id, type__track_status=True)
+
+    if request.method == 'POST':
+        return None
+
+    context = {
+        'action': action,
+    }
+
+    return render(
+        request,
+        'Crm/popup_status_track.html',
+        context,
+    )

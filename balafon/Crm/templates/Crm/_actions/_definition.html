@@ -11,6 +11,7 @@
     href="{% url 'crm_update_action_status' action.id %}"
     class="colorbox-form btn btn-xs btn-default btn-action-status"
     style="{{ action.status.style }}"
+    {% if action.type.track_status %}title="{{ action|action_status_date:action.status|date:"d/m/Y H:i" }}" data-toggle="tooltip" date-placement="top" {% endif %}
   >
     {{action.status}}
   </a>&nbsp;

@@ -6,7 +6,7 @@
 # pylint: disable=too-many-branches
 
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 
 from django.contrib.auth.models import User
@@ -2330,3 +2330,103 @@ class ActionDurationTest(BaseTestCase):
         )
         self.assertEqual(action.duration(), _(u"2 days 2:27"))
 
+
+class ActionStatusTrackTest(BaseTestCase):
+    """calculate duration test"""
+
+    def test_action_no_type(self):
+        """no track is created"""
+        action = mommy.make(models.Action)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 0)
+
+    def test_action_dont_track(self):
+        """no track is created"""
+        action_type = mommy.make(models.ActionType, track_status=False)
+        action = mommy.make(models.Action, type=action_type)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 0)
+
+    def test_action_track_default_status(self):
+        """a track is created"""
+        status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True, default_status=status)
+        action = mommy.make(models.Action, type=action_type)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 0)
+
+    def test_action_track_no_default_status(self):
+        """a track is created"""
+        status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True)
+        action = mommy.make(models.Action, type=action_type)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 0)
+
+    def test_action_track_set_status(self):
+        """a track is created"""
+        status = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True)
+        action = mommy.make(models.Action, type=action_type, status=status)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status)
+        self.assertEqual(track.datetime.date(), date.today())
+
+    def test_action_track(self):
+        """a track is created for each status changed"""
+        status1 = mommy.make(models.ActionStatus)
+        status2 = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True)
+        #
+        action = mommy.make(models.Action, type=action_type, status=status1)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status1)
+        self.assertEqual(track.datetime.date(), date.today())
+        action.status = status2
+        action.save()
+        #
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 2)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status2)
+        self.assertEqual(track.datetime.date(), date.today())
+
+    def test_action_track_none(self):
+        """a track is created for each status changed"""
+        status1 = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True)
+        #
+        action = mommy.make(models.Action, type=action_type, status=status1)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status1)
+        self.assertEqual(track.datetime.date(), date.today())
+        action.status = None
+        action.save()
+        #
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status1)
+        self.assertEqual(track.datetime.date(), date.today())
+
+    def test_action_track_no_status_changed(self):
+        """a track is created for each status changed"""
+        status1 = mommy.make(models.ActionStatus)
+        action_type = mommy.make(models.ActionType, track_status=True)
+        #
+        action = mommy.make(models.Action, type=action_type, status=status1)
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status1)
+        self.assertEqual(track.datetime.date(), date.today())
+        action.subject = u"Test"
+        action.save()
+        #
+        self.assertEqual(models.ActionStatusTrack.objects.count(), 1)
+        track = models.ActionStatusTrack.objects.all()[0]
+        self.assertEqual(track.action, action)
+        self.assertEqual(track.status, status1)
+        self.assertEqual(track.datetime.date(), date.today())

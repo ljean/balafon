@@ -7,9 +7,11 @@ from django import template
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 
+from balafon.Crm.models import ActionStatusTrack
 from balafon.utils import logger
 
 register = template.Library()
+
 
 @register.filter
 def seq_to_br(seq):
@@ -146,3 +148,11 @@ def menu_action_url(parser, token):
     except ValueError:
         raise template.TemplateSyntaxError, "menu_action_url tag requires view_name and action_id"
     return MenuActionUrlNode(view_name_var, action_id_var)
+
+
+@register.filter
+def action_status_date(action, status):
+    """return date"""
+    queryset = ActionStatusTrack.objects.filter(action=action, status=status).order_by('-datetime')
+    if queryset.count():
+        return queryset[0].datetime

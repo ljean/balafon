@@ -95,6 +95,7 @@ urlpatterns = [
     url(r'^update-action-status2/(?P<action_id>\d+)/$', actions.update_action_status2, name='crm_update_action_status2'),
     url(r'^reassign-action/(?P<action_id>\d+)/$', actions.reassign_action, name='crm_reassign_action'),
     url(r'^mailto-action/(?P<action_id>\d+)/$', actions.mailto_action, name='crm_mailto_action'),
+    url(r'^status-track/(?P<action_id>\d+)/$', actions.view_status_track, name='crm_status_track'),
 
     # relationships
     url(r'^same-as/(?P<contact_id>\d+)/$', relationships.same_as, name='crm_same_as'),

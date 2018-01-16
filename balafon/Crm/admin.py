@@ -100,7 +100,6 @@ def initialize_status2(modeladmin, request, queryset):
 initialize_status2.short_description = _("Initialize status2 to default if Null")
 
 
-
 def reset_status2(modeladmin, request, queryset):
     for action_type in queryset:
         if action_type.default_status2:
@@ -121,18 +120,38 @@ def reset_status2(modeladmin, request, queryset):
 reset_status2.short_description = _("Reset status2 to Null")
 
 
+def set_action_previous_status(modeladmin, request, queryset):
+    for action_type in queryset:
+        if not action_type.track_status:
+            actions_queryset = action_type.action_set.all()
+            actions_count = actions_queryset.count()
+            for action in actions_queryset:
+                action.previous_status = action.status
+                action.save()
+            success(
+                request,
+                _(u"set previous values for {0} actions").format(actions_count)
+            )
+        else:
+            error(
+                request,
+                _(u"{0} : track status should be disabled when executing this action").format(action_type.name)
+            )
+set_action_previous_status.short_description = _("Track status : Set previous status")
+
+
 class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated',
-        'default_template', 'is_editable', 'hide_contacts_buttons',
+        'default_template', 'is_editable', 'hide_contacts_buttons', 'track_status',
     ]
     list_filter = [
         'set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template',
-        'hide_contacts_buttons',
+        'hide_contacts_buttons', 'track_status',
     ]
     list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons', ]
-    actions = [initialize_status2, reset_status2]
+    actions = [initialize_status2, reset_status2, set_action_previous_status]
 
 
 admin.site.register(models.ActionType, ActionTypeAdmin)

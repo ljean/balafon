@@ -1,0 +1,22 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block extra_head %}
+  {{block.super}}
+<script>
+  $(document).bind('cbox_complete', function() {
+      $.colorbox.resize({width: 600});
+  });
+</script>
+{% endblock %}
+{% block title %}{% trans "Status track" %}{% endblock %}
+{% block form_url %}{% url "crm_status_track" action.id %}{% endblock %}
+{% block doc_header %}
+  <table class="table table-striped">
+  {% for track in action.actionstatustrack_set.all %}
+    <tr>
+      <td>{{ track.status.name }}</td>
+      <td>{{ track.datetime|date:"d/m/Y H:i" }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}
