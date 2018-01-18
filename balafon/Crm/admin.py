@@ -140,6 +140,40 @@ def set_action_previous_status(modeladmin, request, queryset):
 set_action_previous_status.short_description = _("Track status : Set previous status")
 
 
+def create_action_initial_track(modeladmin, request, queryset):
+    for action_type in queryset:
+        if action_type.track_status:
+            actions_queryset = action_type.action_set.all()
+            actions_count = actions_queryset.count()
+            ignored_count = 0
+            for action in actions_queryset:
+                if action.status and action.status.is_final and action.done_date and action.done_date:
+                    track_datetime = action.done_date
+                else:
+                    track_datetime = action.planned_date
+
+                no_tracks_yet = models.ActionStatusTrack.objects.filter(action=action).count() == 0
+                if action.status and track_datetime and no_tracks_yet:
+                    models.ActionStatusTrack.objects.create(
+                        status=action.status,
+                        action=action,
+                        datetime=track_datetime
+                    )
+                else:
+                    ignored_count += 1
+
+            success(
+                request,
+                _(u"create tracks for {0} actions / {1} ignored").format(actions_count - ignored_count, ignored_count)
+            )
+        else:
+            error(
+                request,
+                _(u"{0} : track status should be enabled when executing this action").format(action_type.name)
+            )
+create_action_initial_track.short_description = _("Track status : create initial track")
+
+
 class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -151,7 +185,7 @@ class ActionTypeAdmin(admin.ModelAdmin):
         'hide_contacts_buttons', 'track_status',
     ]
     list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons', ]
-    actions = [initialize_status2, reset_status2, set_action_previous_status]
+    actions = [initialize_status2, reset_status2, set_action_previous_status, create_action_initial_track]
 
 
 admin.site.register(models.ActionType, ActionTypeAdmin)
@@ -330,3 +364,5 @@ class MailtoSettingsAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.MailtoSettings, MailtoSettingsAdmin)
+
+admin.site.register(models.ActionStatusTrack)
