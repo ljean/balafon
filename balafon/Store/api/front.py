@@ -166,6 +166,7 @@ class CartView(APIView):
                 subject=subject,
                 detail=detail,
                 status=action_type.default_status,
+                status2=action_type.default_status2,
                 type=action_type
             )
             action.contacts.add(contact)
