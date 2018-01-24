@@ -7,14 +7,6 @@
 {% endblock %}
   
 {% block section_data %}
-<div>
-{% for l in "*ABCDEFGHIJKLMNOPQRSTUVWXYZ~" %}
-  <span class="letter-filter btn btn-xs {% if letter_filter == l %}btn-primary{% else %}btn-default{% endif %}" rel="{{l}}">
-    {{l}}
-  </span>
-{% endfor %}
-</div>
-
 <table class="table with-odd-even contacts-table">
   <tr>
     <th colspan="2">{% trans "Contacts" %}</th>

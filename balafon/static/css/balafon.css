@@ -675,3 +675,7 @@ ul.coop-cms_user-messages {
   overflow: hidden;
   vertical-align: middle;
 }
+.letter-bar {
+  background: #eee;
+  padding: 2px 10px;
+}

@@ -64,6 +64,14 @@
     
     {% block document %}
     <div id="document">
+      <div class="letter-bar" rel="{% url 'crm_view_entities_list' %}">
+        <label>{% trans "Contacts" %}</label>
+      {% for l in "*ABCDEFGHIJKLMNOPQRSTUVWXYZ~" %}
+        <span class="letter-filter btn btn-xs {% if letter_filter == l %}btn-primary{% else %}btn-default{% endif %}" rel="{{l}}">
+          {{l}}
+        </span>
+      {% endfor %}
+      </div>
       <h2>{% block document_title %}{{document_title}}{% endblock %}</h2>
       {% block document_content %}{% endblock %}
     {% endblock %}

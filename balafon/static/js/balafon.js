@@ -83,7 +83,8 @@ $(function() {
     
     $(".letter-filter").click(function() {
       var loc = window.location;
-      var url = loc.protocol + '//' + loc.host + loc.pathname;
+      var entitiesListUrl = $(this).closest('.letter-bar').attr('rel');
+      var url = loc.protocol + '//' + loc.host + entitiesListUrl; // loc.pathname;
       window.location = url+"?filter="+$(this).attr('rel');
       return false;
     });
