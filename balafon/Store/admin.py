@@ -217,8 +217,8 @@ class StoreItemAdmin(admin.ModelAdmin):
     ]
     ordering = ['name']
     list_filter = [
-        'published', 'available', 'price_class', StockThresholdFilter, 'supplier', 'tags', 'category', CertificateFilter,
-        'only_for_groups',
+        'published', 'available', 'price_class', 'vat_rate', StockThresholdFilter, 'supplier', 'tags', 'category',
+        CertificateFilter, 'only_for_groups',
     ]
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
