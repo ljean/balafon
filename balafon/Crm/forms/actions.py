@@ -339,7 +339,7 @@ class UpdateActionStatusForm(forms.ModelForm):
         """form from model"""
         model = models.Action
         fields = (
-            'status',
+            'status', 'status2',
         )
 
     def __init__(self, *args, **kwargs):
@@ -352,11 +352,28 @@ class UpdateActionStatusForm(forms.ModelForm):
                 (status.id, status.name) for status in instance.type.allowed_status.all()
             ]
 
+        if instance and instance.id and instance.type and instance.type.allowed_status2.count():
+            # let javascript disable the blank value if default_status2
+            self.fields['status2'].choices = [
+                (status.id, status.name) for status in instance.type.allowed_status2.all()
+            ]
+        else:
+            self.fields['status2'].widget = forms.HiddenInput()
+
     def clean_status(self):
         """status validation"""
         status = self.cleaned_data['status']
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status else [None]) + list(action_type.allowed_status.all())
+        if len(allowed_status) > 0 and status not in allowed_status:
+            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+        return status
+
+    def clean_status2(self):
+        """status validation"""
+        status = self.cleaned_data['status2']
+        action_type = self.instance.type
+        allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
             raise ValidationError(ugettext(u"This status can't not be used for this action type"))
         return status

@@ -581,17 +581,15 @@ def update_action_status(request, action_id, status2=False):
 
         form = form_class(request.POST, instance=action)
         if form.is_valid():
-            if status2:
-                action.status2 = form.cleaned_data['status2']
-            else:
+            if not status2:
                 action.status = form.cleaned_data['status']
+            action.status2 = form.cleaned_data['status2']
             action.save()
-
             return None
     else:
 
         # When the popup is shown after clicking on "done" button
-        # show a final status has default value
+        # show a final status as default value
         on_do = request.GET.get('done', None)
         if on_do and action.type:
             if not status2:
