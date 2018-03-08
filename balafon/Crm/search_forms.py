@@ -11,7 +11,9 @@ import floppyforms as forms
 
 from balafon.Crm import models
 from balafon.Crm.settings import get_language_choices
-from balafon.Crm.utils import get_default_country
+from balafon.Crm.utils import (
+    get_default_country, sort_by_name_callback, sort_by_entity_callback, sort_by_contact_callback
+)
 from balafon.Crm.widgets import CityNoCountryAutoComplete, GroupAutoComplete
 from balafon.Search.forms import SearchFieldForm, TwoDatesForm, YesNoSearchFieldForm
 
@@ -1486,13 +1488,14 @@ class SortContacts(SearchFieldForm):
     name = 'sort'
     label = _(u'Sort contacts')
     contacts_display = True
+    is_sort_form = True
     
     def __init__(self, *args, **kwargs):
         super(SortContacts, self).__init__(*args, **kwargs)
         choices = (
-            ('name', _(u'Name')),
-            ('entity', _(u'Entity')),
-            ('contact', _(u'Contact')),
+            ('entity', _(u'Entity name')),
+            ('contact', _(u'Contact name')),
+            ('name', _(u'Entity or Contact name')),
             ('zipcode', _(u'Zipcode')),
         ) 
         field = forms.CharField(
@@ -1507,26 +1510,16 @@ class SortContacts(SearchFieldForm):
         )
         self._add_field(field)
         self.default_country = get_default_country()
-    
+
     def _sort_by_name(self, contact):
-        """sort by name"""
-        if contact.entity.is_single_contact:
-            value = u"{0} {1}".format(contact.lastname, contact.firstname)
-        else:
-            value = contact.entity.name
-        return value.upper()
-    
-    def _sort_by_contact(self, contact):
-        """sort by contact name"""
-        return u"{0} {1}".format(contact.lastname, contact.firstname).upper()
-    
+        return sort_by_name_callback(contact)
+
     def _sort_by_entity(self, contact):
-        """sort by entity"""
-        value1 = u"B" if contact.entity.is_single_contact else u"A"
-        value2 = self._sort_by_name(contact)
-        value3 = u"{0} {1}".format(contact.lastname, contact.firstname) if not contact.entity.is_single_contact else u""
-        return value1, value2, value3
-    
+        return sort_by_entity_callback(contact)
+
+    def _sort_by_contact(self, contact):
+        return sort_by_contact_callback(contact)
+
     def _sort_by_zipcode(self, contact):
         """sort by zipcode"""
         country = contact.get_country()

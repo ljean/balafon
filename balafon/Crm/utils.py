@@ -169,3 +169,26 @@ def get_suggested_same_as_contacts(contact_id=None, lastname='', firstname='', e
         if contact_id:
             queryset = queryset.exclude(id=contact_id)
         return queryset
+
+
+def sort_by_name_callback(contact):
+    """sort by name"""
+    if contact.entity.is_single_contact:
+        value = u"{0} {1}".format(contact.lastname, contact.firstname)
+    else:
+        value = contact.entity.name
+    return value.upper()
+
+
+def sort_by_contact_callback(contact):
+    """sort by contact name"""
+    return u"{0} {1}".format(contact.lastname, contact.firstname).upper()
+
+
+def sort_by_entity_callback(contact):
+    """key function for sorting by entity"""
+    value1 = u"B" if contact.entity.is_single_contact else u"A"
+    value2 = sort_by_name_callback(contact)
+    value3 = u"{0} {1}".format(contact.lastname, contact.firstname) if not contact.entity.is_single_contact else u""
+    return value1, value2, value3
+

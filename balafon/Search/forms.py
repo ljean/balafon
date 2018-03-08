@@ -24,6 +24,7 @@ from coop_cms.bs_forms import Form as BsForm
 from balafon.fields import HidableModelMultipleChoiceField
 from balafon.Crm.models import Contact, Action, Group, Subscription, SubscriptionType
 from balafon.Crm.widgets import OpportunityAutoComplete
+from balafon.Crm.utils import sort_by_entity_callback
 from balafon.Search import models
 from balafon.Search.widgets import DatespanInput
 from balafon.Search.utils import get_date_bounds
@@ -332,7 +333,8 @@ class SearchForm(forms.Form):
         contacts = set([])
         global_post_processors = []
         self.contains_refuse_newsletter = False
-        
+        has_sort_forms = False
+
         for key in keys:
             post_processors = []
             contacts_set = Contact.objects.all()
@@ -343,6 +345,9 @@ class SearchForm(forms.Form):
                 contacts_set = contacts_set.filter(main_contact=True)
             
             for form in self._forms[key]:
+
+                if form.is_sort_form:
+                    has_sort_forms = True
 
                 if not form.is_action_form:
                     contacts_set = form.get_queryset(contacts_set)
@@ -368,6 +373,10 @@ class SearchForm(forms.Form):
         
         for global_post_processor in global_post_processors:
             contacts = global_post_processor(contacts)
+
+        # By default sort by entity
+        if not has_sort_forms:
+            contacts = sorted(contacts, key=sort_by_entity_callback)
 
         # Just for compatibility
         queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name=u'Newsletter')
@@ -479,6 +488,7 @@ class SearchFieldForm(BsForm):
     contacts_display = False
     multi_values = False
     is_action_form = False
+    is_sort_form = False
 
     def __init__(self, block, count, data=None, *args, **kwargs):
         self.block = block
