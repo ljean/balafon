@@ -1181,6 +1181,40 @@ class NoSameEmailForm(SearchFieldForm):
         return filtered_contacts
 
 
+class DuplicatedContactsForm(SearchFieldForm):
+    """Allow same as contact in results"""
+    name = 'duplicated_contacts'
+    label = _(u'Duplicated contacts')
+
+    def __init__(self, *args, **kwargs):
+        super(DuplicatedContactsForm, self).__init__(*args, **kwargs)
+        choices = ((1, _('Contacts with duplicates')), )
+        field = forms.ChoiceField(choices=choices, label=self.label)
+        self._add_field(field)
+
+    def get_lookup(self):
+        """lookup"""
+        pass
+
+    def get_exclude_lookup(self):
+        """exclude lookup"""
+        pass
+
+    def global_post_process(self, contacts):
+        """this filters the full list of results"""
+        fullnames = {}
+        filtered_contacts = []
+        for contact in contacts:
+            fullname = contact.fullname
+            if fullname:
+                if fullname in fullnames:
+                    filtered_contacts.append(contact)
+                    filtered_contacts.append(fullnames[fullname])
+                else:
+                    fullnames[fullname] = contact
+        return filtered_contacts
+
+
 class ContactsImportSearchForm(SearchFieldForm):
     """by import"""
     name = 'contact_import'

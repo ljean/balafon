@@ -74,6 +74,7 @@ SEARCH_FORMS = [
             search_forms.ContactHasPersonalEmail,
             search_forms.UnknownContact,
             search_forms.ContactLanguageSearchForm,
+            search_forms.DuplicatedContactsForm,
         ],
     ), (
         _(u'Changes'),

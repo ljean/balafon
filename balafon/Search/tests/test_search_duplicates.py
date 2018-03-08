@@ -359,3 +359,60 @@ class SameAsEmailTest(BaseTestCase):
 
         self.assertContains(response, contact2.email)
         self.assertNotContains(response, contact1.email)
+
+
+class SameAsNameTest(BaseTestCase):
+    """Search same-as"""
+
+    def _make_contact(self, **kwargs):
+        kwargs.setdefault('has_left', False)
+        kwargs.setdefault('main_contact', True)
+        entity = mommy.make(models.Entity)
+        contact = mommy.make(models.Contact, entity=entity, **kwargs)
+        contact.entity.default_contact.delete()
+        contact.entity.save()
+        return contact
+
+    def test_search_duplicated_contacts(self):
+        """same as not allowed: search on entity group"""
+
+        contact1 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="a@me.fr")
+        contact2 = self._make_contact(firstname=u"Paul", lastname=u"Dupond", email="b@me.fr")
+        contact3 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="c@me.fr")
+        contact4 = self._make_contact(firstname=u"Pierre", lastname=u"Dupont", email="d@me.fr")
+
+        url = reverse('search')
+
+        data = {"gr0-_-duplicated_contacts-_-1": '1'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.email)
+        self.assertNotContains(response, contact2.email)
+        self.assertContains(response, contact3.email)
+        self.assertNotContains(response, contact4.email)
+
+    def test_search_several_duplicated_contacts(self):
+        """same as not allowed: search on entity group"""
+
+        contact1 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="a@me.fr")
+        contact2 = self._make_contact(firstname=u"Paul", lastname=u"Dupond", email="b@me.fr")
+        contact3 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="c@me.fr")
+        contact4 = self._make_contact(firstname=u"Pierre", lastname=u"Dupont", email="d@me.fr")
+        contact5 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="e@me.fr")
+        contact6 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="f@me.fr")
+
+        url = reverse('search')
+
+        data = {"gr0-_-duplicated_contacts-_-1": '1'}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, contact1.email)
+        self.assertNotContains(response, contact2.email)
+        self.assertContains(response, contact3.email)
+        self.assertNotContains(response, contact4.email)
+        self.assertContains(response, contact5.email)
+        self.assertContains(response, contact6.email)
