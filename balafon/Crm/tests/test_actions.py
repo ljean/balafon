@@ -1338,6 +1338,154 @@ class ActionTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(models.Action.objects.count(), 0)
 
+    def test_view_add_action_with_type(self):
+        """view create from contact"""
+        entity = mommy.make(models.Entity)
+        action_type = mommy.make(models.ActionType)
+        status1 = mommy.make(models.ActionStatus, ordering=1)
+        status2 = mommy.make(models.ActionStatus, ordering=2)
+        status3 = mommy.make(models.ActionStatus, ordering=3)
+        mommy.make(models.ActionStatus, ordering=4)
+        action_type.allowed_status.add(status1, status2)
+        action_type.default_status = status1
+        action_type.allowed_status2.add(status1, status3)
+        action_type.default_status2 = status3
+        action_type.save()
+
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[0, contact.id])
+        response = self.client.get(url, data={'type': action_type.id})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Action.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content)
+
+        type_fields = soup.select('input#id_type')
+        self.assertEqual(1, len(type_fields))
+        type_field = type_fields[0]
+        self.assertEqual(type_field['type'], 'hidden')
+        self.assertEqual(type_field.get('value'), str(action_type.id))
+
+        status_fields = soup.select('select#id_status')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        options = status_field.select('option')
+        self.assertEqual(3, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), None)
+        self.assertEqual(int(options[1]['value']), status1.id)
+        self.assertEqual(options[1]['selected'], "selected")
+        self.assertEqual(int(options[2]['value']), status2.id)
+        self.assertEqual(options[2].get('selected'), None)
+
+        status_fields = soup.select('select#id_status2')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        options = status_field.select('option')
+        self.assertEqual(3, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), None)
+        self.assertEqual(int(options[1]['value']), status1.id)
+        self.assertEqual(options[1].get('selected'), None)
+        self.assertEqual(int(options[2]['value']), status3.id)
+        self.assertEqual(options[2]['selected'], "selected")
+
+    def test_view_add_action_with_type2(self):
+        """view create from contact"""
+        entity = mommy.make(models.Entity)
+        action_type = mommy.make(models.ActionType)
+        status1 = mommy.make(models.ActionStatus, ordering=1)
+        status2 = mommy.make(models.ActionStatus, ordering=2)
+        status3 = mommy.make(models.ActionStatus, ordering=3)
+        mommy.make(models.ActionStatus, ordering=4)
+        action_type.allowed_status.add(status1, status2)
+        action_type.allowed_status2.add(status1, status3)
+        action_type.save()
+
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[0, contact.id])
+        response = self.client.get(url, data={'type': action_type.id})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Action.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content)
+        type_fields = soup.select('input#id_type')
+        self.assertEqual(1, len(type_fields))
+        type_field = type_fields[0]
+        self.assertEqual(type_field['type'], 'hidden')
+        self.assertEqual(type_field.get('value'), str(action_type.id))
+
+        status_fields = soup.select('select#id_status')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        options = status_field.select('option')
+        self.assertEqual(3, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(int(options[1]['value']), status1.id)
+        self.assertEqual(options[1].get('selected'), None)
+        self.assertEqual(int(options[2]['value']), status2.id)
+        self.assertEqual(options[2].get('selected'), None)
+
+        status_fields = soup.select('select#id_status2')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        options = status_field.select('option')
+        self.assertEqual(3, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(int(options[1]['value']), status1.id)
+        self.assertEqual(options[1].get('selected'), None)
+        self.assertEqual(int(options[2]['value']), status3.id)
+        self.assertEqual(options[2].get('selected'), None)
+
+    def test_view_add_action_without_type2(self):
+        """view create from contact"""
+        entity = mommy.make(models.Entity)
+        action_type = mommy.make(models.ActionType)
+        status1 = mommy.make(models.ActionStatus, ordering=1)
+        status2 = mommy.make(models.ActionStatus, ordering=2)
+        status3 = mommy.make(models.ActionStatus, ordering=3)
+        mommy.make(models.ActionStatus, ordering=4)
+        action_type.allowed_status.add(status1, status2)
+        action_type.save()
+
+        contact = entity.default_contact
+        url = reverse('crm_create_action', args=[0, contact.id])
+        response = self.client.get(url, data={'type': action_type.id})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Action.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content)
+        type_fields = soup.select('input#id_type')
+        self.assertEqual(1, len(type_fields))
+        type_field = type_fields[0]
+        self.assertEqual(type_field['type'], 'hidden')
+        self.assertEqual(type_field.get('value'), str(action_type.id))
+
+        status_fields = soup.select('select#id_status')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        options = status_field.select('option')
+        self.assertEqual(3, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(int(options[1]['value']), status1.id)
+        self.assertEqual(options[1].get('selected'), None)
+        self.assertEqual(int(options[2]['value']), status2.id)
+        self.assertEqual(options[2].get('selected'), None)
+
+        status_fields = soup.select('select#id_status2')
+        self.assertEqual(0, len(status_fields))
+        status_fields = soup.select('input#id_status2')
+        self.assertEqual(1, len(status_fields))
+        status_field = status_fields[0]
+        self.assertEqual(status_field['type'], 'hidden')
+        self.assertEqual(status_field.get('value', ''), '')
+
     def test_add_action_from_contact(self):
         """create from contact"""
         entity = mommy.make(models.Entity)

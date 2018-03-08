@@ -98,6 +98,16 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             self.fields['status'].choices = choices + [
                 (status.id, status.name) for status in instance.type.allowed_status.all()
             ]
+        elif action_type and action_type.allowed_status.count():
+            # let javascript disable the blank value if default_status
+            choices = [('', "---------")]
+            self.fields['status'].choices = choices + [
+                (status.id, status.name) for status in action_type.allowed_status.all()
+            ]
+            if action_type.default_status:
+                self.fields['status'].initial = action_type.default_status.id
+            else:
+                self.fields['status'].initial = ''
 
         if instance and instance.id and instance.type and instance.type.allowed_status2.count():
             # let javascript disable the blank value if default_status2
@@ -105,6 +115,18 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             self.fields['status2'].choices = choices + [
                 (status.id, status.name) for status in instance.type.allowed_status2.all()
             ]
+        elif action_type and action_type.allowed_status2.count():
+            # let javascript disable the blank value if default_status
+            choices = [('', "---------")]
+            self.fields['status2'].choices = choices + [
+                (status.id, status.name) for status in action_type.allowed_status2.all()
+            ]
+            if action_type.default_status2:
+                self.fields['status2'].initial = action_type.default_status2.id
+            else:
+                self.fields['status2'].initial = ''
+        else:
+            self.fields['status2'].widget = forms.HiddenInput()
 
         self.fields['opportunity'].widget = forms.HiddenInput()
         self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols': '72'})
