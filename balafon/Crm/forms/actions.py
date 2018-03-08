@@ -59,7 +59,6 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
 
         # Force the type to be hidden
         action_type = None
-        action_type_name = ''
         is_amount_calculated = False
         if instance:
             # If a type is already defined and belongs to a set
@@ -67,7 +66,6 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 action_type = instance.type
             if instance.type:
                 is_amount_calculated = instance.type.is_amount_calculated
-                action_type_name = instance.type.name
                 self.calculated_amount = instance.amount
         else:
             # if initial value is provided (from url)
@@ -75,7 +73,6 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             if action_type:
                 is_amount_calculated = action_type.is_amount_calculated
                 self.calculated_amount = Decimal("0")
-                action_type_name = action_type.name
 
         if action_type:
             for fieldset_name, fieldset_attrs in self.Meta.fieldsets:
