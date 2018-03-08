@@ -178,7 +178,7 @@ class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated',
-        'default_template', 'is_editable', 'hide_contacts_buttons', 'track_status',
+        'default_template', 'is_editable', 'hide_contacts_buttons', 'track_status', 'is_default'
     ]
     list_filter = [
         'set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template',

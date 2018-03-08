@@ -1278,7 +1278,13 @@ class ActionType(NamedElement):
         max_length=100, default='', blank=True, verbose_name=_(u'Subject of email'),
         help_text=_(u'This would be used as subject when sending the action by email')
     )
-    track_status = models.BooleanField(default=False)
+    track_status = models.BooleanField(
+        default=False, verbose_name=_(u'Track status'), help_text=_('If checked, all status changed is stored in DB')
+    )
+    is_default = models.BooleanField(
+        default=False, verbose_name=_(u'is default'),
+        help_text=_('If checked, can be added from list. Action withou types are not displayed')
+    )
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1291,6 +1297,7 @@ class ActionType(NamedElement):
     def save(self, *args, **kwargs):
         """save: create the corresponding menu"""
         ret = super(ActionType, self).save(*args, **kwargs)
+
         if self.id:
             if self.next_action_types.count():
                 ActionMenu.create_action_menu(

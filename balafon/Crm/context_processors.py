@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.db.models import Q
 
 from balafon import VERSION
 from balafon.Crm.models import EntityType, ActionType
@@ -33,5 +34,6 @@ def crm(request):
         'BALAFON_STORE_INSTALLED': 'balafon.Store' in settings.INSTALLED_APPS,
         'NOW': datetime.now(),
         'is_allowed_homepage': is_allowed_homepage(request.path),
-        'addable_action_types': ActionType.objects.filter(set__isnull=False),
+        'addable_action_types': ActionType.objects.filter(Q(set__isnull=False) | Q(is_default=True)),
+        'has_default_action': ActionType.objects.filter(is_default=True).count(),
     }

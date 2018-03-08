@@ -32,7 +32,9 @@
 {% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
 
 {% block section_buttons %}
+  {% if not has_default_action %}
   {% include "Crm/_actions_set_menu.html" %}
+  {% endif %}
   {% for action_type in addable_action_types %}
   {% include "Crm/_actions_set_menu.html" %}
   {% endfor %}
