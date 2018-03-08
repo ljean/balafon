@@ -57,7 +57,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         super(ActionForm, self).__init__(*args, **kwargs)
         self.title = u""
 
-        #Force the type to be hidden
+        # Force the type to be hidden
         action_type = None
         action_type_name = ''
         is_amount_calculated = False
