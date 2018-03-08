@@ -50,7 +50,7 @@ class QuickSearchForm(BsForm):
 
 def get_search_forms():
     """cache the configured forms"""
-    global SEARCH_FORMS #pylint: disable=global-statement
+    global SEARCH_FORMS  #pylint: disable=global-statement
     if not SEARCH_FORMS:
         SEARCH_FORMS = load_from_name(settings.SEARCH_FORM_LIST)
     return SEARCH_FORMS
