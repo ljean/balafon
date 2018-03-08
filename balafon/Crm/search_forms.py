@@ -1188,7 +1188,7 @@ class DuplicatedContactsForm(SearchFieldForm):
 
     def __init__(self, *args, **kwargs):
         super(DuplicatedContactsForm, self).__init__(*args, **kwargs)
-        choices = ((1, _('Contacts with duplicates')), )
+        choices = ((1, _('same firstname and lastname')), (2, _('same lastname')), )
         field = forms.ChoiceField(choices=choices, label=self.label)
         self._add_field(field)
 
@@ -1202,16 +1202,21 @@ class DuplicatedContactsForm(SearchFieldForm):
 
     def global_post_process(self, contacts):
         """this filters the full list of results"""
-        fullnames = {}
+        keys = {}
         filtered_contacts = []
+        try:
+            value = int(self.value)
+        except ValueError:
+            value = 1
         for contact in contacts:
-            fullname = contact.fullname
-            if fullname:
-                if fullname in fullnames:
-                    filtered_contacts.append(contact)
-                    filtered_contacts.append(fullnames[fullname])
-                else:
-                    fullnames[fullname] = contact
+            if contact.lastname:  # ignore contacts without names
+                key = contact.lastname if value == 2 else contact.fullname   # lastname only or fullname
+                if key:
+                    if key in keys:
+                        filtered_contacts.append(contact)
+                        filtered_contacts.append(keys[key])
+                    else:
+                        keys[key] = contact
         return filtered_contacts
 
 
