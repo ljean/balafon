@@ -2,6 +2,11 @@
 {% load i18n %}
 {% block extra_head %}
   {{block.super}}
+<script>
+  $(document).bind('cbox_complete', function() {
+      $.colorbox.resize({width: 300});
+  });
+</script>
 {% endblock %}
 {% block title %}{% trans "Change action status" %}{% endblock %}
 {% block form_url %}{% url "crm_update_action_status" action.id %}{% endblock %}

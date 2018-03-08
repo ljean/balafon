@@ -14,7 +14,7 @@ import floppyforms as forms
 from coop_cms.forms.base import InlineHtmlEditableModelForm
 
 from balafon.Crm import models
-from balafon.Crm.forms.base import BetterBsModelForm, FormWithFieldsetMixin
+from balafon.Crm.forms.base import BetterBsModelForm, FormWithFieldsetMixin, BsPopupModelForm
 from balafon.Crm.widgets import OpportunityAutoComplete
 
 
@@ -332,7 +332,7 @@ class CloneActionForm(forms.Form):
             raise forms.ValidationError(_(u"Invalid type"))
 
 
-class UpdateActionStatusForm(forms.ModelForm):
+class UpdateActionStatusForm(BsPopupModelForm):
     """form changing the status"""
 
     class Meta:
@@ -379,7 +379,7 @@ class UpdateActionStatusForm(forms.ModelForm):
         return status
 
 
-class UpdateActionStatus2Form(forms.ModelForm):
+class UpdateActionStatus2Form(BsPopupModelForm):
     """form changing the status"""
 
     class Meta:

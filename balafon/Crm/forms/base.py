@@ -53,6 +53,12 @@ class FormWithFieldsetMixin(object):
             )
 
 
+class BsPopupForm(forms.Form, BootstrapableMixin):
+    def __init__(self, *args, **kwargs):
+        super(BsPopupForm, self).__init__(*args, **kwargs)
+        self._bs_patch_field_class()
+
+
 class BetterBsForm(forms.Form, BootstrapableMixin):
     """Base class inherit from Bootstrap and form-utils BetterForm"""
 
@@ -73,6 +79,14 @@ class BetterBsForm(forms.Form, BootstrapableMixin):
                 field_class = field.widget.attrs.get("class", "")
                 if not "chosen-select" in field_class:
                     field.widget.attrs["class"] = field_class + " chosen-select"
+
+
+class BsPopupModelForm(forms.ModelForm, BootstrapableMixin):  # (BetterModelForm):
+    """Base class inherit from Bootstrap and form-utils BetterModelForm"""
+
+    def __init__(self, *args, **kwargs):
+        super(BsPopupModelForm, self).__init__(*args, **kwargs)
+        self._bs_patch_field_class()
 
 
 class BetterBsModelForm(forms.ModelForm, BootstrapableMixin):  # (BetterModelForm):

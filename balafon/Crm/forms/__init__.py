@@ -7,7 +7,9 @@ from balafon.Crm.forms.actions import (
     ActionForm, ActionDocumentForm, ActionDoneForm, ActionTypeForm, CloneActionForm, SelectOpportunityForm,
     OpportunityForm, OpportunityStatusForm, UpdateActionStatusForm, UpdateActionStatus2Form
 )
-from balafon.Crm.forms.base import BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity
+from balafon.Crm.forms.base import (
+    BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity, BsPopupModelForm, BsPopupForm
+)
 from balafon.Crm.forms.contacts import (
     ContactForm, SelectContactForm, SelectContactOrEntityForm, SameAsForm, SameAsPriorityForm, AddRelationshipForm,
     ContactsImportForm, ContactsImportConfirmForm, UnsubscribeContactsImportForm, SameAsSuggestionForm
