@@ -22,7 +22,8 @@ setup(
     zip_safe=False,
     install_requires=[
         'django >= 1.6, <1.10',
-        'djangorestframework',
+        'djangorestframework==3.4.7',
+        'django-extensions==1.7.5',
         'apidev-coop_cms >= 1.2',
         'beautifulsoup4',
         'BeautifulSoup',
