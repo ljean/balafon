@@ -107,6 +107,58 @@ class StoreXlsCatalogueView(XlsBaseView):
             )
 
 
+class StoreItemXlsView(XlsBaseView):
+    doc_name = 'articles.xls'
+
+    def do_fill_workbook(self, workbook):
+        """implement it in base class"""
+
+        sheet = workbook.add_sheet(_(u'Articles'))
+
+        try:
+            category_id = int(self.kwargs.get('category_id', 0))
+        except ValueError:
+            category_id = 0
+
+        try:
+            supplier_id = int(self.kwargs.get('supplier_id', 0))
+        except ValueError:
+            supplier_id = 0
+
+        queryset = StoreItem.objects.all()
+        if category_id:
+            queryset = queryset.filter(category=category_id)
+
+        if supplier_id:
+            queryset = queryset.filter(supplier=supplier_id)
+
+        columns = [
+            _(u'Name'), _(u'Famille'), _(u'Category'), _(u'Brand'), _(u"TTC"), _(u"HT"), _('TVA'), _("Available"),
+            _(u'Supplier'), _(u'Reference'), _(u'certificates'),
+        ]
+
+        for col, label in enumerate(columns):
+            self.write_cell(sheet, 0, col, label, style=self.get_header_style())
+
+        for line, store_item in enumerate(queryset):
+            root_category = store_item.root_category()
+            self.write_cell(sheet, line + 1, 0, store_item.fullname())
+            self.write_cell(sheet, line + 1, 1, root_category.name if root_category else '')
+            self.write_cell(sheet, line + 1, 2, store_item.category.name if store_item.category else '')
+            self.write_cell(sheet, line + 1, 3, store_item.brand.name if store_item.brand else '')
+            self.write_cell(sheet, line + 1, 4, store_item.vat_incl_price())
+            self.write_cell(sheet, line + 1, 5, store_item.pre_tax_price)
+            self.write_cell(sheet, line + 1, 6, str(store_item.vat_rate) if store_item.vat_rate else '')
+            self.write_cell(sheet, line + 1, 7, _(u'Yes') if store_item.available else _(u'No'))
+            self.write_cell(sheet, line + 1, 8, store_item.supplier.name if store_item.supplier else '')
+            self.write_cell(sheet, line + 1, 9, store_item.reference)
+            self.write_cell(
+                sheet, line + 1, 10, u','.join(
+                    [certificate.name for certificate in store_item.certificates.all()]
+                )
+            )
+
+
 class StockImportView(FormView):
     """Import purchase price, stock and threshold of store items from Excel file"""
     form_class = StockImportForm

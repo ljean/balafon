@@ -556,6 +556,12 @@ class StoreItem(models.Model):
         self.calculate_price()
         return ret
 
+    def root_category(self):
+        if self.category and self.category.parent:
+            parent = self.category.parent
+            while parent.parent:
+                parent = parent.parent
+            return parent
 
 class StoreItemProperty(models.Model):
     """a property for a store item: DLC, Colisage..."""

@@ -7,5 +7,10 @@
           {% trans "Catalogue" %}
         </a>
     </li>
+    <li>
+        <a href="{% url 'store_xls_articles' original.pk 0 %}" class="grp-state-focus">
+          {% trans "Articles" %}
+        </a>
+    </li>
 
 {% endblock %}
