@@ -66,6 +66,11 @@ class XlsExportView(View):
     doc_name = 'balafon.xls'
     _col_widths = None
     _line_heights = None
+    _default_file = None
+
+    def __init__(self, *args, **kwargs):
+        super(XlsExportView, self).__init__(*args, **kwargs)
+        self._default_file = self.get_default_style()
 
     def dispatch(self, *args, **kwargs):
         if self.only_staff and not can_access(self.request.user):
@@ -74,7 +79,6 @@ class XlsExportView(View):
 
     def get_default_style(self):
         """
-
         * Colour index
         8 through 63. 0 = Black, 1 = White, 2 = Red, 3 = Green, 4 = Blue, 5 = Yellow, 6 = Magenta,
         7 = Cyan, 16 = Maroon, 17 = Dark Green, 18 = Dark Blue, 19 = Dark Yellow , almost brown),
@@ -115,7 +119,6 @@ class XlsExportView(View):
         style.pattern.pattern_fore_colour = 23
 
         """
-
         style = xlwt.XFStyle()
         return style
 
@@ -144,14 +147,14 @@ class XlsExportView(View):
 
     def write_cell(self, sheet, line, column, value, *args, **kwargs):
         value = self.get_value(value)
-        style = kwargs.pop('style', None) or self.get_default_style()
+        style = kwargs.pop('style', None) or self._default_file
         ret = sheet.write(line, column, value, style, *args, **kwargs)
         self._calculate_size(sheet, line, column, value)
         return ret
 
     def write_merge(self, sheet, line1, line2, column1, column2, value, *args, **kwargs):
         value = self.get_value(value)
-        style = kwargs.pop('style', None) or self.get_default_style()
+        style = kwargs.pop('style', None) or self._default_file
         ret = sheet.write_merge(line1, line2, column1, column2, value, style, *args, **kwargs)
         self._calculate_size(sheet, line1, column1, value)
         return ret
