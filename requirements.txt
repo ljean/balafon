@@ -1,4 +1,4 @@
-django >= 1.6, <1.10
+django >= 1.9, <2
 BeautifulSoup
 beautifulsoup4
 django-extensions
