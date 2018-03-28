@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+from __future__ import unicode_literals
+
 from datetime import date, datetime, time
 
 from django.contrib.auth.models import User

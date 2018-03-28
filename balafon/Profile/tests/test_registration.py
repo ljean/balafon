@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.conf import settings
@@ -44,7 +46,7 @@ class RegisterTestCase(TestCase):
         self.assertEqual(rp.user, user)
         self.assertEqual(
             rp.user.contactprofile.subscriptions_ids,
-            u"{0},{1}".format(subscription_type1.id, subscription_type2.id)
+            "{0},{1}".format(subscription_type1.id, subscription_type2.id)
         )
 
         activation_url = reverse('registration_activate', args=[rp.activation_key])

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """import data from files"""
 
+from __future__ import unicode_literals, print_function
+
 from datetime import datetime
 import os.path
 import re
@@ -81,13 +83,13 @@ def _get_subcription_field_name(subscription_type):
 
 def _set_contact_and_entity(contact_data, entity_dict, extract_from_email):
     """format properly name and entity"""
-    name = u"< {0} >".format(_(u"Unknown"))
+    name = "< {0} >".format(_("Unknown"))
     email_providers = (
         'free', 'gmail', 'yahoo', 'yahoo.co', 'wanadoo', 'orange', 'sfr', 'laposte',
         'hotmail', 'neuf', 'club-internet', 'voila', 'aol', 'live', 'ymail', 'outlook',
     )
     if not contact_data['entity']:
-        entity = u''
+        entity = ''
         if extract_from_email:
             res = re.match(r'(?P<name>.+)@(?P<cpn>.+)\.(?P<ext>.+)', contact_data['email'])
             if res:
@@ -233,18 +235,18 @@ def get_imports_fields():
     custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
     if not custom_fields_count:
         custom_fields_count = 0
-    for i in xrange(custom_fields_count):
+    for i in range(custom_fields_count):
         fields.append('cf_{0}'.format(i+1))
 
     custom_fields = []
-    for index_ in xrange(1, custom_fields_count+1):
+    for index_ in range(1, custom_fields_count+1):
         try:
             custom_field = models.CustomField.objects.get(import_order=index_)
             custom_fields.append(custom_field)
         except models.CustomField.DoesNotExist:
             custom_fields.append(None)
         except models.CustomField.MultipleObjectsReturned:
-            raise Exception(_(u"There are several custom fields with index {0}").format(index_))
+            raise Exception(_("There are several custom fields with index {0}").format(index_))
 
     return fields, custom_fields
 
@@ -257,7 +259,7 @@ def contacts_import_template(request):
 
     cols = fields[:len(fields) - len(custom_fields)] + custom_fields
 
-    template_file = u";".join([u'"{0}"'.format(unicode(col)) for col in cols])+u"\n"
+    template_file = ";".join(['"{0}"'.format('{0}'.format(col)) for col in cols]) + "\n"
 
     return HttpResponse(template_file, content_type="text/csv", )
 
@@ -267,9 +269,9 @@ def _create_contact(contact_data, contacts_import, entity_dict):
     #Entity
     if settings.DEBUG:
         try:
-            print contact_data['entity'], contact_data['lastname']
+            print(contact_data['entity'], contact_data['lastname'])
         except UnicodeError:
-            print '##!'
+            print('##!')
 
     if not contact_data['entity.type']:
         entity_type = contacts_import.entity_type
@@ -288,7 +290,7 @@ def _create_contact(contact_data, contacts_import, entity_dict):
                 contact__firstname=contact_data['firstname'],
                 is_single_contact=True
             )[0]
-            entity.name = u"{0} {1}".format(contact_data['firstname'], contact_data['lastname'])
+            entity.name = "{0} {1}".format(contact_data['firstname'], contact_data['lastname'])
             entity.imported_by = contacts_import
             entity.save()
 
@@ -428,7 +430,7 @@ def confirm_contacts_import(request, import_id):
     fields, custom_fields = get_imports_fields()
 
     custom_fields_count = len(custom_fields)
-    cf_names = ['cf_{0}'.format(idx) for idx in xrange(1, custom_fields_count+1)]
+    cf_names = ['cf_{0}'.format(idx) for idx in range(1, custom_fields_count+1)]
 
     contacts_import = get_object_or_404(models.ContactsImport, id=import_id)
     try:
@@ -482,13 +484,13 @@ def confirm_contacts_import(request, import_id):
     except UnicodeDecodeError:
         error(
             request,
-            _(u"An error occurred while reading the csv file. You should check that the file encoding is correct.")
+            _("An error occurred while reading the csv file. You should check that the file encoding is correct.")
         )
-    except Exception, msg:  # pylint: disable broad-except
+    except Exception as msg:  # pylint: disable broad-except
         error(
             request,
-            u'{0}: {1}'.format(
-                _(u"An error occurred. You should check that the file is a valid csv file."),
+            '{0}: {1}'.format(
+                _("An error occurred. You should check that the file is a valid csv file."),
                 msg
             )
         )
@@ -519,10 +521,10 @@ def unsubscribe_contacts_import(request):
                             subscription.accept_subscription = False
                             subscription.unsubscription_date = datetime.now()
                             subscription.save()
-                success(request, _(u"{0} contacts have been unsubscribed").format(contacts_count))
+                success(request, _("{0} contacts have been unsubscribed").format(contacts_count))
 
             except UnicodeDecodeError:
-                error(request, _(u"Unicode error while reading the file"))
+                error(request, _("Unicode error while reading the file"))
 
             return HttpResponseRedirect(reverse('balafon_homepage'))
     else:

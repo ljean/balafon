@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django import template
-from django.template.base import Variable, VariableDoesNotExist
-from balafon.Profile.models import CategoryPermission
-from django.core.urlresolvers import reverse
-from django.contrib.contenttypes.models import ContentType
+from django.utils.text import slugify
+
 from coop_cms.settings import get_article_class
 from coop_cms.shortcuts import get_article
-from balafon.Profile.utils import create_profile_contact, check_category_permission
-from django.template.defaultfilters import slugify
 
 register = template.Library()
+
 
 class IfCanDoArticle(template.Node):
     def __init__(self, title, perm, lang, nodelist_true, nodelist_false):
@@ -27,23 +26,23 @@ class IfCanDoArticle(template.Node):
             yield node
 
     def _check_perm(self, user, force_lang=None, current_lang=None):
-        Article = get_article_class()
+        article_class = get_article_class()
         slug = slugify(self.title)
         try:
             if force_lang:
                 article = get_article(slug, force_lang=force_lang)
             else:
                 article = get_article(slug, current_lang=current_lang)
-        except Article.DoesNotExist:
-            article = Article.objects.create(slug=slug, title=self.title)
+        except article_class.DoesNotExist:
+            article = article_class.objects.create(slug=slug, title=self.title)
         return user.has_perm(self.perm, article)
 
     def render(self, context):
         request = context.get('request')
         
         try:
-            v = template.Variable(self.title)
-            self.title = v.resolve(context)
+            variable = template.Variable(self.title)
+            self.title = variable.resolve(context)
         except template.VariableDoesNotExist:
             self.title = self.title.strip("'").strip('"')
         
@@ -56,8 +55,8 @@ class IfCanDoArticle(template.Node):
 def if_can_do_article(parser, token):
     args = token.contents.split()
     title = args[1]
-    perm = args[2] if len(args)>2 else 'can_view_article'
-    lang = args[3] if len(args)>3 else None
+    perm = args[2] if len(args) > 2 else 'can_view_article'
+    lang = args[3] if len(args) > 3 else None
     
     nodelist_true = parser.parse(('else', 'endif'))
     token = parser.next_token()
@@ -67,4 +66,3 @@ def if_can_do_article(parser, token):
     else:
         nodelist_false = template.NodeList()
     return IfCanDoArticle(title, perm, lang, nodelist_true, nodelist_false)
-

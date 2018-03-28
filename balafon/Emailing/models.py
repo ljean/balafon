@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """models"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 import uuid
 import unicodedata
@@ -16,6 +18,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import signals
 from django.utils.dateformat import DateFormat
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -28,6 +31,7 @@ from balafon.Emailing.settings import is_mandrill_used
 from balafon.Users.models import UserPreferences, Favorite
 
 
+@python_2_unicode_compatible
 class Emailing(TimeStampedModel):
     """configuration on an emailing"""
     
@@ -37,15 +41,15 @@ class Emailing(TimeStampedModel):
     STATUS_SENT = 4
     
     STATUS_CHOICES = (
-        (STATUS_EDITING, _(u'Edition in progress')),
-        (STATUS_SCHEDULED, _(u'Sending is scheduled')),
-        (STATUS_SENDING, _(u'Sending in progress')),
-        (STATUS_SENT, _(u'Sent')),
+        (STATUS_EDITING, _('Edition in progress')),
+        (STATUS_SCHEDULED, _('Sending is scheduled')),
+        (STATUS_SENDING, _('Sending in progress')),
+        (STATUS_SENT, _('Sent')),
     )
 
     class Meta:
-        verbose_name = _(u'Emailing')
-        verbose_name_plural = _(u'Emailings')
+        verbose_name = _('Emailing')
+        verbose_name_plural = _('Emailings')
 
     subscription_type = models.ForeignKey(SubscriptionType)
     newsletter = models.ForeignKey(Newsletter) 
@@ -60,25 +64,25 @@ class Emailing(TimeStampedModel):
     unsub = models.ManyToManyField(Contact, blank=True, related_name="emailing_unsub")
     rejected = models.ManyToManyField(Contact, blank=True, related_name="emailing_rejected")
 
-    scheduling_dt = models.DateTimeField(_(u"scheduling date"), blank=True, default=None, null=True)
-    sending_dt = models.DateTimeField(_(u"sending date"), blank=True, default=None, null=True)
+    scheduling_dt = models.DateTimeField(_("scheduling date"), blank=True, default=None, null=True)
+    sending_dt = models.DateTimeField(_("sending date"), blank=True, default=None, null=True)
 
     favorites = GenericRelation(Favorite)
     lang = models.CharField(
-        _(u"language"),
+        _("language"),
         max_length=5,
         default="",
         blank=True,
         choices=get_language_choices()
     )
-    from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"From email"))
+    from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_("From email"))
 
-    def __unicode__(self):
-        return u"{0} - {1}".format(self.newsletter.subject, self.get_info(extra=True))
+    def __str__(self):
+        return "{0} - {1}".format(self.newsletter.subject, self.get_info(extra=True))
 
     class Meta:
-        verbose_name = _(u'emailing')
-        verbose_name_plural = _(u'emailings')
+        verbose_name = _('emailing')
+        verbose_name_plural = _('emailings')
 
     def get_info(self, extra=False):
         """returns info about the status in order to diplsay it on emailing page"""
@@ -86,16 +90,16 @@ class Emailing(TimeStampedModel):
         if self.status == Emailing.STATUS_EDITING:
             text = _("{0} - {1}").format(text, DateFormat(self.created).format(" d F Y H:i"))
             if extra:
-                text += _(u" - {0} recipients").format(self.send_to.count())
+                text += _(" - {0} recipients").format(self.send_to.count())
         if self.status == Emailing.STATUS_SCHEDULED:
             text = _("{0} - {1}").format(text, DateFormat(self.scheduling_dt).format(" d F Y H:i"))
             if extra:
                 total = self.send_to.count() + self.sent_to.count()
-                text += _(u" - {0}/{1} sent").format(self.sent_to.count(), total)
+                text += _(" - {0}/{1} sent").format(self.sent_to.count(), total)
         elif self.status == Emailing.STATUS_SENT:
             text = _("{0} - {1}").format(text, DateFormat(self.sending_dt).format(" d F Y H:i"))
             if extra:
-                text += _(u" - {0} sent").format(self.sent_to.count())
+                text += _(" - {0} sent").format(self.sent_to.count())
 
         return text
         
@@ -106,7 +110,7 @@ class Emailing(TimeStampedModel):
             action = '''
                 <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
                 '''.format(
-                    ugettext(u'Send'),
+                    ugettext('Send'),
                     reverse("emailing_confirm_send_mail", args=[self.id]),
                     'ok-circle'
                 )
@@ -114,7 +118,7 @@ class Emailing(TimeStampedModel):
             action = '''
                 <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
                 '''.format(
-                    ugettext(u'Cancel'),
+                    ugettext('Cancel'),
                     reverse("emailing_cancel_send_mail", args=[self.id]),
                     'remove-circle'
                 )
@@ -139,27 +143,28 @@ class Emailing(TimeStampedModel):
         return super(Emailing, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class MagicLink(models.Model):
     """A tracking link"""
 
     class Meta:
-        verbose_name = _(u'Magic link')
-        verbose_name_plural = _(u'Magic links')
+        verbose_name = _('Magic link')
+        verbose_name_plural = _('Magic links')
 
     emailing = models.ForeignKey(Emailing)
     url = models.URLField(max_length=500)
     visitors = models.ManyToManyField(Contact, blank=True)
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.url
     
     def save(self, *args, **kwargs):
         """save"""
         super(MagicLink, self).save(*args, **kwargs)
         if not self.uuid:
-            name = u'{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
-            name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
+            name = '{0}-magic-link-{1}-{2}'.format(settings.SECRET_KEY, self.id, self.url)
+            name = unicodedata.normalize('NFKD', '{0}'.format(name)).encode("ascii", 'ignore')
             self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, name)
             return super(MagicLink, self).save()
 
@@ -167,7 +172,7 @@ class MagicLink(models.Model):
 def force_message_in_favorites(sender, instance, signal, created, **kwargs):
     """force an action to be in user favorites"""
     action = instance
-    if created and action.type and action.type.name == ugettext(u"Message"):
+    if created and action.type and action.type.name == ugettext("Message"):
         for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
             content_type = ContentType.objects.get_for_model(action.__class__)
             Favorite.objects.get_or_create(

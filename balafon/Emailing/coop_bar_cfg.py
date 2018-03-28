@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """coop_bar configuration: add links to balafon"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -12,7 +14,7 @@ def balafon_homepage(request, context):
     if request and request.user.is_authenticated() and request.user.is_staff:
         return make_link(
             reverse("balafon_homepage"),
-            _(u'Balafon'),
+            _('Balafon'),
             'img/balafon-icon.png',
             classes=['icon', 'alert_on_click']
         )
@@ -23,7 +25,7 @@ def back_to_newsletters(request, context):
     if request and request.user.is_authenticated() and request.user.is_staff:
         return make_link(
             reverse("emailing_newsletter_list"),
-            _(u'Back to newsletters'),
+            _('Back to newsletters'),
             'fugue/table--arrow.png',
             classes=['icon', 'alert_on_click']
         )

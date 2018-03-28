@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """project settings"""
 
+from __future__ import unicode_literals
+
 import os.path
 import sys
 
@@ -43,8 +45,8 @@ LANGUAGE_CODE = 'en'
 
 gettext = lambda s: s
 LANGUAGES = (
-    ('en', gettext(u'English')),
-    ('fr', gettext(u'Français')),
+    ('en', gettext('English')),
+    ('fr', gettext('Français')),
 )
 
 SITE_ID = 1
@@ -158,9 +160,9 @@ COOP_CMS_NEWSLETTER_TEMPLATES = (
     ('basic_newsletter.html', 'Basic'),
 )
 COOP_CMS_ARTICLE_TEMPLATES = (
-    ('standard.html', u'Standard'),
+    ('standard.html', 'Standard'),
 )
-COOP_CMS_FROM_EMAIL = u'"ljean@apidev.fr"'
+COOP_CMS_FROM_EMAIL = '"ljean@apidev.fr"'
 COOP_CMS_TEST_EMAILS = ('"Luc JEAN - Apidev" <ljean@apidev.fr>', )  # 'luc.jean@gmail.com')
 COOP_CMS_SITE_PREFIX = ''
 COOP_CMS_REPLY_TO = 'ljean@apidev.fr'

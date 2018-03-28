@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test emailing configuration"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 from unittest import skipIf
@@ -295,7 +297,7 @@ class UpdateEmailingTestCase(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(302, response.status_code)
-        redirect_url = u"{0}?next={1}".format(settings.LOGIN_URL, url)
+        redirect_url = "{0}?next={1}".format(settings.LOGIN_URL, url)
         self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
     @override_settings(BALAFON_EMAILING_SENDER_CHOICES=(('toto@toto.fr', 'toto'), ('titi@titi.fr', 'titi')))
@@ -343,9 +345,9 @@ class UpdateEmailingTestCase(BaseTestCase):
         soup = BeautifulSoup(response.content)
 
         self.assertEqual(3, len(soup.select("select#id_lang option")))
-        self.assertEqual(u'', soup.select("select#id_lang option")[0]["value"])
-        self.assertEqual(u'en', soup.select("select#id_lang option")[1]["value"])
-        self.assertEqual(u'fr', soup.select("select#id_lang option")[2]["value"])
+        self.assertEqual('', soup.select("select#id_lang option")[0]["value"])
+        self.assertEqual('en', soup.select("select#id_lang option")[1]["value"])
+        self.assertEqual('fr', soup.select("select#id_lang option")[2]["value"])
 
     @override_settings(LANGUAGES=(('en', 'English'),))
     def test_view_update_emailing_no_lang(self):
@@ -529,4 +531,3 @@ class UpdateEmailingTestCase(BaseTestCase):
         self.assertEqual(emailing.subscription_type, subscription_type1)
         self.assertEqual(emailing.lang, '')
         self.assertEqual(emailing.from_email, settings.BALAFON_DEFAULT_SUBSCRIPTION_TYPE[1][0])
-

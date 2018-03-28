@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can sort results"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -16,7 +18,7 @@ class SortTest(BaseTestCase):
     def _make_contact(self, lastname, firstname, entity=""):
         """make a contact"""
         contact1 = mommy.make(models.Contact, lastname=lastname, firstname=firstname, main_contact=True, has_left=False)
-        contact1.entity.name = entity or u"????"
+        contact1.entity.name = entity or "????"
         contact1.entity.is_single_contact = not bool(entity)
         contact1.entity.default_contact.delete()
         contact1.entity.save()
@@ -24,12 +26,12 @@ class SortTest(BaseTestCase):
 
     def _contacts(self):
         """create contacts"""
-        contact1 = self._make_contact(u'Martin', u'Georges', u'apple')
-        contact2 = self._make_contact(u'Dupond', u'Pierre', u'Abcdef')
-        contact3 = self._make_contact(u'Martin', u'Alain', u'Petitmou')
-        contact4 = self._make_contact(u'Bernard', u'Jacques', u'')
-        contact5 = self._make_contact(u'Xylo', u'Henri', u'Balafon')
-        contact6 = self._make_contact(u'Poulet', u'Andre', u'Maitre Coq')
+        contact1 = self._make_contact('Martin', 'Georges', 'apple')
+        contact2 = self._make_contact('Dupond', 'Pierre', 'Abcdef')
+        contact3 = self._make_contact('Martin', 'Alain', 'Petitmo')
+        contact4 = self._make_contact('Bernard', 'Jacques', '')
+        contact5 = self._make_contact('Xylo', 'Henri', 'Balafon')
+        contact6 = self._make_contact('Poulet', 'Andre', 'Maitre Coq')
         return contact1, contact2, contact3, contact4, contact5, contact6
 
     def _groups(self, *args):
@@ -52,9 +54,9 @@ class SortTest(BaseTestCase):
         url = reverse('search')
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        content = unicode(response.content.decode("iso-8859-15"))
+        content = '{0}'.format(response.content.decode("iso-8859-15"))
 
-        self.assertContains(response, u"<!-- ut: contacts_display -->")
+        self.assertContains(response, "<!-- ut: contacts_display -->")
 
         for contact in expected_order:
             self.assertContains(response, contact.firstname)

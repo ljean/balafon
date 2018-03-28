@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import patterns, url
+from __future__ import unicode_literals
 from . import views
 
 urlpatterns = patterns('balafon.Emailing.views',

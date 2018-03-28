@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by zones"""
 
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.core.urlresolvers import reverse
@@ -25,14 +27,14 @@ class ZoneSearchTest(BaseTestCase):
 
         entity1 = mommy.make(models.Entity, city=city1)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         entity2 = mommy.make(models.Entity)
         contact2 = entity2.default_contact
-        contact2.lastname = u"EFGHIJKL"
+        contact2.lastname = "EFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = city1
@@ -40,7 +42,7 @@ class ZoneSearchTest(BaseTestCase):
 
         entity3 = mommy.make(models.Entity)
         contact3 = entity3.default_contact
-        contact3.lastname = u"IJKLMNOP"
+        contact3.lastname = "IJKLMNOP"
         contact3.main_contact = True
         contact3.has_left = False
         contact3.city = city2
@@ -48,7 +50,7 @@ class ZoneSearchTest(BaseTestCase):
 
         entity4 = mommy.make(models.Entity)
         contact4 = entity4.default_contact
-        contact4.lastname = u"MNOPQRST"
+        contact4.lastname = "MNOPQRST"
         contact4.main_contact = True
         contact4.has_left = False
         contact4.save()
@@ -63,23 +65,23 @@ class ZoneSearchTest(BaseTestCase):
 
     def test_search_zipcode(self):
         """search zipcode"""
-        city1 = mommy.make(models.City, name=u"ZooPark")
-        city2 = mommy.make(models.City, name=u"VodooPark")
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.city = city1
         contact1.zip_code = "42810"
         contact1.save()
 
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False)
 
         entity2 = mommy.make(models.Entity)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = city2
@@ -105,24 +107,24 @@ class ZoneSearchTest(BaseTestCase):
 
     def test_search_zipcode_entity(self):
         """search zipcode of entity"""
-        city1 = mommy.make(models.City, name=u"ZooPark")
-        city2 = mommy.make(models.City, name=u"VodooPark")
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1, zip_code="42810")
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         contact3 = mommy.make(
-            models.Contact, entity=entity1, lastname=u"IJKLMNOP",
+            models.Contact, entity=entity1, lastname="IJKLMNOP",
             main_contact=True, has_left=False
         )
 
         entity2 = mommy.make(models.Entity, city=city2, zip_code="26100")
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.save()
@@ -146,28 +148,28 @@ class ZoneSearchTest(BaseTestCase):
 
     def test_search_zipcode_entity_contact_mix(self):
         """zipcode entity and contact"""
-        city1 = mommy.make(models.City, name=u"ZooPark")
-        city2 = mommy.make(models.City, name=u"VodooPark")
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1, zip_code="42810")
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         contact3 = mommy.make(
-            models.Contact, city=None, entity=entity1, lastname=u"IJKLMNOP",
+            models.Contact, city=None, entity=entity1, lastname="IJKLMNOP",
             main_contact=True, has_left=False
         )
         contact4 = mommy.make(
             models.Contact, city=city2, zip_code="26100", entity=entity1,
-            lastname=u"MNOPQRST", main_contact=True, has_left=False
+            lastname="MNOPQRST", main_contact=True, has_left=False
         )
 
         entity2 = mommy.make(models.Entity)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = city2
@@ -194,28 +196,28 @@ class ZoneSearchTest(BaseTestCase):
 
     def test_search_entity_zipcode(self):
         """another zipcode search"""
-        city1 = mommy.make(models.City, name=u"ZooPark")
-        city2 = mommy.make(models.City, name=u"VodooPark")
+        city1 = mommy.make(models.City, name="ZooPark")
+        city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1, zip_code="42810")
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         contact3 = mommy.make(
-            models.Contact, city=None, entity=entity1, lastname=u"IJKLMNOP",
+            models.Contact, city=None, entity=entity1, lastname="IJKLMNOP",
             main_contact=True, has_left=False
         )
         contact4 = mommy.make(
             models.Contact, city=city2, zip_code="26100", entity=entity1,
-            lastname=u"MNOPQRST", main_contact=True, has_left=False
+            lastname="MNOPQRST", main_contact=True, has_left=False
         )
 
         entity2 = mommy.make(models.Entity, city=city2, zip_code="26100")
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.save()
@@ -244,22 +246,22 @@ class ZoneSearchTest(BaseTestCase):
             city1 = cities[0]
             city2 = cities[1]
         else:
-            city1 = mommy.make(models.City, name=u"ZooPark")
-            city2 = mommy.make(models.City, name=u"VodooPark")
+            city1 = mommy.make(models.City, name="ZooPark")
+            city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.city = city1
         contact1.save()
 
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False)
 
         entity2 = mommy.make(models.Entity)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJK"
+        contact2.lastname = "DEFGHIJK"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = city2
@@ -288,21 +290,21 @@ class ZoneSearchTest(BaseTestCase):
             city1 = cities[0]
             city2 = cities[1]
         else:
-            city1 = mommy.make(models.City, name=u"ZooPark")
-            city2 = mommy.make(models.City, name=u"VodooPark")
+            city1 = mommy.make(models.City, name="ZooPark")
+            city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False)
 
         entity2 = mommy.make(models.Entity, city=city2)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.save()
@@ -330,26 +332,26 @@ class ZoneSearchTest(BaseTestCase):
             city1 = cities[0]
             city2 = cities[1]
         else:
-            city1 = mommy.make(models.City, name=u"ZooPark")
-            city2 = mommy.make(models.City, name=u"VodooPark")
+            city1 = mommy.make(models.City, name="ZooPark")
+            city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         contact3 = mommy.make(
-            models.Contact, city=None, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False
+            models.Contact, city=None, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False
         )
         contact4 = mommy.make(
-            models.Contact, city=city2, entity=entity1, lastname=u"MNOPQRST", main_contact=True, has_left=False
+            models.Contact, city=city2, entity=entity1, lastname="MNOPQRST", main_contact=True, has_left=False
         )
 
         entity2 = mommy.make(models.Entity)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = city2
@@ -377,21 +379,21 @@ class ZoneSearchTest(BaseTestCase):
         """search by zone"""
         city1 = cities[0]
         city2 = cities[1]
-        city3 = mommy.make(models.City, name=u"BlablaPark")
+        city3 = mommy.make(models.City, name="BlablaPark")
 
         entity1 = mommy.make(models.Entity, city=city1 if entity_search else None)
         contact1a = entity1.default_contact
-        contact1a.lastname = u"ABCDEFGH"
+        contact1a.lastname = "ABCDEFGH"
         contact1a.main_contact = True
         contact1a.has_left = False
         contact1a.city = city1
         contact1a.save()
 
-        contact1b = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact1b = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False)
 
         entity2 = mommy.make(models.Entity, city=city2 if entity_search else None)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.city = None if entity_search else city2
@@ -399,7 +401,7 @@ class ZoneSearchTest(BaseTestCase):
 
         entity3 = mommy.make(models.Entity)
         contact3 = entity3.default_contact
-        contact3.lastname = u"MNOPQRST"
+        contact3.lastname = "MNOPQRST"
         contact3.main_contact = True
         contact3.has_left = False
         contact3.city = city3
@@ -432,26 +434,26 @@ class ZoneSearchTest(BaseTestCase):
             city1 = cities[0]
             city2 = cities[1]
         else:
-            city1 = mommy.make(models.City, name=u"ZooPark")
-            city2 = mommy.make(models.City, name=u"VodooPark")
+            city1 = mommy.make(models.City, name="ZooPark")
+            city2 = mommy.make(models.City, name="VodooPark")
 
         entity1 = mommy.make(models.Entity, city=city1)
         contact1 = entity1.default_contact
-        contact1.lastname = u"ABCDEFGH"
+        contact1.lastname = "ABCDEFGH"
         contact1.main_contact = True
         contact1.has_left = False
         contact1.save()
 
         contact3 = mommy.make(
-            models.Contact, city=None, entity=entity1, lastname=u"IJKLMNOP", main_contact=True, has_left=False
+            models.Contact, city=None, entity=entity1, lastname="IJKLMNOP", main_contact=True, has_left=False
         )
         contact4 = mommy.make(
-            models.Contact, city=city2, entity=entity1, lastname=u"MNOPQRST", main_contact=True, has_left=False
+            models.Contact, city=city2, entity=entity1, lastname="MNOPQRST", main_contact=True, has_left=False
         )
 
         entity2 = mommy.make(models.Entity, city=city2)
         contact2 = entity2.default_contact
-        contact2.lastname = u"DEFGHIJKL"
+        contact2.lastname = "DEFGHIJKL"
         contact2.main_contact = True
         contact2.has_left = False
         contact2.save()
@@ -464,7 +466,7 @@ class ZoneSearchTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         soup = BeautifulSoup(response.content)
-        self.assertEqual(0, len(soup.select(u'.field-error')))
+        self.assertEqual(0, len(soup.select('.field-error')))
 
         self.assertContains(response, entity1.name)
         self.assertContains(response, contact1.lastname)
@@ -474,17 +476,17 @@ class ZoneSearchTest(BaseTestCase):
         self.assertNotContains(response, entity2.name)
         self.assertNotContains(response, contact2.lastname)
 
-    def _get_departements_data(self, form_name=u"department"):
+    def _get_departements_data(self, form_name="department"):
         """get departments"""
         default_country = get_default_country()
-        region_type = mommy.make(models.ZoneType, type=u"region")
+        region_type = mommy.make(models.ZoneType, type="region")
         region = mommy.make(models.Zone, parent=default_country, type=region_type)
-        departement_type = mommy.make(models.ZoneType, type=u"department")
+        departement_type = mommy.make(models.ZoneType, type="department")
         departement1 = mommy.make(models.Zone, parent=region, type=departement_type)
         departement2 = mommy.make(models.Zone, parent=region, type=departement_type)
 
-        city1 = mommy.make(models.City, name=u"ZooPark", parent=departement1)
-        city2 = mommy.make(models.City, name=u"VodooPark", parent=departement2)
+        city1 = mommy.make(models.City, name="ZooPark", parent=departement1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=departement2)
 
         data = {"gr0-_-{0}-_-0".format(form_name): departement1.id}
 
@@ -520,20 +522,20 @@ class ZoneSearchTest(BaseTestCase):
 
     def test_search_entity_departement(self):
         """search by entity departements"""
-        self.test_search_entity_city(*self._get_departements_data(u"entity_department"))
+        self.test_search_entity_city(*self._get_departements_data("entity_department"))
 
-    def _get_regions_data(self, form_name=u"region"):
+    def _get_regions_data(self, form_name="region"):
         """get region data"""
         default_country = get_default_country()
-        region_type = mommy.make(models.ZoneType, type=u"region")
+        region_type = mommy.make(models.ZoneType, type="region")
         region1 = mommy.make(models.Zone, parent=default_country, type=region_type)
         region2 = mommy.make(models.Zone, parent=default_country, type=region_type)
-        departement_type = mommy.make(models.ZoneType, type=u"department")
+        departement_type = mommy.make(models.ZoneType, type="department")
         departement1 = mommy.make(models.Zone, parent=region1, type=departement_type)
         departement2 = mommy.make(models.Zone, parent=region2, type=departement_type)
 
-        city1 = mommy.make(models.City, name=u"ZooPark", parent=departement1)
-        city2 = mommy.make(models.City, name=u"VodooPark", parent=departement2)
+        city1 = mommy.make(models.City, name="ZooPark", parent=departement1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=departement2)
 
         data = {"gr0-_-{0}-_-0".format(form_name): region1.id}
 
@@ -563,14 +565,14 @@ class ZoneSearchTest(BaseTestCase):
         """search by entity region"""
         self.test_search_entity_city(*self._get_regions_data("entity_region"))
 
-    def _get_countries_data(self, form_name=u"country"):
+    def _get_countries_data(self, form_name="country"):
         """get countries data"""
         country_type = mommy.make(models.ZoneType, type="country")
         country1 = mommy.make(models.Zone, type=country_type)
         country2 = mommy.make(models.Zone, type=country_type)
 
-        city1 = mommy.make(models.City, name=u"ZooPark", parent=country1)
-        city2 = mommy.make(models.City, name=u"VodooPark", parent=country2)
+        city1 = mommy.make(models.City, name="ZooPark", parent=country1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=country2)
 
         data = {"gr0-_-{0}-_-0".format(form_name): country1.id}
 
@@ -600,18 +602,18 @@ class ZoneSearchTest(BaseTestCase):
         """search by entity country"""
         self.test_search_entity_city(*self._get_countries_data("entity_country"))
 
-    def _get_countries_mix_data(self, form_name=u"country"):
+    def _get_countries_mix_data(self, form_name="country"):
         """get date with full hierarchy"""
-        country_type = mommy.make(models.ZoneType, type=u"country")
+        country_type = mommy.make(models.ZoneType, type="country")
         country1 = default_country = get_default_country()
         country2 = mommy.make(models.Zone, type=country_type, parent=None)
-        region_type = mommy.make(models.ZoneType, type=u"region")
+        region_type = mommy.make(models.ZoneType, type="region")
         region1 = mommy.make(models.Zone, parent=default_country, type=region_type)
-        departement_type = mommy.make(models.ZoneType, type=u"department")
+        departement_type = mommy.make(models.ZoneType, type="department")
         departement1 = mommy.make(models.Zone, parent=region1, type=departement_type)
 
-        city1 = mommy.make(models.City, name=u"ZooPark", parent=departement1)
-        city2 = mommy.make(models.City, name=u"VodooPark", parent=country2)
+        city1 = mommy.make(models.City, name="ZooPark", parent=departement1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=country2)
 
         data = {"gr0-_-{0}-_-0".format(form_name): country1.id}
 
@@ -633,21 +635,21 @@ class ZoneSearchTest(BaseTestCase):
         """again search by entity country full hierarchy"""
         self.test_search_entity_city(*self._get_countries_mix_data("entity_country"))
 
-    def _get_zonegroup_data(self, form_name=u"zone_group"):
+    def _get_zonegroup_data(self, form_name="zone_group"):
         """get zonegroup data"""
         default_country = get_default_country()
 
-        region_type = mommy.make(models.ZoneType, type=u"region")
+        region_type = mommy.make(models.ZoneType, type="region")
         region1 = mommy.make(models.Zone, parent=default_country, type=region_type)
         region2 = mommy.make(models.Zone, parent=default_country, type=region_type)
-        departement_type = mommy.make(models.ZoneType, type=u"department")
+        departement_type = mommy.make(models.ZoneType, type="department")
         departement1 = mommy.make(models.Zone, parent=region1, type=departement_type)
         departement2 = mommy.make(models.Zone, parent=region2, type=departement_type)
 
-        city1 = mommy.make(models.City, name=u"ZooPark", parent=departement1)
-        city2 = mommy.make(models.City, name=u"VodooPark", parent=departement2)
+        city1 = mommy.make(models.City, name="ZooPark", parent=departement1)
+        city2 = mommy.make(models.City, name="VodooPark", parent=departement2)
 
-        zone_group_type = mommy.make(models.ZoneType, type=u"zone_group")
+        zone_group_type = mommy.make(models.ZoneType, type="zone_group")
         zone_group = mommy.make(models.Zone, parent=None, type=zone_group_type)
 
         city1.groups.add(zone_group)
@@ -679,15 +681,15 @@ class CitySearchTest(BaseTestCase):
     def test_search_city(self):
         """search by city"""
         city = mommy.make(models.City)
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp", city=city)
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCDEFGH", email=u"toto1@toto.fr")
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP")
+        entity1 = mommy.make(models.Entity, name="My tiny corp", city=city)
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCDEFGH", email="toto1@toto.fr")
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP")
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", city=city)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", city=city)
 
-        entity3 = mommy.make(models.Entity, name=u"The big Org", email=u"toto2@toto.fr")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC")
+        entity3 = mommy.make(models.Entity, name="The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="ABCABC")
 
         url = reverse('search')
 
@@ -713,28 +715,28 @@ class AddressSearchTest(BaseTestCase):
     def test_search_address(self):
         """search by city"""
         city = mommy.make(models.City)
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp", city=city, address=u"rue Paul Mc Cartney")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCDEFGH", email=u"toto1@toto.fr")
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKLMNOP")
+        entity1 = mommy.make(models.Entity, name="My tiny corp", city=city, address="rue Paul Mc Cartney")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCDEFGH", email="toto1@toto.fr")
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKLMNOP")
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = mommy.make(
-            models.Contact, entity=entity2, lastname=u"WXYZ", city=city, address=u"rue Jean-Paul Belmondo"
+            models.Contact, entity=entity2, lastname="WXYZ", city=city, address="rue Jean-Paul Belmondo"
         )
 
-        entity3 = mommy.make(models.Entity, name=u"The big Org", email=u"toto2@toto.fr")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC")
+        entity3 = mommy.make(models.Entity, name="The big Org", email="toto2@toto.fr")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="ABCABC")
 
         entity5 = mommy.make(models.Entity, is_single_contact=True)
         contact5 = entity5.default_contact
-        contact5.lastname = u"QWERTYUIOP"
-        contact5.address = u"lot appaulou"
+        contact5.lastname = "QWERTYUIOP"
+        contact5.address = "lot appaulou"
         contact5.city = city
         contact5.save()
 
         url = reverse('search')
 
-        data = {"gr0-_-address-_-0": u'Paul'}
+        data = {"gr0-_-address-_-0": 'Paul'}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)

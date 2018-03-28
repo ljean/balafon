@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -39,7 +41,7 @@ def edit_profile(request):
         if form.is_valid():
             #save contact
             form.save()
-            messages.add_message(request, messages.SUCCESS, _(u"Your profile has been updated."))
+            messages.add_message(request, messages.SUCCESS, _("Your profile has been updated."))
             return HttpResponseRedirect(reverse('homepage'))
     else:
         form = profile_form_class(instance=profile.contact)
@@ -85,20 +87,18 @@ def post_message(request):
                 content = t.render(Context(data))
                 
                 email = EmailMessage(
-                    _(u"Message from web site"), content, from_email,
+                    _("Message from web site"), content, from_email,
                     [notification_email], headers = {'Reply-To': profile.contact.email})
                 try:
                     email.send()
-                    messages.add_message(request, messages.SUCCESS,
-                        _(u"The message have been sent"))
-                except Exception, msg:
-                    messages.add_message(request, messages.ERROR,
-                        _(u"The message couldn't be send."))
+                    messages.add_message(request, messages.SUCCESS, _("The message have been sent"))
+                except Exception:
+                    messages.add_message(request, messages.ERROR, _("The message couldn't be send."))
                     
-            #add an action
-            message_action, _is_new = ActionType.objects.get_or_create(name=_(u'Message'))
-            action = Action.objects.create(
-                subject=_(u"New message on web site"), planned_date=now_rounded(),
+            # add an action
+            message_action, _is_new = ActionType.objects.get_or_create(name=_('Message'))
+            Action.objects.create(
+                subject=_("New message on web site"), planned_date=now_rounded(),
                 type=message_action, detail=message, contact=profile.contact, display_on_board=True
             )
         
@@ -160,7 +160,7 @@ class AcceptNewsletterRegistrationView(RegistrationView):
 
         subscription_types = data.get('subscription_types', None)
 
-        user.contactprofile.subscriptions_ids = u",".join([str(s.id) for s in subscription_types])
+        user.contactprofile.subscriptions_ids = ",".join([str(s.id) for s in subscription_types])
         user.contactprofile.save()
 
         return user
@@ -170,7 +170,7 @@ class AcceptNewsletterActivationView(ActivationView):
 
     def activate(self, request, *args, **kwargs):
         activated_user = super(AcceptNewsletterActivationView, self).activate(request, *args, **kwargs)
-        #The account has been activated: We can create the corresponding contact in Balafon
+        # The account has been activated: We can create the corresponding contact in Balafon
         if activated_user:
             profile = create_profile_contact(activated_user)
             notify_registration(profile)

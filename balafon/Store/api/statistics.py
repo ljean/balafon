@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+from __future__ import unicode_literals
+
 from decimal import Decimal
 from datetime import date, datetime, time, timedelta
 
@@ -15,7 +17,6 @@ from balafon.Store.models import (
     SaleItem, StoreItem, StoreItemCategory, StoreItemTag, SaleAnalysisCode
 )
 from balafon.Store.api import get_staff_api_permissions, serializers
-
 
 
 class SalesStatisticsBaseView(APIView):
@@ -204,7 +205,7 @@ class TotalSalesView(SalesStatisticsBaseView):
 
     def get_object_icon(self, obj):
         """return object name"""
-        return u'piggy-bank'
+        return 'piggy-bank'
 
     def get_object_sale_items(self, obj, date_from, date_to):
         """return sales for an objects for the given period (a cell of the statistic array)"""

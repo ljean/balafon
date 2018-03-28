@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+from __future__ import unicode_literals
+
 import xlrd
 import xlwt
 
@@ -35,13 +37,13 @@ class StockXlsView(XlsBaseView):
     def do_fill_workbook(self, workbook):
         """export to excel all articles tin stock"""
 
-        sheet = workbook.add_sheet(_(u"Stock"))
+        sheet = workbook.add_sheet(_("Stock"))
 
         line = 0
 
         columns = [
-            _(u'Id'), _(u'Name'), _(u'Category'), _(u'Purchase price'), _(u"Stock count"), _(u'Stock threshold'),
-            _(u'Value'),
+            _('Id'), _('Name'), _('Category'), _('Purchase price'), _("Stock count"), _('Stock threshold'),
+            _('Value'),
         ]
 
         for col, label in enumerate(columns):
@@ -50,7 +52,7 @@ class StockXlsView(XlsBaseView):
         for line, item in enumerate(self.get_store_items()):
             sheet.write(line + 1, 0, item.id)
             sheet.write(line + 1, 1, item.name)
-            sheet.write(line + 1, 2, u'{0}'.format(item.category) if item.category else '')
+            sheet.write(line + 1, 2, '{0}'.format(item.category) if item.category else '')
             sheet.write(line + 1, 3, item.purchase_price if item.purchase_price else 0)
             sheet.write(line + 1, 4, '' if item.stock_count is None else item.stock_count)
             sheet.write(line + 1, 5, '' if item.stock_count is None else item.stock_threshold)
@@ -75,7 +77,7 @@ class StoreXlsCatalogueView(XlsBaseView):
     def do_fill_workbook(self, workbook):
         """implement it in base class"""
 
-        sheet = workbook.add_sheet(_(u'Catalogue'))
+        sheet = workbook.add_sheet(_('Catalogue'))
 
         try:
             category_id = int(self.kwargs.get('category_id', 0))
@@ -87,8 +89,8 @@ class StoreXlsCatalogueView(XlsBaseView):
             queryset = queryset.filter(category=category_id)
 
         columns = [
-            _(u'Name'), _(u'Category'), _(u'Brand'), _(u"VAT inclusive price"), _(u'Reference'),
-            _(u'certificates'),
+            _('Name'), _('Category'), _('Brand'), _("VAT inclusive price"), _('Reference'),
+            _('certificates'),
         ]
 
         for col, label in enumerate(columns):
@@ -101,7 +103,7 @@ class StoreXlsCatalogueView(XlsBaseView):
             self.write_cell(sheet, line + 1, 3, store_item.vat_incl_price())
             self.write_cell(sheet, line + 1, 4, store_item.reference)
             self.write_cell(
-                sheet, line + 1, 5, u','.join(
+                sheet, line + 1, 5, ','.join(
                     [certificate.name for certificate in store_item.certificates.all()]
                 )
             )
@@ -113,7 +115,7 @@ class StoreItemXlsView(XlsBaseView):
     def do_fill_workbook(self, workbook):
         """implement it in base class"""
 
-        sheet = workbook.add_sheet(_(u'Articles'))
+        sheet = workbook.add_sheet(_('Articles'))
 
         try:
             category_id = int(self.kwargs.get('category_id', 0))
@@ -133,8 +135,8 @@ class StoreItemXlsView(XlsBaseView):
             queryset = queryset.filter(supplier=supplier_id)
 
         columns = [
-            _(u'Name'), _(u'Famille'), _(u'Category'), _(u'Brand'), _(u"TTC"), _(u"HT"), _('TVA'), _("Available"),
-            _(u'Supplier'), _(u'Reference'), _(u'certificates'),
+            _('Name'), _('Famille'), _('Category'), _('Brand'), _("TTC"), _("HT"), _('TVA'), _("Available"),
+            _('Supplier'), _('Reference'), _('certificates'),
         ]
 
         for col, label in enumerate(columns):
@@ -149,11 +151,11 @@ class StoreItemXlsView(XlsBaseView):
             self.write_cell(sheet, line + 1, 4, store_item.vat_incl_price())
             self.write_cell(sheet, line + 1, 5, store_item.pre_tax_price)
             self.write_cell(sheet, line + 1, 6, str(store_item.vat_rate) if store_item.vat_rate else '')
-            self.write_cell(sheet, line + 1, 7, _(u'Yes') if store_item.available else _(u'No'))
+            self.write_cell(sheet, line + 1, 7, _('Yes') if store_item.available else _('No'))
             self.write_cell(sheet, line + 1, 8, store_item.supplier.name if store_item.supplier else '')
             self.write_cell(sheet, line + 1, 9, store_item.reference)
             self.write_cell(
-                sheet, line + 1, 10, u','.join(
+                sheet, line + 1, 10, ','.join(
                     [certificate.name for certificate in store_item.certificates.all()]
                 )
             )

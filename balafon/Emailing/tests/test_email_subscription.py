@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test subscription"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import date
 

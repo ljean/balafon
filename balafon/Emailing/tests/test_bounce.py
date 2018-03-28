@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test mandrill webhooks"""
 
+from __future__ import unicode_literals
+
 import datetime
 import json
 from unittest import skipIf

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """templatetags library"""
 
+from __future__ import unicode_literals
+
 from datetime import date, datetime
 
 from django import template
@@ -17,15 +19,17 @@ register = template.Library()
 def seq_to_br(seq):
     """return sequence items separated by br html tags"""
     if seq:
-        return mark_safe(u"<br>".join([unicode(x) for x in seq]))
-    return mark_safe(u"&nbsp;")
+        return mark_safe("<br>".join(['{0}'.format(x) for x in seq]))
+    return mark_safe("&nbsp;")
+
 
 @register.filter
 def seq_to_dash(seq):
     """return sequence items separated by dashes"""
     if seq:
-        return mark_safe(u" - ".join(seq))
-    return mark_safe(u"&nbsp;")
+        return mark_safe(" - ".join(seq))
+    return mark_safe("&nbsp;")
+
 
 @register.filter
 def is_today(date_time):
@@ -40,8 +44,8 @@ def is_today(date_time):
 def cut_null_hour(value):
     """remove the hour if 00:00"""
     try:
-        date_and_hour = value.split(u" ")
-        date_, hour_ = u' '.join(date_and_hour[:-1]), date_and_hour[-1]
+        date_and_hour = value.split(" ")
+        date_, hour_ = ' '.join(date_and_hour[:-1]), date_and_hour[-1]
         if hour_ == "00:00":
             return date_
     except ValueError:
@@ -62,7 +66,7 @@ def get_action_date_label(action):
 @register.filter
 def custom_field(instance, field_name):
     """access a custom field value"""
-    return getattr(instance, 'custom_field_'+field_name)
+    return getattr(instance, 'custom_field_' + field_name)
     
 
 class IncludeNode(template.Node):
@@ -92,7 +96,7 @@ def try_to_include(parser, token):
     try:
         tag_name, template_name = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
+        raise template.TemplateSyntaxError("{0} tag requires a single argument".format(token.contents.split()[0]))
 
     return IncludeNode(template_name[1:-1])
 
@@ -101,9 +105,9 @@ def try_to_include(parser, token):
 def split_lines(lines, nb=1):
     """split in lines"""
     try:
-        return u"\n".join(lines.splitlines()[:nb])
+        return "\n".join(lines.splitlines()[:nb])
     except Exception:
-        return u""
+        return ""
 
 
 class MenuActionUrlNode(template.Node):
@@ -121,7 +125,7 @@ class MenuActionUrlNode(template.Node):
             obj, attr = self.action_id_var.split('.')
             action_id = getattr(context[obj], attr)
 
-        except (ValueError, KeyError, AttributeError), exc:
+        except (ValueError, KeyError, AttributeError) as exc:
             logger.error('MenuActionUrl: {0}', exc)
             return ''
 
@@ -146,7 +150,7 @@ def menu_action_url(parser, token):
     try:
         tag_name, view_name_var, action_id_var = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError, "menu_action_url tag requires view_name and action_id"
+        raise template.TemplateSyntaxError("menu_action_url tag requires view_name and action_id")
     return MenuActionUrlNode(view_name_var, action_id_var)
 
 

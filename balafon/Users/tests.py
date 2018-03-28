@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, date, timedelta
 import json
 import logging

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """about actions : something you do with a contact or an entity"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -172,7 +174,7 @@ def view_entity_actions(request, entity_id, set_id):
         title = action_set.name
     else:
         filters.append(Q(type__set=None))
-        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _(u"Actions")
+        title = _("Other kind of actions") if models.ActionSet.objects.count() else _("Actions")
 
     actions = models.Action.objects.filter(
         Q(entity=entity) | Q(contact__entity=entity) | Q(opportunity__entity=entity), *filters
@@ -207,7 +209,7 @@ def view_contact_actions(request, contact_id, set_id):
         title = action_set.name
     else:
         filters.append(Q(type__set=None))
-        title = _(u"Other kind of actions") if models.ActionSet.objects.count() else _(u"Actions")
+        title = _("Other kind of actions") if models.ActionSet.objects.count() else _("Actions")
 
     actions = contact.action_set.filter(*filters).order_by("planned_date", "priority")
     page_obj = paginate(request, actions, 50)
@@ -349,7 +351,7 @@ def delete_action(request, action_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Are you sure to delete this action?'),
+            'message': _('Are you sure to delete this action?'),
             'action_url': reverse("crm_delete_action", args=[action_id]),
         },
         context_instance=RequestContext(request)
@@ -417,7 +419,7 @@ def reassign_action(request, action_id):
     else:
         form = forms.SelectContactOrEntityForm()
 
-    title = _(u'Reassign {0}'.format(action.type.name.lower()) if action.type else _(u'action'))
+    title = _('Reassign {0}'.format(action.type.name.lower()) if action.type else _('action'))
     return render_to_response(
         'Crm/popup_reassign_action.html',
         {'form': form, 'action': action, 'title': title},
@@ -469,7 +471,7 @@ def remove_contact_from_action(request, action_id, contact_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you to remove {0} from this action?').format(contact),
+            'message': _('Do you to remove {0} from this action?').format(contact),
             'action_url': reverse("crm_remove_contact_from_action", args=[action_id, contact_id]),
         },
         context_instance=RequestContext(request)
@@ -520,7 +522,7 @@ def remove_entity_from_action(request, action_id, entity_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you to remove {0} from this action?').format(entity),
+            'message': _('Do you to remove {0} from this action?').format(entity),
             'action_url': reverse("crm_remove_entity_from_action", args=[action_id, entity_id]),
         },
         context_instance=RequestContext(request)
@@ -631,7 +633,7 @@ def mailto_action(request, action_id):
     # Remove duplicates and empty and soty in alphabetical order
     emails = list(sorted(set([email for email in emails if email])))
 
-    mailto = u'mailto:'
+    mailto = 'mailto:'
     if mailto_settings.bcc:
         mailto += '?bcc='
     mailto += ','.join(emails)

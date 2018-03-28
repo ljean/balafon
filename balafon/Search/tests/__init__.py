@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """search test package"""
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 

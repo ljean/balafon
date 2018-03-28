@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -43,20 +45,20 @@ class AddressOverloadTest(BaseTestCase):
         city2 = mommy.make(models.City, name='city2')
 
         entity_address = {
-            'address': u'rue Jules Rimet',
-            'address2': u'lot du stade',
-            'address2': u'cité St-Laurent',
-            'cedex': u'Cedex 2',
-            'zip_code': u'12345',
+            'address': 'rue Jules Rimet',
+            'address2': 'lot du stade',
+            'address2': 'cité St-Laurent',
+            'cedex': 'Cedex 2',
+            'zip_code': '12345',
             'city': city1,
         }
 
         contact_address = {
-            'address': u'',
-            'address2': u'',
-            'address2': u'',
-            'cedex': u'',
-            'zip_code': u'',
+            'address': '',
+            'address2': '',
+            'address2': '',
+            'cedex': '',
+            'zip_code': '',
             'city': None,
         }
 
@@ -72,19 +74,19 @@ class AddressOverloadTest(BaseTestCase):
         city2 = mommy.make(models.City, name='city2')
 
         entity_address = {
-            'address': u'rue Jules Rimet',
-            'address2': u'lot du stade',
-            'address2': u'cité St-Laurent',
-            'cedex': u'Cedex 2',
+            'address': 'rue Jules Rimet',
+            'address2': 'lot du stade',
+            'address2': 'cité St-Laurent',
+            'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
         }
 
         contact_address = {
-            'address': u'rue des tilleuls',
-            'address2': u'lot des arbres',
-            'address2': u'verrerie',
-            'cedex': u'Cedex 3',
+            'address': 'rue des tilleuls',
+            'address2': 'lot des arbres',
+            'address2': 'verrerie',
+            'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
         }
@@ -101,26 +103,26 @@ class AddressOverloadTest(BaseTestCase):
         city2 = mommy.make(models.City, name='city2')
 
         entity_address = {
-            'address': u'rue Jules Rimet',
-            'address2': u'lot du stade',
-            'address2': u'cité St-Laurent',
-            'cedex': u'Cedex 2',
+            'address': 'rue Jules Rimet',
+            'address2': 'lot du stade',
+            'address2': 'cité St-Laurent',
+            'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
         }
 
         base_contact_address = {
-            'address': u'rue des tilleuls',
-            'address2': u'lot des arbres',
-            'address2': u'verrerie',
-            'cedex': u'Cedex 3',
+            'address': 'rue des tilleuls',
+            'address2': 'lot des arbres',
+            'address2': 'verrerie',
+            'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
         }
 
         for (key, value) in base_contact_address.items():
             #create a dict with same keys but blank values
-            contact_address = dict([(k, u'') for k in base_contact_address.keys()])
+            contact_address = dict([(k, '') for k in base_contact_address.keys()])
             contact_address[key] = value
             if key != 'city':
                 contact_address['city'] = None
@@ -158,7 +160,7 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(john_doe.lastname, "Doe")
         self.assertEqual(john_doe.firstname, "John")
         self.assertEqual(john_doe.entity.is_single_contact, True)
-        self.assertEqual(john_doe.entity.name, u"doe john")
+        self.assertEqual(john_doe.entity.name, "doe john")
 
     def test_add_single_contact_existing_city(self):
         url = reverse('crm_add_single_contact')
@@ -650,9 +652,9 @@ class EditContactTest(BaseTestCase):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pepe@mémé.fr"
+            'lastname': 'Mémé',
+            'firstname': 'Pépé',
+            "email": "pepe@mémé.fr"
         }
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
@@ -671,9 +673,9 @@ class EditContactTest(BaseTestCase):
         c = mommy.make(models.Contact)
         url = reverse('crm_edit_contact', args=[c.id])
         data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pépé@mémé.fr"
+            'lastname': 'Mémé',
+            'firstname': 'Pépé',
+            "email": "pépé@mémé.fr"
         }
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
@@ -685,12 +687,12 @@ class EditContactTest(BaseTestCase):
         self.assertNotEqual(c.firstname, data['firstname'])
         self.assertNotEqual(c.email, data['email'])
 
-    @override_settings(SECRET_KEY=u"super-héros")
+    @override_settings(SECRET_KEY="super-héros")
     def test_create_contact_uuid(self):
         data = {
-            'lastname': u'Mémé',
-            'firstname': u'Pépé',
-            "email": u"pepe@mémé.fr"
+            'lastname': 'Mémé',
+            'firstname': 'Pépé',
+            "email": "pepe@mémé.fr"
         }
         c = mommy.make(models.Contact, **data)
 
@@ -871,15 +873,15 @@ class EditContactSameAsTest(BaseTestCase):
 
     def test_edit_contact_invalid(self):
         """view edit contact form"""
-        same_contact = mommy.make(models.Contact, lastname=u'Dupond', firstname=u'Paul', email=u'contact@abc.fr')
+        same_contact = mommy.make(models.Contact, lastname='Dupond', firstname='Paul', email='contact@abc.fr')
 
         contact = mommy.make(models.Contact, lastname='', firstname='', email='')
         url = reverse('crm_edit_contact', args=[contact.id])
 
         data = {
-            'lastname': u'Durand',
-            'firstname': u'Pierre',
-            'email': u'contact@def.fr',
+            'lastname': 'Durand',
+            'firstname': 'Pierre',
+            'email': 'contact@def.fr',
             'same_as_suggestions': same_contact.id
         }
         response = self.client.post(url, data=data)
@@ -906,9 +908,9 @@ class EditContactSameAsTest(BaseTestCase):
         url = reverse('crm_edit_contact', args=[contact.id])
 
         data = {
-            'lastname': u'Durand',
-            'firstname': u'Pierre',
-            'email': u'contact@def.fr',
+            'lastname': 'Durand',
+            'firstname': 'Pierre',
+            'email': 'contact@def.fr',
             'same_as_suggestions': "hjkhk"
         }
         response = self.client.post(url, data=data)
@@ -931,9 +933,9 @@ class EditContactSameAsTest(BaseTestCase):
         url = reverse('crm_edit_contact', args=[contact.id])
 
         data = {
-            'lastname': u'Durand',
-            'firstname': u'Pierre',
-            'email': u'contact@def.fr',
+            'lastname': 'Durand',
+            'firstname': 'Pierre',
+            'email': 'contact@def.fr',
             'same_as_suggestions': contact.id + 1
         }
         response = self.client.post(url, data=data)

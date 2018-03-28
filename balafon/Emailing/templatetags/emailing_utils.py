@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django import template
-register = template.Library()
 from django.core.urlresolvers import reverse
-from django.conf import settings
+
+register = template.Library()
+
 
 class EmailTrackingEditNode(template.Node):
     
@@ -12,8 +15,9 @@ class EmailTrackingEditNode(template.Node):
         contact = context.get('contact', None)
         if emailing and contact:
             tracking_url = reverse("emailing_email_tracking", args=[emailing.id, contact.uuid])
-            return u'<img src="{0}" />'.format(tracking_url)
-        return u"<!-- tracking -->"
+            return '<img src="{0}" />'.format(tracking_url)
+        return '<!-- tracking -->'
+
 
 @register.tag
 def email_tracking(parser, token):
@@ -22,4 +26,4 @@ def email_tracking(parser, token):
 
 @register.filter
 def dir_debug(obj):
-    return unicode(dir(obj))
+    return '{0}'.format(dir(obj))

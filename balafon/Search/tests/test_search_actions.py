@@ -2,6 +2,8 @@
 """test search actions"""
 #pylint: disable=too-many-locals
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
@@ -18,27 +20,27 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_type_entities(self):
         """search by action type. Action is set on the entities"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
-        action_type = mommy.make(models.ActionType, name=u"my action type")
+        action_type = mommy.make(models.ActionType, name="my action type")
         action = mommy.make(models.Action, type=action_type)
         action.entities.add(entity1)
         action.entities.add(entity2)
         action.save()
 
-        another_action_type = mommy.make(models.ActionType, name=u"another action type")
+        another_action_type = mommy.make(models.ActionType, name="another action type")
         action = mommy.make(models.Action, type=another_action_type)
         action.entities.add(entity3)
         action.save()
@@ -66,21 +68,21 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_type_contacts(self):
         """search by action type: Action is set on contact"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
-        action_type = mommy.make(models.ActionType, name=u"my action type")
+        action_type = mommy.make(models.ActionType, name="my action type")
         action = mommy.make(models.Action, type=action_type)
         action.contacts.add(contact1)
         action.contacts.add(contact3)
@@ -90,7 +92,7 @@ class ActionSearchTest(BaseTestCase):
         action.contacts.add(contact2)
         action.save()
 
-        another_action_type = mommy.make(models.ActionType, name=u"another action type")
+        another_action_type = mommy.make(models.ActionType, name="another action type")
         action = mommy.make(models.Action, type=another_action_type)
         action.contacts.add(contact5)
         action.save()
@@ -118,21 +120,21 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_type_both(self):
         """search by action type: action on contacts and entities"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
-        action_type = mommy.make(models.ActionType, name=u"my action type")
+        action_type = mommy.make(models.ActionType, name="my action type")
         action = mommy.make(models.Action, type=action_type)
         action.contacts.add(contact1)
         action.contacts.add(contact3)
@@ -142,7 +144,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity2)
         action.save()
 
-        another_action_type = mommy.make(models.ActionType, name=u"another action type")
+        another_action_type = mommy.make(models.ActionType, name="another action type")
         action = mommy.make(models.Action, type=another_action_type)
         action.contacts.add(contact5)
         action.entities.add(entity3)
@@ -171,19 +173,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_subject_both(self):
         """search by action subject for contacts and entities"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, subject="Hello world")
         action.contacts.add(contact1)
@@ -222,19 +224,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_in_progress_both(self):
         """search by action status"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, done=False)
         action.contacts.add(contact1)
@@ -250,7 +252,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -277,19 +279,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_no_action_in_progress_both(self):
         """search by no action in progress"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, done=False)
         action.contacts.add(contact1)
@@ -305,7 +307,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         for contact in (contact1, contact2, contact4, contact5, contact7):
             contact.entity.default_contact.delete()
@@ -335,19 +337,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_has_action(self):
         """search contacts with actions"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, done=False)
         action.contacts.add(contact1)
@@ -363,7 +365,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         for contact in (contact1, contact2, contact4, contact5, contact7):
             contact.entity.default_contact.delete()
@@ -396,19 +398,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_no_action(self):
         """search contacts without actions"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, done=False)
         action.contacts.add(contact1)
@@ -424,7 +426,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         for contact in (contact1, contact2, contact4, contact5, contact7):
             contact.entity.default_contact.delete()
@@ -457,19 +459,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_done_date_both(self):
         """search by action done date"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, done=True)
         action.contacts.add(contact1)
@@ -486,7 +488,7 @@ class ActionSearchTest(BaseTestCase):
         action.done_date = datetime.now() - timedelta(10)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -494,7 +496,7 @@ class ActionSearchTest(BaseTestCase):
         dt2 = datetime.now() + timedelta(1)
 
         data = {
-            "gr0-_-action_by_done_date-_-0": u"{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
+            "gr0-_-action_by_done_date-_-0": "{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
         }
 
         response = self.client.post(url, data=data)
@@ -521,19 +523,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_planned_date_both(self):
         """search by action planned date"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, planned_date=datetime.now(), end_datetime=datetime.now())
         action.contacts.add(contact1)
@@ -552,7 +554,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -560,7 +562,7 @@ class ActionSearchTest(BaseTestCase):
         dt2 = datetime.now() + timedelta(1)
 
         data = {
-            "gr0-_-action_by_planned_date-_-0": u"{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
+            "gr0-_-action_by_planned_date-_-0": "{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
         }
 
         response = self.client.post(url, data=data)
@@ -587,20 +589,20 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_by_planned_end_contacts(self):
         """search by no action in planned date"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact7 = mommy.make(models.Contact, entity=entity1, lastname=u"ZXWV", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, entity=entity1, lastname="ZXWV", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(
             models.Action, planned_date=datetime(2014, 4, 5, 10, 0), end_datetime=datetime(2014, 4, 15, 10, 0))
@@ -643,7 +645,7 @@ class ActionSearchTest(BaseTestCase):
         action.contacts.add(contact7)
         action.save()
 
-        contact8 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact8 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -651,7 +653,7 @@ class ActionSearchTest(BaseTestCase):
         dt2 = datetime(2014, 4, 11)
 
         data = {
-            "gr0-_-action_by_planned_date-_-0": u"{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
+            "gr0-_-action_by_planned_date-_-0": "{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
         }
 
         response = self.client.post(url, data=data)
@@ -672,14 +674,14 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_by_planned_end_entities(self):
         """earch by planned date: entiy actions"""
-        entity1 = mommy.make(models.Entity, name=u"#ENTITY-1#")
-        entity2 = mommy.make(models.Entity, name=u"#ENTITY-2#")
-        entity3 = mommy.make(models.Entity, name=u"#ENTITY-3#")
-        entity4 = mommy.make(models.Entity, name=u"#ENTITY-4#")
-        entity5 = mommy.make(models.Entity, name=u"#ENTITY-5#")
-        entity6 = mommy.make(models.Entity, name=u"#ENTITY-6#")
-        entity7 = mommy.make(models.Entity, name=u"#ENTITY-7#")
-        entity8 = mommy.make(models.Entity, name=u"#ENTITY-8#")
+        entity1 = mommy.make(models.Entity, name="#ENTITY-1#")
+        entity2 = mommy.make(models.Entity, name="#ENTITY-2#")
+        entity3 = mommy.make(models.Entity, name="#ENTITY-3#")
+        entity4 = mommy.make(models.Entity, name="#ENTITY-4#")
+        entity5 = mommy.make(models.Entity, name="#ENTITY-5#")
+        entity6 = mommy.make(models.Entity, name="#ENTITY-6#")
+        entity7 = mommy.make(models.Entity, name="#ENTITY-7#")
+        entity8 = mommy.make(models.Entity, name="#ENTITY-8#")
 
         action = mommy.make(
             models.Action, planned_date=datetime(2014, 4, 5, 10, 0), end_datetime=datetime(2014, 4, 15, 10, 0)
@@ -729,7 +731,7 @@ class ActionSearchTest(BaseTestCase):
         dt2 = datetime(2014, 4, 11)
 
         data = {
-            "gr0-_-action_by_planned_date-_-0": u"{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
+            "gr0-_-action_by_planned_date-_-0": "{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
         }
 
         response = self.client.post(url, data=data)
@@ -750,19 +752,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_start_both(self):
         """search by action start date"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, planned_date=datetime.now())
         action.contacts.add(contact1)
@@ -781,7 +783,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -789,7 +791,7 @@ class ActionSearchTest(BaseTestCase):
         dt2 = datetime.now() + timedelta(1)
 
         data = {
-            "gr0-_-action_by_start_date-_-0": u"{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
+            "gr0-_-action_by_start_date-_-0": "{0} {1}".format(dt1.strftime("%d/%m/%Y"), dt2.strftime("%d/%m/%Y"))
         }
 
         response = self.client.post(url, data=data)
@@ -816,19 +818,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_in_charge_both(self):
         """search by action in charge"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         user1 = mommy.make(models.TeamMember)
         user2 = mommy.make(models.TeamMember)
@@ -850,7 +852,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -880,19 +882,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_amount_gte_both(self):
         """search by action amount greater than"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, amount=20)
         action.contacts.add(contact1)
@@ -911,7 +913,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -941,19 +943,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_by_amout_lt_both(self):
         """seacrh by action amount less than"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         action = mommy.make(models.Action, amount=10)
         action.contacts.add(contact1)
@@ -972,7 +974,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -1002,19 +1004,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_status_both(self):
         """search by action status"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         status1 = mommy.make(models.ActionStatus)
         status2 = mommy.make(models.ActionStatus)
@@ -1036,7 +1038,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -1066,19 +1068,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_opportunity_both(self):
         """search by action opportunity"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         opportunity1 = mommy.make(models.Opportunity)
         opportunity2 = mommy.make(models.Opportunity)
@@ -1100,7 +1102,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -1130,19 +1132,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_opportunity_name_both(self):
         """search by action opprtunities; contacts and entities"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         opportunity1 = mommy.make(models.Opportunity, name="ABCD")
         opportunity2 = mommy.make(models.Opportunity, name="BCDA")
@@ -1165,7 +1167,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -1195,19 +1197,19 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_without_status(self):
         """search by action status"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname="EFGH", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"A big big corp")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="MNOP", main_contact=True, has_left=False)
 
-        entity4 = mommy.make(models.Entity, name=u"A huge corp")
-        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+        entity4 = mommy.make(models.Entity, name="A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname="RSTU", main_contact=True, has_left=False)
 
         status1 = mommy.make(models.ActionStatus)
         status2 = mommy.make(models.ActionStatus)
@@ -1229,7 +1231,7 @@ class ActionSearchTest(BaseTestCase):
         action.entities.add(entity3)
         action.save()
 
-        contact7 = mommy.make(models.Contact, lastname=u"@!+=", main_contact=True, has_left=False)
+        contact7 = mommy.make(models.Contact, lastname="@!+=", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -1259,11 +1261,11 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_multi_criteria(self):
         """search by action status"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
 
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         type1 = mommy.make(models.ActionType)
         type2 = mommy.make(models.ActionType)
@@ -1288,7 +1290,7 @@ class ActionSearchTest(BaseTestCase):
         data = {
             "gr0-_-action_status-_-0": status1.id,
             "gr0-_-action_type-_-1": type1.id,
-            "gr0-_-action_by_planned_date-_-2": u"15/06/2016 22/06/2016"
+            "gr0-_-action_by_planned_date-_-2": "15/06/2016 22/06/2016"
         }
 
         response = self.client.post(url, data=data)
@@ -1303,10 +1305,10 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_multi_criteria_without_status(self):
         """search by action status"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
-        contact4 = mommy.make(models.Contact, lastname=u"MNOP", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname="MNOP", main_contact=True, has_left=False)
 
         type1 = mommy.make(models.ActionType)
         type2 = mommy.make(models.ActionType)
@@ -1350,10 +1352,10 @@ class ActionSearchTest(BaseTestCase):
 
     def test_search_action_multi_group(self):
         """search by action status"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCDEF", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGHIJ", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKLMN", main_contact=True, has_left=False)
-        contact4 = mommy.make(models.Contact, lastname=u"MNOPQR", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCDEF", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGHIJ", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKLMN", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname="MNOPQR", main_contact=True, has_left=False)
 
         type1 = mommy.make(models.ActionType)
         type2 = mommy.make(models.ActionType)
@@ -1382,10 +1384,10 @@ class ActionSearchTest(BaseTestCase):
         data = {
             "gr0-_-action_status-_-0": status1.id,
             "gr0-_-action_type-_-1": type1.id,
-            "gr0-_-action_by_planned_date-_-2": u"15/06/2016 22/06/2016",
+            "gr0-_-action_by_planned_date-_-2": "15/06/2016 22/06/2016",
             "gr1-_-action_status-_-0": status1.id,
             "gr1-_-action_type-_-1": type1.id,
-            "gr1-_-action_by_planned_date-_-2": u"15/06/2015 22/06/2015"
+            "gr1-_-action_by_planned_date-_-2": "15/06/2015 22/06/2015"
         }
 
         response = self.client.post(url, data=data)

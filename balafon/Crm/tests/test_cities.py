@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.conf import settings
@@ -44,10 +46,10 @@ class CitiesSuggestListTestCase(BaseTestCase):
         self.assertNotContains(response, city2.id)
 
     def test_get_city_id_unicode(self):
-        response = self.client.get(u"{0}?name=Mérignac".format(reverse('crm_get_city_id')))
+        response = self.client.get("{0}?name=Mérignac".format(reverse('crm_get_city_id')))
         self.assertEqual(200, response.status_code)
         data = json.loads(response.content)
-        self.assertEqual(data["id"], u"Mérignac")
+        self.assertEqual(data["id"], "Mérignac")
 
     def test_get_city_id_case_insensitive_twice(self):
         city = mommy.make(models.City, name="abcd", parent=self.parent)

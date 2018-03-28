@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 import xlrd
 
 from django.contrib.auth.models import User
@@ -10,7 +12,6 @@ from django.core.urlresolvers import reverse
 from model_mommy import mommy
 
 from balafon.Store import models
-from balafon.Store.admin import StockThresholdFilter, StoreItemAdmin
 
 
 class CatalogueTest(TestCase):

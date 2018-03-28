@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """duplicates searches"""
 
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.core.urlresolvers import reverse
@@ -39,7 +41,7 @@ class SearchTest(BaseTestCase):
     def test_search_contact(self):
         """search by name"""
         """search by name"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
         response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
         self.assertEqual(200, response.status_code)
@@ -49,7 +51,7 @@ class SearchTest(BaseTestCase):
     def test_search_contact_anonymous(self):
         """search as anonymous user"""
         self.client.logout()
-        mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
         response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
         self.assertEqual(302, response.status_code)
@@ -58,7 +60,7 @@ class SearchTest(BaseTestCase):
         """search as anonymous user"""
         self.user.is_staff = False
         self.user.save()
-        mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
         response = self.client.post(reverse('search'), data={"gr0-_-contact_name-_-0": 'ABC'})
         self.assertEqual(302, response.status_code)
@@ -318,17 +320,17 @@ class HasSameAsTest(BaseTestCase):
         same_as = models.SameAs.objects.create()
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=1
         )
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=2
         )
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
         )
 
         url = reverse('search')
@@ -347,17 +349,17 @@ class HasSameAsTest(BaseTestCase):
         same_as = models.SameAs.objects.create()
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=1
         )
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=2
         )
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
         )
 
         url = reverse('search')
@@ -376,17 +378,17 @@ class HasSameAsTest(BaseTestCase):
         same_as = models.SameAs.objects.create()
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=1
         )
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False,
             same_as=same_as, same_as_priority=2
         )
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact3@email3.fr", main_contact=True, has_left=False,
         )
 
         url = reverse('search')
@@ -408,33 +410,33 @@ class SameEmailTest(BaseTestCase):
         """same as not allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCDEFG", email=u"contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCDEFG", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"EFGHIJK", email=u"contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="EFGHIJK", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKLMNO", main_contact=True, has_left=False
+            models.Contact, lastname="IJKLMNO", main_contact=True, has_left=False
         )
-        contact3.entity.email = u'contact1@email1.fr'
+        contact3.entity.email = 'contact1@email1.fr'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
         contact4 = mommy.make(
-            models.Contact, lastname=u"MNOPQRS", email=u"contact4@email1.fr",  main_contact=True, has_left=False
+            models.Contact, lastname="MNOPQRS", email="contact4@email1.fr",  main_contact=True, has_left=False
         )
         contact4.entity.default_contact.delete()
         contact4.entity.save()
 
-        group = mommy.make(models.Group, name=u"GROUP1")
+        group = mommy.make(models.Group, name="GROUP1")
         group.entities.add(contact1.entity)
         group.entities.add(contact2.entity)
         group.entities.add(contact3.entity)
@@ -464,28 +466,28 @@ class SameEmailTest(BaseTestCase):
         """same email allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCDEFG123456#", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCDEFG123456#", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"EFGHIJK456789?", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="EFGHIJK456789?", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"IJKLMNO789012$", main_contact=True, has_left=False
+            models.Contact, lastname="IJKLMNO789012$", main_contact=True, has_left=False
         )
         contact3.entity.email = 'contact1@email1.fr'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
         contact4 = mommy.make(
-            models.Contact, lastname=u"MNOPQRS135791@", email="contact4@email1.fr",  main_contact=True, has_left=False
+            models.Contact, lastname="MNOPQRS135791@", email="contact4@email1.fr",  main_contact=True, has_left=False
         )
         contact4.entity.default_contact.delete()
         contact4.entity.save()

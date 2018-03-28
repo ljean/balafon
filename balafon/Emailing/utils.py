@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """utilities"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 import re
 import sys
@@ -109,7 +111,7 @@ def patch_emailing_html(html_text, emailing, contact):
 
                 view_magic_link_url = reverse('emailing_view_link', args=[magic_link.uuid, contact.uuid])
                 magic_url = emailing.newsletter.get_site_prefix() + view_magic_link_url
-                html_text = html_text.replace(u'href="{0}"'.format(link), u'href="{0}"'.format(magic_url))
+                html_text = html_text.replace('href="{0}"'.format(link), 'href="{0}"'.format(magic_url))
             else:
                 if 'test' not in sys.argv:
                     logger.warning(
@@ -122,7 +124,7 @@ def send_newsletter(emailing, max_nb):
     """send newsletter"""
 
     # Create automatically an action type for logging one action by contact
-    emailing_action_type = ActionType.objects.get_or_create(name=_(u'Emailing'))[0]
+    emailing_action_type = ActionType.objects.get_or_create(name=_('Emailing'))[0]
 
     # Clean the urls
     emailing.newsletter.content = make_links_absolute(
@@ -159,7 +161,7 @@ def send_newsletter(emailing, max_nb):
             )
             list_unsubscribe_email = getattr(settings, 'COOP_CMS_REPLY_TO', '') or from_email
             headers = {
-                "List-Unsubscribe": u"<{0}>, <mailto:{1}?subject=unsubscribe>".format(
+                "List-Unsubscribe": "<{0}>, <mailto:{1}?subject=unsubscribe>".format(
                     list_unsubscribe_url, list_unsubscribe_email
                 )
             }
@@ -177,7 +179,7 @@ def send_newsletter(emailing, max_nb):
             html_text = force_line_max_length(html_text, max_length_per_line=400, dont_cut_in_quotes=True)
             email.attach_alternative(html_text, "text/html")
             if is_mandrill_used():
-                email.tags = [u'{0}'.format(emailing.id), contact.uuid]
+                email.tags = ['{0}'.format(emailing.id), contact.uuid]
             emails.append(email)
             
             # create action
@@ -200,9 +202,9 @@ def send_newsletter(emailing, max_nb):
 
 def create_subscription_action(contact, subscriptions):
     """create action when subscribing to a list"""
-    action_type = ActionType.objects.get_or_create(name=_(u"Subscription"))[0]
+    action_type = ActionType.objects.get_or_create(name=_("Subscription"))[0]
     action = Action.objects.create(
-        subject=_(u"Subscribe to {0}").format(u", ".join(subscriptions)),
+        subject=_("Subscribe to {0}").format(", ".join(subscriptions)),
         type=action_type,
         planned_date=datetime.now(),
         display_on_board=False
@@ -229,12 +231,12 @@ def send_notification_email(request, contact, actions, message):
 
         # remove empty lines and replace any line starting with ## by a line feed
         lines = [line if line[:2] != "##" else "" for line in content.split("\n") if line]
-        content = u"\n".join(lines)
+        content = "\n".join(lines)
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
         email = EmailMessage(
-            _(u"Message from web site"), content, from_email,
+            _("Message from web site"), content, from_email,
             [notification_email], headers={'Reply-To': contact.email}
         )
 
@@ -248,12 +250,12 @@ def send_notification_email(request, contact, actions, message):
             if success:
                 messages.add_message(
                     request, messages.SUCCESS,
-                    _(u"The message have been sent")
+                    _("The message have been sent")
                 )
             else:
                 messages.add_message(
                     request, messages.ERROR,
-                    _(u"The message couldn't be send.")
+                    _("The message couldn't be send.")
                 )
 
 
@@ -263,7 +265,7 @@ def send_verification_email(contact, subscription_types=None):
     if contact.email:
 
         if subscription_types:
-            my_company = u', '.join([subscription_type.name for subscription_type in subscription_types])
+            my_company = ', '.join([subscription_type.name for subscription_type in subscription_types])
         else:
             my_company = settings.BALAFON_MY_COMPANY
 
@@ -279,7 +281,7 @@ def send_verification_email(contact, subscription_types=None):
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
         email = EmailMessage(
-            _(u'Verification of your email address'),
+            _('Verification of your email address'),
             content,
             from_email,
             [contact.email]
@@ -287,7 +289,7 @@ def send_verification_email(contact, subscription_types=None):
         try:
             email.send()
         except Exception as msg:  # pylint: disable=broad-except
-            raise EmailSendError(unicode(msg))
+            raise EmailSendError('{0}'.format(msg))
         return True
     return False
 
@@ -321,7 +323,7 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
     contacts = Contact.objects.filter(email=email)
     entities = Entity.objects.filter(email=email)
 
-    subject = u"{0} - {1}".format(email, u"{0}: {1}".format(event_type, description))
+    subject = "{0} - {1}".format(email, "{0}: {1}".format(event_type, description))
 
     action = Action.objects.create(
         subject=subject[:200],
@@ -372,29 +374,29 @@ def get_language():
 def force_line_max_length(text, max_length_per_line=400, dont_cut_in_quotes=True):
     """returns same text with end of lines inserted if lien length is greater than 400 chars"""
     out_text = ""
-    for line in text.split(u"\n"):
+    for line in text.split("\n"):
 
         if len(line) < max_length_per_line:
-            out_text += line + u"\n"
+            out_text += line + "\n"
         else:
             words = []
             line_length = 0
             quotes_count = 0
-            for word in line.split(u" "):
+            for word in line.split(" "):
                 if word:
                     words.append(word)
-                    quotes_count += word.count(u'"')
+                    quotes_count += word.count('"')
                     line_length += len(word) + 1
                     in_quotes = (quotes_count % 2) == 1  # If there are not an even number we may be inside a ""
                     if line_length > max_length_per_line:
                         if not (not dont_cut_in_quotes and in_quotes):
                             # Line is more than allowed length for a line. Enter a end line character
-                            out_line = u" ".join(words)
-                            out_text += out_line + u"\n"
+                            out_line = " ".join(words)
+                            out_text += out_line + "\n"
                             words = []
                             line_length = 0
             if words:
-                out_line = u" ".join(words)
-                out_text += out_line + u"\n"
+                out_line = " ".join(words)
+                out_text += out_line + "\n"
 
-    return out_text[:-1]   # Remove the last "\n"
+    return out_text[:-1]  # Remove the last "\n"

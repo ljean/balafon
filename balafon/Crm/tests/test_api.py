@@ -5,6 +5,8 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -156,8 +158,8 @@ class ContactOrEntityTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [
-            {'id': contact1.id, 'name': u'Allard', 'type': contact_type.id, 'city': u''},
-            {'id': entity1.id, 'name': u'Alpha', 'type': entity_type.id, 'city': u''},
+            {'id': contact1.id, 'name': 'Allard', 'type': contact_type.id, 'city': ''},
+            {'id': entity1.id, 'name': 'Alpha', 'type': entity_type.id, 'city': ''},
         ])
 
     def test_api_cities(self):
@@ -188,9 +190,9 @@ class ContactOrEntityTest(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [
-            {'id': contact2.id,'name': u'Allard', 'type': contact_type.id, 'city': city2.get_friendly_name()},
-            {'id': entity1.id, 'name': u'Alpha', 'type': entity_type.id, 'city': city1.get_friendly_name()},
-            {'id': contact3.id, 'name': u'Azerty', 'type': contact_type.id, 'city': city3.get_friendly_name()},
+            {'id': contact2.id,'name': 'Allard', 'type': contact_type.id, 'city': city2.get_friendly_name()},
+            {'id': entity1.id, 'name': 'Alpha', 'type': entity_type.id, 'city': city1.get_friendly_name()},
+            {'id': contact3.id, 'name': 'Azerty', 'type': contact_type.id, 'city': city3.get_friendly_name()},
         ])
 
     def test_api_limit(self):

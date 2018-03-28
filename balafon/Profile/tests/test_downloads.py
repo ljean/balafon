@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.conf import settings
@@ -21,40 +23,40 @@ class DownloadTestCase(BaseTestCase):
     
     def test_download_private_permission(self):
         
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
         
-        #Create group
+        # Create group
         gr = models.Group.objects.create(name="Group")
         gr.contacts.add(contact)
         gr.save()
         
-        #Create category
+        # Create category
         cat = ArticleCategory.objects.create(name="CAT")
         
-        #Create CategoryPermission
+        # Create CategoryPermission
         cat_perm = CategoryPermission.objects.create(category=cat)
         cat_perm.can_view_groups.add(gr)
         cat_perm.save()
             
-        #create a public doc
+        # create a public doc
         file = File(self._get_file())
         doc = mommy.make(Document, is_private=True, file=file, category=cat)    
         
-        #check the url
+        # check the url
         private_url = reverse('coop_cms_download_doc', args=[doc.id])
         self.assertEqual(doc.get_download_url(), private_url)
         
-        #login and download
+        # login and download
         response = self.client.get(doc.get_download_url(), follow=True)
         self.assertEqual(response.status_code, 200)
-        #self.assertEquals(response['Content-Disposition'], "attachment; filename=unittest1.txt")
+        # self.assertEquals(response['Content-Disposition'], "attachment; filename=unittest1.txt")
         self.assertEquals(response['Content-Type'], "text/plain")
-        #TODO: This change I/O Exception in UnitTest
-        #self.assertEqual(response.content, self._get_file().read()) 
+        # TODO: This change I/O Exception in UnitTest
+        # self.assertEqual(response.content, self._get_file().read())
         
-        #logout and download
+        # logout and download
         self.client.logout()
         response = self.client.get(doc.get_download_url(), follow=True)
         self.assertEqual(response.status_code, 200)
@@ -65,99 +67,99 @@ class DownloadTestCase(BaseTestCase):
         
     def test_download_private_not_in_group(self):
         
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
         
-        #Create group
+        # Create group
         gr = models.Group.objects.create(name="Group")
         # Contact is not in the group: gr.contacts.add(contact)
-        #gr.save()
+        # gr.save()
         
-        #Create category
+        # Create category
         cat = ArticleCategory.objects.create(name="CAT")
         
-        #Create CategoryPermission
+        # Create CategoryPermission
         cat_perm = CategoryPermission.objects.create(category=cat)
         cat_perm.can_view_groups.add(gr)
         cat_perm.save()
             
-        #create a public doc
+        # create a public doc
         file_ = File(self._get_file())
         doc = mommy.make(Document, is_private=True, file=file_, category=cat)
         
-        #check the url
+        # check the url
         private_url = reverse('coop_cms_download_doc', args=[doc.id])
         self.assertEqual(doc.get_download_url(), private_url)
         
-        #login and download
+        # login and download
         response = self.client.get(doc.get_download_url(), follow=True)
         self.assertEqual(response.status_code, 403)
     
     def test_download_private_group_not_allowed(self):
         
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
         
-        #Create group
+        # Create group
         gr = models.Group.objects.create(name="Group")
         gr.contacts.add(contact)
         gr.save()
         
-        #Create category
+        # Create category
         cat = ArticleCategory.objects.create(name="CAT")
         cat_perm = CategoryPermission.objects.create(category=cat)
         
-        #create a public doc
+        # create a public doc
         file = File(self._get_file())
         doc = mommy.make(Document, is_private=True, file=file, category=cat)    
         
-        #check the url
+        # check the url
         private_url = reverse('coop_cms_download_doc', args=[doc.id])
         self.assertEqual(doc.get_download_url(), private_url)
         
-        #login and download
+        # login and download
         response = self.client.get(doc.get_download_url(), follow=True)
         self.assertEqual(response.status_code, 403)
         
     def test_download_private_no_permission(self):
         
-        #Create contact for the user
+        # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
         
-        #Create category
+        # Create category
         cat = ArticleCategory.objects.create(name="CAT")
             
-        #create a public doc
+        # create a public doc
         file_ = File(self._get_file())
         doc = mommy.make(Document, is_private=True, file=file_, category=cat)
         
-        #check the url
+        # check the url
         private_url = reverse('coop_cms_download_doc', args=[doc.id])
         self.assertEqual(doc.get_download_url(), private_url)
         
-        #login and download
+        # login and download
         response = self.client.get(doc.get_download_url(), follow=True)
         self.assertEqual(response.status_code, 200)
-        #self.assertEquals(response['Content-Disposition'], "attachment; filename=unittest1.txt")
+        # self.assertEquals(response['Content-Disposition'], "attachment; filename=unittest1.txt")
         self.assertEquals(response['Content-Type'], "text/plain")
 
     def test_download_private_no_contact_defined(self):
         
-        #Create category
+        # Create category
         cat = ArticleCategory.objects.create(name="CAT")
         cat_perm = CategoryPermission.objects.create(category=cat)
             
-        #create a public doc
+        # create a public doc
         file_ = File(self._get_file())
         doc = mommy.make(Document, is_private=True, file=file_, category=cat)
         
-        #check the url
+        # check the url
         private_url = reverse('coop_cms_download_doc', args=[doc.id])
         self.assertEqual(doc.get_download_url(), private_url)
         
-        #login and download
+        # login and download
         response = self.client.get(doc.get_download_url())
         self.assertEqual(response.status_code, 403)

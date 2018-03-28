@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.conf import settings
@@ -313,7 +315,7 @@ class EditEntityTestCase(BaseTestCase):
 
         entity = models.Entity.objects.get(id=entity.id)
         self.assertEqual(entity.name, data['name'])
-        self.assertEqual(entity.notes, u'Toto')
+        self.assertEqual(entity.notes, 'Toto')
 
 
 class GetEntityIdTestCase(BaseTestCase):
@@ -329,7 +331,7 @@ class GetEntityIdTestCase(BaseTestCase):
         """return id"""
         entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
         mommy.make(models.Entity, is_single_contact=False, name='WABC')
-        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name))
+        response = self.client.get(reverse('crm_get_entity_id') + '?name={0}'.format(entity1.name))
         self.assertEqual(200, response.status_code)
         data = json.loads(response.content)
         self.assertEqual(data['id'], entity1.id)
@@ -338,13 +340,13 @@ class GetEntityIdTestCase(BaseTestCase):
         """raise Http404"""
         entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
         mommy.make(models.Entity, is_single_contact=False, name='WABC')
-        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name + 'D'))
+        response = self.client.get(reverse('crm_get_entity_id') + '?name={0}'.format(entity1.name + 'D'))
         self.assertEqual(404, response.status_code)
 
     def test_get_duplicate_entity_name(self):
         """raise Http404"""
         entity1 = mommy.make(models.Entity, is_single_contact=False, name='ABC')
         mommy.make(models.Entity, is_single_contact=False, name='ABC')
-        response = self.client.get(reverse('crm_get_entity_id') + u'?name={0}'.format(entity1.name))
+        response = self.client.get(reverse('crm_get_entity_id') + '?name={0}'.format(entity1.name))
         self.assertEqual(404, response.status_code)
 

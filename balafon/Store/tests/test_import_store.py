@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from datetime import date
 from decimal import Decimal
 import os.path
@@ -42,13 +44,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
-            self.assertEqual(item.purchase_price, Decimal(u'{0}.50'.format(index)))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
+            self.assertEqual(item.purchase_price, Decimal('{0}.50'.format(index)))
             self.assertEqual(item.pre_tax_price, item.purchase_price)
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_header(self):
         """it should create items properly: no header in file"""
@@ -71,13 +73,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
-            self.assertEqual(item.purchase_price, Decimal(u'{0}.50'.format(index)))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
+            self.assertEqual(item.purchase_price, Decimal('{0}.50'.format(index)))
             self.assertEqual(item.pre_tax_price, item.purchase_price)
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_purchase_price(self):
         """it should create items properly: price"""
@@ -100,13 +102,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
-            self.assertEqual(item.purchase_price, Decimal(u'{0}.50'.format(index)))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
+            self.assertEqual(item.purchase_price, Decimal('{0}.50'.format(index)))
             self.assertEqual(item.pre_tax_price, item.purchase_price * Decimal('1.2'))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_vat(self):
         """it should create items properly: default VAT"""
@@ -131,12 +133,12 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
             self.assertEqual(item.vat_rate, vat_rate)
 
     def test_import_store_fields_only_1_without_vat(self):
@@ -162,16 +164,16 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
             if index == 1:
                 self.assertEqual(item.vat_rate, vat_rate)
             else:
-                self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+                self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_category(self):
         """it should create items properly: default categorie"""
@@ -194,13 +196,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
             self.assertEqual(item.category.name, ugettext('Uncategorized'))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_category_only_1(self):
         """it should create items properly: default category"""
@@ -223,16 +225,16 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
             if index == 1:
                 self.assertEqual(item.category.name, ugettext('Uncategorized'))
             else:
-                self.assertEqual(item.category.name, u'Category {0}'.format(index))
+                self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_brand_and_ref(self):
         """it should create items properly: default categorie"""
@@ -255,13 +257,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
             self.assertEqual(item.brand, None)
             self.assertEqual(item.reference, '')
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_store_fields_no_brand_and_ref_only_1(self):
         """it should create items properly: default categorie"""
@@ -284,17 +286,17 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
             if index == 1:
                 self.assertEqual(item.brand, None)
                 self.assertEqual(item.reference, '')
             else:
-                self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-                self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+                self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+                self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
 
     def test_import_error(self):
         """it should create items properly: default categorie"""
@@ -336,13 +338,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
             self.assertEqual(item.get_property('dlc'), 'A{0}'.format(index))
 
     def test_import_store_fields_property_existing(self):
@@ -368,13 +370,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
             self.assertEqual(item.get_property('dlc'), 'A{0}'.format(index))
 
     def test_import_store_fields_property_1_missing(self):
@@ -398,13 +400,13 @@ class ImportStoreTest(BaseTestCase):
 
         for index, item in enumerate(models.StoreItem.objects.all()):
 
-            self.assertEqual(item.name, u'Item {0}'.format(index))
-            self.assertEqual(item.brand.name, u'Brand {0}'.format(index))
-            self.assertEqual(item.reference, u'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, u'Category {0}'.format(index))
+            self.assertEqual(item.name, 'Item {0}'.format(index))
+            self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
+            self.assertEqual(item.reference, 'Reference {0}'.format(index))
+            self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)
-            self.assertEqual(item.pre_tax_price, Decimal(u'{0}.50'.format(index)))
-            self.assertEqual(item.vat_rate.rate, Decimal(u'1{0}.00'.format(index)))
+            self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
+            self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
             if index == 1:
                 self.assertEqual(item.get_property('dlc'), '')
             else:

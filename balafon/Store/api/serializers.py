@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+from __future__ import unicode_literals
+
 from rest_framework import serializers
 
 from balafon.Store.models import (

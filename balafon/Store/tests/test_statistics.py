@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import datetime, date, time, timedelta
 from decimal import Decimal
@@ -82,7 +84,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family)
         article1 = mommy.make(models.StoreItem, category=category1, pre_tax_price=Decimal(10), vat_rate=vat)
@@ -123,7 +125,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family)
         article1 = mommy.make(models.StoreItem, category=category1, pre_tax_price=Decimal(10), vat_rate=vat)
@@ -168,7 +170,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family)
         article1 = mommy.make(models.StoreItem, category=category1, pre_tax_price=Decimal(10), vat_rate=vat)
@@ -216,7 +218,7 @@ class SalesByCategoryTest(BaseTestCase):
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
 
         category1 = mommy.make(models.StoreItemCategory, parent=family)
@@ -314,7 +316,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family)
         tag1 = mommy.make(models.StoreItemTag)
@@ -388,7 +390,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family)
         category2 = mommy.make(models.StoreItemCategory, icon='blabla', parent=family)
@@ -450,7 +452,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family1 = mommy.make(models.StoreItemCategory, parent=None)
         family2 = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family1)
@@ -515,7 +517,7 @@ class SalesByCategoryTest(BaseTestCase):
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family1 = mommy.make(models.StoreItemCategory, parent=None)
         family2 = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family1)
@@ -580,7 +582,7 @@ class SalesByCategoryTest(BaseTestCase):
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
         family1 = mommy.make(models.StoreItemCategory, parent=None)
         family2 = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, parent=family1)
@@ -644,7 +646,7 @@ class SalesByCategoryTest(BaseTestCase):
         """It should return all sales data"""
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
 
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, icon='test', parent=family)
@@ -705,7 +707,7 @@ class SalesByCategoryTest(BaseTestCase):
     def test_total_sales(self):
         """It should return all sales data"""
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
@@ -774,7 +776,7 @@ class SalesByCategoryTest(BaseTestCase):
     def test_total_sales_no_code(self):
         """It should return all sales data"""
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
@@ -845,8 +847,8 @@ class SalesByCategoryTest(BaseTestCase):
 
         vat = mommy.make(models.VatRate, rate=Decimal(10))
 
-        code_internet = models.SaleAnalysisCode.objects.get_or_create(name=u'Internet')[0]
-        code_shop = mommy.make(models.SaleAnalysisCode, name=u'Shop')
+        code_internet = models.SaleAnalysisCode.objects.get_or_create(name='Internet')[0]
+        code_shop = mommy.make(models.SaleAnalysisCode, name='Shop')
 
         family = mommy.make(models.StoreItemCategory, parent=None)
         category1 = mommy.make(models.StoreItemCategory, icon='test', parent=family)

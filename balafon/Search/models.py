@@ -5,7 +5,9 @@ if DJANGO_VERSION >= (1, 8, 0):
     from django.contrib.contenttypes.fields import GenericRelation
 else:
     from django.contrib.contenttypes.generic import GenericRelation
+from __future__ import unicode_literals
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
@@ -13,33 +15,36 @@ from django_extensions.db.models import TimeStampedModel
 from balafon.Users.models import Favorite
 
 
+@python_2_unicode_compatible
 class Search(TimeStampedModel):
     """A search"""
     name = models.CharField(_('name'), max_length=100)
     
     favorites = GenericRelation(Favorite)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u'search')
-        verbose_name_plural = _(u'searchs')
+        verbose_name = _('search')
+        verbose_name_plural = _('searchs')
 
 
+@python_2_unicode_compatible
 class SearchGroup(models.Model):
     """blocks"""
     search = models.ForeignKey(Search, verbose_name=_('search'))
     name = models.CharField(_('name'), max_length=100)
     
-    def __unicode__(self):
-        return u'{0} {1}'.format(self.search, self.name)
+    def __str__(self):
+        return '{0} {1}'.format(self.search, self.name)
 
     class Meta:
-        verbose_name = _(u'search group')
-        verbose_name_plural = _(u'search groups')
+        verbose_name = _('search group')
+        verbose_name_plural = _('search groups')
 
 
+@python_2_unicode_compatible
 class SearchField(models.Model):
     """fields"""
     search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'))
@@ -48,9 +53,9 @@ class SearchField(models.Model):
     is_list = models.BooleanField(default=False)
     count = models.IntegerField(default=0)
     
-    def __unicode__(self):
-        return u'{0} {1}'.format(self.search_group, self.field)
+    def __str__(self):
+        return '{0} {1}'.format(self.search_group, self.field)
 
     class Meta:
-        verbose_name = _(u'search field')
-        verbose_name_plural = _(u'search fied')
+        verbose_name = _('search field')
+        verbose_name_plural = _('search fied')

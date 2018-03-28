@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from django.conf import settings
+from __future__ import unicode_literals, print_function
+
 from django.core.management.base import BaseCommand
 
 from balafon.Crm import models
@@ -14,27 +15,27 @@ class Command(BaseCommand):
         verbose = options.get('verbosity', 0)
 
         for region in models.Zone.objects.filter(type__type='region'):
-            print region.name
+            print(region.name)
 
-        print '**********'
+        print('**********')
 
-        large_region_type = models.ZoneType.objects.get_or_create(name=u'Grandes régions', type=u'large_region')[0]
+        large_region_type = models.ZoneType.objects.get_or_create(name='Grandes régions', type='large_region')[0]
 
         mapping = [
-            [u'Hauts de France', [u'Nord-Pas-de-Calais', u'Picardie']],
-            [u'Normandie', [u'Haute-Normandie', u'Basse-Normandie']],
-            [u'Ile-de-France', [u'Ile-de-France']],
-            [u'Grand-Est', [u'Alsace', u'Champagne-Ardenne', u'Lorraine']],
-            [u'Bretagne', [u'Bretagne']],
-            [u'Pays de la Loire', [u'Pays de la Loire']],
-            [u'Centre Val de Loire', [u'Centre']],
-            [u'Bourgogne Franche-Comté', [u'Bourgogne', u'Franche-Comté']],
-            [u'Nouvelle Aquitaine', [u'Aquitaine', u'Poitou-Charentes', u'Limousin']],
-            [u'Occitanie Pyrénées-Méditerranée', [u'Midi-Pyrénées', u'Languedoc-Roussillon']],
-            [u'Auvergne Rhône-Alpes', [u'Auvergne', u'Rhône-Alpes']],
+            ['Hauts de France', ['Nord-Pas-de-Calais', 'Picardie']],
+            ['Normandie', ['Haute-Normandie', 'Basse-Normandie']],
+            ['Ile-de-France', ['Ile-de-France']],
+            ['Grand-Est', ['Alsace', 'Champagne-Ardenne', 'Lorraine']],
+            ['Bretagne', ['Bretagne']],
+            ['Pays de la Loire', ['Pays de la Loire']],
+            ['Centre Val de Loire', ['Centre']],
+            ['Bourgogne Franche-Comté', ['Bourgogne', 'Franche-Comté']],
+            ['Nouvelle Aquitaine', ['Aquitaine', 'Poitou-Charentes', 'Limousin']],
+            ['Occitanie Pyrénées-Méditerranée', ['Midi-Pyrénées', 'Languedoc-Roussillon']],
+            ['Auvergne Rhône-Alpes', ['Auvergne', 'Rhône-Alpes']],
             [u"Provence-Alpes-Côte d'Azur", [u"Provence-Alpes-Côte d'Azur"]],
-            [u"Corse", [u'Corse']],
-            [u"Guyane", [u'Guyane']],
+            [u"Corse", ['Corse']],
+            [u"Guyane", ['Guyane']],
         ]
 
         for large_region_name, child_region_names in mapping:
@@ -51,4 +52,4 @@ class Command(BaseCommand):
                     child_region.groups.add(large_region)
                     child_region.save()
                 except models.Zone.DoesNotExist:
-                    print "#", child_region_name, "missing"
+                    print("#", child_region_name, "missing")

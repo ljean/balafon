@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 
@@ -343,7 +345,7 @@ class CategoryNameTest(TestCase):
         sub_category1 = mommy.make(models.StoreItemCategory, name='Def', parent=category1)
 
         self.assertEqual(category1.get_path_name(), category1.name)
-        self.assertEqual(sub_category1.get_path_name(), u'{0} > {1}'.format(category1.name, sub_category1.name))
+        self.assertEqual(sub_category1.get_path_name(), '{0} > {1}'.format(category1.name, sub_category1.name))
 
 
 class PricePolicyTest(TestCase):
@@ -547,7 +549,7 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
         discount.tags.add(tag)
         discount.save()
@@ -578,7 +580,7 @@ class SaleDiscountTest(TestCase):
         vat_rate = mommy.make(models.VatRate, rate=Decimal("20.0"))
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
         price_class = mommy.make(models.PriceClass)
         price_class.discounts.add(discount)
@@ -610,7 +612,7 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
         )
         discount.tags.add(tag)
         discount.save()
@@ -643,7 +645,7 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=False
         )
         discount.tags.add(tag)
         discount.save()
@@ -676,13 +678,13 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
         discount.tags.add(tag)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-20% à partir de 2 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+            models.Discount, name='-20% à partir de 2 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
         )
         discount2.tags.add(tag)
         discount2.save()
@@ -715,13 +717,13 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
         discount.tags.add(tag)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+            models.Discount, name='-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
         )
         discount2.tags.add(tag)
         discount2.save()
@@ -754,7 +756,7 @@ class SaleDiscountTest(TestCase):
         tag = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-10% à partir de 3 Kg', rate=Decimal("10"), quantity=Decimal("3"), active=True
+            models.Discount, name='-10% à partir de 3 Kg', rate=Decimal("10"), quantity=Decimal("3"), active=True
         )
         discount.tags.add(tag)
         discount.save()
@@ -828,20 +830,20 @@ class StoreItemDiscountTest(TestCase):
         tag4 = mommy.make(models.StoreItemTag, name="super-promos")
 
         discount = mommy.make(
-            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
+            models.Discount, name='-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
         )
         discount.tags.add(tag1)
         discount.tags.add(tag2)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+            models.Discount, name='-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
         )
         discount2.tags.add(tag1)
         discount2.save()
 
         discount3 = mommy.make(
-            models.Discount, name=u'-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
+            models.Discount, name='-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
         )
 
         item = mommy.make(models.StoreItem)
@@ -855,7 +857,7 @@ class StoreItemDiscountTest(TestCase):
         """if several tags are associated"""
 
         discount = mommy.make(
-            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
+            models.Discount, name='-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=True
         )
 
         price_class = mommy.make(models.PriceClass)
@@ -872,14 +874,14 @@ class StoreItemDiscountTest(TestCase):
         tag2 = mommy.make(models.StoreItemTag, name="promo")
 
         discount = mommy.make(
-            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+            models.Discount, name='-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
         )
         discount.tags.add(tag1)
         discount.tags.add(tag2)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
         discount2.tags.add(tag1)
         discount2.save()
@@ -901,13 +903,13 @@ class StoreItemDiscountTest(TestCase):
         tag1 = mommy.make(models.StoreItemTag, name="vrac")
 
         discount = mommy.make(
-            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+            models.Discount, name='-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
         )
         discount.tags.add(tag1)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
 
         price_class = mommy.make(models.PriceClass)
@@ -923,11 +925,11 @@ class StoreItemDiscountTest(TestCase):
     def test_view_price_class_several_discounts(self):
         """if several price classes are associated"""
         discount = mommy.make(
-            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
+            models.Discount, name='-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=True
         )
 
         discount2 = mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
 
         price_class = mommy.make(models.PriceClass)
@@ -941,11 +943,11 @@ class StoreItemDiscountTest(TestCase):
     def test_view_price_class_no_discounts(self):
         """if no price classes are associated"""
         discount = mommy.make(
-            models.Discount, name=u'-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=False
+            models.Discount, name='-20% à partir de 4 Kg', rate=Decimal("20"), quantity=Decimal("4"), active=False
         )
 
         mommy.make(
-            models.Discount, name=u'-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
+            models.Discount, name='-10% à partir de 2 Kg', rate=Decimal("10"), quantity=Decimal("2"), active=True
         )
 
         price_class = mommy.make(models.PriceClass)
@@ -963,20 +965,20 @@ class StoreItemDiscountTest(TestCase):
         tag3 = mommy.make(models.StoreItemTag, name="soldes")
 
         discount = mommy.make(
-            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
+            models.Discount, name='-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
         )
         discount.tags.add(tag1)
         discount.tags.add(tag2)
         discount.save()
 
         discount2 = mommy.make(
-            models.Discount, name=u'-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
+            models.Discount, name='-20% à partir de 3 Kg', rate=Decimal("20"), quantity=Decimal("3"), active=True
         )
         discount2.tags.add(tag1)
         discount2.save()
 
         discount3 = mommy.make(
-            models.Discount, name=u'-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
+            models.Discount, name='-80% à partir de 3 Kg', rate=Decimal("80"), quantity=Decimal("3"), active=True
         )
 
         item = mommy.make(models.StoreItem)
@@ -993,7 +995,7 @@ class StoreItemDiscountTest(TestCase):
         tag2 = mommy.make(models.StoreItemTag, name="promo")
 
         discount = mommy.make(
-            models.Discount, name=u'-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
+            models.Discount, name='-50% à partir de 4 Kg', rate=Decimal("50"), quantity=Decimal("4"), active=False
         )
         discount.tags.add(tag1)
         discount.tags.add(tag2)
@@ -1012,7 +1014,7 @@ class MailtoActionTest(TestCase):
         action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
         mommy.make(models.StoreManagementActionType, action_type=action_type)
 
-        action = mommy.make(Action, type=action_type, subject=u'Test')
+        action = mommy.make(Action, type=action_type, subject='Test')
 
         contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
         action.contacts.add(contact)
@@ -1021,7 +1023,7 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
-        body = _(u"Here is a link to your {0}: {1}{2}").format(
+        body = _("Here is a link to your {0}: {1}{2}").format(
             action_type.name,
             "http://" + Site.objects.get_current().domain,
             url
@@ -1029,14 +1031,14 @@ class MailtoActionTest(TestCase):
 
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body={0}'.format(body)
+            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body={0}'.format(body)
         )
 
     def test_mailto_to_action_body_no_sale(self):
 
         action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
 
-        action = mommy.make(Action, type=action_type, subject=u'Test')
+        action = mommy.make(Action, type=action_type, subject='Test')
 
         contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
         action.contacts.add(contact)
@@ -1046,7 +1048,7 @@ class MailtoActionTest(TestCase):
 
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
+            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
         )
 
     def test_mailto_to_action_body_no_uuid(self):
@@ -1054,7 +1056,7 @@ class MailtoActionTest(TestCase):
         action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=False, name='Doc')
         mommy.make(models.StoreManagementActionType, action_type=action_type)
 
-        action = mommy.make(Action, type=action_type, subject=u'Test')
+        action = mommy.make(Action, type=action_type, subject='Test')
 
         contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
         action.contacts.add(contact)
@@ -1064,7 +1066,7 @@ class MailtoActionTest(TestCase):
 
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
+            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
         )
 
     def test_mailto_to_action_subject(self):
@@ -1072,7 +1074,7 @@ class MailtoActionTest(TestCase):
         action_type = mommy.make(ActionType, mail_to_subject='Another subject', generate_uuid=True, name='Doc')
         mommy.make(models.StoreManagementActionType, action_type=action_type)
 
-        action = mommy.make(Action, type=action_type, subject=u'Test')
+        action = mommy.make(Action, type=action_type, subject='Test')
 
         contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
         action.contacts.add(contact)
@@ -1081,7 +1083,7 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
-        body = _(u"Here is a link to your {0}: {1}{2}").format(
+        body = _("Here is a link to your {0}: {1}{2}").format(
             action_type.name,
             "http://" + Site.objects.get_current().domain,
             url
@@ -1089,7 +1091,7 @@ class MailtoActionTest(TestCase):
 
         self.assertEqual(
             action.mail_to,
-            u'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body={0}'.format(body)
+            'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body={0}'.format(body)
         )
 
 

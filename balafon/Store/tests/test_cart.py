@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 from decimal import Decimal
 import logging
@@ -24,7 +26,7 @@ from balafon.Store.settings import get_cart_type_name
 
 
 def custom_confirmation_email_subject(profile, action):
-    return u'Hello {0}'.format(u''.join([contact.firstname for contact in action.contacts.all()]))
+    return 'Hello {0}'.format(''.join([contact.firstname for contact in action.contacts.all()]))
 
 
 GLOBAL_COUNTER = 0
@@ -124,7 +126,7 @@ class CartTest(BaseTestCase):
         store_item2 = models.StoreItem.objects.get(id=store_item2.id)
         self.assertEqual(store_item2.stock_count, None)
 
-    @override_settings(BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT=u"Hello")
+    @override_settings(BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT="Hello")
     def test_post_cart_email_subject(self):
         """It should create a new sale and action"""
 
@@ -184,7 +186,7 @@ class CartTest(BaseTestCase):
 
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].to, [profile.contact.email])
-        self.assertEqual(mail.outbox[0].subject, u"Hello")
+        self.assertEqual(mail.outbox[0].subject, "Hello")
         self.assertEqual(mail.outbox[1].to, [settings.BALAFON_NOTIFICATION_EMAIL])
 
         store_item1 = models.StoreItem.objects.get(id=store_item1.id)
@@ -200,7 +202,7 @@ class CartTest(BaseTestCase):
         # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
-        contact.firstname = u"Bob"
+        contact.firstname = "Bob"
         contact.save()
 
         store_item1 = mommy.make(models.StoreItem)
@@ -255,7 +257,7 @@ class CartTest(BaseTestCase):
 
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[0].to, [profile.contact.email])
-        self.assertEqual(mail.outbox[0].subject, u"Hello Bob")
+        self.assertEqual(mail.outbox[0].subject, "Hello Bob")
         self.assertEqual(mail.outbox[1].to, [settings.BALAFON_NOTIFICATION_EMAIL])
 
         store_item1 = models.StoreItem.objects.get(id=store_item1.id)
@@ -303,7 +305,7 @@ class CartTest(BaseTestCase):
         action = action_queryset[0]
 
         self.assertEqual(list(action.contacts.all()), [contact])
-        self.assertEqual(action.subject, _(u'Notes'))
+        self.assertEqual(action.subject, _('Notes'))
         self.assertEqual(action.detail, data['notes'])
         self.assertEqual(action.planned_date, data['purchase_datetime'])
 
@@ -361,7 +363,7 @@ class CartTest(BaseTestCase):
         action = action_queryset[0]
 
         self.assertEqual(list(action.contacts.all()), [contact])
-        self.assertEqual(action.subject, _(u'Notes'))
+        self.assertEqual(action.subject, _('Notes'))
         self.assertEqual(action.detail, data['notes'])
         self.assertEqual(action.planned_date, data['purchase_datetime'])
 
@@ -419,7 +421,7 @@ class CartTest(BaseTestCase):
         action = action_queryset[0]
 
         self.assertEqual(list(action.contacts.all()), [contact])
-        self.assertEqual(action.subject, _(u'Notes'))
+        self.assertEqual(action.subject, _('Notes'))
         self.assertEqual(action.detail, 'a\nB\nc')
         self.assertEqual(action.planned_date, data['purchase_datetime'])
 

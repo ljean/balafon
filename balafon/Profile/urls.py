@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from balafon.Profile.views import (
     edit_profile, post_message,  AcceptNewsletterActivationView, AcceptNewsletterRegistrationView
 )
+
 
 urlpatterns = [
     url(r'edit/$', edit_profile, name='profile_edit'),

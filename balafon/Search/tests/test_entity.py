@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by entity"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -15,12 +17,12 @@ class EntitySearchTest(BaseTestCase):
 
     def test_search_entity(self):
         """search by entity name"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -38,15 +40,15 @@ class EntitySearchTest(BaseTestCase):
 
     def test_search_entity_description(self):
         """search by entity description"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp", description="This one should be found.")
+        entity1 = mommy.make(models.Entity, name="My tiny corp", description="This one should be found.")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp", description="Not this one")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp", description="Not this one")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"The big Org", description="Found")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="The big Org", description="Found")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="ABCABC", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -67,15 +69,15 @@ class EntitySearchTest(BaseTestCase):
 
     def test_search_entity_notes(self):
         """search by entity notes"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp", notes="This one should be found.")
+        entity1 = mommy.make(models.Entity, name="My tiny corp", notes="This one should be found.")
         contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp", notes="Not this one")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp", notes="Not this one")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
-        entity3 = mommy.make(models.Entity, name=u"The big Org", notes="Found")
-        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"ABCABC", main_contact=True, has_left=False)
+        entity3 = mommy.make(models.Entity, name="The big Org", notes="Found")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname="ABCABC", main_contact=True, has_left=False)
 
         url = reverse('search')
 

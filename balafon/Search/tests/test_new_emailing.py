@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can create an emailing from search results"""
 
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.conf import settings
@@ -23,7 +25,7 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_view_new_emailing(self):
         """test view form when BALAFON_EMAILING_SENDER_CHOICES is not set"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
         mommy.make(Newsletter)
         mommy.make(models.SubscriptionType)
@@ -45,7 +47,7 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_view_new_emailing_from_email(self):
         """test view form when BALAFON_EMAILING_SENDER_CHOICES is set"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
 
         settings.BALAFON_EMAILING_SENDER_CHOICES = (
             ('toto@toto.fr', 'Toto',),
@@ -73,19 +75,19 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing(self):
         """test create an emailing"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         newsletter = mommy.make(Newsletter)
         subscription_type = mommy.make(models.SubscriptionType)
 
         data = {
             'create_emailing': True,
-        'subject': u"",
+        'subject': "",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             'from_email': '',
         }
@@ -112,18 +114,18 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing_anonymous(self):
         """test create an emailing: anonymous user"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
 
         newsletter = mommy.make(Newsletter)
         subscription_type = mommy.make(models.SubscriptionType)
 
         data = {
             'create_emailing': True,
-            'subject': u"",
+            'subject': "",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             'from_email': '',
         }
@@ -138,19 +140,19 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing_not_in_staff(self):
         """test create an emailing: anonymous user"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         newsletter = mommy.make(Newsletter)
         subscription_type = mommy.make(models.SubscriptionType)
 
         data = {
             'create_emailing': True,
-            'subject': u"",
+            'subject': "",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             'from_email': '',
         }
@@ -166,9 +168,9 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing_from_email(self):
         """test create with from_email set"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         settings.BALAFON_EMAILING_SENDER_CHOICES = (
             ('Toto', 'toto@toto.fr'),
@@ -180,10 +182,10 @@ class CreateEmailingTest(BaseTestCase):
 
         data = {
             'create_emailing': True,
-            'subject': u"",
+            'subject': "",
             'subscription_type': subscription_type.id,
             'newsletter': newsletter.id,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             "from_email": "toto@toto.fr"
         }
@@ -211,18 +213,18 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing_new_newsletter(self):
         """create emailing with new newsletter set"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         subscription_type = mommy.make(models.SubscriptionType)
 
         data = {
             'create_emailing': True,
-            'subject': u"Test",
+            'subject': "Test",
             'subscription_type': subscription_type.id,
             'newsletter': 0,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             'from_email': '',
         }
@@ -254,16 +256,16 @@ class CreateEmailingTest(BaseTestCase):
 
     def test_create_emailing_invalid_subscription(self):
         """create emailing invalid subscription type"""
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         data = {
             'create_emailing': True,
-            'subject': u"Test",
+            'subject': "Test",
             'subscription_type': 0,
             'newsletter': 0,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': '',
             'from_email': '',
         }
@@ -280,16 +282,16 @@ class CreateEmailingTest(BaseTestCase):
         """create emailing language is set"""
         subscription_type = mommy.make(models.SubscriptionType)
 
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
         data = {
             'create_emailing': True,
-            'subject': u"Test",
+            'subject': "Test",
             'subscription_type': subscription_type.id,
             'newsletter': 0,
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
             'lang': settings.LANGUAGES[1][0],
         }
 
@@ -323,11 +325,11 @@ class CreateEmailingTest(BaseTestCase):
         """view emailing with several languages: language is a select"""
         mommy.make(models.SubscriptionType)
 
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
 
         data = {
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
         }
 
         url = reverse('search_emailing')
@@ -342,11 +344,11 @@ class CreateEmailingTest(BaseTestCase):
         """view emailing with just one language: The language field is hidden"""
         mommy.make(models.SubscriptionType)
 
-        contact1 = mommy.make(models.Contact, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact2 = mommy.make(models.Contact, lastname=u"EFGH", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
 
         data = {
-            'contacts': u";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
         }
 
         url = reverse('search_emailing')

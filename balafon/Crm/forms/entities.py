@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
+from __future__ import unicode_literals
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -29,23 +31,23 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 'fields': [
                     'type', 'name', 'description', 'relationship_date', 'website', 'email', 'phone', 'fax'
                 ],
-                'legend': _(u'Name')
+                'legend': _('Name')
             }),
             ('address', {
                 'fields': [
                     'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',
                     'cedex', 'country'
                 ],
-                'legend': _(u'Address')
+                'legend': _('Address')
             }),
             ('billing_address', {
                 'fields': [
                     'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2',
                     'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country'
                 ],
-                'legend': _(u'Billing address')
+                'legend': _('Billing address')
             }),
-            ('logo', {'fields': ['logo'], 'legend': _(u'Logo')}),
+            ('logo', {'fields': ['logo'], 'legend': _('Logo')}),
         ]
 
     def __init__(self, *args, **kwargs):
@@ -75,7 +77,7 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 instance.id = 1
         target_name = models.get_entity_logo_dir(instance, logo)
         if len(target_name) >= models.Entity._meta.get_field('logo').max_length:
-            raise ValidationError(ugettext(u"The file name is too long"))
+            raise ValidationError(ugettext("The file name is too long"))
         return logo
 
 
@@ -99,12 +101,12 @@ class EntityRoleForm(forms.ModelForm):
 
 class SelectEntityForm(forms.Form):
     """Select an entity"""
-    entity = forms.CharField(label=_(u"Entity"))
+    entity = forms.CharField(label=_("Entity"))
 
     def __init__(self, *args, **kwargs):
         super(SelectEntityForm, self).__init__(*args, **kwargs)
         self.fields["entity"].widget = EntityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of an entity'), 'size': '50', 'class': 'colorbox'})
+            attrs={'placeholder': _('Enter the name of an entity'), 'size': '50', 'class': 'colorbox'})
 
     def clean_entity(self):
         """entity validation"""
@@ -112,7 +114,7 @@ class SelectEntityForm(forms.Form):
             entity_id = int(self.cleaned_data["entity"])
             return models.Entity.objects.get(id=entity_id)
         except (ValueError, models.Entity.DoesNotExist):
-            raise ValidationError(ugettext(u"The entity does'nt exist"))
+            raise ValidationError(ugettext("The entity does'nt exist"))
 
 
 class ChangeContactEntityForm(forms.Form):
@@ -124,18 +126,18 @@ class ChangeContactEntityForm(forms.Form):
 
     OPTION_CHOICES = (
         (0, ""),
-        (OPTION_ADD_TO_EXISTING_ENTITY, _(u"Reassign to an existing entity")),
-        (OPTION_CREATE_NEW_ENTITY, _(u"Create a new entity")),
-        (OPTION_SWITCH_SINGLE_CONTACT, _(u"Switch to single contact")),
-        (OPTION_SWITCH_ENTITY_CONTACT, _(u"Switch to entity contact")),
+        (OPTION_ADD_TO_EXISTING_ENTITY, _("Reassign to an existing entity")),
+        (OPTION_CREATE_NEW_ENTITY, _("Create a new entity")),
+        (OPTION_SWITCH_SINGLE_CONTACT, _("Switch to single contact")),
+        (OPTION_SWITCH_ENTITY_CONTACT, _("Switch to entity contact")),
     )
 
-    option = forms.ChoiceField(label=_(u"What to do?"))
+    option = forms.ChoiceField(label=_("What to do?"))
     entity = forms.IntegerField(
-        label=_(u"Which one?"),
+        label=_("Which one?"),
         required=False,
         widget=EntityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of the entity'), 'size': '50', 'class': 'colorbox'}
+            attrs={'placeholder': _('Enter the name of the entity'), 'size': '50', 'class': 'colorbox'}
         )
     )
 
@@ -163,13 +165,13 @@ class ChangeContactEntityForm(forms.Form):
         try:
             option = int(self.cleaned_data["option"])
             if option == 0:
-                raise ValidationError(ugettext(u"Please select one of this options"))
+                raise ValidationError(ugettext("Please select one of this options"))
             try:
                 self.meth_map[option]
             except KeyError:
-                raise ValidationError(ugettext(u"Invalid value"))
+                raise ValidationError(ugettext("Invalid value"))
         except ValueError:
-            raise ValidationError(ugettext(u"Invalid data"))
+            raise ValidationError(ugettext("Invalid data"))
         return option
 
     def clean_entity(self):
@@ -182,7 +184,7 @@ class ChangeContactEntityForm(forms.Form):
             try:
                 return models.Entity.objects.get(id=entity_id)
             except models.Entity.DoesNotExist:
-                raise ValidationError(ugettext(u"Please select an existing entity"))
+                raise ValidationError(ugettext("Please select an existing entity"))
 
     def _add_to_existing_entity(self):
         """add to exsiting entity"""
@@ -203,7 +205,7 @@ class ChangeContactEntityForm(forms.Form):
         old_entity = self.contact.entity
         self.contact.entity = models.Entity.objects.create(
             is_single_contact=True,
-            name=u"{0.lastname} {0.firstname}".format(self.contact).lower()
+            name="{0.lastname} {0.firstname}".format(self.contact).lower()
         )
         self.contact.save()
         self.contact.entity.default_contact.delete()

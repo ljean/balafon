@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
@@ -30,7 +32,7 @@ class ContentTypeField(forms.CharField):
             try:
                 return ContentType.objects.get(id=value)
             except ContentType.DoesNotExist:
-                raise ValidationError(_(u"The content type {0} doesn't exist").format(value))
+                raise ValidationError(_("The content type {0} doesn't exist").format(value))
         return value
 
 
@@ -54,5 +56,5 @@ class UrlForm(forms.Form):
     def clean_url(self):
         url = self.cleaned_data['url']
         if not is_allowed_homepage(url):
-            raise ValidationError(_(u"The url {0} is not allowed as homepage".format(url)))
+            raise ValidationError(_("The url {0} is not allowed as homepage".format(url)))
         return url

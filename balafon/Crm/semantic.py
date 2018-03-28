@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import codecs
+from __future__ import unicode_literals, print_function
+
 from SPARQLWrapper import SPARQLWrapper, JSON, SPARQLExceptions
 import xlwt
 
 #dbpedia = SPARQLWrapper("http://dbpedia.org/sparql")
+
 
 def get_french_cities(source):
     sparql = SPARQLWrapper(source)
@@ -53,8 +55,9 @@ def get_french_cities(source):
         for json_data in results:
             data.append(dict([(k, v["value"]) for (k, v) in json_data.items()]))    
         return data
-    except SPARQLExceptions.QueryBadFormed, msg:
-        print "Error: ", msg
+    except SPARQLExceptions.QueryBadFormed as msg:
+        print("Error: ", msg)
+
 
 def dump_xls(cities_list):
     wb = xlwt.Workbook()
@@ -65,7 +68,8 @@ def dump_xls(cities_list):
             ws.write(line, col, city[field])
     
     wb.save('villes.xls')
-    
+
+
 if __name__ == "__main__":
     cities_list = get_french_cities("http://fr.dbpedia.org/sparql")
     dump_xls(cities_list)

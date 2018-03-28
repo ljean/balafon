@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """utils"""
 
+from __future__ import unicode_literals
+
 import csv
 import codecs
 
@@ -16,8 +18,8 @@ def filter_icontains_unaccent(queryset, field, text):
     """use postgres unaccent"""
     if crm_settings.is_unaccent_filter_supported():
         queryset = queryset.extra(
-            where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
-            params=[u"%{0}%".format(text)]
+            where=["UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
+            params=["%{0}%".format(text)]
         )
         return queryset
     else:
@@ -92,7 +94,7 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
         else:
             parent = queryset[0]
             if country_count > 1:
-                logger_message = u"{0} different zones for '{1}'".format(country_count, country)
+                logger_message = "{0} different zones for '{1}'".format(country_count, country)
                 logger.warning(logger_message)
     else:
         code = zip_code[:2] or default_department
@@ -106,7 +108,7 @@ def resolve_city(city_name, zip_code, country='', default_department=''):
     cities_count = queryset.count()
     if cities_count:
         if cities_count > 1:
-            logger_message = u"{0} different cities for '{1}' {2}".format(cities_count, city_name, parent)
+            logger_message = "{0} different cities for '{1}' {2}".format(cities_count, city_name, parent)
             logger.warning(logger_message)
         return queryset[0]
     else:
@@ -129,7 +131,7 @@ def get_actions_by_set(actions_qs, max_nb=0, action_set_list=None):
                 actions = queryset
             actions_by_set += [(
                 a_set.id if a_set else 0,
-                a_set.name if a_set else u"",
+                a_set.name if a_set else "",
                 actions,
                 qs_count
             )]
@@ -146,7 +148,7 @@ def get_default_country():
         try:
             zone_type = models.ZoneType.objects.get(type="country")
         except models.ZoneType.DoesNotExist:
-            zone_type = models.ZoneType.objects.create(type="country", name=u"Country")
+            zone_type = models.ZoneType.objects.create(type="country", name="Country")
         default_country = models.Zone.objects.create(name=country_name, parent=None, type=zone_type)
     return default_country
 
@@ -174,7 +176,7 @@ def get_suggested_same_as_contacts(contact_id=None, lastname='', firstname='', e
 def sort_by_name_callback(contact):
     """sort by name"""
     if contact.entity.is_single_contact:
-        value = u"{0} {1}".format(contact.lastname, contact.firstname)
+        value = "{0} {1}".format(contact.lastname, contact.firstname)
     else:
         value = contact.entity.name
     return value.upper()
@@ -182,13 +184,13 @@ def sort_by_name_callback(contact):
 
 def sort_by_contact_callback(contact):
     """sort by contact name"""
-    return u"{0} {1}".format(contact.lastname, contact.firstname).upper()
+    return "{0} {1}".format(contact.lastname, contact.firstname).upper()
 
 
 def sort_by_entity_callback(contact):
     """key function for sorting by entity"""
-    value1 = u"B" if contact.entity.is_single_contact else u"A"
+    value1 = "B" if contact.entity.is_single_contact else "A"
     value2 = sort_by_name_callback(contact)
-    value3 = u"{0} {1}".format(contact.lastname, contact.firstname) if not contact.entity.is_single_contact else u""
+    value3 = "{0} {1}".format(contact.lastname, contact.firstname) if not contact.entity.is_single_contact else ""
     return value1, value2, value3
 

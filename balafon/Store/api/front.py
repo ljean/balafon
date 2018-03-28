@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+from __future__ import unicode_literals
+
 from decimal import Decimal
 
 from django.db.models import Q
@@ -21,6 +23,7 @@ from balafon.Store import settings
 from balafon.Store.api import serializers
 from balafon.Store.settings import get_cart_type_name, get_cart_processed_callback
 from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user, logger
+
 
 class CanAccessStorePermission(permissions.BasePermission):
     """Define who can access the store"""
@@ -139,13 +142,13 @@ class CartView(APIView):
                 profile = ContactProfile.objects.get(user=request.user)
                 contact = profile.contact
             except ContactProfile.DoesNotExist:
-                return Response({'ok': False, 'message': _(u"You don't have a valid profile")})
+                return Response({'ok': False, 'message': _("You don't have a valid profile")})
 
             # Get Delivery point
             try:
                 delivery_point = DeliveryPoint.objects.get(id=cart_serializer.validated_data["delivery_point"])
             except DeliveryPoint.DoesNotExist:
-                return Response({'ok': False, 'message': _(u"Invalid delivery point")})
+                return Response({'ok': False, 'message': _("Invalid delivery point")})
 
             # Create a new Sale
             action_type_name = get_cart_type_name()
@@ -158,7 +161,7 @@ class CartView(APIView):
             if 'notes' in cart_serializer.validated_data:
                 notes = cart_serializer.validated_data["notes"].strip()
                 if notes:
-                    subject = _(u'Notes')
+                    subject = _('Notes')
                     detail = notes
 
             action = Action.objects.create(
@@ -172,7 +175,7 @@ class CartView(APIView):
             action.contacts.add(contact)
             action.save()
 
-            action.sale.analysis_code = SaleAnalysisCode.objects.get_or_create(name=u"Internet")[0]
+            action.sale.analysis_code = SaleAnalysisCode.objects.get_or_create(name="Internet")[0]
 
             action.sale.delivery_point = delivery_point
             action.sale.save()
@@ -182,7 +185,7 @@ class CartView(APIView):
             # for each line add a sale item
             for index, item in enumerate(cart_serializer.validated_data['items']):
 
-                quantity = Decimal(u'{0}'.format(item['quantity']))
+                quantity = Decimal('{0}'.format(item['quantity']))
 
                 try:
                     store_item = StoreItem.objects.get(id=item['id'])
@@ -192,7 +195,7 @@ class CartView(APIView):
 
                 if not store_item.available:
                     warnings.append(
-                        _(u"{0} is currently not available. It has been removed from your cart").format(
+                        _("{0} is currently not available. It has been removed from your cart").format(
                             store_item.name
                         )
                     )
@@ -218,7 +221,7 @@ class CartView(APIView):
 
                 return Response({
                     'ok': False,
-                    'message': _(u'Your cart is empty. Your articles are not available'),
+                    'message': _('Your cart is empty. Your articles are not available'),
                     'warnings': warnings,
                 })
             else:
@@ -242,7 +245,7 @@ class CartView(APIView):
             return Response(
                 {
                     'ok': False,
-                    'message': u', '.join([u'{0}: {1}'.format(*err) for err in cart_serializer.errors.items()])
+                    'message': ', '.join(['{0}: {1}'.format(*err) for err in cart_serializer.errors.items()])
                 }
             )
 
@@ -298,7 +301,7 @@ class FavoriteView(ProfileAPIView):
             return Response(
                 {
                     'ok': False,
-                    'message': u', '.join([u'{0}: {1}'.format(*err) for err in favorite_serializer.errors.items()])
+                    'message': ', '.join(['{0}: {1}'.format(*err) for err in favorite_serializer.errors.items()])
                 }
             )
 

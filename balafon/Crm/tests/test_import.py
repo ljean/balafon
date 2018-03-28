@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import date
 import os.path
@@ -105,20 +107,20 @@ class ImportFileTest(BaseTestCase):
         #1 line and 6 columns
         self.assertEqual(len(table.select("tr > td")), 11)
 
-        self.assertEqual(table.select("tr > td")[0].text, u"Big corp")
-        self.assertEqual(table.select("tr > td")[1].text, u"Corp")
-        #self.assertEqual(table.select("tr > td")[2].text, _(u'Mr'))
-        self.assertEqual(table.select("tr > td")[3].text, u"Doe")
-        self.assertEqual(table.select("tr > td")[4].text, u"John")
-        self.assertEqual(table.select("tr > td")[5].text, u'john.doe@mailinator.com')
-        self.assertEqual(table.select("tr > td")[6].text, u"Paris")
-        self.assertEqual(table.select("tr > td")[7].text, u"Lyon")
+        self.assertEqual(table.select("tr > td")[0].text, "Big corp")
+        self.assertEqual(table.select("tr > td")[1].text, "Corp")
+        #self.assertEqual(table.select("tr > td")[2].text, _('Mr'))
+        self.assertEqual(table.select("tr > td")[3].text, "Doe")
+        self.assertEqual(table.select("tr > td")[4].text, "John")
+        self.assertEqual(table.select("tr > td")[5].text, 'john.doe@mailinator.com')
+        self.assertEqual(table.select("tr > td")[6].text, "Paris")
+        self.assertEqual(table.select("tr > td")[7].text, "Lyon")
         self.assertEqual(
             [group.strip() for group in table.select("tr > td")[8].text.strip().split(";")],
-            [u"Client", "Grand compte"]
+            ["Client", "Grand compte"]
         )
-        self.assertEqual(table.select("tr > td")[9].text.strip(), u"marketing")
-        self.assertEqual(table.select("tr > td")[10].text.strip(), u"Boss")
+        self.assertEqual(table.select("tr > td")[9].text.strip(), "marketing")
+        self.assertEqual(table.select("tr > td")[10].text.strip(), "Boss")
 
     def test_confirm_import(self):
         """view confirm contact"""
@@ -142,17 +144,17 @@ class ImportFileTest(BaseTestCase):
         self.assertEqual(1, models.Contact.objects.count())
         contact = models.Contact.objects.all()[0]
 
-        self.assertEqual(contact.entity.name, u"Big corp")
-        self.assertEqual(contact.entity.type.name, u"Corp")
+        self.assertEqual(contact.entity.name, "Big corp")
+        self.assertEqual(contact.entity.type.name, "Corp")
         self.assertEqual(contact.gender, models.Contact.GENDER_MALE)
-        self.assertEqual(contact.lastname, u"Doe")
-        self.assertEqual(contact.firstname, u"John")
-        self.assertEqual(contact.email, u'john.doe@mailinator.com')
-        self.assertEqual(contact.entity.email, u'contact@big-corp.com')
-        self.assertEqual(contact.entity.city.name, u"Paris")
-        self.assertEqual(contact.entity.city.parent.code, u"75")
-        self.assertEqual(contact.city.name, u"Lyon")
-        self.assertEqual(contact.city.parent.code, u"69")
+        self.assertEqual(contact.lastname, "Doe")
+        self.assertEqual(contact.firstname, "John")
+        self.assertEqual(contact.email, 'john.doe@mailinator.com')
+        self.assertEqual(contact.entity.email, 'contact@big-corp.com')
+        self.assertEqual(contact.entity.city.name, "Paris")
+        self.assertEqual(contact.entity.city.parent.code, "75")
+        self.assertEqual(contact.city.name, "Lyon")
+        self.assertEqual(contact.city.parent.code, "69")
         self.assertEqual(contact.group_set.count(), 1)
         self.assertEqual(contact.entity.group_set.count(), 2)
         self.assertEqual(contact.role.all()[0].name, "Boss")
@@ -636,7 +638,7 @@ class ImportTemplateTest(BaseTestCase):
         start_index_for_custom_fields = len(fields)
 
         for j, field in enumerate([custom_fields[0], custom_fields[3], custom_fields[2], custom_fields[5]]):
-            self.assertEqual(cols[start_index_for_custom_fields+j], unicode(field))
+            self.assertEqual(cols[start_index_for_custom_fields+j], '{0}'.format(field))
 
         for field in [custom_fields[1], custom_fields[4]]:
             self.assertTrue(field not in cols)
@@ -715,4 +717,4 @@ class ImportTemplateTest(BaseTestCase):
             self.assertEqual(cols[i], field)
         start_index_for_custom_fields = len(fields)
 
-        self.assertEqual(cols[start_index_for_custom_fields], unicode(custom_field))
+        self.assertEqual(cols[start_index_for_custom_fields], '{0}'.format(custom_field))

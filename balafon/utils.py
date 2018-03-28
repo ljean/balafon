@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """common utils"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import datetime
 import logging
@@ -16,6 +18,7 @@ from django.utils.translation import ugettext as _
 from rest_framework.renderers import JSONRenderer
 
 from balafon.settings import get_allowed_homepages
+
 
 logger = logging.getLogger("balafon_crm")
 
@@ -79,7 +82,7 @@ def validate_rgb(value):
             except ValueError:
                 wrong = True
     if wrong:
-        raise ValidationError(_(u'RGB format (e.g. #123456) expected'))
+        raise ValidationError(_('RGB format (e.g. #123456) expected'))
     return False
 
 

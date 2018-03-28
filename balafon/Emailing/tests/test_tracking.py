@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test email tracking"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, date
 
 from django.conf import settings

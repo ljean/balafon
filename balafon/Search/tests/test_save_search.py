@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can save a search"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -31,7 +33,7 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(soup.select("#id_name")[0]["value"], "ABC")
 
         self.assertEqual(len(soup.select("#id_search_id")), 1)
-        self.assertEqual(soup.select("#id_search_id")[0]["value"], unicode(search.id))
+        self.assertEqual(soup.select("#id_search_id")[0]["value"], '{0}'.format(search.id))
 
     def test_view_name_new_search(self):
         """test view save a new search: name is empty"""
@@ -47,7 +49,7 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(soup.select("#id_name")[0].get("value", ""), "")
 
         self.assertEqual(len(soup.select("#id_search_id")), 1)
-        self.assertEqual(soup.select("#id_search_id")[0]["value"], u"0")
+        self.assertEqual(soup.select("#id_search_id")[0]["value"], "0")
 
     def test_save_search(self):
         """save a new search"""
@@ -80,12 +82,12 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.searchgroup_set.count(), 1)
 
         search_group = search_1.searchgroup_set.all()[0]
-        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.name, "gr0")
 
         self.assertEqual(search_group.searchfield_set.count(), 1)
         search_field = search_group.searchfield_set.all()[0]
-        self.assertEqual(search_field.field, u"group")
-        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        self.assertEqual(search_field.field, "group")
+        self.assertEqual(search_field.value, "{0}".format(group1.id))
         self.assertEqual(search_field.is_list, False)
 
     def test_open_search(self):
@@ -94,9 +96,9 @@ class SearchSaveTest(BaseTestCase):
         group1 = mommy.make(models.Group)
 
         search = mommy.make(Search)
-        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
+        search_group = mommy.make(SearchGroup, name="gr0", search=search)
         mommy.make(
-            SearchField, field='group', value=unicode(group1.id), is_list=False, search_group=search_group
+            SearchField, field='group', value='{0}'.format(group1.id), is_list=False, search_group=search_group
         )
 
         url = reverse("search", args=[search.id])
@@ -106,7 +108,7 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content)
 
-        self.assertEqual(soup.select("input[name=gr0-_-group-_-0]")[0]["value"], unicode(group1.id))
+        self.assertEqual(soup.select("input[name=gr0-_-group-_-0]")[0]["value"], '{0}'.format(group1.id))
 
     def test_open_multi_search(self):
         """open an existing search on several groups"""
@@ -116,8 +118,8 @@ class SearchSaveTest(BaseTestCase):
         group3 = mommy.make(models.Group, name="ABB")
 
         search = mommy.make(Search)
-        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
-        value = u"[u'{0}', u'{1}']".format(group1.id, group2.id)
+        search_group = mommy.make(SearchGroup, name="gr0", search=search)
+        value = "['{0}', '{1}']".format(group1.id, group2.id)
         mommy.make(
             SearchField, field='all_groups', value=value, is_list=True, search_group=search_group
         )
@@ -143,8 +145,8 @@ class SearchSaveTest(BaseTestCase):
         group3 = mommy.make(models.Group, name="ABB")
 
         search = mommy.make(Search)
-        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
-        value = u"[u'{0}']".format(group1.id)
+        search_group = mommy.make(SearchGroup, name="gr0", search=search)
+        value = "['{0}']".format(group1.id)
         mommy.make(
             SearchField, field='all_groups', value=value, is_list=True, search_group=search_group)
 
@@ -169,8 +171,8 @@ class SearchSaveTest(BaseTestCase):
         group3 = mommy.make(models.Group, name="ABB")
 
         search = mommy.make(Search)
-        search_group = mommy.make(SearchGroup, name=u"gr0", search=search)
-        value = u"[]"
+        search_group = mommy.make(SearchGroup, name="gr0", search=search)
+        value = "[]"
         mommy.make(
             SearchField, field='all_groups', value=value, is_list=True, search_group=search_group)
 
@@ -196,7 +198,7 @@ class SearchSaveTest(BaseTestCase):
 
         groups = [group1.id, group2.id]
         search_data = {
-            "gr0-_-all_groups-_-0": [unicode(x) for x in groups],
+            "gr0-_-all_groups-_-0": ['{0}'.format(x) for x in groups],
         }
         data = {
             'name': "ABC",
@@ -220,12 +222,12 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.searchgroup_set.count(), 1)
 
         search_group = search_1.searchgroup_set.all()[0]
-        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.name, "gr0")
 
         self.assertEqual(search_group.searchfield_set.count(), 1)
         search_field = search_group.searchfield_set.all()[0]
-        self.assertEqual(search_field.field, u"all_groups")
-        self.assertEqual(search_field.value, u"[u'{0}', u'{1}']".format(*groups))
+        self.assertEqual(search_field.field, "all_groups")
+        self.assertEqual(search_field.value, "['{0}', '{1}']".format(*groups))
         self.assertEqual(search_field.is_list, True)
 
     def test_save_search_multi_values_only_1(self):
@@ -237,7 +239,7 @@ class SearchSaveTest(BaseTestCase):
 
         groups = [group1.id]
         search_data = {
-            "gr0-_-all_groups-_-0": [unicode(x) for x in groups],
+            "gr0-_-all_groups-_-0": ['{0}'.format(x) for x in groups],
         }
         data = {
             'name': "ABC",
@@ -261,12 +263,12 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.searchgroup_set.count(), 1)
 
         search_group = search_1.searchgroup_set.all()[0]
-        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.name, "gr0")
 
         self.assertEqual(search_group.searchfield_set.count(), 1)
         search_field = search_group.searchfield_set.all()[0]
-        self.assertEqual(search_field.field, u"all_groups")
-        self.assertEqual(search_field.value, u"[u'{0}']".format(group1.id))
+        self.assertEqual(search_field.field, "all_groups")
+        self.assertEqual(search_field.value, "['{0}']".format(group1.id))
         self.assertEqual(search_field.is_list, True)
 
     def test_save_search_multi_values_none(self):
@@ -323,25 +325,25 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.searchgroup_set.count(), 2)
 
         search_group = search_1.searchgroup_set.filter(name="gr0")[0]
-        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.name, "gr0")
         self.assertEqual(search_group.searchfield_set.count(), 2)
 
         search_fields = search_group.searchfield_set.all().order_by("value")
         search_field = search_fields[0]
-        self.assertEqual(search_field.field, u"group")
-        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        self.assertEqual(search_field.field, "group")
+        self.assertEqual(search_field.value, "{0}".format(group1.id))
         self.assertEqual(search_field.count, 0)
         search_field = search_fields[1]
-        self.assertEqual(search_field.field, u"group")
-        self.assertEqual(search_field.value, u"{0}".format(group2.id))
+        self.assertEqual(search_field.field, "group")
+        self.assertEqual(search_field.value, "{0}".format(group2.id))
         self.assertEqual(search_field.count, 1)
 
         search_group = search_1.searchgroup_set.filter(name="gr1")[0]
-        self.assertEqual(search_group.name, u"gr1")
+        self.assertEqual(search_group.name, "gr1")
         self.assertEqual(search_group.searchfield_set.count(), 1)
         search_field = search_group.searchfield_set.all()[0]
-        self.assertEqual(search_field.field, u"group")
-        self.assertEqual(search_field.value, u"{0}".format(group3.id))
+        self.assertEqual(search_field.field, "group")
+        self.assertEqual(search_field.value, "{0}".format(group3.id))
         self.assertEqual(search_field.count, 0)
 
     def test_no_name(self):
@@ -425,12 +427,12 @@ class SearchSaveTest(BaseTestCase):
         self.assertEqual(search_1.searchgroup_set.count(), 1)
 
         search_group = search_1.searchgroup_set.all()[0]
-        self.assertEqual(search_group.name, u"gr0")
+        self.assertEqual(search_group.name, "gr0")
 
         self.assertEqual(search_group.searchfield_set.count(), 1)
         search_field = search_group.searchfield_set.all()[0]
-        self.assertEqual(search_field.field, u"group")
-        self.assertEqual(search_field.value, u"{0}".format(group1.id))
+        self.assertEqual(search_field.field, "group")
+        self.assertEqual(search_field.value, "{0}".format(group1.id))
 
     def test_save_search_anonymous(self):
         """save search as anonymous user"""

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """permission rules and utilities"""
 
+from __future__ import unicode_literals
+
 
 def can_access(user):
     """define who can access"""

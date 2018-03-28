@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test subscription"""
 
+from __future__ import unicode_literals
+
 import os
 from bs4 import BeautifulSoup
 from datetime import date
@@ -713,7 +715,7 @@ class SubscribeTest(TestCase):
 
         # Check the callbacks have been called
         self.assertEqual(models.Group.objects.count(), 1)
-        group = models.Group.objects.get(name=u'newsletter')
+        group = models.Group.objects.get(name='newsletter')
         self.assertEqual(group.entities.count(), 0)
         self.assertEqual(list(group.contacts.all()), [contact])
 

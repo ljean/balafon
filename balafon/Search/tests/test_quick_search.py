@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test quick search"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -94,7 +96,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Skywalker"}
+        data = {"text": "Skywalker"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -111,7 +113,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Skywalker"}
+        data = {"text": "Skywalker"}
 
         self.client.logout()
         response = self.client.post(url, data=data)
@@ -124,7 +126,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Skywalker"}
+        data = {"text": "Skywalker"}
 
         self.user.is_staff = False
         self.user.save()
@@ -142,7 +144,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Skywalker"}
+        data = {"text": "Skywalker"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -164,7 +166,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Star-Wars"}
+        data = {"text": "Star-Wars"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -186,7 +188,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"Star"}
+        data = {"text": "Star"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -206,7 +208,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"04.99"}
+        data = {"text": "04.99"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -235,7 +237,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"04.99"}
+        data = {"text": "04.99"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -263,7 +265,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"@starwars.com"}
+        data = {"text": "@starwars.com"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -299,7 +301,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"@starwars.com"}
+        data = {"text": "@starwars.com"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
@@ -329,7 +331,7 @@ class QuickSearchTest(BaseTestCase):
 
         url = reverse('quick_search')
 
-        data = {"text": u"starwars.com"}
+        data = {"text": "starwars.com"}
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)

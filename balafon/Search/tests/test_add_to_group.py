@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we cans earch contacts y group"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -14,12 +16,12 @@ class AddToGroupActionTest(BaseTestCase):
 
     def test_add_contact_to_group(self):
         """add a contact to group"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
         group = mommy.make(models.Group, name="GROUP1")
         group.entities.add(entity1)
@@ -57,12 +59,12 @@ class AddToGroupActionTest(BaseTestCase):
 
     def test_add_entity_to_group(self):
         """add entity to group"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
         group = mommy.make(models.Group, name="GROUP1")
         group.entities.add(entity1)

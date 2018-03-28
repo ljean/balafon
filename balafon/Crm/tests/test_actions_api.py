@@ -5,6 +5,8 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.contrib.auth.models import User

@@ -5,6 +5,8 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
+from __future__ import unicode_literals
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -730,12 +732,12 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -747,12 +749,12 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony entity"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
         entity = mommy.make(models.Entity, email="toto@toto.fr")
         action.entities.add(entity)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -764,7 +766,7 @@ class MailtoActionTest(BaseTestCase):
         """send email to the several contacts"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
 
         entity = mommy.make(models.Entity, email="entity@toto.fr")
 
@@ -786,7 +788,7 @@ class MailtoActionTest(BaseTestCase):
 
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -801,13 +803,13 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
 
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", bcc=True, action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", bcc=True, action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -819,13 +821,13 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
 
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", subject=u"Subject", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", subject="Subject", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -837,13 +839,13 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
 
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello {{ action.subject }}", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello {{ action.subject }}", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id])
 
@@ -855,7 +857,7 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
@@ -869,12 +871,12 @@ class MailtoActionTest(BaseTestCase):
         """send email to the ony contact"""
 
         type = mommy.make(models.ActionType)
-        action = mommy.make(models.Action, subject=u"Test", type=type)
+        action = mommy.make(models.Action, subject="Test", type=type)
         contact = mommy.make(models.Contact, email="toto@toto.fr")
         action.contacts.add(contact)
         action.save()
 
-        mommy.make(models.MailtoSettings, body_template=u"Hello", action_type=type)
+        mommy.make(models.MailtoSettings, body_template="Hello", action_type=type)
 
         url = reverse("crm_mailto_action", args=[action.id + 1])
 

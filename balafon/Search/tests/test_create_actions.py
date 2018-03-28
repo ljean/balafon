@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can search contacts by action"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from coop_cms.tests import BeautifulSoup
@@ -22,12 +24,12 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_view_form(self):
         """test view crete action form"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
@@ -51,10 +53,10 @@ class ActionForContactsTest(BaseTestCase):
         """test view form is not logged"""
         self.client.logout()
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
@@ -70,15 +72,15 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_post_create_actions_for_contacts(self):
         """test create actions for contact"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
 
         data = {
-            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'contacts': ";".join(['{0}'.format(i) for i in (contact1.id, contact2.id)]),
             'date': '',
             'time': '',
             'type': '',
@@ -113,15 +115,15 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_post_create_actions_anonymous(self):
         """test can't create actions for contact if not logged"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
 
         self.client.logout()
 
         data = {
-            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'contacts': ";".join(['{0}'.format(i) for i in (contact1.id, contact2.id)]),
             'date': '',
             'time': '',
             'type': '',
@@ -145,16 +147,16 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_post_create_actions_not_staff(self):
         """test can't create actions for contact if not in staff"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
 
         self.user.is_staff = False
         self.user.save()
 
         data = {
-            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'contacts': ";".join(['{0}'.format(i) for i in (contact1.id, contact2.id)]),
             'date': '',
             'time': '',
             'type': '',
@@ -178,11 +180,11 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_post_create_actions_default_status(self):
         """test create actions for contact"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
 
         action_type = mommy.make(models.ActionType)
@@ -194,7 +196,7 @@ class ActionForContactsTest(BaseTestCase):
         action_type.save()
 
         data = {
-            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'contacts': ";".join(['{0}'.format(i) for i in (contact1.id, contact2.id)]),
             'date': '',
             'time': '',
             'type': action_type.id,
@@ -231,17 +233,17 @@ class ActionForContactsTest(BaseTestCase):
 
     def test_post_create_actions_opportunity(self):
         """test create actions for contact"""
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
 
         opportunity = mommy.make(models.Opportunity)
 
         data = {
-            'contacts': u";".join([unicode(i) for i in (contact1.id, contact2.id)]),
+            'contacts': ";".join(['{0}'.format(i) for i in (contact1.id, contact2.id)]),
             'date': '',
             'time': '',
             'type': '',

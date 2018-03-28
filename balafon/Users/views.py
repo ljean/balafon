@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import json
 
 from django.contrib.auth.decorators import user_passes_test
@@ -40,9 +42,9 @@ def toggle_favorite(request):
                 
                 if not favorite.content_object:
                     favorite.delete()
-                    raise ToggleFavoriteException(_(u'Invalid object'))
+                    raise ToggleFavoriteException(_('Invalid object'))
             
-                label = getattr(favorite.content_object, 'name', unicode(favorite.content_object))
+                label = getattr(favorite.content_object, 'name', '{0}'.format(favorite.content_object))
                 if is_new:
                     data = {
                         'success': True,
@@ -55,11 +57,11 @@ def toggle_favorite(request):
                         'status': False,
                     }
             else:
-                raise ToggleFavoriteException(u"{0}".format(form.errors))
+                raise ToggleFavoriteException("{0}".format(form.errors))
         else:
-            raise ToggleFavoriteException(u"POST expected")
+            raise ToggleFavoriteException("POST expected")
     except ToggleFavoriteException:
-        data = {'success': False, 'message': _(u'An error occured')}
+        data = {'success': False, 'message': _('An error occured')}
         logger.exception("update_favorite")
     return HttpResponse(json.dumps(data), content_type="application/json")
 
@@ -118,7 +120,7 @@ def user_homepage(request):
 def make_homepage(request):
     """Change the homepage of the user"""
     if request.method == "POST":
-        data = {"ok": False, "message": _(u"An error occured")}
+        data = {"ok": False, "message": _("An error occured")}
         form = forms.UrlForm(request.POST)
         if form.is_valid():
             homepage_url = form.cleaned_data["url"]
@@ -130,7 +132,7 @@ def make_homepage(request):
                 models.UserHomepage.objects.create(user=request.user, url=homepage_url)
             data = {"ok": True, "message": ""}
         else:
-            data["message"] = u", ".join([unicode(error_list) for error_list in form.errors.values()])
+            data["message"] = ", ".join(['{0}'.format(error_list) for error_list in form.errors.values()])
         return HttpResponse(json.dumps(data), content_type="application/json")
     raise Http404
 

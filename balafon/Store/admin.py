@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """admin"""
 
+from __future__ import unicode_literals
+
 from django import forms
 from django.db.models import CharField
 from django.contrib import admin
@@ -28,11 +30,11 @@ class StoreItemInline(admin.TabularInline):
 
 class StoreParentCategoryFilter(admin.SimpleListFilter):
     """filter items which are below their stock threshold"""
-    title = _(u'parent')
+    title = _('parent')
     parameter_name = 'parent_category'
 
     def lookups(self, request, model_admin):
-        return [(0, _(u'None'))] + [
+        return [(0, _('None'))] + [
             (category.id, category.name)
             for category in models.StoreItemCategory.objects.filter(
                 subcategories_set__isnull=False
@@ -112,7 +114,7 @@ admin.site.register(models.StoreManagementActionType, StoreManagementActionTypeA
 
 class StockThresholdFilter(admin.SimpleListFilter):
     """filter items which are below their stock threshold"""
-    title = _(u'Stock level')
+    title = _('Stock level')
     parameter_name = 'stock_threshold_warning'
 
     THRESHOLD_ALERT = 1
@@ -145,7 +147,7 @@ class StockThresholdFilter(admin.SimpleListFilter):
 
 class StoreCategoryFilter(admin.SimpleListFilter):
     """filter items which are below their stock threshold"""
-    title = _(u'Store category')
+    title = _('Store category')
     parameter_name = 'store_category'
 
     def lookups(self, request, model_admin):
@@ -181,11 +183,11 @@ class StoreCategoryFilter(admin.SimpleListFilter):
 
 class CertificateFilter(admin.SimpleListFilter):
     """filter items with a given certificate"""
-    title = _(u'Certificate')
+    title = _('Certificate')
     parameter_name = 'store_certificate'
 
     def lookups(self, request, model_admin):
-        return [(0, _(u'None'))] + [
+        return [(0, _('None'))] + [
             (certificate.id, certificate.name)
             for certificate in models.Certificate.objects.all().order_by('name')
         ]
@@ -226,29 +228,29 @@ class StoreItemAdmin(admin.ModelAdmin):
     raw_id_fields = ['tags', 'certificates', 'only_for_groups']
     inlines = [StoreItemPropertyValueInline]
     fieldsets = (
-        (_(u'General'), {
+        (_('General'), {
             'fields': (
                 'name', 'origin', 'published', 'available', 'category', 'brand', 'certificates', 'tags',
                 'only_for_groups',
             )
         }),
-        (_(u'Info'), {
+        (_('Info'), {
             'fields': (
                 'image', 'description',
             )
         }),
-        (_(u'Price'), {
+        (_('Price'), {
             'fields': (
                 'vat_rate', 'purchase_price', 'price_policy', 'pre_tax_price', 'vat_incl_price', 'price_class',
             )
         }),
-        (_(u'Supplier'), {
+        (_('Supplier'), {
             'fields': ('supplier', 'reference', )
         }),
-        (_(u'Stock'), {
+        (_('Stock'), {
             'fields': ('stock_count', 'stock_threshold', 'stock_threshold_alert', )
         }),
-        (_(u'Import'), {
+        (_('Import'), {
             'fields': ('imported_by', )
         }),
     )
@@ -282,18 +284,18 @@ def import_data(modeladmin, request, queryset):
         if import_file.is_successful:
             success(
                 request,
-                _(u'The file {0} has been properly imported : {1} items have been created').format(
+                _('The file {0} has been properly imported : {1} items have been created').format(
                     import_file, import_file.storeitem_set.count()
                 )
             )
         else:
             error(
                 request,
-                _(u'Error while importing the file {0}: {1}').format(
+                _('Error while importing the file {0}: {1}').format(
                     import_file, import_file.error_message
                 )
             )
-import_data.short_description = _(u"Import")
+import_data.short_description = _("Import")
 
 
 class StoreItemImportAdmin(admin.ModelAdmin):
@@ -304,7 +306,6 @@ class StoreItemImportAdmin(admin.ModelAdmin):
     }
 
 admin.site.register(models.StoreItemImport, StoreItemImportAdmin)
-
 
 admin.site.register(models.StoreItemProperty)
 

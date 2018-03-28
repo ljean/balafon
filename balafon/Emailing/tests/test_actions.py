@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test emailing actions"""
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext
 
@@ -17,7 +19,7 @@ class ActionInFavoriteTestCase(BaseTestCase):
         user = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
         mommy.make(UserPreferences, user=user, message_in_favorites=True)
 
-        action_type = mommy.make(models.ActionType, name=ugettext(u"Message"))
+        action_type = mommy.make(models.ActionType, name=ugettext("Message"))
         action = mommy.make(models.Action, type=action_type)
 
         self.assertEqual(1, user.user_favorite_set.count())
@@ -28,7 +30,7 @@ class ActionInFavoriteTestCase(BaseTestCase):
         user = mommy.make(User, is_active=True, is_staff=True, email="toto@toto.fr")
         up = mommy.make(UserPreferences, user=user, message_in_favorites=False)
 
-        action_type = mommy.make(models.ActionType, name=ugettext(u"Message"))
+        action_type = mommy.make(models.ActionType, name=ugettext("Message"))
         mommy.make(models.Action, type=action_type)
 
         self.assertEqual(0, user.user_favorite_set.count())

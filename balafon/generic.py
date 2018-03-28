@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
+from __future__ import unicode_literals
 
 from datetime import date, datetime
 import xlwt
@@ -124,7 +125,7 @@ class XlsExportView(View):
 
     def _calculate_size(self, ws, line, column, value):
 
-        col_widths = [len(value_lines) for value_lines in unicode(value).split("\n")]
+        col_widths = [len(value_lines) for value_lines in '{0}'.format(value).split("\n")]
         line_height = (len(col_widths) * 240) if len(col_widths) > 1 else 0
         width = 1500 + max(col_widths) * 220
 

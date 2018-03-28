@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import six
+from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms.forms import BoundField
@@ -138,7 +138,7 @@ class _CityBasedForm(object):
             setattr(self, field_prefix + 'country_id', get_default_country().id)
 
         self.fields[field_prefix + 'city'].widget = CityAutoComplete(
-            attrs={'placeholder': _(u'Enter a city'), 'size': '80'}
+            attrs={'placeholder': _('Enter a city'), 'size': '80'}
         )
 
         zones_choices = [
@@ -196,13 +196,13 @@ class _CityBasedForm(object):
                     city = models.City.objects.get_or_create(name=city, parent=country)[0]
                 else:
                     if len(zip_code) < 2:
-                        raise ValidationError(ugettext(u'You must enter a valid zip code for selecting a new city'))
+                        raise ValidationError(ugettext('You must enter a valid zip code for selecting a new city'))
                     dep = models.Zone.objects.get(code=zip_code[:2])
                     city = models.City.objects.get_or_create(name=city, parent=dep)[0]
                 return city
             except ValidationError:
                 raise
-            except Exception, msg:
+            except Exception as msg:
                 raise ValidationError(msg)
 
     def clean_city(self):
@@ -214,10 +214,10 @@ class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
     """ModelForm with city"""
     city = forms.CharField(
         required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        label=_('City'),
+        widget=CityAutoComplete(attrs={'placeholder': _('Enter a city'), 'size': '80'})
     )
-    country = forms.ChoiceField(required=False, label=_(u'Country'))
+    country = forms.ChoiceField(required=False, label=_('Country'))
 
     def __init__(self, *args, **kwargs):
         super(ModelFormWithCity, self).__init__(*args, **kwargs)
@@ -227,9 +227,9 @@ class ModelFormWithCity(BetterBsModelForm, _CityBasedForm):
 class FormWithCity(BetterBsForm, _CityBasedForm):
     """Form with city"""
 
-    country = forms.ChoiceField(required=False, label=_(u'Country'))
-    zip_code = forms.CharField(required=False, label=_(u'zip code'))
-    city = forms.CharField(required=False, label=_(u'City'))
+    country = forms.ChoiceField(required=False, label=_('Country'))
+    zip_code = forms.CharField(required=False, label=_('zip code'))
+    city = forms.CharField(required=False, label=_('City'))
 
     def __init__(self, *args, **kwargs):
         super(FormWithCity, self).__init__(*args, **kwargs)
@@ -240,10 +240,10 @@ class BillingModelFormWithCity(ModelFormWithCity):
     """ModelForm with city"""
     billing_city = forms.CharField(
         required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        label=_('City'),
+        widget=CityAutoComplete(attrs={'placeholder': _('Enter a city'), 'size': '80'})
     )
-    billing_country = forms.ChoiceField(required=False, label=_(u'Country'))
+    billing_country = forms.ChoiceField(required=False, label=_('Country'))
 
     def __init__(self, *args, **kwargs):
         super(BillingModelFormWithCity, self).__init__(*args, **kwargs)
@@ -264,13 +264,13 @@ class ModelFormWithAddress(BillingModelFormWithCity):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
-            prefix = u" ".join([
+            prefix = " ".join([
                 instance.street_number,
                 instance.street_type.name if instance.street_type else '',
             ]).strip()
             instance.address = instance.address.replace(prefix, '', 1).strip()
 
-            billing_prefix = u" ".join([
+            billing_prefix = " ".join([
                 instance.billing_street_number,
                 instance.billing_street_type.name if instance.billing_street_type else '',
             ]).strip()
@@ -290,7 +290,7 @@ class ModelFormWithAddress(BillingModelFormWithCity):
         street_type = self.cleaned_data['street_type']
         address = self.cleaned_data['address']
         if street_number or street_type:
-            return u" ".join([street_number, street_type.name if street_type else '', address]).strip()
+            return " ".join([street_number, street_type.name if street_type else '', address]).strip()
         return address
 
     def clean_billing_address(self):
@@ -299,7 +299,7 @@ class ModelFormWithAddress(BillingModelFormWithCity):
         billing_street_type = self.cleaned_data['billing_street_type']
         billing_address = self.cleaned_data['billing_address']
         if billing_street_number or billing_street_type:
-            return u" ".join(
+            return " ".join(
                 [billing_street_number, billing_street_type.name if billing_street_type else '', billing_address]
             ).strip()
         return billing_address

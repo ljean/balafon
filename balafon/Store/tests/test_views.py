@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from decimal import Decimal
 
@@ -194,7 +196,7 @@ class ViewCommercialDocumentTest(TestCase):
         store_action_type = mommy.make(models.StoreManagementActionType)
         action = mommy.make(Action, type=store_action_type.action_type)
 
-        item = mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+        item = mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
@@ -209,7 +211,7 @@ class ViewCommercialDocumentTest(TestCase):
         action = mommy.make(Action, type=store_action_type.action_type)
 
         item = mommy.make(
-            models.SaleItem, sale=action.sale, item=store_item, text=u'Promo été', quantity=1, pre_tax_price=10
+            models.SaleItem, sale=action.sale, item=store_item, text='Promo été', quantity=1, pre_tax_price=10
         )
 
         url = reverse('store_view_sales_document', args=[action.id])
@@ -226,7 +228,7 @@ class ViewCommercialDocumentTest(TestCase):
 
         self.assertNotEqual(action.uuid, '')
 
-        item = mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+        item = mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
 
         self.client.logout()
         url = reverse('store_view_sales_document_public', args=[action.uuid])
@@ -264,7 +266,7 @@ class ViewCommercialDocumentTest(TestCase):
         action.contacts.add(contact1)
         action.save()
 
-        mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+        mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
 
         url = reverse('store_view_sales_document_pdf', args=[action.id])
         response = self.client.get(url)
@@ -284,7 +286,7 @@ class ViewCommercialDocumentTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         self.client.logout()
 
-        mommy.make(models.SaleItem, sale=action.sale, text=u'Promo été', quantity=1, pre_tax_price=10)
+        mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
 
         url = reverse('store_view_sales_document_pdf_public', args=[action.uuid])
         response = self.client.get(url)
@@ -403,7 +405,7 @@ class ActionMailtoTest(BaseTestCase):
         action.contacts.add(contact)
         action.save()
 
-        body = _(u"Here is a link to your {0}: {1}{2}").format(
+        body = _("Here is a link to your {0}: {1}{2}").format(
             action_type.name,
             "http://" + Site.objects.get_current().domain,
             reverse('store_view_sales_document_public', args=[action.uuid])

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """miscellaneous searches"""
 
+from __future__ import unicode_literals
+
 from datetime import date, timedelta
 
 from django.core.urlresolvers import reverse
@@ -22,26 +24,26 @@ class ModificationBySearchTest(BaseTestCase):
         user2 = mommy.make(models.User, is_staff=True, is_active=True)
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             last_modified_by=user1
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
             last_modified_by=user2
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -65,26 +67,26 @@ class ModificationBySearchTest(BaseTestCase):
         user2 = mommy.make(models.User, is_staff=True, is_active=True)
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             last_modified_by=user1
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
             last_modified_by=user2
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -109,26 +111,26 @@ class ModificationBySearchTest(BaseTestCase):
         user2 = mommy.make(models.User, is_staff=True, is_active=True)
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             last_modified_by=user1
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
             last_modified_by=user2
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -152,27 +154,27 @@ class ModificationBySearchTest(BaseTestCase):
         user2 = mommy.make(models.User, is_staff=True, is_active=True)
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.last_modified_by = user1
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
             last_modified_by=user1
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.last_modified_by = user2
         contact3.entity.save()
@@ -197,27 +199,27 @@ class ModificationBySearchTest(BaseTestCase):
         user2 = mommy.make(models.User, is_staff=True, is_active=True)
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.last_modified_by = user1
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="IJKL", email="contact2@email2.fr", main_contact=True, has_left=False,
             last_modified_by=user1
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="MNOP", email="contact3@email3.fr", main_contact=True, has_left=False,
             last_modified_by=None
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.last_modified_by = user2
         contact3.entity.save()
@@ -258,9 +260,9 @@ class ModificationDateSearchTest(BaseTestCase):
 
         # when saved 'modified' is updated
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False,
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 

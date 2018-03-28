@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """notify_due_actions command"""
 
+from __future__ import unicode_literals, print_function
+
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -29,7 +31,7 @@ def notify_due_actions(user, actions):
     content = template.render(Context(data))
     
     email = EmailMessage(
-        _(u"Balafon: You have due actions"),
+        _("Balafon: You have due actions"),
         content,
         from_email,
         [notification_email]
@@ -43,7 +45,7 @@ def notify_due_actions(user, actions):
 
 class Command(BaseCommand):
     """The command"""
-    help = u"notify due actions"
+    help = "notify due actions"
     use_argparse = False
 
     def handle(self, *args, **options):
@@ -57,12 +59,12 @@ class Command(BaseCommand):
             actions = user.teammember.action_set.filter(planned_date__lt=tomorrow, done=False).order_by("planned_date")
             if actions.count() == 0:
                 if verbose:
-                    print "no due actions for", user.username
+                    print("no due actions for", user.username)
             else:
                 if verbose:
-                    print "send", actions.count(), "due actions to", user.username
+                    print("send", actions.count(), "due actions to", user.username)
 
                 notify_due_actions(user, actions)
             
         if verbose:
-            print "done"
+            print("done")

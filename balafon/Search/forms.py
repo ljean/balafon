@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
+from __future__ import unicode_literals
+
 from datetime import date, datetime, time
 from itertools import chain
 import importlib
@@ -76,7 +78,7 @@ class GroupedSelect(forms.Select):
         for group_label, group in self.choices: 
             if group_label:
                 # should belong to an optgroup
-                group_label = smart_unicode(group_label) 
+                group_label = smart_unicode(group_label)
                 output.append(u'<optgroup label="%s">' % escape(group_label)) 
             for key, value in group:
                 #build option html
@@ -268,7 +270,7 @@ class SearchForm(forms.Form):
         """validate name"""
         name = self.cleaned_data['name']
         if len(name) >= 100:
-            raise ValidationError(_(u"Too long"))
+            raise ValidationError(_("Too long"))
         if self._save:
             if name:
                 queryset = models.Search.objects.filter(name=name)
@@ -379,7 +381,7 @@ class SearchForm(forms.Form):
             contacts = sorted(contacts, key=sort_by_entity_callback)
 
         # Just for compatibility
-        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name=u'Newsletter')
+        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name='Newsletter')
         if queryset.count():
             for contact in contacts:
                 for subscription_type in queryset:
@@ -444,7 +446,7 @@ class SearchForm(forms.Form):
         for contact in contacts:
             if contact.get_email and (contact.id not in excluded_ids) and filter_func(contact):
                 if contact.firstname or contact.lastname:
-                    emails.append(u'"{1}" <{0}>'.format(contact.get_email, contact.fullname))
+                    emails.append('"{1}" <{0}>'.format(contact.get_email, contact.fullname))
                 else:
                     emails.append(contact.get_email)
         return emails
@@ -452,7 +454,7 @@ class SearchForm(forms.Form):
     def actions(self):
         """allowed actions"""
         form = FieldChoiceForm()
-        html_tpl = u"""{0}
+        html_tpl = """{0}
             <a class="btn btn-xs btn-default btn-yellow add-field" href="">
             <span class="glyphicon glyphicon-filter"></span> {1}</a>
             <a class="btn btn-xs btn-default add-block" href="">
@@ -465,17 +467,17 @@ class SearchForm(forms.Form):
             <span class="glyphicon glyphicon-trash"></span> {4}</a>"""
 
         return html_tpl.format(
-            form.as_it_is(), _(u'Add filter'), _(u'Add block'), _(u'Clear'), _(u'Remove'), _(u'Duplicate')
+            form.as_it_is(), _('Add filter'), _('Add block'), _('Clear'), _('Remove'), _('Duplicate')
         )
     
     def as_html(self):
         """as html"""
         keys = self._forms.keys()
         keys.sort()
-        html = u'<div>{0}</div>'.format(self.as_p())
+        html = '<div>{0}</div>'.format(self.as_p())
         if keys:
             for key in keys:
-                html_tpl = u'<div class="search-block" rel="{0}"><div class="actions">{1}</div><div class="fields">'
+                html_tpl = '<div class="search-block" rel="{0}"><div class="actions">{1}</div><div class="fields">'
                 html += html_tpl.format(key, self.actions())
                 for form in self._forms[key]:
                     html += form.as_it_is()
@@ -505,7 +507,7 @@ class SearchFieldForm(BsForm):
         
     def _get_field_name(self):
         """return field name"""
-        return self.block + '-_-' + self.name + '-_-' + unicode(self.count)
+        return self.block + '-_-' + self.name + '-_-' + str(self.count)
         
     def _add_field(self, field):
         """adda field"""
@@ -581,7 +583,7 @@ class TwoDatesForm(SearchFieldForm):
         try:
             self._get_dates()
         except ValueError:
-            raise ValidationError(_(u"Two valid dates are required"))
+            raise ValidationError(_("Two valid dates are required"))
         return self.value
     
     def _get_dates(self):
@@ -618,7 +620,7 @@ class SearchActionBaseMixin(object):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
+            initial_contacts = ';'.join(['{0}'.format(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         return initial_contacts
         
@@ -633,7 +635,7 @@ class SearchActionBaseMixin(object):
         contacts = Contact.objects.filter(id__in=ids)
         contact_by_ids = {}
         for contact in contacts:
-            contact_by_ids[unicode(contact.id)] = contact
+            contact_by_ids['{0}'.format(contact.id)] = contact
         ordered_contacts = []
         for contact_id in ids:
             ordered_contacts.append(contact_by_ids[contact_id])
@@ -654,7 +656,7 @@ class SubscribeContactsAdminForm(SearchActionForm):
     """This form is used for superuser forcing newsletter subscription"""
     subscription_type = forms.ChoiceField(required=True)
     subscribe = forms.BooleanField(
-        required=False, label=_(u'Subscribe'), help_text=_(u'It will subscribe/unsubscribe all selected contacts')
+        required=False, label=_('Subscribe'), help_text=_('It will subscribe/unsubscribe all selected contacts')
     )
 
     def __init__(self, *args, **kwargs):
@@ -668,7 +670,7 @@ class SubscribeContactsAdminForm(SearchActionForm):
         try:
             return SubscriptionType.objects.get(id=self.cleaned_data['subscription_type'])
         except SubscriptionType.DoesNotExist:
-            raise ValidationError(_(u'Unknown subscription type'))
+            raise ValidationError(_('Unknown subscription type'))
 
 
 class PdfTemplateForm(SearchActionForm):
@@ -682,18 +684,18 @@ class PdfTemplateForm(SearchActionForm):
             choices = settings.BALAFON_PDF_TEMPLATES
         else:
             choices = (
-                ('pdf/labels_24.html', _(u'etiquettes 24')),
-                ('pdf/labels_21.html', _(u'etiquettes 21')),
-                ('pdf/agipa_21.html', _(u'Agipa 21')),
-                ('pdf/labels_16.html', _(u'etiquettes 16')),
-                ('pdf/address_strip.html', _(u'bande adresse')),
+                ('pdf/labels_24.html', _('etiquettes 24')),
+                ('pdf/labels_21.html', _('etiquettes 21')),
+                ('pdf/agipa_21.html', _('Agipa 21')),
+                ('pdf/labels_16.html', _('etiquettes 16')),
+                ('pdf/address_strip.html', _('bande adresse')),
             )
         
         self.fields['template'] = forms.ChoiceField(
             choices=choices,
             required=True,
-            label=_(u'template'),
-            help_text=_(u'Select the type of document to generate')
+            label=_('template'),
+            help_text=_('Select the type of document to generate')
         )
         self.fields['template'].widget.attrs.update({'class': 'form-control'})
         
@@ -729,8 +731,8 @@ class PdfTemplateForm(SearchActionForm):
         
 class ActionForContactsForm(forms.ModelForm):
     """Create action for contacts"""
-    date = forms.DateField(label=_(u"planned date"), required=False, widget=forms.TextInput())
-    time = forms.TimeField(label=_(u"planned time"), required=False)
+    date = forms.DateField(label=_("planned date"), required=False, widget=forms.TextInput())
+    time = forms.TimeField(label=_("planned time"), required=False)
     contacts = forms.CharField(widget=forms.HiddenInput())
     
     class Meta:
@@ -744,13 +746,13 @@ class ActionForContactsForm(forms.ModelForm):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([unicode(c.id) for c in initial['contacts']])
+            initial_contacts = ';'.join(['{0}'.format(c.id) for c in initial['contacts']])
             initial.pop('contacts')
         super(ActionForContactsForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
         self.fields['opportunity'].widget = OpportunityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'}
+            attrs={'placeholder': _('Enter the name of an opportunity'), 'size': '80', 'class': 'colorbox'}
         )
         
     def get_contacts(self):
@@ -772,10 +774,10 @@ class GroupForContactsForm(forms.Form):
     contacts = forms.CharField(widget=forms.HiddenInput())
     groups = HidableModelMultipleChoiceField(queryset=Group.objects.all())
     on_contact = forms.BooleanField(
-        label=_(u"Group on contact"),
+        label=_("Group on contact"),
         required=False,
         initial=True,
-        help_text=_(u"Define if the group is added on the contact itself or on his entity")
+        help_text=_("Define if the group is added on the contact itself or on his entity")
     )
     
     class Media:
@@ -791,7 +793,7 @@ class GroupForContactsForm(forms.Form):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([unicode(contact.id) for contact in initial['contacts']])
+            initial_contacts = ';'.join(['{0}'.format(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         super(GroupForContactsForm, self).__init__(*args, **kwargs)
         if initial_contacts:
@@ -799,7 +801,7 @@ class GroupForContactsForm(forms.Form):
     
         self.fields['groups'].widget.attrs = {
             'class': 'chzn-select',
-            'data-placeholder': _(u'Select groups'),
+            'data-placeholder': _('Select groups'),
             'style': "width:350px;"
         }
         self.fields['groups'].help_text = ''
@@ -813,7 +815,7 @@ class GroupForContactsForm(forms.Form):
 class SearchNameForm(forms.Form):
     """Save search form"""
     search_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    name = forms.CharField(required=True, label=_(u"Name"))
+    name = forms.CharField(required=True, label=_("Name"))
     search_fields = forms.CharField(required=True, widget=forms.HiddenInput())
     
     def clean_name(self):
@@ -822,13 +824,13 @@ class SearchNameForm(forms.Form):
         
         name = self.cleaned_data["name"]
         if not name:
-            raise ValidationError(_(u"This field is required"))
+            raise ValidationError(_("This field is required"))
         
         queryset = models.Search.objects.filter(name=name)
         if search_id:
             queryset = queryset.exclude(id=search_id)
         if queryset.count() > 0:
-            raise ValidationError(_(u"This name is already used"))
+            raise ValidationError(_("This name is already used"))
         
         if search_id:
             search = models.Search.objects.get(id=search_id)

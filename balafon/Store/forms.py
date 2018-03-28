@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
+from __future__ import unicode_literals
+
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
@@ -39,9 +41,9 @@ class PricePolicyAdminForm(forms.ModelForm):
             try:
                 Decimal(parameters)
             except InvalidOperation:
-                text = ugettext(u'{0} is not a valid decimal'.format(parameters))
+                text = ugettext('{0} is not a valid decimal'.format(parameters))
                 if ',' in parameters:
-                    text += u' ' + ugettext(u'Did you use coma rather than dot as decimal separator?')
+                    text += ' ' + ugettext('Did you use coma rather than dot as decimal separator?')
                 raise forms.ValidationError(text)
         return parameters
 
@@ -56,12 +58,12 @@ class StoreItemCategoryAdminForm(forms.ModelForm):
     def clean_parent(self):
         parent = self.cleaned_data['parent']
         if self.instance and parent == self.instance:
-            raise forms.ValidationError(ugettext(u'A category can not be its own parent'))
+            raise forms.ValidationError(ugettext('A category can not be its own parent'))
 
         if self.instance:
             if parent in self.instance.get_sub_categories():
                 raise forms.ValidationError(
-                    ugettext(u'A category can not be parent and children of another category')
+                    ugettext('A category can not be parent and children of another category')
                 )
 
         return parent
@@ -70,10 +72,10 @@ class StoreItemCategoryAdminForm(forms.ModelForm):
 class AddExtraSaleForm(BetterBsForm):
     """A form for adding a new extra sale"""
 
-    analysis_code = forms.ChoiceField(label=_(u'Analysis code'), required=True)
-    amount = forms.DecimalField(max_digits=9, decimal_places=2, required=True, label=_(u'Amount'))
-    vat_rate = forms.ChoiceField(label=_(u'VAT rate'), required=True)
-    date = forms.DateField(label=_(u'Date'), required=True)
+    analysis_code = forms.ChoiceField(label=_('Analysis code'), required=True)
+    amount = forms.DecimalField(max_digits=9, decimal_places=2, required=True, label=_('Amount'))
+    vat_rate = forms.ChoiceField(label=_('VAT rate'), required=True)
+    date = forms.DateField(label=_('Date'), required=True)
 
     def __init__(self, *args, **kwargs):
         super(AddExtraSaleForm, self).__init__(*args, **kwargs)
@@ -96,7 +98,7 @@ class AddExtraSaleForm(BetterBsForm):
         try:
             return SaleAnalysisCode.objects.get(id=analysis_code_id, action_type__in=self.valid_action_types)
         except SaleAnalysisCode.DoesNotExist:
-            forms.ValidationError(ugettext(u'Invalid analysis code'))
+            forms.ValidationError(ugettext('Invalid analysis code'))
 
     def clean_vat_rate(self):
         """validate the analysis code"""
@@ -104,13 +106,13 @@ class AddExtraSaleForm(BetterBsForm):
         try:
             return VatRate.objects.get(id=vat_rate_id)
         except VatRate.DoesNotExist:
-            forms.ValidationError(ugettext(u'Invalid analysis code'))
+            forms.ValidationError(ugettext('Invalid analysis code'))
 
 
 class StockImportForm(BetterBsForm):
     """A form for importing stock values from Excel"""
 
     xls_file = forms.FileField(
-        label=_(u'Excel file'),
-        help_text=_(u'Same format than the export file. It will update the purchase price, stock count and threshold')
+        label=_('Excel file'),
+        help_text=_('Same format than the export file. It will update the purchase price, stock count and threshold')
     )

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """context processor"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 
 from django.conf import settings

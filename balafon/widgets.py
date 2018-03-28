@@ -1,4 +1,6 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
 
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
 
@@ -27,12 +29,13 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
                 url = reverse('admin:{0}_{1}_change'.format(app_label, class_name), args=[obj.id])
                 label = escape(smart_unicode(obj))
                 
-                x = u'<a href="{0}" {1}>{2}</a>'.format(url,
+                x = '<a href="{0}" {1}>{2}</a>'.format(
+                    url,
                     'onclick="return showAddAnotherPopup(this);" target="_blank"',
                     label
                 )
                 
                 str_values += [x]
             except self.rel.to.DoesNotExist:
-                str_values += [u'???']
-        return u'&nbsp;<strong>{0}</strong>'.format(u',&nbsp;'.join(str_values))
+                str_values += ['???']
+        return '&nbsp;<strong>{0}</strong>'.format(',&nbsp;'.join(str_values))

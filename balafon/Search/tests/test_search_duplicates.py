@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """miscellaneous searches"""
 
-from unittest import skipIf
+from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 
-from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
-from balafon.Crm import settings as crm_settings
 from balafon.Search.tests import BaseTestCase
 
 
@@ -20,16 +18,16 @@ class SameAsEmailTest(BaseTestCase):
         """same as not allowed: search on entity group"""
 
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
@@ -58,16 +56,16 @@ class SameAsEmailTest(BaseTestCase):
     def test_search_same_as_not_allowed2(self):
         """same as not allowed"""
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
@@ -95,16 +93,16 @@ class SameAsEmailTest(BaseTestCase):
     def test_search_same_as_not_allowed3(self):
         """same as not allowed: two groups"""
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
@@ -135,16 +133,16 @@ class SameAsEmailTest(BaseTestCase):
     def test_search_same_as_allowed(self):
         """same as allowed"""
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
@@ -174,16 +172,16 @@ class SameAsEmailTest(BaseTestCase):
         The same-as contact without priority should be display if the same-as with priority is not returned by search
         """
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
@@ -212,23 +210,23 @@ class SameAsEmailTest(BaseTestCase):
         The same-as contact without priority should be display if the same-as with priority is not returned by search
         """
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -265,23 +263,23 @@ class SameAsEmailTest(BaseTestCase):
         The same-as contact without priority should be display if the same-as with priority is not returned by search
         """
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -318,23 +316,23 @@ class SameAsEmailTest(BaseTestCase):
         The same-as contact without priority should be display if the same-as with priority is not returned by search
         """
         contact1 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact1@email1.fr", main_contact=True, has_left=False
         )
-        contact1.entity.name = u'Tiny Corp'
+        contact1.entity.name = 'Tiny Corp'
         contact1.entity.default_contact.delete()
         contact1.entity.save()
 
         contact2 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact2@email2.fr", main_contact=True, has_left=False
         )
-        contact2.entity.name = u'Other Corp'
+        contact2.entity.name = 'Other Corp'
         contact2.entity.default_contact.delete()
         contact2.entity.save()
 
         contact3 = mommy.make(
-            models.Contact, lastname=u"ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
+            models.Contact, lastname="ABCD", email="contact3@email3.fr", main_contact=True, has_left=False
         )
-        contact3.entity.name = u'Big Corp'
+        contact3.entity.name = 'Big Corp'
         contact3.entity.default_contact.delete()
         contact3.entity.save()
 
@@ -376,10 +374,10 @@ class SameAsNameTest(BaseTestCase):
     def test_search_duplicated_contacts(self):
         """same as not allowed: search on entity group"""
 
-        contact1 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="a@me.fr")
-        contact2 = self._make_contact(firstname=u"Paul", lastname=u"Dupond", email="b@me.fr")
-        contact3 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="c@me.fr")
-        contact4 = self._make_contact(firstname=u"Pierre", lastname=u"Dupont", email="d@me.fr")
+        contact1 = self._make_contact(firstname="Pierre", lastname="Dupond", email="a@me.fr")
+        contact2 = self._make_contact(firstname="Paul", lastname="Dupond", email="b@me.fr")
+        contact3 = self._make_contact(firstname="Pierre", lastname="Dupond", email="c@me.fr")
+        contact4 = self._make_contact(firstname="Pierre", lastname="Dupont", email="d@me.fr")
 
         url = reverse('search')
 
@@ -396,12 +394,12 @@ class SameAsNameTest(BaseTestCase):
     def test_search_several_duplicated_contacts(self):
         """same as not allowed: search on entity group"""
 
-        contact1 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="a@me.fr")
-        contact2 = self._make_contact(firstname=u"Paul", lastname=u"Dupond", email="b@me.fr")
-        contact3 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="c@me.fr")
-        contact4 = self._make_contact(firstname=u"Pierre", lastname=u"Dupont", email="d@me.fr")
-        contact5 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="e@me.fr")
-        contact6 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="f@me.fr")
+        contact1 = self._make_contact(firstname="Pierre", lastname="Dupond", email="a@me.fr")
+        contact2 = self._make_contact(firstname="Paul", lastname="Dupond", email="b@me.fr")
+        contact3 = self._make_contact(firstname="Pierre", lastname="Dupond", email="c@me.fr")
+        contact4 = self._make_contact(firstname="Pierre", lastname="Dupont", email="d@me.fr")
+        contact5 = self._make_contact(firstname="Pierre", lastname="Dupond", email="e@me.fr")
+        contact6 = self._make_contact(firstname="Pierre", lastname="Dupond", email="f@me.fr")
 
         url = reverse('search')
 
@@ -420,10 +418,10 @@ class SameAsNameTest(BaseTestCase):
     def test_search_duplicated_contacts_name_only(self):
         """same as not allowed: search on entity group"""
 
-        contact1 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="a@me.fr")
-        contact2 = self._make_contact(firstname=u"Paul", lastname=u"Dupond", email="b@me.fr")
-        contact3 = self._make_contact(firstname=u"Pierre", lastname=u"Dupond", email="c@me.fr")
-        contact4 = self._make_contact(firstname=u"Pierre", lastname=u"Dupont", email="d@me.fr")
+        contact1 = self._make_contact(firstname="Pierre", lastname="Dupond", email="a@me.fr")
+        contact2 = self._make_contact(firstname="Paul", lastname="Dupond", email="b@me.fr")
+        contact3 = self._make_contact(firstname="Pierre", lastname="Dupond", email="c@me.fr")
+        contact4 = self._make_contact(firstname="Pierre", lastname="Dupont", email="d@me.fr")
 
         url = reverse('search')
 
@@ -440,8 +438,8 @@ class SameAsNameTest(BaseTestCase):
     def test_search_ignore_unknown(self):
         """same as not allowed: search on entity group"""
 
-        contact1 = self._make_contact(firstname=u"", lastname=u"", email="a@me.fr")
-        contact2 = self._make_contact(firstname=u"", lastname=u"", email="b@me.fr")
+        contact1 = self._make_contact(firstname="", lastname="", email="a@me.fr")
+        contact2 = self._make_contact(firstname="", lastname="", email="b@me.fr")
 
         url = reverse('search')
 
@@ -456,8 +454,8 @@ class SameAsNameTest(BaseTestCase):
     def test_search_ignore_unknown_name_only(self):
         """same as not allowed: search on entity group"""
 
-        contact1 = self._make_contact(firstname=u"A", lastname=u"", email="a@me.fr")
-        contact2 = self._make_contact(firstname=u"B", lastname=u"", email="b@me.fr")
+        contact1 = self._make_contact(firstname="A", lastname="", email="a@me.fr")
+        contact2 = self._make_contact(firstname="B", lastname="", email="b@me.fr")
 
         url = reverse('search')
 

@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 """test we can search contacts by action"""
 
-from unittest import skipIf
+from __future__ import unicode_literals
 
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
@@ -35,12 +33,12 @@ class SubscribeAdminContactsTest(BaseTestCase):
         mommy.make(models.SubscriptionType)
         mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
@@ -69,10 +67,10 @@ class SubscribeAdminContactsTest(BaseTestCase):
         mommy.make(models.SubscriptionType)
         mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
@@ -92,11 +90,11 @@ class SubscribeAdminContactsTest(BaseTestCase):
         subscription_type1 = mommy.make(models.SubscriptionType)
         subscription_type2 = mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
         contact4 = mommy.make(models.Contact, entity=entity1)
         contact5 = mommy.make(models.Contact, entity=entity1)
@@ -114,14 +112,14 @@ class SubscribeAdminContactsTest(BaseTestCase):
             models.Subscription, subscription_type=subscription_type1, contact=contact5, accept_subscription=False
         )
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
         contacts = (contact1.id, contact2.id, contact4.id, contact5.id, )
 
         data = {
-            'contacts': u";".join([unicode(i) for i in contacts]),
+            'contacts': ";".join(['{0}'.format(i) for i in contacts]),
             'subscription_type': subscription_type1.id,
             'subscribe': True,
             'subscribe_contacts_admin': True,
@@ -157,11 +155,11 @@ class SubscribeAdminContactsTest(BaseTestCase):
         subscription_type1 = mommy.make(models.SubscriptionType)
         subscription_type2 = mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
         contact4 = mommy.make(models.Contact, entity=entity1)
         contact5 = mommy.make(models.Contact, entity=entity1)
@@ -179,14 +177,14 @@ class SubscribeAdminContactsTest(BaseTestCase):
             models.Subscription, subscription_type=subscription_type1, contact=contact5, accept_subscription=True
         )
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
         contacts = (contact1.id, contact2.id, contact4.id, contact5.id,)
 
         data = {
-            'contacts': u";".join([unicode(i) for i in contacts]),
+            'contacts': ";".join(['{0}'.format(i) for i in contacts]),
             'subscription_type': subscription_type1.id,
             'subscribe': False,
             'subscribe_contacts_admin': True,
@@ -225,11 +223,11 @@ class SubscribeAdminContactsTest(BaseTestCase):
         subscription_type1 = mommy.make(models.SubscriptionType)
         subscription_type2 = mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
         contact1 = entity1.default_contact
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        entity2 = mommy.make(models.Entity, name="Other corp")
         contact2 = entity2.default_contact
-        entity3 = mommy.make(models.Entity, name=u"Big corp")
+        entity3 = mommy.make(models.Entity, name="Big corp")
         contact3 = entity3.default_contact
         contact4 = mommy.make(models.Contact, entity=entity1)
         contact5 = mommy.make(models.Contact, entity=entity1)
@@ -247,14 +245,14 @@ class SubscribeAdminContactsTest(BaseTestCase):
             models.Subscription, subscription_type=subscription_type1, contact=contact5, accept_subscription=False
         )
 
-        group = mommy.make(models.Group, name=u"my group")
+        group = mommy.make(models.Group, name="my group")
         group.entities.add(entity1, entity2)
         group.save()
 
         contacts = (contact1.id, contact2.id, contact4.id, contact5.id,)
 
         data = {
-            'contacts': u";".join([unicode(i) for i in contacts]),
+            'contacts': ";".join(['{0}'.format(i) for i in contacts]),
             'subscription_type': subscription_type1.id,
             'subscribe': True,
             'subscribe_contacts_admin': True,

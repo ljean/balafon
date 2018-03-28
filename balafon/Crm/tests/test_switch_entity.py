@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from coop_cms.tests import BeautifulSoup
@@ -81,7 +83,7 @@ class ChangeContactEntityTest(BaseTestCase):
         city1 = mommy.make(models.City)
 
         entity = mommy.make(models.Entity, is_single_contact=False)
-        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname=u"John",
+        contact = mommy.make(models.Contact, entity=entity, lastname="Sunsun", firstname="John",
             address="Abc", zip_code="42000", city=city1, phone="007")
 
         url = reverse('crm_change_contact_entity', args=[contact.id])
@@ -94,7 +96,7 @@ class ChangeContactEntityTest(BaseTestCase):
         self.assertEqual(contact.entity.is_single_contact, True)
         entity = models.Entity.objects.get(id=entity.id)
         self.assertNotEqual(contact.entity.id, entity.id)
-        self.assertEqual(contact.entity.name, u"{0} {1}".format(contact.lastname, contact.firstname).lower())
+        self.assertEqual(contact.entity.name, "{0} {1}".format(contact.lastname, contact.firstname).lower())
 
         self.assertEqual(contact.address, "Abc")
         self.assertEqual(contact.zip_code, "42000")

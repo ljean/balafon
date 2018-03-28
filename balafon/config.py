@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """configure the balafon search form"""
 
+from __future__ import unicode_literals
+
 import sys
 
 from django.utils.translation import ugettext as _
@@ -12,7 +14,7 @@ from balafon.Emailing import search_forms as emailing_search_forms
 
 SEARCH_FORMS = [
     (
-        _(u'Group'),
+        _('Group'),
         [
             search_forms.GroupSearchForm,
             search_forms.GroupSearchFormDropdownWidget,
@@ -22,7 +24,7 @@ SEARCH_FORMS = [
             search_forms.GroupsMemberOfNoneSearchForm,
         ],
     ), (
-        _(u'Location'),
+        _('Location'),
         [
             search_forms.CitySearchForm,
             search_forms.EntityCitySearchForm,
@@ -43,7 +45,7 @@ SEARCH_FORMS = [
             search_forms.AddressSearchForm,
         ],
     ), (
-        _(u'Entity'),
+        _('Entity'),
         [
             search_forms.EntityNameSearchForm,
             search_forms.EntityNameStartsWithSearchForm,
@@ -55,7 +57,7 @@ SEARCH_FORMS = [
             search_forms.EntityNotesForm,
         ],
     ), (
-        _(u'Contacts'),
+        _('Contacts'),
         [
             search_forms.ContactNameSearchForm,
             search_forms.ContactFirstnameSearchForm,
@@ -76,7 +78,7 @@ SEARCH_FORMS = [
             search_forms.ContactLanguageSearchForm,
         ],
     ), (
-        _(u'Changes'),
+        _('Changes'),
         [
             search_forms.EntityByModifiedDate,
             search_forms.ContactByModifiedDate,
@@ -88,7 +90,7 @@ SEARCH_FORMS = [
             search_forms.EntitiesModifiedBySearchForm,
         ],
     ), (
-        _(u'Actions'),
+        _('Actions'),
         [
             search_forms.ActionNameSearchForm,
             search_forms.ActionTypeSearchForm,
@@ -106,7 +108,7 @@ SEARCH_FORMS = [
             search_forms.OpportunityNameSearchForm,
         ],
     ), (
-        _(u'Emailing'),
+        _('Emailing'),
         [
             emailing_search_forms.EmailingContactsSearchForm,
             emailing_search_forms.EmailingSentSearchForm,
@@ -115,7 +117,7 @@ SEARCH_FORMS = [
             emailing_search_forms.EmailingBounceSearchForm,
         ],
     ), (
-        _(u'Same as'),
+        _('Same as'),
         [
             search_forms.HasSameAsForm,
             search_forms.NoSameAsForm,
@@ -123,17 +125,17 @@ SEARCH_FORMS = [
             search_forms.DuplicatedContactsForm,
         ],
     ), (
-        _(u'Admin'),
+        _('Admin'),
         [
             search_forms.ContactsImportSearchForm,
         ],
     ), (
-        _(u'Options'),
+        _('Options'),
         [
             search_forms.SortContacts,
         ],
     ), (
-        _(u'Unit test'),
+        _('Unit test'),
         [
             search_forms.UnitTestEntityCustomFieldForm if ('test' in sys.argv) else None,
             search_forms.UnitTestContactCustomFieldForm if ('test' in sys.argv) else None,

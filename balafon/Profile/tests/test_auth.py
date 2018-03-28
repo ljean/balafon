@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 from django.test.utils import override_settings
 
 from model_mommy import mommy
+
 
 TEST_AUTHENTICATION_BACKENDS = (
     'balafon.Profile.backends.ArticleCategoryPermissionBackend',

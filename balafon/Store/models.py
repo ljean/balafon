@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """models"""
 
-from datetime import date, datetime
+from __future__ import unicode_literals
+
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 import os.path
 import traceback
@@ -13,6 +15,7 @@ from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sorl.thumbnail import default as sorl_thumbnail
@@ -23,6 +26,7 @@ from balafon.Store.settings import get_thumbnail_crop, get_thumbnail_size, get_i
 from balafon.Store.utils import round_currency
 
 
+@python_2_unicode_compatible
 class StoreManagementActionType(models.Model):
     """
     Define if an action type is linked to the store.
@@ -30,28 +34,28 @@ class StoreManagementActionType(models.Model):
     """
     action_type = models.OneToOneField(ActionType)
     template_name = models.CharField(
-        default='', blank=True, max_length=100, verbose_name=_(u'template name'),
-        help_text=_(u'Set the name of a custom template for commercial document')
+        default='', blank=True, max_length=100, verbose_name=_('template name'),
+        help_text=_('Set the name of a custom template for commercial document')
     )
     show_amount_as_pre_tax = models.BooleanField(
         default=True,
-        verbose_name=_(u'Show amount as pre-tax'),
+        verbose_name=_('Show amount as pre-tax'),
         help_text=_(
-            u'The action amount will be update with pre-tax total if checked and with tax-included total if not'
+            'The action amount will be update with pre-tax total if checked and with tax-included total if not'
         )
     )
     readonly_status = models.ManyToManyField(
-        ActionStatus, blank=True, verbose_name=_(u'readonly status'),
-        help_text=_(u'When action has one of these status, it is not possible to modify a commercial document')
+        ActionStatus, blank=True, verbose_name=_('readonly status'),
+        help_text=_('When action has one of these status, it is not possible to modify a commercial document')
     )
     references_text = models.TextField(
-        blank=True, default="", verbose_name=_(u"references text"),
-        help_text=_(u"this text will be added at the bottom of the commercial document")
+        blank=True, default="", verbose_name=_("references text"),
+        help_text=_("this text will be added at the bottom of the commercial document")
     )
 
     class Meta:
-        verbose_name = _(u"Store management action type")
-        verbose_name_plural = _(u"Store management action types")
+        verbose_name = _("Store management action type")
+        verbose_name_plural = _("Store management action types")
 
     def save(self, *args, **kwargs):
         """save: create the corresponding menu"""
@@ -71,22 +75,23 @@ class StoreManagementActionType(models.Model):
                 self.action_type.save()
         return ret
 
-    def __unicode__(self):
-        return u"{0}".format(self.action_type)
+    def __str__(self):
+        return "{0}".format(self.action_type)
 
 
+@python_2_unicode_compatible
 class VatRate(models.Model):
     """Tax : A VAT rate"""
-    rate = models.DecimalField(verbose_name=_(u"vat rate"), max_digits=4, decimal_places=2)
+    rate = models.DecimalField(verbose_name=_("vat rate"), max_digits=4, decimal_places=2)
     is_default = models.BooleanField(default=False, verbose_name=_("is default"))
 
     @property
     def name(self):
-        return u"{0}%".format(self.rate)
+        return "{0}%".format(self.rate)
 
     class Meta:
-        verbose_name = _(u"VAT rate")
-        verbose_name_plural = _(u"VAT rates")
+        verbose_name = _("VAT rate")
+        verbose_name_plural = _("VAT rates")
         ordering = ['rate']
 
     def save(self, *args, **kwargs):
@@ -95,22 +100,24 @@ class VatRate(models.Model):
             VatRate.objects.exclude(id=self.id).update(is_default=False)
         return return_value
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Unit(models.Model):
     """a unit"""
-    name = models.CharField(verbose_name=_(u"name"), max_length=200)
+    name = models.CharField(verbose_name=_("name"), max_length=200)
 
     class Meta:
-        verbose_name = _(u"unit")
-        verbose_name_plural = _(u"units")
+        verbose_name = _("unit")
+        verbose_name_plural = _("units")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class PricePolicy(models.Model):
 
     APPLY_TO_ALL = 0
@@ -118,50 +125,51 @@ class PricePolicy(models.Model):
     APPLY_TO_CATEGORIES = 2
 
     APPLY_TO_CHOICES = (
-        (APPLY_TO_ALL, _(u'All')),
-        (APPLY_TO_ARTICLES, _(u'Articles')),
-        (APPLY_TO_CATEGORIES, _(u'Categories')),
+        (APPLY_TO_ALL, _('All')),
+        (APPLY_TO_ARTICLES, _('Articles')),
+        (APPLY_TO_CATEGORIES, _('Categories')),
     )
 
     POLICIES = (
-        ('from_category', _(u'Inherit from category')),
-        ('multiply_purchase_by_ratio', _(u'Multiply purchase price by ratio')),
+        ('from_category', _('Inherit from category')),
+        ('multiply_purchase_by_ratio', _('Multiply purchase price by ratio')),
     )
 
-    name = models.CharField(max_length=100, verbose_name=_(u'name'))
-    parameters = models.CharField(max_length=100, verbose_name=_(u'parameters'), blank=True, default='')
-    policy = models.CharField(max_length=100, verbose_name=_(u'policy'), choices=POLICIES)
-    apply_to = models.IntegerField(default=APPLY_TO_ALL, verbose_name=_(u'apply to'), choices=APPLY_TO_CHOICES)
+    name = models.CharField(max_length=100, verbose_name=_('name'))
+    parameters = models.CharField(max_length=100, verbose_name=_('parameters'), blank=True, default='')
+    policy = models.CharField(max_length=100, verbose_name=_('policy'), choices=POLICIES)
+    apply_to = models.IntegerField(default=APPLY_TO_ALL, verbose_name=_('apply to'), choices=APPLY_TO_CHOICES)
 
     class Meta:
-        verbose_name = _(u"Price policy")
-        verbose_name_plural = _(u"Price policies")
+        verbose_name = _("Price policy")
+        verbose_name_plural = _("Price policies")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class StoreItemCategory(models.Model):
     """something for organization of store items"""
-    name = models.CharField(verbose_name=_(u"name"), max_length=200)
-    order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
-    active = models.BooleanField(verbose_name=_(u"active"), default=True)
+    name = models.CharField(verbose_name=_("name"), max_length=200)
+    order_index = models.IntegerField(verbose_name=_("order_index"), default=0)
+    active = models.BooleanField(verbose_name=_("active"), default=True)
     icon = models.CharField(max_length=20, default="", blank=True)
     parent = models.ForeignKey(
         "StoreItemCategory", default=None, blank=True, null=True, verbose_name=_('parent category'),
         related_name="subcategories_set"
     )
-    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
+    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'))
     default_image = models.ImageField(
-        upload_to='storeitemcats', blank=True, default=None, null=True, verbose_name=_(u'image')
+        upload_to='storeitemcats', blank=True, default=None, null=True, verbose_name=_('image')
     )
 
     class Meta:
-        verbose_name = _(u"Store item category")
-        verbose_name_plural = _(u"Store item categories")
+        verbose_name = _("Store item category")
+        verbose_name_plural = _("Store item categories")
         ordering = ['order_index', 'name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_all_articles(self):
@@ -187,22 +195,22 @@ class StoreItemCategory(models.Model):
         for sub_category in self.subcategories_set.all():
             all_articles_count += sub_category.get_all_articles_count()
         return all_articles_count
-    get_all_articles_count.short_description = _(u'Articles total count')
+    get_all_articles_count.short_description = _('Articles total count')
 
     def get_articles_count(self):
         """returns articles count"""
         return self.storeitem_set.count()
-    get_articles_count.short_description = _(u'Articles count')
+    get_articles_count.short_description = _('Articles count')
 
     def get_children_count(self):
         """returns children category count"""
         return self.subcategories_set.count()
-    get_children_count.short_description = _(u'Sub-categories count')
+    get_children_count.short_description = _('Sub-categories count')
 
     def get_path_name(self):
         """returns name with all parents"""
         if self.parent:
-            return u'{0} > {1}'.format(self.parent.get_path_name(), self.name)
+            return '{0} > {1}'.format(self.parent.get_path_name(), self.name)
         else:
             return self.name
 
@@ -232,46 +240,48 @@ class StoreItemCategory(models.Model):
         return ret
 
 
+@python_2_unicode_compatible
 class StoreItemTag(models.Model):
     """something for finding store items more easily"""
-    name = models.CharField(verbose_name=_(u"name"), max_length=200)
-    order_index = models.IntegerField(verbose_name=_(u"order_index"), default=0)
-    active = models.BooleanField(verbose_name=_(u"active"), default=True)
+    name = models.CharField(verbose_name=_("name"), max_length=200)
+    order_index = models.IntegerField(verbose_name=_("order_index"), default=0)
+    active = models.BooleanField(verbose_name=_("active"), default=True)
     icon = models.CharField(max_length=20, default="", blank=True)
-    show_always = models.BooleanField(verbose_name=_(u"show always"), default=True)
+    show_always = models.BooleanField(verbose_name=_("show always"), default=True)
 
     class Meta:
-        verbose_name = _(u"Store item tag")
-        verbose_name_plural = _(u"Store item tags")
+        verbose_name = _("Store item tag")
+        verbose_name_plural = _("Store item tags")
         ordering = ['order_index', 'name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Discount(models.Model):
     """a discount on a store item price"""
-    name = models.CharField(verbose_name=_(u'name'), max_length=100)
-    short_name = models.CharField(verbose_name=_(u'short name'), max_length=100, default="", blank=True)
-    tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u'tags'))
+    name = models.CharField(verbose_name=_('name'), max_length=100)
+    short_name = models.CharField(verbose_name=_('short name'), max_length=100, default="", blank=True)
+    tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_('tags'))
     quantity = models.DecimalField(
-        default=0, max_digits=9, decimal_places=2, verbose_name=_(u'quantity')
+        default=0, max_digits=9, decimal_places=2, verbose_name=_('quantity')
     )
     rate = models.DecimalField(
-        default=0, max_digits=4, decimal_places=2, verbose_name=_(u'rate')
+        default=0, max_digits=4, decimal_places=2, verbose_name=_('rate')
     )
     active = models.BooleanField(
         default=False,
-        verbose_name=_(u'active'),
-        help_text=_(u'Only active discounts are taken into account on a new purchase')
+        verbose_name=_('active'),
+        help_text=_('Only active discounts are taken into account on a new purchase')
     )
 
     class Meta:
-        verbose_name = _(u"Discount")
-        verbose_name_plural = _(u"Discounts")
+        verbose_name = _("Discount")
+        verbose_name_plural = _("Discounts")
         ordering = ['rate', 'name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -285,16 +295,17 @@ class Discount(models.Model):
         return None
 
 
+@python_2_unicode_compatible
 class Brand(models.Model):
     """A brand : cola-cola, peugeot or whatever"""
-    name = models.CharField(max_length=100, verbose_name=_(u'name'))
+    name = models.CharField(max_length=100, verbose_name=_('name'))
 
     class Meta:
-        verbose_name = _(u"Brand")
-        verbose_name_plural = _(u"Brands")
-        ordering = [u'name']
+        verbose_name = _("Brand")
+        verbose_name_plural = _("Brands")
+        ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -302,18 +313,20 @@ class Brand(models.Model):
         return super(Brand, self).save(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class Supplier(models.Model):
     """supplier"""
     name = models.CharField(max_length=100)
 
     class Meta:
-        verbose_name = _(u"Supplier")
-        verbose_name_plural = _(u"Suppliers")
+        verbose_name = _("Supplier")
+        verbose_name_plural = _("Suppliers")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class Certificate(models.Model):
     """certificate"""
     name = models.CharField(max_length=100)
@@ -325,73 +338,75 @@ class Certificate(models.Model):
             return self.logo.url
 
     class Meta:
-        verbose_name = _(u"certificate")
-        verbose_name_plural = _(u"certificates")
+        verbose_name = _("certificate")
+        verbose_name_plural = _("certificates")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class PriceClass(models.Model):
     """price class"""
-    name = models.CharField(max_length=100, verbose_name=_(u'Name'))
-    description = models.CharField(max_length=100, blank=True, default='', verbose_name=_(u'Description'))
-    discounts = models.ManyToManyField(Discount, blank=True, verbose_name=_(u'Discount'))
+    name = models.CharField(max_length=100, verbose_name=_('Name'))
+    description = models.CharField(max_length=100, blank=True, default='', verbose_name=_('Description'))
+    discounts = models.ManyToManyField(Discount, blank=True, verbose_name=_('Discount'))
 
     class Meta:
-        verbose_name = _(u"Price class")
-        verbose_name_plural = _(u"Price classes")
+        verbose_name = _("Price class")
+        verbose_name_plural = _("Price classes")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class StoreItem(models.Model):
     """something than can be buy in this store"""
 
-    name = models.CharField(verbose_name=_(u"name"), max_length=200)
-    category = models.ForeignKey(StoreItemCategory, verbose_name=_(u"category"))
-    tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_(u"tags"))
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"))
+    name = models.CharField(verbose_name=_("name"), max_length=200)
+    category = models.ForeignKey(StoreItemCategory, verbose_name=_("category"))
+    tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_("tags"))
+    vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"))
     pre_tax_price = models.DecimalField(
-        verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2
+        verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2
     )
     stock_count = models.DecimalField(
-        default=None, verbose_name=_(u"stock count"), blank=True, null=True, max_digits=9, decimal_places=2
+        default=None, verbose_name=_("stock count"), blank=True, null=True, max_digits=9, decimal_places=2
     )
     stock_threshold = models.DecimalField(
-        default=None, verbose_name=_(u"stock threshold"), blank=True, null=True, max_digits=9, decimal_places=2
+        default=None, verbose_name=_("stock threshold"), blank=True, null=True, max_digits=9, decimal_places=2
     )
     purchase_price = models.DecimalField(
-        verbose_name=_(u"purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
+        verbose_name=_("purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
     )
     unit = models.ForeignKey(Unit, blank=True, default=None, null=True)
-    brand = models.ForeignKey(Brand, default=None, blank=True, null=True, verbose_name=_(u'brand'))
-    reference = models.CharField(max_length=100, default='', blank=True, verbose_name=_(u'reference'))
+    brand = models.ForeignKey(Brand, default=None, blank=True, null=True, verbose_name=_('brand'))
+    reference = models.CharField(max_length=100, default='', blank=True, verbose_name=_('reference'))
     imported_by = models.ForeignKey(
-        'StoreItemImport', default=None, blank=True, null=True, verbose_name=_(u'imported by')
+        'StoreItemImport', default=None, blank=True, null=True, verbose_name=_('imported by')
     )
-    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_(u'price policy'))
-    available = models.BooleanField(default=True, verbose_name=_(u'Available'))
-    published = models.BooleanField(default=True, verbose_name=_(u'Published'))
+    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'))
+    available = models.BooleanField(default=True, verbose_name=_('Available'))
+    published = models.BooleanField(default=True, verbose_name=_('Published'))
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
-    price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_(u"price class"))
-    certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_(u"certificate"))
+    price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_("price class"))
+    certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_("certificate"))
     only_for_groups = models.ManyToManyField(
-        Group, blank=True, verbose_name=_(u"only for groups"),
-        help_text=_(u'If defined, only members of these groups will be able to see the item')
+        Group, blank=True, verbose_name=_("only for groups"),
+        help_text=_('If defined, only members of these groups will be able to see the item')
     )
-    origin = models.CharField(max_length=50, blank=True, default="", verbose_name=_(u'Origine'))
-    image = models.ImageField(upload_to='storeitems', blank=True, default=None, null=True, verbose_name=_(u'image'))
-    description = models.TextField(blank=True, verbose_name=_(u'description'), default="")
+    origin = models.CharField(max_length=50, blank=True, default="", verbose_name=_('Origine'))
+    image = models.ImageField(upload_to='storeitems', blank=True, default=None, null=True, verbose_name=_('image'))
+    description = models.TextField(blank=True, verbose_name=_('description'), default="")
 
     class Meta:
-        verbose_name = _(u"Store item")
-        verbose_name_plural = _(u"Store items")
+        verbose_name = _("Store item")
+        verbose_name_plural = _("Store items")
         ordering = ['name']
 
-    def __unicode__(self):
-        return u'{0} > {1}{2}'.format(self.category, self.name, u' ({0})'.format(self.brand) if self.brand else '')
+    def __str__(self):
+        return '{0} > {1}{2}'.format(self.category, self.name, ' ({0})'.format(self.brand) if self.brand else '')
 
     def _to_decimal(self, value):
         return Decimal("{0:.2f}".format(value, 2))
@@ -406,7 +421,7 @@ class StoreItem(models.Model):
     def vat_incl_price(self):
         """VAT inclusive price"""
         return self._to_vat_incl(self.pre_tax_price)
-    vat_incl_price.short_description = _(u"VAT inclusive price")
+    vat_incl_price.short_description = _("VAT inclusive price")
 
     def vat_incl_price_with_alert(self):
         """VAT inclusive price"""
@@ -415,16 +430,16 @@ class StoreItem(models.Model):
         if calculated_pre_tax_price is not None:
             calculated_price = self._to_vat_incl(calculated_pre_tax_price)
             if calculated_price != price:
-                return u'{0} <div style="color:red">Attention! calcul = {1}</div>'.format(price, calculated_price)
-        return u'{0}'.format(price)
+                return '{0} <div style="color:red">Attention! calcul = {1}</div>'.format(price, calculated_price)
+        return '{0}'.format(price)
 
-    vat_incl_price_with_alert.short_description = _(u"VAT inclusive price")
+    vat_incl_price_with_alert.short_description = _("VAT inclusive price")
     vat_incl_price_with_alert.allow_tags = True
 
     def get_admin_link(self):
         try:
-            return u'<a href="{0}" target="_extra_admin">{1}</a>'.format(
-                reverse("admin:Store_storeitem_change", args=[self.id]), ugettext(u'Edit')
+            return '<a href="{0}" target="_extra_admin">{1}</a>'.format(
+                reverse("admin:Store_storeitem_change", args=[self.id]), ugettext('Edit')
             )
         except NoReverseMatch:
             return ''
@@ -440,9 +455,9 @@ class StoreItem(models.Model):
             except StoreItemPropertyValue.DoesNotExist:
                 pass
         if properties:
-            return u'{0} ({1})'.format(self.name, u', '.join(properties))
+            return '{0} ({1})'.format(self.name, ', '.join(properties))
         return self.name
-    fullname.short_description = _(u'Name')
+    fullname.short_description = _('Name')
 
     def set_property(self, property_name, value):
         """create and set a property for this item"""
@@ -494,13 +509,13 @@ class StoreItem(models.Model):
         """
         alert_text = ""
         if self.has_stock_threshold_alert():
-            alert_text = u'<img src="{0}store/img/warning-sign.png" />'.format(settings.STATIC_URL)
-        return u"{0} {1}".format(
+            alert_text = '<img src="{0}store/img/warning-sign.png" />'.format(settings.STATIC_URL)
+        return "{0} {1}".format(
             self.stock_threshold if self.stock_threshold is not None else "",
             alert_text
         ).strip()
 
-    stock_threshold_alert.short_description = _(u"Stock threshold")
+    stock_threshold_alert.short_description = _("Stock threshold")
     stock_threshold_alert.allow_tags = True
 
     def get_calculated_price(self):
@@ -563,70 +578,73 @@ class StoreItem(models.Model):
                 parent = parent.parent
             return parent
 
+
+@python_2_unicode_compatible
 class StoreItemProperty(models.Model):
     """a property for a store item: DLC, Colisage..."""
-    name = models.CharField(max_length=100, verbose_name=_(u'name'))
-    label = models.CharField(max_length=100, verbose_name=_(u'label'), default='', blank=True)
+    name = models.CharField(max_length=100, verbose_name=_('name'))
+    label = models.CharField(max_length=100, verbose_name=_('label'), default='', blank=True)
     in_fullname = models.BooleanField(
-        default=False, verbose_name=_(u'in fullname'), help_text=_(u'is inserted in fullname if checked')
+        default=False, verbose_name=_('in fullname'), help_text=_('is inserted in fullname if checked')
     )
     is_public = models.BooleanField(
-        default=False, verbose_name=_(u'is public'), help_text=_(u'returned in public API')
+        default=False, verbose_name=_('is public'), help_text=_('returned in public API')
     )
 
     class Meta:
-        verbose_name = _(u"Store item: property value")
-        verbose_name_plural = _(u"Store item: properties")
+        verbose_name = _("Store item: property value")
+        verbose_name_plural = _("Store item: properties")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label or self.name
 
 
+@python_2_unicode_compatible
 class StoreItemImport(models.Model):
     """Makes possible to import store item"""
     data = models.FileField(
         upload_to='store_item_imports',
-        verbose_name=_(u"Import file"),
-        help_text=_(u'An Excel file (*.xls) with the data')
+        verbose_name=_("Import file"),
+        help_text=_('An Excel file (*.xls) with the data')
     )
     tags = models.ManyToManyField(
         StoreItemTag,
         blank=True,
-        verbose_name=_(u"tags"),
-        help_text=_(u'Tags that can be added to the items')
+        verbose_name=_("tags"),
+        help_text=_('Tags that can be added to the items')
     )
     fields = models.CharField(
         max_length=300,
         default='name,brand,reference,category,purchase_price,vat_rate',
-        verbose_name=_(u"fields"),
-        help_text=_(u"Fields to import in order: if the attribute doesn't exist, create a custom property")
+        verbose_name=_("fields"),
+        help_text=_("Fields to import in order: if the attribute doesn't exist, create a custom property")
     )
-    last_import_date = models.DateTimeField(default=None, blank=True, null=True, verbose_name=_(u"last import"))
-    import_error = models.TextField(default='', blank=True, verbose_name=_(u'import error'))
+    last_import_date = models.DateTimeField(default=None, blank=True, null=True, verbose_name=_("last import"))
+    import_error = models.TextField(default='', blank=True, verbose_name=_('import error'))
     is_successful = models.BooleanField(default=True, verbose_name=_('is successful'))
     ignore_first_line = models.BooleanField(default=True, verbose_name=_('ignore first line'))
     margin_rate = models.DecimalField(
         default=None, null=True, verbose_name=_('margin_rate'), max_digits=9, decimal_places=2
     )
     error_message = models.CharField(
-        default='', blank=True, max_length=100, verbose_name=_(u'error message')
+        default='', blank=True, max_length=100, verbose_name=_('error message')
     )
     category_lines_mode = models.BooleanField(
         default=False, verbose_name=_('category-lines mode'),
-        help_text=_(u'If checked, the store item category are expected as merged-cells header lines')
+        help_text=_('If checked, the store item category are expected as merged-cells header lines')
     )
     default_brand = models.CharField(
-        default='', verbose_name=_(u'default Brand'), blank=True, max_length=50,
-        help_text=_(u'If defined, it will be used if no brand is given')
+        default='', verbose_name=_('default Brand'), blank=True, max_length=50,
+        help_text=_('If defined, it will be used if no brand is given')
     )
     supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
-    make_available = models.BooleanField(default=False, verbose_name=_(u'articles will be available if price is set'))
+    make_available = models.BooleanField(default=False, verbose_name=_('articles will be available if price is set'))
 
     class Meta:
-        verbose_name = _(u"Store item import")
-        verbose_name_plural = _(u"Store item imports")
+        verbose_name = _("Store item import")
+        verbose_name_plural = _("Store item imports")
 
-    def __unicode__(self):
+    def __str__(self):
         return os.path.basename(self.data.file.name)
 
     def get_url(self):
@@ -634,11 +652,11 @@ class StoreItemImport(models.Model):
 
     def _to_decimal(self, raw_value):
         """convert string to decimal"""
-        return Decimal(u'{0}'.format(raw_value))
+        return Decimal('{0}'.format(raw_value))
 
     def _to_string(self, raw_value):
         """to string"""
-        return u'{0}'.format(raw_value)
+        return '{0}'.format(raw_value)
 
     def _to_brand(self, raw_value):
         """convert string to brand"""
@@ -663,7 +681,7 @@ class StoreItemImport(models.Model):
     def _to_vat(self, raw_value):
         """convert string to vat"""
         if raw_value:
-            raw_value = u'{0}'.format(raw_value)  # float to string and the to decimal
+            raw_value = '{0}'.format(raw_value)  # float to string and the to decimal
             return VatRate.objects.get_or_create(rate=Decimal(raw_value))[0]
         else:
             try:
@@ -677,8 +695,8 @@ class StoreItemImport(models.Model):
     def import_data(self):
         """import data from xls file"""
         self.last_import_date = datetime.now()
-        self.import_error = u''
-        self.error_message = u''
+        self.import_error = ''
+        self.error_message = ''
         self.is_successful = False
         self.save()
         self.is_successful = True  # Assume everything will be ok :-)
@@ -707,7 +725,7 @@ class StoreItemImport(models.Model):
                 category_lines = [line[0] for line in sheet.merged_cells]
             else:
                 category_lines = []
-            last_category = u''
+            last_category = ''
             for row_index in range(sheet.nrows):
 
                 if self.ignore_first_line and row_index == 0:
@@ -798,67 +816,71 @@ class StoreItemImport(models.Model):
             self.import_error = repr(error_stack)
             self.is_successful = False
             try:
-                self.error_message = unicode(msg)[:100]
+                self.error_message = '{0}'.format(msg)[:100]
             except:
                 self.error_message = "!!!!!"
 
         self.save()
 
 
+@python_2_unicode_compatible
 class StoreItemPropertyValue(models.Model):
     """The value of a property for a given item"""
-    item = models.ForeignKey(StoreItem, verbose_name=_(u'item'))
-    property = models.ForeignKey(StoreItemProperty, verbose_name=_(u'property'))
-    value = models.CharField(max_length=100, verbose_name=_(u'value'), blank=True, default='')
+    item = models.ForeignKey(StoreItem, verbose_name=_('item'))
+    property = models.ForeignKey(StoreItemProperty, verbose_name=_('property'))
+    value = models.CharField(max_length=100, verbose_name=_('value'), blank=True, default='')
 
     class Meta:
-        verbose_name = _(u"Store item: property value")
-        verbose_name_plural = _(u"Store item: property values")
+        verbose_name = _("Store item: property value")
+        verbose_name_plural = _("Store item: property values")
 
-    def __unicode__(self):
-        return u'{0}'.format(self.property)
+    def __str__(self):
+        return '{0}'.format(self.property)
 
 
+@python_2_unicode_compatible
 class DeliveryPoint(models.Model):
     """Where to get a sale"""
-    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    name = models.CharField(max_length=100, verbose_name=_("name"))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u"Delivery point")
-        verbose_name_plural = _(u"Delivery points")
+        verbose_name = _("Delivery point")
+        verbose_name_plural = _("Delivery points")
         ordering = ('name',)
 
 
+@python_2_unicode_compatible
 class SaleAnalysisCode(models.Model):
     """Where to get a sale"""
-    name = models.CharField(max_length=100, verbose_name=_(u"name"))
-    action_type = models.ForeignKey(ActionType, verbose_name=_(u'action type'), default=None, blank=True, null=True)
+    name = models.CharField(max_length=100, verbose_name=_("name"))
+    action_type = models.ForeignKey(ActionType, verbose_name=_('action type'), default=None, blank=True, null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u"Analysis code")
-        verbose_name_plural = _(u"Analysis codes")
+        verbose_name = _("Analysis code")
+        verbose_name_plural = _("Analysis codes")
         ordering = ('name',)
 
 
+@python_2_unicode_compatible
 class Sale(models.Model):
     """A sale"""
-    action = models.OneToOneField(Action, verbose_name=_(u"action"))
+    action = models.OneToOneField(Action, verbose_name=_("action"))
     delivery_point = models.ForeignKey(
-        DeliveryPoint, default=None, blank=True, null=True, verbose_name=_(u"delivery point")
+        DeliveryPoint, default=None, blank=True, null=True, verbose_name=_("delivery point")
     )
     analysis_code = models.ForeignKey(
-        SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_(u"analysis code")
+        SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_("analysis code")
     )
 
     def get_references_text(self):
         """This text will be added at the bottom of the commercial document"""
-        text = u""
+        text = ""
         if self.action and self.action.type:
             try:
                 text = StoreManagementActionType.objects.get(action_type=self.action.type).references_text
@@ -909,21 +931,21 @@ class Sale(models.Model):
     @property
     def creation_date(self):
         return self.action.created
-    creation_date.fget.short_description = _(u'Creation date')
+    creation_date.fget.short_description = _('Creation date')
 
     class Meta:
-        verbose_name = _(u"Sale")
-        verbose_name_plural = _(u"Sales")
+        verbose_name = _("Sale")
+        verbose_name_plural = _("Sales")
         ordering = ['-action__created']
 
-    def __unicode__(self):
-        contacts = u', '.join([u'{0}'.format(item) for item in self.action.contacts.all()])
-        entities = u', '.join([u'{0}'.format(item) for item in self.action.entities.all()])
-        customers = u', '.join([item for item in (contacts, entities) if item])
+    def __str__(self):
+        contacts = ', '.join(['{0}'.format(item) for item in self.action.contacts.all()])
+        entities = ', '.join(['{0}'.format(item) for item in self.action.entities.all()])
+        customers = ', '.join([item for item in (contacts, entities) if item])
         if customers:
-            return u'{0} - {1}'.format(self.action.planned_date.date(), customers)
+            return '{0} - {1}'.format(self.action.planned_date.date(), customers)
         else:
-            return u'{0}'.format(self.action.planned_date.date())
+            return '{0}'.format(self.action.planned_date.date())
 
     def clone(self, new_sale):
         """clone a sale: clone its items"""
@@ -943,48 +965,50 @@ class Sale(models.Model):
         return ret
 
 
+@python_2_unicode_compatible
 class Favorite(models.Model):
-    user = models.ForeignKey(User, verbose_name=_(u'user'))
-    item = models.ForeignKey(StoreItem, verbose_name=_(u'store item'))
+    user = models.ForeignKey(User, verbose_name=_('user'))
+    item = models.ForeignKey(StoreItem, verbose_name=_('store item'))
 
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.user, self.item)
+    def __str__(self):
+        return '{0} - {1}'.format(self.user, self.item)
 
     class Meta:
-        verbose_name = _(u"Favorite")
-        verbose_name_plural = _(u"Favorites")
+        verbose_name = _("Favorite")
+        verbose_name_plural = _("Favorites")
 
 
+@python_2_unicode_compatible
 class SaleItem(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale)
     item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
-    quantity = models.DecimalField(verbose_name=_(u"quantity"), max_digits=9, decimal_places=2)
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_(u"VAT rate"), blank=True, null=True, default=None)
-    pre_tax_price = models.DecimalField(verbose_name=_(u"pre-tax price"), max_digits=9, decimal_places=2)
-    text = models.TextField(verbose_name=_(u"Text"), max_length=3000, default='', blank=True)
+    quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
+    vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"), blank=True, null=True, default=None)
+    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
+    text = models.TextField(verbose_name=_("Text"), max_length=3000, default='', blank=True)
     order_index = models.IntegerField(default=0)
     is_blank = models.BooleanField(
-        default=False, verbose_name=_(u'is blank'), help_text=_(u'displayed as an empty line')
+        default=False, verbose_name=_('is blank'), help_text=_('displayed as an empty line')
     )
     discount = models.ForeignKey(Discount, blank=True, null=True, default=None)
     no_quantity = models.BooleanField(
-        default=False, verbose_name=_(u'no quantity'), help_text=_(u'quantity and unit price are not shown on bill')
+        default=False, verbose_name=_('no quantity'), help_text=_('quantity and unit price are not shown on bill')
     )
     is_discount = models.BooleanField(
-        default=False, verbose_name=_(u'is discount'), help_text=_(u'added after total on the bill')
+        default=False, verbose_name=_('is discount'), help_text=_('added after total on the bill')
     )
 
     class Meta:
-        verbose_name = _(u"Sale item")
-        verbose_name_plural = _(u"Sales items")
+        verbose_name = _("Sale item")
+        verbose_name_plural = _("Sales items")
         ordering = ['order_index']
 
-    def __unicode__(self):
+    def __str__(self):
         if self.id:
-            return _(u"{1} x {0}").format(self.item, self.quantity)
+            return _("{1} x {0}").format(self.item, self.quantity)
         else:
-            return _(u"Sale item not set")
+            return _("Sale item not set")
 
     def vat_incl_price(self, round_value=True):
         """VAT inclusive price"""

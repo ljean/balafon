@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
+from __future__ import unicode_literals
+
 from decimal import Decimal
 
 from django.conf import settings
@@ -20,7 +22,7 @@ def notify_cart_to_admin(profile, action):
     notification_email = getattr(settings, 'BALAFON_NOTIFICATION_EMAIL', '')
     if notification_email:
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
-        subject = _(u"New cart purchased on store")
+        subject = _("New cart purchased on store")
         data = {
             'profile': profile,
             'action': action,

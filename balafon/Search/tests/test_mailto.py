@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test mailto action on search results"""
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -39,7 +41,7 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-entity_name-_-0": entity.name}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertContains(response, _(u'Mailto: Error, no emails defined'))
+        self.assertContains(response, _('Mailto: Error, no emails defined'))
 
     def test_mailto_one_email(self):
         """test mailto one email"""

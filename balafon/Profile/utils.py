@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template import Context
@@ -54,12 +56,12 @@ def create_profile_contact(user):
             contact = entity.default_contact
 
         if warn_duplicates:
-            action_type = ActionType.objects.get_or_create(name=_(u"Balafon admin"))[0]
+            action_type = ActionType.objects.get_or_create(name=_("Balafon admin"))[0]
             action = Action.objects.create(
-                subject=_(u"A user have registred with email {0} used by several other contacts".format(user.email)),
+                subject=_("A user have registred with email {0} used by several other contacts".format(user.email)),
                 type=action_type,
                 planned_date=now_rounded(),
-                detail=_(u'You should check that this contact is not duplicated'),
+                detail=_('You should check that this contact is not duplicated'),
                 display_on_board=True
             )
             action.contacts.add(contact)
@@ -110,9 +112,9 @@ def create_profile_contact(user):
         except Group.DoesNotExist:
             pass
 
-    action_type = ActionType.objects.get_or_create(name=_(u"Account creation"))[0]
+    action_type = ActionType.objects.get_or_create(name=_("Account creation"))[0]
     action = Action.objects.create(
-        subject=_(u"Create an account on web site"),
+        subject=_("Create an account on web site"),
         type=action_type,
         planned_date=now_rounded(),
         display_on_board=False,
@@ -122,7 +124,7 @@ def create_profile_contact(user):
     action.save()
     
     if rename_entity:
-        contact.entity.name = u"{0.lastname} {0.firstname}".format(contact).strip().upper()
+        contact.entity.name = "{0.lastname} {0.firstname}".format(contact).strip().upper()
         contact.entity.save()
     
     profile.contact = contact
@@ -186,7 +188,7 @@ def notify_registration(profile):
         content = t.render(Context(data))
         
         email = EmailMessage(
-            _(u"New registration"), content, from_email,
+            _("New registration"), content, from_email,
             [notification_email], headers={'Reply-To': profile.contact.email})
         try:
             email.send()

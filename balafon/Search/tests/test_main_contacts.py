@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test search behavior for main and has_left contacts"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -14,7 +16,7 @@ class MainContactAndHasLeftSearchTest(BaseTestCase):
 
     def _make_contact(self, main_contact, has_left):
         """make a contact"""
-        entity = mommy.make(models.Entity, name=u"TinyTinyCorp")
+        entity = mommy.make(models.Entity, name="TinyTinyCorp")
         contact = entity.default_contact
         contact.lastname = 'TiniMax'
         contact.firstname = 'Boss'

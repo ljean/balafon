@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """search forms : this forms are included in main search form"""
 
+from __future__ import unicode_literals
+
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
@@ -31,13 +33,13 @@ class EmailingSearchForm(SearchFieldForm):
         try:
             return models.Emailing.objects.get(id=self.value)
         except models.Emailing.DoesNotExist:
-            raise ValidationError(_(u"Unknown emailing"))
+            raise ValidationError(_("Unknown emailing"))
 
 
 class EmailingSentSearchForm(EmailingSearchForm):
     """Emailing sent to"""
     name = 'emailing_sent'
-    label = _(u'Emailing sent')
+    label = _('Emailing sent')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
     
     def get_lookup(self):
@@ -49,7 +51,7 @@ class EmailingSentSearchForm(EmailingSearchForm):
 class EmailingOpenedSearchForm(EmailingSearchForm):
     """Emailing opened"""
     name = 'emailing_opened'
-    label = _(u'Emailing opened')
+    label = _('Emailing opened')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
     
     def get_lookup(self):
@@ -61,7 +63,7 @@ class EmailingOpenedSearchForm(EmailingSearchForm):
 class EmailingSendToSearchForm(EmailingSearchForm):
     """Emailing send to"""
     name = 'emailing_send'
-    label = _(u'Emailing send to')
+    label = _('Emailing send to')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_EDITING, models.Emailing.STATUS_SCHEDULED]
 
     def get_lookup(self):
@@ -73,7 +75,7 @@ class EmailingSendToSearchForm(EmailingSearchForm):
 class EmailingBounceSearchForm(EmailingSearchForm):
     """Emailing bounce"""
     name = 'emailing_bounce'
-    label = _(u'Emailing bounce')
+    label = _('Emailing bounce')
     allowed_status = [models.Emailing.STATUS_SENDING, models.Emailing.STATUS_SENT]
 
     def get_lookup(self):
@@ -90,7 +92,7 @@ class EmailingBounceSearchForm(EmailingSearchForm):
 class EmailingContactsSearchForm(EmailingSearchForm):
     """Emailing send to"""
     name = 'emailing_contacts'
-    label = _(u'Emailing contacts')
+    label = _('Emailing contacts')
 
     def get_lookup(self):
         """get all contacts for this emailing"""

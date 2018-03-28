@@ -5,6 +5,8 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
+from __future__ import unicode_literals
+
 from decimal import Decimal
 from datetime import datetime, timedelta, date
 import json
@@ -791,7 +793,7 @@ class ActionTest(BaseTestCase):
         entity = mommy.make(models.Entity)
         contact1 = entity.default_contact
 
-        actions = [mommy.make(models.Action, subject=u"--{0}--".format(i), archived=False) for i in range(10)]
+        actions = [mommy.make(models.Action, subject="--{0}--".format(i), archived=False) for i in range(10)]
         for action in actions:
             action.contacts.add(contact1)
             action.save()
@@ -811,13 +813,13 @@ class ActionTest(BaseTestCase):
         entity = mommy.make(models.Entity)
         contact1 = entity.default_contact
 
-        action1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=get_dt())
-        action2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=get_dt(-1))
-        action3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=get_dt(-2))
-        action4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=get_dt(-3))
-        action5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=get_dt(+1))
-        action6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=get_dt(+2))
-        action7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=get_dt(+3))
+        action1 = mommy.make(models.Action, subject="--1--", archived=False, planned_date=get_dt())
+        action2 = mommy.make(models.Action, subject="--2--", archived=False, planned_date=get_dt(-1))
+        action3 = mommy.make(models.Action, subject="--3--", archived=False, planned_date=get_dt(-2))
+        action4 = mommy.make(models.Action, subject="--4--", archived=False, planned_date=get_dt(-3))
+        action5 = mommy.make(models.Action, subject="--5--", archived=False, planned_date=get_dt(+1))
+        action6 = mommy.make(models.Action, subject="--6--", archived=False, planned_date=get_dt(+2))
+        action7 = mommy.make(models.Action, subject="--7--", archived=False, planned_date=get_dt(+3))
 
         for action in [action1, action2, action3, action4, action5, action6, action7]:
             action.contacts.add(contact1)
@@ -838,13 +840,13 @@ class ActionTest(BaseTestCase):
         entity = mommy.make(models.Entity)
         contact1 = entity.default_contact
 
-        action1 = mommy.make(models.Action, subject=u"--1--", archived=False, planned_date=get_dt())
-        action2 = mommy.make(models.Action, subject=u"--2--", archived=False, planned_date=get_dt(-1))
-        action3 = mommy.make(models.Action, subject=u"--3--", archived=False, planned_date=get_dt(-2))
-        action4 = mommy.make(models.Action, subject=u"--4--", archived=False, planned_date=get_dt(-3))
-        action5 = mommy.make(models.Action, subject=u"--5--", archived=False, planned_date=get_dt(+1))
-        action6 = mommy.make(models.Action, subject=u"--6--", archived=False, planned_date=get_dt(+2))
-        action7 = mommy.make(models.Action, subject=u"--7--", archived=False, planned_date=get_dt(+3))
+        action1 = mommy.make(models.Action, subject="--1--", archived=False, planned_date=get_dt())
+        action2 = mommy.make(models.Action, subject="--2--", archived=False, planned_date=get_dt(-1))
+        action3 = mommy.make(models.Action, subject="--3--", archived=False, planned_date=get_dt(-2))
+        action4 = mommy.make(models.Action, subject="--4--", archived=False, planned_date=get_dt(-3))
+        action5 = mommy.make(models.Action, subject="--5--", archived=False, planned_date=get_dt(+1))
+        action6 = mommy.make(models.Action, subject="--6--", archived=False, planned_date=get_dt(+2))
+        action7 = mommy.make(models.Action, subject="--7--", archived=False, planned_date=get_dt(+3))
 
         for action in [action1, action2, action3, action4, action5, action6, action7]:
             action.contacts.add(contact1)
@@ -877,35 +879,35 @@ class ActionTest(BaseTestCase):
         hidden_actions = []
 
         for i in range(2):  # pylint: disable=unused-variable
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type1, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(10):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type3, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(10):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type2, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type4, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
@@ -938,7 +940,7 @@ class ActionTest(BaseTestCase):
         hidden_actions = []
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), archived=False)
             if i % 2:
                 action.contacts.add(contact1)
             else:
@@ -948,7 +950,7 @@ class ActionTest(BaseTestCase):
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type1, archived=False)
             if i % 2:
                 action.contacts.add(contact1)
             else:
@@ -958,7 +960,7 @@ class ActionTest(BaseTestCase):
             counter += 1
 
         for i in range(10):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type3, archived=False)
             if i % 2:
                 action.contacts.add(contact1)
             else:
@@ -968,7 +970,7 @@ class ActionTest(BaseTestCase):
             counter += 1
 
         for i in range(10):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type2, archived=False)
             if i % 2:
                 action.contacts.add(contact1)
             else:
@@ -978,7 +980,7 @@ class ActionTest(BaseTestCase):
             counter += 1
 
         for i in range(3):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type4, archived=False)
             if i % 2:
                 action.contacts.add(contact1)
             else:
@@ -1014,70 +1016,70 @@ class ActionTest(BaseTestCase):
         hidden_actions = []
 
         for i in range(2):  # pylint: disable=unused-variable
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type1, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type1, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type1, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type3, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type2, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(2):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type2, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type2, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type3, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type3, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
             counter += 1
 
         for i in range(3):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type4, archived=False)
             action.contacts.add(contact1)
             action.save()
             hidden_actions.append(action)
             counter += 1
 
         for i in range(5):
-            action = mommy.make(models.Action, subject=u"--{0}--".format(counter), type=action_type4, archived=False)
+            action = mommy.make(models.Action, subject="--{0}--".format(counter), type=action_type4, archived=False)
             action.contacts.add(contact1)
             action.save()
             visible_actions.append(action)
@@ -2476,7 +2478,7 @@ class ActionDurationTest(BaseTestCase):
             planned_date=datetime(2016, 2, 2, 13, 48),
             end_datetime=datetime(2016, 2, 4, 16, 15)
         )
-        self.assertEqual(action.duration(), _(u"2 days 2:27"))
+        self.assertEqual(action.duration(), _("2 days 2:27"))
 
 
 class ActionStatusTrackTest(BaseTestCase):
@@ -2570,7 +2572,7 @@ class ActionStatusTrackTest(BaseTestCase):
         self.assertEqual(track.action, action)
         self.assertEqual(track.status, status1)
         self.assertEqual(track.datetime.date(), date.today())
-        action.subject = u"Test"
+        action.subject = "Test"
         action.save()
         #
         self.assertEqual(models.ActionStatusTrack.objects.count(), 1)

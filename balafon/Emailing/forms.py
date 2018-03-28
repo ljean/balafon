@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
+from __future__ import unicode_literals
+
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -31,7 +33,7 @@ from balafon.Emailing import settings as emailing_settings
 
 class UnregisterForm(BsForm):
     """User wants to unregister from emailing"""
-    reason = forms.CharField(required=False, widget=forms.Textarea, label=_(u"Reason"))
+    reason = forms.CharField(required=False, widget=forms.Textarea, label=_("Reason"))
 
 
 class UpdateEmailingForm(BsModelForm):
@@ -58,39 +60,39 @@ class UpdateEmailingForm(BsModelForm):
         if not getattr(settings, 'LANGUAGES', None) or len(settings.LANGUAGES) < 2:
             self.fields["lang"].widget = forms.HiddenInput()
         else:
-            language_choices = crm_settings.get_language_choices(_(u"Favorite language of the contact"))
+            language_choices = crm_settings.get_language_choices(_("Favorite language of the contact"))
             self.fields["lang"].widget = forms.Select(choices=language_choices, attrs={'class': 'form-control'})
 
 
 class NewEmailingForm(BsForm):
     """Form for creating a new emailing"""
 
-    subscription_type = forms.IntegerField(label=_(u"Subscription Type"))
-    newsletter = forms.IntegerField(label=_(u"Newsletter"))
+    subscription_type = forms.IntegerField(label=_("Subscription Type"))
+    newsletter = forms.IntegerField(label=_("Newsletter"))
     subject = forms.CharField(
-        label=_(u"Subject"), required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+        label=_("Subject"), required=False,
+        widget=forms.TextInput(attrs={'placeholder': _('Subject of the newsletter')})
     )
     contacts = forms.CharField(widget=forms.HiddenInput())
     lang = forms.CharField(
         required=False,
-        label=_(u"Language"),
-        widget=forms.Select(choices=[('', _(u'Default'))] + list(settings.LANGUAGES))
+        label=_("Language"),
+        widget=forms.Select(choices=[('', _('Default'))] + list(settings.LANGUAGES))
     )
-    from_email = forms.CharField(required=False, label=_(u"Sent from"))
+    from_email = forms.CharField(required=False, label=_("Sent from"))
 
     def __init__(self, *args, **kwargs):
         initial = kwargs.get('initial')
         initial_contacts = ''
         if initial and 'contacts' in initial:
-            initial_contacts = u';'.join([u'{0}'.format(contact.id) for contact in initial['contacts']])
+            initial_contacts = ';'.join(['{0}'.format(contact.id) for contact in initial['contacts']])
             initial.pop('contacts')
         super(NewEmailingForm, self).__init__(*args, **kwargs)
         if initial_contacts:
             self.fields['contacts'].initial = initial_contacts
 
         newsletter_choices = [
-            (0, ugettext(u'-- New --'))
+            (0, ugettext('-- New --'))
         ] + [
             (newsletter.id, newsletter.subject) for newsletter in Newsletter.objects.all().order_by('-id')
         ]
@@ -121,7 +123,7 @@ class NewEmailingForm(BsForm):
         newsletter_id = int(self.cleaned_data['newsletter'])
         subject = self.cleaned_data['subject']
         if newsletter_id == 0 and not subject:
-            raise ValidationError(ugettext(u"Please enter a subject for the newsletter"))
+            raise ValidationError(ugettext("Please enter a subject for the newsletter"))
         return subject
 
     def clean_subscription_type(self):
@@ -130,18 +132,18 @@ class NewEmailingForm(BsForm):
             subscription_type = int(self.cleaned_data['subscription_type'])
             return SubscriptionType.objects.get(id=subscription_type)
         except (ValueError, KeyError, SubscriptionType.DoesNotExist):
-            raise ValidationError(ugettext(u"Please select a valid subscription"))
+            raise ValidationError(ugettext("Please select a valid subscription"))
 
 
 class NewNewsletterForm(BsForm):
     """Create a new newsletter"""
     subject = forms.CharField(
-        label=_(u"Subject"),
-        widget=forms.TextInput(attrs={'placeholder': _(u'Subject of the newsletter')})
+        label=_("Subject"),
+        widget=forms.TextInput(attrs={'placeholder': _('Subject of the newsletter')})
     )
-    template = forms.ChoiceField(label=_(u"Template"), choices=get_newsletter_templates(None, None))
-    source_url = forms.URLField(label=_(u'Source URL'), required=False)
-    content = forms.CharField(label=_(u'Content'), required=False, widget=forms.HiddenInput())
+    template = forms.ChoiceField(label=_("Template"), choices=get_newsletter_templates(None, None))
+    source_url = forms.URLField(label=_('Source URL'), required=False)
+    content = forms.CharField(label=_('Content'), required=False, widget=forms.HiddenInput())
     
     def __init__(self, *args, **kwargs):
         super(NewNewsletterForm, self).__init__(*args, **kwargs)
@@ -168,7 +170,7 @@ class NewNewsletterForm(BsForm):
                         html = urllib2.urlopen(url).read()
                         # and extract the selector content as initial content for the newsletter
                         soup = BeautifulSoup(html, "html.parser")
-                        content = u''.join([u'{0}'.format(tag) for tag in soup.select(selector)])
+                        content = ''.join(['{0}'.format(tag) for tag in soup.select(selector)])
                         if post_processor:
                             # import the post_processor function
                             module_name, processor_name = post_processor.rsplit('.', 1)
@@ -180,22 +182,22 @@ class NewNewsletterForm(BsForm):
                         return url
                     except Exception as msg:
                         raise ValidationError(msg)
-            raise ValidationError(ugettext(u"The url is not allowed"))
-        return u''
+            raise ValidationError(ugettext("The url is not allowed"))
+        return ''
 
     def clean_content(self):
         """content validation"""
         url = self.cleaned_data['source_url']
         if url:
             return self.source_content
-        return u''
+        return ''
 
 
 class EmailSubscribeForm(BetterBsModelForm):
     """Register to an emailing with just email address"""
     email = forms.EmailField(
         required=True, label="",
-        widget=forms.TextInput(attrs={'placeholder': _(u'Email'), 'size': '80'})
+        widget=forms.TextInput(attrs={'placeholder': _('Email'), 'size': '80'})
     )
     
     class Meta:
@@ -246,7 +248,7 @@ class EmailSubscribeForm(BetterBsModelForm):
         if subscriptions:
             send_notification_email(request, contact, [], "")
         else:
-            send_notification_email(request, contact, [], u"Error: "+ugettext(u"No subscription_type defined"))
+            send_notification_email(request, contact, [], "Error: "+ugettext("No subscription_type defined"))
                 
         return contact
 
@@ -268,7 +270,7 @@ class SubscriptionTypeFormMixin(object):
 
             initial = None
             if contact:
-                initial = u','.join(
+                initial = ','.join(
                     [
                         str(subscription.subscription_type.id)
                         for subscription in contact.subscription_set.all()
@@ -304,13 +306,13 @@ class SubscriptionTypeFormMixin(object):
                 SubscriptionType.objects.get(id=st_id) for st_id in self.cleaned_data['subscription_types']
             ]
         except SubscriptionType.DoesNotExist:
-            raise ValidationError(_(u"Invalid subscription type"))
+            raise ValidationError(_("Invalid subscription type"))
 
         if self.subscription_required and not (len(subscription_types)):
             if self.subscription_types_count > 1:
-                raise ValidationError(_(u"You must check a least one subscription"))
+                raise ValidationError(_("You must check a least one subscription"))
             else:
-                raise ValidationError(_(u"This field is required"))
+                raise ValidationError(_("This field is required"))
         return subscription_types
 
     def _save_subscription_types(self, contact):
@@ -338,17 +340,17 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     """Subscribe to emailing"""
 
     city = forms.CharField(
-        required=False, label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        required=False, label=_('City'),
+        widget=CityAutoComplete(attrs={'placeholder': _('Enter a city'), 'size': '80'})
     )
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
     entity = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')})
+        widget=forms.TextInput(attrs={'placeholder': _('Name of the entity')})
     )
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
-    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _(u'Message'), 'cols':'90'}))
+    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Message'), 'cols':'90'}))
     captcha = get_captcha_field()
     favorite_language = forms.CharField(required=False, widget=forms.HiddenInput())
 
@@ -359,11 +361,11 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             'address2', 'address3', 'zip_code'
         )
         widgets = {
-            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname'), 'required': 'required'}),
-            'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
-            'phone': forms.TextInput(attrs={'placeholder': _(u'Phone')}),
-            'email': forms.TextInput(attrs={'placeholder': _(u'Email'), 'required': 'required'}),
-            'zip_code': forms.TextInput(attrs={'placeholder': _(u'zip code')}),
+            'lastname': forms.TextInput(attrs={'placeholder': _('Lastname'), 'required': 'required'}),
+            'firstname': forms.TextInput(attrs={'placeholder': _('Firstname')}),
+            'phone': forms.TextInput(attrs={'placeholder': _('Phone')}),
+            'email': forms.TextInput(attrs={'placeholder': _('Email'), 'required': 'required'}),
+            'zip_code': forms.TextInput(attrs={'placeholder': _('zip code')}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -378,7 +380,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         entity_types_choices = []
 
         if crm_settings.ALLOW_SINGLE_CONTACT:
-            entity_types_choices.append((0, _(u'Individual')))
+            entity_types_choices.append((0, _('Individual')))
         else:
             entity_types_choices.append((0, ''))
 
@@ -409,7 +411,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
                 return EntityType.objects.get(id=entity_type)
             return None
         except (ValueError, EntityType.DoesNotExist):
-            raise ValidationError(ugettext(u"Invalid entity type"))
+            raise ValidationError(ugettext("Invalid entity type"))
         
     def get_entity(self):
         """get entity from form"""
@@ -424,7 +426,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             else:
                 et_id = getattr(settings, 'BALAFON_INDIVIDUAL_ENTITY_ID', 1)
                 entity_type = EntityType.objects.get(id=et_id)
-                entity_name = u"{0} {1}".format(
+                entity_name = "{0} {1}".format(
                     self.cleaned_data['lastname'], self.cleaned_data['firstname'])
                 return Entity.objects.create(name=entity_name, type=entity_type)
             
@@ -434,10 +436,10 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         entity = self._dehtmled_field("entity")
         if entity_type:
             if not entity:
-                raise ValidationError(u"{0}: {1}".format(entity_type.name, ugettext(u"Please enter a name")))
+                raise ValidationError("{0}: {1}".format(entity_type.name, ugettext("Please enter a name")))
         else:
             data = [self.cleaned_data[x] for x in ('lastname', 'firstname')]
-            entity = u' '.join([x for x in data if x]).strip().upper()
+            entity = ' '.join([x for x in data if x]).strip().upper()
             
         return entity
          
@@ -478,7 +480,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         """validate message"""
         message = self._dehtmled_field("message", allow_spaces=True)
         if len(message) > 10000:
-            raise ValidationError(ugettext(u"Your message is too long"))
+            raise ValidationError(ugettext("Your message is too long"))
         return message
     
     def clean_groups(self):
@@ -486,7 +488,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         try:
             groups = [Group.objects.get(id=group_id) for group_id in self.cleaned_data['groups']]
         except Group.DoesNotExist:
-            raise ValidationError(ugettext(u"Invalid group"))
+            raise ValidationError(ugettext("Invalid group"))
         return groups
     
     def clean_action_types(self):
@@ -494,7 +496,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         try:
             action_types = [ActionType.objects.get(id=at_id) for at_id in self.cleaned_data['action_types']]
         except ActionType.DoesNotExist:
-            raise ValidationError(ugettext(u"Invalid action type"))
+            raise ValidationError(ugettext("Invalid action type"))
         return action_types
 
     def save(self, request=None):
@@ -520,9 +522,9 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         message = self.cleaned_data["message"]
 
         if message:
-            action_type = ActionType.objects.get_or_create(name=ugettext(u"Message"))[0]
+            action_type = ActionType.objects.get_or_create(name=ugettext("Message"))[0]
             action = Action.objects.create(
-                subject=ugettext(u"Message from web site"),
+                subject=ugettext("Message from web site"),
                 type=action_type,
                 planned_date=datetime.now(),
                 detail=message,
@@ -538,7 +540,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         actions = []
         for action_type in action_types:
             action = Action.objects.create(
-                subject=ugettext(u"Contact"),
+                subject=ugettext("Contact"),
                 type=action_type,
                 planned_date=datetime.now(),
                 display_on_board=True
@@ -568,10 +570,10 @@ class NewsletterSchedulingForm(forms.ModelForm):
         sch_dt = self.cleaned_data['scheduling_dt']
 
         if not sch_dt:
-            raise ValidationError(ugettext(u"This field is required"))
+            raise ValidationError(ugettext("This field is required"))
 
         if sch_dt < dt_now():
-            raise ValidationError(ugettext(u"The scheduling date must be in future"))
+            raise ValidationError(ugettext("The scheduling date must be in future"))
 
         return sch_dt
 
@@ -588,9 +590,9 @@ class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
             'email', 'firstname', 'lastname'
         )
         widgets = {
-            'lastname': forms.TextInput(attrs={'placeholder': _(u'Lastname')}),
-            'firstname': forms.TextInput(attrs={'placeholder': _(u'Firstname')}),
-            'email': forms.TextInput(attrs={'placeholder': _(u'Email'), 'required': 'required'}),
+            'lastname': forms.TextInput(attrs={'placeholder': _('Lastname')}),
+            'firstname': forms.TextInput(attrs={'placeholder': _('Firstname')}),
+            'email': forms.TextInput(attrs={'placeholder': _('Email'), 'required': 'required'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -605,7 +607,7 @@ class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
 
     def get_entity(self):
         """get entity from form"""
-        name = u'{0} {1}'.format(self.cleaned_data['lastname'], self.cleaned_data['firstname'])
+        name = '{0} {1}'.format(self.cleaned_data['lastname'], self.cleaned_data['firstname'])
         if crm_settings.ALLOW_SINGLE_CONTACT:
             return Entity.objects.create(name=name, type=None, is_single_contact=True)
         else:
@@ -630,4 +632,3 @@ class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
         send_notification_email(request, contact, [], '')
 
         return contact
-

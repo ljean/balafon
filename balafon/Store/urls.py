@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """urls"""
 
+from __future__ import unicode_literals
+
 from django.conf.urls import url
 
 from balafon.Store.views.sales_documents import (

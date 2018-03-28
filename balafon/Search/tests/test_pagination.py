@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by entity"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.utils import override_settings
@@ -24,7 +26,7 @@ class SearchPaginationTest(BaseTestCase):
         """less than default number, it should not display pagination"""
         del settings.BALAFON_SEARCH_NB_IN_PAGE  # use default settings
 
-        entities = [mommy.make(models.Entity, name=u"tiny{0:02d}#".format(i)) for i in range(50)]
+        entities = [mommy.make(models.Entity, name="tiny{0:02d}#".format(i)) for i in range(50)]
 
         url = reverse('search')
 
@@ -44,7 +46,7 @@ class SearchPaginationTest(BaseTestCase):
         """more than default number, it should display pagination"""
         del settings.BALAFON_SEARCH_NB_IN_PAGE  # use default settings
 
-        entities = [mommy.make(models.Entity, name=u"tiny{0:02d}#".format(i)) for i in range(51)]
+        entities = [mommy.make(models.Entity, name="tiny{0:02d}#".format(i)) for i in range(51)]
 
         url = reverse('search')
 
@@ -63,7 +65,7 @@ class SearchPaginationTest(BaseTestCase):
     def test_search_custom_pagination_less(self):
         """less than custom number, it should not display pagination"""
 
-        entities = [mommy.make(models.Entity, name=u"tiny{0:02d}#".format(i)) for i in range(10)]
+        entities = [mommy.make(models.Entity, name="tiny{0:02d}#".format(i)) for i in range(10)]
 
         url = reverse('search')
 
@@ -81,7 +83,7 @@ class SearchPaginationTest(BaseTestCase):
     def test_search_custom_pagination(self):
         """more than custom number, it should display pagination"""
 
-        entities = [mommy.make(models.Entity, name=u"tiny{0:02d}#".format(i)) for i in range(11)]
+        entities = [mommy.make(models.Entity, name="tiny{0:02d}#".format(i)) for i in range(11)]
 
         url = reverse('search')
 

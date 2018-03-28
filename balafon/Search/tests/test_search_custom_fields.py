@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """miscellaneous searches"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -20,23 +22,23 @@ class SearchEntityCustomFieldsTest(BaseTestCase):
         another_field = models.CustomField.objects.create(model=models.CustomField.MODEL_CONTACT, name="ut_another")
         entity_field = models.CustomField.objects.create(model=models.CustomField.MODEL_ENTITY, name=name)
 
-        contact1 = mommy.make(models.Contact, lastname=u"ABCDEFGH", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCDEFGH", main_contact=True, has_left=False)
         contact1.set_custom_field(custom_field_name, "Yes")
 
-        contact2 = mommy.make(models.Contact, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="IJKLMNOP", main_contact=True, has_left=False)
         contact2.set_custom_field(custom_field_name, "No")
         contact2.set_custom_field(another_field.name, "Yes")
 
-        contact3 = mommy.make(models.Contact, lastname=u"QRSTUVW", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="QRSTUVW", main_contact=True, has_left=False)
         contact3.set_custom_field(another_field.name, "Yes")
 
-        contact4 = mommy.make(models.Contact, lastname=u"XYZZYXWV", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname="XYZZYXWV", main_contact=True, has_left=False)
         contact4.set_custom_field(custom_field_name, "Yes!")
 
-        contact5 = mommy.make(models.Contact, lastname=u"UTSRQPNM", main_contact=True, has_left=False)
+        contact5 = mommy.make(models.Contact, lastname="UTSRQPNM", main_contact=True, has_left=False)
         contact5.set_custom_field(custom_field_name, "Yes")
 
-        contact6 = mommy.make(models.Contact, lastname=u"LKJIHGFE", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, lastname="LKJIHGFE", main_contact=True, has_left=False)
         contact6.entity.set_custom_field(custom_field_name, "Yes")
 
         response = self.client.post(reverse('search'), data={"gr0-_-{0}-_-0".format(name): 'Yes'})
@@ -57,23 +59,23 @@ class SearchEntityCustomFieldsTest(BaseTestCase):
         another_field = models.CustomField.objects.create(model=models.CustomField.MODEL_ENTITY, name="ut_another")
         entity_field = models.CustomField.objects.create(model=models.CustomField.MODEL_CONTACT, name=name)
 
-        contact1 = mommy.make(models.Contact, lastname=u"ABCDEFGH", main_contact=True, has_left=False)
+        contact1 = mommy.make(models.Contact, lastname="ABCDEFGH", main_contact=True, has_left=False)
         contact1.entity.set_custom_field(custom_field_name, "Yes")
 
-        contact2 = mommy.make(models.Contact, lastname=u"IJKLMNOP", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="IJKLMNOP", main_contact=True, has_left=False)
         contact2.entity.set_custom_field(custom_field_name, "No")
         contact2.entity.set_custom_field(another_field.name, "Yes")
 
-        contact3 = mommy.make(models.Contact, lastname=u"QRSTUVW", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="QRSTUVW", main_contact=True, has_left=False)
         contact3.entity.set_custom_field(another_field.name, "Yes")
 
-        contact4 = mommy.make(models.Contact, lastname=u"XYZZYXWV", main_contact=True, has_left=False)
+        contact4 = mommy.make(models.Contact, lastname="XYZZYXWV", main_contact=True, has_left=False)
         contact4.entity.set_custom_field(custom_field_name, "Yes!")
 
-        contact5 = mommy.make(models.Contact, lastname=u"UTSRQPNM", main_contact=True, has_left=False)
+        contact5 = mommy.make(models.Contact, lastname="UTSRQPNM", main_contact=True, has_left=False)
         contact5.entity.set_custom_field(custom_field_name, "Yes")
 
-        contact6 = mommy.make(models.Contact, lastname=u"LKJIHGFE", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, lastname="LKJIHGFE", main_contact=True, has_left=False)
         contact6.set_custom_field(custom_field_name, "Yes")
 
         response = self.client.post(reverse('search'), data={"gr0-_-{0}-_-0".format(name): 'Yes'})

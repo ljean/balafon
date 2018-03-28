@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """admin"""
 
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.contrib.messages import success, error
 from django.utils.translation import ugettext_lazy as _
@@ -12,13 +14,13 @@ from balafon.Crm.forms.actions import ActionMenuAdminForm
 
 class HasParentFilter(admin.SimpleListFilter):
     """filter items to know if they have a parent"""
-    title = _(u'Has parent')
+    title = _('Has parent')
     parameter_name = 'has_parent'
 
     def lookups(self, request, model_admin):
         return [
-            (1, _(u'Yes')),
-            (2, _(u'No')),
+            (1, _('Yes')),
+            (2, _('No')),
         ]
 
     def queryset(self, request, queryset):
@@ -36,6 +38,7 @@ class ZoneAdmin(admin.ModelAdmin):
     ordering = ['type', 'name']
     list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']
+
 admin.site.register(models.Zone, ZoneAdmin)
 
 
@@ -88,14 +91,14 @@ def initialize_status2(modeladmin, request, queryset):
             actions_queryset.update(status2=action_type.default_status2)
             success(
                 request,
-                _(u"initialize {0} actions of type '{1}' with status2 '{2}'").format(
+                _("initialize {0} actions of type '{1}' with status2 '{2}'").format(
                     actions_count, action_type.name, action_type.default_status2.name
                 )
             )
         else:
             error(
                 request,
-                _(u"No default status2 for actions type '{0}'").format(action_type.name)
+                _("No default status2 for actions type '{0}'").format(action_type.name)
             )
 initialize_status2.short_description = _("Initialize status2 to default if Null")
 
@@ -108,14 +111,14 @@ def reset_status2(modeladmin, request, queryset):
             actions_queryset.update(status2=None)
             success(
                 request,
-                _(u"reset {0} actions of type '{1}'").format(
+                _("reset {0} actions of type '{1}'").format(
                     actions_count, action_type.name
                 )
             )
         else:
             error(
                 request,
-                _(u"No default status2 for actions type '{0}'").format(action_type.name)
+                _("No default status2 for actions type '{0}'").format(action_type.name)
             )
 reset_status2.short_description = _("Reset status2 to Null")
 
@@ -130,12 +133,12 @@ def set_action_previous_status(modeladmin, request, queryset):
                 action.save()
             success(
                 request,
-                _(u"set previous values for {0} actions").format(actions_count)
+                _("set previous values for {0} actions").format(actions_count)
             )
         else:
             error(
                 request,
-                _(u"{0} : track status should be disabled when executing this action").format(action_type.name)
+                _("{0} : track status should be disabled when executing this action").format(action_type.name)
             )
 set_action_previous_status.short_description = _("Track status : Set previous status")
 
@@ -164,12 +167,12 @@ def create_action_initial_track(modeladmin, request, queryset):
 
             success(
                 request,
-                _(u"create tracks for {0} actions / {1} ignored").format(actions_count - ignored_count, ignored_count)
+                _("create tracks for {0} actions / {1} ignored").format(actions_count - ignored_count, ignored_count)
             )
         else:
             error(
                 request,
-                _(u"{0} : track status should be enabled when executing this action").format(action_type.name)
+                _("{0} : track status should be enabled when executing this action").format(action_type.name)
             )
 create_action_initial_track.short_description = _("Track status : create initial track")
 

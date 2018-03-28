@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """contacts"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -262,7 +264,7 @@ def delete_contact(request, contact_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Are you sure to delete the contact "{0}"?').format(contact),
+            'message': _('Are you sure to delete the contact "{0}"?').format(contact),
             'action_url': reverse("crm_delete_contact", args=[contact_id]),
         },
         context_instance=RequestContext(request)

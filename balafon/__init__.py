@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
+from __future__ import unicode_literals
+
 VERSION = "3.3.40"
 __version__ = VERSION
 

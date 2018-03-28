@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
@@ -20,8 +22,8 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     """A form for updating user profile"""
     city = forms.CharField(
         required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        label=_('City'),
+        widget=CityAutoComplete(attrs={'placeholder': _('Enter a city'), 'size': '80'})
     )
 
     class Media:
@@ -49,34 +51,34 @@ class EmailField(forms.EmailField):
         super(EmailField, self).clean(value)
         if User.objects.filter(email__iexact=value).count() > 0:
             raise forms.ValidationError(
-                ugettext(u"This email is already registered. Use the 'forgot password' link on the login page")
+                ugettext("This email is already registered. Use the 'forgot password' link on the login page")
             )
         return value
 
 
 class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     """A form for creating a new account on a website"""
-    email = EmailField(required=True, label=_(u"Email"), widget=forms.TextInput())
-    password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Password"))
-    password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_(u"Repeat your password"))
+    email = EmailField(required=True, label=_("Email"), widget=forms.TextInput())
+    password1 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_("Password"))
+    password2 = forms.CharField(required=True, widget=forms.PasswordInput(), label=_("Repeat your password"))
 
     entity_type = forms.ChoiceField(required=False, widget=forms.Select())
     entity = forms.CharField(
          required=False,
-         widget=forms.TextInput(attrs={'placeholder': _(u'Name of the entity')})
+         widget=forms.TextInput(attrs={'placeholder': _('Name of the entity')})
     )
 
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
 
     accept_termofuse = forms.BooleanField(
-        label=_(u'Accept terms of use'),
-        help_text=_(u"Check for accepting the terms of use")
+        label=_('Accept terms of use'),
+        help_text=_("Check for accepting the terms of use")
     )
 
     city = forms.CharField(
         required=False,
-        label=_(u'City'),
-        widget=CityAutoComplete(attrs={'placeholder': _(u'Enter a city'), 'size': '80'})
+        label=_('City'),
+        widget=CityAutoComplete(attrs={'placeholder': _('Enter a city'), 'size': '80'})
     )
 
     class Meta:
@@ -92,10 +94,10 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
         if 'gender' in self.fields:
             # do not display Mrs and Mr
-            self.fields['gender'].choices = ((0, u'----------'), ) + Contact.GENDER_CHOICE[:2]
+            self.fields['gender'].choices = ((0, '----------'), ) + Contact.GENDER_CHOICE[:2]
 
         if 'entity_type' in self.fields:
-            self.fields['entity_type'].choices = [(0, ugettext(u'Individual'))]+[
+            self.fields['entity_type'].choices = [(0, ugettext('Individual'))]+[
                 (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
             ]
         if not has_entity_on_registration_form():
@@ -106,7 +108,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         termsofuse_url = get_registration_accept_terms_of_use_link()
         if 'accept_termofuse' in self.fields and termsofuse_url:
             self.fields['accept_termofuse'].label = mark_safe(
-                ugettext(u'Accept <a href="{0}">terms of use</a>').format(
+                ugettext('Accept <a href="{0}">terms of use</a>').format(
                     termsofuse_url
                 )
             )
@@ -117,20 +119,20 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         entity = self.cleaned_data['entity']
         if entity_type:
             if not entity:
-                raise ValidationError(_(u"{0}: Please enter a name".format(entity_type)))
+                raise ValidationError(_("{0}: Please enter a name".format(entity_type)))
         return entity
         
     def clean_entity_type(self):
         try:
             entity_type_id = int(self.cleaned_data['entity_type'] or 0)
         except ValueError:
-            raise ValidationError(ugettext(u'Invalid entity type'))
+            raise ValidationError(ugettext('Invalid entity type'))
        
         if entity_type_id:
             try:
                 return EntityType.objects.get(id=entity_type_id)
             except EntityType.DoesNotExist:
-                raise ValidationError(ugettext(u'Unknown entity type'))
+                raise ValidationError(ugettext('Unknown entity type'))
         
         return None
 
@@ -138,7 +140,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         password1 = self.cleaned_data.get('password1', "")
         password2 = self.cleaned_data.get('password2', "")
         if password1 and (password1 != password2):
-            raise forms.ValidationError(ugettext(u'Passwords are not the same'))
+            raise forms.ValidationError(ugettext('Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
 
     def save(self, commit=True):
@@ -184,11 +186,11 @@ class MessageForm(forms.Form):
     """A form for sending a message to web site owner"""
     message = forms.CharField(
         required=True,
-        widget=forms.Textarea(attrs={'placeholder': _(u"Your message"),})
+        widget=forms.Textarea(attrs={'placeholder': _("Your message"),})
     )
     
     def clean_message(self):
         message = self.cleaned_data['message']
         if len(message) > 10000:
-            raise forms.ValidationError(ugettext(u'Message is too long'))
+            raise forms.ValidationError(ugettext('Message is too long'))
         return message

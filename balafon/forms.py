@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
+from __future__ import unicode_literals
+
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, PasswordChangeForm
 
-from coop_cms.bs_forms import BootstrapableMixin
 import floppyforms as forms
+
+from coop_cms.bs_forms import BootstrapableMixin
 
 
 class BsAuthenticationForm(BootstrapableMixin, AuthenticationForm):

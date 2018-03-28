@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 import logging
 
@@ -262,7 +264,7 @@ class StoreItemApiTest(BaseTestCase):
         mommy.make(models.StoreItem)
 
         url = reverse('store_store-items-list') + "?ids={0}".format(
-            u','.join([str(id_) for id_ in (store_item1.id, store_item2.id)])
+            ','.join([str(id_) for id_ in (store_item1.id, store_item2.id)])
         )
 
         response = self.client.get(url, format='json')
@@ -307,7 +309,7 @@ class StoreItemApiTest(BaseTestCase):
         store_item1 = mommy.make(models.StoreItem)
 
         url = reverse('store_store-items-list') + "?ids={0}".format(
-            u','.join([str(id_) for id_ in (store_item1.id, store_item1.id + 1)])
+            ','.join([str(id_) for id_ in (store_item1.id, store_item1.id + 1)])
         )
 
         response = self.client.get(url, format='json')
@@ -342,7 +344,7 @@ class StoreItemApiTest(BaseTestCase):
         mommy.make(models.StoreItem)
 
         url = reverse('store_store-items-list') + "?ids={0}".format(
-            u','.join([str(id_) for id_ in (store_item1.id, "hjhkhz")])
+            ','.join([str(id_) for id_ in (store_item1.id, "hjhkhz")])
         )
 
         response = self.client.get(url, format='json')
@@ -669,8 +671,8 @@ class LastSalesApiTest(BaseTestCase):
         store_item1 = mommy.make(models.StoreItem)
         mommy.make(models.StoreItem)
 
-        self.user.first_name = u'John'
-        self.user.last_name = u'Doe'
+        self.user.first_name = 'John'
+        self.user.last_name = 'Doe'
         self.user.save()
 
         profile = create_profile_contact(self.user)
@@ -698,13 +700,13 @@ class LastSalesApiTest(BaseTestCase):
     def test_view_last_sales_not_published(self):
         """It should return one store item"""
 
-        store_item1 = mommy.make(models.StoreItem, name=u'Orange')
-        store_item2 = mommy.make(models.StoreItem, name=u'Banana')
-        store_item3 = mommy.make(models.StoreItem, name=u'Apple', published=False)
+        store_item1 = mommy.make(models.StoreItem, name='Orange')
+        store_item2 = mommy.make(models.StoreItem, name='Banana')
+        store_item3 = mommy.make(models.StoreItem, name='Apple', published=False)
         store_item4 = mommy.make(models.StoreItem)
 
-        self.user.first_name = u'John'
-        self.user.last_name = u'Doe'
+        self.user.first_name = 'John'
+        self.user.last_name = 'Doe'
         self.user.save()
 
         profile = create_profile_contact(self.user)
@@ -750,13 +752,13 @@ class LastSalesApiTest(BaseTestCase):
     def test_view_last_sales_only_two_sales(self):
         """It should return three store item"""
 
-        store_item1 = mommy.make(models.StoreItem, name=u'Orange')
-        store_item2 = mommy.make(models.StoreItem, name=u'Banana')
-        store_item3 = mommy.make(models.StoreItem, name=u'Apple')
+        store_item1 = mommy.make(models.StoreItem, name='Orange')
+        store_item2 = mommy.make(models.StoreItem, name='Banana')
+        store_item3 = mommy.make(models.StoreItem, name='Apple')
         store_item4 = mommy.make(models.StoreItem)
 
-        self.user.first_name = u'John'
-        self.user.last_name = u'Doe'
+        self.user.first_name = 'John'
+        self.user.last_name = 'Doe'
         self.user.save()
 
         profile = create_profile_contact(self.user)

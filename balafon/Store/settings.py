@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """common place for settings. Define defaults"""
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
@@ -14,12 +16,12 @@ def is_public_api_allowed():
 
 def get_cart_type_name():
     """returns true if an anonymous can view some data : products, categories, tags"""
-    return getattr(settings, 'BALAFON_STORE_CART_TYPE', _(u'Cart'))
+    return getattr(settings, 'BALAFON_STORE_CART_TYPE', _('Cart'))
 
 
 def get_cart_confirmation_subject(profile, action):
     """returns true if an anonymous can view some data : products, categories, tags"""
-    subject = getattr(settings, 'BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT', _(u'Purchasing confirmation'))
+    subject = getattr(settings, 'BALAFON_CART_CONFIRMATION_EMAIL_SUBJECT', _('Purchasing confirmation'))
     if callable(subject):
         return subject(profile, action)
     else:

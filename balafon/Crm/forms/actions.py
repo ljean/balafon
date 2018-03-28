@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 from decimal import Decimal
 
@@ -42,13 +44,13 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                     'subject', 'in_charge', 'date', 'time', 'planned_date', 'end_date', 'end_time', 'end_datetime',
                     'opportunity'
                 ],
-                'legend': _(u'Summary')
+                'legend': _('Summary')
             }),
-            ('type', {'fields': ['type', 'status', 'status2', 'amount', 'number'], 'legend': _(u'Type')}),
-            ('details', {'fields': ['detail'], 'legend': _(u'Details')}),
+            ('type', {'fields': ['type', 'status', 'status2', 'amount', 'number'], 'legend': _('Type')}),
+            ('details', {'fields': ['detail'], 'legend': _('Details')}),
         ]
         help_texts = {
-            'amount': _(u'Amount is disabled when value is calculated'),
+            'amount': _('Amount is disabled when value is calculated'),
         }
 
     def __init__(self, *args, **kwargs):
@@ -129,7 +131,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             self.fields['status2'].widget = forms.HiddenInput()
 
         self.fields['opportunity'].widget = forms.HiddenInput()
-        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols': '72'})
+        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _('enter details'), 'cols': '72'})
 
         self._init_dt_field("planned_date", "date", "time")
         self._init_dt_field("end_datetime", "end_date", "end_time")
@@ -285,12 +287,12 @@ class OpportunityForm(FormWithFieldsetMixin, BetterBsModelForm):
         fields = ('name', 'detail')
 
         fieldsets = [
-            ('name', {'fields': ['name', 'detail'], 'legend': _(u'Summary')}),
+            ('name', {'fields': ['name', 'detail'], 'legend': _('Summary')}),
         ]
 
     def __init__(self, *args, **kwargs):
         super(OpportunityForm, self).__init__(*args, **kwargs)
-        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _(u'enter details'), 'cols':'72'})
+        self.fields['detail'].widget = forms.Textarea(attrs={'placeholder': _('enter details'), 'cols':'72'})
 
 
 class OpportunityStatusForm(forms.ModelForm):
@@ -309,7 +311,7 @@ class SelectOpportunityForm(forms.Form):
         kwargs.pop('choices', None)
         super(SelectOpportunityForm, self).__init__(*args, **kwargs)
         widget = OpportunityAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of a opportunity'), 'size': '50', 'class': 'colorbox'})
+            attrs={'placeholder': _('Enter the name of a opportunity'), 'size': '50', 'class': 'colorbox'})
         self.fields["opportunity"] = forms.CharField(label=_(u"Opportunity"), widget=widget)
 
     def clean_opportunity(self):
@@ -323,7 +325,7 @@ class SelectOpportunityForm(forms.Form):
 
 class CloneActionForm(forms.Form):
     """form for clone_action: choose which type to chooses"""
-    action_type = forms.ChoiceField(required=True, choices=[], label=_(u'New type'))
+    action_type = forms.ChoiceField(required=True, choices=[], label=_('New type'))
 
     def __init__(self, action_type, *args, **kwargs):
         super(CloneActionForm, self).__init__(*args, **kwargs)
@@ -333,7 +335,7 @@ class CloneActionForm(forms.Form):
             for action_type in action_type.next_action_types.all().order_by('order_index')
         ]
         self.fields['action_type'].choices = choices
-        #If only 1 choice = change it to a confirmation
+        # If only 1 choice = change it to a confirmation
         if len(choices) == 1:
             self.fields['action_type'].initial = choices[0][0]
             self.fields['action_type'].widget = forms.HiddenInput()
@@ -348,7 +350,7 @@ class CloneActionForm(forms.Form):
         try:
             return models.ActionType.objects.get(id=action_type)
         except models.ActionType.DoesNotExist:
-            raise forms.ValidationError(_(u"Invalid type"))
+            raise forms.ValidationError(_("Invalid type"))
 
 
 class UpdateActionStatusForm(BsPopupModelForm):
@@ -385,7 +387,7 @@ class UpdateActionStatusForm(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status else [None]) + list(action_type.allowed_status.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+            raise ValidationError(ugettext("This status can't not be used for this action type"))
         return status
 
     def clean_status2(self):
@@ -394,7 +396,7 @@ class UpdateActionStatusForm(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+            raise ValidationError(ugettext("This status can't not be used for this action type"))
         return status
 
 
@@ -424,7 +426,7 @@ class UpdateActionStatus2Form(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+            raise ValidationError(ugettext("This status can't not be used for this action type"))
         return status
 
 

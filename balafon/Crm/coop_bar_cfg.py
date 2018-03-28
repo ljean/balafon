@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from django.utils.translation import ugettext as _
+
 from coop_bar.utils import make_link
 
 
@@ -25,7 +28,7 @@ def doc_to_pdf(request, context):
     obj = context.get("object", None)
     if obj:
         if not context.get('edit_mode') and hasattr(obj, 'get_pdf_url'):
-            return make_link(obj.get_pdf_url(), _(u'Pdf'), 'fugue/document-pdf.png',
+            return make_link(obj.get_pdf_url(), _('Pdf'), 'fugue/document-pdf.png',
                 classes=['icon', 'alert_on_click'])
 
 

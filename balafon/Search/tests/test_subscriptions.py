@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by subscription type"""
 
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
@@ -16,12 +18,12 @@ class SubscriptionSearchTest(BaseTestCase):
         """search by accept subscriptions"""
         mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
         url = reverse('search')
 
@@ -50,12 +52,12 @@ class SubscriptionSearchTest(BaseTestCase):
         """search by refuse subscription"""
         mommy.make(models.SubscriptionType)
 
-        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
-        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
-        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        entity1 = mommy.make(models.Entity, name="My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname="ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname="IJKL", main_contact=True, has_left=False)
 
-        entity2 = mommy.make(models.Entity, name=u"Other corp")
-        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+        entity2 = mommy.make(models.Entity, name="Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname="WXYZ", main_contact=True, has_left=False)
 
         url = reverse('search')
 

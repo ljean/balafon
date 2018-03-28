@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -22,14 +24,14 @@ from balafon.Crm.widgets import ContactAutoComplete
 class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
     """Edit contact form"""
     same_as_suggestions = forms.ChoiceField(
-        label=_(u'Same-as contacts'),
+        label=_('Same-as contacts'),
         choices=[],
         required=False,
         help_text=_(
-            u'If this is a new contact for an existing person, you can link the different contacts between them'
+            'If this is a new contact for an existing person, you can link the different contacts between them'
         ),
         widget=forms.Select(
-            attrs={'class': 'chosen-select', 'data-placeholder': _(u'Select same-as contacts'), 'style': "width: 100%;"}
+            attrs={'class': 'chosen-select', 'data-placeholder': _('Select same-as contacts'), 'style': "width: 100%;"}
         )
     )
 
@@ -45,9 +47,9 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country', 'same_as_suggestions'
         )
         widgets = {
-            'notes': forms.Textarea(attrs={'placeholder': _(u'enter notes about the contact'), 'cols': '72'}),
+            'notes': forms.Textarea(attrs={'placeholder': _('enter notes about the contact'), 'cols': '72'}),
             'role': forms.SelectMultiple(
-                attrs={'class': 'chosen-select', 'data-placeholder': _(u'Select roles'), 'style': "width: 100%;"}
+                attrs={'class': 'chosen-select', 'data-placeholder': _('Select roles'), 'style': "width: 100%;"}
             ),
         }
         fieldsets = [
@@ -55,13 +57,13 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 'fields': [
                     'gender', 'gender_title', 'lastname', 'firstname', 'email', 'same_as_suggestions', 'phone', 'mobile'
                 ],
-                'legend': _(u'Name')
+                'legend': _('Name')
             }),
             ('web', {
                 'fields': [
                     'birth_date', 'title', 'role', 'job', 'favorite_language',
                 ],
-                'legend': _(u'Contact details')
+                'legend': _('Contact details')
                 }
             ),
             ('address', {
@@ -69,20 +71,20 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                     'street_number', 'street_type', 'address', 'address2', 'address3', 'zip_code', 'city',
                     'cedex', 'country'
                 ],
-                'legend': _(u'Address')
+                'legend': _('Address')
             }),
             ('billing_address', {
                 'fields': [
                     'billing_street_number', 'billing_street_type', 'billing_address', 'billing_address2',
                     'billing_address3', 'billing_zip_code', 'billing_city', 'billing_cedex', 'billing_country'
                 ],
-                'legend': _(u'Billing address')
+                'legend': _('Billing address')
             }),
             ('relationship', {
                 'fields': ['main_contact', 'email_verified', 'has_left', 'accept_notifications'],
-                'legend': _(u'Options')
+                'legend': _('Options')
             }),
-            ('photo', {'fields': ['photo'], 'legend': _(u'Photo')}),
+            ('photo', {'fields': ['photo'], 'legend': _('Photo')}),
         ]
 
     def __init__(self, *args, **kwargs):
@@ -101,7 +103,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         except models.Entity.DoesNotExist:
             pass
 
-        self.fields["role"].help_text = _(u"Select the roles played by the contact in his entity")
+        self.fields["role"].help_text = _("Select the roles played by the contact in his entity")
 
         if 'balafon.Profile' not in settings.INSTALLED_APPS:
             self.fields["accept_notifications"].widget = forms.HiddenInput()
@@ -110,13 +112,13 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
 
         # define the allowed gender
         gender_choices = [
-            ('', u'-------'),
-            (models.Contact.GENDER_MALE, ugettext(u'Mr')),
-            (models.Contact.GENDER_FEMALE, ugettext(u'Mrs')),
+            ('', '-------'),
+            (models.Contact.GENDER_MALE, ugettext('Mr')),
+            (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
         ]
         if ALLOW_COUPLE_GENDER:
             gender_choices += [
-                (models.Contact.GENDER_COUPLE, ugettext(u'Mrs and Mr'))
+                (models.Contact.GENDER_COUPLE, ugettext('Mrs and Mr'))
             ]
         self.fields['gender'].choices = gender_choices
 
@@ -160,7 +162,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                     contact_id=contact_id, lastname=lastname, firstname=firstname, email=email
                 )
                 self.fields['same_as_suggestions'].choices = [
-                    (contact.id, unicode(contact)) for contact in same_as_contacts
+                    (contact.id, '{0}'.format(contact)) for contact in same_as_contacts
                 ]
         else:
             # hide the field
@@ -186,7 +188,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 instance.id = 1
         target_name = models.get_contact_photo_dir(instance, photo)
         if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
-            raise ValidationError(ugettext(u"The file name is too long"))
+            raise ValidationError(ugettext("The file name is too long"))
         return photo
 
     def save_contact_subscriptions(self, contact):
@@ -216,7 +218,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 contact = models.Contact.objects.get(id=contact_id)
                 return contact
             except models.Contact.DoesNotExist:
-                raise ValidationError(ugettext(u"Contact does'nt exist"))
+                raise ValidationError(ugettext("Contact does'nt exist"))
 
     def save_same_as(self, this_contact):
         contact = self.cleaned_data['same_as_suggestions']
@@ -250,12 +252,12 @@ class SelectContactForm(forms.Form):
         super(SelectContactForm, self).__init__(*args, **kwargs)
         if choices:
             widget = forms.Select(choices=[(x.id, x.fullname) for x in choices])
-            self.fields["contact"] = forms.IntegerField(label=_(u"Contact"), widget=widget)
+            self.fields["contact"] = forms.IntegerField(label=_("Contact"), widget=widget)
         else:
             widget = ContactAutoComplete(
-                attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
+                attrs={'placeholder': _('Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
             )
-            self.fields["contact"] = forms.CharField(label=_(u"Contact"), widget=widget)
+            self.fields["contact"] = forms.CharField(label=_("Contact"), widget=widget)
 
     def clean_contact(self):
         """validation"""
@@ -263,7 +265,7 @@ class SelectContactForm(forms.Form):
             contact_id = int(self.cleaned_data["contact"])
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
-            raise ValidationError(ugettext(u"The contact does'nt exist"))
+            raise ValidationError(ugettext("The contact does'nt exist"))
 
 
 class SelectContactOrEntityForm(forms.Form):
@@ -282,18 +284,18 @@ class SelectContactOrEntityForm(forms.Form):
         }.get(object_type, None)
 
         if not object_class:
-            raise ValidationError(ugettext(u"Invalid type '{0}'").format(object_type))
+            raise ValidationError(ugettext("Invalid type '{0}'").format(object_type))
 
         try:
             object_id = int(object_id)
             return object_class.objects.get(id=object_id)
         except (ValueError, object_class.DoesNotExist):
-            raise ValidationError(ugettext(u"Does'nt exist"))
+            raise ValidationError(ugettext("Does'nt exist"))
 
 
 class SameAsPriorityForm(BetterBsForm):
     """Define "same as" priority for a contact"""
-    priority = forms.IntegerField(label=_(u"Priority"))
+    priority = forms.IntegerField(label=_("Priority"))
 
     def __init__(self, contact, *args, **kwargs):
         super(SameAsPriorityForm, self).__init__(*args, **kwargs)
@@ -307,7 +309,7 @@ class SameAsPriorityForm(BetterBsForm):
         max_value = self.contact.same_as.contact_set.count()
         if value < min_value or value > max_value:
             raise ValidationError(
-                ugettext(u'Invalid value : It should be between {0} and {1}').format(
+                ugettext('Invalid value : It should be between {0} and {1}').format(
                     min_value, max_value
                 )
             )
@@ -337,7 +339,7 @@ class SameAsSuggestionForm(forms.Form):
 
 class SameAsForm(forms.Form):
     """Define "same as" for two contacts"""
-    contact = forms.IntegerField(label=_(u"Contact"))
+    contact = forms.IntegerField(label=_("Contact"))
 
     def __init__(self, contact, *args, **kwargs):
         super(SameAsForm, self).__init__(*args, **kwargs)
@@ -347,7 +349,7 @@ class SameAsForm(forms.Form):
         if contact.same_as:
             # Do not propose again current SameAs
             potential_contacts = potential_contacts.exclude(same_as=contact.same_as)
-        self._same_as = [(same_as_contact.id, u"{0}".format(same_as_contact)) for same_as_contact in potential_contacts]
+        self._same_as = [(same_as_contact.id, "{0}".format(same_as_contact)) for same_as_contact in potential_contacts]
         if len(self._same_as):
             self.fields["contact"].widget = forms.Select(choices=self._same_as)
         else:
@@ -362,16 +364,16 @@ class SameAsForm(forms.Form):
         contact_id = self.cleaned_data["contact"]
         try:
             if contact_id not in [same_as[0] for same_as in self._same_as]:
-                raise ValidationError(ugettext(u"Invalid contact"))
+                raise ValidationError(ugettext("Invalid contact"))
             return models.Contact.objects.get(id=contact_id)
         except models.Contact.DoesNotExist:
-            raise ValidationError(ugettext(u"Contact does not exist"))
+            raise ValidationError(ugettext("Contact does not exist"))
 
 
 class AddRelationshipForm(forms.Form):
     """form for adding relationships"""
-    relationship_type = forms.IntegerField(label=_(u"relationship type"))
-    contact2 = forms.CharField(label=_(u"Contact"))
+    relationship_type = forms.IntegerField(label=_("relationship type"))
+    contact2 = forms.CharField(label=_("Contact"))
 
     def __init__(self, contact1, *args, **kwargs):
         super(AddRelationshipForm, self).__init__(*args, **kwargs)
@@ -387,9 +389,9 @@ class AddRelationshipForm(forms.Form):
         self.fields["relationship_type"].widget = forms.Select(choices=relationship_types)
 
         widget = ContactAutoComplete(
-            attrs={'placeholder': _(u'Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
+            attrs={'placeholder': _('Enter the name of a contact'), 'size': '50', 'class': 'colorbox'}
         )
-        self.fields["contact2"] = forms.CharField(label=_(u"Contact"), widget=widget)
+        self.fields["contact2"] = forms.CharField(label=_("Contact"), widget=widget)
 
     def clean_relationship_type(self):
         """validate relationship type"""
@@ -401,9 +403,9 @@ class AddRelationshipForm(forms.Form):
                 relationship_type = -relationship_type
             return models.RelationshipType.objects.get(id=relationship_type)
         except ValueError:
-            raise ValidationError(ugettext(u"Invalid data"))
+            raise ValidationError(ugettext("Invalid data"))
         except models.RelationshipType.DoesNotExist:
-            raise ValidationError(ugettext(u"Relationship type does not exist"))
+            raise ValidationError(ugettext("Relationship type does not exist"))
 
     def clean_contact2(self):
         """clean the contacts in relation"""
@@ -411,9 +413,9 @@ class AddRelationshipForm(forms.Form):
             contact2 = int(self.cleaned_data["contact2"])
             return models.Contact.objects.get(id=contact2)
         except ValueError:
-            raise ValidationError(ugettext(u"Invalid data"))
+            raise ValidationError(ugettext("Invalid data"))
         except models.Contact.DoesNotExist:
-            raise ValidationError(ugettext(u"Contact does not exist"))
+            raise ValidationError(ugettext("Contact does not exist"))
 
     def save(self):
         """save"""
@@ -451,14 +453,14 @@ class ContactsImportForm(BsModelForm):
 
         self.fields['groups'].widget.attrs = {
             'class': 'chosen-select form-control',
-            'data-placeholder': _(u'The created entities will be added to the selected groups'),
+            'data-placeholder': _('The created entities will be added to the selected groups'),
         }
         self.fields['groups'].help_text = ''
 
     def clean_separator(self):
         """validation"""
         if len(self.cleaned_data["separator"]) != 1:
-            raise ValidationError(ugettext(u'Invalid separator {0}').format(self.cleaned_data["separator"]))
+            raise ValidationError(ugettext('Invalid separator {0}').format(self.cleaned_data["separator"]))
         return self.cleaned_data["separator"]
 
 
@@ -466,8 +468,8 @@ class ContactsImportConfirmForm(ContactsImportForm):
     """confirm contact import"""
     default_department = forms.ChoiceField(
         required=False,
-        label=_(u'Default department'),
-        help_text=_(u'The city in red will be created with this department as parent')
+        label=_('Default department'),
+        help_text=_('The city in red will be created with this department as parent')
     )
 
     class Meta(ContactsImportForm.Meta):
@@ -484,7 +486,7 @@ class ContactsImportConfirmForm(ContactsImportForm):
         code = self.cleaned_data['default_department']
         if code:
             if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
-                raise ValidationError(ugettext(u'Please enter a valid code'))
+                raise ValidationError(ugettext('Please enter a valid code'))
             return self.cleaned_data['default_department']
         else:
             return None

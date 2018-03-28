@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 import json
 
@@ -280,7 +282,7 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"u{0}".format(y.id) for y in [user_joe, user_jack]],
+            ["u{0}".format(y.id) for y in [user_joe, user_jack]],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
@@ -311,7 +313,7 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            sorted([u"t{0}".format(y.id) for y in [action_type1, action_type2]]),
+            sorted(["t{0}".format(y.id) for y in [action_type1, action_type2]]),
             sorted([x["value"] for x in soup.select("select.action-filter option[selected=selected]")])
         )
 
@@ -366,7 +368,7 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t0"] + [u"t{0}".format(y.id) for y in [action_type1,]],
+            ["t0"] + ["t{0}".format(y.id) for y in [action_type1,]],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
@@ -441,7 +443,7 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
+            ["t{0}".format(action_type1.id)] + ["u{0}".format(user_joe.id)],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 
@@ -483,14 +485,14 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t{0}".format(action_type1.id)] + [u"s{0}".format(action_status2.id)],
+            ["t{0}".format(action_type1.id)] + ["s{0}".format(action_status2.id)],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
         self.assertEqual(
             [
-                u"t0",
-                u"t{0}".format(action_type2.id), u"t{0}".format(action_type1.id),
-                u"s{0}".format(action_status2.id), u"s{0}".format(action_status1.id)
+                "t0",
+                "t{0}".format(action_type2.id), "t{0}".format(action_type1.id),
+                "s{0}".format(action_status2.id), "s{0}".format(action_status1.id)
             ],
             [x["value"] for x in soup.select("select.action-filter option")]
         )
@@ -528,11 +530,11 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t{0}".format(action_type1.id)],
+            ["t{0}".format(action_type1.id)],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
         self.assertEqual(
-            [u"t0", u"t{0}".format(action_type1.id), u"t{0}".format(action_type2.id)],
+            ["t0", "t{0}".format(action_type1.id), "t{0}".format(action_type2.id)],
             [x["value"] for x in soup.select("select.action-filter option")]
         )
 
@@ -665,7 +667,7 @@ class ActionArchiveTest(BaseTestCase):
 
         soup = BeautifulSoup(response.content)
         self.assertEqual(
-            [u"t{0}".format(action_type1.id)] + [u"u{0}".format(user_joe.id)],
+            ["t{0}".format(action_type1.id)] + ["u{0}".format(user_joe.id)],
             [x["value"] for x in soup.select("select.action-filter option[selected=selected]")]
         )
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """view and edit entities"""
 
+from __future__ import unicode_literals, print_function
+
 from datetime import date
 import json
 import re
@@ -54,7 +56,7 @@ def get_entity_id(request):
         try:
             entity = get_object_or_404(models.Entity, name=name)
         except models.Entity.MultipleObjectsReturned:
-            warning(request, _(u'Duplicate entities {0}').format(name))
+            warning(request, _('Duplicate entities {0}').format(name))
             raise Http404
         return HttpResponse(json.dumps({'id': entity.id}), 'application/json')
     raise Http404
@@ -106,8 +108,8 @@ def view_entities_list(request):
     if re.search(r"\w+", letter_filter):
         if is_unaccent_filter_supported():
             queryset = queryset.extra(
-                where=[u"UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
-                params=[u"{0}%".format(letter_filter)]
+                where=["UPPER(unaccent(name)) LIKE UPPER(unaccent(%s))"],
+                params=["{0}%".format(letter_filter)]
             )
         else:
             queryset = queryset.filter(name__istartswith=letter_filter)
@@ -157,8 +159,8 @@ def change_contact_entity(request, contact_id):
             context_dict,
             context_instance=RequestContext(request)
         )
-    except Exception, msg:
-        print "#ERR", msg
+    except Exception as msg:
+        print("#ERR", msg)
         raise
 
 
@@ -238,7 +240,7 @@ def delete_entity(request, entity_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Are you sure to delete {0.name}?').format(entity),
+            'message': _('Are you sure to delete {0.name}?').format(entity),
             'action_url': reverse("crm_delete_entity", args=[entity_id]),
         },
         context_instance=RequestContext(request)

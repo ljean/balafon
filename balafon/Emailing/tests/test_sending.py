@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """test email sending"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 from unittest import skipIf
 
@@ -879,7 +881,7 @@ class SendEmailingTest(BaseTestCase):
         redirect_url = other_lang + next_url
         self.assertTrue(response['Location'].find(redirect_url) >= 0)
 
-    @override_settings(SECRET_KEY=u"super-héros")
+    @override_settings(SECRET_KEY="super-héros")
     def test_view_online_utf_links(self):
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(
@@ -888,7 +890,7 @@ class SendEmailingTest(BaseTestCase):
         )
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': u'<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr/à-bientôt">à bientôt</a></p>',
+            'content': '<h2>Hello #!-fullname-!#!</h2><p>Visit <a href="http://toto.fr/à-bientôt">à bientôt</a></p>',
             'template': 'test/newsletter_contact.html'
         }
         newsletter = mommy.make(Newsletter, **newsletter_data)
@@ -909,7 +911,7 @@ class SendEmailingTest(BaseTestCase):
 
         magic_link1 = MagicLink.objects.all()[1]
         self.assertContains(response, reverse('emailing_view_link', args=[magic_link1.uuid, contact.uuid]))
-        self.assertEqual(magic_link1.url, u'http://toto.fr/à-bientôt')
+        self.assertEqual(magic_link1.url, 'http://toto.fr/à-bientôt')
 
     def test_view_long_links(self):
         entity = mommy.make(models.Entity, name="my corp")
@@ -921,7 +923,7 @@ class SendEmailingTest(BaseTestCase):
         long_link = "http://toto.fr/{0}".format("abcde" * 100)  # >500 chars
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': u'<p>Visit <a href="{0}">long link</a> <a href="{1}">long link</a></p>'.format(
+            'content': '<p>Visit <a href="{0}">long link</a> <a href="{1}">long link</a></p>'.format(
                 short_link, long_link),
             'template': 'test/newsletter_no_link.html'
         }
@@ -951,7 +953,7 @@ class SendEmailingTest(BaseTestCase):
         short_link = "http://toto.fr/abcde/"
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': u'<p>Visit <a href="{0}">link1</a> <a href="{1}">link2</a></p>'.format(
+            'content': '<p>Visit <a href="{0}">link1</a> <a href="{1}">link2</a></p>'.format(
                 short_link, short_link
             ),
             'template': 'test/newsletter_no_link.html'
@@ -980,7 +982,7 @@ class SendEmailingTest(BaseTestCase):
         short_link = "http://toto.fr/abcde/"
         newsletter_data = {
             'subject': 'This is the subject',
-            'content': u'<p>Visit <a href="{0}">link1</a></p>'.format(
+            'content': '<p>Visit <a href="{0}">link1</a></p>'.format(
                 short_link
             ),
             'template': 'test/newsletter_no_link.html'
@@ -1030,8 +1032,8 @@ class CustomTemplateTest(BaseTestCase):
             gender=models.Contact.GENDER_MALE,
             entity=entity,
             email='john@toto.fr',
-            lastname=u'Doe',
-            firstname=u'John',
+            lastname='Doe',
+            firstname='John',
             address='2 rue de la lune',
             zip_code='42424',
             city=city
@@ -1109,25 +1111,25 @@ class MaxLineLengthTest(BaseTestCase):
         """it should not have a line more than 400 chars"""
 
         in_lines = [
-            u'This is a messsage',
-            u"123456789 " * 50,
-            u"That's all folks!"
+            'This is a messsage',
+            "123456789 " * 50,
+            "That's all folks!"
         ]
-        text = u"\n".join(in_lines)
+        text = "\n".join(in_lines)
 
         out_text = force_line_max_length(text, max_length_per_line=400, dont_cut_in_quotes=True)
-        out_lines = out_text.split(u"\n")
+        out_lines = out_text.split("\n")
 
         self.assertEqual(len(out_lines), 4)
         self.assertEqual(out_lines[0], in_lines[0])
-        self.assertEqual(out_lines[1], u"123456789 " * 40 + u"123456789")
-        self.assertEqual(out_lines[2], u"123456789 " * 8 + u"123456789")
+        self.assertEqual(out_lines[1], "123456789 " * 40 + "123456789")
+        self.assertEqual(out_lines[2], "123456789 " * 8 + "123456789")
         self.assertEqual(out_lines[3], in_lines[2])
 
     def test_force_line_max_length_in_p(self):
         """it should not have a line more than 400 chars"""
 
-        content = u"""
+        content = """
             <html>
             <body>
             </body>
@@ -1139,9 +1141,9 @@ class MaxLineLengthTest(BaseTestCase):
             <p>Paragraph 2</p>
             <p>{0}</p>
             </html>
-        """.format(u"123456789 " * 50)
+        """.format("123456789 " * 50)
 
-        expected_content = u"""
+        expected_content = """
             <html>
             <body>
             </body>
@@ -1153,8 +1155,8 @@ class MaxLineLengthTest(BaseTestCase):
             <p>Paragraph 2</p>\n<p>{0}\n{1}</p>
             </html>
         """.format(
-            u"123456789 " * 39 + u"123456789",
-            u"123456789 " * 10
+            "123456789 " * 39 + "123456789",
+            "123456789 " * 10
         )
 
         result = force_line_max_length(content, max_length_per_line=400, dont_cut_in_quotes=False)
@@ -1163,7 +1165,7 @@ class MaxLineLengthTest(BaseTestCase):
     def test_force_line_max_length_a1(self):
         """it should not have a line more than 400 chars"""
 
-        content = u"""
+        content = """
             <html>
             <body>
             </body>
@@ -1175,9 +1177,9 @@ class MaxLineLengthTest(BaseTestCase):
             <p>Paragraph 2</p>
             <p>{0}<a href="{1}">This is a link</a></p>
             </html>
-        """.format(u"123456789 " * 36, u"this-is-a-link-dont-cut-in-quotes")
+        """.format("123456789 " * 36, "this-is-a-link-dont-cut-in-quotes")
 
-        expected_content = u"""
+        expected_content = """
             <html>
             <body>
             </body>
@@ -1188,7 +1190,7 @@ class MaxLineLengthTest(BaseTestCase):
             </p>
             <p>Paragraph 2</p>\n<p>{0}<a href="{1}">This\nis a link</a></p>
             </html>
-        """.format(u"123456789 " * 36, u"this-is-a-link-dont-cut-in-quotes")
+        """.format("123456789 " * 36, "this-is-a-link-dont-cut-in-quotes")
 
         result = force_line_max_length(content,  max_length_per_line=400, dont_cut_in_quotes=False)
 
@@ -1197,7 +1199,7 @@ class MaxLineLengthTest(BaseTestCase):
     def test_force_line_max_length_a2(self):
         """it should not have a line more than 400 chars"""
 
-        content = u"""
+        content = """
             <html>
             <body>
             </body>
@@ -1209,9 +1211,9 @@ class MaxLineLengthTest(BaseTestCase):
             <p>Paragraph 2</p>
             <p>{0}<a class="abcdefgh ijklmnop qrstuvwxyz" href="{1}">This is a link</a></p>
             </html>
-        """.format(u"123456789 " * 38, u"this-is-a-link-dont-cut-in-quotes")
+        """.format("123456789 " * 38, "this-is-a-link-dont-cut-in-quotes")
 
-        expected_content = u"""
+        expected_content = """
             <html>
             <body>
             </body>
@@ -1222,7 +1224,7 @@ class MaxLineLengthTest(BaseTestCase):
             </p>
             <p>Paragraph 2</p>\n<p>{0}<a class="abcdefgh ijklmnop qrstuvwxyz"\nhref="{1}">This is a link</a></p>
             </html>
-        """.format(u"123456789 " * 38, u"this-is-a-link-dont-cut-in-quotes")
+        """.format("123456789 " * 38, "this-is-a-link-dont-cut-in-quotes")
 
         result = force_line_max_length(content, max_length_per_line=400, dont_cut_in_quotes=False)
         self.assertEqual(expected_content, result)

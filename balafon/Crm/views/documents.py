@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """documents"""
 
+from __future__ import unicode_literals
+
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.messages import api as user_message
@@ -33,10 +35,10 @@ class ActionDocumentDetailView(EditableObjectView):
         except self.model.DoesNotExist:
             warning_text = ""
             if not action.type:
-                warning_text = _(u"The action has no type set: Unable to create the corresponding document")
+                warning_text = _("The action has no type set: Unable to create the corresponding document")
             elif not action.type.default_template:
                 warning_text = _(
-                    u"The action type has no document template defined: Unable to create the corresponding document"
+                    "The action type has no document template defined: Unable to create the corresponding document"
                 )
             if warning_text:
                 logger.warning(warning_text)
@@ -64,7 +66,7 @@ class ActionDocumentPdfView(PDFTemplateView):
         if action_type:
             action_type = slugify(action_type.name)
             potential_templates += [
-                u"documents/_{0}_{1}.html".format(action_type, template_type),
+                "documents/_{0}_{1}.html".format(action_type, template_type),
             ]
 
         potential_templates += [
@@ -108,5 +110,5 @@ class ActionDocumentPdfView(PDFTemplateView):
             self.cmd_options = pdf_options
         self.header_template = self.find_template("header", action.type)
         self.footer_template = self.find_template("footer", action.type)
-        self.filename = slugify(u"{0}.contact - {0}.subject".format(action))+".pdf"
+        self.filename = slugify("{0}.contact - {0}.subject".format(action))+".pdf"
         return super(ActionDocumentPdfView, self).render_to_response(context, **response_kwargs)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """opportunities : certainly a bad name :-) this is a group of actions"""
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 import json
 
@@ -37,7 +39,7 @@ def get_opportunities(request):
     """view"""
     term = request.GET.get('term')
     queryset = models.Opportunity.objects.filter(ended=False, name__icontains=term)
-    opportunities = [{'id': x.id, 'name': u'{0}'.format(x.name)} for x in queryset]
+    opportunities = [{'id': x.id, 'name': '{0}'.format(x.name)} for x in queryset]
     return HttpResponse(json.dumps(opportunities), 'application/json')
 
 
@@ -178,7 +180,7 @@ def delete_opportunity(request, opportunity_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Are you sure to delete the opportunity "{0}"?').format(opportunity),
+            'message': _('Are you sure to delete the opportunity "{0}"?').format(opportunity),
             'action_url': reverse("crm_delete_opportunity", args=[opportunity_id]),
         },
         context_instance=RequestContext(request)
@@ -234,7 +236,7 @@ def remove_action_from_opportunity(request, action_id, opportunity_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you want to remove the action {0} from opportunity {1}?').format(
+            'message': _('Do you want to remove the action {0} from opportunity {1}?').format(
                 action.subject, opportunity.name
             ),
             'action_url': reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity.id]),

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 import sys
 
 from django.conf import settings
@@ -15,8 +17,9 @@ from balafon.settings import is_simple_captcha_used
 from balafon.Users import views as users_views
 from balafon.views import redirect_to_homepage, auto_save_data
 
+
 if getattr(settings, 'BALAFON_NOTIFY_SUBSCRIPTIONS', ''):
-    raise Exception(u"Invalid setting : BALAFON_NOTIFY_SUBSCRIPTIONS has been replaced by BALAFON_NOTIFICATION_EMAIL")
+    raise Exception("Invalid setting : BALAFON_NOTIFY_SUBSCRIPTIONS has been replaced by BALAFON_NOTIFICATION_EMAIL")
 
 
 localized_patterns = get_url_patterns()
@@ -90,25 +93,15 @@ else:
         ),
     )
 
+
 urlpatterns += localized_patterns('',
     url(r'^accounts/', include('django.contrib.auth.urls'))
 )
-
-if 'djrill' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'^mandrill/', include('djrill.urls')),
-    ]
 
 
 if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
     urlpatterns += [
         url(r'^captcha/', include('captcha.urls')),
-    ]
-
-
-if 'balafon.Apis' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'', include('balafon.Apis.urls')),
     ]
 
 
@@ -129,12 +122,6 @@ if 'balafon.Users' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns('',
         url(r'^users/', include('balafon.Users.urls')),
     )
-
-
-if 'jhouston' in settings.INSTALLED_APPS:
-    urlpatterns += [
-        url(r'^jhouston/', include('jhouston.urls')),
-    ]
 
 
 if getattr(settings, 'BALAFON_AS_HOMEPAGE', False):

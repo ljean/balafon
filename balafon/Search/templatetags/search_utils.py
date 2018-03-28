@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.utils.safestring import mark_safe
+
+from __future__ import unicode_literals
+
 from django import template
+
+
 register = template.Library()
-from datetime import date
+
 
 @register.filter
 def dt_from(dt):
@@ -11,10 +15,10 @@ def dt_from(dt):
     except:
         return ""
 
+
 @register.filter
 def dt_to(dt):
     try:
         return dt.split(" ")[1]
     except:
         return ""
-    

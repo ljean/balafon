@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """relationships between contacts"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -45,12 +47,12 @@ def delete_relationship(request, contact_id, relationship_id):
         contact = models.Contact.objects.get(id=contact_id)
     except models.Contact.DoesNotExist:
         contact = None
-        err_msg = _(u"The contact doesn't exist anymore")
+        err_msg = _("The contact doesn't exist anymore")
 
     try:
         relationship = models.Relationship.objects.get(id=relationship_id)
     except models.Relationship.DoesNotExist:
-        err_msg = _(u"The relationship doesn't exist anymore")
+        err_msg = _("The relationship doesn't exist anymore")
 
     if err_msg:
         if contact:
@@ -78,7 +80,7 @@ def delete_relationship(request, contact_id, relationship_id):
             'balafon/confirmation_dialog.html',
             {
                 'form': form,
-                'message': _(u'Are you sure to delete the relationship "{0}"?').format(relationship),
+                'message': _('Are you sure to delete the relationship "{0}"?').format(relationship),
                 'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
             },
             context_instance=RequestContext(request)
@@ -108,8 +110,8 @@ def same_as(request, contact_id):
             return render_to_response(
                 'balafon/message_dialog.html',
                 {
-                    'title': _(u'SameAs contacts'),
-                    'message': _(u"No homonymous for {0}").format(contact),
+                    'title': _('SameAs contacts'),
+                    'message': _("No homonymous for {0}").format(contact),
                     'next_url': reverse('crm_view_contact', args=[contact.id]),
                 },
                 context_instance=RequestContext(request)
@@ -130,7 +132,7 @@ def get_same_as_suggestions(request):
         if form.is_valid():
             suggestion_list = []
             for contact in form.get_suggested_contacts():
-                suggestion_list.append({'id': contact.id, 'fullname': unicode(contact)})
+                suggestion_list.append({'id': contact.id, 'fullname': '{0}'.format(contact)})
 
             return HttpResponse(json.dumps(suggestion_list), content_type='application/json')
     else:
@@ -179,9 +181,9 @@ def remove_same_as(request, current_contact_id, contact_id):
             return HttpResponseRedirect(reverse('crm_view_contact', args=[current_contact_id]))
     else:
         form = forms.ConfirmForm()
-    confirm_message = _(u'Are you sure that "{0}" and "{1}" are not identical?').format(contact, current_contact)
+    confirm_message = _('Are you sure that "{0}" and "{1}" are not identical?').format(contact, current_contact)
     if the_same_as.contact_set.count() > 2 and the_same_as.main_contact == contact:
-        confirm_message += _(u"\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(
+        confirm_message += _("\n\nNote: {0} is the main contact. This role will be transfered to {1}.").format(
             contact, current_contact
         )
 
@@ -254,7 +256,7 @@ def make_main_contact(request, current_contact_id, contact_id):
         {
             'form': form,
             'message': _(
-                u'{0}: Do you want to change the priority order of contacts for this person? (1 is higher priority)'
+                '{0}: Do you want to change the priority order of contacts for this person? (1 is higher priority)'
             ).format(
                 contact
             ),

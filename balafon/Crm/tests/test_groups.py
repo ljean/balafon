@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
+from __future__ import unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -470,24 +472,24 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
     def test_get_contact_and_entity(self):
         """It should return contact and entity"""
 
-        entity1 = mommy.make(models.Entity, name=u"Abc")
+        entity1 = mommy.make(models.Entity, name="Abc")
         contact1 = entity1.default_contact
-        contact1.lastname = u'Abbes'
+        contact1.lastname = 'Abbes'
         contact1.save()
 
-        entity2 = mommy.make(models.Entity, name=u"Rab")
+        entity2 = mommy.make(models.Entity, name="Rab")
         contact2 = entity2.default_contact
-        contact2.lastname = u'Plabo'
+        contact2.lastname = 'Plabo'
         contact2.save()
 
-        entity3 = mommy.make(models.Entity, name=u"ABO")
+        entity3 = mommy.make(models.Entity, name="ABO")
         contact3 = entity3.default_contact
-        contact3.lastname = u'Wab'
+        contact3.lastname = 'Wab'
         contact3.save()
 
         entity4 = mommy.make(models.Entity, name="Waw")
         contact4 = entity4.default_contact
-        contact4.lastname = u'Aby'
+        contact4.lastname = 'Aby'
         contact4.save()
 
         response = self.client.get(reverse(self.view_name)+'?term=ab')
@@ -509,24 +511,24 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
     def test_get_contact_and_entity_empty(self):
         """It should return empty"""
 
-        entity1 = mommy.make(models.Entity, name=u"Abc")
+        entity1 = mommy.make(models.Entity, name="Abc")
         contact1 = entity1.default_contact
-        contact1.lastname = u'Abbes'
+        contact1.lastname = 'Abbes'
         contact1.save()
 
-        entity2 = mommy.make(models.Entity, name=u"Rab")
+        entity2 = mommy.make(models.Entity, name="Rab")
         contact2 = entity2.default_contact
-        contact2.lastname = u'Plabo'
+        contact2.lastname = 'Plabo'
         contact2.save()
 
-        entity3 = mommy.make(models.Entity, name=u"ABO")
+        entity3 = mommy.make(models.Entity, name="ABO")
         contact3 = entity3.default_contact
-        contact3.lastname = u'Wab'
+        contact3.lastname = 'Wab'
         contact3.save()
 
         entity4 = mommy.make(models.Entity, name="Waw")
         contact4 = entity4.default_contact
-        contact4.lastname = u'Aby'
+        contact4.lastname = 'Aby'
         contact4.save()
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
@@ -538,9 +540,9 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
     def test_get_contact_and_entity_invalid_url(self):
         """It should return empty"""
 
-        entity1 = mommy.make(models.Entity, name=u"Abc")
+        entity1 = mommy.make(models.Entity, name="Abc")
         contact1 = entity1.default_contact
-        contact1.lastname = u'Abbes'
+        contact1.lastname = 'Abbes'
         contact1.save()
 
         response = self.client.get(reverse(self.view_name)+'?zz=Ab')
@@ -554,9 +556,9 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         self.client.logout()
 
-        entity1 = mommy.make(models.Entity, name=u"Abc")
+        entity1 = mommy.make(models.Entity, name="Abc")
         contact1 = entity1.default_contact
-        contact1.lastname = u'Abbes'
+        contact1.lastname = 'Abbes'
         contact1.save()
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
@@ -570,9 +572,9 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        entity1 = mommy.make(models.Entity, name=u"Abc")
+        entity1 = mommy.make(models.Entity, name="Abc")
         contact1 = entity1.default_contact
-        contact1.lastname = u'Abbes'
+        contact1.lastname = 'Abbes'
         contact1.save()
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
@@ -892,7 +894,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
 
         self.assertEqual(
             response.content,
-            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+            '<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
                 json_data, 'entity', entity.id
             )
         )
@@ -919,7 +921,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
 
         self.assertEqual(
             response.content,
-            u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+            '<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
                 json_data, 'contact', contact.id
             )
         )

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
+from __future__ import unicode_literals
+
 import floppyforms as forms
 
 from balafon.Crm import models

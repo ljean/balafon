@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """about groups"""
 
+from __future__ import unicode_literals, print_function
+
 import json
 
 from django.core.urlresolvers import reverse
@@ -81,8 +83,8 @@ def add_contact_to_group(request, contact_id):
         )
 
     # pylint: disable=broad-except
-    except Exception, msg:
-        print "#ERR", msg
+    except Exception as msg:
+        print("#ERR", msg)
         raise
 
 
@@ -98,8 +100,8 @@ def get_group_suggest_list(request):
         return HttpResponse(json.dumps(suggestions), content_type='application/json')
 
     # pylint: disable=broad-except
-    except Exception, msg:
-        print '###', msg
+    except Exception as msg:
+        print('###', msg)
 
 
 @user_passes_test(can_access)
@@ -120,7 +122,7 @@ def remove_entity_from_group(request, group_id, entity_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Do you want to remove {0.name} from the {1.name} group?').format(entity, group),
+            'message': _('Do you want to remove {0.name} from the {1.name} group?').format(entity, group),
             'action_url': reverse("crm_remove_entity_from_group", args=[group_id, entity_id]),
         },
         context_instance=RequestContext(request)
@@ -146,15 +148,15 @@ def remove_contact_from_group(request, group_id, contact_id):
             'balafon/confirmation_dialog.html',
             {
                 'form': form,
-                'message': _(u'Do you want to remove {0.fullname} from the {1.name} group?').format(contact, group),
+                'message': _('Do you want to remove {0.fullname} from the {1.name} group?').format(contact, group),
                 'action_url': reverse("crm_remove_contact_from_group", args=[group_id, contact_id]),
             },
             context_instance=RequestContext(request)
         )
 
     # pylint: disable=broad-except
-    except Exception, msg:
-        print "#ERR", msg
+    except Exception as msg:
+        print("#ERR", msg)
         raise
 
 
@@ -229,7 +231,7 @@ def delete_group(request, group_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Are you sure to delete the group {0.name}?').format(group),
+            'message': _('Are you sure to delete the group {0.name}?').format(group),
             'action_url': reverse("crm_delete_group", args=[group_id]),
         },
         context_instance=RequestContext(request)
@@ -343,7 +345,7 @@ def select_contact_or_entity(request):
             }
             json_data = json.dumps(dict_obj)
             return HttpResponse(
-                u'<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
+                '<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
                     json_data, dict_obj['type'], dict_obj['id']
                 )
             )
@@ -393,5 +395,5 @@ def get_contact_or_entity(request):
         return HttpResponse(json.dumps(suggestions), content_type='application/json')
 
     # pylint: disable=broad-except
-    except Exception, msg:
-        print '###', msg
+    except Exception as msg:
+        print('###', msg)

@@ -2,6 +2,8 @@
 """user customization"""
 
 from django import VERSION as DJANGO_VERSION
+from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -11,26 +13,29 @@ if DJANGO_VERSION >= (1, 8, 0):
 else:
     from django.contrib.contenttypes.generic import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import python_2_unicode_compatible
 
 from coop_cms.utils import RequestManager, RequestNotFound
 
 from balafon.permissions import can_access
 
 
+@python_2_unicode_compatible
 class UserPreferences(models.Model):
     """user preferences"""
 
     user = models.OneToOneField(User)
-    notify_due_actions = models.BooleanField(default=False, verbose_name=_(u"Notify due actions"))
+    notify_due_actions = models.BooleanField(default=False, verbose_name=_("Notify due actions"))
     message_in_favorites = models.BooleanField(
         default=False,
-        verbose_name=_(u"Create automatically a favorite for message posted from the public form")
+        verbose_name=_("Create automatically a favorite for message posted from the public form")
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return self.user.username
 
 
+@python_2_unicode_compatible
 class Favorite(models.Model):
     """user favorite items"""
 
@@ -40,14 +45,15 @@ class Favorite(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     
     class Meta:
-        verbose_name = _(u'Favorite')
-        verbose_name_plural = _(u'Favorites')
+        verbose_name = _('Favorite')
+        verbose_name_plural = _('Favorites')
         unique_together = (('user', 'content_type', 'object_id'),)
         
-    def __unicode__(self):
-        return u"{0} - {1}".format(self.user, self.content_object)
+    def __str__(self):
+        return "{0} - {1}".format(self.user, self.content_object)
 
 
+@python_2_unicode_compatible
 class UserHomepage(models.Model):
     """User homepage"""
 
@@ -55,34 +61,35 @@ class UserHomepage(models.Model):
     url = models.URLField(verbose_name=_("URL"))
     
     class Meta:
-        verbose_name = _(u'User homepage')
-        verbose_name_plural = _(u'User homepages')
+        verbose_name = _('User homepage')
+        verbose_name_plural = _('User homepages')
         
-    def __unicode__(self):
-        return u"{0} - {1}".format(self.user, self.url)
+    def __str__(self):
+        return "{0} - {1}".format(self.user, self.url)
 
 
+@python_2_unicode_compatible
 class CustomMenu(models.Model):
     """Menus that can be added to the Balafon menu"""
     POSITION_MENU = 0
     POSITION_PLANNING = 1
 
     POSITION_CHOICES = (
-        (POSITION_MENU, _(u'Menu')),
-        (POSITION_PLANNING, _(u'Planning')),
+        (POSITION_MENU, _('Menu')),
+        (POSITION_PLANNING, _('Planning')),
     )
 
     label = models.CharField(max_length=100, verbose_name=_("label"))
-    icon = models.CharField(max_length=20, verbose_name=_(u"icon"), blank=True, default="")
+    icon = models.CharField(max_length=20, verbose_name=_("icon"), blank=True, default="")
     order_index = models.IntegerField(default=0)
     position = models.IntegerField(
-        default=0, choices=POSITION_CHOICES, verbose_name=_(u'position'),
-        help_text=_(u'Where the menu will be set')
+        default=0, choices=POSITION_CHOICES, verbose_name=_('position'),
+        help_text=_('Where the menu will be set')
     )
 
     class Meta:
-        verbose_name = _(u'Custom menu')
-        verbose_name_plural = _(u'Custom menus')
+        verbose_name = _('Custom menu')
+        verbose_name_plural = _('Custom menus')
         ordering = ['order_index', 'label']
 
     def get_children(self):
@@ -99,34 +106,35 @@ class CustomMenu(models.Model):
             pass
         return children
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
+@python_2_unicode_compatible
 class CustomMenuItem(models.Model):
     """Menus items hat can be added to the Balafon menu"""
     parent = models.ForeignKey(CustomMenu)
-    label = models.CharField(max_length=100, verbose_name=_(u"label"))
-    icon = models.CharField(max_length=20, verbose_name=_(u"icon"), blank=True, default="")
-    url = models.CharField(max_length=100, verbose_name=_(u"url"), default='', blank=True)
-    reverse = models.CharField(max_length=100, verbose_name=_(u"reverse"), default='', blank=True)
+    label = models.CharField(max_length=100, verbose_name=_("label"))
+    icon = models.CharField(max_length=20, verbose_name=_("icon"), blank=True, default="")
+    url = models.CharField(max_length=100, verbose_name=_("url"), default='', blank=True)
+    reverse = models.CharField(max_length=100, verbose_name=_("reverse"), default='', blank=True)
     reverse_kwargs = models.CharField(
-        max_length=100, verbose_name=_(u"reverse_kwargs"), default='', blank=True,
-        help_text=_(u'kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 ')
+        max_length=100, verbose_name=_("reverse_kwargs"), default='', blank=True,
+        help_text=_('kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 ')
     )
     order_index = models.IntegerField(default=0)
     only_for_users = models.ManyToManyField(
-        User, blank=True, verbose_name=_(u"only for users"), limit_choices_to={'is_staff': True}
+        User, blank=True, verbose_name=_("only for users"), limit_choices_to={'is_staff': True}
     )
-    attributes = models.CharField(max_length=100, verbose_name=_(u"attributes"), default="", blank=True)
+    attributes = models.CharField(max_length=100, verbose_name=_("attributes"), default="", blank=True)
 
     class Meta:
-        verbose_name = _(u'Custom menu item')
-        verbose_name_plural = _(u'Custom menu items')
+        verbose_name = _('Custom menu item')
+        verbose_name_plural = _('Custom menu items')
         ordering = ['order_index', 'label']
 
-    def __unicode__(self):
-        return u"{0} > {1}".format(self.parent.label, self.label)
+    def __str__(self):
+        return "{0} > {1}".format(self.parent.label, self.label)
 
     def get_url(self, *args, **kwargs):
         """return the url to display"""
@@ -162,6 +170,3 @@ class CustomMenuItem(models.Model):
         if url:
             setattr(self, '_cached_url', url)
         return url
-
-
-

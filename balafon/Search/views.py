@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """search views and actions"""
 
+from __future__ import unicode_literals
+
 import json
 import xlwt
 
@@ -36,8 +38,8 @@ from balafon.Search.forms import (
 def filter_icontains_unaccent(queryset, field, text):
     if crm_settings.is_unaccent_filter_supported():
         queryset = queryset.extra(
-            where=[u"UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
-            params=[u"%{0}%".format(text)]
+            where=["UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
+            params=["%{0}%".format(text)]
         )
         return list(queryset)
     return list(queryset.filter(**{field+"__icontains": text}))
@@ -139,7 +141,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
                 contains_refuse_newsletter = search_form.contains_refuse_newsletter
             
             if not results:
-                message = _(u'Sorry, no results found')
+                message = _('Sorry, no results found')
     else:
         search_obj = get_object_or_404(Search, id=search_id) if search_id else None
         search_form = SearchForm(instance=search_obj)
@@ -255,12 +257,12 @@ def mailto_contacts(request, bcc):
                             context_instance=RequestContext(request)
                         )
                 else:
-                    mailto = u'mailto:'
+                    mailto = 'mailto:'
                     if int(bcc): mailto += '?bcc='
                     mailto += ','.join(emails)
                     return HttpResponseRedirectMailtoAllowed(mailto)
             else:
-                return HttpResponse(_(u'Mailto: Error, no emails defined'), content_type='text/plain')
+                return HttpResponse(_('Mailto: Error, no emails defined'), content_type='text/plain')
     raise Http404
 
 
@@ -341,7 +343,7 @@ def export_contacts_as_excel(request):
             contacts = search_form.get_contacts()
             if not search_form.contacts_display:
                 # if the form already has a sort criteria: don't sort again
-                contacts.sort(key=lambda x: u"{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
+                contacts.sort(key=lambda x: "{0}-{1}-{2}".format(x.entity, x.lastname, x.firstname))
             
             # create the excel document
             workbook = xlwt.Workbook()
@@ -357,8 +359,8 @@ def export_contacts_as_excel(request):
             header_style = xlwt.easyxf('font: bold 1; pattern: pattern solid, fore-colour gray25;')
             # create a map of verbose name for each field
             field_dict = dict([(field.name, _(field.verbose_name).capitalize()) for field in Contact._meta.fields])
-            field_dict['foreign_country'] = _(u"Country")
-            field_dict['entity_name'] = _(u"Entity")
+            field_dict['foreign_country'] = _("Country")
+            field_dict['entity_name'] = _("Entity")
             
             # Add custom fields
             for cf in CustomField.objects.filter(export_order__gt=0).order_by('export_order'):
@@ -384,20 +386,20 @@ def export_contacts_as_excel(request):
                     field = getattr(contact, field_name)
 
                     if field_name == 'role':
-                        field = u", ".join([r.name for r in field.all()])
+                        field = ", ".join([r.name for r in field.all()])
 
                     elif callable(field):
                         field = field()
 
                     if field:
-                        worksheet.write(index+1, index2, unicode(field), style)
+                        worksheet.write(index+1, index2, '{0}'.format(field), style)
 
             response = HttpResponse(content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename={0}.xls'.format('balafon')
             workbook.save(response)
             return response
         else:
-            logger.error(unicode(search_form.errors))
+            logger.error('{0}'.format(search_form.errors))
     raise Http404
 
 
@@ -422,7 +424,7 @@ def create_action_for_contacts(request):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    _(u"{0} actions have been created".format(len(contacts)))
+                    _("{0} actions have been created".format(len(contacts)))
                 )
                 return HttpResponseRedirect(reverse('crm_board_panel'))
             else:
@@ -447,7 +449,7 @@ def create_action_for_contacts(request):
                         'balafon/message_dialog.html',
                         {
                             'title': _('Create action for contacts'),
-                            'message': _(u'The search results contains no contacts')
+                            'message': _('The search results contains no contacts')
                         },
                         context_instance=RequestContext(request)
                     )
@@ -470,14 +472,18 @@ def add_contacts_to_group(request):
                             for c in contacts:
                                 g.contacts.add(c)
                             g.save()
-                        messages.add_message(request, messages.SUCCESS, _(u"{0} contacts have been added to groups".format(len(contacts))))
+                        messages.add_message(
+                            request, messages.SUCCESS, _("{0} contacts have been added to groups".format(len(contacts)))
+                        )
                     else:
                         entities = set([c.entity for c in contacts])
                         for g in groups:
                             for entity in entities:
                                 g.entities.add(entity)
                             g.save()
-                        messages.add_message(request, messages.SUCCESS, _(u"{0} entities have been added to groups".format(len(entities))))
+                        messages.add_message(
+                            request, messages.SUCCESS, _("{0} entities have been added to groups".format(len(entities)))
+                        )
                     return HttpResponseRedirect(reverse('crm_board_panel'))
                 else:
                     return render_to_response(
@@ -501,7 +507,7 @@ def add_contacts_to_group(request):
                             'balafon/message_dialog.html',
                             {
                                 'title': _('Add contacts to group'),
-                                'message': _(u'The search results contains no contacts')
+                                'message': _('The search results contains no contacts')
                             },
                             context_instance=RequestContext(request)
                         )
@@ -552,13 +558,13 @@ def subscribe_contacts_admin(request):
                         messages.add_message(
                             request,
                             messages.SUCCESS,
-                            _(u"{0} contacts have subscribe to the newsletter".format(nb_contacts))
+                            _("{0} contacts have subscribe to the newsletter".format(nb_contacts))
                         )
                     else:
                         messages.add_message(
                             request,
                             messages.SUCCESS,
-                            _(u"{0} contacts have unsubscribe to the newsletter".format(nb_contacts))
+                            _("{0} contacts have unsubscribe to the newsletter".format(nb_contacts))
                         )
 
                     return None  # popup_close will return js code to close the popup
@@ -585,7 +591,7 @@ def subscribe_contacts_admin(request):
                             'balafon/message_dialog.html',
                             {
                                 'title': _('Subscribe contacts admin'),
-                                'message': _(u'The search results contains no contacts')
+                                'message': _('The search results contains no contacts')
                             }
                         )
     except Exception:

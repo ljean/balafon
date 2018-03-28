@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """emailing views"""
 
+from __future__ import unicode_literals, print_function
+
 import datetime
 import os.path
 
@@ -75,7 +77,7 @@ def delete_emailing(request, emailing_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u"Are you sure to delete '{0.newsletter.subject}' {1}?").format(
+            'message': _("Are you sure to delete '{0.newsletter.subject}' {1}?").format(
                 emailing, emailing.get_status_display()),
             'action_url': reverse("emailing_delete", args=[emailing_id]),
         }
@@ -109,7 +111,7 @@ def new_newsletter(request):
                 source_url = form.cleaned_data["source_url"]
                 go_to_edit = False
                 if not content:
-                    content = _(u"Enter the text of your newsletter here")
+                    content = _("Enter the text of your newsletter here")
                     go_to_edit = True
                 
                 newsletter = Newsletter.objects.create(
@@ -129,7 +131,7 @@ def new_newsletter(request):
             {'form': form}
         )
     except Exception as msg:
-        print "#ERR", msg
+        print("#ERR", msg)
         raise
 
 
@@ -145,9 +147,9 @@ def confirm_send_mail(request, emailing_id):
                 emailing = form.save()
                 emailing.status = models.Emailing.STATUS_SCHEDULED
                 emailing.save()
-                messages.add_message(request, messages.SUCCESS, _(u"The sending has been scheduled"))
+                messages.add_message(request, messages.SUCCESS, _("The sending has been scheduled"))
             else:
-                messages.add_message(request, messages.ERROR, _(u"The sending can't be scheduled"))
+                messages.add_message(request, messages.ERROR, _("The sending can't be scheduled"))
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     else:
         form = forms.NewsletterSchedulingForm(instance=emailing)
@@ -157,7 +159,7 @@ def confirm_send_mail(request, emailing_id):
         'Emailing/confirm_send_mail.html',
         {
             'form': form,
-            'message': _(u'Is this newsletter ready to be sent?'),
+            'message': _('Is this newsletter ready to be sent?'),
             'action_url': reverse("emailing_confirm_send_mail", args=[emailing_id]),
         }
     )
@@ -178,9 +180,9 @@ def cancel_send_mail(request, emailing_id):
                     emailing.status = models.Emailing.STATUS_EDITING
                     emailing.scheduling_dt = None
                     emailing.save()
-                    messages.add_message(request, messages.SUCCESS, _(u"The sending has been cancelled"))
+                    messages.add_message(request, messages.SUCCESS, _("The sending has been cancelled"))
                 else:
-                    messages.add_message(request, messages.ERROR, _(u"The sending can't be cancelled"))
+                    messages.add_message(request, messages.ERROR, _("The sending can't be cancelled"))
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     else:
         form = ConfirmForm()
@@ -190,7 +192,7 @@ def cancel_send_mail(request, emailing_id):
         'balafon/confirmation_dialog.html',
         {
             'form': form,
-            'message': _(u'Cancel the sending?'),
+            'message': _('Cancel the sending?'),
             'action_url': reverse("emailing_cancel_send_mail", args=[emailing_id]),
         }
     )
@@ -205,7 +207,7 @@ def view_link(request, link_uuid, contact_uuid):
         link.visitors.add(contact)
         
         #create action
-        link_action = ActionType.objects.get_or_create(name=_(u'Link'))[0]
+        link_action = ActionType.objects.get_or_create(name=_('Link'))[0]
         action = Action.objects.create(
             subject=link.url, planned_date=now_rounded(),
             type=link_action, detail='', done=True, display_on_board=False,
@@ -243,9 +245,9 @@ def unregister_contact(request, emailing_id, contact_uuid):
                     subscription.unsubscription_date = datetime.datetime.now()
                     subscription.save()
 
-                    emailing_action = ActionType.objects.get_or_create(name=_(u'Unregister'))[0]
+                    emailing_action = ActionType.objects.get_or_create(name=_('Unregister'))[0]
                     action = Action.objects.create(
-                        subject=_(u'{0} has unregister').format(contact),
+                        subject=_('{0} has unregister').format(contact),
                         planned_date=now_rounded(), type=emailing_action, detail=form.cleaned_data['reason'],
                         done=True, display_on_board=False, done_date=now_rounded()
                     )
@@ -318,7 +320,7 @@ def subscribe_done(request, contact_uuid):
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
     ]
     if subscription_type_names:
-        my_company = u', '.join(subscription_type_names)
+        my_company = ', '.join(subscription_type_names)
     else:
         my_company = settings.BALAFON_MY_COMPANY
     
@@ -339,7 +341,7 @@ def subscribe_error(request, contact_uuid):
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
         ]
     if subscription_type_names:
-        my_company = u', '.join(subscription_type_names)
+        my_company = ', '.join(subscription_type_names)
     
     return render(
         request,
@@ -358,7 +360,7 @@ def email_verification(request, contact_uuid):
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
         ]
     if subscription_type_names:
-        my_company = u', '.join(subscription_type_names)
+        my_company = ', '.join(subscription_type_names)
     else:
         my_company = settings.BALAFON_MY_COMPANY
     
@@ -467,10 +469,10 @@ class SubscribeView(View):
                 logger.exception(except_text)
                 
                 # create action
-                detail = _(u"An error occurred while verifying the email address of this contact.")
-                fix_action = ActionType.objects.get_or_create(name=_(u'Balafon'))[0]
+                detail = _("An error occurred while verifying the email address of this contact.")
+                fix_action = ActionType.objects.get_or_create(name=_('Balafon'))[0]
                 action = Action.objects.create(
-                    subject=_(u"Need to verify the email address"), planned_date=now_rounded(),
+                    subject=_("Need to verify the email address"), planned_date=now_rounded(),
                     type=fix_action, detail=detail, display_on_board=True,
                 )
                 action.contacts.add(contact)
@@ -478,7 +480,7 @@ class SubscribeView(View):
                 
                 return HttpResponseRedirect(self.get_error_url(contact))
         else:
-            except_text = u'contact form : {0}'.format(form.errors)
+            except_text = 'contact form : {0}'.format(form.errors)
             logger.warning(except_text)
         return self._display_form(form)
 

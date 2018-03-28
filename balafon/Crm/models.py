@@ -2,6 +2,8 @@
 """models"""
 # pylint: disable=model-no-explicit-unicode
 
+from __future__ import unicode_literals
+
 import uuid
 import unicodedata
 from urlparse import urlparse
@@ -22,6 +24,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist, Context
 from django.template.loader import get_template
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
@@ -35,26 +38,28 @@ from balafon.utils import now_rounded, logger, validate_rgb
 from balafon.Users.models import Favorite
 
 
+@python_2_unicode_compatible
 class NamedElement(models.Model):
     """Base class for models with a name field"""
-    name = models.CharField(_(u'Name'), max_length=200)
+    name = models.CharField(_('Name'), max_length=200)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
         abstract = True
 
 
+@python_2_unicode_compatible
 class LastModifiedModel(TimeStampedModel):
     """track the user who last modified an object"""
 
     created_by = models.ForeignKey(
-        User, default=None, blank=True, null=True, verbose_name=_(u"created by"), related_name='+',
+        User, default=None, blank=True, null=True, verbose_name=_("created by"), related_name='+',
     )
 
     last_modified_by = models.ForeignKey(
-        User, default=None, blank=True, null=True, verbose_name=_(u"last modified by")
+        User, default=None, blank=True, null=True, verbose_name=_("last modified by")
     )
 
     class Meta:
@@ -81,23 +86,24 @@ class LastModifiedModel(TimeStampedModel):
 
 def _get_logo_dir(obj, filename):
     """path to directory for media files"""
-    return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
+    return '{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
 
 
+@python_2_unicode_compatible
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
 
     GENDER_MALE = 1
     GENDER_FEMALE = 2
-    GENDER_CHOICE = ((GENDER_MALE, _(u'Male')), (GENDER_FEMALE, _(u'Female')))
+    GENDER_CHOICE = ((GENDER_MALE, _('Male')), (GENDER_FEMALE, _('Female')))
     
     # required for translation into some languages (french for example)
-    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
-    order = models.IntegerField(_(u'order'), default=0)
-    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=_get_logo_dir)
+    gender = models.IntegerField(_('gender'), choices=GENDER_CHOICE, default=GENDER_MALE)
+    order = models.IntegerField(_('order'), default=0)
+    logo = models.ImageField(_("logo"), blank=True, default="", upload_to=_get_logo_dir)
     subscribe_form = models.BooleanField(
-        default=True, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This type will be proposed on the public subscribe form')
+        default=True, verbose_name=_('Subscribe form'),
+        help_text=_('This type will be proposed on the public subscribe form')
     )
     
     def is_male(self):
@@ -105,20 +111,22 @@ class EntityType(NamedElement):
         return self.gender == EntityType.GENDER_MALE
     
     class Meta:
-        verbose_name = _(u'entity type')
-        verbose_name_plural = _(u'entity types')
+        verbose_name = _('entity type')
+        verbose_name_plural = _('entity types')
         ordering = ['order']
 
 
+@python_2_unicode_compatible
 class ZoneType(NamedElement):
     """Type of zones (cities, coutries, ...)"""
     type = models.CharField(_('type'), max_length=200)
     
     class Meta:
-        verbose_name = _(u'zone type')
-        verbose_name_plural = _(u'zone types')
+        verbose_name = _('zone type')
+        verbose_name_plural = _('zone types')
 
 
+@python_2_unicode_compatible
 class BaseZone(NamedElement):
     """Base class for zones"""
     parent = models.ForeignKey('Zone', blank=True, default=None, null=True)
@@ -126,22 +134,23 @@ class BaseZone(NamedElement):
     def get_full_name(self):
         """full name"""
         if self.parent:
-            return u'{0} - {1}'.format(self.parent.get_full_name(), self.name)
+            return '{0} - {1}'.format(self.parent.get_full_name(), self.name)
         return self.name
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
         abstract = True
 
 
+@python_2_unicode_compatible
 class Zone(BaseZone):
     """A zone is a group of cities : departements, region, country..."""
     type = models.ForeignKey(ZoneType)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
     groups = models.ManyToManyField(
-        "Zone", blank=True, verbose_name=_(u'parent groups'), related_name='children_groups_set'
+        "Zone", blank=True, verbose_name=_('parent groups'), related_name='children_groups_set'
     )
     
     def is_country(self):
@@ -157,20 +166,21 @@ class Zone(BaseZone):
         return False
 
     class Meta:
-        verbose_name = _(u'zone')
-        verbose_name_plural = _(u'zones')
+        verbose_name = _('zone')
+        verbose_name_plural = _('zones')
         ordering = ['name']
 
 
+@python_2_unicode_compatible
 class City(BaseZone):
     """city"""
     groups = models.ManyToManyField(
-        Zone, blank=True, verbose_name=_(u'group'), related_name='city_groups_set'
+        Zone, blank=True, verbose_name=_('group'), related_name='city_groups_set'
     )
 
     class Meta:
-        verbose_name = _(u'city')
-        verbose_name_plural = _(u'cities')
+        verbose_name = _('city')
+        verbose_name_plural = _('cities')
         ordering = ['name']
     
     def get_country(self):
@@ -192,7 +202,7 @@ class City(BaseZone):
     def get_friendly_name(self):
         """friendly name"""
         if self.parent:
-            return u'{0} ({1})'.format(
+            return '{0} ({1})'.format(
                 self.name,
                 self.parent.code if self.parent.code else self.parent.name[:2]
             )
@@ -201,47 +211,48 @@ class City(BaseZone):
 
 def get_entity_logo_dir(instance, filename):
     """path to logo in media"""
-    return u'{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
+    return '{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 
+@python_2_unicode_compatible
 class StreetType(NamedElement):
     """A selection for street type"""
 
     class Meta:
-        verbose_name = _(u'street type')
-        verbose_name_plural = _(u'street types')
+        verbose_name = _('street type')
+        verbose_name_plural = _('street types')
         ordering = ('name', )
 
 
 class AddressModel(LastModifiedModel):
     """Base class for entity or contact"""
 
-    address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+    address = models.CharField(_('address'), max_length=200, blank=True, default='')
+    address2 = models.CharField(_('address 2'), max_length=200, blank=True, default='')
+    address3 = models.CharField(_('address 3'), max_length=200, blank=True, default='')
 
-    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default='')
+    cedex = models.CharField(_('cedex'), max_length=200, blank=True, default='')
     city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
 
     #These fields are just kept for editing the address field
-    street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
-    street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'))
+    street_number = models.CharField(_('street number'), max_length=20, blank=True, default='')
+    street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_('street type'))
 
-    billing_address = models.CharField(_('address'), max_length=200, blank=True, default=u'')
-    billing_address2 = models.CharField(_('address 2'), max_length=200, blank=True, default=u'')
-    billing_address3 = models.CharField(_('address 3'), max_length=200, blank=True, default=u'')
+    billing_address = models.CharField(_('address'), max_length=200, blank=True, default='')
+    billing_address2 = models.CharField(_('address 2'), max_length=200, blank=True, default='')
+    billing_address3 = models.CharField(_('address 3'), max_length=200, blank=True, default='')
 
-    billing_zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default=u'')
-    billing_cedex = models.CharField(_('cedex'), max_length=200, blank=True, default=u'')
+    billing_zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default='')
+    billing_cedex = models.CharField(_('cedex'), max_length=200, blank=True, default='')
     billing_city = models.ForeignKey(
         City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set'
     )
 
     # These fields are just kept for editing the address field
-    billing_street_number = models.CharField(_(u'street number'), max_length=20, blank=True, default='')
+    billing_street_number = models.CharField(_('street number'), max_length=20, blank=True, default='')
     billing_street_type = models.ForeignKey(
-        StreetType, default=None, blank=True, null=True, verbose_name=_(u'street type'),
+        StreetType, default=None, blank=True, null=True, verbose_name=_('street type'),
         related_name='%(class)s_billing_set'
     )
 
@@ -250,13 +261,13 @@ class AddressModel(LastModifiedModel):
 
     def get_full_address(self):
         """join address fields"""
-        return u' '.join(self.get_address_fields())
+        return ' '.join(self.get_address_fields())
 
     def get_address_fields(self):
         """address fields: address, cedex, zipcode, city..."""
         if self.city:
             fields = [
-                self.address, self.address2, self.address3, u" ".join([self.zip_code, self.city.name, self.cedex])
+                self.address, self.address2, self.address3, " ".join([self.zip_code, self.city.name, self.cedex])
             ]
             country = self.city.get_foreign_country()
             if country:
@@ -268,7 +279,7 @@ class AddressModel(LastModifiedModel):
         """address fields: address, cedex, zipcode, city..."""
         if self.billing_city:
             fields = [
-                self.billing_address, self.billing_address2, self.billing_address3, u" ".join(
+                self.billing_address, self.billing_address2, self.billing_address3, " ".join(
                     [self.billing_zip_code, self.billing_city.name, self.billing_cedex]
                 )
             ]
@@ -280,7 +291,7 @@ class AddressModel(LastModifiedModel):
 
     def get_billing_full_address(self):
         """join address fields"""
-        billing_address = u' '.join(self.get_billing_address_fields())
+        billing_address = ' '.join(self.get_billing_address_fields())
         if not billing_address:
             return self.get_full_address()
         return billing_address
@@ -302,18 +313,19 @@ class AddressModel(LastModifiedModel):
         return self.get_full_address()
 
 
+@python_2_unicode_compatible
 class Entity(AddressModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
-    type = models.ForeignKey(EntityType, verbose_name=_(u'type'), blank=True, null=True, default=None)
-    relationship_date = models.DateField(_(u'relationship date'), default=None, blank=True, null=True)
+    type = models.ForeignKey(EntityType, verbose_name=_('type'), blank=True, null=True, default=None)
+    relationship_date = models.DateField(_('relationship date'), default=None, blank=True, null=True)
     
-    logo = models.ImageField(_("logo"), blank=True, default=u"", upload_to=get_entity_logo_dir)
+    logo = models.ImageField(_("logo"), blank=True, default="", upload_to=get_entity_logo_dir)
     
-    phone = models.CharField(_('phone'), max_length=200, blank=True, default=u'')
-    fax = models.CharField(_('fax'), max_length=200, blank=True, default=u'')
-    email = models.EmailField(_('email'), blank=True, default=u'')
+    phone = models.CharField(_('phone'), max_length=200, blank=True, default='')
+    fax = models.CharField(_('fax'), max_length=200, blank=True, default='')
+    email = models.EmailField(_('email'), blank=True, default='')
     website = models.CharField(_('web site'), max_length=200, blank=True, default='')
 
     notes = models.TextField(_('notes'), blank=True, default="")
@@ -331,7 +343,7 @@ class Entity(AddressModel):
         if self.website:
             parsing = urlparse(self.website)
             if not parsing.scheme:
-                self.website = u"http://"+self.website
+                self.website = "http://"+self.website
             
         super(Entity, self).save(*args, **kwargs)
         if self.contact_set.filter(has_left=False).count() == 0:
@@ -343,11 +355,11 @@ class Entity(AddressModel):
             contact.save()
         if self.is_single_contact:
             contact = self.default_contact
-            self.name = u"{0} {1}".format(contact.lastname, contact.firstname).lower()
+            self.name = "{0} {1}".format(contact.lastname, contact.firstname).lower()
             #don't put *args, *kwargs -> it may cause integrity error
             super(Entity, self).save()
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_view_url(self):
@@ -359,12 +371,12 @@ class Entity(AddressModel):
 
     def get_preview_url(self):
         """absolute_url in popup"""
-        return u"{0}?preview=1".format(self.get_absolute_url())
+        return "{0}?preview=1".format(self.get_absolute_url())
 
     def get_email_address(self):
         """email address"""
         if self.name:
-            return u'"{1}" <{0}>'.format(self.email, self.name)
+            return '"{1}" <{0}>'.format(self.email, self.name)
         else:
             return self.email
     
@@ -388,7 +400,7 @@ class Entity(AddressModel):
         else:
             logo = "img/entity.png"
         
-        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
+        return "{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def get_logo_center_style(self):
         """get logo style to apply to img html tag to get the logo centered"""
@@ -491,92 +503,97 @@ class Entity(AddressModel):
                 custom_field_value = self.entitycustomfieldvalue_set.get(entity=self, custom_field=custom_field)
                 return custom_field_value.value
             except EntityCustomFieldValue.DoesNotExist:
-                return u''  # If no value defined: return empty string
+                return ''  # If no value defined: return empty string
         return object.__getattribute__(self, attr)
 
     class Meta:
-        verbose_name = _(u'entity')
-        verbose_name_plural = _(u'entities')
+        verbose_name = _('entity')
+        verbose_name_plural = _('entities')
         ordering = ('name',)
 
 
+@python_2_unicode_compatible
 class EntityRole(NamedElement):
     """what a contact is doing in an entity"""
     class Meta:
-        verbose_name = _(u'entity role')
-        verbose_name_plural = _(u'entity roles')    
+        verbose_name = _('entity role')
+        verbose_name_plural = _('entity roles')
 
 
 def get_contact_photo_dir(instance, filename):
     """directory foe contacts photos in media"""
-    return u'{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
+    return '{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
 
 
+@python_2_unicode_compatible
 class SameAs(models.Model):
     """Link between two contacts for the same physical person"""
 
-    def __unicode__(self):
-        return _(u"Same As: {0}").format(
-            [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')]
+    def __str__(self):
+        return _("Same As: {0}").format(
+            ['{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')]
         )
 
     def priority_contact(self):
         """Th econtact with priority 1"""
         try:
-            return u"{0}".format(
-                [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
+            return "{0}".format(
+                ['{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
             )
         except IndexError:
             return ""
-    priority_contact.short_description = _(u'Priority contact')
+    priority_contact.short_description = _('Priority contact')
 
     def other_contacts(self):
         """all contacts except the 1st one"""
         try:
-            return u"{0}".format(
-                [u'{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][1:]
+            return "{0}".format(
+                ['{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][1:]
             )
         except IndexError:
             return ""
-    other_contacts.short_description = _(u'Other contacts')
+    other_contacts.short_description = _('Other contacts')
 
     def contacts_count(self):
         """Numbers of same-as contacts"""
         return self.contact_set.count()
-    contacts_count.short_description = _(u'Contacts count')
+    contacts_count.short_description = _('Contacts count')
 
     class Meta:
-        verbose_name = _(u'same as')
-        verbose_name_plural = _(u'sames as')
+        verbose_name = _('same as')
+        verbose_name_plural = _('sames as')
 
 
+@python_2_unicode_compatible
 class RelationshipType(models.Model):
     """type of relationship: client-provider, partner ..."""
-    name = models.CharField(max_length=100, blank=False, verbose_name=_(u"name"))
-    reverse = models.CharField(max_length=100, blank=True, default="", verbose_name=_(u"reverse relation"))
+    name = models.CharField(max_length=100, blank=False, verbose_name=_("name"))
+    reverse = models.CharField(max_length=100, blank=True, default="", verbose_name=_("reverse relation"))
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
-        verbose_name = _(u'relationship type')
-        verbose_name_plural = _(u'relationship types')
-    
-    
+        verbose_name = _('relationship type')
+        verbose_name_plural = _('relationship types')
+
+
+@python_2_unicode_compatible
 class Relationship(TimeStampedModel):
     """a relationship between two contacts"""
-    contact1 = models.ForeignKey("Contact", verbose_name=_(u"contact 1"), related_name=u"relationships1")
-    contact2 = models.ForeignKey("Contact", verbose_name=_(u"contact 2"), related_name=u"relationships2")
-    relationship_type = models.ForeignKey("RelationshipType", verbose_name=_(u"relationship type"))
+    contact1 = models.ForeignKey("Contact", verbose_name=_("contact 1"), related_name="relationships1")
+    contact2 = models.ForeignKey("Contact", verbose_name=_("contact 2"), related_name="relationships2")
+    relationship_type = models.ForeignKey("RelationshipType", verbose_name=_("relationship type"))
     
-    def __unicode__(self):
-        return _(u"{0} {1} of {2}").format(self.contact1, self.relationship_type, self.contact2)
+    def __str__(self):
+        return _("{0} {1} of {2}").format(self.contact1, self.relationship_type, self.contact2)
     
     class Meta:
-        verbose_name = _(u'relationship')
-        verbose_name_plural = _(u'relationships')
+        verbose_name = _('relationship')
+        verbose_name_plural = _('relationships')
     
 
+@python_2_unicode_compatible
 class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
     GENDER_MALE = 1
@@ -584,50 +601,50 @@ class Contact(AddressModel):
     GENDER_COUPLE = 3
     
     GENDER_CHOICE = (
-        (GENDER_MALE, _(u'Mr')),
-        (GENDER_FEMALE, _(u'Mrs')),
-        (GENDER_COUPLE, _(u'Mrs and Mr'))
+        (GENDER_MALE, _('Mr')),
+        (GENDER_FEMALE, _('Mrs')),
+        (GENDER_COUPLE, _('Mrs and Mr'))
     )
 
     entity = models.ForeignKey(Entity)
-    role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_(u'Roles'))
+    role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_('Roles'))
     
-    gender = models.IntegerField(_(u'gender'), choices=GENDER_CHOICE, blank=True, default=0)
+    gender = models.IntegerField(_('gender'), choices=GENDER_CHOICE, blank=True, default=0)
     gender_title = models.CharField(
-        max_length=50, verbose_name=_(u'gender title'), default=u'', blank=True,
-        help_text=_(u'Overwrites gender if defined')
+        max_length=50, verbose_name=_('gender title'), default='', blank=True,
+        help_text=_('Overwrites gender if defined')
     )
-    title = models.CharField(_(u'title'), max_length=200, blank=True, default=u'')
-    lastname = models.CharField(_(u'last name'), max_length=200, blank=True, default=u'', db_index=True)
-    firstname = models.CharField(_(u'first name'), max_length=200, blank=True, default=u'')
-    nickname = models.CharField(_(u'nickname'), max_length=200, blank=True, default=u'')
+    title = models.CharField(_('title'), max_length=200, blank=True, default='')
+    lastname = models.CharField(_('last name'), max_length=200, blank=True, default='', db_index=True)
+    firstname = models.CharField(_('first name'), max_length=200, blank=True, default='')
+    nickname = models.CharField(_('nickname'), max_length=200, blank=True, default='')
     
-    photo = models.ImageField(_(u"photo"), blank=True, default=u"", upload_to=get_contact_photo_dir)
-    birth_date = models.DateField(_(u"birth date"), blank=True, default=None, null=True)
-    job = models.CharField(_(u"job"), max_length=200, blank=True, default=u"")
+    photo = models.ImageField(_("photo"), blank=True, default="", upload_to=get_contact_photo_dir)
+    birth_date = models.DateField(_("birth date"), blank=True, default=None, null=True)
+    job = models.CharField(_("job"), max_length=200, blank=True, default="")
     
     main_contact = models.BooleanField(_("main contact"), default=True, db_index=True)
     accept_notifications = models.BooleanField(
         _("accept notifications"),
         default=True,
-        help_text=_(u'We may have to notify you some events (e.g. a new message).')
+        help_text=_('We may have to notify you some events (e.g. a new message).')
     )
     email_verified = models.BooleanField(_("email verified"), default=False)
     
-    phone = models.CharField(_('phone'), max_length=200, blank=True, default=u'')
-    mobile = models.CharField(_('mobile'), max_length=200, blank=True, default=u'')
-    email = models.EmailField(_('email'), blank=True, default=u'')
+    phone = models.CharField(_('phone'), max_length=200, blank=True, default='')
+    mobile = models.CharField(_('mobile'), max_length=200, blank=True, default='')
+    email = models.EmailField(_('email'), blank=True, default='')
     
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     
     notes = models.TextField(_('notes'), blank=True, default="")
     
-    same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None, verbose_name=_(u'same as'))
-    same_as_priority = models.IntegerField(default=0, verbose_name=_(u'same as priority'))
+    same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None, verbose_name=_('same as'))
+    same_as_priority = models.IntegerField(default=0, verbose_name=_('same as priority'))
     
     relationships = models.ManyToManyField("Contact", blank=True, default=None, through=Relationship)
     
-    has_left = models.BooleanField(_(u'has left'), default=False)
+    has_left = models.BooleanField(_('has left'), default=False)
     
     imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
     
@@ -649,7 +666,7 @@ class Contact(AddressModel):
 
     def get_preview_url(self):
         """absolute url in popup"""
-        return u"{0}?preview=1".format(self.get_absolute_url())
+        return "{0}?preview=1".format(self.get_absolute_url())
     
     def get_relationships(self):
         """get all retlationships for this contact"""
@@ -725,7 +742,7 @@ class Contact(AddressModel):
             logo = "img/single-contact.png"
         else:
             logo = "img/contact.png"
-        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
+        return "{0}{1}".format(project_settings.STATIC_URL, logo)
     
     def photo_thumbnail(self):
         """photo thumbnail"""
@@ -741,7 +758,7 @@ class Contact(AddressModel):
         """name and entity"""
         if self.entity.is_single_contact:
             return self.fullname
-        return u"{0} ({1})".format(self.fullname, self.entity.name)
+        return "{0} ({1})".format(self.fullname, self.entity.name)
 
     def __getattribute__(self, attr):
         """
@@ -791,7 +808,7 @@ class Contact(AddressModel):
                     custom_field_value = self.contactcustomfieldvalue_set.get(contact=self, custom_field=custom_field)
                     return custom_field_value.value
                 except ContactCustomFieldValue.DoesNotExist:
-                    return u''  # If no value defined: return empty string
+                    return ''  # If no value defined: return empty string
             else:
                 entity_prefix = "entity_"
                 full_prefix = entity_prefix + prefix
@@ -844,7 +861,7 @@ class Contact(AddressModel):
     def get_email_address(self):
         """email address"""
         if self.lastname or self.firstname:
-            return u'"{1}" <{0}>'.format(self.get_email, self.fullname)
+            return '"{1}" <{0}>'.format(self.get_email, self.fullname)
         else:
             return self.get_email
         
@@ -870,15 +887,15 @@ class Contact(AddressModel):
         
     def get_entity_name(self):
         """entity name"""
-        return self.entity.name if self.has_entity() else u""
+        return self.entity.name if self.has_entity() else ""
             
-    def __unicode__(self):
-        fullname = u"{0} {1}".format(self.lastname, self.firstname).strip()
+    def __str__(self):
+        fullname = "{0} {1}".format(self.lastname, self.firstname).strip()
         if not fullname:
             fullname = self.email
         if self.entity.is_single_contact:
             return fullname
-        return u"{0} ({1})".format(fullname, self.entity.name)
+        return "{0} ({1})".format(fullname, self.entity.name)
 
     def get_gender_text(self):
         if self.gender_title:
@@ -894,17 +911,17 @@ class Contact(AddressModel):
             if self.email:
                 return self.email.strip()
             else:
-                return u"< {0} >".format(ugettext(u"Unknown")).strip()
+                return "< {0} >".format(ugettext("Unknown")).strip()
         
         if self.gender and self.lastname:
-            title = u'{0} '.format(self.get_gender_text())
+            title = '{0} '.format(self.get_gender_text())
         else:
-            title = u''
+            title = ''
         
         if (not self.firstname) or (not self.lastname):
-            return u"{1}{0.firstname}{0.lastname}".format(self, title).strip()
+            return "{1}{0.firstname}{0.lastname}".format(self, title).strip()
 
-        return u"{1}{0.firstname} {0.lastname}".format(self, title).strip()
+        return "{1}{0.firstname} {0.lastname}".format(self, title).strip()
 
     @property
     def display_name(self):
@@ -916,15 +933,15 @@ class Contact(AddressModel):
             if email:
                 return email
             else:
-                return u"< {0} >".format(ugettext(u"Unknown")).strip()
+                return "< {0} >".format(ugettext("Unknown")).strip()
 
-        return u"{0} {1}".format(lastname, firstname).strip()
+        return "{0} {1}".format(lastname, firstname).strip()
 
     @property
     def full_address(self):
         """address for custom templating in newsletter"""
         fields = self.get_address_fields()
-        return u' '.join(fields)
+        return ' '.join(fields)
 
     @property
     def entity_name(self):
@@ -946,22 +963,22 @@ class Contact(AddressModel):
         """gender as string for custom templating in newsletter"""
         for gender, name in Contact.GENDER_CHOICE:
             if self.gender == gender:
-                return unicode(name)  # lazy translation must be converted in unicode
-        return u''
+                return '{0}'.format(name)  # lazy translation must be converted in unicode
+        return ''
 
     @property
     def gender_dear(self):
         """return male/female version of Dear"""
         if self.gender == Contact.GENDER_MALE:
-            return ugettext(u'Dear (male)')
+            return ugettext('Dear (male)')
 
         elif self.gender == Contact.GENDER_FEMALE:
-            return ugettext(u'Dear (female)')
+            return ugettext('Dear (female)')
 
         elif self.gender == Contact.GENDER_COUPLE:
-            return ugettext(u'Dears (couple)')
+            return ugettext('Dears (couple)')
 
-        return u''
+        return ''
 
     def set_custom_field(self, field_name, value, is_link=False):
         """set the value of a custom field"""
@@ -994,10 +1011,10 @@ class Contact(AddressModel):
 
         super(Contact, self).save(*args, **kwargs)
         if not self.uuid:
-            ascii_name = unicodedata.normalize('NFKD', unicode(self.fullname)).encode("ascii", 'ignore')
-            name = u'{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ascii_name, self.email)
-            name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
-            self.uuid = unicode(uuid.uuid5(uuid.NAMESPACE_URL, name))
+            ascii_name = unicodedata.normalize('NFKD', '{0}'.format(self.fullname)).encode("ascii", 'ignore')
+            name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ascii_name, self.email)
+            name = unicodedata.normalize('NFKD', '{0}'.format(name)).encode("ascii", 'ignore')
+            self.uuid = '{0}'.format(uuid.uuid5(uuid.NAMESPACE_URL, name))
             return super(Contact, self).save()
         
         if self.entity.is_single_contact:
@@ -1005,8 +1022,8 @@ class Contact(AddressModel):
             self.entity.save()
             
     class Meta:
-        verbose_name = _(u'contact')
-        verbose_name_plural = _(u'contacts')
+        verbose_name = _('contact')
+        verbose_name_plural = _('contacts')
         ordering = ('lastname', 'firstname')
 
 
@@ -1032,60 +1049,63 @@ def on_update_same_as(sender, instance, **kwargs):
 pre_delete.connect(on_update_same_as, sender=Contact)
 
 
+@python_2_unicode_compatible
 class SubscriptionType(models.Model):
     """Subscription type: a mailing list for example"""
-    name = models.CharField(max_length=100, verbose_name=_(u"name"))
+    name = models.CharField(max_length=100, verbose_name=_("name"))
     site = models.ForeignKey(Site, blank=True, null=True)
-    order_index = models.IntegerField(default=0, verbose_name=_(u"order index"))
+    order_index = models.IntegerField(default=0, verbose_name=_("order index"))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u'Subscription type')
-        verbose_name_plural = _(u'Subscription types')
-        ordering = (u'order_index', )
+        verbose_name = _('Subscription type')
+        verbose_name_plural = _('Subscription types')
+        ordering = ('order_index', )
 
 
+@python_2_unicode_compatible
 class Subscription(models.Model):
     """contact is subscribing to a mailing list"""
     subscription_type = models.ForeignKey(SubscriptionType)
     contact = models.ForeignKey(Contact)
     
     accept_subscription = models.BooleanField(
-        _(u"accept subscription"), default=False,
-        help_text=_(u'Keep this checked if you want to receive our newsletter.')
+        _("accept subscription"), default=False,
+        help_text=_('Keep this checked if you want to receive our newsletter.')
     )
     
     subscription_date = models.DateTimeField(blank=True, default=None, null=True)
     unsubscription_date = models.DateTimeField(blank=True, default=None, null=True)
 
-    def __unicode__(self):
-        return u"{0} {1}".format(self.subscription_type, self.contact)
+    def __str__(self):
+        return "{0} {1}".format(self.subscription_type, self.contact)
 
 
+@python_2_unicode_compatible
 class Group(TimeStampedModel):
     """Group of contacts or entities"""
-    name = models.CharField(_(u'name'), max_length=200, unique=True, db_index=True)
-    description = models.CharField(_(u'description'), max_length=200, blank=True, default="")
+    name = models.CharField(_('name'), max_length=200, unique=True, db_index=True)
+    description = models.CharField(_('description'), max_length=200, blank=True, default="")
     entities = models.ManyToManyField(Entity, blank=True)
     contacts = models.ManyToManyField(Contact, blank=True)
     subscribe_form = models.BooleanField(
-        default=False, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This group will be proposed on the public subscribe form')
+        default=False, verbose_name=_('Subscribe form'),
+        help_text=_('This group will be proposed on the public subscribe form')
     )
     fore_color = models.CharField(
-        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Fore color'),
-        help_text=_(u"Fore color. Must be a rgb code. For example: #ffffff")
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Fore color'),
+        help_text=_("Fore color. Must be a rgb code. For example: #ffffff")
     )
     background_color = models.CharField(
-        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Background color'),
-        help_text=_(u"Background color. Must be a rgb code. For example: #000000")
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Background color'),
+        help_text=_("Background color. Must be a rgb code. For example: #000000")
     )
     
     favorites = GenericRelation(Favorite)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     @property
@@ -1099,35 +1119,38 @@ class Group(TimeStampedModel):
         return super(Group, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _(u'group')
-        verbose_name_plural = _(u'groups')
+        verbose_name = _('group')
+        verbose_name_plural = _('groups')
 
 
+@python_2_unicode_compatible
 class OpportunityStatus(NamedElement):
     """status for an opportynity"""
     ordering = models.IntegerField(default=0)
     
     class Meta:
-        verbose_name = _(u'opportunity status')
-        verbose_name_plural = _(u'opportunity status')
+        verbose_name = _('opportunity status')
+        verbose_name_plural = _('opportunity status')
 
 
+@python_2_unicode_compatible
 class OpportunityType(NamedElement):
     """type for an opprtunity"""
     class Meta:
-        verbose_name = _(u'opportunity type')
-        verbose_name_plural = _(u'opportunity types')
+        verbose_name = _('opportunity type')
+        verbose_name_plural = _('opportunity types')
 
 
+@python_2_unicode_compatible
 class Opportunity(TimeStampedModel):
     """An opportunity is kind of project. It makes possible to group different actions"""
     PROBABILITY_LOW = 1
     PROBABILITY_MEDIUM = 2
     PROBABILITY_HIGH = 3
     PROBABILITY_CHOICES = (
-        (PROBABILITY_LOW, _(u'low')),
-        (PROBABILITY_MEDIUM, _(u'medium')),
-        (PROBABILITY_HIGH, _(u'high')),
+        (PROBABILITY_LOW, _('low')),
+        (PROBABILITY_MEDIUM, _('medium')),
+        (PROBABILITY_HIGH, _('high')),
     )
     
     #TO BE REMOVED--
@@ -1141,15 +1164,15 @@ class Opportunity(TimeStampedModel):
     probability = models.IntegerField(
         _('probability'), default=PROBABILITY_MEDIUM, choices=PROBABILITY_CHOICES
     )
-    amount = models.DecimalField(_(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2)
+    amount = models.DecimalField(_('amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2)
     #----------------
-    ended = models.BooleanField(_(u'closed'), default=False, db_index=True)
+    ended = models.BooleanField(_('closed'), default=False, db_index=True)
     #TO BE REMOVED---
     start_date = models.DateField(_('starting date'), blank=True, null=True, default=None)
     end_date = models.DateField(_('closing date'), blank=True, null=True, default=None)
     #----------------
     display_on_board = models.BooleanField(
-        verbose_name=_(u'display on board'),
+        verbose_name=_('display on board'),
         default=settings.OPPORTUNITY_DISPLAY_ON_BOARD_DEFAULT,
         db_index=True
     )
@@ -1173,41 +1196,43 @@ class Opportunity(TimeStampedModel):
     def default_logo(self):
         """dafult logo"""
         logo = "img/folder.png"
-        return u"{0}{1}".format(project_settings.STATIC_URL, logo)
+        return "{0}{1}".format(project_settings.STATIC_URL, logo)
     
-    def __unicode__(self):
-        return u"{0.name}".format(self)
+    def __str__(self):
+        return "{0.name}".format(self)
 
     class Meta:
-        verbose_name = _(u'opportunity')
-        verbose_name_plural = _(u'opportunities')
+        verbose_name = _('opportunity')
+        verbose_name_plural = _('opportunities')
 
 
+@python_2_unicode_compatible
 class ActionSet(NamedElement):
     """group some actions types"""
-    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    ordering = models.IntegerField(verbose_name=_('display ordering'), default=10)
 
     class Meta:
-        verbose_name = _(u'action set')
-        verbose_name_plural = _(u'action sets')
+        verbose_name = _('action set')
+        verbose_name_plural = _('action sets')
         ordering = ['ordering']
 
 
+@python_2_unicode_compatible
 class ActionStatus(NamedElement):
     """status for an action"""
-    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
+    ordering = models.IntegerField(verbose_name=_('display ordering'), default=10)
     is_final = models.BooleanField(
         default=False,
-        verbose_name=_(u'is final'),
-        help_text=_(u'The action will be marked done when it gets a final status')
+        verbose_name=_('is final'),
+        help_text=_('The action will be marked done when it gets a final status')
     )
     fore_color = models.CharField(
-        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Fore color'),
-        help_text=_(u"Fore color. Must be a rgb code. For example: #ffffff")
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Fore color'),
+        help_text=_("Fore color. Must be a rgb code. For example: #ffffff")
     )
     background_color = models.CharField(
-        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_(u'Background color'),
-        help_text=_(u"Background color. Must be a rgb code. For example: #000000")
+        blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Background color'),
+        help_text=_("Background color. Must be a rgb code. For example: #000000")
     )
 
     @property
@@ -1220,82 +1245,83 @@ class ActionStatus(NamedElement):
         return style
 
     class Meta:
-        verbose_name = _(u'action status')
-        verbose_name_plural = _(u'action status')
+        verbose_name = _('action status')
+        verbose_name_plural = _('action status')
         ordering = ['ordering']
 
 
+@python_2_unicode_compatible
 class ActionType(NamedElement):
     """type of an action"""
     subscribe_form = models.BooleanField(
-        default=False, verbose_name=_(u'Subscribe form'),
-        help_text=_(u'This action type will be proposed on the public subscribe form')
+        default=False, verbose_name=_('Subscribe form'),
+        help_text=_('This action type will be proposed on the public subscribe form')
     )
-    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_(u"action set"))
-    last_number = models.IntegerField(_(u'last number'), default=0)
-    number_auto_generated = models.BooleanField(_(u'generate number automatically'), default=False)
+    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_("action set"))
+    last_number = models.IntegerField(_('last number'), default=0)
+    number_auto_generated = models.BooleanField(_('generate number automatically'), default=False)
     default_template = models.CharField(
-        _(u'document template'), max_length=200, blank=True, default="",
-        help_text=_(u'Action of this type will have a document with the given template')
+        _('document template'), max_length=200, blank=True, default="",
+        help_text=_('Action of this type will have a document with the given template')
     )
     allowed_status = models.ManyToManyField(
-        ActionStatus, blank=True, default=None, help_text=_(u'Action of this type allow the given status')
+        ActionStatus, blank=True, default=None, help_text=_('Action of this type allow the given status')
     )
     default_status = models.ForeignKey(
         ActionStatus, blank=True, default=None, null=True,
-        help_text=_(u'Default status for actions of this type'),
+        help_text=_('Default status for actions of this type'),
         related_name='type_default_status_set'
     )
     allowed_status2 = models.ManyToManyField(
-        ActionStatus, blank=True, default=None, help_text=_(u'Action of this type allow the given status'),
+        ActionStatus, blank=True, default=None, help_text=_('Action of this type allow the given status'),
         related_name="type_status2_set"
     )
     default_status2 = models.ForeignKey(
         ActionStatus, blank=True, default=None, null=True,
-        help_text=_(u'Default status for actions of this type'),
+        help_text=_('Default status for actions of this type'),
         related_name='type_default_status2_set'
     )
     is_editable = models.BooleanField(
-        _(u'is editable'),
+        _('is editable'),
         default=True,
-        help_text=_(u'If default_template is set, define if the template has a editable content')
+        help_text=_('If default_template is set, define if the template has a editable content')
     )
     action_template = models.CharField(
-        _(u'action template'), max_length=200, blank=True, default="",
-        help_text=_(u'Action of this type will be displayed using the given template')
+        _('action template'), max_length=200, blank=True, default="",
+        help_text=_('Action of this type will be displayed using the given template')
     )
-    order_index = models.IntegerField(default=10, verbose_name=_(u"Order"))
-    is_amount_calculated = models.BooleanField(default=False, verbose_name=_(u"Is amount calculated"))
-    next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_(u'next action type'))
-    not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_(u"Not assigned when cloned"))
-    generate_uuid = models.BooleanField(default=False, verbose_name=_(u"Generate UUID for action"))
+    order_index = models.IntegerField(default=10, verbose_name=_("Order"))
+    is_amount_calculated = models.BooleanField(default=False, verbose_name=_("Is amount calculated"))
+    next_action_types = models.ManyToManyField('ActionType', blank=True, verbose_name=_('next action type'))
+    not_assigned_when_cloned = models.BooleanField(default=False, verbose_name=_("Not assigned when cloned"))
+    generate_uuid = models.BooleanField(default=False, verbose_name=_("Generate UUID for action"))
     hide_contacts_buttons = models.BooleanField(
         default=False,
-        verbose_name=_(u'hide contacts buttons'),
-        help_text=_(u'The add and remove contact buttons will be hidden')
+        verbose_name=_('hide contacts buttons'),
+        help_text=_('The add and remove contact buttons will be hidden')
     )
     mail_to_subject = models.CharField(
-        max_length=100, default='', blank=True, verbose_name=_(u'Subject of email'),
-        help_text=_(u'This would be used as subject when sending the action by email')
+        max_length=100, default='', blank=True, verbose_name=_('Subject of email'),
+        help_text=_('This would be used as subject when sending the action by email')
     )
     track_status = models.BooleanField(
-        default=False, verbose_name=_(u'Track status'), help_text=_('If checked, all status changed is stored in DB')
+        default=False, verbose_name=_('Track status'), help_text=_('If checked, all status changed is stored in DB')
     )
     is_default = models.BooleanField(
-        default=False, verbose_name=_(u'is default'),
+        default=False, verbose_name=_('is default'),
         help_text=_('If checked, can be added from list. Action withou types are not displayed')
     )
 
     def status_defined(self):
         """true if a status is defined for this type"""
         return self.allowed_status.count() > 0
-    status_defined.short_description = _(u"Status defined")
+    status_defined.short_description = _("Status defined")
 
     def has_final_status(self):
         return self.allowed_status.filter(is_final=True).exists()
 
     def save(self, *args, **kwargs):
-        """save: create the corresponding menu"""
+        """save: create the corresponding men"""
         ret = super(ActionType, self).save(*args, **kwargs)
 
         if self.id:
@@ -1322,54 +1348,56 @@ class ActionType(NamedElement):
         return ret
     
     class Meta:
-        verbose_name = _(u'action type')
-        verbose_name_plural = _(u'action types')
+        verbose_name = _('action type')
+        verbose_name_plural = _('action types')
         ordering = ['order_index', 'name']
 
 
+@python_2_unicode_compatible
 class TeamMember(models.Model):
     """A member of the team : can be in charge of actions"""
-    user = models.OneToOneField(User, default=None, blank=True, null=True, verbose_name=_(u"user"))
-    name = models.CharField(max_length=100, verbose_name=_(u"name"))
-    active = models.BooleanField(default=True, verbose_name=(_(u"active")))
+    user = models.OneToOneField(User, default=None, blank=True, null=True, verbose_name=_("user"))
+    name = models.CharField(max_length=100, verbose_name=_("name"))
+    active = models.BooleanField(default=True, verbose_name=(_("active")))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
-        verbose_name = _(u'team member')
-        verbose_name_plural = _(u'team members')
+        verbose_name = _('team member')
+        verbose_name_plural = _('team members')
 
 
+@python_2_unicode_compatible
 class ActionMenu(models.Model):
     """A menu to add to every action of this type"""
 
-    action_type = models.ForeignKey(ActionType, verbose_name=_(u'Action type'))
-    view_name = models.CharField(_(u'view_name'), max_length=200)
-    icon = models.CharField(_(u'icon'), max_length=30, default="", blank=True)
-    label = models.CharField(_(u'label'), max_length=200)
+    action_type = models.ForeignKey(ActionType, verbose_name=_('Action type'))
+    view_name = models.CharField(_('view_name'), max_length=200)
+    icon = models.CharField(_('icon'), max_length=30, default="", blank=True)
+    label = models.CharField(_('label'), max_length=200)
     a_attrs = models.CharField(
         max_length=50,
-        verbose_name=_(u"Link args"),
+        verbose_name=_("Link args"),
         blank=True,
         default="",
-        help_text=_(u'Example: class="colorbox-form" for colorbos display')
+        help_text=_('Example: class="colorbox-form" for colorbos display')
     )
-    order_index = models.IntegerField(default=0, verbose_name=_(u"order_index"))
-    only_for_status = models.ManyToManyField(ActionStatus, blank=True, verbose_name=_(u'Only for status'))
+    order_index = models.IntegerField(default=0, verbose_name=_("order_index"))
+    only_for_status = models.ManyToManyField(ActionStatus, blank=True, verbose_name=_('Only for status'))
 
     class Meta:
-        verbose_name = _(u'action menu')
-        verbose_name_plural = _(u'action menus')
+        verbose_name = _('action men')
+        verbose_name_plural = _('action menus')
         ordering = ['order_index']
 
     def only_for_status_str(self):
         """returns status as string for admin"""
         all_status = list(self.only_for_status.all())
         if all_status:
-            return u', '.join([status.name for status in all_status])
-        return u""
-    only_for_status_str.short_description = _(u'Only for status')
+            return ', '.join([status.name for status in all_status])
+        return ""
+    only_for_status_str.short_description = _('Only for status')
 
     @classmethod
     def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs=''):
@@ -1383,54 +1411,55 @@ class ActionMenu(models.Model):
                 a_attrs=a_attrs
             )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.label
 
 
+@python_2_unicode_compatible
 class Action(LastModifiedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
     PRIORITY_MEDIUM = 2
     PRIORITY_HIGH = 3
     PRIORITY_CHOICES = (
-        (PRIORITY_LOW, _(u'low priority')),
-        (PRIORITY_MEDIUM, _(u'medium priority')),
-        (PRIORITY_HIGH, _(u'high priority')),
+        (PRIORITY_LOW, _('low priority')),
+        (PRIORITY_MEDIUM, _('medium priority')),
+        (PRIORITY_HIGH, _('high priority')),
     )
     
     class Meta:
-        verbose_name = _(u'action')
-        verbose_name_plural = _(u'actions')
+        verbose_name = _('action')
+        verbose_name_plural = _('actions')
 
-    subject = models.CharField(_(u'subject'), max_length=200, blank=True, default="")
-    planned_date = models.DateTimeField(_(u'planned date'), default=None, blank=True, null=True, db_index=True)
+    subject = models.CharField(_('subject'), max_length=200, blank=True, default="")
+    planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
     type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
-    detail = models.TextField(_(u'detail'), blank=True, default='')
-    priority = models.IntegerField(_(u'priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
-    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_(u'opportunity'))
-    done = models.BooleanField(_(u'done'), default=False, db_index=True)
+    detail = models.TextField(_('detail'), blank=True, default='')
+    priority = models.IntegerField(_('priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
+    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_('opportunity'))
+    done = models.BooleanField(_('done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
-    in_charge = models.ForeignKey(TeamMember, verbose_name=_(u'in charge'), blank=True, null=True, default=None)
-    display_on_board = models.BooleanField(verbose_name=_(u'display on board'), default=True, db_index=True)
-    archived = models.BooleanField(verbose_name=_(u'archived'), default=False, db_index=True)
+    in_charge = models.ForeignKey(TeamMember, verbose_name=_('in charge'), blank=True, null=True, default=None)
+    display_on_board = models.BooleanField(verbose_name=_('display on board'), default=True, db_index=True)
+    archived = models.BooleanField(verbose_name=_('archived'), default=False, db_index=True)
     amount = models.DecimalField(
-        _(u'amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2
+        _('amount'), default=None, blank=True, null=True, max_digits=11, decimal_places=2
     )
     number = models.IntegerField(
-        _(u'number'), default=0, help_text=_(u'This number is auto-generated based on action type.')
+        _('number'), default=0, help_text=_('This number is auto-generated based on action type.')
     )
     status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
     status2 = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='status2_set')
-    contacts = models.ManyToManyField(Contact, blank=True, default=None, verbose_name=_(u'contacts'))
-    entities = models.ManyToManyField(Entity, blank=True, default=None, verbose_name=_(u'entities'))
+    contacts = models.ManyToManyField(Contact, blank=True, default=None, verbose_name=_('contacts'))
+    entities = models.ManyToManyField(Entity, blank=True, default=None, verbose_name=_('entities'))
     favorites = GenericRelation(Favorite)
-    end_datetime = models.DateTimeField(_(u'end date'), default=None, blank=True, null=True, db_index=True)
-    parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_(u"parent"))
+    end_datetime = models.DateTimeField(_('end date'), default=None, blank=True, null=True, db_index=True)
+    parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_("parent"))
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     previous_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='+')
     
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.planned_date, self.subject or self.type)
+    def __str__(self):
+        return '{0} - {1}'.format(self.planned_date, self.subject or self.type)
 
     def show_duration(self):
         """Show duration on action line. If False show end_time"""
@@ -1445,9 +1474,9 @@ class Action(LastModifiedModel):
             days, hours = divmod(hours, 24)
 
             if days:
-                return _(u"{0} days {1}:{2:02}").format(int(days), int(hours), int(minutes))
+                return _("{0} days {1}:{2:02}").format(int(days), int(hours), int(minutes))
             else:
-                return u'{0}:{1:02}'.format(int(hours), int(minutes))
+                return '{0}:{1:02}'.format(int(hours), int(minutes))
 
     def has_non_editable_document(self):
         """true if a non editable doc is linked to this action"""
@@ -1464,7 +1493,7 @@ class Action(LastModifiedModel):
                 get_template(self.type.action_template)
                 return self.type.action_template
             except TemplateDoesNotExist:
-                message = u"get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
+                message = "get_action_template: TemplateDoesNotExist {0}".format(self.type.action_template)
                 logger.warning(message)
         return 'Crm/_action.html'
 
@@ -1478,7 +1507,7 @@ class Action(LastModifiedModel):
 
     def get_action_number(self):
         if self.type and self.number:
-            return _(u'{0} N° {1}').format(self.type.name, self.number)
+            return _('{0} N° {1}').format(self.type.name, self.number)
         return ''
 
     def get_menus(self):
@@ -1522,11 +1551,11 @@ class Action(LastModifiedModel):
 
         if self.type:
             if self.type.generate_uuid and not self.uuid:
-                name = u'{0}-action-{1}-{2}'.format(
+                name = '{0}-action-{1}-{2}'.format(
                     project_settings.SECRET_KEY, self.id, self.type.id if self.type else 0
                 )
-                name = unicodedata.normalize('NFKD', unicode(name)).encode("ascii", 'ignore')
-                self.uuid = unicode(uuid.uuid5(uuid.NAMESPACE_URL, name))
+                name = unicodedata.normalize('NFKD', '{0}'.format(name)).encode("ascii", 'ignore')
+                self.uuid = '{0}'.format(uuid.uuid5(uuid.NAMESPACE_URL, name))
                 super(Action, self).save()
 
             if not self.type.generate_uuid and self.uuid:
@@ -1577,13 +1606,13 @@ class Action(LastModifiedModel):
         )))
 
         if not unique_emails:
-            return u""
+            return ""
 
-        body = u""
+        body = ""
         if self.uuid and hasattr(self, 'sale'):
             try:
                 url = reverse('store_view_sales_document_public', args=[self.uuid])
-                body = ugettext(u"Here is a link to your {0}: {1}{2}").format(
+                body = ugettext("Here is a link to your {0}: {1}{2}").format(
                     self.type.name,
                     "http://" + Site.objects.get_current().domain,
                     url
@@ -1591,18 +1620,19 @@ class Action(LastModifiedModel):
             except ObjectDoesNotExist:
                 pass
 
-        return u"mailto:{0}?subject={1}&body={2}".format(
-            u",".join(unique_emails),
+        return "mailto:{0}?subject={1}&body={2}".format(
+            ",".join(unique_emails),
             self.type.mail_to_subject if (self.type and self.type.mail_to_subject) else self.subject,
             body
         )
 
 
+@python_2_unicode_compatible
 class ActionDocument(models.Model):
     """A document"""
-    content = models.TextField(_(u'content'), blank=True, default="")
+    content = models.TextField(_('content'), blank=True, default="")
     action = models.OneToOneField(Action)
-    template = models.CharField(_(u'template'), max_length=200)
+    template = models.CharField(_('template'), max_length=200)
     
     def get_edit_url(self):
         """edit url"""
@@ -1624,10 +1654,11 @@ class ActionDocument(models.Model):
         """can view?"""
         return user.is_staff
     
-    def __unicode__(self):
-        return u"{0} - {1}".format(self.template, self.action)
+    def __str__(self):
+        return "{0} - {1}".format(self.template, self.action)
     
-    
+
+@python_2_unicode_compatible
 class CustomField(models.Model):
     """An additional field for a contact or an entity"""
 
@@ -1635,75 +1666,79 @@ class CustomField(models.Model):
     MODEL_CONTACT = 2
     
     MODEL_CHOICE = (
-        (MODEL_ENTITY, _(u'Entity')),
-        (MODEL_CONTACT, _(u'Contact')), 
+        (MODEL_ENTITY, _('Entity')),
+        (MODEL_CONTACT, _('Contact')),
     )
     
-    name = models.CharField(max_length=100, verbose_name=_(u'name'))
-    label = models.CharField(max_length=100, verbose_name=_(u'label'), blank=True, default='')
-    model = models.IntegerField(verbose_name=_(u'model'), choices=MODEL_CHOICE)
-    widget = models.CharField(max_length=100, verbose_name=_(u'widget'), blank=True, default='')
-    ordering = models.IntegerField(verbose_name=_(u'display ordering'), default=10)
-    import_order = models.IntegerField(verbose_name=_(u'import ordering'), default=0)
-    export_order = models.IntegerField(verbose_name=_(u'export ordering'), default=0)
-    is_link = models.BooleanField(default=False, verbose_name=_(u'is link'))
+    name = models.CharField(max_length=100, verbose_name=_('name'))
+    label = models.CharField(max_length=100, verbose_name=_('label'), blank=True, default='')
+    model = models.IntegerField(verbose_name=_('model'), choices=MODEL_CHOICE)
+    widget = models.CharField(max_length=100, verbose_name=_('widget'), blank=True, default='')
+    ordering = models.IntegerField(verbose_name=_('display ordering'), default=10)
+    import_order = models.IntegerField(verbose_name=_('import ordering'), default=0)
+    export_order = models.IntegerField(verbose_name=_('export ordering'), default=0)
+    is_link = models.BooleanField(default=False, verbose_name=_('is link'))
     
-    def __unicode__(self):
-        return _(u"{0}:{1}").format(self.model_name(), self.name)
+    def __str__(self):
+        return _("{0}:{1}").format(self.model_name(), self.name)
     
     def model_name(self):
         """model name : entity or contact"""
         if self.model == self.MODEL_ENTITY:
-            return u'entity'
+            return 'entity'
         else:
-            return u'contact'
+            return 'contact'
     
     class Meta:
-        verbose_name = _(u'custom field')
-        verbose_name_plural = _(u'custom fields')
+        verbose_name = _('custom field')
+        verbose_name_plural = _('custom fields')
         ordering = ('ordering', 'import_order', 'export_order')
 
 
+@python_2_unicode_compatible
 class CustomFieldValue(models.Model):
     """base class for custom field value"""
-    custom_field = models.ForeignKey(CustomField, verbose_name=_(u'custom field'))
-    value = models.TextField(verbose_name=_(u'value'))
+    custom_field = models.ForeignKey(CustomField, verbose_name=_('custom field'))
+    value = models.TextField(verbose_name=_('value'))
     
     class Meta:
-        verbose_name = _(u'custom field value')
-        verbose_name_plural = _(u'custom field values')
+        verbose_name = _('custom field value')
+        verbose_name_plural = _('custom field values')
         abstract = True
 
 
+@python_2_unicode_compatible
 class EntityCustomFieldValue(CustomFieldValue):
     """a value for a custom field on an entity"""
     entity = models.ForeignKey(Entity)
     
     class Meta:
-        verbose_name = _(u'entity custom field value')
-        verbose_name_plural = _(u'entity custom field values')
+        verbose_name = _('entity custom field value')
+        verbose_name_plural = _('entity custom field values')
 
-    def __unicode__(self):
-        return u'{0} {1}'.format(self.entity, self.custom_field)
+    def __str__(self):
+        return '{0} {1}'.format(self.entity, self.custom_field)
 
 
+@python_2_unicode_compatible
 class ContactCustomFieldValue(CustomFieldValue):
     """a value for a custom field of a contact"""
     contact = models.ForeignKey(Contact)
     
     class Meta:
-        verbose_name = _(u'contact custom field value')
-        verbose_name_plural = _(u'contact custom field values')
+        verbose_name = _('contact custom field value')
+        verbose_name_plural = _('contact custom field values')
 
-    def __unicode__(self):
-        return u'{0} {1}'.format(self.contact, self.custom_field)
+    def __str__(self):
+        return '{0} {1}'.format(self.contact, self.custom_field)
 
 
 def _get_import_dir(contact_import, filename):
     """directory fro storing the files to import"""
-    return u'{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
+    return '{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
 
+@python_2_unicode_compatible
 class ContactsImport(TimeStampedModel):
     """import from csv"""
     
@@ -1714,67 +1749,69 @@ class ContactsImport(TimeStampedModel):
     )
     
     SEPARATORS = (
-        (',', _(u'Coma')),
-        (';', _(u'Semi-colon')),
+        (',', _('Coma')),
+        (';', _('Semi-colon')),
     )
 
     import_file = models.FileField(
-        _(u'import file'), upload_to=_get_import_dir,
-        help_text=_(u'CSV file following the import contacts format.')
+        _('import file'), upload_to=_get_import_dir,
+        help_text=_('CSV file following the import contacts format.')
     )
     name = models.CharField(
-        max_length=100, verbose_name=_(u'name'), blank=True, default=u'',
-        help_text=_(u'Optional name for searching contacts more easily. If not defined, use the name of the file.')
+        max_length=100, verbose_name=_('name'), blank=True, default='',
+        help_text=_('Optional name for searching contacts more easily. If not defined, use the name of the file.')
     )
-    imported_by = models.ForeignKey(User, verbose_name=_(u'imported by'))
+    imported_by = models.ForeignKey(User, verbose_name=_('imported by'))
     encoding = models.CharField(max_length=50, default='utf-8', choices=ENCODINGS)
     separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
     entity_type = models.ForeignKey(
-        EntityType, verbose_name=_(u'entity type'), blank=True, null=True, default=None,
-        help_text=_(u'All created entities will get this type. Ignored if the entity already exist.')
+        EntityType, verbose_name=_('entity type'), blank=True, null=True, default=None,
+        help_text=_('All created entities will get this type. Ignored if the entity already exist.')
     )
     groups = models.ManyToManyField(
-        Group, verbose_name=_(u'groups'), blank=True, default=None,
-        help_text=_(u'The created entities will be added to the selected groups.')
+        Group, verbose_name=_('groups'), blank=True, default=None,
+        help_text=_('The created entities will be added to the selected groups.')
     )
     entity_name_from_email = models.BooleanField(
-        verbose_name=_(u'generate entity name from email address'), default=True
+        verbose_name=_('generate entity name from email address'), default=True
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
     
     class Meta:
-        verbose_name = _(u'contact import')
-        verbose_name_plural = _(u'contact imports')
+        verbose_name = _('contact import')
+        verbose_name_plural = _('contact imports')
 
 
+@python_2_unicode_compatible
 class MailtoSettings(models.Model):
     """make possible to send emails to actions contacts via mailto"""
-    action_type = models.OneToOneField(ActionType, verbose_name=_(u"action type"))
-    bcc = models.BooleanField(default=False, verbose_name=_(u"carbon copy"))
+    action_type = models.OneToOneField(ActionType, verbose_name=_("action type"))
+    bcc = models.BooleanField(default=False, verbose_name=_("carbon copy"))
     subject = models.CharField(
-        verbose_name=_(u"subject"), default="", max_length=100, blank=True, help_text=_(u"Use action subject if empty")
+        verbose_name=_("subject"), default="", max_length=100, blank=True, help_text=_("Use action subject if empty")
     )
-    body_template = models.TextField(verbose_name=_(u"body template"), default="", blank=True)
+    body_template = models.TextField(verbose_name=_("body template"), default="", blank=True)
 
-    def __unicode__(self):
-        return u'{0}'.format(self.action_type)
+    def __str__(self):
+        return '{0}'.format(self.action_type)
 
     class Meta:
-        verbose_name = _(u'Mailto settings')
-        verbose_name_plural = _(u'Mailto settings')
+        verbose_name = _('Mailto settings')
+        verbose_name_plural = _('Mailto settings')
 
 
+@python_2_unicode_compatible
 class ActionStatusTrack(models.Model):
     action = models.ForeignKey(Action)
     status = models.ForeignKey(ActionStatus)
     datetime = models.DateTimeField()
 
-    def __unicode__(self):
-        return u'{0} / {1}'.format(self.action, self.status)
+    def __str__(self):
+        return '{0} / {1}'.format(self.action, self.status)
 
     class Meta:
-        verbose_name = _(u'Action state track')
-        verbose_name_plural = _(u'Action state tracks')
+        verbose_name = _('Action state track')
+        verbose_name_plural = _('Action state tracks')
         ordering = ('-datetime', )

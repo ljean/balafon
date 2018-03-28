@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
+from __future__ import unicode_literals
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -14,8 +16,8 @@ from balafon.Crm import models
 class AddEntityToGroupForm(forms.Form):
     """form for adding an entity to a group"""
     group_name = forms.CharField(
-        label=_(u"Group name"),
-        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
+        label=_("Group name"),
+        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _('start typing name and choose if exists')})
     )
 
     def __init__(self, entity, *args, **kwargs):
@@ -26,15 +28,15 @@ class AddEntityToGroupForm(forms.Form):
         """"validation"""
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
-            raise ValidationError(ugettext(u"The entity already belong to group {0}").format(name))
+            raise ValidationError(ugettext("The entity already belong to group {0}").format(name))
         return name
 
 
 class AddContactToGroupForm(forms.Form):
     """form for adding a contact to a group"""
     group_name = forms.CharField(
-        label=_(u"Group name"),
-        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _(u'start typing name and choose if exists')})
+        label=_("Group name"),
+        widget=forms.TextInput(attrs={'size': 70, 'placeholder': _('start typing name and choose if exists')})
     )
 
     def __init__(self, contact, *args, **kwargs):
@@ -45,7 +47,7 @@ class AddContactToGroupForm(forms.Form):
         """validation"""
         name = self.cleaned_data['group_name']
         if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
-            raise ValidationError(ugettext(u"The contact already belong to group {0}").format(name))
+            raise ValidationError(ugettext("The contact already belong to group {0}").format(name))
         return name
 
 
@@ -59,13 +61,13 @@ class EditGroupForm(BsModelForm):
         widgets = {
             'description': forms.TextInput(
                 attrs={
-                    'placeholder': _(u'Enter a description for your group'),
+                    'placeholder': _('Enter a description for your group'),
                     'size': '80',
                 }
             ),
             'name': forms.TextInput(
                 attrs={
-                    'placeholder': _(u'Enter a name for your group'),
+                    'placeholder': _('Enter a name for your group'),
                     'size': '80',
                 }
             ),
@@ -76,7 +78,7 @@ class EditGroupForm(BsModelForm):
         name = self.cleaned_data['name']
         if self.instance and not self.instance.id:
             if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count() > 0:
-                raise ValidationError(ugettext(u"A group with this name already exists"))
+                raise ValidationError(ugettext("A group with this name already exists"))
         return name
 
     def _clean_list(self, the_list):
