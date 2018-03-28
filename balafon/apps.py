@@ -3,12 +3,12 @@
 app configuration
 """
 
-from django import VERSION
+from __future__ import unicode_literals
 
-if VERSION > (1, 7, 0):
-    from django.apps import AppConfig
+from django.apps import AppConfig
 
-    class BalafonAppConfig(AppConfig):
-        name = 'balafon'
-        verbose_name = "Balafon"
+
+class BalafonAppConfig(AppConfig):
+    name = 'balafon'
+    verbose_name = "Balafon"
 

@@ -3,13 +3,12 @@
 app configuration
 """
 
-from django import VERSION
+from __future__ import unicode_literals
+
+from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
 
-if VERSION > (1, 7, 0):
-    from django.apps import AppConfig
-
-    class BalafonAppConfig(AppConfig):
-        name = 'balafon.Users'
-        verbose_name = _(u"Balafon Users")
+class BalafonAppConfig(AppConfig):
+    name = 'balafon.Users'
+    verbose_name = _("Balafon Users")
