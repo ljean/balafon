@@ -7,13 +7,9 @@ from datetime import datetime
 import uuid
 import unicodedata
 
-from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-if DJANGO_VERSION > (1, 8, 0):
-    from django.contrib.contenttypes.fields import GenericRelation
-else:
-    from django.contrib.contenttypes.generic import GenericRelation
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import signals

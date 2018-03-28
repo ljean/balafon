@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 """user customization"""
 
-from django import VERSION as DJANGO_VERSION
 from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-if DJANGO_VERSION >= (1, 8, 0):
-    from django.contrib.contenttypes.fields import GenericForeignKey
-else:
-    from django.contrib.contenttypes.generic import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import python_2_unicode_compatible
 
