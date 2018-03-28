@@ -13,11 +13,6 @@ def get_default_subscription_type():
     return getattr(project_settings, 'BALAFON_DEFAULT_SUBSCRIPTION_TYPE', None)
 
 
-def is_mandrill_used():
-    """return true if mandrill is used for sending emails"""
-    return 'djrill' in project_settings.INSTALLED_APPS
-
-
 def is_subscribe_enabled():
     """return true if subscribe page is enabled : True by default for compatibility reason"""
     return getattr(project_settings, 'BALAFON_SUBSCRIBE_ENABLED', True)

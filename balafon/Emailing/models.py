@@ -23,7 +23,6 @@ from django_extensions.db.models import TimeStampedModel
 
 from balafon.Crm.models import Contact, Action, SubscriptionType
 from balafon.Crm.settings import get_language_choices
-from balafon.Emailing.settings import is_mandrill_used
 from balafon.Users.models import UserPreferences, Favorite
 
 
@@ -178,7 +177,3 @@ def force_message_in_favorites(sender, instance, signal, created, **kwargs):
             )
             
 signals.post_save.connect(force_message_in_favorites, sender=Action)
-
-if is_mandrill_used():
-    # Import the mandrill backend
-    import balafon.Emailing.backends.mandrill  # pylint: disable=unused-import

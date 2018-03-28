@@ -25,7 +25,6 @@ from coop_cms.utils import dehtml, make_links_absolute
 from balafon.utils import logger
 from balafon.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
 from balafon.Emailing.models import Emailing, MagicLink
-from balafon.Emailing.settings import is_mandrill_used
 
 
 class EmailSendError(Exception):
@@ -178,8 +177,6 @@ def send_newsletter(emailing, max_nb):
             )
             html_text = force_line_max_length(html_text, max_length_per_line=400, dont_cut_in_quotes=True)
             email.attach_alternative(html_text, "text/html")
-            if is_mandrill_used():
-                email.tags = ['{0}'.format(emailing.id), contact.uuid]
             emails.append(email)
             
             # create action
