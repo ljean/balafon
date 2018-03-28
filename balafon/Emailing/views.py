@@ -6,14 +6,10 @@ from __future__ import unicode_literals, print_function
 import datetime
 import os.path
 
-from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-if DJANGO_VERSION >= (1, 9, 0):
-    from wsgiref.util import FileWrapper
-else:
-    from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse, HttpResponseRedirect, Http404
