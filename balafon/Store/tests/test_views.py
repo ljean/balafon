@@ -187,7 +187,7 @@ class ViewCommercialDocumentTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) > 0)
 
     def test_view_values(self):

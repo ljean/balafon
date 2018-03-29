@@ -67,7 +67,7 @@ class ActionForContactsTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_post_create_actions_for_contacts(self):
@@ -140,7 +140,7 @@ class ActionForContactsTest(BaseTestCase):
 
         self.assertEqual(302, response.status_code)
         #login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
         self.assertEqual(models.Action.objects.count(), 0)
@@ -173,7 +173,7 @@ class ActionForContactsTest(BaseTestCase):
 
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
         self.assertEqual(models.Action.objects.count(), 0)

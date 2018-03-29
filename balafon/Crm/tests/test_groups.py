@@ -461,7 +461,7 @@ class GroupSuggestListTestCase(BaseTestCase):
         response = self.client.get(reverse(self.view_name)+'?term=c')
         self.assertEqual(302, response.status_code)
         #login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
 
@@ -563,7 +563,7 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_get_contact_and_entity_forbidden(self):
@@ -579,7 +579,7 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
 
@@ -1005,7 +1005,7 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
 
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_post_select_contact_not_allowed(self):
@@ -1022,5 +1022,5 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
 
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)

@@ -28,7 +28,7 @@ class ActionArchiveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_monthly_action_non_staff(self):
@@ -40,7 +40,7 @@ class ActionArchiveTest(BaseTestCase):
         now = datetime.now()
         url = reverse('crm_actions_of_month', args=[now.year, now.month])
         response = self.client.get(url)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_monthly_action(self):
@@ -106,7 +106,7 @@ class ActionArchiveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_weekly_action_non_staff(self):
@@ -118,7 +118,7 @@ class ActionArchiveTest(BaseTestCase):
         now = datetime.now()
         url = reverse('crm_actions_of_week', args=[now.year, now.strftime("%W")])
         response = self.client.get(url)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_weekly_action(self):
@@ -185,7 +185,7 @@ class ActionArchiveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_dailly_action_non_staff(self):
@@ -197,7 +197,7 @@ class ActionArchiveTest(BaseTestCase):
         now = datetime.now()
         url = reverse('crm_actions_of_day', args=[now.year, now.month, now.day])
         response = self.client.get(url)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_daily_action(self):
@@ -599,7 +599,7 @@ class ActionArchiveTest(BaseTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_not_planned_action_non_staff(self):
@@ -610,7 +610,7 @@ class ActionArchiveTest(BaseTestCase):
 
         url = reverse('crm_actions_not_planned')
         response = self.client.get(url)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_not_planned_action(self):

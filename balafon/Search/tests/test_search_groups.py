@@ -27,7 +27,7 @@ class GroupSearchTest(BaseTestCase):
         response = self.client.get(reverse('search'))
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_search_non_staff(self):
@@ -37,7 +37,7 @@ class GroupSearchTest(BaseTestCase):
         response = self.client.get(reverse('search'))
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_view_group(self):

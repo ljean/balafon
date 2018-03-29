@@ -1025,7 +1025,7 @@ class ExtraSaleTest(TestCase):
         self.user.save()
 
         url = reverse('store_add_extra_sale')
-        auth_url = reverse('django.contrib.auth.views.login')[3:]
+        auth_url = reverse('login')[3:]
 
         action_type = mommy.make(ActionType)
         vat_rate = mommy.make(models.VatRate, rate=Decimal(10))
@@ -1051,7 +1051,7 @@ class ExtraSaleTest(TestCase):
         self.client.logout()
 
         url = reverse('store_add_extra_sale')
-        auth_url = reverse('django.contrib.auth.views.login')[3:]
+        auth_url = reverse('login')[3:]
 
         action_type = mommy.make(ActionType)
         vat_rate = mommy.make(models.VatRate, rate=Decimal(10))

@@ -287,7 +287,7 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         response = self.client.get(reverse('crm_get_entities')+'?term=c')
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_contacts_not_logged(self):
@@ -295,7 +295,7 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         response = self.client.get(reverse('crm_get_contacts')+'?term=c')
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_entities(self):
@@ -542,7 +542,7 @@ class EditContactTest(BaseTestCase):
         }
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
         contact = models.Contact.objects.get(id=contact.id)
@@ -565,7 +565,7 @@ class EditContactTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(302, response.status_code)
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
         contact = models.Contact.objects.get(id=contact.id)

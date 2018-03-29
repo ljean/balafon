@@ -81,7 +81,7 @@ class SubscribeAdminContactsTest(BaseTestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
         # login url without lang prefix
-        login_url = reverse('django.contrib.auth.views.login')[3:]
+        login_url = reverse('login')[3:]
         self.assertTrue(response['Location'].find(login_url) >= 0)
 
     def test_subscribe_contacts(self):
