@@ -2,9 +2,9 @@
 
 from __future__ import unicode_literals
 
-from floppyforms.widgets import TextInput
+import floppyforms.__future__ as forms
 
 
-class DatespanInput(TextInput):
+class DatespanInput(forms.TextInput):
     """widget with two dates"""
     template_name = 'Search/_datespan_widget.html'

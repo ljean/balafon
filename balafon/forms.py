@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, PasswordChangeForm
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from coop_cms.bs_forms import BootstrapableMixin
 

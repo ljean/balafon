@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from balafon.Emailing import models
 from balafon.Search.forms import SearchFieldForm

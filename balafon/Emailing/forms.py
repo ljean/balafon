@@ -19,7 +19,7 @@ from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_templates
 from coop_cms.utils import dehtml
 from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from balafon.settings import get_captcha_field
 from balafon.Crm import settings as crm_settings

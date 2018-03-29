@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 from registration import get_version as get_registration_version
 
 from balafon.Crm.models import Contact, EntityType

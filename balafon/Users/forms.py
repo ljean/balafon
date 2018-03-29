@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ValidationError
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from balafon.utils import is_allowed_homepage
 from balafon.Users.models import UserPreferences

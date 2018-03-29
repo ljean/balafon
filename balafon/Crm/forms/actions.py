@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from coop_cms.forms.base import InlineHtmlEditableModelForm
 

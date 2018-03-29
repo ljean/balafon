@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from balafon.Crm import models
 from balafon.Crm.forms.base import BetterBsForm

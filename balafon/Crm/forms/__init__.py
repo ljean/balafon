@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 
 from balafon.Crm.forms.actions import (
     ActionForm, ActionDocumentForm, ActionDoneForm, ActionTypeForm, CloneActionForm, SelectOpportunityForm,

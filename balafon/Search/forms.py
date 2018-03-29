@@ -20,7 +20,7 @@ from django.utils.encoding import smart_text
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-import floppyforms as forms
+import floppyforms.__future__ as forms
 from coop_cms.bs_forms import Form as BsForm
 
 from balafon.fields import HidableModelMultipleChoiceField
