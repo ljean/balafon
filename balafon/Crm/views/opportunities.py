@@ -9,8 +9,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect
@@ -60,14 +59,14 @@ def view_entity_opportunities(request, entity_id):
 
     request.session["redirect_url"] = reverse('crm_entity_opportunities', args=[entity_id])
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/entity_opportunities.html',
         {
             'entity': entity,
             'opportunities': opportunities,
             'all_opportunities': True,
         },
-        context_instance=RequestContext(request)
     )
 
 
@@ -91,7 +90,8 @@ def view_all_opportunities(request, ordering=None):
     request.session["redirect_url"] = reverse('crm_all_opportunities')
     page_obj = paginate(request, opportunities, 50)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/all_opportunities.html',
         {
             "opportunities": list(page_obj),
@@ -99,7 +99,6 @@ def view_all_opportunities(request, ordering=None):
             "ordering": ordering,
             "all_opportunities": True,
         },
-        context_instance=RequestContext(request)
     )
 
 
@@ -118,10 +117,10 @@ def edit_opportunity(request, opportunity_id):
     else:
         form = forms.OpportunityForm(instance=opportunity)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_opportunity.html',
         {'opportunity': opportunity, 'form': form},
-        context_instance=RequestContext(request)
     )
 
 
@@ -148,10 +147,10 @@ def view_opportunity(request, opportunity_id):
         'contacts': contacts,
     }
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/view_opportunity.html',
         context,
-        context_instance=RequestContext(request)
     )
 
 
@@ -176,14 +175,14 @@ def delete_opportunity(request, opportunity_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Are you sure to delete the opportunity "{0}"?').format(opportunity),
             'action_url': reverse("crm_delete_opportunity", args=[opportunity_id]),
         },
-        context_instance=RequestContext(request)
     )
 
 
@@ -205,10 +204,10 @@ def add_action_to_opportunity(request, action_id):
     else:
         form = forms.SelectOpportunityForm()
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/add_action_to_opportunity.html',
         {'action': action, 'form': form},
-        context_instance=RequestContext(request)
     )
 
 
@@ -232,7 +231,8 @@ def remove_action_from_opportunity(request, action_id, opportunity_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
@@ -241,7 +241,6 @@ def remove_action_from_opportunity(request, action_id, opportunity_id):
             ),
             'action_url': reverse("crm_remove_action_from_opportunity", args=[action.id, opportunity.id]),
         },
-        context_instance=RequestContext(request)
     )
 
 
@@ -261,8 +260,8 @@ def add_opportunity(request):
         form = forms.OpportunityForm()
 
     next_url = next_url or reverse('crm_board_panel')
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_opportunity.html',
         {'next_url': next_url, 'form': form},
-        context_instance=RequestContext(request)
     )

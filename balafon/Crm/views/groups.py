@@ -8,8 +8,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect
@@ -44,10 +43,10 @@ def add_entity_to_group(request, entity_id):
         'request': request,
     }
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/add_entity_to_group.html',
-        context_dict,
-        context_instance=RequestContext(request)
+        context_dict
     )
 
 
@@ -76,10 +75,10 @@ def add_contact_to_group(request, contact_id):
             'form': form,
         }
 
-        return render_to_response(
+        return render(
+            request,
             'Crm/add_contact_to_group.html',
-            context_dict,
-            context_instance=RequestContext(request)
+            context_dict
         )
 
     # pylint: disable=broad-except
@@ -118,14 +117,14 @@ def remove_entity_from_group(request, group_id, entity_id):
             return HttpResponseRedirect(reverse('crm_view_entity', args=[entity_id]))
     else:
         form = forms.ConfirmForm()
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Do you want to remove {0.name} from the {1.name} group?').format(entity, group),
             'action_url': reverse("crm_remove_entity_from_group", args=[group_id, entity_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -144,14 +143,14 @@ def remove_contact_from_group(request, group_id, contact_id):
             return HttpResponseRedirect(reverse('crm_view_contact', args=[contact_id]))
         else:
             form = forms.ConfirmForm()
-        return render_to_response(
+        return render(
+            request,
             'balafon/confirmation_dialog.html',
             {
                 'form': form,
                 'message': _('Do you want to remove {0.fullname} from the {1.name} group?').format(contact, group),
                 'action_url': reverse("crm_remove_contact_from_group", args=[group_id, contact_id]),
-            },
-            context_instance=RequestContext(request)
+            }
         )
 
     # pylint: disable=broad-except
@@ -203,10 +202,10 @@ def edit_group(request, group_id):
         'next_url': next_url,
     }
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_group.html',
-        context_dict,
-        context_instance=RequestContext(request)
+        context_dict
     )
 
 
@@ -227,14 +226,14 @@ def delete_group(request, group_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Are you sure to delete the group {0.name}?').format(group),
             'action_url': reverse("crm_delete_group", args=[group_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -252,13 +251,13 @@ def add_group(request):
     else:
         form = forms.EditGroupForm()
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_group.html',
         {
             'group': group,
             'form': form,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -284,14 +283,14 @@ def see_my_groups(request):
 
     page_obj = paginate(request, groups, 50)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/my_groups.html',
         {
             'groups': list(page_obj),
             'page_obj': page_obj,
             'ordering': ordering,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -352,12 +351,12 @@ def select_contact_or_entity(request):
     else:
         form = forms.SelectContactOrEntityForm()
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/popup_select_contact_or_entity.html',
         {
             'form': form,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 @user_passes_test(can_access)

@@ -13,8 +13,8 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, render
-from django.template import RequestContext, Context, Template
+from django.shortcuts import render, get_object_or_404, render
+from django.template import Context, Template
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_close
@@ -93,10 +93,10 @@ def quick_search(request):
                 'groups_by_name': groups_by_name,
             }
                 
-            return render_to_response(
+            return render(
+                request,
                 'Search/quicksearch_results.html',
-                context_dict,
-                context_instance=RequestContext(request)
+                context_dict
             )
     else:
         raise Http404
@@ -150,7 +150,8 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
 
     page_obj = paginate(request, results, getattr(settings, 'BALAFON_SEARCH_NB_IN_PAGE', None) or 50)
 
-    return render_to_response(
+    return render(
+        request,
         'Search/search.html',
         {
             'page_obj': page_obj,
@@ -167,8 +168,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             'opportunity': opportunity,
             'city': city,
             'contacts_display': contacts_display,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -200,13 +200,13 @@ def save_search(request, search_id):
             initial = {'search_id': 0}
         form = SearchNameForm(initial=initial)
     
-    return render_to_response(
+    return render(
+        request,
         'Search/search_name.html',
         {
             'form': form,
             'search_id': search_id,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -251,10 +251,10 @@ def mailto_contacts(request, bcc):
                                 email_groups.append(emails[index_from:])
                                 break
                             index_from = index_to
-                        return render_to_response(
+                        return render(
+                            request,
                             'Search/mailto_groups.html',
-                            {'bcc': int(bcc), 'email_groups': email_groups, 'nb_limit': nb_limit},
-                            context_instance=RequestContext(request)
+                            {'bcc': int(bcc), 'email_groups': email_groups, 'nb_limit': nb_limit}
                         )
                 else:
                     mailto = 'mailto:'
@@ -271,13 +271,13 @@ def view_search_list(request):
     searches = Search.objects.all()
     page_obj = paginate(request, searches, 50)
 
-    return render_to_response(
+    return render(
+        request,
         'Search/search_list.html',
         {
             'searches': list(page_obj),
             'page_obj': page_obj,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -314,20 +314,20 @@ def create_emailing(request):
                     
                     return HttpResponseRedirect(newsletter.get_absolute_url())
                 else:
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/create_action_for_contacts.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
             else:
                 search_form = SearchForm(request.POST)
                 if search_form.is_valid():
                     contacts = search_form.get_contacts()
                     form = NewEmailingForm(initial={'contacts': contacts})
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/new_emailing.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
     except Exception as msg:
         logger.exception("create_emailing")
@@ -428,10 +428,10 @@ def create_action_for_contacts(request):
                 )
                 return HttpResponseRedirect(reverse('crm_board_panel'))
             else:
-                return render_to_response(
+                return render(
+                    request,
                     'Search/create_action_for_contacts.html',
-                    {'form': form},
-                    context_instance=RequestContext(request)
+                    {'form': form}
                 )
         else:
             search_form = SearchForm(request.POST)
@@ -439,19 +439,19 @@ def create_action_for_contacts(request):
                 contacts = search_form.get_contacts()
                 if contacts:
                     form = ActionForContactsForm(initial={'contacts': contacts})
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/create_action_for_contacts.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
                 else:
-                    return render_to_response(
+                    return render(
+                        request,
                         'balafon/message_dialog.html',
                         {
                             'title': _('Create action for contacts'),
                             'message': _('The search results contains no contacts')
-                        },
-                        context_instance=RequestContext(request)
+                        }
                     )
     raise Http404
 
@@ -486,10 +486,10 @@ def add_contacts_to_group(request):
                         )
                     return HttpResponseRedirect(reverse('crm_board_panel'))
                 else:
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/add_contacts_to_group.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
             else:
                 search_form = SearchForm(request.POST)
@@ -497,19 +497,19 @@ def add_contacts_to_group(request):
                     contacts = search_form.get_contacts()
                     if contacts:
                         form = GroupForContactsForm(initial={'contacts': contacts})
-                        return render_to_response(
+                        return render(
+                            request,
                             'Search/add_contacts_to_group.html',
-                            {'form': form},
-                            context_instance=RequestContext(request)
+                            {'form': form}
                         )
                     else:
-                        return render_to_response(
+                        return render(
+                            request,
                             'balafon/message_dialog.html',
                             {
                                 'title': _('Add contacts to group'),
                                 'message': _('The search results contains no contacts')
-                            },
-                            context_instance=RequestContext(request)
+                            }
                         )
     except Exception as msg:
         logger.exception("add_contacts_to_group")
@@ -634,10 +634,10 @@ def export_to_pdf(request):
                     return pdf_view.render_to_response(context)
 
                 else:
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/export_to_pdf.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
             else:
                 search_form = SearchForm(request.POST)
@@ -645,10 +645,10 @@ def export_to_pdf(request):
                     contacts = search_form.get_contacts()
                     search_dict = json.dumps(search_form.serialize())
                     form = PdfTemplateForm(initial={'contacts': contacts, 'search_dict': search_dict})
-                    return render_to_response(
+                    return render(
+                        request,
                         'Search/export_to_pdf.html',
-                        {'form': form},
-                        context_instance=RequestContext(request)
+                        {'form': form}
                     )
     except Exception as msg:
         logger.exception("export_to_pdf")

@@ -9,8 +9,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, render, get_object_or_404
-from django.template import RequestContext, Template, Context
+from django.shortcuts import render, get_object_or_404
+from django.template import Template, Context
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_reload, popup_close
@@ -78,14 +78,14 @@ def view_all_contact_actions(request, contact_id, action_set_id):
     actions = contact.action_set.filter(archived=False).order_by("planned_date", "priority")
     actions_by_set = get_actions_by_set(actions, 0, action_set_list)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/view_contact_actions.html',
         {
             'contact': contact,
             'actions_by_set': actions_by_set,
             'entity': contact.entity
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -106,13 +106,13 @@ def view_all_entity_actions(request, entity_id, action_set_id):
     ).distinct().order_by("planned_date", "priority")
     actions_by_set = get_actions_by_set(actions, 0, action_set_list)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/view_entity_actions.html',
         {
             'actions_by_set': actions_by_set,
             'entity': entity
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -155,10 +155,10 @@ def add_action_for_contact(request, contact_id):
         'contact': contact,
     }
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_action.html',
-        context,
-        context_instance=RequestContext(request)
+        context
     )
 
 
@@ -182,7 +182,8 @@ def view_entity_actions(request, entity_id, set_id):
     request.session["redirect_url"] = reverse('crm_entity_actions', args=[entity_id, set_id])
     page_obj = paginate(request, actions, 50)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/entity_actions.html',
         {
             'title': title,
@@ -192,8 +193,7 @@ def view_entity_actions(request, entity_id, set_id):
             'actions': list(page_obj),
             'page_obj': page_obj,
             'filters': filters,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -215,7 +215,8 @@ def view_contact_actions(request, contact_id, set_id):
     page_obj = paginate(request, actions, 50)
     request.session["redirect_url"] = reverse('crm_contact_actions', args=[contact_id, set_id])
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/entity_actions.html',
         {
             'contact': contact,
@@ -224,8 +225,7 @@ def view_contact_actions(request, contact_id, set_id):
             'page_obj': page_obj,
             'all_actions': True,
             'title': title,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -288,10 +288,10 @@ def create_action(request, entity_id, contact_id):
         'entity_id': entity_id,
     }
 
-    return render_to_response(
+    return render(
+        render,
         'Crm/edit_action.html',
-        context,
-        context_instance=RequestContext(request)
+        context
     )
 
 
@@ -316,10 +316,10 @@ def edit_action(request, action_id):
         'action': action,
     }
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_action.html',
-        context,
-        context_instance=RequestContext(request)
+        context
     )
 
 
@@ -347,14 +347,14 @@ def delete_action(request, action_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Are you sure to delete this action?'),
             'action_url': reverse("crm_delete_action", args=[action_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -363,7 +363,8 @@ def view_all_actions(request):
     """view"""
     actions = models.Action.objects.all().order_by("-planned_date")
     request.session["redirect_url"] = reverse('crm_all_actions')
-    return render_to_response(
+    return render(
+        request,
         'Crm/all_actions.html',
         {
             'actions': actions,
@@ -372,8 +373,7 @@ def view_all_actions(request):
             'default_my_actions': False,
             'all_actions': True,
             'view_name': "crm_all_actions",
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -391,10 +391,10 @@ def do_action(request, action_id):
     else:
         form = forms.ActionDoneForm(instance=action)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/do_action.html',
-        {'form': form, 'action': action},
-        context_instance=RequestContext(request)
+        {'form': form, 'action': action}
     )
 
 
@@ -420,10 +420,10 @@ def reassign_action(request, action_id):
         form = forms.SelectContactOrEntityForm()
 
     title = _('Reassign {0}'.format(action.type.name.lower()) if action.type else _('action'))
-    return render_to_response(
+    return render(
+        request,
         'Crm/popup_reassign_action.html',
-        {'form': form, 'action': action, 'title': title},
-        context_instance=RequestContext(request)
+        {'form': form, 'action': action, 'title': title}
     )
 
 
@@ -443,10 +443,10 @@ def add_contact_to_action(request, action_id):
     else:
         form = forms.SelectContactForm()
 
-    return render_to_response(
+    return render(
+        request,
         "Crm/add_contact_to_action.html",
-        {'form': form, 'action': action},
-        context_instance=RequestContext(request)
+        {'form': form, 'action': action}
     )
 
 
@@ -467,14 +467,14 @@ def remove_contact_from_action(request, action_id, contact_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Do you to remove {0} from this action?').format(contact),
             'action_url': reverse("crm_remove_contact_from_action", args=[action_id, contact_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -494,10 +494,10 @@ def add_entity_to_action(request, action_id):
     else:
         form = forms.SelectEntityForm()
 
-    return render_to_response(
+    return render(
+        request,
         "Crm/add_entity_to_action.html",
-        {'form': form, 'action': action},
-        context_instance=RequestContext(request)
+        {'form': form, 'action': action}
     )
 
 
@@ -518,14 +518,14 @@ def remove_entity_from_action(request, action_id, entity_id):
     else:
         form = forms.ConfirmForm()
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': _('Do you to remove {0} from this action?').format(entity),
             'action_url': reverse("crm_remove_entity_from_action", args=[action_id, entity_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 

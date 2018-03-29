@@ -5,8 +5,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 
 from colorbox.decorators import popup_redirect
 
@@ -36,8 +35,8 @@ def edit_custom_fields(request, model_name, instance_id):
     else:
         form = form_class(instance)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/edit_custom_fields.html',
         {'form': form, 'instance': instance, 'model_name': model_name},
-        context_instance=RequestContext(request)
     )

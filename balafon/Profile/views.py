@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext, Context
+from django.shortcuts import render
+from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -46,13 +46,13 @@ def edit_profile(request):
     else:
         form = profile_form_class(instance=profile.contact)
         
-    return render_to_response(
+    return render(
+        request,
         'Profile/edit_profile.html',
         {
             'contact': profile.contact,
             'form': form,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -106,13 +106,13 @@ def post_message(request):
     else:
         form = MessageForm()
         
-    return render_to_response(
+    return render(
+        request,
         'Profile/post_message.html',
         {
             'contact': profile.contact,
             'form': form,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 

@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
-from django.template import RequestContext, TemplateDoesNotExist
+from django.shortcuts import render
+from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -97,10 +97,10 @@ def list_favorites(request):
         'favs_by_type': favs_by_type,
     }
     
-    return render_to_response(
+    return render(
+        request,
         'Users/favorites_list.html',
-        context,
-        context_instance=RequestContext(request)
+        context
     )
 
 @user_passes_test(can_access)

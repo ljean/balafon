@@ -13,8 +13,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.messages import success, error
 from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 
@@ -40,10 +39,10 @@ def new_contacts_import(request):
     else:
         form = forms.ContactsImportForm()
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/new_contacts_import.html',
-        {'form': form},
-        context_instance=RequestContext(request)
+        {'form': form}
     )
 
 
@@ -475,10 +474,10 @@ def confirm_contacts_import(request, import_id):
             )
             contacts, total_contacts = read_contacts(reader, fields, contacts_import.entity_name_from_email)
 
-        return render_to_response(
+        return render(
+            request,
             'Crm/confirm_contacts_import.html',
-            {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts},
-            context_instance=RequestContext(request)
+            {'form': form, 'contacts': contacts, 'nb_contacts': len(contacts), 'total_contacts': total_contacts}
         )
 
     except UnicodeDecodeError:
@@ -530,8 +529,8 @@ def unsubscribe_contacts_import(request):
     else:
         form = forms.UnsubscribeContactsImportForm()
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/unsubscribe_contacts_import.html',
         {'form': form},
-        context_instance=RequestContext(request)
     )

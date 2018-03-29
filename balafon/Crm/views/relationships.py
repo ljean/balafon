@@ -8,8 +8,7 @@ import json
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect
@@ -31,10 +30,10 @@ def add_relationship(request, contact_id):
     else:
         form = forms.AddRelationshipForm(contact1)
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/add_relationship.html',
         {'contact': contact1, 'form': form},
-        context_instance=RequestContext(request)
     )
 
 
@@ -59,13 +58,13 @@ def delete_relationship(request, contact_id, relationship_id):
             next_url = reverse("crm_view_contact", args=[contact.id])
         else:
             next_url = reverse('crm_board_panel')
-        return render_to_response(
+        return render(
+            request,
             'balafon/message_dialog.html',
             {
                 'message': err_msg,
                 'next_url':  next_url,
-            },
-            context_instance=RequestContext(request)
+            }
         )
     else:
         if request.method == 'POST':
@@ -76,14 +75,14 @@ def delete_relationship(request, contact_id, relationship_id):
                 return HttpResponseRedirect(reverse('crm_view_contact', args=[contact.id]))
         else:
             form = forms.ConfirmForm()
-        return render_to_response(
+        return render(
+            request,
             'balafon/confirmation_dialog.html',
             {
                 'form': form,
                 'message': _('Are you sure to delete the relationship "{0}"?').format(relationship),
                 'action_url': reverse("crm_delete_relationship", args=[contact_id, relationship_id]),
-            },
-            context_instance=RequestContext(request)
+            }
         )
 
 
@@ -107,20 +106,20 @@ def same_as(request, contact_id):
     else:
         form = forms.SameAsForm(contact)
         if not form.has_choices():
-            return render_to_response(
+            return render(
+                request,
                 'balafon/message_dialog.html',
                 {
                     'title': _('SameAs contacts'),
                     'message': _("No homonymous for {0}").format(contact),
                     'next_url': reverse('crm_view_contact', args=[contact.id]),
-                },
-                context_instance=RequestContext(request)
+                }
             )
 
-    return render_to_response(
+    return render(
+        request,
         'Crm/same_as.html',
-        {'contact': contact, 'form': form},
-        context_instance=RequestContext(request)
+        {'contact': contact, 'form': form}
     )
 
 
@@ -187,14 +186,14 @@ def remove_same_as(request, current_contact_id, contact_id):
             contact, current_contact
         )
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
             'message': confirm_message,
             'action_url': reverse("crm_remove_same_as", args=[current_contact_id, contact_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -251,7 +250,8 @@ def make_main_contact(request, current_contact_id, contact_id):
     else:
         form = forms.SameAsPriorityForm(contact)
 
-    return render_to_response(
+    return render(
+        request,
         'balafon/confirmation_dialog.html',
         {
             'form': form,
@@ -261,6 +261,5 @@ def make_main_contact(request, current_contact_id, contact_id):
                 contact
             ),
             'action_url': reverse("crm_make_main_contact", args=[current_contact_id, contact_id]),
-        },
-        context_instance=RequestContext(request)
+        }
     )
