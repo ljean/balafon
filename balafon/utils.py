@@ -57,7 +57,7 @@ def get_form_errors(response):
 
 def is_allowed_homepage(url_string):
     """return True is the current page can be set as homepage"""
-    url = urlparse.urlparse(url_string)
+    url = urlparse(url_string)
     try:
         safe_url = url.path
         resolved = resolve(safe_url)
