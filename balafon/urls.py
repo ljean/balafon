@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import sys
 
 from django.conf import settings
-from django.conf.urls import include, url, patterns
+from django.conf.urls import include, url
 from django.contrib.auth import views as django_auth_views
 from django.contrib.staticfiles.views import serve as serve_static
 from django.views.static import serve as serve_media
@@ -38,42 +38,41 @@ if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', T
         urlpatterns += [
             url(r'^static/(?P<path>.*)$', serve_media, {'document_root': settings.STATIC_ROOT}),
         ]
-    urlpatterns += patterns(
-        '',
+    urlpatterns += [
         url(
             r'^media/(?P<path>.*)$',
             serve_media,
             {'document_root': get_media_root(), 'show_indexes': True}
         ),
-    )
+    ]
 
 
-urlpatterns += localized_patterns('',
+urlpatterns += localized_patterns(
     url(r'^crm/', include('balafon.Crm.urls')),
-    url(r'^crm/', include('balafon.Crm.api_urls')),
-    url(r'^crm-search/', include('balafon.Search.urls')),
-    url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
-    url(
-        r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
-        auto_save_data,
-        name="auto_save_data"
-    ),
-    url(r'^emailing/', include('balafon.Emailing.urls')),
+    # url(r'^crm/', include('balafon.Crm.api_urls')),
+    # url(r'^crm-search/', include('balafon.Search.urls')),
+    # url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
+    # url(
+    #     r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
+    #     auto_save_data,
+    #     name="auto_save_data"
+    # ),
+    # url(r'^emailing/', include('balafon.Emailing.urls')),
 )
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns('',
+    urlpatterns += localized_patterns(
         url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
     )
 
     if 'registration' in settings.INSTALLED_APPS and 'balafon.Profile' not in settings.INSTALLED_APPS:
-        urlpatterns += localized_patterns('',
+        urlpatterns += localized_patterns(
             url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
         )
 
 else:
 
-    urlpatterns += localized_patterns('',
+    urlpatterns += localized_patterns(
         url(
             r'^accounts/login/$',
             django_auth_views.login,
@@ -94,34 +93,34 @@ else:
     )
 
 
-urlpatterns += localized_patterns('',
+urlpatterns += localized_patterns(
     url(r'^accounts/', include('django.contrib.auth.urls'))
 )
 
 
-if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
-    urlpatterns += [
-        url(r'^captcha/', include('captcha.urls')),
-    ]
+# if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
+#     urlpatterns += [
+#         url(r'^captcha/', include('captcha.urls')),
+#     ]
 
 
-if 'balafon.Profile' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns('',
-        url(r'^accounts/', include('balafon.Profile.urls'))
-    )
-
-
-if 'balafon.Store' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns('',
-        url(r'^store/', include('balafon.Store.urls')),
-        url(r'^store/', include('balafon.Store.api.urls'))
-    )
-
-
-if 'balafon.Users' in settings.INSTALLED_APPS:
-    urlpatterns += localized_patterns('',
-        url(r'^users/', include('balafon.Users.urls')),
-    )
+# if 'balafon.Profile' in settings.INSTALLED_APPS:
+#     urlpatterns += localized_patterns(
+#         url(r'^accounts/', include('balafon.Profile.urls'))
+#     )
+#
+#
+# if 'balafon.Store' in settings.INSTALLED_APPS:
+#     urlpatterns += localized_patterns(
+#         url(r'^store/', include('balafon.Store.urls')),
+#         url(r'^store/', include('balafon.Store.api.urls'))
+#     )
+#
+#
+# if 'balafon.Users' in settings.INSTALLED_APPS:
+#     urlpatterns += localized_patterns(
+#         url(r'^users/', include('balafon.Users.urls')),
+#     )
 
 
 if getattr(settings, 'BALAFON_AS_HOMEPAGE', False):
@@ -131,6 +130,5 @@ if getattr(settings, 'BALAFON_AS_HOMEPAGE', False):
 
 
 urlpatterns += localized_patterns(
-    '',
     url(r'^', include('coop_cms.urls')),
 )
