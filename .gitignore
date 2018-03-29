@@ -13,4 +13,4 @@
 Icon?
 Thumbs.db
 
-balafon/ci/*/ci_local_settings.py
+balafon/ci/*/local_settings.py
