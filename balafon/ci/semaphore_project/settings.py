@@ -3,13 +3,14 @@
 
 from __future__ import unicode_literals
 
+from django import VERSION as DJANGO_VERSION
+
 import os.path
 import sys
 import warnings
 
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 CI_DRONE = True
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -101,10 +102,56 @@ STATICFILES_FINDERS = (
 SECRET_KEY = 'drone-ci'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+if DJANGO_VERSION > (1, 9):
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                os.path.join(PROJECT_PATH, 'templates'),
+            ],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    "django.contrib.auth.context_processors.auth",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.request",
+                    "django.template.context_processors.media",
+                    "django.template.context_processors.static",
+                    "django.contrib.messages.context_processors.messages",
+                    "balafon.Search.context_processors.quick_search_form",
+                    "balafon.Crm.context_processors.crm",
+                    "balafon.Users.context_processors.user_config",
+                ],
+            },
+        },
+    ]
+else:
+    TEMPLATE_LOADERS = (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )
+
+    TEMPLATE_DIRS = (
+        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+        # Always use forward slashes, even on Windows.
+        # Don't forget to use absolute paths, not relative paths.
+        os.path.abspath(PROJECT_PATH + '/templates'),
+    )
+
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        'django.core.context_processors.request',
+        "django.core.context_processors.media",
+        "django.core.context_processors.static",
+        "django.contrib.messages.context_processors.messages",
+        "balafon.Search.context_processors.quick_search_form",
+        "balafon.Crm.context_processors.crm",
+        "balafon.Users.context_processors.user_config",
+    )
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -122,26 +169,6 @@ ROOT_URLCONF = 'urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'application'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.abspath(PROJECT_PATH + '/templates'),
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    'django.core.context_processors.request',
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.contrib.messages.context_processors.messages",
-    "balafon.Search.context_processors.quick_search_form",
-    "balafon.Crm.context_processors.crm",
-    "balafon.Users.context_processors.user_config",
-)
 
 AUTHENTICATION_BACKENDS = (
     'balafon.Profile.backends.ArticleCategoryPermissionBackend',
