@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import uuid
 import unicodedata
-from urlparse import urlparse
+from six.moves.urllib.parse import urlparse
 from datetime import datetime
 
 from django.db import models
@@ -1007,14 +1007,13 @@ class Contact(AddressModel):
 
         super(Contact, self).save(*args, **kwargs)
         if not self.uuid:
-            ascii_name = unicodedata.normalize('NFKD', '{0}'.format(self.fullname)).encode("ascii", 'ignore')
-            name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, ascii_name, self.email)
-            name = unicodedata.normalize('NFKD', '{0}'.format(name)).encode("ascii", 'ignore')
-            self.uuid = '{0}'.format(uuid.uuid5(uuid.NAMESPACE_URL, name))
+            name = '{0}-contact-{1}-{2}-{3}'.format(project_settings.SECRET_KEY, self.id, self.fullname, self.email)
+            ascii_name = unicodedata.normalize('NFKD', name).encode("ascii", 'ignore')
+            self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, '{0}'.format(ascii_name))
             return super(Contact, self).save()
         
         if self.entity.is_single_contact:
-            #force the entity name for ordering
+            # force the entity name for ordering
             self.entity.save()
             
     class Meta:
@@ -1550,8 +1549,8 @@ class Action(LastModifiedModel):
                 name = '{0}-action-{1}-{2}'.format(
                     project_settings.SECRET_KEY, self.id, self.type.id if self.type else 0
                 )
-                name = unicodedata.normalize('NFKD', '{0}'.format(name)).encode("ascii", 'ignore')
-                self.uuid = '{0}'.format(uuid.uuid5(uuid.NAMESPACE_URL, name))
+                ascii_name = unicodedata.normalize('NFKD', name).encode("ascii", 'ignore')
+                self.uuid = uuid.uuid5(uuid.NAMESPACE_URL, '{0}'.format(ascii_name))
                 super(Action, self).save()
 
             if not self.type.generate_uuid and self.uuid:

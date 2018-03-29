@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from cStringIO import StringIO
 import json
 import sys
 
@@ -11,6 +10,7 @@ from django.core import management
 from django.core.urlresolvers import reverse
 
 from coop_cms.tests import BeautifulSoup
+from coop_cms.moves import StringIO
 from model_mommy import mommy
 
 from balafon.Crm import models

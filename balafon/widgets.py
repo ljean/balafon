@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
 
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 
@@ -27,7 +27,7 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
             try:
                 obj = self.rel.to._default_manager.using(self.db).get(**{key: v})
                 url = reverse('admin:{0}_{1}_change'.format(app_label, class_name), args=[obj.id])
-                label = escape(smart_unicode(obj))
+                label = escape(smart_text(obj))
                 
                 x = '<a href="{0}" {1}>{2}</a>'.format(
                     url,

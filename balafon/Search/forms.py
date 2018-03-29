@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
 from django.forms.utils import flatatt
 from django.template import Context
 from django.template.loader import get_template
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
@@ -74,20 +74,20 @@ class GroupedSelect(forms.Select):
             value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select {0}>'.format(flatatt(final_attrs))] 
-        str_value = smart_unicode(value)
+        str_value = smart_text(value)
         for group_label, group in self.choices: 
             if group_label:
                 # should belong to an optgroup
-                group_label = smart_unicode(group_label)
+                group_label = smart_text(group_label)
                 output.append(u'<optgroup label="%s">' % escape(group_label)) 
             for key, value in group:
                 #build option html
-                option_value = smart_unicode(key)
+                option_value = smart_text(key)
                 output.append(
                     u'<option value="{0}"{1}>{2}</option>'.format(
                         escape(option_value),
                         (option_value == str_value) and u' selected="selected"' or '',
-                        escape(smart_unicode(value))
+                        escape(smart_text(value))
                     )
                 )
             if group_label:
@@ -117,7 +117,7 @@ class GroupedChoiceField(forms.ChoiceField):
         value = super(GroupedChoiceField, self).clean(value)
         if value in (None, ''):
             value = u''
-        value = forms.util.smart_unicode(value)
+        value = smart_text(value)
         if value == u'':
             return value
         valid_values = []

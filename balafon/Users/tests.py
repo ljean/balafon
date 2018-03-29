@@ -7,7 +7,6 @@ from datetime import datetime, date, timedelta
 import json
 import logging
 from unittest import skipIf
-from StringIO import StringIO
 import sys
 
 from django.conf import settings
@@ -19,6 +18,7 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.utils import timezone
 
+from coop_cms.moves import StringIO
 from coop_cms.utils import RequestManager
 from model_mommy import mommy
 

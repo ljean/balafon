@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from bs4 import BeautifulSoup
 from datetime import datetime
 import logging
-import urlparse
+from six.moves.urllib.parse import urlparse
 from importlib import import_module
 
 from django.conf import settings
