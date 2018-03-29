@@ -23,12 +23,11 @@ setup(
     license='CeCILL 2.1',
     zip_safe=False,
     install_requires=[
-        'django >= 1.9, <2',
+        'django >= 1.9, <1.11',
         'djangorestframework==3.4.7',
         'django-extensions==1.7.5',
         'apidev-coop_cms >= 1.2',
         'beautifulsoup4',
-        'BeautifulSoup',
         'django-wkhtmltopdf',
         'xlwt',
         'xlrd',

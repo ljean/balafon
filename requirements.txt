@@ -1,5 +1,4 @@
-django >= 1.9, <2
-BeautifulSoup
+django >= 1.9, <1.11
 beautifulsoup4
 django-extensions
 django-pagination
