@@ -15,6 +15,7 @@ import floppyforms.__future__ as forms
 
 from coop_cms.forms.base import InlineHtmlEditableModelForm
 
+from balafon.widgets import CalcHiddenInput
 from balafon.Crm import models
 from balafon.Crm.forms.base import BetterBsModelForm, FormWithFieldsetMixin, BsPopupModelForm
 from balafon.Crm.widgets import OpportunityAutoComplete
@@ -138,7 +139,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
 
     def _init_dt_field(self, dt_field, date_field, time_field):
         """init datetime fields"""
-        self.fields[dt_field].widget = forms.HiddenInput()
+        self.fields[dt_field].widget = CalcHiddenInput()
         the_datetime = getattr(self.instance, dt_field) if self.instance else self.fields[dt_field].initial
         if the_datetime:
             self.fields[date_field].initial = the_datetime.date()
@@ -192,7 +193,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         return the_time
 
     def clean_end_date(self):
-        """end date valodation"""
+        """end date validation"""
         date1 = self.cleaned_data.get("date", None)
         date2 = self.cleaned_data.get("end_date", None)
         if date2:
