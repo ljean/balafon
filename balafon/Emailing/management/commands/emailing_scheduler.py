@@ -12,13 +12,14 @@ from balafon.Emailing.utils import send_newsletter
 
 class Command(BaseCommand):
     help = "send all emailing marked ready for sending"
-    use_argparse = False
 
-    def handle(self, *args, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('max_nb', type=int, default=20, nargs='?')
+
+    def handle(self, max_nb, *args, **options):
         # look for emailing to be sent
         verbose = options.get('verbosity', 0)
         
-        max_nb = args[0] if len(args) > 0 else 20
         emailings = Emailing.objects.filter(
             status__in=(Emailing.STATUS_SCHEDULED, Emailing.STATUS_SENDING),
             scheduling_dt__lte=datetime.now()
