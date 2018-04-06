@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -296,7 +295,7 @@ def view_emailing_online(request, emailing_id, contact_uuid):
     """view an emailing online"""
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
-    context = Context(get_emailing_context(emailing, contact))
+    context = get_emailing_context(emailing, contact)
     the_template = get_template(emailing.newsletter.get_template_name())
     html_text = the_template.render(context)
     html_text = patch_emailing_html(html_text, emailing, contact)
