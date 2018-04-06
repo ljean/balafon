@@ -9,7 +9,7 @@ from . import views
 
 urlpatterns = [
     url(r'^newsletters/$', views.newsletter_list, name='emailing_newsletter_list'),
-    url(r'^view-emailing/(?P<emailing_id>\d+)/$', 'view_emailing', name='emailing_view'),
+    url(r'^view-emailing/(?P<emailing_id>\d+)/$', views.view_emailing, name='emailing_view'),
     url(
         r'^update-emailing/(?P<pk>\d+)/$',
         views.EmailingUpdateView.as_view(),
@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^confirm-send-mail/(?P<emailing_id>\d+)/$', views.confirm_send_mail, name='emailing_confirm_send_mail'),
     url(r'^cancel_send_mail/(?P<emailing_id>\d+)/$', views.cancel_send_mail, name='emailing_cancel_send_mail'),
     url(r'^subscribe/$', views.SubscribeView.as_view(), name='emailing_subscribe_newsletter'),
+
     url(r'^email-subscribe/$', views.EmailSubscribeView.as_view(), name='emailing_email_subscribe_newsletter'),
     url(
         r'^email-subscribe/(?P<subscription_type>\d+)/$',

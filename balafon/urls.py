@@ -49,15 +49,15 @@ if settings.DEBUG or ('test' in sys.argv) or getattr(settings, 'SERVE_STATIC', T
 
 urlpatterns += localized_patterns(
     url(r'^crm/', include('balafon.Crm.urls')),
-    # url(r'^crm/', include('balafon.Crm.api_urls')),
-    # url(r'^crm-search/', include('balafon.Search.urls')),
-    # url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
-    # url(
-    #     r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
-    #     auto_save_data,
-    #     name="auto_save_data"
-    # ),
-    # url(r'^emailing/', include('balafon.Emailing.urls')),
+    url(r'^crm/', include('balafon.Crm.api_urls')),
+    url(r'^crm-search/', include('balafon.Search.urls')),
+    url('^crm/go-to-home/', redirect_to_homepage, name="homepage"),
+    url(
+        r'^auto-save/(?P<model_type>\w+)/(?P<field_name>[\w-]+)/(?P<obj_id>\d+)/$',
+        auto_save_data,
+        name="auto_save_data"
+    ),
+    url(r'^emailing/', include('balafon.Emailing.urls')),
 )
 
 if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
@@ -115,12 +115,11 @@ urlpatterns += localized_patterns(
 #         url(r'^store/', include('balafon.Store.urls')),
 #         url(r'^store/', include('balafon.Store.api.urls'))
 #     )
-#
-#
-# if 'balafon.Users' in settings.INSTALLED_APPS:
-#     urlpatterns += localized_patterns(
-#         url(r'^users/', include('balafon.Users.urls')),
-#     )
+
+if 'balafon.Users' in settings.INSTALLED_APPS:
+    urlpatterns += localized_patterns(
+        url(r'^users/', include('balafon.Users.urls')),
+    )
 
 
 if getattr(settings, 'BALAFON_AS_HOMEPAGE', False):
