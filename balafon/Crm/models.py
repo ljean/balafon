@@ -531,7 +531,7 @@ class SameAs(models.Model):
         )
 
     def priority_contact(self):
-        """Th econtact with priority 1"""
+        """The contact with priority 1"""
         try:
             return "{0}".format(
                 ['{0}'.format(contact) for contact in self.contact_set.order_by('same_as_priority')][0]
