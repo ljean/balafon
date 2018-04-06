@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from importlib import import_module
 import re
-import urllib2
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -21,6 +20,7 @@ from coop_cms.utils import dehtml
 from coop_cms.bs_forms import Form as BsForm, ModelForm as BsModelForm
 import floppyforms.__future__ as forms
 
+from balafon.moves import urlopen
 from balafon.settings import get_captcha_field
 from balafon.Crm import settings as crm_settings
 from balafon.Crm.forms import ModelFormWithCity, BetterBsModelForm
@@ -167,7 +167,7 @@ class NewNewsletterForm(BsForm):
                 if re.match(regex, url):
                     try:
                         # if so get the content
-                        html = urllib2.urlopen(url).read()
+                        html = urlopen(url)
                         # and extract the selector content as initial content for the newsletter
                         soup = BeautifulSoup(html, "html.parser")
                         content = ''.join(['{0}'.format(tag) for tag in soup.select(selector)])
