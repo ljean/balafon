@@ -104,17 +104,17 @@ if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
     ]
 
 
-# if 'balafon.Profile' in settings.INSTALLED_APPS:
-#     urlpatterns += localized_patterns(
-#         url(r'^accounts/', include('balafon.Profile.urls'))
-#     )
-#
-#
-# if 'balafon.Store' in settings.INSTALLED_APPS:
-#     urlpatterns += localized_patterns(
-#         url(r'^store/', include('balafon.Store.urls')),
-#         url(r'^store/', include('balafon.Store.api.urls'))
-#     )
+if 'balafon.Profile' in settings.INSTALLED_APPS:
+    urlpatterns += localized_patterns(
+        url(r'^accounts/', include('balafon.Profile.urls'))
+    )
+
+
+if 'balafon.Store' in settings.INSTALLED_APPS:
+    urlpatterns += localized_patterns(
+        url(r'^store/', include('balafon.Store.urls')),
+        url(r'^store/', include('balafon.Store.api.urls'))
+    )
 
 if 'balafon.Users' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns(
