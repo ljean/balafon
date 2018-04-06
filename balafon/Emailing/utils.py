@@ -12,7 +12,6 @@ from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.mail import get_connection, EmailMessage, EmailMultiAlternatives
 from django.core.urlresolvers import reverse
-from django.template import Context
 from django.template.loader import get_template
 from django.utils import translation
 from django.utils.safestring import mark_safe
@@ -143,7 +142,7 @@ def send_newsletter(emailing, max_nb):
 
             emailing_context = get_emailing_context(emailing, contact)
             emailing_context["LANGUAGE_CODE"] = lang
-            context = Context(emailing_context)
+            context = emailing_context
             the_template = get_template(emailing.newsletter.get_template_name())
 
             html_text = the_template.render(context)
@@ -224,7 +223,7 @@ def send_notification_email(request, contact, actions, message):
             'site': Site.objects.get_current(),
         }
         the_templatate = get_template('Emailing/subscribe_notification_email.txt')
-        content = the_templatate.render(Context(data))
+        content = the_templatate.render(data)
 
         # remove empty lines and replace any line starting with ## by a line feed
         lines = [line if line[:2] != "##" else "" for line in content.split("\n") if line]
@@ -273,7 +272,7 @@ def send_verification_email(contact, subscription_types=None):
             'my_company': mark_safe(my_company),
         }
         the_template = get_template('Emailing/subscribe_verification_email.txt')
-        content = the_template.render(Context(data))
+        content = the_template.render(data)
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
