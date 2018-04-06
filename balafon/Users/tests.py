@@ -294,7 +294,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         
     def test_render_template(self):
         """make sure render do not fail"""
-        for i in xrange(5):
+        for i in range(5):
             mommy.make(User)
         
         template = Template(self._template_content())
@@ -311,7 +311,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
     def test_render_template_not_logged(self):
         """render for anonymous"""
         self.client.logout()
-        for i in xrange(5):
+        for i in range(5):
             mommy.make(User)
         
         template = Template(self._template_content())
@@ -434,8 +434,8 @@ class ListFavoritesTestCase(BaseTestCase):
     def test_list(self):
         """view list"""
         logged_user = self.user
-        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        not_faved_users = [mommy.make(User, username='NOT-{0}'.format(i)) for i in xrange(5)]
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in range(5)]
+        not_faved_users = [mommy.make(User, username='NOT-{0}'.format(i)) for i in range(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         for user in faved_users:
@@ -452,8 +452,8 @@ class ListFavoritesTestCase(BaseTestCase):
         """do not see someone else list"""
         logged_user = self.user
         other_user = mommy.make(User)
-        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        not_my_faved_users = [mommy.make(User, username='OTHER-{0}'.format(i)) for i in xrange(5)]
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in range(5)]
+        not_my_faved_users = [mommy.make(User, username='OTHER-{0}'.format(i)) for i in range(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         
@@ -474,8 +474,8 @@ class ListFavoritesTestCase(BaseTestCase):
     def test_list_different_cts(self):
         """different contentypes in list"""
         logged_user = self.user
-        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in xrange(5)]
-        faved_groups = [mommy.make(Group, name='group-{0}'.format(i)) for i in xrange(5)]
+        faved_users = [mommy.make(User, username='user-{0}'.format(i)) for i in range(5)]
+        faved_groups = [mommy.make(Group, name='group-{0}'.format(i)) for i in range(5)]
         
         user_ct = ContentType.objects.get_for_model(User)
         group_ct = ContentType.objects.get_for_model(Group)
@@ -632,7 +632,7 @@ class UserHomepageTestCase(BaseTestCase):
 
 
 @skipIf(
-    "balafon.Users.context_processors.user_config" not in settings.TEMPLATE_CONTEXT_PROCESSORS,
+    "balafon.Users.context_processors.user_config" not in settings.TEMPLATES[0]['OPTIONS']['context_processors'],
     "User context processor not set"
 )
 class CustomMenuTestCase(BaseTestCase):
