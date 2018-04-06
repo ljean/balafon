@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from datetime import datetime
 from unittest import skipIf
 
@@ -13,6 +12,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 
 from coop_cms.models import Newsletter
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models

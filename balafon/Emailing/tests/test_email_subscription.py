@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from datetime import date
 
 from django.conf import settings
@@ -14,6 +13,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -22,7 +22,11 @@ from balafon.Crm.signals import new_subscription
 @override_settings(BALAFON_EMAIL_SUBSCRIBE_ENABLED=True)
 class SubscribeTest(TestCase):
     """Subscription with just his email address"""
-    
+
+    @staticmethod
+    def email_as_text(email):
+        return email.message().as_string()
+
     def setUp(self):
         """before each test"""
         self._lang = settings.LANGUAGES[0][0]
@@ -76,7 +80,7 @@ class SubscribeTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 0)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content)
         self.assertEqual(1, len(soup.select('form')))
         form = soup.select('form')[0]
         self.assertEqual(form['action'], url)
@@ -89,7 +93,7 @@ class SubscribeTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 0)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content)
         self.assertEqual(1, len(soup.select('form')))
         form = soup.select('form')[0]
         self.assertEqual(form['action'], url)
@@ -127,13 +131,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         #Not an Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
         
         for subscription_type in (subscription_type1, subscription_type2):
             subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
@@ -214,13 +218,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         #Not an Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
 
         for subscription_type in (subscription_type1, ):
             subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
@@ -265,13 +269,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         # Not an Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
 
         for subscription_type in (subscription_type1, ):
             subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
@@ -317,13 +321,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         #Not an Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
 
         for subscription_type in (subscription_type2, ):
             subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
@@ -368,13 +372,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         #Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") >= 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") >= 0)
 
         queryset = models.Subscription.objects.filter(contact=contact)
         self.assertEqual(0, queryset.count())
@@ -417,12 +421,12 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [new_contact.email])
         url = reverse('emailing_email_verification', args=[new_contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
-        email_content = notification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(notification_email)
         self.assertTrue(email_content.find(new_contact.fullname) > 0)
         self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
         self.assertTrue(email_content.find(existing_contact.get_absolute_url()) > 0)
@@ -484,12 +488,12 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [new_contact.email])
         url = reverse('emailing_email_verification', args=[new_contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
-        email_content = notification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(notification_email)
         self.assertTrue(email_content.find(new_contact.fullname) > 0)
         self.assertTrue(email_content.find(new_contact.get_absolute_url()) > 0)
         for existing_contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4):
@@ -555,13 +559,13 @@ class SubscribeTest(TestCase):
         verification_email = mail.outbox[1]
         self.assertEqual(verification_email.to, [contact.email])
         url = reverse('emailing_email_verification', args=[contact.uuid])
-        email_content = verification_email.message().as_string().decode('utf-8')
+        email_content = self.email_as_text(verification_email)
         self.assertTrue(email_content.find(url) > 0)
 
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
         # Not an Error message
-        self.assertTrue(notification_email.message().as_string().decode('utf-8').find("Error") < 0)
+        self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
 
         for subscription_type in (subscription_type1, subscription_type2):
             subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
