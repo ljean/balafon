@@ -98,10 +98,10 @@ urlpatterns += localized_patterns(
 )
 
 
-# if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
-#     urlpatterns += [
-#         url(r'^captcha/', include('captcha.urls')),
-#     ]
+if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
+    urlpatterns += [
+        url(r'^captcha/', include('captcha.urls')),
+    ]
 
 
 # if 'balafon.Profile' in settings.INSTALLED_APPS:
