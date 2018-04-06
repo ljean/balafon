@@ -786,7 +786,8 @@ class ActionTest(BaseTestCase):
         url = reverse("crm_view_entity", args=[entity.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, response.content.count(action.subject))
+        content = response.content.decode('utf-8')
+        self.assertEqual(1, content.count(action.subject))
 
     def test_view_contact_actions_more_than_five(self):
         """view contact actions if more than five"""
@@ -1122,10 +1123,11 @@ class ActionTest(BaseTestCase):
         url = reverse("crm_view_contact", args=[contact1.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, response.content.count(action1.subject))
-        self.assertEqual(1, response.content.count(action2.subject))
-        self.assertEqual(0, response.content.count(action3.subject))
-        self.assertEqual(0, response.content.count(action4.subject))
+        content = response.content.decode('utf-8')
+        self.assertEqual(1, content.count(action1.subject))
+        self.assertEqual(1, content.count(action2.subject))
+        self.assertEqual(0, content.count(action3.subject))
+        self.assertEqual(0, content.count(action4.subject))
 
     def test_view_remove_contact_from_action(self):
         """view remove contact from action"""
@@ -1881,9 +1883,9 @@ class UpdateActionStatusTest(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -1911,9 +1913,9 @@ class UpdateActionStatusTest(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertNotEqual(
-            '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -1941,9 +1943,9 @@ class UpdateActionStatusTest(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -1971,9 +1973,9 @@ class UpdateActionStatusTest(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertNotEqual(
+        self.assertNotContains(
+            response,
             '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -2150,9 +2152,9 @@ class UpdateActionStatus2Test(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -2180,9 +2182,9 @@ class UpdateActionStatus2Test(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertNotEqual(
+        self.assertNotContains(
+            response,
             '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -2210,9 +2212,9 @@ class UpdateActionStatus2Test(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -2240,9 +2242,9 @@ class UpdateActionStatus2Test(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertNotEqual(
-            '<script>$.colorbox.close(); window.location=window.location;</script>',
-            response.content
+        self.assertNotContains(
+            response,
+            '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
 
         action = models.Action.objects.get(id=action.id)
@@ -2363,7 +2365,7 @@ class ReassignActionTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         js_script = '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact2.get_absolute_url())
-        self.assertEqual(response.content, js_script)
+        self.assertContains(response, js_script)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.contacts.count(), 1)
@@ -2391,7 +2393,7 @@ class ReassignActionTest(BaseTestCase):
         js_script = '<script>$.colorbox.close(); window.location="{0}";</script>'.format(
             contact1.entity.get_absolute_url()
         )
-        self.assertEqual(response.content, js_script)
+        self.assertContains(response, js_script)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.contacts.count(), 0)

@@ -67,21 +67,27 @@ class CustomFieldTest(BaseTestCase):
     def test_custom_field_ordering(self):
         """view ordered custom fields"""
         entity = mommy.make(models.Entity)
-        cf1 = models.CustomField.objects.create(name='no_siret', label='SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2)
-        cf2 = models.CustomField.objects.create(name='code_naf', label='Code NAF', model=models.CustomField.MODEL_ENTITY, ordering=1)
+        cf1 = models.CustomField.objects.create(
+            name='no_siret', label='SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2
+        )
+        cf2 = models.CustomField.objects.create(
+            name='code_naf', label='Code NAF', model=models.CustomField.MODEL_ENTITY, ordering=1
+        )
         url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        pos_siret = response.content.find('no_siret')
-        pos_naf = response.content.find('code_naf')
+        content = response.content.decode('utf8')
+        pos_siret = content.find('no_siret')
+        pos_naf = content.find('code_naf')
         self.assertTrue(pos_naf < pos_siret)
 
         cfv1 = models.EntityCustomFieldValue.objects.create(custom_field=cf1, entity=entity, value='1234567890')
         cfv2 = models.EntityCustomFieldValue.objects.create(custom_field=cf2, entity=entity, value='995588')
 
         response = self.client.get(entity.get_absolute_url())
-        pos_siret = response.content.find('SIRET')
-        pos_naf = response.content.find('Code NAF')
+        content = response.content.decode('utf8')
+        pos_siret = content.find('SIRET')
+        pos_naf = content.find('Code NAF')
         self.assertTrue(pos_naf < pos_siret)
 
     def test_custom_field_visibility(self):
@@ -90,7 +96,6 @@ class CustomFieldTest(BaseTestCase):
         cf1 = models.CustomField.objects.create(name='no_siret', label='SIRET', model=models.CustomField.MODEL_ENTITY, ordering=2)
 
         response = self.client.get(entity.get_absolute_url())
-        pos_siret = response.content.find('SIRET')
         self.assertNotContains(response, 'SIRET')
 
         cfv1 = models.EntityCustomFieldValue.objects.create(custom_field=cf1, entity=entity, value='1234567890')

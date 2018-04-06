@@ -458,7 +458,7 @@ class CloneActionTest(BaseTestCase):
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
 
-        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+        self.assertContains(response, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
@@ -508,7 +508,7 @@ class CloneActionTest(BaseTestCase):
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
 
-        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+        self.assertContains(response, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
@@ -559,7 +559,7 @@ class CloneActionTest(BaseTestCase):
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
 
-        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+        self.assertContains(response, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
