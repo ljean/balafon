@@ -106,10 +106,11 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-group-_-0": group.id}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
+        content = response.content.decode('utf-8')
         for contact in contacts:
-            self.assertTrue(response.content.find(contact.email) > 0)
-            self.assertTrue(response.content.find(contact.lastname) > 0)
-            self.assertTrue(response.content.find(contact.firstname) > 0)
+            self.assertTrue(content.find(contact.email) > 0)
+            self.assertTrue(content.find(contact.lastname) > 0)
+            self.assertTrue(content.find(contact.firstname) > 0)
 
     def test_more_than_limit_clicks(self):
         """mailto sevaral emails more than limit: click mode """
@@ -127,7 +128,8 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-group-_-0": group.id}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(2, response.content.count('class="email-group"'))
+        content = response.content.decode('utf-8')
+        self.assertEqual(2, content.count('class="email-group"'))
 
     def test_more_than_limit_clicks_not_exact(self):
         """mailto more than limit with not full groups"""
@@ -145,7 +147,8 @@ class MailtoContactsTest(BaseTestCase):
         data = {"gr0-_-group-_-0": group.id}
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(2, response.content.count('class="email-group"'))
+        content = response.content.decode('utf-8')
+        self.assertEqual(2, content.count('class="email-group"'))
 
     def test_get_mailto(self):
         """GET request on mailto action url"""
