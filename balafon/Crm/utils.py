@@ -9,6 +9,8 @@ import codecs
 from django.contrib.auth.models import User
 from django.db.models import Q
 
+from coop_cms.moves import StringIO
+
 from balafon.Crm import models
 from balafon.Crm import settings as crm_settings
 from balafon.utils import logger
@@ -39,11 +41,17 @@ def get_in_charge_users():
 
 def unicode_csv_reader(the_file, encoding, dialect=csv.excel, **kwargs):
     """read csv file properly"""
+    the_file.seek(0)
+    content = the_file.read()
+    decoded = content.decode(encoding)
+
+    text_file = StringIO(decoded)
+
     if 'delimiter' in kwargs:
         kwargs['delimiter'] = str(kwargs['delimiter'])
-    csv_reader = csv.reader(the_file, dialect=dialect, **kwargs)
+    csv_reader = csv.reader(text_file, dialect=dialect, **kwargs)
     for row in csv_reader:
-        yield [codecs.decode(cell, encoding) for cell in row]
+        yield [cell for cell in row]
 
 
 def check_city_exists(city_name, zip_code, country):
