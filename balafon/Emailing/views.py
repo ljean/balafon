@@ -9,12 +9,11 @@ import os.path
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-from wsgiref.util import FileWrapper
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
-from django.template import RequestContext, Context
+from django.template import Context
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -23,6 +22,7 @@ from django.views.generic.base import View, TemplateView
 from colorbox.decorators import popup_redirect
 from coop_cms.models import Newsletter
 from coop_cms.utils import redirect_to_language, paginate
+from wsgiref.util import FileWrapper
 
 from balafon.permissions import can_access
 from balafon.utils import logger
@@ -58,7 +58,7 @@ def delete_emailing(request, emailing_id):
     """delete an emailing"""
 
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
-    
+
     if request.method == 'POST':
         form = ConfirmForm(request.POST)
         if form.is_valid():
@@ -109,18 +109,18 @@ def new_newsletter(request):
                 if not content:
                     content = _("Enter the text of your newsletter here")
                     go_to_edit = True
-                
+
                 newsletter = Newsletter.objects.create(
                     subject=subject, template=template, content=content, source_url=source_url
                 )
-                
+
                 if go_to_edit:
                     return HttpResponseRedirect(newsletter.get_edit_url())
                 else:
                     return HttpResponseRedirect(newsletter.get_absolute_url())
         else:
             form = forms.NewNewsletterForm()
-    
+
         return render(
             request,
             'Emailing/new_newsletter.html',
@@ -149,7 +149,7 @@ def confirm_send_mail(request, emailing_id):
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     else:
         form = forms.NewsletterSchedulingForm(instance=emailing)
-    
+
     return render(
         request,
         'Emailing/confirm_send_mail.html',
@@ -182,7 +182,7 @@ def cancel_send_mail(request, emailing_id):
             return HttpResponseRedirect(reverse('emailing_newsletter_list'))
     else:
         form = ConfirmForm()
-        
+
     return render(
         request,
         'balafon/confirmation_dialog.html',
@@ -201,7 +201,7 @@ def view_link(request, link_uuid, contact_uuid):
     try:
         contact = Contact.objects.get(uuid=contact_uuid)
         link.visitors.add(contact)
-        
+
         #create action
         link_action = ActionType.objects.get_or_create(name=_('Link'))[0]
         action = Action.objects.create(
@@ -211,7 +211,7 @@ def view_link(request, link_uuid, contact_uuid):
         )
         action.contacts.add(contact)
         action.save()
-        
+
     except Contact.DoesNotExist:
         pass
 
@@ -228,7 +228,7 @@ def unregister_contact(request, emailing_id, contact_uuid):
     except models.Emailing.DoesNotExist:
         emailing = None
         my_company = settings.BALAFON_MY_COMPANY
-    
+
     if request.method == "POST":
         if 'unregister' in request.POST:
             form = forms.UnregisterForm(request.POST)
@@ -266,7 +266,7 @@ def unregister_contact(request, emailing_id, contact_uuid):
                 )
             else:
                 pass #not valid : display with errors
-        
+
         else:
             return render(
                 request,
@@ -319,7 +319,7 @@ def subscribe_done(request, contact_uuid):
         my_company = ', '.join(subscription_type_names)
     else:
         my_company = settings.BALAFON_MY_COMPANY
-    
+
     return render(
         request,
         'Emailing/public/subscribe_done.html',
@@ -338,7 +338,7 @@ def subscribe_error(request, contact_uuid):
         ]
     if subscription_type_names:
         my_company = ', '.join(subscription_type_names)
-    
+
     return render(
         request,
         'Emailing/public/subscribe_error.html',
@@ -359,10 +359,10 @@ def email_verification(request, contact_uuid):
         my_company = ', '.join(subscription_type_names)
     else:
         my_company = settings.BALAFON_MY_COMPANY
-    
+
     contact.email_verified = True
     contact.save()
-    
+
     return render(
         request,
         'Emailing/public/verification_done.html',
@@ -377,10 +377,10 @@ def email_tracking(request, emailing_id, contact_uuid):
     """handle download of email opening tracking image"""
     emailing = get_object_or_404(models.Emailing, id=emailing_id)
     contact = get_object_or_404(Contact, uuid=contact_uuid)
-    
+
     emailing.opened_emails.add(contact)
     emailing.save()
-    
+
     dir_name = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(dir_name, "email-tracking.png")
     response = HttpResponse(FileWrapper(open(file_name, 'r')), content_type='image/png')
@@ -391,11 +391,11 @@ def email_tracking(request, emailing_id, contact_uuid):
 class SubscribeView(View):
     """Subscribe to emailing"""
     template_name = 'Emailing/public/subscribe.html'
-        
+
     def get_form_class(self):
         """get form: can be customized"""
         return get_subscription_form() or forms.SubscribeForm
-        
+
     def get_template(self):
         """get template"""
         return self.template_name
@@ -412,7 +412,7 @@ class SubscribeView(View):
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_done', args=[contact.uuid])
-    
+
     def get_error_url(self, contact):
         """where to redirect on error"""
         return reverse('emailing_subscribe_error', args=[contact.uuid])
@@ -463,7 +463,7 @@ class SubscribeView(View):
             except EmailSendError:
                 except_text = 'send_verification_email'
                 logger.exception(except_text)
-                
+
                 # create action
                 detail = _("An error occurred while verifying the email address of this contact.")
                 fix_action = ActionType.objects.get_or_create(name=_('Balafon'))[0]
@@ -473,7 +473,7 @@ class SubscribeView(View):
                 )
                 action.contacts.add(contact)
                 action.save()
-                
+
                 return HttpResponseRedirect(self.get_error_url(contact))
         else:
             except_text = 'contact form : {0}'.format(form.errors)
@@ -491,7 +491,7 @@ class EmailSubscribeView(SubscribeView):
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
         return reverse('emailing_subscribe_email_done')
-    
+
     def get_error_url(self, contact):
         """where to redirect on error"""
         return reverse('emailing_subscribe_email_error')
