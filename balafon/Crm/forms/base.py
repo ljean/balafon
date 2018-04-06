@@ -107,7 +107,7 @@ class BetterBsModelForm(forms.ModelForm, BootstrapableMixin):  # (BetterModelFor
         for field in self.fields.values():
             if field.widget.__class__.__name__ == forms.Select().__class__.__name__:
                 css_class = field.widget.attrs.get("class", "")
-                if not "chosen-select" in css_class:
+                if "chosen-select" not in css_class:
                     field.widget.attrs["class"] = css_class + " chosen-select"
 
 
