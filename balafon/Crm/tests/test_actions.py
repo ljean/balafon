@@ -1913,7 +1913,7 @@ class UpdateActionStatusTest(BaseTestCase):
         response = self.client.post(url, data)
 
         self.assertEqual(200, response.status_code)
-        self.assertContains(
+        self.assertNotContains(
             response,
             '<script>$.colorbox.close(); window.location=window.location;</script>'
         )
