@@ -289,7 +289,7 @@ def create_action(request, entity_id, contact_id):
     }
 
     return render(
-        render,
+        request,
         'Crm/edit_action.html',
         context
     )
