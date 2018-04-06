@@ -3,10 +3,11 @@
 from __future__ import unicode_literals
 
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
-
-from django.utils.encoding import smart_text
 from django.core.urlresolvers import reverse
+from django.utils.encoding import smart_text
 from django.utils.html import escape
+
+import floppyforms.__future__ as forms
 
 
 class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
@@ -39,3 +40,11 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
             except self.rel.to.DoesNotExist:
                 str_values += ['???']
         return '&nbsp;<strong>{0}</strong>'.format(',&nbsp;'.join(str_values))
+
+
+class CalcHiddenInput(forms.HiddenInput):
+    """This field is calculated and hidden. It is not in POST data"""
+
+    def value_omitted_from_data(self, data, files, name):
+        # Tell django that this is field value doesn't come from POST data
+        return False
