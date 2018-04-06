@@ -249,8 +249,8 @@ class SameAsPriorityTest(BaseTestCase):
 
         response = self.client.post(url, data={'priority': 2})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact2.get_absolute_url()),
         )
 
@@ -281,8 +281,8 @@ class SameAsPriorityTest(BaseTestCase):
 
         response = self.client.post(url, data={'priority': 1})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact2.get_absolute_url()),
         )
 
@@ -320,8 +320,8 @@ class SameAsPriorityTest(BaseTestCase):
 
         response = self.client.post(url, data={'priority': 2})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact1.get_absolute_url()),
         )
 
@@ -361,8 +361,8 @@ class SameAsPriorityTest(BaseTestCase):
 
         response = self.client.post(url, data={'priority': 3})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact2.get_absolute_url()),
         )
 
@@ -400,8 +400,8 @@ class SameAsPriorityTest(BaseTestCase):
 
         response = self.client.post(url, data={'priority': 4})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(contact1.get_absolute_url()),
         )
 
@@ -805,7 +805,6 @@ class RemoveSameAsTest(BaseTestCase):
 
         self.assertEqual(0, models.SameAs.objects.count())
         self.assertEqual(contact1.same_as_priority, 0)
-
 
 
 class FindSameAsTest(BaseTestCase):
