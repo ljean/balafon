@@ -592,11 +592,13 @@ class Relationship(TimeStampedModel):
 @python_2_unicode_compatible
 class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
+    GENDER_NOT_SET = 0
     GENDER_MALE = 1
     GENDER_FEMALE = 2
     GENDER_COUPLE = 3
     
     GENDER_CHOICE = (
+        (GENDER_NOT_SET, ''),
         (GENDER_MALE, _('Mr')),
         (GENDER_FEMALE, _('Mrs')),
         (GENDER_COUPLE, _('Mrs and Mr'))
@@ -605,7 +607,7 @@ class Contact(AddressModel):
     entity = models.ForeignKey(Entity)
     role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_('Roles'))
     
-    gender = models.IntegerField(_('gender'), choices=GENDER_CHOICE, blank=True, default=0)
+    gender = models.IntegerField(_('gender'), choices=GENDER_CHOICE, blank=True, default=GENDER_NOT_SET)
     gender_title = models.CharField(
         max_length=50, verbose_name=_('gender title'), default='', blank=True,
         help_text=_('Overwrites gender if defined')

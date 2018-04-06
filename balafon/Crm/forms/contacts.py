@@ -112,7 +112,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
 
         # define the allowed gender
         gender_choices = [
-            ('', '-------'),
+            (models.Contact.GENDER_NOT_SET, '-------'),
             (models.Contact.GENDER_MALE, ugettext('Mr')),
             (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
         ]
