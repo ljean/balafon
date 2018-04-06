@@ -383,7 +383,7 @@ def email_tracking(request, emailing_id, contact_uuid):
 
     dir_name = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(dir_name, "email-tracking.png")
-    response = HttpResponse(FileWrapper(open(file_name, 'r')), content_type='image/png')
+    response = HttpResponse(FileWrapper(open(file_name, 'rb')), content_type='image/png')
     response['Content-Length'] = os.path.getsize(file_name)
     return response
 
