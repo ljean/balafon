@@ -3,12 +3,12 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from datetime import date
 import os.path
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -23,7 +23,7 @@ class ImportFileTest(BaseTestCase):
     def _get_file(self, file_name):
         """open a csv file for test"""
         full_name = os.path.normpath(os.path.dirname(__file__) + '/import_files/' + file_name)
-        return open(full_name, 'rb')
+        return open(full_name, 'rt')
 
     def _get_fields(self):
         """teh fields in the file"""
@@ -101,10 +101,10 @@ class ImportFileTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content)
         table = soup.select("table.ut-contacts")[0]
-        #header + 1 contact
+        # header + 1 contact
         self.assertEqual(len(table.select("tr")), 2)
 
-        #1 line and 6 columns
+        # 1 line and 6 columns
         self.assertEqual(len(table.select("tr > td")), 11)
 
         self.assertEqual(table.select("tr > td")[0].text, "Big corp")
@@ -436,7 +436,7 @@ class UnsubscribeImportFileTest(BaseTestCase):
         contacts_to_unsubscribe = [
             mommy.make(models.Contact, email="contact1@toto.fr"),
             mommy.make(models.Contact, email="contact2@toto.fr"),
-            #two contacts with same address
+            # two contacts with same address
             mommy.make(models.Contact, email="contact2@toto.fr"),
         ]
 
@@ -617,10 +617,11 @@ class ImportTemplateTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], 'text/csv')
+        content = response.content.decode('utf-8')
 
-        self.assertEqual(response.content.count('\n'), 1)
-        pos = response.content.find('\n')
-        line = response.content[:pos]
+        self.assertEqual(content.count('\n'), 1)
+        pos = content.find('\n')
+        line = content[:pos]
         cols = [x.strip('"') for x in line.split(";")]
 
         fields = [
@@ -661,9 +662,11 @@ class ImportTemplateTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], 'text/csv')
 
-        self.assertEqual(response.content.count('\n'), 1)
-        pos = response.content.find('\n')
-        line = response.content[:pos]
+        content = response.content.decode('utf-8')
+
+        self.assertEqual(content.count('\n'), 1)
+        pos = content.find('\n')
+        line = content[:pos]
         cols = [x.strip('"') for x in line.split(";")]
 
         fields = [
@@ -697,10 +700,11 @@ class ImportTemplateTest(BaseTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], 'text/csv')
+        content = response.content.decode('utf-8')
 
-        self.assertEqual(response.content.count('\n'), 1)
-        pos = response.content.find('\n')
-        line = response.content[:pos]
+        self.assertEqual(content.count('\n'), 1)
+        pos = content.find('\n')
+        line = content[:pos]
         cols = [x.strip('"') for x in line.split(";")]
 
         fields = [

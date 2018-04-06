@@ -892,8 +892,8 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
                 json_data, 'entity', entity.id
             )
@@ -919,8 +919,8 @@ class SelectContactOrEntityGroupTestCase(BaseTestCase):
         response = self.client.post(reverse('crm_select_contact_or_entity'), data=data)
         self.assertEqual(200, response.status_code)
 
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); if (addMember("{1}", {2})) {{addMemberToList({0});}};</script>'.format(
                 json_data, 'contact', contact.id
             )

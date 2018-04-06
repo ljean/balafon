@@ -561,7 +561,8 @@ class ActionArchiveTest(BaseTestCase):
         subjects = [action.subject for action in actions]
         for subject in subjects:
             self.assertContains(response, subject)
-        pos = [response.content.find(subject) for subject in subjects]
+        content = response.content.decode('utf-8')
+        pos = [content.find(subject) for subject in subjects]
         self.assertEqual(pos, list(sorted(pos)))
 
     def test_action_type_ordering_desc(self):
@@ -587,7 +588,8 @@ class ActionArchiveTest(BaseTestCase):
         subjects = [action.subject for action in actions]
         for subject in subjects:
             self.assertContains(response, subject)
-        pos = [response.content.find(subject) for subject in subjects]
+        content = response.content.decode('utf-8')
+        pos = [content.find(subject) for subject in subjects]
         self.assertEqual(pos, list(sorted(pos)))
 
     def test_view_not_planned_action_anonymous(self):
