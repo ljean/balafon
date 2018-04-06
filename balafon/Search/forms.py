@@ -285,7 +285,7 @@ class SearchForm(forms.Form):
     
     def clean(self):
         """validate form"""
-        keys = self._forms.keys()
+        keys = list(self._forms.keys())
         keys.sort()
         cleaned_data = super(SearchForm, self).clean()
         for key in keys:
@@ -320,7 +320,7 @@ class SearchForm(forms.Form):
         """is full form valid?"""
         if not super(SearchForm, self).is_valid():
             return False
-        keys = self._forms.keys()
+        keys = list(self._forms.keys())
         keys.sort()
         for key in keys:
             for form in self._forms[key]:
@@ -330,7 +330,7 @@ class SearchForm(forms.Form):
     
     def _get_contacts(self):
         """get contacts"""
-        keys = self._forms.keys()
+        keys = list(self._forms.keys())
         keys.sort()
         contacts = set([])
         global_post_processors = []
@@ -412,7 +412,7 @@ class SearchForm(forms.Form):
         for contact in contacts:
             pass_filter = filter_func(contact)
             entity = contact.entity if contact else None
-            if entity and not entities.has_key(entity.id):
+            if entity and not entity.id in entities:
                 entities[entity.id] = (entity, [])
                 empty_entities[entity.id] = entity
             if pass_filter:
@@ -472,7 +472,7 @@ class SearchForm(forms.Form):
     
     def as_html(self):
         """as html"""
-        keys = self._forms.keys()
+        keys = list(self._forms.keys())
         keys.sort()
         html = '<div>{0}</div>'.format(self.as_p())
         if keys:

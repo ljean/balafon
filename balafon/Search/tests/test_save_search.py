@@ -73,8 +73,8 @@ class SearchSaveTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         next_url = reverse("search", args=[search_1.id])
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url)
         )
 
@@ -213,8 +213,8 @@ class SearchSaveTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         next_url = reverse("search", args=[search_1.id])
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url)
         )
 
@@ -254,8 +254,8 @@ class SearchSaveTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         next_url = reverse("search", args=[search_1.id])
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url)
         )
 
@@ -316,8 +316,8 @@ class SearchSaveTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         next_url = reverse("search", args=[search_1.id])
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url)
         )
 
@@ -418,8 +418,8 @@ class SearchSaveTest(BaseTestCase):
 
         self.assertEqual(response.status_code, 200)
         next_url = reverse("search", args=[search_1.id])
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(next_url)
         )
 

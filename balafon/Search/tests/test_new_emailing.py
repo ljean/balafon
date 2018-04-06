@@ -95,9 +95,9 @@ class CreateEmailingTest(BaseTestCase):
         url = reverse('search_emailing')
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url())
         )
 
         self.assertEqual(Emailing.objects.count(), 1)
@@ -193,9 +193,9 @@ class CreateEmailingTest(BaseTestCase):
         url = reverse('search_emailing')
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url())
         )
 
         self.assertEqual(Emailing.objects.count(), 1)
@@ -236,9 +236,9 @@ class CreateEmailingTest(BaseTestCase):
         self.assertEqual(Newsletter.objects.count(), 1)
         newsletter = Newsletter.objects.all()[0]
 
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url())
         )
 
         self.assertEqual(Emailing.objects.count(), 1)
@@ -302,9 +302,9 @@ class CreateEmailingTest(BaseTestCase):
         self.assertEqual(Newsletter.objects.count(), 1)
         newsletter = Newsletter.objects.all()[0]
 
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url()),
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url())
         )
 
         self.assertEqual(Emailing.objects.count(), 1)

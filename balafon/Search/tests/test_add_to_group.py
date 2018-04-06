@@ -44,8 +44,8 @@ class AddToGroupActionTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(reverse('crm_board_panel'))
         )
 
@@ -87,8 +87,8 @@ class AddToGroupActionTest(BaseTestCase):
 
         response = self.client.post(url, data=data)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(
-            response.content,
+        self.assertContains(
+            response,
             '<script>$.colorbox.close(); window.location="{0}";</script>'.format(reverse('crm_board_panel'))
         )
 

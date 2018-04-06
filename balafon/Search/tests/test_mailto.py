@@ -73,7 +73,7 @@ class MailtoContactsTest(BaseTestCase):
         """test mailto several emails"""
         group = mommy.make(models.Group)
         contacts = []
-        for i in xrange(50):
+        for i in range(50):
             email = 'toto{0}@mailinator.com'.format(i)
             entity, contact = self._create_contact(email)
             contacts.append(contact)
@@ -95,7 +95,7 @@ class MailtoContactsTest(BaseTestCase):
         group = mommy.make(models.Group)
         settings.BALAFON_MAILTO_LIMIT_AS_TEXT = True
         contacts = []
-        for i in xrange(settings.BALAFON_MAILTO_LIMIT + 1):
+        for i in range(settings.BALAFON_MAILTO_LIMIT + 1):
             email = 'toto{0}@mailinator.com'.format(i)
             entity, contact = self._create_contact(email)
             contacts.append(contact)
@@ -116,7 +116,7 @@ class MailtoContactsTest(BaseTestCase):
         group = mommy.make(models.Group)
         settings.BALAFON_MAILTO_LIMIT_AS_TEXT = False
         contacts = []
-        for i in xrange(settings.BALAFON_MAILTO_LIMIT * 2):
+        for i in range(settings.BALAFON_MAILTO_LIMIT * 2):
             email = 'toto{0}@mailinator.com'.format(i)
             entity, contact = self._create_contact(email)
             contacts.append(contact)
@@ -134,7 +134,7 @@ class MailtoContactsTest(BaseTestCase):
         group = mommy.make(models.Group)
         settings.BALAFON_MAILTO_LIMIT_AS_TEXT = False
         contacts = []
-        for i in xrange(settings.BALAFON_MAILTO_LIMIT + 1):
+        for i in range(settings.BALAFON_MAILTO_LIMIT + 1):
             email = 'toto{0}@mailinator.com'.format(i)
             entity, contact = self._create_contact(email)
             contacts.append(contact)
