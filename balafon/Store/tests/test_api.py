@@ -398,7 +398,7 @@ class StoreItemApiTest(BaseTestCase):
     def test_view_store_items_by_name2(self):
         """It should return only items of name"""
 
-        for i in xrange(25):
+        for i in range(25):
             mommy.make(models.StoreItem, name="Abc{0}".format(i))
 
         url = reverse('store_store-items-list') + "?name=Abc"
