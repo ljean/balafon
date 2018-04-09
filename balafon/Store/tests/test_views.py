@@ -462,7 +462,7 @@ class EditSaleActionTest(BaseTestCase):
     """It should display edit action correctly"""
 
     def test_edit_action_calculated_amount(self):
-        """edit with caculated amount"""
+        """edit with calculated amount"""
         contact = mommy.make(Contact)
 
         action_type = mommy.make(ActionType, is_amount_calculated=False)
@@ -506,7 +506,6 @@ class EditSaleActionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
 
         soup = BeautifulSoup(response.content)
-
         fields = soup.select("#id_amount")
         self.assertEqual(len(fields), 1)
 
@@ -566,7 +565,8 @@ class CloneSaleActionTest(BaseTestCase):
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
 
-        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+        content = response.content.decode('utf-8')
+        self.assertEqual(content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)
@@ -647,7 +647,8 @@ class CloneSaleActionTest(BaseTestCase):
         original_action = models.Action.objects.get(type=action_type_1)
         new_action = models.Action.objects.get(type=action_type_2)
 
-        self.assertEqual(response.content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
+        content = response.content.decode('utf-8')
+        self.assertEqual(content, 'reload: {0}'.format(reverse('crm_edit_action', args=[new_action.id])))
 
         self.assertEqual(original_action.subject, new_action.subject)
         self.assertEqual(new_action.parent, original_action)

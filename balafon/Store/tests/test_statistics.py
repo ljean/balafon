@@ -10,7 +10,6 @@ import logging
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.utils.translation import ugettext as _
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
@@ -961,9 +960,9 @@ class ExtraSaleTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(
-            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(redirect_url),
-            response.content
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(redirect_url)
         )
 
         self.assertEqual(models.Sale.objects.count(), 1)
