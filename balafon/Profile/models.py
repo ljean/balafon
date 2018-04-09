@@ -21,6 +21,7 @@ class ContactProfile(models.Model):
         verbose_name_plural = _('Contact profiles')
     
     GENDER_CHOICE = (
+        (Contact.GENDER_NOT_SET, ''),
         (Contact.GENDER_MALE, _('Mr')),
         (Contact.GENDER_FEMALE, _('Mrs')),
     )
