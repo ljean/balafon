@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from datetime import datetime, date, time, timedelta
 from decimal import Decimal
 import logging
@@ -13,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient

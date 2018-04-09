@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from decimal import Decimal
 
 from django.contrib.auth.models import User
@@ -12,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm.models import Action, ActionStatus, ActionType, Contact, Entity
