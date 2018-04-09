@@ -40,8 +40,8 @@
         <a>{% trans "Account" %}</a>
         <ul>
           {%if BALAFON_SITE_URL %}<li><a href="{{ BALAFON_SITE_URL }}">{% trans "Back to site" %}</a></li>{% endif %}
-          <li><a href="{% url "django.contrib.auth.views.logout" %}">{% trans "Logout" %}</a></li>
-          <li><a href="{% url "django.contrib.auth.views.password_change" %}">{% trans "Password" %}</a></li>
+          <li><a href="{% url "logout" %}">{% trans "Logout" %}</a></li>
+          <li><a href="{% url "password_change" %}">{% trans "Password" %}</a></li>
           {%if user.is_staff %}<li><a href="{% url "admin:index" %}">{% trans "Admin" %}</a></li>{% endif %}
           {%if user.is_staff %}<li><a href="{% url "crm_new_contacts_import" %}">{% trans "Contacts import" %}</a></li>{% endif %}
           {%if user.is_staff %}<li><a href="{% url "export_database_json" %}">{% trans "Export database" %}</a></li>{% endif %}
