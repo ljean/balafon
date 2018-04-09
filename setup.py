@@ -26,7 +26,7 @@ setup(
         'django >= 1.9, <1.11',
         'djangorestframework==3.4.7',
         'django-extensions==1.7.5',
-        'apidev-coop_cms >= 1.2',
+        'apidev-coop_cms==1.3.1',
         'beautifulsoup4',
         'django-wkhtmltopdf',
         'xlwt',
@@ -37,11 +37,9 @@ setup(
         'django-tastypie',
         'django-cors-headers',
     ],
-    dependency_links = [
+    dependency_links=[
         # Python3 version
-        'https://github.com/ljean/coop_cms.git@1139d22bb110052a5ab23ce6e3f830ed835e5a5f#egg=apidev_coop_cms',
-        'https://github.com/ljean/coop_html_editor.git@75ea6a776e70cff43758e2d14282196b8defd158#egg=coop_html_editor',
-
+        'git+https://github.com/ljean/coop_cms.git@98d869ad61eaf381f1d081e0e862e52f1bf2f814#egg=apidev_coop_cms-1.3.1'
     ],
     long_description=open('README.rst').read(),
     url='https://github.com/ljean/balafon',
