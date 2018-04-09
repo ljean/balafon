@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 from datetime import datetime, timedelta, date
-import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -18,6 +17,7 @@ from django.utils.translation import ugettext as _
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -73,7 +73,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status")+"?t="+str(action_type.id)+"&timestamp=777"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
@@ -90,7 +90,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)+"&timestamp=777"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status2'])
         self.assertEqual(0, data['default_status2'])
 
@@ -108,7 +108,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status")+"?t="+str(action_type.id)+"&timestamp=777"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status'])
         self.assertEqual(action_status2.id, data['default_status'])
 
@@ -126,7 +126,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)+"&timestamp=777"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([action_status1.id, action_status2.id], data['allowed_status2'])
         self.assertEqual(action_status2.id, data['default_status2'])
 
@@ -137,7 +137,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status")+"?t="+str(action_type.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
@@ -148,7 +148,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status2")+"?t="+str(action_type.id)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([], data['allowed_status2'])
         self.assertEqual(0, data['default_status2'])
 
@@ -157,7 +157,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status")+"?t="+str(0)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([], data['allowed_status'])
         self.assertEqual(0, data['default_status'])
 
@@ -166,7 +166,7 @@ class EditActionTest(BaseTestCase):
         url = reverse("crm_get_action_status2") + "?t=" + str(0)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual([], data['allowed_status2'])
         self.assertEqual(0, data['default_status2'])
 

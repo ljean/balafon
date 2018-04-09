@@ -3,13 +3,12 @@
 
 from __future__ import unicode_literals
 
-import json
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -48,7 +47,7 @@ class CitiesSuggestListTestCase(BaseTestCase):
     def test_get_city_id_unicode(self):
         response = self.client.get("{0}?name=Mérignac".format(reverse('crm_get_city_id')))
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual(data["id"], "Mérignac")
 
     def test_get_city_id_case_insensitive_twice(self):

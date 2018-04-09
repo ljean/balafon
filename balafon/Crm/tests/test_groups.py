@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -494,7 +495,7 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         response = self.client.get(reverse(self.view_name)+'?term=ab')
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
 
         self.assertEqual(len(data), 4)
 
@@ -533,7 +534,7 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         response = self.client.get(reverse(self.view_name)+'?term=zzzzzzz')
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
 
         self.assertEqual(len(data), 0)
 
@@ -547,7 +548,7 @@ class ContactAndEntitySuggestListTestCase(BaseTestCase):
 
         response = self.client.get(reverse(self.view_name)+'?zz=Ab')
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
 
         self.assertEqual(len(data), 0)
 

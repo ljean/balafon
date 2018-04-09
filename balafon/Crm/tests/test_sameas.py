@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-import json
 import sys
 
 from django.core import management
@@ -13,6 +12,7 @@ from coop_cms.tests import BeautifulSoup
 from coop_cms.moves import StringIO
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -911,7 +911,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(0, len(resp_data))
 
     def test_lastname(self):
@@ -928,7 +928,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(1, len(resp_data))
         self.assertEqual(resp_data[0]['id'], contact2.id)
@@ -949,7 +949,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(1, len(resp_data))
         self.assertEqual(resp_data[0]['id'], contact1.id)
         self.assertNotEqual(resp_data[0]['fullname'], '')
@@ -970,7 +970,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(2, len(resp_data))
         resp_data = sorted(resp_data, key=lambda contact: contact['id'])
         self.assertEqual(resp_data[0]['id'], contact1.id)
@@ -994,7 +994,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(1, len(resp_data))
         resp_data = sorted(resp_data, key=lambda contact: contact['id'])
         self.assertEqual(resp_data[0]['id'], contact1.id)
@@ -1016,7 +1016,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(1, len(resp_data))
         resp_data = sorted(resp_data, key=lambda contact: contact['id'])
         self.assertEqual(resp_data[0]['id'], contact2.id)
@@ -1040,7 +1040,7 @@ class SameAsSuggestionApiTest(BaseTestCase):
         response = self.client.post(url, data=data)
 
         self.assertEqual(response.status_code, 200)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(2, len(resp_data))
         resp_data = sorted(resp_data, key=lambda contact: contact['id'])
         self.assertEqual(resp_data[0]['id'], contact1.id)

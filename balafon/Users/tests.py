@@ -4,7 +4,6 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, date, timedelta
-import json
 from unittest import skipIf
 import sys
 
@@ -19,7 +18,7 @@ from django.utils import timezone
 from coop_cms.moves import StringIO
 from model_mommy import mommy
 
-from balafon.unit_tests import TestCase
+from balafon.unit_tests import TestCase, response_as_json
 from balafon.utils import is_allowed_homepage
 from balafon.Crm import models
 from balafon.Emailing.models import Emailing
@@ -346,7 +345,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         
         response = self.client.post(reverse('users_toggle_favorite'), data)
         self.assertEqual(200, response.status_code)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(True, resp_data['success'])
         self.assertEqual(True, resp_data['status'])
         self.assertEqual(1, Favorite.objects.count())
@@ -375,7 +374,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         }
         response = self.client.post(reverse('users_toggle_favorite'), data)
         self.assertEqual(200, response.status_code)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(True, resp_data['success'])
         self.assertEqual(False, resp_data['status'])
         self.assertEqual(0, Favorite.objects.count())
@@ -391,7 +390,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         }
         response = self.client.post(reverse('users_toggle_favorite'), data)
         self.assertEqual(200, response.status_code)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(False, resp_data['success'])
         
     def test_post_wrong_ct(self):
@@ -405,7 +404,7 @@ class UpdateFavoriteTestCase(BaseTestCase):
         }
         response = self.client.post(reverse('users_toggle_favorite'), data)
         self.assertEqual(200, response.status_code)
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
         self.assertEqual(False, resp_data['success'])
         
         
@@ -543,7 +542,7 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.post(url, data={'url': homepage_url})
         self.assertEqual(200, response.status_code)
 
-        response_data = json.loads(response.content)
+        response_data = response_as_json(response)
 
         self.assertEqual(response_data["ok"], False)
 
@@ -566,7 +565,7 @@ class UserHomepageTestCase(BaseTestCase):
         response = self.client.post(url, data={'url': homepage_url})
         self.assertEqual(200, response.status_code)
 
-        response_data = json.loads(response.content)
+        response_data = response_as_json(response)
 
         self.assertEqual(response_data["ok"], True)
 

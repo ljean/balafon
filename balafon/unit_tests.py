@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+import json
 import logging
 import os.path
 import shutil
@@ -40,3 +41,7 @@ class TestCase(DjangoTestCase):
         """after each test"""
         logging.disable(logging.NOTSET)
         self._clean_files()
+
+
+def response_as_json(response):
+    return json.loads(response.content.decode('utf-8'))

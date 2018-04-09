@@ -4,13 +4,13 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-import json
 
 from django.core.urlresolvers import reverse
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -866,7 +866,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 2, 14]) + '?filter=t2')
 
@@ -883,7 +883,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 9, 14]) + '?filter=t2')
 
@@ -900,7 +900,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_day', args=[2016, 12, 9]) + '?filter=t2')
 
@@ -917,7 +917,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_month', args=[2016, 2]) + '?filter=t2')
 
@@ -934,7 +934,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_week', args=[2016, 6]) + '?filter=t2')
 
@@ -951,7 +951,7 @@ class GoToPlanningDateTest(BaseTestCase):
         response = self.client.post(url, data)
         self.assertEqual(200, response.status_code)
 
-        resp_data = json.loads(response.content)
+        resp_data = response_as_json(response)
 
         self.assertEqual(resp_data['url'], reverse('crm_actions_of_week', args=[2016, 6]))
 

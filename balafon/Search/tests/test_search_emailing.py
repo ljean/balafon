@@ -4,13 +4,13 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-import json
 
 from django.core.urlresolvers import reverse
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Emailing.models import Emailing
 from balafon.Emailing.tests import BaseTestCase
@@ -37,7 +37,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_sent-_-0 option")
         self.assertEqual(1, len(selector))
@@ -57,7 +57,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_sent-_-0 option")
         self.assertEqual(3, len(selector))
@@ -80,7 +80,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_opened-_-0 option")
         self.assertEqual(3, len(selector))
@@ -103,7 +103,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_send-_-0 option")
         self.assertEqual(4, len(selector))
@@ -127,7 +127,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_bounce-_-0 option")
         self.assertEqual(3, len(selector))
@@ -150,7 +150,7 @@ class EmailingSearchTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         soup = BeautifulSoup(data['form'])
         selector = soup.select("select#id_gr0-_-emailing_contacts-_-0 option")
         self.assertEqual(5, len(selector))

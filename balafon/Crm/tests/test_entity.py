@@ -3,8 +3,6 @@
 
 from __future__ import unicode_literals
 
-import json
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -12,6 +10,7 @@ from django.test.utils import override_settings
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
 
@@ -333,7 +332,7 @@ class GetEntityIdTestCase(BaseTestCase):
         mommy.make(models.Entity, is_single_contact=False, name='WABC')
         response = self.client.get(reverse('crm_get_entity_id') + '?name={0}'.format(entity1.name))
         self.assertEqual(200, response.status_code)
-        data = json.loads(response.content)
+        data = response_as_json(response)
         self.assertEqual(data['id'], entity1.id)
 
     def test_get_entity_missing_name(self):
