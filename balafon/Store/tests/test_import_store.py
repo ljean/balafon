@@ -7,7 +7,7 @@ from datetime import date
 from decimal import Decimal
 import os.path
 
-from django.core.files import File
+from django.core.files.base import ContentFile
 from django.utils.translation import ugettext
 
 from model_mommy import mommy
@@ -19,19 +19,22 @@ from balafon.Store import models
 class ImportStoreTest(BaseTestCase):
     """Import test"""
 
-    def _get_file(self, file_name):
+    @staticmethod
+    def _get_file(file_name):
         """open a csv file for test"""
         full_name = os.path.normpath(os.path.dirname(__file__) + '/import_files/' + file_name)
-        return open(full_name, 'rb')
+        with open(full_name, 'rb') as f:
+            return ContentFile(f.read(), name=file_name)
 
     def test_import_store_fields(self):
         """it should create items properly"""
-        data_file = File(self._get_file('import_store_fields.xls'))
+        data_file = self._get_file('import_store_fields.xls')
 
-        #by default fields are name,brand,reference,category,purchase_price,vat_rate
+        # by default fields are name,brand,reference,category,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
-            data=data_file
+            data=data_file,
+            _create_files=True
         )
 
         store_import.import_data()
@@ -54,9 +57,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_header(self):
         """it should create items properly: no header in file"""
-        data_file = File(self._get_file('import_store_fields_no_header.xls'))
+        data_file = self._get_file('import_store_fields_no_header.xls')
 
-        #by default fields are name,brand,reference,category,purchase_price,vat_rate
+        # by default fields are name,brand,reference,category,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -83,9 +86,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_purchase_price(self):
         """it should create items properly: price"""
-        data_file = File(self._get_file('import_store_fields.xls'))
+        data_file = self._get_file('import_store_fields.xls')
 
-        #by default fields are name,brand,reference,category,purchase_price,vat_rate
+        # by default fields are name,brand,reference,category,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -112,11 +115,11 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_vat(self):
         """it should create items properly: default VAT"""
-        data_file = File(self._get_file('import_store_fields_no_vat.xls'))
+        data_file = self._get_file('import_store_fields_no_vat.xls')
 
         vat_rate = mommy.make(models.VatRate, rate=Decimal('20'), is_default=True)
 
-        #by default fields are name,brand,reference,category,purchase_price,vat_rate
+        # by default fields are name,brand,reference,category,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -143,11 +146,11 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_only_1_without_vat(self):
         """it should create items properly: default VAT if no value"""
-        data_file = File(self._get_file('import_store_fields_no_vat_only_1.xls'))
+        data_file = self._get_file('import_store_fields_no_vat_only_1.xls')
 
         vat_rate = mommy.make(models.VatRate, rate=Decimal('20'), is_default=True)
 
-        #by default fields are name,brand,reference,category,purchase_price,vat_rate
+        # by default fields are name,brand,reference,category,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -177,9 +180,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_category(self):
         """it should create items properly: default categorie"""
-        data_file = File(self._get_file('import_store_fields_no_category.xls'))
+        data_file = self._get_file('import_store_fields_no_category.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -206,9 +209,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_category_only_1(self):
         """it should create items properly: default category"""
-        data_file = File(self._get_file('import_store_fields_no_category_only_1.xls'))
+        data_file = self._get_file('import_store_fields_no_category_only_1.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -238,9 +241,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_brand_and_ref(self):
         """it should create items properly: default categorie"""
-        data_file = File(self._get_file('import_store_fields_no_brand_and_ref.xls'))
+        data_file = self._get_file('import_store_fields_no_brand_and_ref.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -267,9 +270,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_no_brand_and_ref_only_1(self):
         """it should create items properly: default categorie"""
-        data_file = File(self._get_file('import_store_fields_no_brand_and_ref_only_1.xls'))
+        data_file = self._get_file('import_store_fields_no_brand_and_ref_only_1.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -300,9 +303,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_error(self):
         """it should create items properly: default categorie"""
-        data_file = File(self._get_file('import_store_fields_no_brand_and_ref_only_1.xls'))
+        data_file = self._get_file('import_store_fields_no_brand_and_ref_only_1.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -319,9 +322,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_property(self):
         """it should create items properly: property"""
-        data_file = File(self._get_file('import_store_fields_property.xls'))
+        data_file = self._get_file('import_store_fields_property.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -349,11 +352,11 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_property_existing(self):
         """it should create items properly: property already existing"""
-        data_file = File(self._get_file('import_store_fields_property.xls'))
+        data_file = self._get_file('import_store_fields_property.xls')
 
         mommy.make(models.StoreItemProperty, name='dlc')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
@@ -381,9 +384,9 @@ class ImportStoreTest(BaseTestCase):
 
     def test_import_store_fields_property_1_missing(self):
         """it should create items properly: missing value for 1 property"""
-        data_file = File(self._get_file('import_store_fields_property_missing_1.xls'))
+        data_file = self._get_file('import_store_fields_property_missing_1.xls')
 
-        #by default fields are name,brand,reference,purchase_price,vat_rate
+        # by default fields are name,brand,reference,purchase_price,vat_rate
         store_import = mommy.make(
             models.StoreItemImport,
             data=data_file,
