@@ -730,7 +730,7 @@ class StoreItemImport(models.Model):
             for row_index in range(sheet.nrows):
 
                 if self.ignore_first_line and row_index == 0:
-                    #ignore
+                    # ignore
                     continue
 
                 raw_values = [sheet.cell(rowx=row_index, colx=col_index).value for col_index in range(sheet.ncols)]
