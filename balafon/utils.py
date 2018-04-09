@@ -88,7 +88,9 @@ def validate_rgb(value):
 
 class Utf8JSONRenderer(JSONRenderer):
     """Utf-8 support"""
-    ensure_ascii = False
+    def render(self, *args, **kwargs):
+        content = super(Utf8JSONRenderer, self).render(*args, **kwargs)
+        return content.decode('utf-8')
 
 
 def load_from_module(settings_key, default_value):

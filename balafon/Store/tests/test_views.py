@@ -196,7 +196,7 @@ class ViewCommercialDocumentTest(TestCase):
         store_action_type = mommy.make(models.StoreManagementActionType)
         action = mommy.make(Action, type=store_action_type.action_type)
 
-        item = mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
+        item = mommy.make(models.SaleItem, sale=action.sale, text='Promo ETE', quantity=1, pre_tax_price=10)
 
         url = reverse('store_view_sales_document', args=[action.id])
         response = self.client.get(url)
@@ -211,7 +211,7 @@ class ViewCommercialDocumentTest(TestCase):
         action = mommy.make(Action, type=store_action_type.action_type)
 
         item = mommy.make(
-            models.SaleItem, sale=action.sale, item=store_item, text='Promo été', quantity=1, pre_tax_price=10
+            models.SaleItem, sale=action.sale, item=store_item, text='Promo ETE', quantity=1, pre_tax_price=10
         )
 
         url = reverse('store_view_sales_document', args=[action.id])
@@ -220,6 +220,23 @@ class ViewCommercialDocumentTest(TestCase):
         self.assertContains(response, item.text)
 
     def test_view_public(self):
+        """It should display item text"""
+
+        action_type = mommy.make(ActionType, generate_uuid=True)
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+        action = mommy.make(Action, type=action_type)
+
+        self.assertNotEqual(action.uuid, '')
+
+        item = mommy.make(models.SaleItem, sale=action.sale, text='Promo ETE', quantity=1, pre_tax_price=10)
+
+        self.client.logout()
+        url = reverse('store_view_sales_document_public', args=[action.uuid])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, item.text)
+
+    def test_view_public_utf8(self):
         """It should display item text"""
 
         action_type = mommy.make(ActionType, generate_uuid=True)
