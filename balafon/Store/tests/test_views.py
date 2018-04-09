@@ -8,12 +8,12 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Crm.models import Action, ActionStatus, ActionType, Contact, Entity
 from balafon.Crm.tests import BaseTestCase
 from balafon.Store import models
@@ -30,6 +30,7 @@ class ViewCommercialDocumentTest(TestCase):
 
     def setUp(self):
         """before each test"""
+        super(ViewCommercialDocumentTest, self).setUp()
         user = mommy.make(User, is_active=True, is_staff=True, is_superuser=False)
         user.set_password('abc')
         user.save()
@@ -38,6 +39,7 @@ class ViewCommercialDocumentTest(TestCase):
 
     def tearDown(self):
         """after each test"""
+        super(ViewCommercialDocumentTest, self).tearDown()
         self.client.logout()
 
     def test_view_no_sale_action_type(self):

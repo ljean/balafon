@@ -9,13 +9,13 @@ import logging
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
+from balafon.unit_tests import TestCase
 from balafon.Crm.models import ActionType
 from balafon.Store import models
 
@@ -926,14 +926,11 @@ class ExtraSaleTest(TestCase):
     """Test that it is possible to add 'extra-sales'"""
 
     def setUp(self):
-        logging.disable(logging.CRITICAL)
+        super(ExtraSaleTest, self).setUp()
         self.user = User.objects.create(username="toto", is_active=True, is_staff=True)
         self.user.set_password("abc")
         self.user.save()
         self._login()
-
-    def tearDown(self):
-        logging.disable(logging.NOTSET)
 
     def _login(self):
         self.client.login(username="toto", password="abc")
@@ -1074,9 +1071,6 @@ class ExtraSaleTest(TestCase):
 
 class StatIndexTest(TestCase):
     """Test that it is possible to view stats index"""
-
-    def setUp(self):
-        logging.disable(logging.CRITICAL)
 
     def _create_user(self, is_staff=True):
         self.user = User.objects.create(username="toto", is_active=True, is_staff=is_staff)

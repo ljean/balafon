@@ -6,11 +6,11 @@ from __future__ import unicode_literals
 import xlrd
 
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Store import models
 
 
@@ -19,6 +19,7 @@ class CatalogueTest(TestCase):
 
     def setUp(self):
         """before each test"""
+        super(CatalogueTest, self).setUp()
         user = mommy.make(User, is_active=True, is_staff=True, is_superuser=False)
         user.set_password('abc')
         user.save()

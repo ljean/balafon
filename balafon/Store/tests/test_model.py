@@ -3,16 +3,16 @@
 
 from __future__ import unicode_literals
 
-from bs4 import BeautifulSoup
 from decimal import Decimal
 
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.utils.translation import ugettext as _
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Crm.models import Action, ActionMenu, ActionType, Contact
 from balafon.Store import models
 
@@ -23,7 +23,7 @@ class StockThresholdTest(TestCase):
     def test_above_threshold(self):
         """It should not show a warning sign"""
         item = mommy.make(models.StoreItem, stock_count=40, stock_threshold=30)
-        soup = BeautifulSoup(item.stock_threshold_alert(), "html.parser")
+        soup = BeautifulSoup(item.stock_threshold_alert())
         self.assertEqual(0, len(soup.select("img")))
 
     def test_threshold_not_defined(self):
@@ -39,7 +39,7 @@ class StockThresholdTest(TestCase):
     def test_below_threshold(self):
         """It should show a warning sign"""
         item = mommy.make(models.StoreItem, stock_count=20, stock_threshold=30)
-        soup = BeautifulSoup(item.stock_threshold_alert(), "html.parser")
+        soup = BeautifulSoup(item.stock_threshold_alert())
         self.assertEqual(1, len(soup.select("img")))
 
 

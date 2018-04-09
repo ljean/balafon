@@ -9,11 +9,11 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.core import mail
-from django.test import TestCase
 
 from model_mommy import mommy
 from registration.models import RegistrationProfile
 
+from balafon.unit_tests import TestCase
 from balafon.Crm import models
 
 

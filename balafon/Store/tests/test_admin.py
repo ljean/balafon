@@ -3,10 +3,9 @@
 
 from __future__ import unicode_literals
 
-from django.test import TestCase
-
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Store import models
 from balafon.Store.admin import StockThresholdFilter, StoreItemAdmin
 

@@ -5,10 +5,9 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.test import TestCase
-
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Crm import models
 from balafon.Emailing.models import Emailing
 from balafon.Emailing.utils import on_bounce

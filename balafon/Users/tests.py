@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 from datetime import datetime, date, timedelta
 import json
-import logging
 from unittest import skipIf
 import sys
 
@@ -15,13 +14,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail, management
 from django.core.urlresolvers import reverse
 from django.template import Template, Context
-from django.test import TestCase
 from django.utils import timezone
 
 from coop_cms.moves import StringIO
-from coop_cms.utils import RequestManager
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.utils import is_allowed_homepage
 from balafon.Crm import models
 from balafon.Emailing.models import Emailing
@@ -33,17 +31,12 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
         """before each test"""
-        logging.disable(logging.CRITICAL)
-        RequestManager().clean()
+        super(BaseTestCase, self).setUp()
         self.user = User.objects.create(username="toto")
         self.user.set_password("abc")
         self.user.is_staff = True
         self.user.save()
         self._login()
-
-    def tearDown(self):
-        """after each test"""
-        logging.disable(logging.NOTSET)
 
     def _login(self):
         """login user"""

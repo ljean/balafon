@@ -2,12 +2,15 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.contrib.auth.models import User
-from django.test import TestCase
 
 from django.test.utils import override_settings
 
 from model_mommy import mommy
+
+from balafon.unit_tests import TestCase
 
 
 TEST_AUTHENTICATION_BACKENDS = (

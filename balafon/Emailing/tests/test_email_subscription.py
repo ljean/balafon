@@ -9,15 +9,16 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Crm import models
 from balafon.Crm.signals import new_subscription
+
 
 @override_settings(BALAFON_EMAIL_SUBSCRIBE_ENABLED=True)
 class SubscribeTest(TestCase):
@@ -29,6 +30,7 @@ class SubscribeTest(TestCase):
 
     def setUp(self):
         """before each test"""
+        super(SubscribeTest, self).setUp()
         self._lang = settings.LANGUAGES[0][0]
         activate(self._lang)
 
@@ -43,6 +45,7 @@ class SubscribeTest(TestCase):
         """after each test"""
         activate(self._lang)
         settings.BALAFON_DEFAULT_SUBSCRIPTION_TYPE = self._default_subscription_type
+        super(SubscribeTest, self).tearDown()
 
     @override_settings(LANGUAGES=(('en', 'English'), ('fr', 'French')))
     def test_view_subscription_language(self):

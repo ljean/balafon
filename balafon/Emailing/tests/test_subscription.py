@@ -10,13 +10,13 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.translation import activate
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
+from balafon.unit_tests import TestCase
 from balafon.Crm import models
 from balafon.Crm.signals import new_subscription
 
@@ -31,6 +31,7 @@ class SubscribeTest(TestCase):
 
     def setUp(self):
         """before each test"""
+        super(SubscribeTest, self).setUp()
         self._lang = settings.LANGUAGES[0][0]
         activate(self._lang)
 
@@ -45,9 +46,9 @@ class SubscribeTest(TestCase):
     def tearDown(self):
         """after each test"""
         activate(self._lang)
-
         if settings.BALAFON_USE_RECAPTCHA:
             os.environ['RECAPTCHA_TESTING'] = 'False'
+        super(SubscribeTest, self).tearDown()
 
     def test_view_subscribe_newsletter(self):
         """view subscription page"""

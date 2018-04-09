@@ -7,11 +7,11 @@ from unittest import skipIf
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.test import TestCase
 
 from model_mommy import mommy
 from registration.models import RegistrationProfile
 
+from balafon.unit_tests import TestCase
 from balafon.Crm import models
 from balafon.Profile.utils import create_profile_contact, notify_registration
 
@@ -20,6 +20,7 @@ from balafon.Profile.utils import create_profile_contact, notify_registration
 class ProfileBackendTest(TestCase):
     
     def setUp(self):
+        super(ProfileBackendTest, self).setUp()
         settings.BALAFON_NOTIFICATION_EMAIL = "ljean@apidev.fr"
     
     def _create_user(self, **kwargs):
