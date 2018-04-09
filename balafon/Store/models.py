@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 import os.path
+from six import string_types
 import traceback
 import xlrd
 
@@ -732,10 +733,10 @@ class StoreItemImport(models.Model):
                     #ignore
                     continue
 
-                raw_values = [sheet.cell(rowx=row_index, colx=col_index).value for col_index in xrange(sheet.ncols)]
+                raw_values = [sheet.cell(rowx=row_index, colx=col_index).value for col_index in range(sheet.ncols)]
 
                 raw_values = [
-                    raw_value.strip() if type(raw_value) is unicode else raw_value
+                    raw_value.strip() if isinstance(raw_value, string_types) else raw_value
                     for raw_value in raw_values
                 ]
 
