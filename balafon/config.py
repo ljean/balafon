@@ -91,6 +91,7 @@ SEARCH_FORMS = [
         _(u'Actions'),
         [
             search_forms.ActionNameSearchForm,
+            search_forms.ExcludeActionNameSearchForm,
             search_forms.ActionTypeSearchForm,
             search_forms.ActionInProgressForm,
             search_forms.ActionByDoneDate,

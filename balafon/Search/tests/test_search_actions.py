@@ -185,6 +185,9 @@ class ActionSearchTest(BaseTestCase):
         entity4 = mommy.make(models.Entity, name=u"A huge corp")
         contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
 
+        entity5 = mommy.make(models.Entity, name=u"Not really a corp")
+        contact7 = mommy.make(models.Contact, entity=entity5, lastname=u"VWAB", main_contact=True, has_left=False)
+
         action = mommy.make(models.Action, subject="Hello world")
         action.contacts.add(contact1)
         action.contacts.add(contact3)
@@ -219,6 +222,125 @@ class ActionSearchTest(BaseTestCase):
 
         self.assertNotContains(response, entity4.name)
         self.assertNotContains(response, contact5.lastname)
+
+        self.assertNotContains(response, entity5.name)
+        self.assertNotContains(response, contact7.lastname)
+
+    def test_search_exclude_action_subject(self):
+        """search by action subject for contacts and entities"""
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+
+        entity5 = mommy.make(models.Entity, name=u"Not really a corp")
+        contact7 = mommy.make(models.Contact, entity=entity5, lastname=u"VWAB", main_contact=True, has_left=False)
+
+        action = mommy.make(models.Action, subject="Hello world")
+        action.contacts.add(contact1)
+        action.contacts.add(contact3)
+        action.save()
+
+        action = mommy.make(models.Action, subject="Hello world")
+        action.entities.add(entity2)
+        action.save()
+
+        action = mommy.make(models.Action, subject="Bye-bye")
+        action.contacts.add(contact5)
+        action.entities.add(entity3)
+        action.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-exclude_action_name-_-0": "Hello world"}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, entity1.name)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertContains(response, contact6.lastname)
+
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+
+        self.assertContains(response, entity3.name)
+        self.assertContains(response, contact4.lastname)
+
+        self.assertContains(response, entity4.name)
+        self.assertContains(response, contact5.lastname)
+
+        self.assertContains(response, entity5.name)
+        self.assertContains(response, contact7.lastname)
+
+    def test_search_action_subject_exclude_include(self):
+        """search by action subject for contacts and entities"""
+        entity1 = mommy.make(models.Entity, name=u"My tiny corp")
+        contact1 = mommy.make(models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False)
+        contact6 = mommy.make(models.Contact, entity=entity1, lastname=u"EFGH", main_contact=True, has_left=False)
+
+        entity2 = mommy.make(models.Entity, name=u"Other corp")
+        contact2 = mommy.make(models.Contact, entity=entity2, lastname=u"WXYZ", main_contact=True, has_left=False)
+
+        entity3 = mommy.make(models.Entity, name=u"A big big corp")
+        contact4 = mommy.make(models.Contact, entity=entity3, lastname=u"MNOP", main_contact=True, has_left=False)
+
+        entity4 = mommy.make(models.Entity, name=u"A huge corp")
+        contact5 = mommy.make(models.Contact, entity=entity4, lastname=u"RSTU", main_contact=True, has_left=False)
+
+        entity5 = mommy.make(models.Entity, name=u"Not really a corp")
+        contact7 = mommy.make(models.Contact, entity=entity5, lastname=u"VWAB", main_contact=True, has_left=False)
+
+        action = mommy.make(models.Action, subject="Hello world")
+        action.contacts.add(contact1)
+        action.contacts.add(contact3)
+        action.save()
+
+        action = mommy.make(models.Action, subject="Hello world")
+        action.entities.add(entity2)
+        action.save()
+
+        action = mommy.make(models.Action, subject="Bye-bye")
+        action.entities.add(entity2)
+        action.contacts.add(contact3)
+        action.contacts.add(contact5)
+        action.entities.add(entity3)
+        action.save()
+
+        url = reverse('search')
+
+        data = {"gr0-_-exclude_action_name-_-0": "Bye-Bye", "gr0-_-action_name-_-1": "Hello world"}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertNotContains(response, contact6.lastname)
+
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2.lastname)
+
+        self.assertNotContains(response, entity3.name)
+        self.assertNotContains(response, contact4.lastname)
+
+        self.assertNotContains(response, entity4.name)
+        self.assertNotContains(response, contact5.lastname)
+
+        self.assertNotContains(response, entity5.name)
+        self.assertNotContains(response, contact7.lastname)
 
     def test_search_action_in_progress_both(self):
         """search by action status"""

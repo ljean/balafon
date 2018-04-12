@@ -963,6 +963,14 @@ class ActionNameSearchForm(SearchFieldForm):
         return Q(subject__icontains=self.value)
 
 
+class ExcludeActionNameSearchForm(ActionNameSearchForm):
+    """by subject of action"""
+    name = 'exclude_action_name'
+    label = _(u'No Action with subject')
+    is_action_form = True
+    is_exclude_action_form = True
+
+
 class RelationshipDateForm(TwoDatesForm):
     """by date of relationship"""
     name = 'relationship_date'
