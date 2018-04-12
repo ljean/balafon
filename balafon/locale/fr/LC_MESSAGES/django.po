@@ -1596,7 +1596,7 @@ msgstr "Contacts inconnus"
 
 #: Crm/search_forms.py:950
 msgid "Action subject"
-msgstr "Sujet d'une action"
+msgstr "Avec une action ayant pour sujet"
 
 #: Crm/search_forms.py:957
 msgid "enter a part of the name of the searched action"
@@ -1604,7 +1604,7 @@ msgstr "Entrez une partie du nom"
 
 #: Crm/search_forms.py:969
 msgid "No Action with subject"
-msgstr "Aucune action avec le sujet"
+msgstr "Sans action ayant pour sujet"
 
 #: Crm/search_forms.py:977
 msgid "Relationship date"
