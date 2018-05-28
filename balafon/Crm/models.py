@@ -1283,7 +1283,7 @@ class ActionType(NamedElement):
     )
     is_default = models.BooleanField(
         default=False, verbose_name=_(u'is default'),
-        help_text=_('If checked, can be added from list. Action withou types are not displayed')
+        help_text=_('If checked, can be added from list. Action without types are not displayed')
     )
 
     def status_defined(self):
