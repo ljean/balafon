@@ -892,3 +892,57 @@ class MultiGroupSearchTest(BaseTestCase):
 
         self.assertNotContains(response, entity3.name)
         self.assertNotContains(response, contact3.lastname)
+
+
+class ContactWithEmailInGroupSearchForm(BaseTestCase):
+    """search on multiple groups form"""
+
+    def test_search_all_groups_only_1(self):
+        """all groups: members of 1 only"""
+        entity1 = mommy.make(models.Entity, name=u"#Tiny corp")
+        contact1a = mommy.make(
+            models.Contact, entity=entity1, lastname=u"ABCD", main_contact=True, has_left=False, email="test1@abcd.fr"
+        )
+        contact1b = mommy.make(
+            models.Contact, entity=entity1, lastname=u"IJKL", main_contact=True, has_left=False, email="test2@abcd.fr"
+        )
+        contact1c = mommy.make(
+            models.Contact, entity=entity1, lastname=u"MNOP", main_contact=True, has_left=False, email="test1@abcd.fr"
+        )
+        contact1d = mommy.make(
+            models.Contact, entity=entity1, lastname=u"QRST", main_contact=True, has_left=False, email="test3@abcd.fr"
+        )
+
+        entity2 = mommy.make(models.Entity, name=u"#Other corp")
+        contact2a = mommy.make(
+            models.Contact, entity=entity2, lastname=u"UVWX", main_contact=True, has_left=False, email="test1@abcd.fr"
+        )
+        contact2b = mommy.make(
+            models.Contact, entity=entity2, lastname=u"YZAB", main_contact=True, has_left=False, email="test3@abcd.fr"
+        )
+
+        group1 = mommy.make(models.Group, name=u"#group1")
+        group1.entities.add(entity1)
+        group1.save()
+
+        group2 = mommy.make(models.Group, name=u"#group2")
+        group2.contacts.add(contact2a)
+        group2.contacts.add(contact1b)
+        group2.save()
+
+        url = reverse('search')
+        groups = (group1.id, )
+        data = {'gr0-_-all_groups-_-0': [str(x) for x in groups], "gr0-_-email_in_group-_-1": group2.id}
+
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, entity1.name)
+        self.assertContains(response, contact1a.lastname)
+        self.assertContains(response, contact1b.lastname)
+        self.assertContains(response, contact1c.lastname)
+        self.assertNotContains(response, contact1d.lastname)
+
+        self.assertNotContains(response, entity2.name)
+        self.assertNotContains(response, contact2a.lastname)
+        self.assertNotContains(response, contact2b.lastname)

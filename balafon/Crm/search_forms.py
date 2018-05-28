@@ -629,7 +629,7 @@ class GroupSearchForm(SearchFieldForm):
         queryset = models.Group.objects.all()
         try:
             queryset = queryset.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
-        except Exception: #pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             queryset = queryset.order_by('name')
         kwargs = {}
         widget = self._get_widget()
@@ -747,7 +747,7 @@ class NotInGroupSearchForm(SearchFieldForm):
         queryset = models.Group.objects.all()
         try:
             queryset = queryset.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
-        except Exception: #pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             queryset = queryset.order_by('name')
         field = forms.ModelChoiceField(
             queryset,
@@ -1551,3 +1551,45 @@ class SortContacts(SearchFieldForm):
         """filter the final results"""
         callback = getattr(self, '_sort_by_{0}'.format(self.value), None)
         return sorted(contacts, key=callback)
+
+
+class ContactWithEmailInGroupSearchForm(SearchFieldForm):
+    """get contacts with someone with the same email in group"""
+    name = 'email_in_group'
+    label = _(u'Some with same email in group')
+
+    def _get_widget(self):
+        """customize widget: autocomplete"""
+        return GroupAutoComplete(attrs={
+            'placeholder': _(u'Enter part of the group name'), 'size': '80',
+        })
+
+    def __init__(self, *args, **kwargs):
+        super(ContactWithEmailInGroupSearchForm, self).__init__(*args, **kwargs)
+        queryset = models.Group.objects.all()
+        try:
+            queryset = queryset.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
+        except Exception:  # pylint: disable=broad-except
+            queryset = queryset.order_by('name')
+        kwargs = {}
+        widget = self._get_widget()
+        if widget:
+            kwargs['widget'] = widget
+        field = forms.ModelChoiceField(queryset, label=self.label, **kwargs)
+        self._add_field(field)
+
+    # def get_lookup(self):
+    #     """lookup"""
+    #     return Q(entity__group__id=self.value) | Q(group__id=self.value)
+
+    def global_post_process(self, contacts):
+        """filter the final results"""
+        group_contacts = models.Contact.objects.filter(Q(entity__group__id=self.value) | Q(group__id=self.value))
+
+        contacts_with_same_email_in_group = []
+        for contact in contacts:
+            email = contact.get_email
+            if group_contacts.filter(Q(email=email) | Q(email='', entity__email=email)):
+                contacts_with_same_email_in_group.append(contact)
+
+        return contacts_with_same_email_in_group

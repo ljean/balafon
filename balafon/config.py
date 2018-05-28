@@ -20,6 +20,7 @@ SEARCH_FORMS = [
             search_forms.GroupsMemberOfAllSearchForm,
             search_forms.GroupsMemberOfAnySearchForm,
             search_forms.GroupsMemberOfNoneSearchForm,
+            search_forms.ContactWithEmailInGroupSearchForm,
         ],
     ), (
         _(u'Location'),
