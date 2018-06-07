@@ -234,7 +234,7 @@ class GroupInline(admin.TabularInline):
 
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['__unicode__', 'parent']
+    list_display = ['name', 'parent']
     search_fields = ['name']
     ordering = ['name']
     list_filter = [HasParentFilter, 'parent', ]
