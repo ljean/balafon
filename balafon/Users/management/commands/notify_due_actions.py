@@ -28,7 +28,7 @@ def notify_due_actions(user, actions):
         'site': settings.COOP_CMS_SITE_PREFIX,
     }
     template = get_template('Users/due_actions_notification_email.txt')
-    content = template.render(Context(data))
+    content = template.render(data)
     
     email = EmailMessage(
         _("Balafon: You have due actions"),
