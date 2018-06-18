@@ -42,7 +42,7 @@ class BaseTestCase(APITestCase):
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
-        self.user = User.objects.create(username="toto", is_active=True, is_staff=False)
+        self.user = User.objects.create(username="toto", is_active=True, is_staff=False, email='toto@toto.fr')
         self.user.set_password("abc")
         self.user.save()
         self.client = APIClient()
