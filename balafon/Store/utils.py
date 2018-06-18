@@ -29,7 +29,7 @@ def notify_cart_to_admin(profile, action):
             'subject': subject,
         }
         the_template = get_template('Store/cart_notification_email.html')
-        html_text = the_template.render(Context(data))
+        html_text = the_template.render(data)
         text = dehtml(html_text)
 
         email = EmailMultiAlternatives(
@@ -60,7 +60,7 @@ def confirm_cart_to_user(profile, action):
     }
 
     the_template = get_template('Store/cart_confirmation_email.html')
-    html_text = the_template.render(Context(data))
+    html_text = the_template.render(data)
     text = dehtml(html_text)
 
     email = EmailMultiAlternatives(
