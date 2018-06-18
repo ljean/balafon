@@ -83,8 +83,8 @@ def post_message(request):
                     'message': message,
                     'site': settings.COOP_CMS_SITE_PREFIX,
                 }
-                t = get_template('Emailing/subscribe_notification_email.txt')
-                content = t.render(Context(data))
+                template_ = get_template('Emailing/subscribe_notification_email.txt')
+                content = template_.render(Context(data))
                 
                 email = EmailMessage(
                     _("Message from web site"), content, from_email,

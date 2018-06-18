@@ -1497,7 +1497,7 @@ class Action(LastModifiedModel):
     def get_recipients(self, html=True):
         """returns contacts and entites as html code. Use template for easy customization"""
         template_file = get_template("Crm/_actions/recipients.html")
-        text = template_file.render(Context({'action': self}))
+        text = template_file.render({'action': self})
         if not html:
             text = dehtml(text)
         return text

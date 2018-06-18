@@ -14,7 +14,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.forms.utils import flatatt
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.encoding import smart_text
 from django.utils.html import escape
@@ -68,11 +67,12 @@ def get_field_form(field):
 
 
 class GroupedSelect(forms.Select):
-    """Buld select with all forms"""
+    """Build select with all forms"""
     def render(self, name, value, attrs=None, choices=(), *args, **kwargs):
         if value is None:
             value = ''
-        final_attrs = self.build_attrs(attrs, name=name)
+        attrs['name'] = name
+        final_attrs = self.build_attrs(attrs)
         output = [u'<select {0}>'.format(flatatt(final_attrs))] 
         str_value = smart_text(value)
         for group_label, group in self.choices: 
@@ -81,7 +81,7 @@ class GroupedSelect(forms.Select):
                 group_label = smart_text(group_label)
                 output.append(u'<optgroup label="%s">' % escape(group_label)) 
             for key, value in group:
-                #build option html
+                # build option html
                 option_value = smart_text(key)
                 output.append(
                     u'<option value="{0}"{1}>{2}</option>'.format(
@@ -246,7 +246,7 @@ class SearchForm(forms.Form):
             return unicode_str
             
         if str_value[0] == '[' and str_value[-1] == ']':
-            #remove [ and ]
+            # remove [ and ]
             values = str_value[1:-1]
             # get things separated by ', '
             values = values.split(", ")
@@ -529,7 +529,7 @@ class SearchFieldForm(BsForm):
     def as_it_is(self):
         """return form html without any wrapper tag"""
         template = get_template("Search/_search_field_form.html")
-        return template.render(Context({"form": self}))
+        return template.render({"form": self})
     
     def get_queryset(self, queryset):
         """

@@ -219,8 +219,11 @@ def get_field(request, name):
     try:
         form_class = get_field_form(name)
         the_template = Template('{{form.as_it_is}}')
-        the_context = Context({'form': form_class(block, count)})
-        return HttpResponse(json.dumps({'form': the_template.render(the_context)}), content_type="application/json")
+        the_context = {'form': form_class(block, count)}
+        return HttpResponse(
+            json.dumps({'form': the_template.render(Context(the_context))}),
+            content_type="application/json"
+        )
     except KeyError:
         raise Http404
     except Exception as msg:

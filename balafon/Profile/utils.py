@@ -184,8 +184,8 @@ def notify_registration(profile):
             'contact': profile.contact,
             'site': getattr(settings, 'COOP_CMS_SITE_PREFIX', None),
         }
-        t = get_template('Profile/registration_notification_email.txt')
-        content = t.render(Context(data))
+        template_ = get_template('Profile/registration_notification_email.txt')
+        content = template_.render(data)
         
         email = EmailMessage(
             _("New registration"), content, from_email,
