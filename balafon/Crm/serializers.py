@@ -85,6 +85,7 @@ class EntitySerializer(serializers.ModelSerializer):
     type = EntityTypeSerializer(read_only=True)
     get_view_url = serializers.CharField(read_only=True)
     country = CountrySerializer(read_only=True)
+    billing_city = CitySerializer(read_only=True)
     billing_country = CountrySerializer(read_only=True)
 
     class Meta:

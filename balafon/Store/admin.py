@@ -92,6 +92,7 @@ class SaleItemInline(admin.TabularInline):
         'text', 'item', 'quantity', 'pre_tax_price', 'discount', 'calculate_discount', 'vat_rate', 'order_index',
         'is_blank', 'no_quantity', 'is_discount',
     )
+    raw_id_fields = ['item']
     readonly_fields = ('calculate_discount', )
 
 
@@ -101,6 +102,7 @@ class SaleAdmin(admin.ModelAdmin):
     search_fields = ('action__contacts__lastname', 'action__entities__name', )
     inlines = (SaleItemInline, )
     list_filter = ('analysis_code', )
+    raw_id_fields = ['action', ]
 
 admin.site.register(models.Sale, SaleAdmin)
 
