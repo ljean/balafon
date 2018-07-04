@@ -19,7 +19,7 @@ class CommandWrapper(object):
         """run a command"""
         try:
             return subprocess.check_output(command_line.split(' ')), 0
-        except subprocess.CalledProcessError, ex:
+        except subprocess.CalledProcessError as ex:
             return ex.output, ex.returncode
 
 
