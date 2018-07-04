@@ -75,7 +75,7 @@ admin.site.register(models.Brand, BrandAdmin)
 
 
 class StoreItemTagAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'name', 'order_index', 'icon', 'active', 'show_always')
+    list_display = ('__str__', 'name', 'order_index', 'icon', 'active', 'show_always')
     list_editable = ('name', 'order_index', 'icon', 'active', 'show_always')
     fields = (
         'name', 'order_index', 'icon', 'active', 'show_always'
@@ -97,7 +97,7 @@ class SaleItemInline(admin.TabularInline):
 
 
 class SaleAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'creation_date', 'analysis_code', )
+    list_display = ('__str__', 'creation_date', 'analysis_code', )
     readonly_fields = ('creation_date', )
     search_fields = ('action__contacts__lastname', 'action__entities__name', )
     inlines = (SaleItemInline, )
