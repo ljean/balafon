@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import signals
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from coop_cms.models import ArticleCategory
@@ -13,6 +14,7 @@ from coop_cms.models import ArticleCategory
 from balafon.Crm.models import Contact, Group, City, EntityType
 
 
+@python_2_unicode_compatible
 class ContactProfile(models.Model):
     """Info creating a contact from registration"""
 
@@ -53,7 +55,7 @@ class ContactProfile(models.Model):
 
     groups_ids = models.CharField(max_length=100, default="", blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.user.username
     
  
@@ -71,10 +73,12 @@ def create_profile(sender, instance, signal, created, **kwargs):
     if created_profile:
         ContactProfile(user=instance).save()
 
+
 if "balafon.Profile" in settings.INSTALLED_APPS:
     signals.post_save.connect(create_profile, sender=User)
 
 
+@python_2_unicode_compatible
 class CategoryPermission(models.Model):
     """Permissions on category"""
 
@@ -90,5 +94,5 @@ class CategoryPermission(models.Model):
         Group, blank=True, default=None, related_name="can_edit_perm"
     )
     
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.category)
