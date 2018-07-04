@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
@@ -23,10 +22,10 @@ setup(
     license='CeCILL 2.1',
     zip_safe=False,
     install_requires=[
-        'django >= 1.9, <1.11',
-        'djangorestframework==3.4.7',
-        'django-extensions==1.7.5',
-        'apidev-coop_cms==1.3.1',
+        'django >= 1.9, <2.0',
+        'djangorestframework',
+        'django-extensions',
+        'apidev-coop_cms>=1.3.1',
         'beautifulsoup4',
         'django-wkhtmltopdf',
         'xlwt',
@@ -34,7 +33,6 @@ setup(
         'django-simple-captcha',
         'django-registration',
         'model_mommy',
-        'django-tastypie',
         'django-cors-headers',
     ],
     dependency_links=[
