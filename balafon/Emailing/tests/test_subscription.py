@@ -35,8 +35,7 @@ class SubscribeTest(TestCase):
         self._lang = settings.LANGUAGES[0][0]
         activate(self._lang)
 
-        if settings.BALAFON_USE_RECAPTCHA:
-            os.environ['RECAPTCHA_TESTING'] = 'True'
+        os.environ['RECAPTCHA_DISABLE'] = 'True'
 
         if not getattr(settings, 'BALAFON_ALLOW_SINGLE_CONTACT', True):
             settings.BALAFON_INDIVIDUAL_ENTITY_ID = models.EntityType.objects.create(name="particulier").id
@@ -46,8 +45,7 @@ class SubscribeTest(TestCase):
     def tearDown(self):
         """after each test"""
         activate(self._lang)
-        if settings.BALAFON_USE_RECAPTCHA:
-            os.environ['RECAPTCHA_TESTING'] = 'False'
+        os.environ['RECAPTCHA_DISABLE'] = 'False'
         super(SubscribeTest, self).tearDown()
 
     def test_view_subscribe_newsletter(self):
@@ -443,19 +441,7 @@ class SubscribeTest(TestCase):
 
     def _patch_with_captcha(self, url, data):
         """path form data with captcha"""
-        if settings.BALAFON_USE_RECAPTCHA:
-            data.update({'recaptcha_response_field': 'PASSED'})
-
-        else:
-            from captcha.models import CaptchaStore
-            self.failUnlessEqual(CaptchaStore.objects.count(), 0)
-            self.client.get(url)
-            self.failUnlessEqual(CaptchaStore.objects.count(), 1)
-            captcha = CaptchaStore.objects.all()[0]
-            data.update({
-                'captcha_0': captcha.hashkey,
-                'captcha_1': captcha.response
-            })
+        pass
 
     def test_view_subscribe_with_types(self):
         """view subscribe page"""

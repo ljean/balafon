@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.core.mail import EmailMessage
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -28,7 +27,7 @@ def notify_due_actions(user, actions):
         'site': settings.COOP_CMS_SITE_PREFIX,
     }
     template = get_template('Users/due_actions_notification_email.txt')
-    content = template.render(Context(data))
+    content = template.render(data)
     
     email = EmailMessage(
         _("Balafon: You have due actions"),

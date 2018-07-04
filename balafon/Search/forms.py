@@ -14,7 +14,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.forms.utils import flatatt
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.encoding import smart_text
 from django.utils.html import escape
@@ -72,8 +71,9 @@ class GroupedSelect(forms.Select):
     def render(self, name, value, attrs=None, choices=(), *args, **kwargs):
         if value is None:
             value = ''
-        final_attrs = self.build_attrs(attrs, name=name)
-        output = [u'<select {0}>'.format(flatatt(final_attrs))] 
+        final_attrs = self.build_attrs(attrs)
+        final_attrs.update(dict(name=name))
+        output = [u'<select {0}>'.format(flatatt(final_attrs))]
         str_value = smart_text(value)
         for group_label, group in self.choices: 
             if group_label:
@@ -541,7 +541,7 @@ class SearchFieldForm(BsForm):
     def as_it_is(self):
         """return form html without any wrapper tag"""
         template = get_template("Search/_search_field_form.html")
-        return template.render(Context({"form": self}))
+        return template.render({"form": self})
     
     def get_queryset(self, queryset):
         """

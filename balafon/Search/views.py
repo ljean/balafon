@@ -13,8 +13,8 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, render
-from django.template import Context, Template
+from django.shortcuts import get_object_or_404, render
+from django.template import Template, Context
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_close

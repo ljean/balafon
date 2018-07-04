@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -184,8 +183,8 @@ def notify_registration(profile):
             'contact': profile.contact,
             'site': getattr(settings, 'COOP_CMS_SITE_PREFIX', None),
         }
-        t = get_template('Profile/registration_notification_email.txt')
-        content = t.render(Context(data))
+        the_template = get_template('Profile/registration_notification_email.txt')
+        content = the_template.render(data)
         
         email = EmailMessage(
             _("New registration"), content, from_email,

@@ -293,12 +293,12 @@ class UpdateFavoriteTestCase(BaseTestCase):
         
         dummy_request = DummyRequest()
         setattr(dummy_request, 'user', self.user)
-        context = {
+        context = Context({
             'users': User.objects.all(),
             'request': dummy_request,
-        }
+        })
         
-        template.render(Context(context))
+        template.render(context)
         
     def test_render_template_not_logged(self):
         """render for anonymous"""

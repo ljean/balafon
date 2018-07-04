@@ -18,7 +18,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.template import TemplateDoesNotExist, Context
+from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import mark_safe
@@ -1497,7 +1497,7 @@ class Action(LastModifiedModel):
     def get_recipients(self, html=True):
         """returns contacts and entites as html code. Use template for easy customization"""
         template_file = get_template("Crm/_actions/recipients.html")
-        text = template_file.render(Context({'action': self}))
+        text = template_file.render({'action': self})
         if not html:
             text = dehtml(text)
         return text

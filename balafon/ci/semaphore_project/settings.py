@@ -153,7 +153,7 @@ else:
     )
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -178,11 +178,6 @@ AUTHENTICATION_BACKENDS = (
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
-SOUTH_SKIP_MIGRATIONS = True
-SOUTH_TESTS_MIGRATE = False
-
-LOCALE_REDIRECT_PERMANENT = False
-
 COOP_HTML_EDITOR_LINK_MODELS = ('basic_cms.Article', )
 COOP_CMS_ARTICLE_LOGO_SIZE = "950x250"
 COOP_CMS_NEWSLETTER_TEMPLATES = (
@@ -204,7 +199,6 @@ BALAFON_MY_COMPANY = "Apidev"
 BALAFON_AS_HOMEPAGE = False
 BALAFON_NOTIFICATION_EMAIL = 'ljean@apidev.fr'
 BALAFON_UNACCENT_FILTER_SUPPORT = True
-BALAFON_USE_RECAPTCHA = False
 
 LOGIN_REDIRECT_URL = "/"
 
@@ -217,6 +211,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+RECAPTCHA_PUBLIC_KEY = "dummy"
+RECAPTCHA_PRIVATE_KEY = "dummy"
 
 INSTALLED_APPS = (
     # contribs

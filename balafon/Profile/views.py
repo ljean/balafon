@@ -9,7 +9,6 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -84,7 +83,7 @@ def post_message(request):
                     'site': settings.COOP_CMS_SITE_PREFIX,
                 }
                 t = get_template('Emailing/subscribe_notification_email.txt')
-                content = t.render(Context(data))
+                content = t.render(data)
                 
                 email = EmailMessage(
                     _("Message from web site"), content, from_email,
