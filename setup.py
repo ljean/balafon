@@ -30,7 +30,7 @@ setup(
         'django-wkhtmltopdf',
         'xlwt',
         'xlrd',
-        'django-simple-captcha',
+        'django-recaptcha2',
         'django-registration',
         'model_mommy',
         'django-cors-headers',

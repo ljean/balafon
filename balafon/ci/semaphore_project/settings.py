@@ -232,7 +232,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'floppyforms',
     'sorl.thumbnail',
-    'captcha',
+    'snowpenguin.django.recaptcha2',
     'registration',
 
     # externals
