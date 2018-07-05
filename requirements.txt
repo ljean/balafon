@@ -11,3 +11,4 @@ django-recaptcha2
 django-registration
 model_mommy
 django-cors-headers
+Pillow
