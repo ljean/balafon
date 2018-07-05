@@ -679,3 +679,12 @@ ul.coop-cms_user-messages {
   background: #eee;
   padding: 2px 10px;
 }
+.container.container-not-preview {
+  padding-top: 70px;
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .container.container-not-preview {
+    padding-top: 140px;
+  }
+}
+/*# sourceMappingURL=balafon.css.map */

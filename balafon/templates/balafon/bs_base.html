@@ -58,12 +58,17 @@
   {% block header_bar %}
   {% include "balafon/_bs_navigation.html" %}
   {% endblock %}
-  <div class="container" {% if not preview %}style="padding-top: 70px;"{% endif %}>
+  <div class="container {% if not preview %}container-not-preview{% endif %}">
   {% block main %}
     {% include "coop_cms/_messages.html" %}
     
     {% block document %}
     <div id="document">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="version pull-right">Balafon {{ BALAFON_VERSION }}</div>
+        </div>
+      </div>
       <div class="letter-bar" rel="{% url 'crm_view_entities_list' %}">
         <label>{% trans "Contacts" %}</label>
       {% for l in "*ABCDEFGHIJKLMNOPQRSTUVWXYZ~" %}
@@ -78,11 +83,6 @@
     </div>
     
     {% block footer %}
-    <footer>
-    </footer>
-    <div class="row"><div class="col-md-12">
-        <div class="version pull-right">Balafon {{ BALAFON_VERSION }}</div>
-    </div></div>
     {% endblock %}
 
   {% endblock %}
