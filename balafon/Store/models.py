@@ -915,6 +915,14 @@ class Sale(models.Model):
                 )
         return vat_totals
 
+    def total_vat(self):
+        """returns amount of VAT by VAT rate"""
+        # calculate price for each VAT rate
+        total_vat = Decimal(0)
+        for sale_item in self.saleitem_set.all():
+            total_vat += sale_item.quantity * sale_item.vat_price()
+        return round_currency(total_vat)
+
     def vat_incl_total_price(self):
         """return total price of the command"""
         total = Decimal(0)
