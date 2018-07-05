@@ -1,0 +1,5 @@
+{% extends "balafon/popup_form.html" %}
+{% load i18n %}
+{% block title %}{% trans "Export" %} {{ action_type.name }}{% endblock %}
+{% block form_url %}{% url 'store_actions_summary' action_type.id %}{% endblock %}
+{% block form_ok %}{% trans "Ok" %}{% endblock %}

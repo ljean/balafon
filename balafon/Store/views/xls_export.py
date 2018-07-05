@@ -3,17 +3,23 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime, date, time
 import xlrd
 import xlwt
 
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext as _
 from django.views.generic import FormView
 
-from balafon.generic import XlsExportView
+from balafon.generic import XlsExportView, StaffPopupFormView
+from balafon.Crm.models import ActionType
 from balafon.Store.forms import StockImportForm
 from balafon.Store.models import StoreItem
 from balafon.Store.utils import to_decimal
+
+from ..forms import DateRangeForm
 
 
 class XlsBaseView(XlsExportView):
@@ -196,3 +202,95 @@ class StockImportView(FormView):
                     store_item.save()
 
         return super(StockImportView, self).form_valid(form)
+
+
+class ActionSummaryFormView(StaffPopupFormView):
+    template_name = 'Store/popup_actions_summary.html'
+    form_class = DateRangeForm
+    action_type = None
+
+    def get_header_style(self):
+        """style of header"""
+        style = xlwt.XFStyle()
+        style.pattern = xlwt.Pattern()
+        style.pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+        style.pattern.pattern_fore_colour = 22
+        return style
+
+    def get_action_type(self):
+        if self.action_type is None:
+            self.action_type = get_object_or_404(ActionType, id=self.kwargs['action_type_id'])
+        return self.action_type
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action_type'] = self.get_action_type()
+        return context
+
+    def form_valid(self, form):
+        """returns objects to export"""
+        action_type = self.get_action_type()
+        start_date = form.cleaned_data['start_date'].strftime('%Y-%m-%d')
+        end_date = form.cleaned_data['end_date'].strftime('%Y-%m-%d')
+        url = reverse('store_actions_summary_xls', args=[action_type.id, start_date, end_date])
+        return HttpResponseRedirect(url)
+
+
+class ActionSummaryXlsView(XlsBaseView):
+    doc_name = 'action-summary.xlsx'
+    template_name = 'Store/popup_actions_summary.html'
+    form_class = DateRangeForm
+    only_staff = True
+    action_type = None
+
+    def get_action_type(self):
+        if self.action_type is None:
+            self.action_type = get_object_or_404(ActionType, id=self.kwargs['action_type_id'])
+        return self.action_type
+
+    def get_actions(self, action_type, start_date, end_date):
+        """returns objects to export"""
+        start_date = date(*[int(elt) for elt in start_date.split('-')])
+        end_date = date(*[int(elt) for elt in end_date.split('-')])
+
+        start_datetime = datetime.combine(start_date, time.min)
+        end_datetime = datetime.combine(end_date, time.max)
+
+        return action_type.action_set.filter(
+            planned_date__gte=start_datetime, planned_date__lte=end_datetime
+        ).order_by('number')
+
+    def do_fill_workbook(self, workbook):
+        """export to excel all actions of this type"""
+
+        action_type = self.get_action_type()
+        start_date = self.kwargs['start_date']
+        end_date = self.kwargs['end_date']
+
+        name = action_type.name
+        sheet = workbook.add_sheet(name)
+        self.doc_name = "{0}_{1}_{2}.xlsx".format(name.lower().replace(' ', '-'), start_date, end_date)
+
+        line = 0
+
+        columns = [
+            _('Number'), _('Client'), _('Date'), _('Pre-tax amount'), _('VAT amount'), _('Tax incl Amount'), _('State')
+        ]
+
+        for col, label in enumerate(columns):
+            self.write_cell(sheet, 0, col, label, style=self.get_header_style())
+
+        actions = self.get_actions(action_type, start_date, end_date)
+        for line, action in enumerate(actions):
+
+            sheet.write(line + 1, 0, action.number)
+            sheet.write(line + 1, 1, action.get_recipients(False))
+            sheet.write(line + 1, 2, action.planned_date)
+            sheet.write(line + 1, 3, action.sale.pre_tax_total_price())
+            sheet.write(line + 1, 4, action.sale.total_vat())
+            sheet.write(line + 1, 5, action.sale.vat_incl_total_price())
+            sheet.write(line + 1, 6, action.status.name if action.status else '')
+
+        sheet.write(line + 3, 3, xlwt.Formula('SUM(D2:D{0})'.format(line + 1)), style=self.get_header_style())
+        sheet.write(line + 3, 4, xlwt.Formula('SUM(E2:E{0})'.format(line + 1)), style=self.get_header_style())
+        sheet.write(line + 3, 5, xlwt.Formula('SUM(F3:F{0})'.format(line + 1)), style=self.get_header_style())

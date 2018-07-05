@@ -10,7 +10,8 @@ from balafon.Store.views.sales_documents import (
 )
 from balafon.Store.views.statistics import StaticticsIndexView, AddExtraSaleView
 from balafon.Store.views.xls_export import (
-    StockXlsView, StockAlertXlsView, StoreXlsCatalogueView, StockImportView, StoreItemXlsView
+    StockXlsView, StockAlertXlsView, StoreXlsCatalogueView, StockImportView, StoreItemXlsView, ActionSummaryFormView,
+    ActionSummaryXlsView
 )
 
 
@@ -75,4 +76,17 @@ urlpatterns = [
         StockImportView.as_view(),
         name='store_import_stock'
     ),
+
+    url(
+        r"^admin/actions-summary/(?P<action_type_id>\d+)/$",
+        ActionSummaryFormView.as_view(),
+        name='store_actions_summary'
+    ),
+
+    url(
+        r"^admin/actions-summary-xls/(?P<action_type_id>\d+)/(?P<start_date>.+)/(?P<end_date>.+)/$",
+        ActionSummaryXlsView.as_view(),
+        name='store_actions_summary_xls'
+    ),
+
 ]

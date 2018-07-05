@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -116,3 +116,22 @@ class StockImportForm(BetterBsForm):
         label=_('Excel file'),
         help_text=_('Same format than the export file. It will update the purchase price, stock count and threshold')
     )
+
+
+class DateRangeForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        today = date.today()
+        first_day_of_month = date(today.year, today.month, 1)
+        if today.month == 12:
+            month_of_next = 1
+            year_of_next = today.year + 1
+        else:
+            month_of_next = today.month + 1
+            year_of_next = today.year
+        first_day_of_next_month = date(year_of_next, month_of_next, 1)
+        last_day_of_month = first_day_of_next_month - timedelta(days=1)
+
+        self.fields['start_date'] = forms.DateField(label=_("From"), required=True, initial=first_day_of_month)
+        self.fields['end_date'] = forms.DateField(label=_("To"), required=True, initial=last_day_of_month)
