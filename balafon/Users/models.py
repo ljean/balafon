@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -161,8 +162,10 @@ class CustomMenuItem(models.Model):
                     url = reverse(self.reverse, kwargs=reverse_kwargs) + "?" + query_string
                 except TypeError:
                     pass
-            except NoReverseMatch:
-                pass
+            except NoReverseMatch as err:
+                if settings.DEBUG:
+                    print("NoReverseMatch", err)
+
         if url:
             setattr(self, '_cached_url', url)
         return url
