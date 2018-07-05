@@ -856,6 +856,10 @@ class MailtoActionTest(BaseTestCase):
     def test_mailto_action_no_settings(self):
         """send email to the ony contact"""
 
+        # Give super user right in order to allow access to admin changelist
+        self.user.is_superuser = True
+        self.user.save()
+
         type = mommy.make(models.ActionType)
         action = mommy.make(models.Action, subject="Test", type=type)
         contact = mommy.make(models.Contact, email="toto@toto.fr")
@@ -864,8 +868,27 @@ class MailtoActionTest(BaseTestCase):
 
         url = reverse("crm_mailto_action", args=[action.id])
 
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse('admin:Crm_mailtosettings_changelist'))
+
+    def test_mailto_action_no_settings_not_superuser(self):
+        """send email to the ony contact"""
+
+        # No super user right in order to forbid access to admin changelist
+        self.user.is_superuser = False
+        self.user.save()
+
+        type = mommy.make(models.ActionType)
+        action = mommy.make(models.Action, subject=u"Test", type=type)
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse('admin:Crm_mailtosettings_changelist'), target_status_code=403)
+
 
     def test_mailto_action_invalid_action(self):
         """send email to the ony contact"""

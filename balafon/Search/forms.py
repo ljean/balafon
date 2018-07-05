@@ -71,9 +71,9 @@ class GroupedSelect(forms.Select):
     def render(self, name, value, attrs=None, choices=(), *args, **kwargs):
         if value is None:
             value = ''
-        attrs['name'] = name
         final_attrs = self.build_attrs(attrs)
-        output = [u'<select {0}>'.format(flatatt(final_attrs))] 
+        final_attrs.update(dict(name=name))
+        output = [u'<select {0}>'.format(flatatt(final_attrs))]
         str_value = smart_text(value)
         for group_label, group in self.choices: 
             if group_label:
@@ -341,7 +341,9 @@ class SearchForm(forms.Form):
             post_processors = []
             contacts_set = Contact.objects.all()
             actions_set = Action.objects.all()
+            exclude_actions_set = Action.objects.all()
             has_action_forms = False
+            has_exclude_action_forms = False
 
             if not ('secondary_contact' in [form.name for form in self._forms[key]]):
                 contacts_set = contacts_set.filter(main_contact=True)
@@ -354,8 +356,12 @@ class SearchForm(forms.Form):
                 if not form.is_action_form:
                     contacts_set = form.get_queryset(contacts_set)
                 else:
-                    has_action_forms = True
-                    actions_set = form.get_queryset(actions_set)
+                    if form.is_exclude_action_form:
+                        has_exclude_action_forms = True
+                        exclude_actions_set = form.get_queryset(exclude_actions_set)
+                    else:
+                        has_action_forms = True
+                        actions_set = form.get_queryset(actions_set)
 
                 if hasattr(form, 'post_process'):
                     post_processors.append(form.post_process)
@@ -366,6 +372,11 @@ class SearchForm(forms.Form):
             if has_action_forms:
                 contacts_set = contacts_set.filter(
                     Q(action__in=actions_set) | Q(entity__action__in=actions_set)
+                ).distinct()
+
+            if has_exclude_action_forms:
+                contacts_set = contacts_set.exclude(
+                    Q(action__in=exclude_actions_set) | Q(entity__action__in=exclude_actions_set)
                 ).distinct()
 
             for post_processor in post_processors:
@@ -490,6 +501,7 @@ class SearchFieldForm(BsForm):
     contacts_display = False
     multi_values = False
     is_action_form = False
+    is_exclude_action_form = False
     is_sort_form = False
 
     def __init__(self, block, count, data=None, *args, **kwargs):

@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -138,22 +137,22 @@ def check_category_permission(obj, permission, user):
     try:
         cat_perm = CategoryPermission.objects.get(category=obj.category)
     except AttributeError:
-        #logger.debug('object category has no category')
+        # logger.debug('object category has no category')
         return True
     except CategoryPermission.DoesNotExist:
-        #If no category permission exists : anyone is allowed
-        #logger.debug('object category has no permission defined')
+        # If no category permission exists : anyone is allowed
+        # logger.debug('object category has no permission defined')
         return True
     
-    #Get the contact corresponding to the logged user
+    # Get the contact corresponding to the logged user
     try:
         contact = user.contactprofile.contact
         if not contact.id:
             return False
     except (ContactProfile.DoesNotExist, Contact.DoesNotExist, AttributeError):
-        #If anonymous user or no contact exists for this profile
-        #users are not allowed to check the category
-        #logger.debug("user contact does't exist")
+        # If anonymous user or no contact exists for this profile
+        # users are not allowed to check the category
+        # logger.debug("user contact does't exist")
         return False
     
     if permission == 'can_view_article':
@@ -168,9 +167,9 @@ def check_category_permission(obj, permission, user):
     
     for group in groups.all():
         if group.contacts.filter(id=contact.id).count() or group.entities.filter(id=contact.entity.id).count():
-            #user is member of an allowed group
+            # user is member of an allowed group
             return True
-    #user is not member of a group : do not allow
+    # user is not member of a group : do not allow
     return False
 
 
@@ -184,9 +183,8 @@ def notify_registration(profile):
             'contact': profile.contact,
             'site': getattr(settings, 'COOP_CMS_SITE_PREFIX', None),
         }
-        template_ = get_template('Profile/registration_notification_email.txt')
-        content = template_.render(data)
-        
+        the_template = get_template('Profile/registration_notification_email.txt')
+        content = the_template.render(data)
         email = EmailMessage(
             _("New registration"), content, from_email,
             [notification_email], headers={'Reply-To': profile.contact.email})

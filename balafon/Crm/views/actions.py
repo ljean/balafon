@@ -622,7 +622,11 @@ def mailto_action(request, action_id):
     """Open the mail client in order to send email to action contacts"""
 
     action = get_object_or_404(models.Action, id=action_id)
-    mailto_settings = get_object_or_404(models.MailtoSettings, action_type=action.type)
+    try:
+        mailto_settings = models.MailtoSettings.objects.get(action_type=action.type)
+    except models.MailtoSettings.DoesNotExist:
+        redirect_url = reverse('admin:Crm_mailtosettings_changelist')
+        return HttpResponseRedirect(redirect_url)
 
     emails = [contact.get_email for contact in action.contacts.all()]
     emails += [entity.email for entity in action.entities.all()]

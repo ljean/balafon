@@ -9,7 +9,6 @@ from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
-from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import ugettext as _
 
@@ -20,7 +19,7 @@ except ImportError:
     from registration.backends.model_activation.views import RegistrationView, ActivationView
 
 from balafon.Crm.models import Action, ActionType
-from balafon.Profile.forms import MessageForm, UserRegistrationForm
+from balafon.Profile.forms import MessageForm
 from balafon.Profile.models import ContactProfile
 from balafon.Profile.utils import create_profile_contact, notify_registration
 from balafon.settings import get_profile_form, get_registration_form
@@ -84,8 +83,7 @@ def post_message(request):
                     'site': settings.COOP_CMS_SITE_PREFIX,
                 }
                 template_ = get_template('Emailing/subscribe_notification_email.txt')
-                content = template_.render(Context(data))
-                
+                content = template_.render(data)
                 email = EmailMessage(
                     _("Message from web site"), content, from_email,
                     [notification_email], headers = {'Reply-To': profile.contact.email})

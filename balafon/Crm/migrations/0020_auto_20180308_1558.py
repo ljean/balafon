@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='actiontype',
             name='is_default',
-            field=models.BooleanField(default=False, help_text='If checked, can be added from list. Action withou types are not displayed', verbose_name='is default'),
+            field=models.BooleanField(default=False, help_text='If checked, can be added from list. Action without types are not displayed', verbose_name='is default'),
         ),
         migrations.AlterField(
             model_name='actiontype',

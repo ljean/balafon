@@ -8,7 +8,6 @@ import sys
 
 from django import VERSION
 from django.conf import settings
-from django.template import RequestContext, Context
 
 
 if sys.version_info[0] < 3:

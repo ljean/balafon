@@ -18,7 +18,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.template import TemplateDoesNotExist, Context
+from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import mark_safe
@@ -1306,7 +1306,7 @@ class ActionType(NamedElement):
     )
     is_default = models.BooleanField(
         default=False, verbose_name=_('is default'),
-        help_text=_('If checked, can be added from list. Action withou types are not displayed')
+        help_text=_('If checked, can be added from list. Action without types are not displayed')
     )
 
     def status_defined(self):
@@ -1337,11 +1337,11 @@ class ActionType(NamedElement):
             for action in self.action_set.all():
                 if self.generate_uuid:
                     if not action.uuid:
-                        action.save()  # force uuid to be generated
+                        action.save(from_save_type=True)  # force uuid to be generated
                 else:
                     if action.uuid:
                         action.uuid = ''
-                        action.save()  # force uuid to be empty
+                        action.save(from_save_type=True)  # force uuid to be empty
         return ret
     
     class Meta:
@@ -1520,6 +1520,8 @@ class Action(LastModifiedModel):
     def save(self, *args, **kwargs):
         """save"""
 
+        from_save_type = kwargs.pop('from_save_type', False)
+
         if self.status and self.status.is_final:
             self.done = True
         elif self.type and self.type.allowed_status.filter(is_final=True).exists():
@@ -1529,11 +1531,12 @@ class Action(LastModifiedModel):
             self.done_date = now_rounded()
         elif self.done_date and not self.done:
             self.done_date = None
-            
-        # generate number automatically based on action type
-        if self.number == 0 and self.type and self.type.number_auto_generated:
-            self.number = self.type.last_number = self.type.last_number + 1
-            self.type.save()
+
+        if not from_save_type:  # avoid infinite loop
+            # generate number automatically based on action type
+            if self.number == 0 and self.type and self.type.number_auto_generated:
+                self.number = self.type.last_number = self.type.last_number + 1
+                self.type.save()
 
         created_track = None
         if self.status and self.type and self.type.track_status:

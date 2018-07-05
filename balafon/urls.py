@@ -13,7 +13,6 @@ from django.views.static import serve as serve_media
 from coop_cms.settings import get_url_patterns, get_media_root
 
 from balafon.forms import BsAuthenticationForm, BsPasswordChangeForm, BsPasswordResetForm
-from balafon.settings import is_simple_captcha_used
 from balafon.Users import views as users_views
 from balafon.views import redirect_to_homepage, auto_save_data
 
@@ -97,11 +96,6 @@ urlpatterns += localized_patterns(
     url(r'^accounts/', include('django.contrib.auth.urls'))
 )
 
-
-if 'captcha' in settings.INSTALLED_APPS and is_simple_captcha_used():
-    urlpatterns += [
-        url(r'^captcha/', include('captcha.urls')),
-    ]
 
 
 if 'balafon.Profile' in settings.INSTALLED_APPS:

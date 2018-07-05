@@ -22,6 +22,7 @@ SEARCH_FORMS = [
             search_forms.GroupsMemberOfAllSearchForm,
             search_forms.GroupsMemberOfAnySearchForm,
             search_forms.GroupsMemberOfNoneSearchForm,
+            search_forms.ContactWithEmailInGroupSearchForm,
         ],
     ), (
         _('Location'),
@@ -93,6 +94,7 @@ SEARCH_FORMS = [
         _('Actions'),
         [
             search_forms.ActionNameSearchForm,
+            search_forms.ExcludeActionNameSearchForm,
             search_forms.ActionTypeSearchForm,
             search_forms.ActionInProgressForm,
             search_forms.ActionByDoneDate,
