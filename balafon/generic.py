@@ -62,21 +62,11 @@ class StaffPopupFormView(FormView):
         return super(StaffPopupFormView, self).dispatch(*args, **kwargs)
 
 
-class XlsExportView(View):
-    only_staff = True
+class XlsExportMixin:
     doc_name = 'balafon.xls'
     _col_widths = None
     _line_heights = None
-    _default_file = None
-
-    def __init__(self, *args, **kwargs):
-        super(XlsExportView, self).__init__(*args, **kwargs)
-        self._default_file = self.get_default_style()
-
-    def dispatch(self, *args, **kwargs):
-        if self.only_staff and not can_access(self.request.user):
-            raise PermissionDenied()
-        return super(XlsExportView, self).dispatch(*args, **kwargs)
+    _default_style = None
 
     def get_default_style(self):
         """
@@ -148,17 +138,39 @@ class XlsExportView(View):
 
     def write_cell(self, sheet, line, column, value, *args, **kwargs):
         value = self.get_value(value)
-        style = kwargs.pop('style', None) or self._default_file
+        style = kwargs.pop('style', None) or self._default_style
         ret = sheet.write(line, column, value, style, *args, **kwargs)
         self._calculate_size(sheet, line, column, value)
         return ret
 
     def write_merge(self, sheet, line1, line2, column1, column2, value, *args, **kwargs):
         value = self.get_value(value)
-        style = kwargs.pop('style', None) or self._default_file
+        style = kwargs.pop('style', None) or self._default_style
         ret = sheet.write_merge(line1, line2, column1, column2, value, style, *args, **kwargs)
         self._calculate_size(sheet, line1, column1, value)
         return ret
+
+    def get_doc_name(self):
+        return self.doc_name
+
+    def build_response(self, workbook):
+        response = HttpResponse(content_type="application/ms-excel")
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(self.get_doc_name())
+        workbook.save(response)
+        return response
+
+
+class XlsExportView(View, XlsExportMixin):
+    only_staff = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._default_style = self.get_default_style()
+
+    def dispatch(self, *args, **kwargs):
+        if self.only_staff and not can_access(self.request.user):
+            raise PermissionDenied()
+        return super(XlsExportView, self).dispatch(*args, **kwargs)
 
     def do_fill_workbook(self, workbook):
         """implement it in base class"""
@@ -170,7 +182,4 @@ class XlsExportView(View):
         self._line_heights = {}
         self.do_fill_workbook(workbook)
 
-        response = HttpResponse(content_type="application/ms-excel")
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(self.doc_name)
-        workbook.save(response)
-        return response
+        return self.build_response(workbook)
