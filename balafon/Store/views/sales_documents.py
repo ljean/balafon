@@ -82,9 +82,6 @@ class SalesDocumentViewMixin(object):
         sale_items_serializer = SaleItemSerializer(self.get_sale_items(), many=True)
         sale_items_data = Utf8JSONRenderer().render(sale_items_serializer.data)
 
-        for elt in sale_items_serializer.data:
-            print('$', elt)
-
         vat_rates_serializer = VatRateSerializer(VatRate.objects.all(), many=True)
         vat_rates_data = Utf8JSONRenderer().render(vat_rates_serializer.data)
 
@@ -107,8 +104,7 @@ class SalesDocumentViewMixin(object):
             isReadOnly: {6},
             discounts: {7},
             vat_totals: {8},
-            percentageLabel: {9},
-            showPercentage: {10},
+            showPercentage: {9},
         }};""".format(
             action_data,
             sale_items_data,
@@ -119,8 +115,7 @@ class SalesDocumentViewMixin(object):
             'true' if is_read_only else 'false',
             discounts_data,
             vat_total_data,
-            "'Pourcentage'",
-            'true' if True else 'false'
+            'true' if getattr(settings, 'BALAFON_STORE_SHOW_PERCENTAGE', False) else 'false'
         )
         return context
 

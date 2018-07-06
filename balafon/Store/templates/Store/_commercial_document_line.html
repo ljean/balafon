@@ -58,13 +58,14 @@
   </textarea>
   <div ng-show="allowEdit && editedLines[$index]">{{ 'NO_QUANTITY' | translate }} <input type="checkbox" ng-model="item.no_quantity"></div>
   <div ng-show="allowEdit && editedLines[$index]">{{ 'DISCOUNT' | translate }} <input type="checkbox" ng-model="item.is_discount"></div>
+  <div ng-show="allowEdit && editedLines[$index]">{{ 'SHOW_PERCENTAGE' | translate }} <input type="checkbox" ng-model="item.showPercentage"></div>
 </td>
 
 <td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
 
 <td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
 
-<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount && showPercentage">&nbsp;</td>
+<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount && hasPercentage()">&nbsp;</td>
 
 <td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
   <span ng-hide="editedLines[$index] && !changeOrder">
@@ -84,7 +85,7 @@
   </span>
 </td>
 
-<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount && showPercentage">
+<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount && hasPercentage()">
   <span ng-hide="editedLines[$index] && !changeOrder">
     {{ item.percentage | number:2 }} %
   </span>
