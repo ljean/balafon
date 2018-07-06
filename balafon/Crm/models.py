@@ -1308,6 +1308,10 @@ class ActionType(NamedElement):
         default=False, verbose_name=_('is default'),
         help_text=_('If checked, can be added from list. Action without types are not displayed')
     )
+    label = models.CharField(
+        max_length=100, default='', blank=True, verbose_name=_('label'),
+        help_text=_('If set, replace name on commercial document')
+    )
 
     def status_defined(self):
         """true if a status is defined for this type"""
@@ -1504,7 +1508,7 @@ class Action(LastModifiedModel):
 
     def get_action_number(self):
         if self.type and self.number:
-            return _('{0} N° {1}').format(self.type.name, self.number)
+            return _('{0} N° {1}').format(self.type.label or self.type.name, self.number)
         return ''
 
     def get_menus(self):
