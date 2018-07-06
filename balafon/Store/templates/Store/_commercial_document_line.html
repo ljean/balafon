@@ -1,5 +1,5 @@
 {% verbatim %}
-<td colspan="6" ng-if="item.is_blank">
+<td colspan="{{ columnsCount + 1 }}" ng-if="item.is_blank">
   <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
     <div class="show-on-hover">
       <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
@@ -19,7 +19,7 @@
   />
 </td>
 
-<td class="cell-label" ng-if="!item.is_blank" colspan="{{ item.is_discount?5:1 }}">
+<td class="cell-label" ng-if="!item.is_blank" colspan="{{ item.is_discount?(columnsCount):1 }}">
   <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
     <div class="show-on-hover">
       <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
@@ -64,6 +64,8 @@
 
 <td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
 
+<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount && showPercentage">&nbsp;</td>
+
 <td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
   <span ng-hide="editedLines[$index] && !changeOrder">
     {{ getUnitPrice(item) | number:2 }} €
@@ -80,6 +82,21 @@
       {{ item.discount.display_name }}
     </span>
   </span>
+</td>
+
+<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount && showPercentage">
+  <span ng-hide="editedLines[$index] && !changeOrder">
+    {{ item.percentage | number:2 }} %
+  </span>
+  <input
+    class="form-control"
+    required="required"
+    type="number"
+    max="100"
+    min="0"
+    ng-model="item.percentage"
+    ng-show="editedLines[$index] && !changeOrder"
+  />
 </td>
 
 <td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">

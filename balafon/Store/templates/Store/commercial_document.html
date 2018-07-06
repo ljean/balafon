@@ -54,6 +54,7 @@
         THE_LABEL_FIELD_IS_REQUIRED: 'The label field is required',
         THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'The quantity field is required number',
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'The pre-tax price field is required number',
+        THE_PERCENTAGE_FIELD_IS_REQUIRED_NUMBER: "The percentage filed is required number",
         THE_VAT_REQUIRED: 'The VAT rate is required',
         SEND_BY_MAIL: 'Send by email',
         READ_ONLY: 'Read_only',
@@ -90,6 +91,7 @@
         THE_LABEL_FIELD_IS_REQUIRED: 'Le libellé est requis',
         THE_QUANTITY_FIELD_IS_REQUIRED_NUMBER: 'La quantité doit être un nombre',
         THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER: 'Le prix unitaire doit être un nombre',
+        THE_PERCENTAGE_FIELD_IS_REQUIRED_NUMBER: "Le pourcentage doit être un nombre",
         THE_VAT_REQUIRED: 'La TVA est requise',
         SEND_BY_MAIL: 'Envoyer par email',
         READ_ONLY: 'Lecture seule',
@@ -105,6 +107,9 @@
     function ($scope, $modal, $http, $translate, $filter, $log) {
       $scope.app = DJANGO_APP;
       $scope.editMode = false;
+      $scope.showPercentage = $scope.app.showPercentage;
+      $scope.percentageLabel = $scope.app.percentageLabel;
+      $scope.columnsCount = ($scope.showPercentage)?6:5;
       $scope.allowEdit = !$scope.app.isReadOnly;
       $scope.formErrors = '';
       $scope.editBackup = null;
@@ -165,6 +170,7 @@
           order_index: $scope.app.sale_items.length + 1,
           order_memory: $scope.app.sale_items.length + 1,
           pre_tax_price: 0.0,
+          percentage: 100,
           vat_rate: $scope.getDefaultVatRate(),
           quantity: 1,
           text: isBlank?' ':'',
@@ -273,6 +279,7 @@
             text: item.text,
             vat_rate: item.vat_rate?item.vat_rate.id:null,
             pre_tax_price: item.pre_tax_price,
+            percentage: item.percentage,
             quantity: item.quantity,
             item: item.item,
             is_blank: item.is_blank,
@@ -302,7 +309,7 @@
           item.item = respData.item;
           item.is_discount = respData.is_discount;
           item.no_quantity = respData.no_quantity;
-
+          item.percentage = respData.percentage;
           $scope.updateVatTotals();
 
         });
@@ -329,6 +336,7 @@
             text: item.text,
             vat_rate: item.vat_rate?item.vat_rate.id:null,
             pre_tax_price: item.pre_tax_price,
+            percentage: item.percentage,
             quantity: item.quantity,
             item: item.item,
             is_blank: item.is_blank,
@@ -353,6 +361,7 @@
 
       $scope.getUnitPrice = function(item) {
         var value = item.unit_price;
+        console.log('>', item.unit_price)
         if (isNaN(value)) {
           return translate('ERROR');
         }
@@ -360,7 +369,7 @@
       };
 
       $scope.getItemPreTaxPrice = function(item) {
-        var value = (item.unit_price) * item.quantity;
+        var value = item.unit_price * item.quantity * (item.percentage / 100);
         if (isNaN(value)) {
           return translate('ERROR');
         }
@@ -369,7 +378,7 @@
 
       $scope.getItemTaxInclPrice = function(item, noRound) {
         if (item.vat_rate !== null) {
-          var value = item.quantity * item.unit_price * (100 + item.vat_rate.rate) / 100;
+          var value = item.quantity * item.unit_price  * (item.percentage / 100) * (100 + item.vat_rate.rate) / 100;
           if (isNaN(value)) {
             return translate('ERROR');
           }
@@ -464,6 +473,10 @@
           return translate('THE_PRE_TAX_PRICE_FIELD_IS_REQUIRED_NUMBER');
         }
 
+        if (isNaN(item.percentage)) {
+          return translate('THE_PERCENTAGE_FIELD_IS_REQUIRED_NUMBER');
+        }
+
         if (!item.vat_rate && !item.is_blank) {
           return translate('THE_VAT_REQUIRED');
         }
@@ -496,6 +509,7 @@
           item.vat_rate = selectedItem.vat_rate;
           item.pre_tax_price = selectedItem.pre_tax_price;
           item.unit_price = selectedItem.pre_tax_price;
+          item.percentage = 100;
           item.item = selectedItem.id;
           item.discount = null;
         }, function () {
@@ -834,6 +848,7 @@
                       </div>
                     </th>
                     <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
+                    <th class="number" ng-if="showPercentage">{{ percentageLabel }}</th>
                     <th class="number">{{ 'QUANTITY' | translate }}</th>
                     <th class="number">{{ 'PRE_TAX_PRICE' | translate }}</th>
                     <th class="number">{{ 'VAT_RATE' | translate }}</th>
@@ -845,11 +860,11 @@
                   </tr>
 
                   <tr class="tr-row" ng-show="!editMode && app.vat_totals.length">
-                    <th colspan="6">{{ 'TOTAL' | translate }}</th>
+                    <th colspan="{{ columnsCount + 1 }}">{{ 'TOTAL' | translate }}</th>
                   </tr>
 
                   <tr class="results tr-row" ng-if="hasDiscount()">
-                    <td colspan="5">
+                    <td colspan="{{ columnsCount }}">
                       {{ 'PRE_TAX_TOTAL_BEFORE_DISCOUNT' | translate }}
                     </td>
                     <td class="number">{{ getTotalPreTaxPriceNoDiscount() | number:2 }} €</td>
@@ -860,28 +875,27 @@
                   </tr>
 
                   <tr class="results tr-row">
-                    <td colspan="5">
+                    <td colspan="{{ columnsCount }}">
                       {{ 'PRE_TAX_TOTAL' | translate }}
                     </td>
                     <td class="number">{{ getTotalPreTaxPrice() | number:2 }} €</td>
                   </tr>
 
                   <tr class="tr-row" ng-repeat="vat_total in app.vat_totals" ng-show="!editMode && vat_total.amount != 0">
-                    <td colspan="5">{{ "VAT" | translate }} {{ vat_total.vat_rate.name }}</td>
+                    <td colspan="{{ columnsCount }}">{{ "VAT" | translate }} {{ vat_total.vat_rate.name }}</td>
                     <td class="number">{{ vat_total.amount| number:2 }} €</td>
                   </tr>
                   <tr class="results tr-row" ng-show="!editMode && app.vat_totals.length">
-                    <td colspan="5">{{ 'TOTAL' | translate }} {{ "VAT" | translate }}</td>
+                    <td colspan="{{ columnsCount }}">{{ 'TOTAL' | translate }} {{ "VAT" | translate }}</td>
                     <td class="number">{{ getVatTotalAmount() | number:2 }} €</td>
                   </tr>
 
                   <tr class="results tr-row">
-                    <td colspan="5">
+                    <td colspan="{{ columnsCount }}">
                       {{ 'TAX_INCL_TOTAL' | translate }}
                     </td>
                     <td class="number">{{ getTotalTaxInclPrice() | number:2 }} €</td>
                   </tr>
-
 
                 </table>
                 </form>

@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from balafon.Store.models import (
@@ -130,12 +132,13 @@ class SaleItemSerializer(serializers.ModelSerializer):
     unit_price = serializers.FloatField()
     discount = DiscountSerializer()
     vat_rate = VatRateSerializer()
+    percentage = serializers.FloatField()
 
     class Meta:
         model = SaleItem
         fields = (
             'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'is_blank',
-            'discount', 'unit_price', 'no_quantity', 'is_discount',
+            'discount', 'unit_price', 'no_quantity', 'is_discount', 'percentage',
         )
 
 
@@ -143,12 +146,13 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
     """Serialize a sale item for update"""
     quantity = serializers.DecimalField(max_digits=9, decimal_places=2)
     pre_tax_price = serializers.DecimalField(max_digits=9, decimal_places=2)
+    percentage = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, default=Decimal(100))
 
     class Meta:
         model = SaleItem
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale', 'is_blank',
-            'discount', 'no_quantity', 'is_discount',
+            'discount', 'no_quantity', 'is_discount', 'percentage',
         )
 
 

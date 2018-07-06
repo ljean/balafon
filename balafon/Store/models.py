@@ -1007,6 +1007,10 @@ class SaleItem(models.Model):
     is_discount = models.BooleanField(
         default=False, verbose_name=_('is discount'), help_text=_('added after total on the bill')
     )
+    percentage = models.DecimalField(
+        verbose_name=_('percentage'), default=Decimal(100), max_digits=5, decimal_places=2,
+        help_text=_('Only a percentage of the item price')
+    )
 
     class Meta:
         verbose_name = _("Sale item")
@@ -1026,7 +1030,7 @@ class SaleItem(models.Model):
 
     def total_vat_price(self, round_value=True):
         """VAT price * quantity"""
-        return self.quantity * self.vat_price(round_value=round_value)
+        return self.vat_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
 
     def vat_price(self, round_value=True):
         """VAT price"""
@@ -1039,7 +1043,7 @@ class SaleItem(models.Model):
 
     def vat_incl_total_price(self, round_value=True):
         """VAT inclusive price"""
-        return self.vat_incl_price(round_value=round_value) * self.quantity
+        return self.vat_incl_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
 
     def raw_total_price(self, round_value=True):
         """VAT inclusive price"""
@@ -1052,7 +1056,7 @@ class SaleItem(models.Model):
         """VAT inclusive price"""
         if self.is_blank:
             return Decimal(0)
-        return self.unit_price(round_value=round_value) * self.quantity
+        return self.unit_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
 
     def unit_price(self, round_value=False):
         """pre tax price with discount"""
