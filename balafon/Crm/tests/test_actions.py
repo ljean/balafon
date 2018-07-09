@@ -757,6 +757,21 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(soup.select("#id_end_date")[0]["disabled"], "disabled")
         self.assertEqual(soup.select("#id_end_time")[0]["disabled"], "disabled")
 
+    def test_view_action_auto_generated(self):
+        """view action start and end"""
+        action_type = mommy.make(models.ActionType, number_auto_generated=True)
+        action = mommy.make(
+            models.Action, subject="AAA", type=action_type, number=1
+        )
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(soup.select("#id_number")[0]["value"], "1")
+        self.assertEqual(soup.select("#id_number")[0]["disabled"], "disabled")
+
 
 class ActionTest(BaseTestCase):
     """View actions"""

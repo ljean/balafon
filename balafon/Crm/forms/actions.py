@@ -87,10 +87,13 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                 self.title = ugettext(u"Edition {0}").format(action_type.name)
             else:
                 self.title = ugettext(u"Creation {0}").format(action_type.name)
-            if action_type.number_auto_generated:
-                self.fields['number'].widget.attrs['disabled'] = 'disabled'
         else:
             self.title = ugettext(u"Edit action") if instance else ugettext(u"Create action")
+
+        is_auto_generated = (action_type and action_type.number_auto_generated) or \
+                            (instance and instance.type and instance.type.number_auto_generated)
+        if is_auto_generated:
+            self.fields['number'].widget.attrs['disabled'] = 'disabled'
 
         self.fields['amount'].widget.attrs['step'] = 'any'
         if is_amount_calculated:
