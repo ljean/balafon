@@ -231,7 +231,7 @@ class QuickSearchTest(BaseTestCase):
         obi = mommy.make(
             models.Contact, firstname="Obi-Wan", lastname="Kenobi", mobile="04.99.00.00.00", has_left=True
         )
-        doe = mommy.make(models.Contact, firstname="Doe", lastname="John", phone="03.33.33.33.33")
+        doe = mommy.make(models.Contact, firstname="DoeDoeDoe", lastname="JohnJohnJohn", phone="03.33.33.33.33")
         star_wars_company = mommy.make(models.Entity, phone="04.99.11.22.33")
         mommy.make(models.Contact, firstname="Luke", lastname="Skywalker", entity=star_wars_company, has_left=True)
 
