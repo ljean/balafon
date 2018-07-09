@@ -152,6 +152,11 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             else:
                 self.fields[time_field].initial = the_datetime.time()
 
+        is_frozen = self.instance.frozen if self.instance else False
+        if is_frozen:
+            self.fields[date_field].widget.attrs['disabled'] = 'disabled'
+            self.fields[time_field].widget.attrs['disabled'] = 'disabled'
+
     def clean_status(self):
         """status validation"""
         type_of = self.cleaned_data['type']

@@ -57,18 +57,18 @@ class SalesDocumentViewMixin(object):
 
         action = self.get_action()
 
-        try:
-            sale = action.sale
-        except Sale.DoesNotExist:
-            raise Http404
+        sale = self.get_sale(action)
 
         if self.is_public:
             is_read_only = True
         else:
-            if action.type:
-                is_read_only = action.status in action.type.storemanagementactiontype.readonly_status.all()
+            if action.frozen:
+                is_read_only = True
             else:
-                is_read_only = False
+                if action.type:
+                    is_read_only = action.status in action.type.storemanagementactiontype.readonly_status.all()
+                else:
+                    is_read_only = False
 
         action_serializer = ActionSerializer(self.get_action())
         action_data = Utf8JSONRenderer().render(action_serializer.data)
@@ -131,6 +131,12 @@ class SalesDocumentViewMixin(object):
                 action_id = self.kwargs.get('action_id', 0)
                 self.action = get_object_or_404(Action, id=action_id)
         return self.action
+
+    def get_sale(self, action):
+        try:
+            return action.sale
+        except Sale.DoesNotExist:
+            raise Http404
 
     def get_sale_items(self):
         """get the sales items"""

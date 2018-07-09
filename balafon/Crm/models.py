@@ -1459,6 +1459,10 @@ class Action(LastModifiedModel):
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     previous_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='+')
     
+    frozen = models.BooleanField(
+        default=False, verbose_name=_('frozen'), help_text=_('Some data (date, sale, ...) can not be changed ')
+    )
+
     def __str__(self):
         return '{0} - {1}'.format(self.planned_date, self.subject or self.type)
 

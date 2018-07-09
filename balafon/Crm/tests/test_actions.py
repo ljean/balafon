@@ -727,9 +727,35 @@ class EditActionTest(BaseTestCase):
 
         self.assertEqual(soup.select("#id_date")[0]["value"], "2014-04-09")
         self.assertEqual(soup.select("#id_time")[0]["value"], "12:15:00")
+        self.assertEqual(soup.select("#id_date")[0].get("disabled"), None)
+        self.assertEqual(soup.select("#id_time")[0].get("disabled"), None)
 
         self.assertEqual(soup.select("#id_end_date")[0]["value"], "2014-04-10")
         self.assertEqual(soup.select("#id_end_time")[0]["value"], "09:30:00")
+        self.assertEqual(soup.select("#id_end_date")[0].get("disabled"), None)
+        self.assertEqual(soup.select("#id_end_time")[0].get("disabled"), None)
+
+    def test_view_action_start_and_end_frozen(self):
+        """view action start and end"""
+        action = mommy.make(
+            models.Action, subject="AAA", frozen=True,
+            planned_date=datetime(2014, 4, 9, 12, 15), end_datetime=datetime(2014, 4, 10, 9, 30)
+        )
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(soup.select("#id_date")[0]["value"], "2014-04-09")
+        self.assertEqual(soup.select("#id_time")[0]["value"], "12:15:00")
+        self.assertEqual(soup.select("#id_date")[0]["disabled"], "disabled")
+        self.assertEqual(soup.select("#id_time")[0]["disabled"], "disabled")
+
+        self.assertEqual(soup.select("#id_end_date")[0]["value"], "2014-04-10")
+        self.assertEqual(soup.select("#id_end_time")[0]["value"], "09:30:00")
+        self.assertEqual(soup.select("#id_end_date")[0]["disabled"], "disabled")
+        self.assertEqual(soup.select("#id_end_time")[0]["disabled"], "disabled")
 
 
 class ActionTest(BaseTestCase):
