@@ -1620,23 +1620,7 @@ class Action(LastModifiedModel):
         if not unique_emails:
             return ""
 
-        body = ""
-        if self.uuid and hasattr(self, 'sale'):
-            try:
-                url = reverse('store_view_sales_document_public', args=[self.uuid])
-                body = ugettext("Here is a link to your {0}: {1}{2}").format(
-                    self.type.name,
-                    "http://" + Site.objects.get_current().domain,
-                    url
-                )
-            except ObjectDoesNotExist:
-                pass
-
-        return "mailto:{0}?subject={1}&body={2}".format(
-            ",".join(unique_emails),
-            self.type.mail_to_subject if (self.type and self.type.mail_to_subject) else self.subject,
-            body
-        )
+        return reverse('crm_mailto_action', args=[self.id])
 
 
 @python_2_unicode_compatible
