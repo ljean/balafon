@@ -103,8 +103,11 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             # let javascript disable the blank value if default_status
             choices = [('', "---------")]
+            allowed_status = instance.type.allowed_status.all()
+            if instance.frozen:
+                allowed_status = allowed_status.filter(allowed_on_frozen=True)
             self.fields['status'].choices = choices + [
-                (status.id, status.name) for status in instance.type.allowed_status.all()
+                (status.id, status.name) for status in allowed_status
             ]
         elif action_type and action_type.allowed_status.count():
             # let javascript disable the blank value if default_status
@@ -119,9 +122,12 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
 
         if instance and instance.id and instance.type and instance.type.allowed_status2.count():
             # let javascript disable the blank value if default_status2
+            allowed_status2 = instance.type.allowed_status2.all()
+            if instance.frozen:
+                allowed_status2 = allowed_status2.filter(allowed_on_frozen=True)
             choices = [('', "---------")]
             self.fields['status2'].choices = choices + [
-                (status.id, status.name) for status in instance.type.allowed_status2.all()
+                (status.id, status.name) for status in allowed_status2
             ]
         elif action_type and action_type.allowed_status2.count():
             # let javascript disable the blank value if default_status
@@ -380,14 +386,20 @@ class UpdateActionStatusForm(BsPopupModelForm):
 
         if instance and instance.id and instance.type and instance.type.allowed_status.count():
             # let javascript disable the blank value if default_status
+            allowed_status = instance.type.allowed_status.all()
+            if instance.frozen:
+                allowed_status = allowed_status.filter(allowed_on_frozen=True)
             self.fields['status'].choices = [
-                (status.id, status.name) for status in instance.type.allowed_status.all()
+                (status.id, status.name) for status in allowed_status
             ]
 
         if instance and instance.id and instance.type and instance.type.allowed_status2.count():
             # let javascript disable the blank value if default_status2
+            allowed_status2 = instance.type.allowed_status2.all()
+            if instance.frozen:
+                allowed_status2 = allowed_status2.filter(allowed_on_frozen=True)
             self.fields['status2'].choices = [
-                (status.id, status.name) for status in instance.type.allowed_status2.all()
+                (status.id, status.name) for status in allowed_status2
             ]
         else:
             self.fields['status2'].widget = forms.HiddenInput()

@@ -1235,6 +1235,9 @@ class ActionStatus(NamedElement):
         "ActionStatus", verbose_name=_('Next status on send by email'), default=None, null=True, blank=True,
         on_delete=models.CASCADE, help_text=_('automatically change the status when sent by email'), related_name="+"
     )
+    allowed_on_frozen = models.BooleanField(
+        default=True, verbose_name=_('allowed on frozen'), help_text=_('If False, not shown if action si frozen')
+    )
 
     @property
     def style(self):
@@ -1462,7 +1465,6 @@ class Action(LastModifiedModel):
     parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_("parent"))
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
     previous_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='+')
-    
     frozen = models.BooleanField(
         default=False, verbose_name=_('frozen'), help_text=_('Some data (date, sale, ...) can not be changed ')
     )

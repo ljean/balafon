@@ -1636,6 +1636,32 @@ class ActionTest(BaseTestCase):
         self.assertEqual(soup.select("input#id_date")[0]["value"], "2014-01-31")
         self.assertEqual(soup.select("input#id_time")[0]["value"], "11:34:00")
 
+    def test_view_edit_action_frozen(self):
+        """view edit action"""
+        entity = mommy.make(models.Entity)
+        contact = entity.default_contact
+        planned_datetime = datetime(2014, 1, 31, 11, 34, 00)
+
+        action_type = mommy.make(models.ActionType)
+        action_status1 = mommy.make(models.ActionStatus, name="status1")
+        action_status2 = mommy.make(models.ActionStatus, name="status2", allowed_on_frozen=False)
+        action_type.allowed_status.add(action_status1, action_status2)
+        action_type.save()
+        mommy.make(User, last_name="Dupond", first_name="Pierre", is_staff=True)
+
+        action = mommy.make(models.Action, planned_date=planned_datetime, frozen=True, type=action_type)
+        action.contacts.add(contact)
+        action.entities.add(entity)
+        action.save()
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select("select#id_status option")), 2)
+        self.assertEqual(soup.select("select#id_status option")[0]["value"], '')
+        self.assertEqual(soup.select("select#id_status option")[1]["value"], str(action_status1.id))
+
     def test_edit_action(self):
         """edit action"""
         entity = mommy.make(models.Entity)
@@ -1838,16 +1864,54 @@ class UpdateActionStatusTest(BaseTestCase):
     def test_view_update_action_status_existing(self):
         """it should display form"""
 
-        action_status1 = mommy.make(models.ActionStatus)
-        action_status2 = mommy.make(models.ActionStatus)
-        action_status3 = mommy.make(models.ActionStatus)
+        action_status1 = mommy.make(models.ActionStatus, name="status1")
+        action_status2 = mommy.make(models.ActionStatus, name="status2")
+        action_status3 = mommy.make(models.ActionStatus, name="status3")
+        action_status4 = mommy.make(models.ActionStatus, name="status4", allowed_on_frozen=False)
 
         action_type = mommy.make(models.ActionType)
         action_type.allowed_status.add(action_status1)
         action_type.allowed_status.add(action_status2)
+        action_type.allowed_status.add(action_status4)
         action_type.save()
 
-        action = mommy.make(models.Action, type=action_type, status=action_status1)
+        action = mommy.make(models.Action, type=action_type, status=action_status1, frozen=False)
+
+        url = reverse('crm_update_action_status', args=[action.id])
+
+        response = self.client.get(url)
+
+        self.assertEqual(200, response.status_code)
+
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(3, len(soup.select("#id_status option")))
+        self.assertContains(response, action_status1.name)
+        self.assertContains(response, action_status2.name)
+        self.assertNotContains(response, action_status3.name)
+        self.assertContains(response, action_status4.name)
+
+        self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
+        self.assertEqual(action_status1.name, soup.select("#id_status option[selected=selected]")[0].text)
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status, action_status1)
+
+    def test_view_update_action_status_frozen(self):
+        """it should display form"""
+
+        action_status1 = mommy.make(models.ActionStatus)
+        action_status2 = mommy.make(models.ActionStatus)
+        action_status3 = mommy.make(models.ActionStatus)
+        action_status4 = mommy.make(models.ActionStatus, allowed_on_frozen=False)
+
+        action_type = mommy.make(models.ActionType)
+        action_type.allowed_status.add(action_status1)
+        action_type.allowed_status.add(action_status2)
+        action_type.allowed_status.add(action_status4)
+        action_type.save()
+
+        action = mommy.make(models.Action, type=action_type, status=action_status1, frozen=True)
 
         url = reverse('crm_update_action_status', args=[action.id])
 
@@ -1861,6 +1925,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertContains(response, action_status1.name)
         self.assertContains(response, action_status2.name)
         self.assertNotContains(response, action_status3.name)
+        self.assertNotContains(response, action_status4.name)
 
         self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
         self.assertEqual(action_status1.name, soup.select("#id_status option[selected=selected]")[0].text)

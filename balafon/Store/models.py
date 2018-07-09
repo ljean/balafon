@@ -45,6 +45,10 @@ class StoreManagementActionType(models.Model):
             'The action amount will be update with pre-tax total if checked and with tax-included total if not'
         )
     )
+    default_readonly_status = models.ForeignKey(
+        ActionStatus, blank=True, verbose_name=_('default readonly status'), null=True, default=None,
+        on_delete=models.SET_NULL, related_name="+"
+    )
     readonly_status = models.ManyToManyField(
         ActionStatus, blank=True, verbose_name=_('readonly status'),
         help_text=_('When action has one of these status, it is not possible to modify a commercial document')
@@ -1173,3 +1177,18 @@ def on_action_cloned(sender, original_action, new_action, **kwargs):
         pass
 
 action_cloned.connect(on_action_cloned, sender=Action)
+
+
+def freeze_readonly_action(sender, instance, created, **kwargs):
+    """update the corresponding action amount when item is added or updated"""
+    if instance.type and not instance.frozen:
+        try:
+            action_type_cfg = StoreManagementActionType.objects.get(action_type=instance.type)
+            if instance.status in action_type_cfg.readonly_status.all():
+                instance.frozen = True
+                instance.save()
+        except StoreManagementActionType.DoesNotExist:
+            pass
+
+
+post_save.connect(freeze_readonly_action, sender=Action)

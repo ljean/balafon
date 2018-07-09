@@ -167,6 +167,15 @@ class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
         """get context data"""
         context = super(SalesDocumentPdfView, self).get_context_data(**kwargs)
 
+        # Make sure that the action is in readonly status
+        action = self.get_action()
+        default_readonly_status = action.type.storemanagementactiontype.default_readonly_status
+        if default_readonly_status:
+            read_only_status = action.type.storemanagementactiontype.readonly_status.all()
+            if action.status not in read_only_status:
+                action.status = default_readonly_status
+                action.save()
+
         if settings.DEBUG:
             port = self.request.META.get('SERVER_PORT', 8000)
             context["DOMAIN"] = 'http://127.0.0.1:{0}'.format(port)

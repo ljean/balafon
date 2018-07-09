@@ -310,6 +310,56 @@ class ViewCommercialDocumentTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 
+    def test_view_pdf_make_action_readonly(self):
+        """It should display item text"""
+
+        status1 = mommy.make(ActionStatus)
+        status2 = mommy.make(ActionStatus)
+        status3 = mommy.make(ActionStatus)
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type, status=status1)
+        store_action_type.default_readonly_status = status3
+        store_action_type.readonly_status.add(status2, status3)
+        store_action_type.save()
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        action.contacts.add(contact1)
+        action.save()
+
+        mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
+
+        url = reverse('store_view_sales_document_pdf', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        action  = Action.objects.get(id=action.id)
+        self.assertEqual(action.status, status3)
+
+    def test_view_pdf_action_already_readonly(self):
+        """It should display item text"""
+
+        status1 = mommy.make(ActionStatus)
+        status2 = mommy.make(ActionStatus)
+        status3 = mommy.make(ActionStatus)
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        action = mommy.make(Action, type=store_action_type.action_type, status=status2)
+        store_action_type.default_readonly_status = status3
+        store_action_type.readonly_status.add(status2, status3)
+        store_action_type.save()
+
+        contact1 = mommy.make(Contact, lastname='abc' * 10)
+        action.contacts.add(contact1)
+        action.save()
+
+        mommy.make(models.SaleItem, sale=action.sale, text='Promo été', quantity=1, pre_tax_price=10)
+
+        url = reverse('store_view_sales_document_pdf', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        action  = Action.objects.get(id=action.id)
+        self.assertEqual(action.status, status2)
+
     def test_view_public_pdf(self):
         """It should display item text"""
 
@@ -366,9 +416,7 @@ class ActionMailtoTest(BaseTestCase):
         action.contacts.add(contact)
         action.save()
         self.assertEqual(
-            action.mail_to, 'mailto:"{0}" <{1}>?subject={2}&body='.format(
-                contact.fullname, contact.email, action.subject,
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_entity(self):
@@ -379,9 +427,7 @@ class ActionMailtoTest(BaseTestCase):
         action.entities.add(entity)
         action.save()
         self.assertEqual(
-            action.mail_to, 'mailto:"{0}" <{1}>?subject={2}&body='.format(
-                entity.name, entity.email, action.subject,
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_entity_contact(self):
@@ -392,9 +438,7 @@ class ActionMailtoTest(BaseTestCase):
         action.contacts.add(entity.default_contact)
         action.save()
         self.assertEqual(
-            action.mail_to, 'mailto:{0}?subject={1}&body='.format(
-                entity.email, action.subject,
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_several(self):
@@ -410,9 +454,7 @@ class ActionMailtoTest(BaseTestCase):
 
         action.save()
         self.assertEqual(
-            action.mail_to, 'mailto:{0},{1}?subject={2}&body='.format(
-                entity.email, contact.email, action.subject,
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_twice(self):
@@ -429,9 +471,7 @@ class ActionMailtoTest(BaseTestCase):
         action.save()
 
         self.assertEqual(
-            action.mail_to, 'mailto:{0}?subject={1}&body='.format(
-                entity.email, action.subject,
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_uuid(self):
@@ -453,9 +493,7 @@ class ActionMailtoTest(BaseTestCase):
         self.assertEqual(contact.firstname, '')
 
         self.assertEqual(
-            action.mail_to, 'mailto:{0}?subject={1}&body={2}'.format(
-                contact.email, action.subject, body
-            )
+            action.mail_to, reverse('crm_mailto_action', args=[action.id])
         )
 
     def test_mail_to_no_email(self):
