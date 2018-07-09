@@ -7,7 +7,8 @@ import json
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Q
+from django.contrib.sites.models import Site
+from django.db.models import Q, ObjectDoesNotExist
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import Template, Context
@@ -624,25 +625,49 @@ def mailto_action(request, action_id):
     action = get_object_or_404(models.Action, id=action_id)
     try:
         mailto_settings = models.MailtoSettings.objects.get(action_type=action.type)
+        body_template = mailto_settings.body_template
+        subject = mailto_settings.subject or action.type.mail_to_subject or action.subject
+        is_bcc = mailto_settings.bcc
     except models.MailtoSettings.DoesNotExist:
-        redirect_url = reverse('admin:Crm_mailtosettings_changelist')
-        return HttpResponseRedirect(redirect_url)
+        body_template = ''
+        mailto_settings = None
+        if action.type:
+            subject = action.type.mail_to_subject or action.subject
+        else:
+            subject = action.subject
+        is_bcc = False
+
+    if action.status and action.status.next_on_send:
+        action.status = action.status.next_on_send
+        action.save()
 
     emails = [contact.get_email for contact in action.contacts.all()]
     emails += [entity.email for entity in action.entities.all()]
 
-    template_text = Template(mailto_settings.body_template)
-    body = template_text.render(Context({'action': action, 'settings': mailto_settings}))
+    doc_url = ''
+    if action.uuid and hasattr(action, 'sale'):
+        try:
+            url = reverse('store_view_sales_document_public', args=[action.uuid])
+            prefix = "http{0}://".format('s' if request.is_secure else '')
+            doc_url = prefix + Site.objects.get_current().domain + url
+        except ObjectDoesNotExist:
+            pass
 
-    # Remove duplicates and empty and soty in alphabetical order
+    if body_template:
+        template_text = Template(body_template)
+        body = template_text.render(Context({'action': action, 'settings': mailto_settings, 'doc_url': doc_url}))
+    else:
+        body = ''
+
+    # Remove duplicates and empty and sort in alphabetical order
     emails = list(sorted(set([email for email in emails if email])))
 
     mailto = 'mailto:'
-    if mailto_settings.bcc:
+    if is_bcc:
         mailto += '?bcc='
     mailto += ','.join(emails)
-    mailto += "&" if mailto_settings.bcc else "?"
-    mailto += 'subject={0}'.format(mailto_settings.subject or action.subject)
+    mailto += "&" if is_bcc else "?"
+    mailto += 'subject={0}'.format(subject)
     mailto += '&body={0}'.format(body)
     return HttpResponseRedirectMailtoAllowed(mailto)
 

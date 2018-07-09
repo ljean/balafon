@@ -1231,6 +1231,10 @@ class ActionStatus(NamedElement):
         blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Background color'),
         help_text=_("Background color. Must be a rgb code. For example: #000000")
     )
+    next_on_send = models.ForeignKey(
+        "ActionStatus", verbose_name=_('Next status on send by email'), default=None, null=True, blank=True,
+        on_delete=models.CASCADE, help_text=_('automatically change the status when sent by email'), related_name="+"
+    )
 
     @property
     def style(self):

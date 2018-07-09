@@ -5,15 +5,14 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.unit_tests import TestCase
-from balafon.Crm.models import Action, ActionMenu, ActionType, Contact
+from balafon.Crm.models import Action, ActionMenu, ActionType, Contact, ActionStatus, MailtoSettings
 from balafon.Store import models
 
 
@@ -1007,7 +1006,15 @@ class StoreItemDiscountTest(TestCase):
 
 
 class MailtoActionTest(TestCase):
-    """mailtto"""
+    """mailto"""
+
+    def setUp(self):
+        """before each test"""
+        super(MailtoActionTest, self).setUp()
+        user = mommy.make(User, is_active=True, is_staff=True, is_superuser=False)
+        user.set_password('abc')
+        user.save()
+        self.client.login(username=user.username, password='abc')
 
     def test_mailto_to_action_body(self):
 
@@ -1023,16 +1030,19 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
-        body = _("Here is a link to your {0}: {1}{2}").format(
-            action_type.name,
-            "http://" + Site.objects.get_current().domain,
-            url
+        expected_body = "Here is a link to your document: https://example.com{0}".format(url).replace(' ', '%20')
+
+        mommy.make(
+            MailtoSettings,
+            body_template="Here is a link to your document: {{ doc_url }}",
+            action_type=action_type
         )
 
-        self.assertEqual(
-            action.mail_to,
-            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body={0}'.format(body)
-        )
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body={0}".format(expected_body))
 
     def test_mailto_to_action_body_no_sale(self):
 
@@ -1044,12 +1054,33 @@ class MailtoActionTest(TestCase):
         action.contacts.add(contact)
         action.save()
 
+        mommy.make(MailtoSettings, body_template="", action_type=action_type)
+
         self.assertNotEqual(action.uuid, '')
 
-        self.assertEqual(
-            action.mail_to,
-            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
-        )
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=")
+
+    def test_mailto_to_action_body_no_settings(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
+
+        action = mommy.make(Action, type=action_type, subject='Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=")
 
     def test_mailto_to_action_body_no_uuid(self):
 
@@ -1064,10 +1095,11 @@ class MailtoActionTest(TestCase):
 
         self.assertEqual(action.uuid, '')
 
-        self.assertEqual(
-            action.mail_to,
-            'mailto:"John Doe" <toto@toto.fr>?subject=Test&body='
-        )
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=")
 
     def test_mailto_to_action_subject(self):
 
@@ -1083,16 +1115,11 @@ class MailtoActionTest(TestCase):
         self.assertNotEqual(action.uuid, '')
         url = reverse('store_view_sales_document_public', args=[action.uuid])
 
-        body = _("Here is a link to your {0}: {1}{2}").format(
-            action_type.name,
-            "http://" + Site.objects.get_current().domain,
-            url
-        )
-
-        self.assertEqual(
-            action.mail_to,
-            'mailto:"John Doe" <toto@toto.fr>?subject=Another subject&body={0}'.format(body)
-        )
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Another%20subject&body=")
 
 
 class SaleItemOrderTest(TestCase):
@@ -1132,7 +1159,7 @@ class SaleItemOrderTest(TestCase):
         self.assertEqual(1, item.order_index)
 
 
-class SaleReferenceText(TestCase):
+class SaleReferenceTest(TestCase):
     """It should increment the order correctly"""
 
     def test_empty(self):
@@ -1155,3 +1182,60 @@ class SaleReferenceText(TestCase):
 
         self.assertNotEqual(action.sale, None)
         self.assertEqual(action.sale.get_references_text(), references_text)
+
+
+class FreezeActionTest(TestCase):
+    """It should increment the order correctly"""
+
+    def test_not_frozen(self):
+        """It should be empty"""
+        status1 = mommy.make(ActionStatus)
+        status2 = mommy.make(ActionStatus)
+        status3 = mommy.make(ActionStatus)
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        store_action_type.default_readonly_status = status3
+        store_action_type.readonly_status.add(status2, status3)
+        store_action_type.save()
+
+        action = mommy.make(Action, type=store_action_type.action_type, status=status1)
+        self.assertEqual(action.frozen, False)
+
+    def test_frozen(self):
+        """It should be empty"""
+        status1 = mommy.make(ActionStatus)
+        status2 = mommy.make(ActionStatus)
+        status3 = mommy.make(ActionStatus)
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        store_action_type.default_readonly_status = status3
+        store_action_type.readonly_status.add(status2, status3)
+        store_action_type.save()
+
+        action = mommy.make(Action, type=store_action_type.action_type, status=status2)
+        self.assertEqual(action.frozen, True)
+
+    def test_refreeze(self):
+        """It should be empty"""
+        status1 = mommy.make(ActionStatus)
+        status2 = mommy.make(ActionStatus)
+        status3 = mommy.make(ActionStatus)
+
+        store_action_type = mommy.make(models.StoreManagementActionType)
+        store_action_type.default_readonly_status = status3
+        store_action_type.readonly_status.add(status2, status3)
+        store_action_type.save()
+
+        action = mommy.make(Action, type=store_action_type.action_type, status=status1)
+        self.assertEqual(action.frozen, False)
+
+        action.frozen = True
+        action.save()
+        self.assertEqual(action.frozen, True)
+        self.assertEqual(action.status, status1)
+
+        action.status = status2
+        action.save()
+        self.assertEqual(action.frozen, True)
+        self.assertEqual(action.status, status2)
+

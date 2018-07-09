@@ -868,8 +868,9 @@ class MailtoActionTest(BaseTestCase):
 
         url = reverse("crm_mailto_action", args=[action.id])
 
-        response = self.client.get(url, follow=True)
-        self.assertRedirects(response, reverse('admin:Crm_mailtosettings_changelist'))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=")
 
     def test_mailto_action_no_settings_not_superuser(self):
         """send email to the ony contact"""
@@ -886,9 +887,9 @@ class MailtoActionTest(BaseTestCase):
 
         url = reverse("crm_mailto_action", args=[action.id])
 
-        response = self.client.get(url, follow=True)
-        self.assertRedirects(response, reverse('admin:Crm_mailtosettings_changelist'), target_status_code=403)
-
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=")
 
     def test_mailto_action_invalid_action(self):
         """send email to the ony contact"""
@@ -905,3 +906,25 @@ class MailtoActionTest(BaseTestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_mailto_action_next_status(self):
+        """send email to the ony contact"""
+
+        type = mommy.make(models.ActionType)
+        status2 = mommy.make(models.ActionStatus)
+        status1 = mommy.make(models.ActionStatus, next_on_send=status2)
+        action = mommy.make(models.Action, subject="Test", type=type, status=status1)
+        contact = mommy.make(models.Contact, email="toto@toto.fr")
+        action.contacts.add(contact)
+        action.save()
+
+        mommy.make(models.MailtoSettings, body_template="Hello", action_type=type)
+
+        url = reverse("crm_mailto_action", args=[action.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body=Hello")
+
+        action = models.Action.objects.get(id=action.id)
+        self.assertEqual(action.status, status2)
