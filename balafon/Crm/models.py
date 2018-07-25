@@ -1395,7 +1395,7 @@ class ActionMenu(models.Model):
     only_for_status = models.ManyToManyField(ActionStatus, blank=True, verbose_name=_('Only for status'))
 
     class Meta:
-        verbose_name = _('action men')
+        verbose_name = _('action menu')
         verbose_name_plural = _('action menus')
         ordering = ['order_index']
 
