@@ -1398,8 +1398,8 @@ class ActionTest(BaseTestCase):
         action_type.save()
 
         contact = entity.default_contact
-        url = reverse('crm_create_action', args=[0, contact.id])
-        response = self.client.get(url, data={'type': action_type.id})
+        url = reverse('crm_create_action_of_type', args=[0, contact.id, action_type.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(models.Action.objects.count(), 0)
@@ -1449,8 +1449,8 @@ class ActionTest(BaseTestCase):
         action_type.save()
 
         contact = entity.default_contact
-        url = reverse('crm_create_action', args=[0, contact.id])
-        response = self.client.get(url, data={'type': action_type.id})
+        url = reverse('crm_create_action_of_type', args=[0, contact.id, action_type.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(models.Action.objects.count(), 0)
@@ -1498,8 +1498,8 @@ class ActionTest(BaseTestCase):
         action_type.save()
 
         contact = entity.default_contact
-        url = reverse('crm_create_action', args=[0, contact.id])
-        response = self.client.get(url, data={'type': action_type.id})
+        url = reverse('crm_create_action_of_type', args=[0, contact.id, action_type.id])
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(models.Action.objects.count(), 0)

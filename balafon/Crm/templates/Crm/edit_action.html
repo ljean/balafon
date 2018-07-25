@@ -97,7 +97,7 @@
 
 {% block title %}{{ form.title }}{% endblock %}
 
-{% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_create_action" entity_id contact_id %}{% endif %}{% endblock %}
+{% block form_url %}{% if action %}{% url "crm_edit_action" action.id %}{% else %}{% url "crm_create_action_of_type" entity_id contact_id type_id %}{% endif %}{% endblock %}
 
 
 {% block popup_buttons %}

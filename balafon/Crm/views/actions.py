@@ -232,7 +232,7 @@ def view_contact_actions(request, contact_id, set_id):
 
 @user_passes_test(can_access)
 @popup_redirect
-def create_action(request, entity_id, contact_id):
+def create_action(request, entity_id, contact_id, type_id=None):
     """view"""
     # entity_id or contact_id can be 0
     # add from menu -> both are 0 / add from contact -> entity_id = 0 / add from entity -> contact_id = 0
@@ -241,8 +241,13 @@ def create_action(request, entity_id, contact_id):
     contact = get_object_or_404(models.Contact, id=contact_id) if contact_id else None
     entity = get_object_or_404(models.Entity, id=entity_id) if entity_id else None
 
+    try:
+        action_type = models.ActionType.objects.get(id=type_id)
+    except (ValueError, models.ActionType.DoesNotExist):
+        action_type = None
+
     if request.method == 'POST':
-        form = forms.ActionForm(request.POST)
+        form = forms.ActionForm(request.POST, action_type=action_type)
         if form.is_valid():
             next_url = request.session.get('redirect_url')
             action = form.save()
@@ -275,18 +280,13 @@ def create_action(request, entity_id, contact_id):
         except (ValueError, models.Opportunity.DoesNotExist):
             pass
 
-        try:
-            type_id = int(request.GET.get('type', 0))
-            initial['type'] = models.ActionType.objects.get(id=type_id)
-        except (ValueError, models.ActionType.DoesNotExist):
-            pass
-
-        form = forms.ActionForm(initial=initial)
+        form = forms.ActionForm(initial=initial, action_type=action_type)
 
     context = {
         'form': form,
         'contact_id': contact_id,
         'entity_id': entity_id,
+        'type_id': action_type.id if action_type else 0,
     }
 
     return render(

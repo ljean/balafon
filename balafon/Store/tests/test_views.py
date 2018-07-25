@@ -560,7 +560,7 @@ class EditSaleActionTest(BaseTestCase):
         action_type = ActionType.objects.get(id=action_type.id)
         self.assertEqual(action_type.is_amount_calculated, True)
 
-        url = reverse('crm_create_action', args=[0, 0]) + "?type={0}".format(action_type.id)
+        url = reverse('crm_create_action_of_type', args=[0, 0, action_type.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
 

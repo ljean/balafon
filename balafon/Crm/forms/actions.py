@@ -57,32 +57,23 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
     def __init__(self, *args, **kwargs):
         kwargs.pop('entity', None)
         instance = kwargs.get('instance', None)
+        action_type = kwargs.pop('action_type', None)
         super(ActionForm, self).__init__(*args, **kwargs)
         self.title = u""
-
-        # Force the type to be hidden
-        action_type = None
-        is_amount_calculated = False
         if instance:
-            # If a type is already defined and belongs to a set
-            if instance.type and instance.type.set:
-                action_type = instance.type
-            if instance.type:
-                is_amount_calculated = instance.type.is_amount_calculated
-                self.calculated_amount = instance.amount
-        else:
-            # if initial value is provided (from url)
-            action_type = kwargs.get('initial', {}).get('type', None)
-            if action_type:
-                is_amount_calculated = action_type.is_amount_calculated
-                self.calculated_amount = Decimal("0")
+            action_type = instance.type
+        self.action_type = action_type
 
+        is_amount_calculated = False
         if action_type:
+            is_amount_calculated = action_type.is_amount_calculated
+            self.calculated_amount = Decimal("0")
             for fieldset_name, fieldset_attrs in self.Meta.fieldsets:
                 if fieldset_name == 'type':
                     fieldset_attrs['legend'] = action_type.name
                     break
             self.fields['type'].widget = forms.HiddenInput()
+            self.fields['type'].initial = action_type
             if instance:
                 self.title = ugettext(u"Edition {0}").format(action_type.name)
             else:
@@ -94,46 +85,35 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
                             (instance and instance.type and instance.type.number_auto_generated)
         if is_auto_generated:
             self.fields['number'].widget.attrs['disabled'] = 'disabled'
+            self.fields['number'].required = False
 
         self.fields['amount'].widget.attrs['step'] = 'any'
         if is_amount_calculated:
             self.fields['amount'].widget.attrs['disabled'] = 'disabled'
         self.is_amount_calculated = is_amount_calculated
 
-        if instance and instance.id and instance.type and instance.type.allowed_status.count():
+        if action_type and action_type.allowed_status.count():
             # let javascript disable the blank value if default_status
             choices = [('', "---------")]
-            allowed_status = instance.type.allowed_status.all()
-            if instance.frozen:
+            allowed_status = action_type.allowed_status.all()
+            if instance and instance.frozen:
                 allowed_status = allowed_status.filter(allowed_on_frozen=True)
             self.fields['status'].choices = choices + [
                 (status.id, status.name) for status in allowed_status
-            ]
-        elif action_type and action_type.allowed_status.count():
-            # let javascript disable the blank value if default_status
-            choices = [('', "---------")]
-            self.fields['status'].choices = choices + [
-                (status.id, status.name) for status in action_type.allowed_status.all()
             ]
             if action_type.default_status:
                 self.fields['status'].initial = action_type.default_status.id
             else:
                 self.fields['status'].initial = ''
 
-        if instance and instance.id and instance.type and instance.type.allowed_status2.count():
+        if action_type and action_type.allowed_status2.count():
             # let javascript disable the blank value if default_status2
-            allowed_status2 = instance.type.allowed_status2.all()
-            if instance.frozen:
+            allowed_status2 = action_type.allowed_status2.all()
+            if instance and instance.frozen:
                 allowed_status2 = allowed_status2.filter(allowed_on_frozen=True)
             choices = [('', "---------")]
             self.fields['status2'].choices = choices + [
                 (status.id, status.name) for status in allowed_status2
-            ]
-        elif action_type and action_type.allowed_status2.count():
-            # let javascript disable the blank value if default_status
-            choices = [('', "---------")]
-            self.fields['status2'].choices = choices + [
-                (status.id, status.name) for status in action_type.allowed_status2.all()
             ]
             if action_type.default_status2:
                 self.fields['status2'].initial = action_type.default_status2.id
@@ -168,7 +148,7 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
 
     def clean_status(self):
         """status validation"""
-        type_of = self.cleaned_data['type']
+        type_of = self.cleaned_data.get('type') or self.action_type
         status = self.cleaned_data['status']
         if type_of:
             allowed_status = ([] if type_of.default_status else [None]) + list(type_of.allowed_status.all())

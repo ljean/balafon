@@ -90,6 +90,11 @@ urlpatterns = [
         name='crm_remove_entity_from_action'
     ),
     url(r'^create-action/(?P<entity_id>\d+)/(?P<contact_id>\d+)/$', actions.create_action, name='crm_create_action'),
+    url(
+        r'^create-action-of-type/(?P<entity_id>\d+)/(?P<contact_id>\d+)/(?P<type_id>\d+)/$',
+        actions.create_action,
+        name='crm_create_action_of_type'
+    ),
     url(r'allowed-action-status/$', actions.get_action_status, name="crm_get_action_status"),
     url(r'allowed-action-status2/$', actions.get_action_status2, name="crm_get_action_status2"),
     url(r'^clone-action/(?P<action_id>\d+)/$', actions.clone_action, name='crm_clone_action'),
