@@ -6,6 +6,7 @@
 /build
 */.hg
 .hg*
+dist/*
 
 # OS generated files #
 ######################
