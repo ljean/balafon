@@ -25,7 +25,7 @@ setup(
         'django >= 1.11, <2.0',
         'djangorestframework',
         'django-extensions',
-        'apidev-coop_cms>=1.3.1',
+        'apidev-coop_cms>=1.3.2',
         'beautifulsoup4',
         'django-wkhtmltopdf',
         'xlwt',
