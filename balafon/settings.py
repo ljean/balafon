@@ -91,3 +91,9 @@ def get_captcha_field():
         return captcha_field(widget=captcha_widget, help_text=captcha_help_text)
     else:
         return captcha_field(help_text=captcha_help_text)
+
+
+def is_profile_installed():
+    """returns True of balafon Profile is installed"""
+    installed_apps = getattr(settings, 'INSTALLED_APPS', [])
+    return 'balafon.Profile' in installed_apps

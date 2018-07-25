@@ -13,6 +13,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from balafon.settings import is_profile_installed
 from balafon.Crm.models import Action, ActionType
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
@@ -71,12 +72,13 @@ class StoreItemViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """returns objects"""
         contact = None
-        try:
-            if self.request.user.is_authenticated():
-                profile = ContactProfile.objects.get(user=self.request.user)
-                contact = profile.contact
-        except ContactProfile.DoesNotExist:
-            pass
+        if is_profile_installed():
+            try:
+                if self.request.user.is_authenticated():
+                    profile = ContactProfile.objects.get(user=self.request.user)
+                    contact = profile.contact
+            except ContactProfile.DoesNotExist:
+                pass
 
         if contact:
             # The contact exists : show items with a only_for_groups if contact is member of one of the groups
