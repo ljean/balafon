@@ -28,7 +28,9 @@ class StoreItemCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StoreItemCategory
-        fields = ('id', 'name', "icon", "get_path_name", "parent", "get_articles_count", "get_children_count")
+        fields = (
+            'id', 'name', "icon", "get_path_name", "parent", "get_articles_count", "get_children_count"
+        )
 
 
 class VatRateSerializer(serializers.ModelSerializer):
@@ -120,7 +122,7 @@ class StoreItemSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'origin', 'category', 'vat_rate', 'pre_tax_price', 'vat_incl_price', 'brand', 'reference',
             'tags', 'available', 'unit', 'public_properties', 'discounts', 'price_class', 'certificates',
-            'as_thumbnail', 'as_image', 'description',
+            'as_thumbnail', 'as_image', 'description', 'accounting_code',
         )
 
 

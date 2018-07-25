@@ -41,7 +41,7 @@ class CatalogueTest(TestCase):
         workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
         sheet = workbook.sheet_by_index(0)
 
-        self.assertEqual(sheet.nrows, 1 + 2) # header + 2 lines
+        self.assertEqual(sheet.nrows, 1 + 2)  # header + 2 lines
 
     def test_export_all_available(self):
         """It should export only available items"""
@@ -212,10 +212,11 @@ class ActionSummaryTest(TestCase):
         self.assertEqual(values[0], 1)
         self.assertEqual(values[1], "Pierre Dupond")
         self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date.date())
-        self.assertEqual(values[3], Decimal(10))
-        self.assertEqual(values[4], Decimal(1))
-        self.assertEqual(values[5], Decimal(11))
-        self.assertEqual(values[6], action_status.name)
+        self.assertEqual(values[3], action_status.name)
+        self.assertEqual(values[4], '')
+        self.assertEqual(values[5], Decimal(10))
+        self.assertEqual(values[6], Decimal(1))
+        self.assertEqual(values[7], Decimal(11))
 
     def test_export_one_for_contact_before_start(self):
         """It should export all in xls"""
@@ -244,7 +245,7 @@ class ActionSummaryTest(TestCase):
         workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
         sheet = workbook.sheet_by_index(0)
 
-        self.assertEqual(sheet.nrows, 2 + 2)
+        self.assertEqual(sheet.nrows, 1)
 
         # Check emptiness
         for row in range(1, sheet.nrows):
@@ -278,7 +279,7 @@ class ActionSummaryTest(TestCase):
         workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
         sheet = workbook.sheet_by_index(0)
 
-        self.assertEqual(sheet.nrows, 2 + 2)
+        self.assertEqual(sheet.nrows, 1)
 
         # Check emptiness
         for row in range(1, sheet.nrows):
@@ -313,7 +314,7 @@ class ActionSummaryTest(TestCase):
         workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
         sheet = workbook.sheet_by_index(0)
 
-        self.assertEqual(sheet.nrows, 2 + 2)
+        self.assertEqual(sheet.nrows, 1)
 
         # Check emptiness
         for row in range(1, sheet.nrows):
@@ -366,19 +367,21 @@ class ActionSummaryTest(TestCase):
         self.assertEqual(values[0], 1)
         self.assertEqual(values[1], "Pierre Dupond")
         self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date1.date())
-        self.assertEqual(values[3], Decimal(210))
-        self.assertEqual(values[4], Decimal("12"))
-        self.assertEqual(values[5], Decimal("222"))
-        self.assertEqual(values[6], action_status1.name)
+        self.assertEqual(values[3], action_status1.name)
+        self.assertEqual(values[4], '')
+        self.assertEqual(values[5], Decimal(210))
+        self.assertEqual(values[6], Decimal("12"))
+        self.assertEqual(values[7], Decimal("222"))
 
         values = [sheet.cell(2, col).value for col in range(sheet.ncols)]
         self.assertEqual(values[0], 2)
         self.assertEqual(values[1], "Paul Dupuis")
         self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date2.date())
-        self.assertEqual(values[3], Decimal(100))
-        self.assertEqual(values[4], Decimal("5.5"))
-        self.assertEqual(values[5], Decimal("105.5"))
-        self.assertEqual(values[6], action_status2.name)
+        self.assertEqual(values[3], action_status2.name)
+        self.assertEqual(values[4], '')
+        self.assertEqual(values[5], Decimal(100))
+        self.assertEqual(values[6], Decimal("5.5"))
+        self.assertEqual(values[7], Decimal("105.5"))
 
     def test_export_one_for_entity(self):
         """It should export all in xls"""
@@ -413,8 +416,77 @@ class ActionSummaryTest(TestCase):
         self.assertEqual(values[0], 1)
         self.assertEqual(values[1], "Horse&Co")
         self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date.date())
-        self.assertEqual(values[3], Decimal(10))
-        self.assertEqual(values[4], Decimal(1))
-        self.assertEqual(values[5], Decimal(11))
-        self.assertEqual(values[6], action_status.name)
+        self.assertEqual(values[3], action_status.name)
+        self.assertEqual(values[4], '')
+        self.assertEqual(values[5], Decimal(10))
+        self.assertEqual(values[6], Decimal(1))
+        self.assertEqual(values[7], Decimal(11))
+
+    def test_export_accounting(self):
+        """It should export all in xls"""
+        action_type = mommy.make(ActionType, name="Bills of Month", number_auto_generated=1)
+        action_status = mommy.make(ActionStatus, name="Created")
+        action_status = mommy.make(ActionStatus, name="Paid")
+
+        cat1 = mommy.make(models.StoreItemCategory, accounting_code="code1")
+        cat2 = mommy.make(models.StoreItemCategory, accounting_code="code2")
+        item1 = mommy.make(models.StoreItem, item_accounting_code="code1")
+        item2 = mommy.make(models.StoreItem, item_accounting_code="", category=cat1)
+        item3 = mommy.make(models.StoreItem, item_accounting_code="", category=cat2)
+        item4 = mommy.make(models.StoreItem, item_accounting_code="code1", category=cat2)
+
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        entity = mommy.make(Entity, name="Horse&Co")
+
+        planned_date = datetime(2018, 6, 21)
+        action = mommy.make(Action, type=action_type, planned_date=planned_date, status=action_status)
+        action.entities.add(entity)
+        action.save()
+
+        vat_rate1 = mommy.make(models.VatRate, rate=Decimal(10))
+        sale_item1 = mommy.make(
+            models.SaleItem, sale=action.sale, vat_rate=vat_rate1, pre_tax_price=Decimal(10), quantity=1, item=item1
+        )  # code1
+
+        vat_rate2 = mommy.make(models.VatRate, rate=Decimal(20))
+        sale_item2 = mommy.make(
+            models.SaleItem, sale=action.sale, vat_rate=vat_rate2, pre_tax_price=Decimal(20), quantity=2, item=item2
+        )  # code1
+        sale_item3 = mommy.make(
+            models.SaleItem, sale=action.sale, vat_rate=vat_rate2, pre_tax_price=Decimal(20), quantity=1, item=item3
+        )  # code2
+        sale_item4 = mommy.make(
+            models.SaleItem, sale=action.sale, vat_rate=vat_rate2, pre_tax_price=Decimal(10), quantity=1, item=item4
+        )  # code1
+
+        url = reverse('store_actions_summary_xls', args=[action_type.id, '2018-06-01', '2018-06-30'])
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        workbook = xlrd.open_workbook(file_contents=response.content, formatting_info=True)
+        sheet = workbook.sheet_by_index(0)
+
+        self.assertEqual(sheet.nrows, 3 + 2)
+
+        values = [sheet.cell(1, col).value for col in range(sheet.ncols)]
+        self.assertEqual(values[0], 1)
+        self.assertEqual(values[1], "Horse&Co")
+        self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date.date())
+        self.assertEqual(values[3], action_status.name)
+        self.assertEqual(values[4], 'code1')
+        self.assertEqual(values[5], Decimal(60))
+        self.assertEqual(values[6], Decimal(11))
+        self.assertEqual(values[7], Decimal(71))
+
+        values = [sheet.cell(2, col).value for col in range(sheet.ncols)]
+        self.assertEqual(values[0], 1)
+        self.assertEqual(values[1], "Horse&Co")
+        self.assertEqual(datetime(*xlrd.xldate_as_tuple(values[2], workbook.datemode)).date(), planned_date.date())
+        self.assertEqual(values[3], action_status.name)
+        self.assertEqual(values[4], 'code2')
+        self.assertEqual(values[5], Decimal(20))
+        self.assertEqual(values[6], Decimal(4))
+        self.assertEqual(values[7], Decimal(24))
+
 

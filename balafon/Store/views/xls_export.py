@@ -271,26 +271,36 @@ class ActionSummaryXlsView(XlsBaseView):
         sheet = workbook.add_sheet(name)
         self.doc_name = "{0}_{1}_{2}.xlsx".format(name.lower().replace(' ', '-'), start_date, end_date)
 
-        line = 0
-
         columns = [
-            _('Number'), _('Client'), _('Date'), _('Pre-tax amount'), _('VAT amount'), _('Tax incl Amount'), _('State')
+            _('Number'), _('Client'), _('Date') + ' ' * 6, _('State'), _('Accounting code'), _('Pre-tax amount'), _('VAT amount'),
+            _('Tax incl Amount'),
         ]
+
+        sheet.col(2).width = 256 * 20
+
+        date_format = xlwt.XFStyle()
+        date_format.num_format_str = 'dd/mm/yyyy'
 
         for col, label in enumerate(columns):
             self.write_cell(sheet, 0, col, label, style=self.get_header_style())
 
         actions = self.get_actions(action_type, start_date, end_date)
-        for line, action in enumerate(actions):
+        line = 0
+        for action in actions:
 
-            sheet.write(line + 1, 0, action.number)
-            sheet.write(line + 1, 1, action.get_recipients(False))
-            sheet.write(line + 1, 2, action.planned_date)
-            sheet.write(line + 1, 3, action.sale.pre_tax_total_price())
-            sheet.write(line + 1, 4, action.sale.total_vat())
-            sheet.write(line + 1, 5, action.sale.vat_incl_total_price())
-            sheet.write(line + 1, 6, action.status.name if action.status else '')
+            for accounting_elt in action.sale.accounting_code_amounts():
+                line += 1
 
-        sheet.write(line + 3, 3, xlwt.Formula('SUM(D2:D{0})'.format(line + 1)), style=self.get_header_style())
-        sheet.write(line + 3, 4, xlwt.Formula('SUM(E2:E{0})'.format(line + 1)), style=self.get_header_style())
-        sheet.write(line + 3, 5, xlwt.Formula('SUM(F3:F{0})'.format(line + 1)), style=self.get_header_style())
+                sheet.write(line, 0, action.number)
+                sheet.write(line, 1, action.get_recipients(False))
+                sheet.write(line, 2, action.planned_date, style=date_format)
+                sheet.write(line, 3, action.status.name if action.status else '')
+                sheet.write(line, 4, accounting_elt['accounting_code'])
+                sheet.write(line, 5, accounting_elt['pre_tax_total'])
+                sheet.write(line, 6, accounting_elt['vat_total'])
+                sheet.write(line, 7, accounting_elt['vat_incl_total'])
+
+        if line:
+            sheet.write(line + 2, 5, xlwt.Formula('SUM(F2:F{0})'.format(line + 1)), style=self.get_header_style())
+            sheet.write(line + 2, 6, xlwt.Formula('SUM(G2:G{0})'.format(line + 1)), style=self.get_header_style())
+            sheet.write(line + 2, 7, xlwt.Formula('SUM(H3:H{0})'.format(line + 1)), style=self.get_header_style())

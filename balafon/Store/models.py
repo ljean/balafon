@@ -168,6 +168,7 @@ class StoreItemCategory(models.Model):
     default_image = models.ImageField(
         upload_to='storeitemcats', blank=True, default=None, null=True, verbose_name=_('image')
     )
+    accounting_code = models.CharField(max_length=20, blank=True, default="", verbose_name=_('accounting code'))
 
     class Meta:
         verbose_name = _("Store item category")
@@ -218,6 +219,13 @@ class StoreItemCategory(models.Model):
             return '{0} > {1}'.format(self.parent.get_path_name(), self.name)
         else:
             return self.name
+
+    def get_accounting_code(self):
+        if self.accounting_code:
+            return self.accounting_code
+        elif self.parent:
+            return self.parent.get_accounting_code()
+        return ""
 
     def save(self, *args, **kwargs):
         """Save category"""
@@ -404,6 +412,7 @@ class StoreItem(models.Model):
     origin = models.CharField(max_length=50, blank=True, default="", verbose_name=_('Origine'))
     image = models.ImageField(upload_to='storeitems', blank=True, default=None, null=True, verbose_name=_('image'))
     description = models.TextField(blank=True, verbose_name=_('description'), default="")
+    item_accounting_code = models.CharField(max_length=20, blank=True, default="", verbose_name=_('accounting code'))
 
     class Meta:
         verbose_name = _("Store item")
@@ -582,6 +591,14 @@ class StoreItem(models.Model):
             while parent.parent:
                 parent = parent.parent
             return parent
+
+    @property
+    def accounting_code(self):
+        if self.item_accounting_code:
+            return self.item_accounting_code
+        elif self.category:
+            return self.category.get_accounting_code()
+        return ""
 
 
 @python_2_unicode_compatible
@@ -918,6 +935,41 @@ class Sale(models.Model):
                     }
                 )
         return vat_totals
+
+    def accounting_code_amounts(self):
+        """returns amount by code"""
+        # calculate price for each VAT rate
+        total_vat_by_code = {}
+        pre_tax_by_code = {}
+        total_tax_incl_by_code = {}
+        for sale_item in self.saleitem_set.all():
+            if sale_item.item:
+                accounting_code = sale_item.item.accounting_code
+            else:
+                accounting_code = ''
+
+            if accounting_code in total_vat_by_code:
+                total_vat_by_code[accounting_code] += sale_item.total_vat_price(round_value=False)
+                pre_tax_by_code[accounting_code] += sale_item.pre_tax_total_price(round_value=False)
+                total_tax_incl_by_code[accounting_code] += sale_item.vat_incl_total_price(round_value=False)
+            else:
+                total_vat_by_code[accounting_code] = sale_item.total_vat_price(round_value=False)
+                pre_tax_by_code[accounting_code] = sale_item.pre_tax_total_price(round_value=False)
+                total_tax_incl_by_code[accounting_code] = sale_item.vat_incl_total_price(round_value=False)
+
+        # returns codes in order
+        accounting_data = []
+        accounting_codes = sorted(total_vat_by_code.keys())
+        for accounting_code in accounting_codes:
+            accounting_data.append(
+                {
+                    'accounting_code': accounting_code,
+                    'pre_tax_total': round_currency(pre_tax_by_code[accounting_code]),
+                    'vat_total': round_currency(total_vat_by_code[accounting_code]),
+                    'vat_incl_total': round_currency(total_tax_incl_by_code[accounting_code]),
+                }
+            )
+        return accounting_data
 
     def total_vat(self):
         """returns amount of VAT by VAT rate"""
