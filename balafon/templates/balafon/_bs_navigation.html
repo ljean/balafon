@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n static %}
 
 <!-- Fixed navbar -->
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -11,7 +11,7 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="{% url 'balafon_homepage' %}" title="{% trans 'Board panel' %}">
-        <img src="{{STATIC_URL}}img/logo-balafon.png" tile="{% trans 'balafon' %}" style="height: 24px;">
+        <img src="{% static 'img/logo-balafon.png' %}" tile="{% trans 'balafon' %}" style="height: 24px;">
       </a>
     </div>
     <div class="navbar-collapse collapse">
@@ -183,7 +183,7 @@
         {% endif %}
         </li>
         <li class="quick-search-form">
-            <form method="POST" action="{% url 'quick_search' %}">{% csrf_token %}{{quick_search_form.text}}</form>
+            <form method="POST" action="{% url 'quick_search' %}">{% csrf_token %} {{ quick_search_form.text }}</form>
         </li>
       </ul>
     </div><!--/.nav-collapse -->
