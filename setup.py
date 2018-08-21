@@ -39,7 +39,7 @@ setup(
         # Python3 version
         'git+https://github.com/ljean/coop_cms.git@98d869ad61eaf381f1d081e0e862e52f1bf2f814#egg=apidev_coop_cms-1.3.1'
     ],
-    long_description=open('README.rst').read(),
+    # long_description=open('README.rst').read(),
     url='https://github.com/ljean/balafon',
     classifiers=[
         'Development Status :: 5 - Production/Stable',

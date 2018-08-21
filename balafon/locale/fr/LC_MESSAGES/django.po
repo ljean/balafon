@@ -4957,9 +4957,7 @@ msgstr "Test unitaire"
 
 #: settings.py:88
 msgid "Make sure you are a human"
-msgstr ""
-"Entrez le texte affiché sur l'image afin que nous vérifions que vous n'êtes "
-"pas un robot de spam"
+msgstr "Prouvez que vous n'êtes pas un robot de spam"
 
 #: templates/403.html:6 templates/404.html:6 templates/404.html:13
 msgid "Page not found"
