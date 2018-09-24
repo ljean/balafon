@@ -772,6 +772,65 @@ class EditActionTest(BaseTestCase):
         self.assertEqual(soup.select("#id_number")[0]["value"], "1")
         self.assertEqual(soup.select("#id_number")[0]["disabled"], "disabled")
 
+    def test_view_action_auto_generated_generator(self):
+        """view action start and end"""
+        generator1 = mommy.make(models.ActionNumberGenerator, number=110)
+        action_type1 = mommy.make(models.ActionType, number_auto_generated=True, number_generator=generator1)
+
+        action = mommy.make(models.Action, subject="AAA", type=action_type1)
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(soup.select("#id_number")[0]["value"], "111")
+        self.assertEqual(soup.select("#id_number")[0]["disabled"], "disabled")
+        generator1 = models.ActionNumberGenerator.objects.get(id=generator1.id)
+        self.assertEqual(generator1.number, 111)
+
+    def test_view_action_existing_number_generator(self):
+        """view action start and end"""
+        generator1 = mommy.make(models.ActionNumberGenerator, number=110)
+        action_type1 = mommy.make(models.ActionType, number_auto_generated=True, number_generator=generator1)
+
+        action = mommy.make(models.Action, subject="AAA", type=action_type1, number=57)
+
+        url = reverse('crm_edit_action', args=[action.id])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+
+        self.assertEqual(soup.select("#id_number")[0]["value"], "57")
+        self.assertEqual(soup.select("#id_number")[0]["disabled"], "disabled")
+
+        generator1 = models.ActionNumberGenerator.objects.get(id=generator1.id)
+        self.assertEqual(generator1.number, 110)
+
+    def test_view_action_generator_generator_shared_between_types(self):
+        """view action start and end"""
+        generator1 = mommy.make(models.ActionNumberGenerator, number=110)
+        generator2 = mommy.make(models.ActionNumberGenerator, number=5)
+        action_type1 = mommy.make(models.ActionType, number_auto_generated=True, number_generator=generator1)
+        action_type2 = mommy.make(models.ActionType, number_auto_generated=True, number_generator=generator1)
+        action_type3 = mommy.make(models.ActionType, number_auto_generated=True, number_generator=generator2)
+
+        action1 = mommy.make(models.Action, subject="AAA", type=action_type1, number=0)
+        action2 = mommy.make(models.Action, subject="AAA", type=action_type2, number=0)
+        action3 = mommy.make(models.Action, subject="AAA", type=action_type3, number=0)
+
+        generator1 = models.ActionNumberGenerator.objects.get(id=generator1.id)
+        generator2 = models.ActionNumberGenerator.objects.get(id=generator2.id)
+        self.assertEqual(generator1.number, 112)
+        self.assertEqual(generator2.number, 6)
+
+        action1 = models.Action.objects.get(id=action1.id)
+        action2 = models.Action.objects.get(id=action2.id)
+        action3 = models.Action.objects.get(id=action3.id)
+        self.assertEqual(action1.number, 111)
+        self.assertEqual(action2.number, 112)
+        self.assertEqual(action3.number, 6)
+
 
 class ActionTest(BaseTestCase):
     """View actions"""

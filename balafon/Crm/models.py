@@ -1255,6 +1255,26 @@ class ActionStatus(NamedElement):
 
 
 @python_2_unicode_compatible
+class ActionNumberGenerator(models.Model):
+    class Meta:
+        verbose_name = _('action number generator')
+        verbose_name_plural = _('action number generators')
+
+    name = models.CharField(_('name'), max_length=200, blank=True, default="")
+    number = models.IntegerField(
+        _('number'), default=0, help_text=_('This number is auto-generated.')
+    )
+
+    def __str__(self):
+        return self.name
+
+    def next(self):
+        self.number += 1
+        self.save()
+        return self.number
+
+
+@python_2_unicode_compatible
 class ActionType(NamedElement):
     """type of an action"""
     subscribe_form = models.BooleanField(
@@ -1264,6 +1284,9 @@ class ActionType(NamedElement):
     set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_("action set"))
     last_number = models.IntegerField(_('last number'), default=0)
     number_auto_generated = models.BooleanField(_('generate number automatically'), default=False)
+    number_generator = models.ForeignKey(
+        ActionNumberGenerator, blank=True, default=None, null=True, verbose_name=_('number generator')
+    )
     default_template = models.CharField(
         _('document template'), max_length=200, blank=True, default="",
         help_text=_('Action of this type will have a document with the given template')
@@ -1549,8 +1572,11 @@ class Action(LastModifiedModel):
         if not from_save_type:  # avoid infinite loop
             # generate number automatically based on action type
             if self.number == 0 and self.type and self.type.number_auto_generated:
-                self.number = self.type.last_number = self.type.last_number + 1
-                self.type.save()
+                if self.type.number_generator:
+                    self.number = self.type.number_generator.next()
+                else:
+                    self.number = self.type.last_number = self.type.last_number + 1
+                    self.type.save()
 
         created_track = None
         if self.status and self.type and self.type.track_status:
