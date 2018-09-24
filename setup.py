@@ -31,7 +31,7 @@ setup(
         'xlwt',
         'xlrd',
         'django-recaptcha2',
-        'django-registration',
+        'django-registration<3.0',
         'model_mommy',
         'django-cors-headers',
     ],
