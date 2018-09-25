@@ -1617,12 +1617,12 @@ class Action(LastModifiedModel):
 
         return ret
 
-    def clone(self, new_type):
+    def clone(self, new_type, planned_date=None):
         """Create a new action with same values but different types"""
         new_action = Action(parent=self)
 
         attrs_to_clone = [
-            'subject', 'planned_date', 'detail', 'priority', 'opportunity', 'amount', 'end_datetime'
+            'subject', 'detail', 'priority', 'opportunity', 'amount', 'end_datetime'
         ]
 
         if not new_type.not_assigned_when_cloned:
@@ -1630,6 +1630,12 @@ class Action(LastModifiedModel):
 
         for attr in attrs_to_clone:
             setattr(new_action, attr, getattr(self, attr))
+
+        if planned_date is not None:
+            new_action.planned_date = planned_date
+        else:
+            new_action.planned_date = self.planned_date
+
         new_action.type = new_type
         new_action.status = new_type.default_status
         new_action.status2 = new_type.default_status2
