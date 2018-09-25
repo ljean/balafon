@@ -180,14 +180,14 @@ create_action_initial_track.short_description = _("Track status : create initial
 class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
-        'name', 'set', 'status_defined', 'subscribe_form', 'last_number', 'number_auto_generated',
+        'name', 'set', 'status_defined', 'subscribe_form', 'action_number',
         'default_template', 'is_editable', 'hide_contacts_buttons', 'track_status', 'is_default'
     ]
     list_filter = [
-        'set', 'subscribe_form', 'number_auto_generated', 'default_template', 'action_template',
+        'set', 'subscribe_form', 'number_auto_generated', 'number_generator', 'default_template', 'action_template',
         'hide_contacts_buttons', 'track_status',
     ]
-    list_editable = ['set', 'subscribe_form', 'last_number', 'number_auto_generated', 'hide_contacts_buttons', ]
+    list_editable = ['set', 'subscribe_form', 'hide_contacts_buttons', ]
     actions = [initialize_status2, reset_status2, set_action_previous_status, create_action_initial_track]
 
 
@@ -369,3 +369,10 @@ class MailtoSettingsAdmin(admin.ModelAdmin):
 admin.site.register(models.MailtoSettings, MailtoSettingsAdmin)
 
 admin.site.register(models.ActionStatusTrack)
+
+
+class ActionNumberGeneratorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'number', )
+
+admin.site.register(models.ActionNumberGenerator, ActionNumberGeneratorAdmin)
+

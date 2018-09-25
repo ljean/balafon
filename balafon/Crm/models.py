@@ -1351,6 +1351,15 @@ class ActionType(NamedElement):
     def has_final_status(self):
         return self.allowed_status.filter(is_final=True).exists()
 
+    def action_number(self):
+        if self.number_auto_generated:
+            if self.number_generator:
+                return '{0}: {1}'.format(self.number_generator.name, self.number_generator.number)
+            else:
+                return '{0}'.format(self.last_number)
+        return ""
+    action_number.short_description = _('Last number')
+
     def save(self, *args, **kwargs):
         """save: create the corresponding men"""
         ret = super(ActionType, self).save(*args, **kwargs)
