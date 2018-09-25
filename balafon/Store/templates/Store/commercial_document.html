@@ -799,6 +799,7 @@
               <div class="action-date">{{ app.action.planned_date|date }}</div>
               <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
               <div class="action-subject">{{ app.action.subject }}</div>
+              {% endverbatim %}{% block extra_doc_header %}{% endblock %}{% verbatim %}
             </div></div>
           </div>
 
