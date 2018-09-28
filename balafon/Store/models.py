@@ -382,7 +382,7 @@ class StoreItem(models.Model):
     tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_("tags"))
     vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"))
     pre_tax_price = models.DecimalField(
-        verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2
+        verbose_name=_("pre-tax price"), max_digits=11, decimal_places=4
     )
     stock_count = models.DecimalField(
         default=None, verbose_name=_("stock count"), blank=True, null=True, max_digits=9, decimal_places=2
@@ -1050,7 +1050,7 @@ class SaleItem(models.Model):
     item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
     quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
     vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"), blank=True, null=True, default=None)
-    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=9, decimal_places=2)
+    pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=11, decimal_places=4)
     text = models.TextField(verbose_name=_("Text"), max_length=3000, default='', blank=True)
     order_index = models.IntegerField(default=0)
     is_blank = models.BooleanField(
@@ -1081,12 +1081,13 @@ class SaleItem(models.Model):
 
     def vat_incl_price(self, round_value=True):
         """VAT inclusive price"""
-        value = self.unit_price() + self.vat_price(round_value=round_value)
+        value = self.unit_price() + self.vat_price(round_value=False)
         return round_currency(value) if round_value else value
 
     def total_vat_price(self, round_value=True):
         """VAT price * quantity"""
-        return self.vat_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
+        value = self.vat_price(round_value=False) * self.quantity * (self.percentage / Decimal(100))
+        return round_currency(value) if round_value else value
 
     def vat_price(self, round_value=True):
         """VAT price"""
@@ -1099,7 +1100,8 @@ class SaleItem(models.Model):
 
     def vat_incl_total_price(self, round_value=True):
         """VAT inclusive price"""
-        return self.vat_incl_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
+        vat_incl_price = self.vat_incl_price(round_value=False) * self.quantity * (self.percentage / Decimal(100))
+        return round_currency(vat_incl_price) if round_value else vat_incl_price
 
     def raw_total_price(self, round_value=True):
         """VAT inclusive price"""
@@ -1112,7 +1114,8 @@ class SaleItem(models.Model):
         """VAT inclusive price"""
         if self.is_blank:
             return Decimal(0)
-        return self.unit_price(round_value=round_value) * self.quantity * (self.percentage / Decimal(100))
+        tax_total_price = self.unit_price(round_value=False) * self.quantity * (self.percentage / Decimal(100))
+        return round_currency(tax_total_price) if round_value else tax_total_price
 
     def unit_price(self, round_value=False):
         """pre tax price with discount"""
