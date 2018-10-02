@@ -512,7 +512,7 @@ class StoreItem(models.Model):
 
     def has_stock_threshold_alert(self):
         """returns True if stock is below threshold"""
-        if self.stock_threshold:
+        if self.stock_count and self.stock_threshold:
             return self.stock_count <= self.stock_threshold
         return False
 
