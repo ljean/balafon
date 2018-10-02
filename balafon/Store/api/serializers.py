@@ -147,7 +147,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
 class UpdateSaleItemSerializer(serializers.ModelSerializer):
     """Serialize a sale item for update"""
     quantity = serializers.DecimalField(max_digits=9, decimal_places=2)
-    pre_tax_price = serializers.DecimalField(max_digits=9, decimal_places=2)
+    pre_tax_price = serializers.DecimalField(max_digits=11, decimal_places=4)
     percentage = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, default=Decimal(100))
 
     class Meta:
