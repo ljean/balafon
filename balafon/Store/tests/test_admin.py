@@ -35,11 +35,11 @@ class StockThresholdListFilterTest(TestCase):
 
     def test_above_threshold(self):
         """It should filter display items above threshold"""
-        mommy.make(models.StoreItem, stock_count=20, stock_threshold=30)
-        item2 = mommy.make(models.StoreItem, stock_count=40, stock_threshold=30)
-        mommy.make(models.StoreItem, stock_count=0, stock_threshold=30)
-        mommy.make(models.StoreItem, stock_count=40, stock_threshold=None)
-        mommy.make(models.StoreItem, stock_count=None, stock_threshold=None)
+        mommy.make(models.StoreItem, stock_count=20, stock_threshold=30, name="Pomme")
+        item2 = mommy.make(models.StoreItem, stock_count=40, stock_threshold=30, name="Poire")
+        mommy.make(models.StoreItem, stock_count=0, stock_threshold=30, name="Banane")
+        mommy.make(models.StoreItem, stock_count=40, stock_threshold=None, name="Raisin")
+        mommy.make(models.StoreItem, stock_count=None, stock_threshold=None, name="Kiwi")
 
         list_filter = StockThresholdFilter(
             None,
@@ -48,7 +48,7 @@ class StockThresholdListFilterTest(TestCase):
             StoreItemAdmin
         )
         filtered_items = list_filter.queryset(None, models.StoreItem.objects.all())
-        self.assertEqual(sorted([item2]), sorted(filtered_items.all()))
+        self.assertEqual([item2], list(filtered_items.all()))
 
     def test_no_threshold(self):
         """It should filter items without threshold"""
