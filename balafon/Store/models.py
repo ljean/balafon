@@ -579,6 +579,16 @@ class StoreItem(models.Model):
         if image:
             return sorl_thumbnail.backend.get_thumbnail(image.file, size, crop=crop).url
 
+    @property
+    def imported_by_file(self):
+        if self.imported_by:
+            try:
+                return self.imported_by.path
+            except Exception as err:
+                return str(err)
+        else:
+            return "-"
+
     def save(self, *args, **kwargs):
         self.name = self.name.strip()
         ret = super(StoreItem, self).save(*args, **kwargs)

@@ -226,7 +226,7 @@ class StoreItemAdmin(admin.ModelAdmin):
     ]
     list_editable = ['available']
     search_fields = ['name', 'brand__name']
-    readonly_fields = ['vat_incl_price', 'stock_threshold_alert']
+    readonly_fields = ['vat_incl_price', 'stock_threshold_alert', 'imported_by_file']
     raw_id_fields = ['tags', 'certificates', 'only_for_groups']
     inlines = [StoreItemPropertyValueInline]
     fieldsets = (
@@ -253,7 +253,7 @@ class StoreItemAdmin(admin.ModelAdmin):
             'fields': ('stock_count', 'stock_threshold', 'stock_threshold_alert', )
         }),
         (_('Import'), {
-            'fields': ('imported_by', )
+            'fields': ('imported_by_file', )
         }),
     )
     list_per_page = 500
