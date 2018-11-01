@@ -6,25 +6,56 @@ from __future__ import unicode_literals
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 
+from django.contrib import messages
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms.__future__ as forms
 
+from coop_cms.utils import RequestManager, RequestNotFound
+
 from balafon.Crm.forms.base import BetterBsForm
 from balafon.Crm.models import ActionStatus
-from balafon.Store.models import StoreManagementActionType, PricePolicy, StoreItemCategory, SaleAnalysisCode, VatRate
+from balafon.Store.models import (
+    StoreManagementActionType, PricePolicy, StoreItemCategory, SaleAnalysisCode, VatRate, update_action_amount
+)
 
 
 class StoreManagementActionTypeAdminForm(forms.ModelForm):
     """admin form"""
+    initial_show_amount_as_pre_tax = None
 
     def __init__(self, *args, **kwargs):
         super(StoreManagementActionTypeAdminForm, self).__init__(*args, **kwargs)
         if self.instance and self.instance.id and self.instance.action_type:
+            self.initial_show_amount_as_pre_tax = self.instance.show_amount_as_pre_tax
             self.fields['readonly_status'].queryset = self.instance.action_type.allowed_status
         else:
             self.fields['readonly_status'].queryset = ActionStatus.objects.none()
             self.fields['readonly_status'].widget = forms.HiddenInput()
+
+    def save(self, *args, **kwargs):
+        show_amount_as_pre_tax = self.cleaned_data['show_amount_as_pre_tax']
+        recalculate = False
+        if self.instance and self.initial_show_amount_as_pre_tax != show_amount_as_pre_tax:
+            recalculate = True
+        ret = super(StoreManagementActionTypeAdminForm, self).save(*args, **kwargs)
+        if recalculate:
+            action_type = self.instance.action_type
+            for action in action_type.action_set.all():
+                try:
+                    update_action_amount(action.sale)
+                except (AttributeError, StoreManagementActionType.DoesNotExist):
+                    pass
+            try:
+                request = RequestManager().get_request()
+                if request:
+                    messages.success(
+                        request,
+                        _('Recalculate {0} {1}').format(action_type.action_set.count(), action_type)
+                    )
+            except (RequestNotFound, AttributeError):
+                pass
+        return ret
 
 
 class PricePolicyAdminForm(forms.ModelForm):

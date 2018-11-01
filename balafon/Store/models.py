@@ -1185,12 +1185,12 @@ class SaleItem(models.Model):
         return round_currency(discount_price)
 
 
-def update_action_amount(sale_item, delete_me=False):
+def update_action_amount(sale, delete_sale_item=None):
     """update the corresponding action amount """
-    action = sale_item.sale.action
-    queryset = action.sale.saleitem_set.all()
-    if delete_me:
-        queryset = queryset.exclude(id=sale_item.id)
+    action = sale.action
+    queryset = sale.saleitem_set.all()
+    if delete_sale_item:
+        queryset = queryset.exclude(id=delete_sale_item.id)
     total_amount = 0
     try:
         show_amount_as_pre_tax = action.type.storemanagementactiontype.show_amount_as_pre_tax
@@ -1208,12 +1208,12 @@ def update_action_amount(sale_item, delete_me=False):
 
 def on_save_sale_item(sender, instance, created, **kwargs):
     """update the corresponding action amount when item is added or updated"""
-    update_action_amount(instance, False)
+    update_action_amount(instance.sale)
 
 
 def on_delete_sale_item(sender, instance, **kwargs):
     """update the corresponding action amount when item is deleted"""
-    update_action_amount(instance, True)
+    update_action_amount(instance.sale, instance)
 
 
 post_save.connect(on_save_sale_item, sender=SaleItem)

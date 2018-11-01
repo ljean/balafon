@@ -71,6 +71,7 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('name',)
     inlines = (StoreItemInline, )
 
+
 admin.site.register(models.Brand, BrandAdmin)
 
 
@@ -103,12 +104,12 @@ class SaleAdmin(admin.ModelAdmin):
     inlines = (SaleItemInline, )
     list_filter = ('analysis_code', )
     raw_id_fields = ['action', ]
-
 admin.site.register(models.Sale, SaleAdmin)
 
 
 class StoreManagementActionTypeAdmin(admin.ModelAdmin):
     """StoreManagementActionTypeAdmin"""
+    list_display = ('action_type', 'template_name', 'show_amount_as_pre_tax')
     form = StoreManagementActionTypeAdminForm
 
 admin.site.register(models.StoreManagementActionType, StoreManagementActionTypeAdmin)
