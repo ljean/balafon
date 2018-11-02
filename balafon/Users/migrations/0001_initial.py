@@ -80,6 +80,10 @@ class Migration(migrations.Migration):
                 ('message_in_favorites', models.BooleanField(default=False, verbose_name='Create automatically a favorite for message posted from the public form')),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'verbose_name': 'User preferences',
+                'verbose_name_plural': 'User preferences',
+            },
         ),
         migrations.AlterUniqueTogether(
             name='favorite',

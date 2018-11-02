@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-01 09:45+0100\n"
+"POT-Creation-Date: 2018-11-02 09:13+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1097,7 +1097,7 @@ msgid ""
 msgstr "Si coché, type par défaut des nouvelles actions"
 
 #: Crm/models.py:1342 Crm/models.py:1418 Crm/models.py:1713 Store/models.py:618
-#: Users/models.py:79 Users/models.py:114
+#: Users/models.py:83 Users/models.py:118
 msgid "label"
 msgstr "libellé"
 
@@ -1127,8 +1127,8 @@ msgstr "type d'action"
 msgid "action types"
 msgstr "types d'action"
 
-#: Crm/models.py:1399 Store/models.py:1045 Users/models.py:39
-#: Users/models.py:57
+#: Crm/models.py:1399 Store/models.py:1045 Users/models.py:43
+#: Users/models.py:61
 msgid "user"
 msgstr "utilisateur"
 
@@ -1153,7 +1153,7 @@ msgstr "Type d'action"
 msgid "view_name"
 msgstr "nom de la vue"
 
-#: Crm/models.py:1417 Users/models.py:80 Users/models.py:115
+#: Crm/models.py:1417 Users/models.py:84 Users/models.py:119
 msgid "icon"
 msgstr "icone"
 
@@ -4488,11 +4488,11 @@ msgstr "Ventes"
 msgid "store item"
 msgstr "article"
 
-#: Store/models.py:1052 Users/models.py:45
+#: Store/models.py:1052 Users/models.py:49
 msgid "Favorite"
 msgstr "Favori"
 
-#: Store/models.py:1053 Users/models.py:46
+#: Store/models.py:1053 Users/models.py:50
 #: Users/templates/Users/favorites_list.html:4
 #: Users/templates/Users/favorites_list.html:9
 #: templates/balafon/_bs_navigation.html:25
@@ -4705,82 +4705,86 @@ msgstr ""
 "Crée automatiquement un favori si un message est posté depuis le formulaire "
 "de contact"
 
-#: Users/models.py:40
+#: Users/models.py:32 Users/models.py:33
+msgid "User preferences"
+msgstr "Préférences utilisateur"
+
+#: Users/models.py:44
 msgid "content_type"
 msgstr "type de contenu"
 
-#: Users/models.py:41
+#: Users/models.py:45
 msgid "object id"
 msgstr "id objet"
 
-#: Users/models.py:58
+#: Users/models.py:62
 msgid "URL"
 msgstr "URL"
 
-#: Users/models.py:61
+#: Users/models.py:65
 msgid "User homepage"
 msgstr "Page d'accueil utilisateur"
 
-#: Users/models.py:62
+#: Users/models.py:66
 msgid "User homepages"
 msgstr "Pages d'accueil utilisateur"
 
-#: Users/models.py:75
+#: Users/models.py:79
 msgid "Menu"
 msgstr "Menu"
 
-#: Users/models.py:76 templates/balafon/_bs_navigation.html:100
+#: Users/models.py:80 templates/balafon/_bs_navigation.html:100
 msgid "Planning"
 msgstr "Planning"
 
-#: Users/models.py:83
+#: Users/models.py:87
 msgid "position"
 msgstr "position"
 
-#: Users/models.py:84
+#: Users/models.py:88
 msgid "Where the menu will be set"
 msgstr "L'emplacement du menu"
 
-#: Users/models.py:88
+#: Users/models.py:92
 msgid "Custom menu"
 msgstr "Menu personnalisés"
 
-#: Users/models.py:89
+#: Users/models.py:93
 msgid "Custom menus"
 msgstr "Menus personnalisés"
 
-#: Users/models.py:116
+#: Users/models.py:120
 msgid "url"
 msgstr "url"
 
-#: Users/models.py:117
+#: Users/models.py:121
 msgid "reverse"
 msgstr "nom de la vue"
 
-#: Users/models.py:119
+#: Users/models.py:123
 msgid "reverse_kwargs"
 msgstr "arguments de la vue"
 
-#: Users/models.py:120
+#: Users/models.py:124
 msgid ""
 "kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 "
 msgstr ""
 "arguments (et éventuellement valeurs par défaut) par nom pour construire "
 "l'url via le reverse. Exemple year,month:1,day:1"
 
-#: Users/models.py:124
+#: Users/models.py:128
 msgid "only for users"
 msgstr "seulement pour les utilisateurs"
 
-#: Users/models.py:126
+#: Users/models.py:130
 msgid "attributes"
 msgstr "attributs"
 
-#: Users/models.py:129
+#: Users/models.py:133
 msgid "Custom menu item"
 msgstr "Élément de menu personnalisé"
 
-#: Users/models.py:130
+#: Users/models.py:134
 msgid "Custom menu items"
 msgstr "Éléments de menu personnalisé"
 

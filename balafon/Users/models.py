@@ -27,6 +27,10 @@ class UserPreferences(models.Model):
         default=False,
         verbose_name=_("Create automatically a favorite for message posted from the public form")
     )
+
+    class Meta:
+        verbose_name = _('User preferences')
+        verbose_name_plural = _('User preferences')
     
     def __str__(self):
         return self.user.username

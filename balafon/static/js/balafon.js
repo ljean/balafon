@@ -1,5 +1,12 @@
 $(function() {
-    
+
+    // multilines for navbar
+    setTimeout(function () {
+        var height = $("body > .navbar .navbar-collapse").height();
+        $("#document").css('margin-top', height - 60);
+    }, 100);
+
+
     $.fn.serializeForm = function() {
         var o = {};
         var a = this.serializeArray();
