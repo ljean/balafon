@@ -423,9 +423,13 @@ class StoreItem(models.Model):
         return '{0} > {1}{2}'.format(self.category, self.name, ' ({0})'.format(self.brand) if self.brand else '')
 
     def _to_decimal(self, value):
+        if value is None:
+            value = 0
         return Decimal("{0:.2f}".format(value, 2))
 
     def _to_vat_incl(self, value):
+        if value is None:
+            value = 0
         if self.vat_rate:
             vat_value = self.vat_rate.rate
         else:
