@@ -22,7 +22,7 @@ class StoreItemInline(admin.TabularInline):
     """display property on the store item"""
     model = models.StoreItem
     fields = (
-        'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price'
+        'name', 'get_admin_link', 'category', 'purchase_price', 'price_policy', 'pre_tax_price',
         'vat_rate', 'vat_incl_price_with_alert', 'available', 'published', 'stock_count', 'stock_threshold_alert'
     )
     readonly_fields = ['get_admin_link', 'stock_threshold_alert', 'vat_incl_price_with_alert', ]
