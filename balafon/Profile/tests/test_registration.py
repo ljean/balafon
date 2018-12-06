@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.core import mail
+from django.test.utils import override_settings
 
 from model_mommy import mommy
 from registration.models import RegistrationProfile
@@ -18,6 +19,7 @@ from balafon.Crm import models
 
 
 @skipIf(not ("balafon.Profile" in settings.INSTALLED_APPS), "registration not installed")
+@override_settings(BALAFON_REGISTRATION_ENABLED=True)
 class RegisterTestCase(TestCase):
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
@@ -81,6 +83,27 @@ class RegisterTestCase(TestCase):
         )
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
+
+    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @override_settings(BALAFON_REGISTRATION_ENABLED=False)
+    def test_register_disable(self):
+        site = Site.objects.get_current()
+        subscription_type1 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type2 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type3 = mommy.make(models.SubscriptionType, site=site)
+        subscription_type4 = mommy.make(models.SubscriptionType)
+
+        url = reverse('registration_register')
+        data = {
+            'email': 'john@toto.fr',
+            'password1': 'PAss',
+            'password2': 'PAss',
+            'accept_termofuse': True,
+            'subscription_types': [subscription_type1.id, subscription_type2.id],
+            'gender': 1,
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 404)
 
     @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
     def test_register_no_subscription(self):
