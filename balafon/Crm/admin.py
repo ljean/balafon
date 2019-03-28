@@ -7,9 +7,12 @@ from django.contrib import admin
 from django.contrib.messages import success, error
 from django.utils.translation import ugettext_lazy as _
 
+import floppyforms.__future__ as forms
+
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models
 from balafon.Crm.forms.actions import ActionMenuAdminForm
+from balafon.Crm.settings import get_language_choices
 
 
 class HasParentFilter(admin.SimpleListFilter):
@@ -212,6 +215,14 @@ class ContactAdmin(admin.ModelAdmin):
     search_fields = ['lastname', 'email']
     raw_id_admin = ('entity',)
     inlines = (SubscriptionInline,)
+
+    def get_form(self, *args, **kwargs):
+        form_class = super(ContactAdmin, self).get_form(*args, **kwargs)
+        class custom_form_class(form_class):
+            def __init__(self, *args, **kwargs):
+                super(custom_form_class, self).__init__(*args, **kwargs)
+                self.fields['favorite_language'].widget = forms.Select(choices=get_language_choices())
+        return custom_form_class
 
 admin.site.register(models.Contact, ContactAdmin)
 

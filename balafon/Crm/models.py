@@ -648,9 +648,7 @@ class Contact(AddressModel):
     
     favorites = GenericRelation(Favorite)
 
-    favorite_language = models.CharField(
-        _("favorite language"), max_length=10, default="", blank=True, choices=settings.get_language_choices()
-    )
+    favorite_language = models.CharField(_("favorite language"), max_length=10, default="", blank=True)
 
     def get_view_url(self):
         if self.entity.is_single_contact:
