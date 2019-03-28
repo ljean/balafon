@@ -173,3 +173,20 @@ class CustomMenuItem(models.Model):
         if url:
             setattr(self, '_cached_url', url)
         return url
+
+
+@python_2_unicode_compatible
+class UserPermissions(models.Model):
+    """user preferences"""
+
+    user = models.OneToOneField(User)
+    can_create_group = models.BooleanField(
+        default=True, verbose_name=_('can create group'), help_text=_('If not checked, the user can not create group')
+    )
+
+    class Meta:
+        verbose_name = _('User permissions')
+        verbose_name_plural = _('User permissions')
+
+    def __str__(self):
+        return self.user.username

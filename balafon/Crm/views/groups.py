@@ -16,6 +16,7 @@ from coop_cms.utils import paginate
 
 from balafon.Crm import models, forms
 from balafon.permissions import can_access
+from balafon.Users.utils import can_create_group
 from balafon.utils import log_error
 
 
@@ -29,7 +30,10 @@ def add_entity_to_group(request, entity_id):
         form = forms.AddEntityToGroupForm(entity, request.POST)
         if form.is_valid():
             name = form.cleaned_data["group_name"]
-            group = models.Group.objects.get_or_create(name=name)[0]
+            if can_create_group(request.user):
+                group = models.Group.objects.get_or_create(name=name)[0]
+            else:
+                group = get_object_or_404(models.Group, name=name)
             group.entities.add(entity)
             group.save()
             next_url = reverse('crm_view_entity', args=[entity_id])
@@ -61,7 +65,10 @@ def add_contact_to_group(request, contact_id):
             form = forms.AddContactToGroupForm(contact, request.POST)
             if form.is_valid():
                 name = form.cleaned_data["group_name"]
-                group = models.Group.objects.get_or_create(name=name)[0]
+                if can_create_group(request.user):
+                    group = models.Group.objects.get_or_create(name=name)[0]
+                else:
+                    group = get_object_or_404(models.Group, name=name)
                 if contact not in group.contacts.all():
                     group.contacts.add(contact)
                     group.save()
@@ -92,7 +99,7 @@ def get_group_suggest_list(request):
     """view"""
     try:
         suggestions = []
-        #the 1st chars entered in the autocomplete
+        # the 1st chars entered in the autocomplete
         term = request.GET["term"]
         for group in models.Group.objects.filter(name__icontains=term):
             suggestions.append(group.name)

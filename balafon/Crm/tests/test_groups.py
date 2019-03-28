@@ -13,6 +13,7 @@ from model_mommy import mommy
 from balafon.unit_tests import response_as_json
 from balafon.Crm import models
 from balafon.Crm.tests import BaseTestCase
+from balafon.Users.models import UserPermissions
 
 
 class GroupTest(BaseTestCase):
@@ -82,6 +83,72 @@ class GroupTest(BaseTestCase):
         group = models.Group.objects.all()[0]
         self.assertEqual(group.name, data['group_name'])
         self.assertEqual(list(group.entities.all()), [entity])
+
+    def test_create_group_not_allowed(self):
+        """add entity to existing group"""
+        UserPermissions.objects.create(user=self.user, can_create_group=False)
+        entity = mommy.make(models.Entity)
+        data = {
+            'group_name': 'toto',
+        }
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, reverse('crm_view_entity', args=[entity.id]))
+        self.assertEqual(0, models.Group.objects.count())
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_add_group_existing_not_allowed_to_create(self):
+        """add entity to existing group"""
+        UserPermissions.objects.create(user=self.user, can_create_group=False)
+        group = mommy.make(models.Group, name='toto')
+        entity = mommy.make(models.Entity)
+        data = {
+            'group_name': group.name
+        }
+        url = reverse('crm_add_entity_to_group', args=[entity.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_entity', args=[entity.id]))
+
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.entities.all()), [entity])
+
+    def test_create_group_not_allowed_for_contact(self):
+        """add entity to existing group"""
+        UserPermissions.objects.create(user=self.user, can_create_group=False)
+        contact = mommy.make(models.Contact)
+        data = {
+            'group_name': 'toto',
+        }
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, reverse('crm_view_entity', args=[contact.id]))
+        self.assertEqual(0, models.Group.objects.count())
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('.field-error')), 1)
+
+    def test_add_group_existing_not_allowed_to_create_for_contact(self):
+        """add entity to existing group"""
+        UserPermissions.objects.create(user=self.user, can_create_group=False)
+        group = mommy.make(models.Group, name='toto')
+        contact = mommy.make(models.Contact)
+        data = {
+            'group_name': group.name
+        }
+        url = reverse('crm_add_contact_to_group', args=[contact.id])
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, reverse('crm_view_contact', args=[contact.id]))
+
+        self.assertEqual(1, models.Group.objects.count())
+        group = models.Group.objects.all()[0]
+        self.assertEqual(group.name, data['group_name'])
+        self.assertEqual(list(group.contacts.all()), [contact])
 
     def test_add_already_in_group(self):
         """add entity already in group"""

@@ -4,14 +4,21 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from balafon.Users import models
-from balafon.Users.forms import UserPreferencesAdminForm
+from balafon.Users.forms import UserPreferencesAdminForm, UserPermissionsAdminForm
 
 
 class UserPreferencesAdmin(admin.ModelAdmin):
     form = UserPreferencesAdminForm
-    list_display = ['user', 'notify_due_actions', 'message_in_favorites']
+    list_display = ['user', 'notify_due_actions', 'message_in_favorites', ]
 
 admin.site.register(models.UserPreferences, UserPreferencesAdmin)
+
+
+class UserPermissionsAdmin(admin.ModelAdmin):
+    form = UserPermissionsAdminForm
+    list_display = ['user', 'can_create_group', ]
+
+admin.site.register(models.UserPermissions, UserPermissionsAdmin)
 
 
 class FavoriteAdmin(admin.ModelAdmin):
