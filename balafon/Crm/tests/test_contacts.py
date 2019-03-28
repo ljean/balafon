@@ -1009,6 +1009,137 @@ class EditContactSameAsTest(BaseTestCase):
         self.assertEqual(contact.same_as_priority, 2)
 
 
+class EditContactEmailVerifiedTest(BaseTestCase):
+    """It should be possible to edit a contact"""
+    fixtures = ['zones.json', ]
+
+    def test_add_contact_email_verified(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'])
+        self.assertEqual(contact.email_verified, False)
+
+    def test_add_contact_email_verified_set(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'email_verified': False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'])
+        self.assertEqual(contact.email_verified, False)  # Email verified can not be changed from this form
+
+    def test_view_edit_contact_email_verified(self):
+        contact = mommy.make(models.Contact, email_verified=False)
+        response = self.client.get(reverse('crm_edit_contact', args=[contact.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        fields = soup.select('#id_email_verified')
+        self.assertEqual(1, len(fields))
+        field = fields[0]
+        self.assertEqual(field.attrs.get('checked'), None)  # not checked
+        self.assertEqual(field.attrs.get('disabled'), 'disabled')
+
+    def test_view_edit_contact_email_verified_set(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        response = self.client.get(reverse('crm_edit_contact', args=[contact.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        fields = soup.select('#id_email_verified')
+        self.assertEqual(1, len(fields))
+        field = fields[0]
+        self.assertEqual(field.attrs.get('checked'), '')  # checked
+        self.assertEqual(field.attrs.get('disabled'), 'disabled')
+
+    def test_edit_contact_email_verified(self):
+        contact = mommy.make(models.Contact, email_verified=False)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            # email_verified is disabled and should not be sent by the browser
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, False)
+
+    def test_edit_contact_email_verified_set(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            # email_verified is disabled and should not be sent by the browser
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, True)
+
+    def test_edit_contact_email_verified_set_no_changed(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            'email_verified': False,   # email_verified should not be changed even if browser send something
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, True)
+
+
 class EditContactSubscriptionTest(BaseTestCase):
     """It should be possible to edit a contact"""
     fixtures = ['zones.json', ]

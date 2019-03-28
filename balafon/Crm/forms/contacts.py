@@ -95,6 +95,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             if field_name not in fieldset_fields:
                 fieldset_fields.append(field_name)
 
+        has_data = len(args) > 0
         super(ContactForm, self).__init__(*args, **kwargs)
 
         try:
@@ -108,7 +109,10 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         if 'balafon.Profile' not in settings.INSTALLED_APPS:
             self.fields["accept_notifications"].widget = forms.HiddenInput()
 
-        self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
+        if has_data:
+            self.fields.pop("email_verified")
+        else:
+            self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
 
         # define the allowed gender
         gender_choices = [
