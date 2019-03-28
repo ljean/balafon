@@ -128,16 +128,16 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             field = self.fields[field_name] = forms.BooleanField(
                 label=subscription_type.name, required=False
             )
-            if self.instance:
+            if self.instance and self.instance.id:
                 try:
                     subscription = models.Subscription.objects.get(
-                        subscription_type=subscription_type, contact=self.instance
+                        subscription_type=subscription_type,
+                        contact=self.instance
                     )
                     field.initial = subscription.accept_subscription
                 except models.Subscription.DoesNotExist:
-                    field.initial = get_subscription_default_value()
+                    field.initial = False
             else:
-
                 field.initial = get_subscription_default_value()
 
         if has_language_choices():

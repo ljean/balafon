@@ -47,7 +47,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -56,7 +56,7 @@ class AddressOverloadTest(BaseTestCase):
         contact_address = {
             'address': '',
             'address2': '',
-            'address2': '',
+            'address3': '',
             'cedex': '',
             'zip_code': '',
             'city': None,
@@ -76,7 +76,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -85,7 +85,7 @@ class AddressOverloadTest(BaseTestCase):
         contact_address = {
             'address': 'rue des tilleuls',
             'address2': 'lot des arbres',
-            'address2': 'verrerie',
+            'address3': 'verrerie',
             'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
@@ -105,7 +105,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -114,7 +114,7 @@ class AddressOverloadTest(BaseTestCase):
         base_contact_address = {
             'address': 'rue des tilleuls',
             'address2': 'lot des arbres',
-            'address2': 'verrerie',
+            'address3': 'verrerie',
             'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
@@ -335,7 +335,6 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
         c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
         c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
-
 
         response = self.client.get(reverse('crm_get_contact_id')+"?name="+c1.lastname)
         self.assertEqual(200, response.status_code)
@@ -1049,7 +1048,9 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
@@ -1073,7 +1074,9 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
@@ -1081,7 +1084,7 @@ class EditContactSubscriptionTest(BaseTestCase):
 
         soup.select(f1)[0]["checked"]
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
-        soup.select(f3)[0]["checked"]
+        self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
 
     @override_settings(BALAFON_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_add_contact_subscriptions(self):
@@ -1095,13 +1098,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is not checked
+        # Is not checked
         self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
@@ -1118,13 +1123,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is not checked
+        # Is not checked
         self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
@@ -1141,13 +1148,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is checked
+        # Is checked
         soup.select(f1)[0]["checked"]
         soup.select(f2)[0]["checked"]
         soup.select(f3)[0]["checked"]
@@ -1164,13 +1173,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is checked
+        # Is checked
         soup.select(f1)[0]["checked"]
         soup.select(f2)[0]["checked"]
         soup.select(f3)[0]["checked"]
