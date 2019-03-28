@@ -17,6 +17,7 @@ admin.site.register(models.UserPreferences, UserPreferencesAdmin)
 class UserPermissionsAdmin(admin.ModelAdmin):
     form = UserPermissionsAdminForm
     list_display = ['user', 'can_create_group', ]
+    list_editable = ['can_create_group', ]
 
 admin.site.register(models.UserPermissions, UserPermissionsAdmin)
 
