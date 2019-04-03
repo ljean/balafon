@@ -16,7 +16,6 @@ from django.conf import settings as project_settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
