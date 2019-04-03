@@ -103,8 +103,11 @@ class NewEmailingForm(BsForm):
             choices=subscription_choices, attrs={'class': 'form-control'}
         )
 
-        if len(settings.LANGUAGES) < 2:
-            self.fields['lang'].widget = forms.HiddenInput()
+        if not getattr(settings, 'LANGUAGES', None) or len(settings.LANGUAGES) < 2:
+            self.fields["lang"].widget = forms.HiddenInput()
+        else:
+            language_choices = crm_settings.get_language_choices(_("Favorite language of the contact"))
+            self.fields["lang"].widget = forms.Select(choices=language_choices, attrs={'class': 'form-control'})
 
         if getattr(settings, 'BALAFON_EMAILING_SENDER_CHOICES', None):
             self.fields['from_email'].widget = forms.Select(

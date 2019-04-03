@@ -47,7 +47,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -56,7 +56,7 @@ class AddressOverloadTest(BaseTestCase):
         contact_address = {
             'address': '',
             'address2': '',
-            'address2': '',
+            'address3': '',
             'cedex': '',
             'zip_code': '',
             'city': None,
@@ -76,7 +76,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -85,7 +85,7 @@ class AddressOverloadTest(BaseTestCase):
         contact_address = {
             'address': 'rue des tilleuls',
             'address2': 'lot des arbres',
-            'address2': 'verrerie',
+            'address3': 'verrerie',
             'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
@@ -105,7 +105,7 @@ class AddressOverloadTest(BaseTestCase):
         entity_address = {
             'address': 'rue Jules Rimet',
             'address2': 'lot du stade',
-            'address2': 'cité St-Laurent',
+            'address3': 'cité St-Laurent',
             'cedex': 'Cedex 2',
             'zip_code': '12345',
             'city': city1,
@@ -114,7 +114,7 @@ class AddressOverloadTest(BaseTestCase):
         base_contact_address = {
             'address': 'rue des tilleuls',
             'address2': 'lot des arbres',
-            'address2': 'verrerie',
+            'address3': 'verrerie',
             'cedex': 'Cedex 3',
             'zip_code': '12346',
             'city': city2,
@@ -335,7 +335,6 @@ class ContactEntitiesSuggestListTestCase(BaseTestCase):
         c1 = mommy.make(models.Contact, lastname="Zcz", entity=e1)
         c2 = mommy.make(models.Contact, lastname="aaa", entity=e1)
         c3 = mommy.make(models.Contact, lastname="bbb", entity=e2)
-
 
         response = self.client.get(reverse('crm_get_contact_id')+"?name="+c1.lastname)
         self.assertEqual(200, response.status_code)
@@ -1010,6 +1009,137 @@ class EditContactSameAsTest(BaseTestCase):
         self.assertEqual(contact.same_as_priority, 2)
 
 
+class EditContactEmailVerifiedTest(BaseTestCase):
+    """It should be possible to edit a contact"""
+    fixtures = ['zones.json', ]
+
+    def test_add_contact_email_verified(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'])
+        self.assertEqual(contact.email_verified, False)
+
+    def test_add_contact_email_verified_set(self):
+        st1 = mommy.make(models.SubscriptionType)
+        st2 = mommy.make(models.SubscriptionType)
+
+        url = reverse('crm_add_single_contact')
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'email_verified': False,
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        contact = models.Contact.objects.get(lastname=data['lastname'], firstname=data['firstname'])
+        self.assertEqual(contact.email_verified, False)  # Email verified can not be changed from this form
+
+    def test_view_edit_contact_email_verified(self):
+        contact = mommy.make(models.Contact, email_verified=False)
+        response = self.client.get(reverse('crm_edit_contact', args=[contact.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        fields = soup.select('#id_email_verified')
+        self.assertEqual(1, len(fields))
+        field = fields[0]
+        self.assertEqual(field.attrs.get('checked'), None)  # not checked
+        self.assertEqual(field.attrs.get('disabled'), 'disabled')
+
+    def test_view_edit_contact_email_verified_set(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        response = self.client.get(reverse('crm_edit_contact', args=[contact.id]))
+        self.assertEqual(200, response.status_code)
+        soup = BeautifulSoup(response.content)
+        fields = soup.select('#id_email_verified')
+        self.assertEqual(1, len(fields))
+        field = fields[0]
+        self.assertEqual(field.attrs.get('checked'), '')  # checked
+        self.assertEqual(field.attrs.get('disabled'), 'disabled')
+
+    def test_edit_contact_email_verified(self):
+        contact = mommy.make(models.Contact, email_verified=False)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            # email_verified is disabled and should not be sent by the browser
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, False)
+
+    def test_edit_contact_email_verified_set(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            # email_verified is disabled and should not be sent by the browser
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, True)
+
+    def test_edit_contact_email_verified_set_no_changed(self):
+        contact = mommy.make(models.Contact, email_verified=True)
+        url = reverse('crm_edit_contact', args=[contact.id])
+        data = {
+            'lastname': 'Dupond',
+            'firstname': 'Paul',
+            'city': models.City.objects.get(name="Paris").id,
+            'email_verified': False,   # email_verified should not be changed even if browser send something
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(200, response.status_code)
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+        next_url = reverse('crm_view_contact', args=[contact.id])
+        self.assertContains(response, "<script>")
+        self.assertContains(response, next_url)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.lastname, data['lastname'])
+        self.assertEqual(contact.firstname, data['firstname'])
+        self.assertEqual(contact.city.id, data['city'])
+        self.assertEqual(contact.email_verified, True)
+
+
 class EditContactSubscriptionTest(BaseTestCase):
     """It should be possible to edit a contact"""
     fixtures = ['zones.json', ]
@@ -1049,7 +1179,9 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
@@ -1073,7 +1205,9 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
@@ -1081,7 +1215,7 @@ class EditContactSubscriptionTest(BaseTestCase):
 
         soup.select(f1)[0]["checked"]
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
-        soup.select(f3)[0]["checked"]
+        self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
 
     @override_settings(BALAFON_SUBSCRIPTION_DEFAULT_VALUE=False)
     def test_view_add_contact_subscriptions(self):
@@ -1095,13 +1229,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is not checked
+        # Is not checked
         self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
@@ -1118,13 +1254,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is not checked
+        # Is not checked
         self.assertRaises(KeyError, lambda: soup.select(f1)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f2)[0]["checked"])
         self.assertRaises(KeyError, lambda: soup.select(f3)[0]["checked"])
@@ -1141,13 +1279,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is checked
+        # Is checked
         soup.select(f1)[0]["checked"]
         soup.select(f2)[0]["checked"]
         soup.select(f3)[0]["checked"]
@@ -1164,13 +1304,15 @@ class EditContactSubscriptionTest(BaseTestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
 
-        f1, f2, f3 = '#id_subscription_{0}'.format(st1.id), '#id_subscription_{0}'.format(st2.id), '#id_subscription_{0}'.format(st3.id)
+        f1 = '#id_subscription_{0}'.format(st1.id)
+        f2 = '#id_subscription_{0}'.format(st2.id)
+        f3 = '#id_subscription_{0}'.format(st3.id)
 
         self.assertEqual(1, len(soup.select(f1)))
         self.assertEqual(1, len(soup.select(f2)))
         self.assertEqual(1, len(soup.select(f3)))
 
-        #Is checked
+        # Is checked
         soup.select(f1)[0]["checked"]
         soup.select(f2)[0]["checked"]
         soup.select(f3)[0]["checked"]

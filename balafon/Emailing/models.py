@@ -63,13 +63,7 @@ class Emailing(TimeStampedModel):
     sending_dt = models.DateTimeField(_("sending date"), blank=True, default=None, null=True)
 
     favorites = GenericRelation(Favorite)
-    lang = models.CharField(
-        _("language"),
-        max_length=5,
-        default="",
-        blank=True,
-        choices=get_language_choices()
-    )
+    lang = models.CharField(_("language"), max_length=5, default="", blank=True)
     from_email = models.CharField(max_length=100, blank=True, default="", verbose_name=_("From email"))
 
     def __str__(self):
@@ -133,6 +127,8 @@ class Emailing(TimeStampedModel):
         
     def save(self, *args, **kwargs):
         """save"""
+        if self.lang and self.lang not in [value for (value, label) in get_language_choices()]:
+            self.lang = ''
         if self.status == Emailing.STATUS_SENT and self.sending_dt is None:
             self.sending_dt = datetime.now()
         return super(Emailing, self).save(*args, **kwargs)

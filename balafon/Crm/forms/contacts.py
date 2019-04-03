@@ -95,6 +95,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             if field_name not in fieldset_fields:
                 fieldset_fields.append(field_name)
 
+        has_data = len(args) > 0
         super(ContactForm, self).__init__(*args, **kwargs)
 
         try:
@@ -108,7 +109,10 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         if 'balafon.Profile' not in settings.INSTALLED_APPS:
             self.fields["accept_notifications"].widget = forms.HiddenInput()
 
-        self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
+        if has_data:
+            self.fields.pop("email_verified")
+        else:
+            self.fields["email_verified"].widget.attrs['disabled'] = "disabled"
 
         # define the allowed gender
         gender_choices = [
@@ -128,16 +132,16 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
             field = self.fields[field_name] = forms.BooleanField(
                 label=subscription_type.name, required=False
             )
-            if self.instance:
+            if self.instance and self.instance.id:
                 try:
                     subscription = models.Subscription.objects.get(
-                        subscription_type=subscription_type, contact=self.instance
+                        subscription_type=subscription_type,
+                        contact=self.instance
                     )
                     field.initial = subscription.accept_subscription
                 except models.Subscription.DoesNotExist:
-                    field.initial = get_subscription_default_value()
+                    field.initial = False
             else:
-
                 field.initial = get_subscription_default_value()
 
         if has_language_choices():

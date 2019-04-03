@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-VERSION = "3.4.9"
+VERSION = "3.4.13"
 __version__ = VERSION
 
 default_app_config = 'balafon.apps.BalafonAppConfig'

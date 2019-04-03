@@ -21,6 +21,7 @@ except ImportError:
 from balafon.Crm.models import Action, ActionType
 from balafon.Profile.forms import MessageForm
 from balafon.Profile.models import ContactProfile
+from balafon.Profile.settings import is_registration_enabled
 from balafon.Profile.utils import create_profile_contact, notify_registration
 from balafon.settings import get_profile_form, get_registration_form
 from balafon.utils import now_rounded
@@ -118,6 +119,12 @@ class AcceptNewsletterRegistrationView(RegistrationView):
     
     def get_form_class(self, request=None):
         return get_registration_form()
+
+    def dispatch(self, request, *args, **kwargs):
+        """make possible to disable this view from settings"""
+        if not is_registration_enabled():
+            raise Http404
+        return super(AcceptNewsletterRegistrationView, self).dispatch(request, *args, **kwargs)
     
     def register(self, request_or_form, **kwargs):
 

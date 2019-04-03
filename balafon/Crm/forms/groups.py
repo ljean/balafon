@@ -8,12 +8,14 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms.__future__ as forms
 
-from coop_cms.bs_forms import ModelForm as BsModelForm
+from coop_cms.bs_forms import ModelForm as BsModelForm, Form as BsForm
+from coop_cms.utils.requests import RequestManager
 
 from balafon.Crm import models
+from balafon.Users.utils import can_create_group
 
 
-class AddEntityToGroupForm(forms.Form):
+class AddEntityToGroupForm(BsForm):
     """form for adding an entity to a group"""
     group_name = forms.CharField(
         label=_("Group name"),
@@ -27,12 +29,16 @@ class AddEntityToGroupForm(forms.Form):
     def clean_group_name(self):
         """"validation"""
         name = self.cleaned_data['group_name']
+        request = RequestManager().get_request()
+        if not can_create_group(request.user) and models.Group.objects.filter(name=name).count() == 0:
+            raise ValidationError(ugettext("You are not allowed to create new groups"))
+
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
             raise ValidationError(ugettext("The entity already belong to group {0}").format(name))
         return name
 
 
-class AddContactToGroupForm(forms.Form):
+class AddContactToGroupForm(BsForm):
     """form for adding a contact to a group"""
     group_name = forms.CharField(
         label=_("Group name"),
@@ -46,6 +52,9 @@ class AddContactToGroupForm(forms.Form):
     def clean_group_name(self):
         """validation"""
         name = self.cleaned_data['group_name']
+        request = RequestManager().get_request()
+        if not can_create_group(request.user) and models.Group.objects.filter(name=name).count() == 0:
+            raise ValidationError(ugettext("You are not allowed to create new groups"))
         if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
             raise ValidationError(ugettext("The contact already belong to group {0}").format(name))
         return name

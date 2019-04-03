@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 import floppyforms.__future__ as forms
 
 from balafon.utils import is_allowed_homepage
-from balafon.Users.models import UserPreferences
+from balafon.Users.models import UserPreferences, UserPermissions
 
 
 class UserPreferencesAdminForm(forms.ModelForm):
@@ -23,6 +23,17 @@ class UserPreferencesAdminForm(forms.ModelForm):
     class Meta:
         model = UserPreferences
         fields = ('user', 'notify_due_actions', 'message_in_favorites', )
+
+
+class UserPermissionsAdminForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UserPermissionsAdminForm, self).__init__(*args, **kwargs)
+        self.fields['user'].queryset = User.objects.filter(is_staff=True)
+
+    class Meta:
+        model = UserPermissions
+        fields = ('user', 'can_create_group', )
 
 
 class ContentTypeField(forms.CharField): 
