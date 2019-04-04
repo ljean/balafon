@@ -344,14 +344,14 @@ class Entity(AddressModel):
         if self.contact_set.filter(has_left=False).count() == 0:
             Contact.objects.create(entity=self, main_contact=True, has_left=False)
         elif self.contact_set.filter(main_contact=True, has_left=False).count() == 0:
-            #Always at least 1 main contact per entity
+            # Always at least 1 main contact per entity
             contact = self.default_contact
             contact.main_contact = True
             contact.save()
         if self.is_single_contact:
             contact = self.default_contact
             self.name = "{0} {1}".format(contact.lastname, contact.firstname).lower()
-            #don't put *args, *kwargs -> it may cause integrity error
+            # don't put *args, *kwargs -> it may cause integrity error
             super(Entity, self).save()
     
     def __str__(self):
