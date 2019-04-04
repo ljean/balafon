@@ -16,6 +16,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import Template, Context
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
 
 from colorbox.decorators import popup_redirect, popup_close
 from coop_cms.models import Newsletter
@@ -45,61 +46,64 @@ def filter_icontains_unaccent(queryset, field, text):
     return list(queryset.filter(**{field+"__icontains": text}))
 
 
+@csrf_exempt
 @user_passes_test(can_access)
 def quick_search(request):
-    if request.method == "POST":
-        form = QuickSearchForm(request.POST)
-        if form.is_valid():
-            text = form.cleaned_data["text"]
-            
-            queryset = Entity.objects.filter(is_single_contact=False)
-            entities_by_name = filter_icontains_unaccent(queryset, 'name', text)
-            
-            queryset = Contact.objects.all()#.filter(has_left=False)
-            contacts_by_name = filter_icontains_unaccent(queryset, 'lastname', text)
-            
-            for entity in entities_by_name:
-                setattr(entity, 'is_entity', True)
-                for contact in entity.contact_set.all():
-                    try:
-                        # avoid duplicates
-                        contacts_by_name.remove(contact)
-                    except ValueError:
-                        pass
-            contacts = entities_by_name + contacts_by_name
-            contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
-            
-            queryset = Group.objects.all()
-            groups_by_name = filter_icontains_unaccent(queryset, 'name', text)
-            
-            contacts_by_email = Contact.objects.filter(
-                Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
-            
-            cities_by_name = []
-            for city in City.objects.filter(name__icontains=text):
-                entities_count, contacts_count = city.contact_set.count(), city.entity_set.count()
-                if entities_count + contacts_count:
-                    cities_by_name.append((city, entities_count, contacts_count))
-            
-            contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
-            contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
-            
-            context_dict = {
-                'contacts_by_phone': contacts_by_phone,
-                'cities_by_name': cities_by_name,
-                'text': text,
-                'contacts_by_email': contacts_by_email,
-                'contacts': contacts,
-                'groups_by_name': groups_by_name,
-            }
-                
-            return render(
-                request,
-                'Search/quicksearch_results.html',
-                context_dict
-            )
+    form = QuickSearchForm(request.GET)
+    if form.is_valid():
+        text = form.cleaned_data["text"]
+
+        queryset = Entity.objects.filter(is_single_contact=False)
+        entities_by_name = filter_icontains_unaccent(queryset, 'name', text)
+
+        queryset = Contact.objects.all()#.filter(has_left=False)
+        contacts_by_name = filter_icontains_unaccent(queryset, 'lastname', text)
+
+        for entity in entities_by_name:
+            setattr(entity, 'is_entity', True)
+            for contact in entity.contact_set.all():
+                try:
+                    # avoid duplicates
+                    contacts_by_name.remove(contact)
+                except ValueError:
+                    pass
+        contacts = entities_by_name + contacts_by_name
+        contacts.sort(key=lambda x: getattr(x, 'name', getattr(x, 'lastname', '')))
+
+        queryset = Group.objects.all()
+        groups_by_name = filter_icontains_unaccent(queryset, 'name', text)
+
+        contacts_by_email = Contact.objects.filter(
+            Q(email__icontains=text) | (Q(email="") & Q(entity__email__icontains=text)))
+
+        cities_by_name = []
+        for city in City.objects.filter(name__icontains=text):
+            entities_count, contacts_count = city.contact_set.count(), city.entity_set.count()
+            if entities_count + contacts_count:
+                cities_by_name.append((city, entities_count, contacts_count))
+
+        contacts_by_phone = list(Contact.objects.filter(Q(mobile__icontains=text) | Q(phone__icontains=text)))
+        contacts_by_phone += list(Entity.objects.filter(phone__icontains=text))
+
+        context_dict = {
+            'contacts_by_phone': contacts_by_phone,
+            'cities_by_name': cities_by_name,
+            'text': text,
+            'contacts_by_email': contacts_by_email,
+            'contacts': contacts,
+            'groups_by_name': groups_by_name,
+        }
     else:
-        raise Http404
+        context_dict = {
+            'text': request.GET.get('text', '') or '',
+        }
+
+    return render(
+        request,
+        'Search/quicksearch_results.html',
+        context_dict
+    )
+
 
 
 @user_passes_test(can_access)

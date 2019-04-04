@@ -183,7 +183,7 @@
         {% endif %}
         </li>
         <li class="quick-search-form">
-            <form method="POST" action="{% url 'quick_search' %}">{% csrf_token %} {{ quick_search_form.text }}</form>
+            <form method="GET" action="{% url 'quick_search' %}">{{ quick_search_form.text }}</form>
         </li>
       </ul>
     </div><!--/.nav-collapse -->

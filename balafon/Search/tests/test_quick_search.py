@@ -30,7 +30,7 @@ class QuickSearchTest(BaseTestCase):
         url = reverse("quick_search")
         data = {"text": "Zoo"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, city1.name)
@@ -51,7 +51,7 @@ class QuickSearchTest(BaseTestCase):
         url = reverse("quick_search")
         data = {"text": "oo"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, city1.name)
@@ -80,7 +80,7 @@ class QuickSearchTest(BaseTestCase):
         url = reverse("quick_search")
         data = {"text": "oo"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, city1.name)
@@ -98,12 +98,32 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "Skywalker"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.firstname)
         self.assertNotContains(response, obi.firstname)
         self.assertContains(response, luke.firstname)
+        self.assertNotContains(response, doe.firstname)
+
+    def test_empty(self):
+        """quick search by name"""
+        anakin = mommy.make(models.Contact, firstname="Anakin", lastname="Skywalker")
+        obi = mommy.make(models.Contact, firstname="Obi-Wan", lastname="Kenobi")
+        doe = mommy.make(models.Contact, firstname="Benjamin", lastname="Doe")
+        star_wars_company = mommy.make(models.Entity)
+        luke = mommy.make(models.Contact, firstname="Luuukeeee", lastname="Skywalker", entity=star_wars_company)
+
+        url = reverse('quick_search')
+
+        data = {"text": ""}
+
+        response = self.client.get(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertNotContains(response, anakin.firstname)
+        self.assertNotContains(response, obi.firstname)
+        self.assertNotContains(response, luke.firstname)
         self.assertNotContains(response, doe.firstname)
 
     def test_quick_search_anonymous(self):
@@ -116,7 +136,7 @@ class QuickSearchTest(BaseTestCase):
         data = {"text": "Skywalker"}
 
         self.client.logout()
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(302, response.status_code)
 
     def test_quick_search_non_staff(self):
@@ -131,7 +151,7 @@ class QuickSearchTest(BaseTestCase):
         self.user.is_staff = False
         self.user.save()
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(302, response.status_code)
 
     def test_has_left_contact_by_name(self):
@@ -146,7 +166,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "Skywalker"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.firstname)
@@ -168,7 +188,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "Star-Wars"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertNotContains(response, anakin.firstname)
@@ -190,7 +210,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "Star"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, piccard.firstname)
@@ -210,7 +230,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "04.99"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.phone)
@@ -239,7 +259,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "04.99"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.phone)
@@ -267,7 +287,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "@starwars.com"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.email)
@@ -303,7 +323,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "@starwars.com"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.email)
@@ -333,7 +353,7 @@ class QuickSearchTest(BaseTestCase):
 
         data = {"text": "starwars.com"}
 
-        response = self.client.post(url, data=data)
+        response = self.client.get(url, data=data)
         self.assertEqual(200, response.status_code)
 
         self.assertContains(response, anakin.email)
