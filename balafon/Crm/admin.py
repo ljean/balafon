@@ -193,6 +193,7 @@ class ActionTypeAdmin(admin.ModelAdmin):
     ]
     list_editable = ['set', 'subscribe_form', 'hide_contacts_buttons', ]
     actions = [initialize_status2, reset_status2, set_action_previous_status, create_action_initial_track]
+    search_fields = ['name']
 
 
 @admin.register(models.OpportunityStatus)
@@ -314,6 +315,7 @@ class ActionSetAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'ordering']
     list_editable = ['ordering']
+    search_fields = ['name']
 
 
 @admin.register(models.ActionStatus)
@@ -322,6 +324,7 @@ class ActionStatusAdmin(admin.ModelAdmin):
     list_display = ['name', 'ordering', 'is_final', 'background_color', 'fore_color']
     list_filter = ['is_final']
     list_editable = ['ordering', 'is_final', 'background_color', 'fore_color']
+    search_fields = ['name']
 
 
 @admin.register(models.ActionDocument)
