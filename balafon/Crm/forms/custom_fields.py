@@ -18,14 +18,16 @@ class CustomFieldForm(BetterBsForm):
         custom_fields = models.CustomField.objects.filter(model=model_type)
         for field in custom_fields:
             self.fields[field.name] = forms.CharField(required=False, label=field.label or field.name)
-
+            if field.choices.count():
+                choices = [('', '')] + [(choice.value, choice.label) for choice in field.choices.all()]
+                self.fields[field.name].widget = forms.Select(choices=choices)
             self.fields[field.name].widget.attrs = {'class': 'form-control'}
             if field.widget:
                 self.fields[field.name].widget.attrs['class'] += ' ' + field.widget
 
-            #No Post
+            # No Post
             if len(args) == 0:
-                self.fields[field.name].initial = getattr(instance, 'custom_field_'+field.name, '')
+                self.fields[field.name].initial = getattr(instance, 'custom_field_' + field.name, '')
 
     def save(self, *args, **kwargs):
         """save"""

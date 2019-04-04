@@ -285,12 +285,19 @@ class ActionAdmin(admin.ModelAdmin):
         return db_field.formfield(**kwargs)
 
 
+@admin.register(models.CustomFieldChoice)
+class CustomFieldChoicedAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = ['value', 'label', 'order']
+
+
 @admin.register(models.CustomField)
 class CustomFieldAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'model', 'label', 'widget', 'ordering', 'import_order', 'export_order']
     list_editable = ['ordering', 'import_order', 'export_order']
     list_filter = ('model', 'widget')
+    filter_horizontal = ['choices']
 
 
 @admin.register(models.EntityCustomFieldValue)

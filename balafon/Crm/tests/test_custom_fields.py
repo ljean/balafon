@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 
+from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
 
 from balafon.Crm import models
@@ -23,6 +24,70 @@ class CustomFieldTest(BaseTestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(entity.custom_field_siret, data['siret'])
+
+    def test_view_entity_custom_field_choice(self):
+        """entity coustom field"""
+        entity = mommy.make(models.Entity)
+        choice1 = models.CustomFieldChoice.objects.create(value="PA", label="Paris", order=1)
+        choice2 = models.CustomFieldChoice.objects.create(value="LY", label="Lyon", order=2)
+        choice3 = models.CustomFieldChoice.objects.create(value="MA", label="Marseille", order=3)
+        cfv = models.CustomField.objects.create(name='tournee', label='Tournée', model=models.CustomField.MODEL_ENTITY)
+        cfv.choices.add(choice1)
+        cfv.choices.add(choice2)
+        cfv.save()
+
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content)
+        self.assertEqual(len(soup.select('select#id_tournee')), 1)
+        select_field = soup.select('select#id_tournee')[0]
+        options = select_field.select('option')
+        self.assertEqual(len(options), 3)
+        option = options[0]
+        self.assertEqual(option['value'], '')
+        self.assertEqual(option.text, '')
+        option = options[1]
+        self.assertEqual(option['value'], 'PA')
+        self.assertEqual(option.text, 'Paris')
+        option = options[2]
+        self.assertEqual(option['value'], 'LY')
+        self.assertEqual(option.text, 'Lyon')
+
+        self.assertEqual(entity.custom_field_tournee, '')
+
+    def test_edit_entity_custom_field_choice(self):
+        """entity coustom field"""
+        entity = mommy.make(models.Entity)
+        choice1 = models.CustomFieldChoice.objects.create(value="PA", label="Paris", order=1)
+        choice2 = models.CustomFieldChoice.objects.create(value="LY", label="Lyon", order=2)
+        choice3 = models.CustomFieldChoice.objects.create(value="MA", label="Marseille", order=3)
+        cfv = models.CustomField.objects.create(name='tournee', label='Tournée', model=models.CustomField.MODEL_ENTITY)
+        cfv.choices.add(choice1)
+        cfv.choices.add(choice2)
+        cfv.save()
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        data = {'tournee': 'PA'}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(entity.custom_field_tournee, 'PA')
+
+    def test_reset_entity_custom_field_choice(self):
+        """entity coustom field"""
+        entity = mommy.make(models.Entity)
+        choice1 = models.CustomFieldChoice.objects.create(value="PA", label="Paris", order=1)
+        choice2 = models.CustomFieldChoice.objects.create(value="LY", label="Lyon", order=2)
+        choice3 = models.CustomFieldChoice.objects.create(value="MA", label="Marseille", order=3)
+        cfv = models.CustomField.objects.create(name='tournee', label='Tournée', model=models.CustomField.MODEL_ENTITY)
+        cfv.choices.add(choice1)
+        cfv.choices.add(choice2)
+        cfv.save()
+        url = reverse('crm_edit_custom_fields', args=['entity', entity.id])
+        data = {'tournee': ''}
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(entity.custom_field_tournee, '')
 
     def test_entity_custom_two_fields(self):
         """entity with 2 custom fields"""

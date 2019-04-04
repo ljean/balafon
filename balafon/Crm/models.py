@@ -1692,7 +1692,22 @@ class ActionDocument(models.Model):
     
     def __str__(self):
         return "{0} - {1}".format(self.template, self.action)
-    
+
+
+@python_2_unicode_compatible
+class CustomFieldChoice(models.Model):
+    value = models.CharField(max_length=100, verbose_name=_('value'))
+    label = models.CharField(max_length=100, verbose_name=_('label'))
+    order = models.IntegerField(default=0, verbose_name=_('order'))
+
+    def __str__(self):
+        return '{0} ({1})'.format(self.label, self.value)
+
+    class Meta:
+        verbose_name = _('custom field choice')
+        verbose_name_plural = _('custom field choices')
+        ordering = ('order', 'label', )
+
 
 @python_2_unicode_compatible
 class CustomField(models.Model):
@@ -1714,6 +1729,7 @@ class CustomField(models.Model):
     import_order = models.IntegerField(verbose_name=_('import ordering'), default=0)
     export_order = models.IntegerField(verbose_name=_('export ordering'), default=0)
     is_link = models.BooleanField(default=False, verbose_name=_('is link'))
+    choices = models.ManyToManyField(CustomFieldChoice, blank=True)
     
     def __str__(self):
         return _("{0}:{1}").format(self.model_name(), self.name)
