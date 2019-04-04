@@ -35,6 +35,7 @@ class HasParentFilter(admin.SimpleListFilter):
         return queryset
 
 
+@admin.register(models.Zone)
 class ZoneAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'parent', 'type']
@@ -42,22 +43,25 @@ class ZoneAdmin(admin.ModelAdmin):
     list_filter = ['type', HasParentFilter, 'parent']
     search_fields = ['name']
 
-admin.site.register(models.Zone, ZoneAdmin)
+
+@admin.register(models.EntityRole)
+class EntityRoleAdmin(admin.ModelAdmin):
+    pass
 
 
-admin.site.register(models.EntityRole)
-
-
+@admin.register(models.SameAs)
 class SameAsAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['priority_contact', 'other_contacts', 'contacts_count']
 
-admin.site.register(models.SameAs, SameAsAdmin)
 
 
-admin.site.register(models.OpportunityType)
+@admin.register(models.OpportunityType)
+class OpportunityTypeAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(models.ActionMenu)
 class ActionMenuAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['action_type', 'view_name', 'label', 'icon', 'a_attrs', 'order_index', 'only_for_status_str']
@@ -66,24 +70,20 @@ class ActionMenuAdmin(admin.ModelAdmin):
     search_fields = ['label', ]
     form = ActionMenuAdminForm
 
-admin.site.register(models.ActionMenu, ActionMenuAdmin)
 
-
+@admin.register(models.EntityType)
 class EntityTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['id', 'name', 'gender', 'order', 'subscribe_form']
     list_editable = ['name', 'gender', 'order', 'subscribe_form']
     list_filter = ['subscribe_form']
 
-admin.site.register(models.EntityType, EntityTypeAdmin)
 
-
+@admin.register(models.ZoneType)
 class ZoneTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'type']
     ordering = ['type', 'name']
-
-admin.site.register(models.ZoneType, ZoneTypeAdmin)
 
 
 def initialize_status2(modeladmin, request, queryset):
@@ -180,6 +180,7 @@ def create_action_initial_track(modeladmin, request, queryset):
 create_action_initial_track.short_description = _("Track status : create initial track")
 
 
+@admin.register(models.ActionType)
 class ActionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -194,14 +195,10 @@ class ActionTypeAdmin(admin.ModelAdmin):
     actions = [initialize_status2, reset_status2, set_action_previous_status, create_action_initial_track]
 
 
-admin.site.register(models.ActionType, ActionTypeAdmin)
-
-
+@admin.register(models.OpportunityStatus)
 class OpportunityStatusAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'ordering']
-
-admin.site.register(models.OpportunityStatus, OpportunityStatusAdmin)
 
 
 class SubscriptionInline(admin.TabularInline):
@@ -209,6 +206,7 @@ class SubscriptionInline(admin.TabularInline):
     model = models.Subscription
 
 
+@admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['lastname', 'firstname', 'entity', 'email']
@@ -224,9 +222,8 @@ class ContactAdmin(admin.ModelAdmin):
                 self.fields['favorite_language'].widget = forms.Select(choices=get_language_choices())
         return custom_form_class
 
-admin.site.register(models.Contact, ContactAdmin)
 
-
+@admin.register(models.Group)
 class GroupAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'description', 'subscribe_form']
@@ -235,14 +232,13 @@ class GroupAdmin(admin.ModelAdmin):
     list_editable = ['subscribe_form']
     filter_horizontal = ['entities', 'contacts']
 
-admin.site.register(models.Group, GroupAdmin)
-
 
 class GroupInline(admin.TabularInline):
     """custom inline"""
     model = models.Group
 
 
+@admin.register(models.City)
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'parent']
@@ -251,26 +247,23 @@ class CityAdmin(admin.ModelAdmin):
     list_filter = [HasParentFilter, 'parent', ]
     raw_id_fields = ('groups',)
 
-admin.site.register(models.City, CityAdmin)
 
-
+@admin.register(models.Entity)
 class EntityAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ('name', 'type')
     search_fields = ['name']
 
-admin.site.register(models.Entity, EntityAdmin)
 
-
+@admin.register(models.Opportunity)
 class OpportunityAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', ]
     search_fields = ['name', ]
     raw_id_admin = ('entity',)
 
-admin.site.register(models.Opportunity, OpportunityAdmin)
 
-
+@admin.register(models.Action)
 class ActionAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -290,100 +283,95 @@ class ActionAdmin(admin.ModelAdmin):
         kwargs.pop('request')
         return db_field.formfield(**kwargs)
 
-admin.site.register(models.Action, ActionAdmin)
 
-
+@admin.register(models.CustomField)
 class CustomFieldAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'model', 'label', 'widget', 'ordering', 'import_order', 'export_order']
     list_editable = ['ordering', 'import_order', 'export_order']
     list_filter = ('model', 'widget')
 
-admin.site.register(models.CustomField, CustomFieldAdmin)
 
-
+@admin.register(models.EntityCustomFieldValue)
 class EntityCustomFieldValueAdmin(admin.ModelAdmin):
     """custom admin view"""
     search_fields = ['entity']
 
-admin.site.register(models.EntityCustomFieldValue, EntityCustomFieldValueAdmin)
 
-
+@admin.register(models.ContactCustomFieldValue)
 class ContactCustomFieldValueAdmin(admin.ModelAdmin):
     """custom admin view"""
     search_fields = ['contact']
 
-admin.site.register(models.ContactCustomFieldValue, ContactCustomFieldValueAdmin)
 
-admin.site.register(models.ContactsImport)
+@admin.register(models.ContactsImport)
+class ContactsImportAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(models.ActionSet)
 class ActionSetAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'ordering']
     list_editable = ['ordering']
 
-admin.site.register(models.ActionSet, ActionSetAdmin)
 
-
+@admin.register(models.ActionStatus)
 class ActionStatusAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'ordering', 'is_final', 'background_color', 'fore_color']
     list_filter = ['is_final']
     list_editable = ['ordering', 'is_final', 'background_color', 'fore_color']
 
-admin.site.register(models.ActionStatus, ActionStatusAdmin)
 
-admin.site.register(models.ActionDocument)
+@admin.register(models.ActionDocument)
+class ActionDocumentAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(models.RelationshipType)
 class RelationshipTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['id', 'name', 'reverse']
     list_editable = ['name', 'reverse']
 
-admin.site.register(models.RelationshipType, RelationshipTypeAdmin)
 
-
+@admin.register(models.Relationship)
 class RelationshipAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['id', 'contact1', 'relationship_type', 'contact2']
 
-admin.site.register(models.Relationship, RelationshipAdmin)
 
-
+@admin.register(models.SubscriptionType)
 class SubscriptionTypeAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'site', 'order_index']
     list_editable = ['order_index']
 
-admin.site.register(models.SubscriptionType, SubscriptionTypeAdmin)
 
-
+@admin.register(models.TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['name', 'user', 'active']
     list_filter = ['active']
 
 
-admin.site.register(models.TeamMember, TeamMemberAdmin)
+@admin.register(models.StreetType)
+class StreetTypeAdmin(admin.ModelAdmin):
+    pass
 
 
-admin.site.register(models.StreetType)
-
-
+@admin.register(models.MailtoSettings)
 class MailtoSettingsAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = ['action_type', 'subject', 'bcc']
 
 
-admin.site.register(models.MailtoSettings, MailtoSettingsAdmin)
+@admin.register(models.ActionStatusTrack)
+class ActionStatusTrackAdmin(admin.ModelAdmin):
+    pass
 
-admin.site.register(models.ActionStatusTrack)
 
-
+@admin.register(models.ActionNumberGenerator)
 class ActionNumberGeneratorAdmin(admin.ModelAdmin):
     list_display = ('name', 'number', )
-
-admin.site.register(models.ActionNumberGenerator, ActionNumberGeneratorAdmin)
-

@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-from django.conf import settings
 from django.contrib import admin
 
 import floppyforms.__future__ as forms
@@ -12,6 +11,7 @@ from balafon.Crm import settings as crm_settings
 from balafon.Emailing import models
 
 
+@admin.register(models.Emailing)
 class EmailingAdmin(admin.ModelAdmin):
     """Emailing"""
     list_display = ['newsletter']
@@ -27,14 +27,10 @@ class EmailingAdmin(admin.ModelAdmin):
                 self.fields['lang'].widget = forms.Select(choices=crm_settings.get_language_choices())
         return custom_form_class
 
-admin.site.register(models.Emailing, EmailingAdmin)
 
-
+@admin.register(models.MagicLink)
 class MagicLinkAdmin(admin.ModelAdmin):
     """Magic link"""
     list_display = ['url', 'emailing']
     search_fields = ['url', 'emailing']
     raw_id_admin = ('emailing',)
-
-admin.site.register(models.MagicLink, MagicLinkAdmin)
-

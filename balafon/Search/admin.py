@@ -7,19 +7,20 @@ from django.contrib import admin
 from balafon.Search import models
 
 
-admin.site.register(models.Search)
+@admin.register(models.Search)
+class SearchAdmin(admin.ModelAdmin):
+    pass
 
+
+@admin.register(models.SearchGroup)
 class SearchGroupAdmin(admin.ModelAdmin):
     list_display = ['name', 'search']
     search_fields = ['name', 'search']
     raw_id_admin = ('search',)
 
-admin.site.register(models.SearchGroup, SearchGroupAdmin)
 
-
+@admin.register(models.SearchField)
 class SearchFieldAdmin(admin.ModelAdmin):
     list_display = ['field', 'search_group', 'value']
     search_fields = ['field', 'field__group__search']
     raw_id_admin = ('search_group',)
-
-admin.site.register(models.SearchField, SearchFieldAdmin)

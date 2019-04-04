@@ -14,8 +14,14 @@ from balafon.Store import models
 from balafon.Store.forms import StoreManagementActionTypeAdminForm, PricePolicyAdminForm, StoreItemCategoryAdminForm
 
 
-admin.site.register(models.Unit)
-admin.site.register(models.DeliveryPoint)
+@admin.register(models.Unit)
+class UnitAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.DeliveryPoint)
+class DeliveryPointAdmin(admin.ModelAdmin):
+    pass
 
 
 class StoreItemInline(admin.TabularInline):
@@ -52,6 +58,7 @@ class StoreParentCategoryFilter(admin.SimpleListFilter):
             return queryset
 
 
+@admin.register(models.StoreItemCategory)
 class StoreItemCategoryAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'parent', 'icon', 'active', 'price_policy', 'get_articles_count', 'get_all_articles_count',
@@ -64,26 +71,19 @@ class StoreItemCategoryAdmin(admin.ModelAdmin):
     inlines = (StoreItemInline, )
 
 
-admin.site.register(models.StoreItemCategory, StoreItemCategoryAdmin)
-
-
+@admin.register(models.Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('name',)
     inlines = (StoreItemInline, )
 
 
-admin.site.register(models.Brand, BrandAdmin)
-
-
+@admin.register(models.StoreItemTag)
 class StoreItemTagAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'name', 'order_index', 'icon', 'active', 'show_always')
     list_editable = ('name', 'order_index', 'icon', 'active', 'show_always')
     fields = (
         'name', 'order_index', 'icon', 'active', 'show_always'
     )
-
-
-admin.site.register(models.StoreItemTag, StoreItemTagAdmin)
 
 
 class SaleItemInline(admin.TabularInline):
@@ -97,6 +97,7 @@ class SaleItemInline(admin.TabularInline):
     readonly_fields = ('calculate_discount', )
 
 
+@admin.register(models.Sale)
 class SaleAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'creation_date', 'analysis_code', )
     readonly_fields = ('creation_date', )
@@ -104,15 +105,13 @@ class SaleAdmin(admin.ModelAdmin):
     inlines = (SaleItemInline, )
     list_filter = ('analysis_code', )
     raw_id_fields = ['action', ]
-admin.site.register(models.Sale, SaleAdmin)
 
 
+@admin.register(models.StoreManagementActionType)
 class StoreManagementActionTypeAdmin(admin.ModelAdmin):
     """StoreManagementActionTypeAdmin"""
     list_display = ('action_type', 'template_name', 'show_amount_as_pre_tax')
     form = StoreManagementActionTypeAdminForm
-
-admin.site.register(models.StoreManagementActionType, StoreManagementActionTypeAdmin)
 
 
 class StockThresholdFilter(admin.SimpleListFilter):
@@ -214,6 +213,7 @@ class StoreItemPropertyValueInline(admin.TabularInline):
     fields = ('property', 'value')
 
 
+@admin.register(models.StoreItem)
 class StoreItemAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
@@ -268,17 +268,14 @@ class StoreItemAdmin(admin.ModelAdmin):
         kwargs.pop('request')
         return db_field.formfield(**kwargs)
 
-admin.site.register(models.StoreItem, StoreItemAdmin)
 
-
+@admin.register(models.VatRate)
 class VatRateAdmin(admin.ModelAdmin):
     """custom admin view"""
     list_display = [
         'name', 'is_default',
     ]
     readonly_fields = ['name']
-
-admin.site.register(models.VatRate, VatRateAdmin)
 
 
 def import_data(modeladmin, request, queryset):
@@ -301,6 +298,7 @@ def import_data(modeladmin, request, queryset):
 import_data.short_description = _("Import")
 
 
+@admin.register(models.StoreItemImport)
 class StoreItemImportAdmin(admin.ModelAdmin):
     """custom admin"""
     actions = [import_data]
@@ -308,33 +306,43 @@ class StoreItemImportAdmin(admin.ModelAdmin):
         CharField: {'widget': forms.TextInput(attrs={'size': 150})},
     }
 
-admin.site.register(models.StoreItemImport, StoreItemImportAdmin)
 
-admin.site.register(models.StoreItemProperty)
+@admin.register(models.StoreItemProperty)
+class StoreItemPropertyAdmin(admin.ModelAdmin):
+    pass
 
-admin.site.register(models.Supplier)
+
+@admin.register(models.Supplier)
+class SupplierAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(models.PricePolicy)
 class PricePolicyAdmin(admin.ModelAdmin):
     form = PricePolicyAdminForm
 
-admin.site.register(models.PricePolicy, PricePolicyAdmin)
 
-admin.site.register(models.Discount)
-
-admin.site.register(models.PriceClass)
-
-admin.site.register(models.Certificate)
+@admin.register(models.Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    pass
 
 
+@admin.register(models.PriceClass)
+class PriceClassAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(models.Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('item', 'user')
     list_filter = ('item__category', 'user')
 
-admin.site.register(models.Favorite, FavoriteAdmin)
 
-
+@admin.register(models.SaleAnalysisCode)
 class SaleAnalysisCodeAdmin(admin.ModelAdmin):
     list_display = ('name', 'action_type')
-
-admin.site.register(models.SaleAnalysisCode, SaleAnalysisCodeAdmin)
