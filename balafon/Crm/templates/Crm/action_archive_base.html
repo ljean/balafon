@@ -157,6 +157,8 @@
       <select class="form-control action-order">
         <option value="o1" {% if ordering == 'asc' %}selected="selected"{% endif %}>{% trans "Ascending" %}</option>
         <option value="o0" {% if ordering == 'desc' %}selected="selected"{% endif %}>{% trans "Descending" %}</option>
+        <option value="o2" {% if ordering == 'contact' %}selected="selected"{% endif %}>{% trans "Contacts" %}</option>
+        <option value="o3" {% if ordering == 'entity' %}selected="selected"{% endif %}>{% trans "Entities" %}</option>
       </select>
     </div>
     <div class="col-md-2">

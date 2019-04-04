@@ -592,6 +592,86 @@ class ActionArchiveTest(BaseTestCase):
         pos = [content.find(subject) for subject in subjects]
         self.assertEqual(pos, list(sorted(pos)))
 
+    def test_action_type_ordering_name(self):
+        """view actions of the month incharge filter"""
+        now = datetime(2016, 10, 10, 12, 0)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=now + timedelta(days=1))
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=now + timedelta(days=2))
+        action3 = mommy.make(models.Action, subject="#ACT3#", planned_date=now - timedelta(days=1))
+        action4 = mommy.make(models.Action, subject="#ACT4#", planned_date=now - timedelta(days=3))
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=now)
+
+        contact1 = mommy.make(models.Contact, lastname="Dupond")
+        contact2 = mommy.make(models.Contact, lastname="Alain")
+        contact3 = contact2
+        contact4 = mommy.make(models.Contact, lastname="Bernard")
+        contact5 = mommy.make(models.Contact, lastname="Chausson")
+
+        actions = [action1, action2, action3, action4, action5]
+        contacts = [contact1, contact2, contact3, contact4, contact5]
+
+        for action, contact in zip(actions, contacts):
+            action.contacts.add(contact)
+            action.save()
+
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=o2"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        actions = [
+            action3, action2, action4, action5, action1
+        ]
+
+        subjects = [action.subject for action in actions]
+        for subject in subjects:
+            self.assertContains(response, subject)
+        content = response.content.decode('utf-8')
+        pos = [content.find(subject) for subject in subjects]
+        self.assertEqual(pos, list(sorted(pos)))
+
+    def test_action_type_ordering_entity_name(self):
+        """view actions of the month incharge filter"""
+        now = datetime(2016, 10, 10, 12, 0)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=now + timedelta(days=1))
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=now + timedelta(days=2))
+        action3 = mommy.make(models.Action, subject="#ACT3#", planned_date=now - timedelta(days=1))
+        action4 = mommy.make(models.Action, subject="#ACT4#", planned_date=now - timedelta(days=3))
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=now)
+
+        entity1 = mommy.make(models.Entity, name="Dupond")
+        entity2 = mommy.make(models.Entity, name="Alain")
+        entity3 = entity2
+        entity4 = mommy.make(models.Entity, name="Bernard")
+        entity5 = mommy.make(models.Entity, name="Chausson")
+
+        actions = [action1, action2, action3, action4, action5]
+        entities = [entity1, entity2, entity3, entity4, entity5]
+
+        for action, entity in zip(actions, entities):
+            action.entities.add(entity)
+            action.save()
+
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=o3"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        actions = [
+            action3, action2, action4, action5, action1
+        ]
+
+        subjects = [action.subject for action in actions]
+        for subject in subjects:
+            self.assertContains(response, subject)
+        content = response.content.decode('utf-8')
+        pos = [content.find(subject) for subject in subjects]
+        self.assertEqual(pos, list(sorted(pos)))
+
     def test_view_not_planned_action_anonymous(self):
         """make sure not display for anonymous users"""
         mommy.make(models.Action, subject="#ACT1#")

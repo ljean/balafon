@@ -91,6 +91,12 @@ class ActionArchiveView(object):
                 queryset = queryset.order_by("-planned_date", "-id")
             elif actions_ordering == [1]:
                 queryset = queryset.order_by("planned_date", "id")
+            elif actions_ordering == [2]:
+                # Order by contact
+                queryset = queryset.order_by("contacts__lastname", "planned_date", "id")
+            elif actions_ordering == [3]:
+                # Order by contact
+                queryset = queryset.order_by("entities__name", "planned_date", "id")
 
         return queryset
 
@@ -142,6 +148,10 @@ class ActionArchiveView(object):
                 ordering = "desc"
             elif actions_ordering == [1]:
                 ordering = "asc"
+            elif actions_ordering == [2]:
+                ordering = "contact"
+            elif actions_ordering == [3]:
+                ordering = "entity"
 
         if HAS_CUSTOM_MENU:
             context['planning_custom_menus'] = [
