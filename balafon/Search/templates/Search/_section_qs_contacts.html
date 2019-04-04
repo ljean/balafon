@@ -17,6 +17,7 @@
       <td rowspan={{x.main_contacts|length}}>
         <a href="{% url "crm_view_entity" x.id %}">{{x}}</a>
       </td>
+    {% if x.main_contacts %}
       {% for c in x.main_contacts %}
         {% if not forloop.first %}
           <tr>
@@ -26,11 +27,11 @@
         <td>{{c.get_phones|seq_to_dash}}</td>
         <td><a href="mailto:{{c.get_email}}">{{c.get_email}}</a></td>
         <td>{{c.get_city|default:"&nbsp;"}}</td>
-        {% if not forloop.last %}
-          </tr>
-        {%endif %}
+      </tr>
       {% endfor %}
-    </tr>
+    {% else %}
+      </tr>
+    {% endif %}
   {% else %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
     {% with x.entity as e %}
