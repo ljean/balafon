@@ -144,13 +144,24 @@ class ContactOrEntityTest(APITestCase):
         entity_type = ContentType.objects.get_for_model(models.Entity)
 
         entity1 = mommy.make(models.Entity, name='Alpha', is_single_contact=False)
+        contact = entity1.default_contact
+        contact.lastname = 'zzz'
+        contact.save()
+
         entity2 = mommy.make(models.Entity, name='Beta', is_single_contact=False)
+        contact = entity2.default_contact
+        contact.lastname = 'xxx'
+        contact.save()
 
         entity3 = mommy.make(models.Entity, name='ALLARD', is_single_contact=True)
-        contact1 = mommy.make(models.Contact, lastname='Allard', entity=entity3)
+        contact1 = entity3.default_contact
+        contact1.lastname = 'Allard'
+        contact1.save()
 
         entity4 = mommy.make(models.Entity, name='Zardo', is_single_contact=False)
-        contact2 = mommy.make(models.Contact, lastname='Bernard')
+        contact2 = entity4.default_contact
+        contact2.lastname = 'Bernard'
+        contact2.save()
 
         self._login()
 
@@ -177,12 +188,20 @@ class ContactOrEntityTest(APITestCase):
         city3 = mommy.make(models.City, name="ijkl", parent=foreign_country)
 
         entity1 = mommy.make(models.Entity, name='Alpha', is_single_contact=False, city=city1)
+        contact = entity1.default_contact
+        contact.lastname = 'zzz'
+        contact.save()
 
         entity2 = mommy.make(models.Entity, name='ENTITY2', is_single_contact=False, city=city2)
-        contact2 = mommy.make(models.Contact, lastname='Allard', entity=entity2)
+        contact2 = entity2.default_contact
+        contact2.lastname = 'Allard'
+        contact2.save()
 
         entity3 = mommy.make(models.Entity, name='ENTITY3', is_single_contact=False, city=city2)
-        contact3 = mommy.make(models.Contact, lastname='Azerty', entity=entity3, city=city3)
+        contact3 = entity3.default_contact
+        contact3.lastname = 'Azerty'
+        contact3.city = city3
+        contact3.save()
 
         self._login()
 
