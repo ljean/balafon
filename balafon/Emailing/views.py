@@ -226,7 +226,7 @@ def unregister_contact(request, emailing_id, contact_uuid):
         my_company = emailing.subscription_type.name
     except models.Emailing.DoesNotExist:
         emailing = None
-        my_company = settings.BALAFON_MY_COMPANY
+        my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
 
     if request.method == "POST":
         if 'unregister' in request.POST:
@@ -314,10 +314,9 @@ def subscribe_done(request, contact_uuid):
     subscription_type_names = [
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
     ]
-    if subscription_type_names:
-        my_company = ', '.join(subscription_type_names)
-    else:
-        my_company = settings.BALAFON_MY_COMPANY
+    my_company = ', '.join(subscription_type_names)
+    if not my_company:
+        my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
 
     return render(
         request,
@@ -334,9 +333,10 @@ def subscribe_error(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     subscription_type_names = [
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
-        ]
-    if subscription_type_names:
-        my_company = ', '.join(subscription_type_names)
+    ]
+    my_company = ', '.join(subscription_type_names)
+    if not my_company:
+        my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
 
     return render(
         request,
@@ -354,10 +354,9 @@ def email_verification(request, contact_uuid):
     subscription_type_names = [
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
         ]
-    if subscription_type_names:
-        my_company = ', '.join(subscription_type_names)
-    else:
-        my_company = settings.BALAFON_MY_COMPANY
+    my_company = ', '.join(subscription_type_names)
+    if not my_company:
+        my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
 
     contact.email_verified = True
     contact.save()
