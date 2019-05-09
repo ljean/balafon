@@ -139,7 +139,7 @@ class SubscribeTest(TestCase):
         
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
-        #Not an Error message
+        # Not an Error message
         self.assertTrue(self.email_as_text(notification_email).find("Error") < 0)
         
         for subscription_type in (subscription_type1, subscription_type2):

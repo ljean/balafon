@@ -392,7 +392,8 @@ class SearchForm(forms.Form):
             contacts = sorted(contacts, key=sort_by_entity_callback)
 
         # Just for compatibility
-        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current(), name='Newsletter')
+        current_site = Site.objects.get_current()
+        queryset = SubscriptionType.objects.filter(Q(site=current_site) | Q(allowed_on_sites=current_site))
         if queryset.count():
             for contact in contacts:
                 for subscription_type in queryset:

@@ -492,7 +492,7 @@ class SubscribeTest(TestCase):
         self.assertEqual('', soup.select("#id_favorite_language")[0].get("value", ""))
 
     def test_accept_newsletter_not_in_site(self):
-        """if subscribtion is not set on the site, it should not be possible to subscribe"""
+        """if subscription is not set on the site, it should not be possible to subscribe"""
         newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=None)
 
         url = reverse("emailing_subscribe_newsletter")
@@ -512,6 +512,42 @@ class SubscribeTest(TestCase):
         self.assertEqual(models.Contact.objects.count(), 0)
         self.assertEqual(models.Subscription.objects.count(), 0)
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_accept_newsletter_allowed_site(self):
+        """if subscription is not set on the site, it should not be possible to subscribe"""
+        site1 = Site.objects.get_current()
+        site2 = mommy.make(Site, domain="balafon.net")
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site2)
+        newsletter_subscription.allowed_on_sites.add(site1)
+        newsletter_subscription.save()
+
+        url = reverse("emailing_subscribe_newsletter")
+
+        data = {
+            'entity_type': 0,
+            'lastname': 'Dupond',
+            'firstname': 'Pierre',
+            'email': 'pdupond@apidev.fr',
+            'subscription_types': [newsletter_subscription.id],
+        }
+
+        self._patch_with_captcha(url, data)
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 1)
+        contact = models.Contact.objects.all()[0]
+        self.assertEqual(models.Subscription.objects.count(), 1)
+        self.assertEqual(len(mail.outbox), 2)
+
+        verification_email = mail.outbox[1]
+        self.assertEqual(verification_email.to, [contact.email])
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = self.email_as_string(verification_email)
+        self.assertTrue(email_content.find(url) > 0)
+
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
 
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
         """subscribe and accept some subscribtions"""
