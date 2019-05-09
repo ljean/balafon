@@ -291,7 +291,7 @@ def send_verification_email(contact, subscription_types=None):
 
 
 def save_subscriptions(contact, subscription_types):
-    """save aubscriptions"""
+    """save subscriptions"""
     subscriptions = []
     queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
     for subscription_type in queryset:
