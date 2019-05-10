@@ -377,10 +377,13 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         super(SubscribeForm, self).__init__(*args, **kwargs)
 
         self.fields['email'].required = True
-        #self.fields['lastname'].required = True
-        
+
         # Do not display (Mrs and M) gender on subscribe form
-        self.fields['gender'].choices = self.fields['gender'].choices[:3]
+        self.fields['gender'].choices = [
+            (models.Contact.GENDER_NOT_SET, _('')),
+            (models.Contact.GENDER_MALE, ugettext('Mr')),
+            (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
+        ]
 
         entity_types_choices = []
 

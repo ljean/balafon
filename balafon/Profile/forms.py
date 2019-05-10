@@ -94,7 +94,11 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
         if 'gender' in self.fields:
             # do not display Mrs and Mr
-            self.fields['gender'].choices = ((0, '----------'), ) + Contact.GENDER_CHOICE[:2]
+            self.fields['gender'].choices = [
+                (Contact.GENDER_NOT_SET, _('Gender')),
+                (Contact.GENDER_MALE, ugettext('Mr')),
+                (Contact.GENDER_FEMALE, ugettext('Mrs')),
+            ]
 
         if 'entity_type' in self.fields:
             self.fields['entity_type'].choices = [(0, ugettext('Individual'))]+[
