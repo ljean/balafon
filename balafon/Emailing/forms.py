@@ -11,6 +11,7 @@ import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.contrib.sites.models import Site
+from django.db.models import Q
 from django.utils.timezone import now as dt_now
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -300,7 +301,8 @@ class SubscriptionTypeFormMixin(object):
 
     def get_queryset(self):
         """returns subscription_types"""
-        return SubscriptionType.objects.filter(site=Site.objects.get_current())
+        current_site = Site.objects.get_current()
+        return SubscriptionType.objects.filter(Q(site=current_site) | Q(allowed_on_sites=current_site))
 
     def clean_subscription_types(self):
         """validation"""
@@ -375,10 +377,13 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         super(SubscribeForm, self).__init__(*args, **kwargs)
 
         self.fields['email'].required = True
-        #self.fields['lastname'].required = True
-        
+
         # Do not display (Mrs and M) gender on subscribe form
-        self.fields['gender'].choices = self.fields['gender'].choices[:3]
+        self.fields['gender'].choices = [
+            (models.Contact.GENDER_NOT_SET, _('')),
+            (models.Contact.GENDER_MALE, ugettext('Mr')),
+            (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
+        ]
 
         entity_types_choices = []
 

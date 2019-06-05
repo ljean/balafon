@@ -213,8 +213,7 @@ def read_contacts(reader, fields, extract_from_email):
 def get_imports_fields():
     """get the list of fields to import"""
     fields = [
-        'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job',
-        'notes', 'role',
+        'gender', 'firstname', 'lastname', 'email', 'phone', 'mobile', 'job', 'notes', 'role',
     ]
 
     for subscription_type in models.SubscriptionType.objects.all():
@@ -222,7 +221,8 @@ def get_imports_fields():
             _get_subcription_field_name(subscription_type)
         ]
 
-    fields += [    'entity', 'entity.type', 'entity.description', 'entity.website', 'entity.email',
+    fields += [
+        'entity', 'entity.type', 'entity.description', 'entity.website', 'entity.email',
         'entity.phone', 'entity.fax', 'entity.notes',
         'entity.address', 'entity.address2', 'entity.address3',
         'entity.city', 'entity.cedex', 'entity.zip_code', 'entity.country',
@@ -230,7 +230,7 @@ def get_imports_fields():
         'entity.groups', 'groups', 'favorite_language', 'title', 'birth_date'
     ]
 
-    #custom fields
+    # custom fields
     custom_fields_count = models.CustomField.objects.all().aggregate(Max('import_order'))['import_order__max']
     if not custom_fields_count:
         custom_fields_count = 0
@@ -265,7 +265,7 @@ def contacts_import_template(request):
 
 def _create_contact(contact_data, contacts_import, entity_dict):
     """create a contact from import file"""
-    #Entity
+    # Entity
     if settings.DEBUG:
         try:
             print(contact_data['entity'], contact_data['lastname'])
@@ -299,7 +299,7 @@ def _create_contact(contact_data, contacts_import, entity_dict):
         is_first_for_entity = entity.name not in entity_dict
         entity_dict[entity.name] = True
 
-    #Contact
+    # Contact
     contact = models.Contact.objects.get_or_create(
         entity=entity, firstname=contact_data['firstname'], lastname=contact_data['lastname']
     )[0]

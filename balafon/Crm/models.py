@@ -1049,6 +1049,7 @@ class SubscriptionType(models.Model):
     name = models.CharField(max_length=100, verbose_name=_("name"))
     site = models.ForeignKey(Site, blank=True, null=True)
     order_index = models.IntegerField(default=0, verbose_name=_("order index"))
+    allowed_on_sites = models.ManyToManyField(Site, blank=True, related_name='+')
 
     def __str__(self):
         return self.name
