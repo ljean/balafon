@@ -146,17 +146,14 @@
       $('.new-members-list').on('click', "a.add-me", function() {
         var member_type = $(this).data('type');
         var member_id = $(this).data('id');
-        if (!(isNaN(eltId))) {
-          if (addMember(member_type, member_id)) {
-            var label = $(this).closest('.label');
-            if (label.hasClass('existing')) {
-              label.removeClass('label-removed');
-              $(this).hide();
-              label.find('a.remove-me').show();
-            }
+        if (addMember(member_type, member_id)) {
+          var label = $(this).closest('.label');
+          if (label.hasClass('existing')) {
+            label.removeClass('label-removed');
+            $(this).hide();
+            label.find('a.remove-me').show();
           }
         }
-
         return false;
       });
     })
