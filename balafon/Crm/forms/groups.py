@@ -101,40 +101,37 @@ class EditGroupForm(BsModelForm):
     def clean_contacts(self):
         """name validation"""
         contacts_ids = self._clean_list(self.cleaned_data['contacts'])
-        print(contacts_ids)
         return contacts_ids
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.get('instance')
         super(EditGroupForm, self).__init__(*args, **kwargs)
-
         self.fields['entities'] = forms.CharField(
-            # widget=forms.HiddenInput(),
-            initial=[elt.id for elt in self.instance.entities.all()],
+            widget=forms.HiddenInput(),
+            initial=[elt.id for elt in self.instance.entities.all()] if self.instance.id else [],
             required=False,
         )
-
         self.fields['contacts'] = forms.CharField(
-            # widget=forms.HiddenInput(),
-            initial=[elt.id for elt in self.instance.contacts.all()],
+            widget=forms.HiddenInput(),
+            initial=[elt.id for elt in self.instance.contacts.all()] if self.instance.id else [],
             required=False
         )
 
     def save(self, *args, **kwargs):
-        super(EditGroupForm, self).save(*args, **kwargs)
-
-        self.instance.contacts.clear()
+        instance = super(EditGroupForm, self).save(*args, **kwargs)
+        instance.contacts.clear()
         for contact_id in self.cleaned_data['contacts']:
             try:
                 contact = models.Contact.objects.get(id=contact_id)
-                self.instance.contacts.add(contact)
+                instance.contacts.add(contact)
             except models.Contact.DoesNotExist:
                 pass
-        self.instance.entities.clear()
+        instance.entities.clear()
         for entity_id in self.cleaned_data['entities']:
             try:
                 entity = models.Entity.objects.get(id=entity_id)
-                self.instance.entities.add(entity)
+                instance.entities.add(entity)
             except models.Entity.DoesNotExist:
                 pass
-        self.instance.save()
+        instance.save()
+        return instance
