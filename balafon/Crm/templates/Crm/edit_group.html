@@ -4,8 +4,6 @@
 {% block extra_head %}
   {{block.super}}
   <script type="text/javascript" src="{{STATIC_URL}}js/js18n.js"></script>
-  <script type="text/javascript" src="{{STATIC_URL}}admin/js/jquery.min.js"></script>
-  <script type="text/javascript" src="{{STATIC_URL}}admin/js/jquery.init.js"></script>
   {{form.media}}
   <style>
     table.edit-group-fields th {
@@ -23,7 +21,15 @@
   <script>
     function strToListValue(listValue) {
       if (listValue) {
-        return listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+        var listofIds = listValue.trim().replace(/^\[/,'').replace(/\]$/,'').split(",");
+        listofIds = listofIds.filter(function (elt) {
+            if (elt) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+        return listofIds;
       } else {
         return [];
       }
@@ -37,12 +43,14 @@
       var ids = strToListValue(listValue);
       //look for existing id
       for(var i=0; i<ids.length; i++) {
-        ids[i] = parseInt(ids[i], 10);
-        if (newId === ids[i]) {
+        var eltId = parseInt(ids[i], 10);
+        if (newId === eltId) {
           return null;
         }
       }
-      ids.push(newId);
+      if (newId) {
+        ids.push(newId);
+      }
       return '['+ids.toString()+']';
     };
 
@@ -102,7 +110,6 @@
     };
 
     $(function() {
-
       var removeLabel = function(label) {
         if (label.hasClass('existing')) {
           label.addClass('label-removed');
@@ -139,7 +146,6 @@
       $('.new-members-list').on('click', "a.add-me", function() {
         var member_type = $(this).data('type');
         var member_id = $(this).data('id');
-
         if (addMember(member_type, member_id)) {
           var label = $(this).closest('.label');
           if (label.hasClass('existing')) {
@@ -211,6 +217,7 @@
             <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
           </a>
           {% endif %}
+        </td>
       </tr>
 
     </table>
