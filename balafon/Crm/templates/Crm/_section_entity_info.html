@@ -21,7 +21,7 @@
 
 {% block section_data %}
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-lg-4">
     <table class="table">
       <tr><td>
         <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
@@ -52,7 +52,7 @@
     </table>
   </div>
 
-  <div class="col-md-6">
+  <div class="col-lg-6">
 
     <div class="note" style="margin-bottom: 5px;">
       <span class="contenteditable" contenteditable="true" rel="{% url 'auto_save_data' 'entity' 'notes' entity.id %}">
@@ -69,7 +69,7 @@
     {% endwith %}
   </div>
 
-  <div class="col-md-2">
+  <div class="col-lg-2">
     <table class="table micro-table table-striped">
       {% if entity.relationship_date %}
         <tr><td><b>{% trans "Relationship" %}</b> {{ entity.relationship_date|date:"d/m/Y" }}</td></tr>
@@ -91,8 +91,8 @@
 {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url 'crm_edit_entity' entity.id %}">{% trans "Edit" %}</a></li>
-  <li><a class="colorbox-form" href="{% url 'crm_delete_entity' entity.id %}">{% trans "Delete" %}</a></li>
+  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_edit_entity' entity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_delete_entity' entity.id %}">{% trans "Delete" %}</a></li>
 {% endblock %}
 
 {% block section_favorite %}

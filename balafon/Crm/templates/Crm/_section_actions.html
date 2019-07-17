@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block section_data %}
-<div class="row"><div class="col-md-12">
+<div class="row"><div class="col-lg-12">
 {% if actions %}
   {% include "Crm/_actions_table.html" %}
   {% include "coop_cms/_pagination.html" %}
@@ -26,15 +26,15 @@
 {% block section_buttons %}
   {% if not has_default_action %}
     {% if contact %}
-      <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 contact.id %}">
+      <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_action' 0 contact.id %}">
         {% trans "action" %}</a></li>
     {% else %}
       {% if entity %}
-        <li><a class="colorbox-form" href="{% url 'crm_create_action' entity.id 0 %}">
+        <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_action' entity.id 0 %}">
           {% trans "action" %}
         </a></li>
       {% else %}
-        <li><a class="colorbox-form" href="{% url 'crm_create_action' 0 0 %}">
+        <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_action' 0 0 %}">
           {% trans "action" %}
         </a></li>
       {% endif %}

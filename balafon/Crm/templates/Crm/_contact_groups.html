@@ -2,12 +2,12 @@
 <div class="groups-box">
   <div class="groups-header">
     <span class="groups-title">{% trans "Groups" %}</span>
-    <a class="btn btn-xs pull-right colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">
+    <a class="btn btn-xs float-right colorbox-form" href="{% url "crm_add_contact_to_dropdown-menu showgroup" contact.id %}">
       <span class="glyphicon glyphicon-plus"></span> {% trans "Add to a group" %}
     </a>
   </div>
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-lg-12">
       <div class="data-groups">
         {% for g in contact.entity.group_set.all %}
           <span class="group-tag btn btn-xs btn-gray" title="{{g.description}}">

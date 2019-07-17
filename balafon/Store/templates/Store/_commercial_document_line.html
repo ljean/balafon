@@ -1,11 +1,11 @@
 {% verbatim %}
 <td colspan="{{ columnsCount + 1 }}" ng-if="item.is_blank">
-  <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+  <div ng-show="allowEdit && !editedLines[$index]" class="float-right">
     <div class="show-on-hover">
-      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+      <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
         <span class="glyphicon glyphicon-sort-by-order-alt"></span>
       </a>
-      <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+      <a href class="btn btn-xs btn-outline-secondary" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
         <span class="glyphicon glyphicon-trash"></span>
       </a>
     </div>
@@ -20,22 +20,22 @@
 </td>
 
 <td class="cell-label" ng-if="!item.is_blank" colspan="{{ item.is_discount?(columnsCount):1 }}">
-  <div ng-show="allowEdit && !editedLines[$index]" class="pull-right">
+  <div ng-show="allowEdit && !editedLines[$index]" class="float-right">
     <div class="show-on-hover">
-      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+      <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
         <span class="glyphicon glyphicon-sort-by-order-alt"></span>
       </a>
-      <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
+      <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
-      <a href class="btn btn-xs btn-default" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+      <a href class="btn btn-xs btn-outline-secondary" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
         <span class="glyphicon glyphicon-trash"></span>
       </a>
     </div>
   </div>
-  <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="pull-right">
+  <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="float-right">
       <input type="hidden" name="item" ng-model="item.item" />
-      <a href class="btn btn-xs btn-default" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
+      <a href class="btn btn-xs btn-outline-secondary" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
         <span class="glyphicon glyphicon-search"></span>
       </a>
   </div>

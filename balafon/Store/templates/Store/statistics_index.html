@@ -225,7 +225,7 @@
     <div ng-controller="storeStatsCtrl" class="container-fluid">
 
       <div class="row" style="margin-bottom: 10px;">
-        <div class="col-md-5">
+        <div class="col-xl-5">
           <div class="title">
             <h2 ng-show="mode==='total'"> {{ 'STATS_TOTAL' | translate }} </h2>
             <h2 ng-show="mode==='categories'"> {{ 'STATS_BY_CATEGORY' | translate }} </h2>
@@ -238,28 +238,28 @@
             </h2>
           </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-xl-2">
         <select ng-disabled="loading" class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
         </select>
         </div>
-        <div class="col-md-5">
-          <div class="btn-group pull-right" role="group" aria-label="...">
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-default': !isTotal()}"
+        <div class="col-xl-5">
+          <div class="btn-group float-right" role="group" aria-label="...">
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-outline-secondary': !isTotal()}"
               ng-click="loadTotalSalesStatistics()"
             >
               {{ 'TOTAL' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-default': !isFamilies()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-outline-secondary': !isFamilies()}"
               ng-click="loadFamiliesStatistics()"
             >
               {{ 'BY_FAMILY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-default': !isCategories()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-outline-secondary': !isCategories()}"
               ng-click="loadCategoriesStatistics()"
             >
               {{ 'BY_CATEGORY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-default': !isTags()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-outline-secondary': !isTags()}"
               ng-click="loadTagsStatistics()"
             >
               {{ 'BY_TAG' | translate }}

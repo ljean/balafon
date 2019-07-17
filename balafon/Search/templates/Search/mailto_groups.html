@@ -104,7 +104,7 @@
 {% endblock %}
 
 {% block document_content %}
-<div class="pull-right" style="padding: 5px; border: solid 1px #888; color: #888; margin-top: -50px;">
+<div class="float-right" style="padding: 5px; border: solid 1px #888; color: #888; margin-top: -50px;">
   {% trans "Clipboard separator"%}
   <select class="clipboard-separators" style="display: inline-block;">
     <option value=",">{% trans "Coma" %}</option>
@@ -115,10 +115,10 @@
 
 <div class="warning">
   <div class=row>
-    <div class="col-md-1" style="text-align: center;">
+    <div class="col-lg-1" style="text-align: center;">
       <span class="glyphicon glyphicon-exclamation-sign" style="font-size: 2.7em;"></span>
     </div>
-    <div class="col-md-11">
+    <div class="col-lg-11">
   {% blocktrans %}
   If the number of email address exceeds {{nb_limit}}, there is a risk that your mail is considered as spam.
   You may be blocked.<br />
@@ -136,7 +136,7 @@
   </div>
   <div class="clipboard-div">
     <b>{% trans "Copy to clipboard: Ctrl+C" %}</b>
-    <a class="hide-clipboard btn btn-xs btn-default"><span class="glyphicon glyphicon-remove"></span> {% trans "Close" %}</a>
+    <a class="hide-clipboard btn btn-xs btn-outline-secondary"><span class="glyphicon glyphicon-remove"></span> {% trans "Close" %}</a>
     <div>
       <div contenteditable="true" class="clipboard" style="width: 100%; height: auto;"></div>
     </div>

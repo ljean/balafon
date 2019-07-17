@@ -80,9 +80,9 @@
 
 {% block section_buttons %}
   <li>
-    <a class="colorbox-form" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
+    <a class="colorbox-form dropdown-link" href="{% url "crm_same_as" contact.id %}">{% trans "Same As" %}</a>
   </li>
   {% if contact.can_add_relation %}
-    <li><a class="colorbox-form add-relation" href="{% url "crm_add_relationship" contact.id %}">{% trans "Add relationship" %}</a><li>
+    <li><a class="colorbox-form add-relation dropdown-link" href="{% url "crm_add_relationship" contact.id %}">{% trans "Add relationship" %}</a><li>
   {% endif %}
 {% endblock %}

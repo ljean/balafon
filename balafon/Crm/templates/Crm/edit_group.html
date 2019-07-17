@@ -208,12 +208,12 @@
 
           </p>
 
-          <a class="btn btn-sm btn-default colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
+          <a class="btn btn-sm btn-outline-secondary colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
             <span class="glyphicon glyphicon-plus colorbox-form"></span> {% trans 'Add new member' %}
           </a>
 
           {% if group %}
-          <a class="btn btn-sm btn-default" href="{% url 'search_group' group.id %}">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'search_group' group.id %}">
             <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
           </a>
           {% endif %}
@@ -222,14 +222,14 @@
 
     </table>
     <div class="row">
-      <div class="col-md-10">
-        <div class="buttons pull-right">
-          <input class="btn btn-md btn-primary" type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
+      <div class="col-lg-10">
+        <div class="buttons float-right">
+          <input class="btn btn-primary" type="submit" value="{%if group %}{% trans "Save"%}{% else %}{% trans "Add" %}{% endif %}" />
           {% if group %}
-            <a class="btn btn-md btn-danger colorbox-form" href="{% url 'crm_delete_group' group.id %}">{% trans "Delete" %}</a>
-            <a class="btn btn-md btn-default" href="{{ next_url }}">{% trans "Cancel" %}</a>
+            <a class="btn btn-danger colorbox-form" href="{% url 'crm_delete_group' group.id %}">{% trans "Delete" %}</a>
+            <a class="btn btn-warning" href="{{ next_url }}">{% trans "Cancel" %}</a>
           {% else %}
-            <a class="btn btn-md btn-default" href="{% url 'crm_see_my_groups' %}">{% trans "Cancel" %}</a>
+            <a class="btn btn-warning" href="{% url 'crm_see_my_groups' %}">{% trans "Cancel" %}</a>
           {% endif %}
           </div>
       </div>

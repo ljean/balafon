@@ -5,7 +5,7 @@
   
 {% block section_data %}
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-lg-12">
     {% if contacts %}
     <table class="table table-responsive table-bordered">
       <tr>
@@ -19,7 +19,7 @@
           <td class="ut-contact-{{c.id}}">
             {% favorite_item object=c %}
             <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
-            <a class="pull-right btn btn-xs btn-default colorbox-form" href="{% url "crm_edit_contact_on_entity" c.id %}">
+            <a class="float-right btn btn-xs btn-outline-secondary colorbox-form" href="{% url "crm_edit_contact_on_entity" c.id %}">
               <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
             </a>
             {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
@@ -53,9 +53,9 @@
 
 {% block section_buttons %}
   {% if entity %}
-    <li><a class="colorbox-form" href="{% url 'crm_add_contact' entity.id %}">{% trans "Add" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_add_contact' entity.id %}">{% trans "Add" %}</a></li>
   {% endif %}
   {% if opportunity %}
-    <li><a href="{% url 'search_opportunity' opportunity.id %}">{% trans "View in search" %}</a></li>
+    <li><a href="{% url 'search_opportunity' opportunity.id %}" class="dropdown-link">{% trans "View in search" %}</a></li>
   {% endif %}
 {% endblock %}

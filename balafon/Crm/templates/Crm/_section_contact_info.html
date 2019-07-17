@@ -5,7 +5,7 @@
 
 {% block section_title %}
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-lg-5">
     <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">
       <span class="glyphicon glyphicon-user"></span>
       <div class="logo-container">
@@ -33,12 +33,12 @@
     <div class="section-subtitle">{{contact.title}}</div>
     </div>
   </div>
-  <div class="col-md-2 text-center" style="vertical-align: middle; margin-top: 10px;">
+  <div class="col-lg-2 text-center" style="vertical-align: middle; margin-top: 10px;">
     {% if not contact.entity.is_single_contact %}
       <span class="glyphicon glyphicon-chevron-right"></span>
     {% endif %}
   </div>
-  <div class="col-md-5">
+  <div class="col-lg-5">
     {% if not contact.entity.is_single_contact %}
     <div class="logo-container">
       <img {{contact.entity.get_logo_center_style}} class="contact-entity-logo" src="{{contact.entity.get_safe_logo}}">
@@ -55,7 +55,7 @@
 
 {% block section_data %}
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-lg-4">
     <table class="table">
       {% if contact.birth_date %}
       <tr><td>
@@ -104,7 +104,7 @@
     </table>
   </div>
   
-  <div class="col-md-6">
+  <div class="col-lg-6">
     
     <div class="note" style="margin-bottom: 5px;">
       
@@ -125,7 +125,7 @@
     
   </div>
   
-  <div class="col-md-2">
+  <div class="col-lg-2">
     <table class="table micro-table table-striped">
       {% if contact.has_left %}
       <tr><td colspan="2"><b>{% trans "This contact has left." %}</b></td></tr>
@@ -144,9 +144,9 @@
 {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
-    <li><a class="colorbox-form" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
-    <li><a class="colorbox-form" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
-    <li><a class="colorbox-form" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
 {% endblock %}
 
 {% block section_favorite %}

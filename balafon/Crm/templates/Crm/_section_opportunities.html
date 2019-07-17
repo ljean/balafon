@@ -33,7 +33,7 @@
     <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
     
     <td>
-      <a class="btn btn-xs btn-default pull-right" href="{% url "crm_view_opportunity" o.id %}">
+      <a class="btn btn-xs btn-outline-secondary float-right" href="{% url "crm_view_opportunity" o.id %}">
         <span class="glyphicon glyphicon-tag"></span>
         {%  trans "View" %}
       </a>
@@ -52,9 +52,8 @@
 
 {% block section_buttons %}
   {% if not entity and not contact %}
-  <li><a class="colorbox-form" href="{% url "crm_add_opportunity" %}">
+  <a class="colorbox-form dropdown-item dropdown-link" href="{% url "crm_add_opportunity" %}">
     <span class="glyphicon glyphicon-tag"></span>
     {% trans "New opportunity" %}</a>
-  </li>
   {% endif %}
 {% endblock %}

@@ -1,6 +1,6 @@
 {% load i18n balafon_utils %}
 {% if action.actiondocument or action.has_non_editable_document %}
-  <div class="btn btn-xs btn-default">
+  <div class="btn btn-xs btn-outline-secondary">
     <a href="{% url 'crm_view_action_document' action.id %}" target="_blank">
       <span class="glyphicon glyphicon-file" title="{% trans 'document' %}"></span>
       {% trans "View document" %}
@@ -8,7 +8,7 @@
   </div>
 {% else %}
   {% if action.has_editable_document %}
-    <div class="btn btn-xs btn-default">
+    <div class="btn btn-xs btn-outline-secondary">
       <a href="{% url 'crm_edit_action_document' action.id %}" target="_blank">
         <span class="glyphicon glyphicon-file" title="{% trans 'add document' %}"></span>
         {% trans "Create document" %}

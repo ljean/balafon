@@ -14,7 +14,7 @@
       <td>
         {% favorite_item object=g %}
         <span
-          class="group-tag label{% if not g.background_color %} label-group{% endif %}"
+          class="badge label{% if not g.background_color %} label-group{% endif %}"
           style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
         >
           {{g.name}}
@@ -28,10 +28,10 @@
         </span>
       </td>
       <td class="ico-col">
-        <a class="btn btn-xs btn-default pull-right" href="{% url 'crm_edit_group' g.id %}">
+        <a class="btn btn-xs btn-outline-secondary float-right" href="{% url 'crm_edit_group' g.id %}">
             <span class="glyphicon glyphicon-cog"></span> {% trans "Edit" %}
         </a>
-        <a href="{% url 'search_group' g.id %}" class="btn btn-xs btn-default pull-right" style="margin: 0 5px;">
+        <a class="btn btn-xs btn-outline-secondary float-right" href="{% url 'search_group' g.id %}" style="margin-top:5px">
           <span class="glyphicon glyphicon-search"></span> {% trans "Search" %}
         </a>
       </td>
@@ -43,9 +43,9 @@
 
 {% block section_buttons %}
     {% if entity %}
-        <li><a href="{% url 'crm_add_entity_to_group' entity.id %}">{% trans "Add" %}</a></li>
+        <li><a class="dropdown-item dropdown-link"  href="{% url 'crm_add_entity_to_group' entity.id %}">{% trans "Add" %}</a></li>
     {% else %}
-        <li><a href="{% url 'crm_add_group' %}">{% trans "Add" %}</a></li>
+        <li><a class="dropdown-item dropdown-link"  href="{% url 'crm_add_group' %}">{% trans "Add" %}</a></li>
     {% endif %}
     {% comment %}
     <li><a class="{% if ordering == 'name' %}disabled{% endif %}" href="{% url 'crm_see_my_groups' %}?ordering=name">{% trans "Order by name" %}</a></li>

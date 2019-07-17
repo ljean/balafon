@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block document_content %}
-  <div class="row"><div class="col-md-12">
+  <div class="row"><div class="col-lg-12">
   <h2>{% trans "Import contacts" %}</h2>
   
   <form role="form" method="POST" action="" enctype="multipart/form-data">{% csrf_token %}
@@ -25,9 +25,9 @@
       {% include "bs/form_fields.html" %}
   
     <div class="row">
-      <div class="col-md-6 col-md-offset-6">
+      <div class="col-lg-6 col-lg-offset-6">
         <input class="btn btn-md btn-primary" type="submit" value="{% trans 'Import' %}">
-        <a class="btn btn-md btn-default" href="{{cancel_url}}">{% trans "Cancel" %}</a>
+        <a class="btn btn-md btn-outline-secondary" href="{{cancel_url}}">{% trans "Cancel" %}</a>
       </div>
     </div>
   </form>

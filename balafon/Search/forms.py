@@ -467,11 +467,11 @@ class SearchForm(forms.Form):
         """allowed actions"""
         form = FieldChoiceForm()
         html_tpl = """{0}
-            <a class="btn btn-xs btn-default btn-yellow add-field" href="">
+            <a class="btn btn-xs btn-yellow add-field" href="">
             <span class="glyphicon glyphicon-filter"></span> {1}</a>
-            <a class="btn btn-xs btn-default add-block" href="">
+            <a class="btn btn-xs btn-outline-secondary add-block" href="">
             <span class="glyphicon glyphicon-th-list"></span> {2}</a>
-            <a class="btn btn-xs btn-default duplicate-block" href="">
+            <a class="btn btn-xs btn-outline-secondary duplicate-block" href="">
             <span class="glyphicon glyphicon-share"></span> {5}</a>
             <a class="btn btn-xs btn-danger clear-block" href="">
             <span class="glyphicon glyphicon-remove"></span> {3}</a>

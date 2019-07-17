@@ -7,7 +7,7 @@
   
 {% block section_data %}
   {% for set_id, set_title, actions, total_count in actions_by_set %}
-    <div class="row"><div class="col-md-12">
+    <div class="row"><div class="col-lg-12">
     {% if set_title %}
       <div class="section-action-set-title">
       {{ set_title }}
@@ -17,7 +17,7 @@
         <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
           <span class="glyphicon glyphicon-warning-sign"></span>
           {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
-          <a class="btn btn-default btn-xs"
+          <a class="btn btn-outline-secondary btn-xs"
              href="{% if contact %}{% url 'crm_view_contact_actions' contact.id set_id %}{% else %}{% url 'crm_view_entity_actions' entity.id set_id %}{% endif %}"
           >
             {% trans "View all" %}
@@ -32,7 +32,7 @@
 {% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
 
 {% block section_buttons %}
-  {% if not has_default_action %}
+  {% if not has_default_Bonaction %}
   {% include "Crm/_actions_set_menu.html" %}
   {% endif %}
   {% for action_type in addable_action_types %}

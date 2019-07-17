@@ -20,7 +20,7 @@
           <td>
             {% favorite_item object=newsletter %}
             {{newsletter.subject|dehtml }}
-            <a class="btn btn-xs btn-default" href="{{ newsletter.get_absolute_url }}">
+            <a class="btn btn-xs btn-outline-secondary" href="{{ newsletter.get_absolute_url }}">
               <span class="glyphicon glyphicon-eye-open"></span> {% trans "View" %}
             </a>
           </td>
@@ -28,10 +28,10 @@
             {% if newsletter.emailing_set.count %}
               {% for e in newsletter.emailing_set.all %}
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-lg-12">
                         {% favorite_item object=e %}
                         {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
-                        <a class="btn btn-xs btn-default" href="{% url 'emailing_view' e.id %}">
+                        <a class="btn btn-xs btn-outline-secondary" href="{% url 'emailing_view' e.id %}">
                           <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
                         </a>
                     </div>
@@ -56,10 +56,10 @@
 {% endblock %}
 
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url "emailing_new_newsletter" %}">
+  <li><a class="colorbox-form dropdown-link" href="{% url "emailing_new_newsletter" %}">
     <span class="glyphicon glyphicon-file"></span> {% trans "New Newsletter" %}
   </a></li>
-  <li><a href="{% url "search" %}">
+  <li><a href="{% url "search" %}" class="dropdown-link">
     <span class="glyphicon glyphicon-open-file"></span> {% trans "New Sending" %}
   </a></li>
 {% endblock %}

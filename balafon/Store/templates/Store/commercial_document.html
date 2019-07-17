@@ -3,10 +3,10 @@
 <head lang="{{ LANGUAGE_CODE }}">
   <meta charset="UTF-8">
   <title></title>
-  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}bs4/css/bootstrap.css" />
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
-  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}bs4/js/bootstrap.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/moment/moment.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -787,15 +787,15 @@
       </div>
 
       <div class="content">
-        <div class="row"><div class="col-md-12">
+        <div class="row"><div class="col-xl-12">
           <div class="header">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               {% endverbatim %}{% block header %}{% endblock %}{% verbatim %}
             </div></div>
           </div>
 
           <div class="doc-header">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               <div class="action-date">{{ app.action.planned_date|date }}</div>
               <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
               <div class="action-subject">{{ app.action.subject }}</div>
@@ -805,7 +805,7 @@
 
           <div class="contacts">
             <div ng-repeat="entity in app.action.entities" class="entity">
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div>
                   {{ entity.name }}
                 </div>
@@ -826,7 +826,7 @@
               </div></div>
             </div>
             <div ng-repeat="contact in app.action.contacts" class="contact">
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div>
                   {{ contact.fullname }}
                 </div>
@@ -850,19 +850,19 @@
 
           <div class="sale_items">
             <div>
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <form role="form" class="form" name="editForm">
                 <table class="table table-bordered">
                   <tr>
                     <th>
                       {{ 'LABEL' | translate }}
-                      <div ng-show="allowEdit" class="pull-right">
+                      <div ng-show="allowEdit" class="float-right">
                         <div class="show-on-hover">
-                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-plus"></span>
                           </a>
 
-                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
                             <span class="glyphicon glyphicon-resize-vertical"></span>
                           </a>
                         </div>
@@ -922,18 +922,18 @@
                 </form>
               </div></div>
 
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div class="alert alert-danger" role="alert" ng-show="editMode && formErrors">
                   {{ formErrors }}
                 </div>
 
-                <div ng-show="allowEdit" class="pull-right">
+                <div ng-show="allowEdit" class="float-right">
 
-                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="saveEdit()">
+                  <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="saveEdit()">
                     <span class="glyphicon glyphicon-ok"></span> {{ 'OK' | translate }}
                   </a>
 
-                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="cancelEdit()">
+                  <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="cancelEdit()">
                     <span class="glyphicon glyphicon-remove"></span> {{ 'CANCEL' | translate }}
                   </a>
                 </div>
@@ -948,7 +948,7 @@
           </div>
 
           <div class="doc-footer">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               {% endverbatim %}{% block footer %}{{ references_text|safe }}{% endblock %}{% verbatim %}
             </div></div>
           </div>
@@ -970,7 +970,7 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-xl-6">
                 <input
                   class="form-control"
                   ng-model="selectedItem"
@@ -985,7 +985,7 @@
                 />
                 <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
               </div>
-              <div class="col-md-6">
+              <div class="col-xl-6">
                 <div ng-show="selectedItem.name" class="selected-item-details">
                   <div>{{ selectedItem.category.name }}</div>
                   <div ng-if="selectedItem.accounting_code">{{ selectedItem.accounting_code }}</div>

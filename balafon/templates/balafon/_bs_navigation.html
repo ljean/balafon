@@ -1,191 +1,186 @@
 {% load i18n static %}
 
 <!-- Fixed navbar -->
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="{% url 'balafon_homepage' %}" title="{% trans 'Board panel' %}">
-        <img src="{% static 'img/logo-balafon.png' %}" tile="{% trans 'balafon' %}" style="height: 24px;">
-      </a>
-    </div>
-    <div class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "View" %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li>
-              <a href="{% url 'users_favorites_list' %}">
-                <span class="glyphicon glyphicon-star"></span>
-                {% trans "Favorites" %}
-              </a>
-            </li>
-            <li>
-              <a href="{% url 'crm_view_entities_list' %}">
-                <span class="glyphicon glyphicon-user"></span>
-              {% trans "Contacts" %}
-              </a>
-            </li>
-            <li>
-              <a href="{% url 'crm_all_opportunities' %}">
-                <span class="glyphicon glyphicon-tag"></span>
-                {% trans "Opportunities" %}
-              </a>
-            </li>
-            <li>
-              <a href="{% url 'crm_see_my_groups' %}">
-                <span class="glyphicon glyphicon-asterisk"></span>
-                {% trans "Groups" %}
-              </a>
-            </li>
-            <li>
-              <a href="{% url 'emailing_newsletter_list' %}">
-                <span class="glyphicon glyphicon-open-file"></span>
-                {% trans "Mailings" %}
-              </a>
-            </li>
-            {% if BALAFON_STORE_INSTALLED %}
-            <li>
-              <a href="{% url 'store_statistics_index' %}">
-                <span class="glyphicon glyphicon-equalizer"></span>
-                {% trans "Store statistics" %}
-              </a>
-            </li>
-            {% endif %}
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Add" %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-          {% if BALAFON_NO_ENTITY_TYPE %}
-              <li><a class="colorbox-form" href="{% url 'crm_create_entity' 0 %}">
-                <span class="glyphicon glyphicon-tower"></span>
-                {% trans "Entity" %}
-              </a></li>
-          {% else %}
-          {% for entity_type in BALAFON_ENTITY_TYPES %}
-              <li><a class="colorbox-form" href="{% url 'crm_create_entity' entity_type.id %}">
-                <span class="glyphicon glyphicon-tower"></span>
-                {{ entity_type.name }}
-              </a></li>
-          {% endfor %}
-          {% endif %}
-          {% if BALAFON_ALLOW_SINGLE_CONTACT %}
-              <li><a class="colorbox-form" href="{% url 'crm_add_single_contact' %}">
-                <span class="glyphicon glyphicon-user"></span>
-                {% trans "Single contact" %}
-              </a></li>
-          {% endif %}
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="{% url 'search' %}">
-              <span class="glyphicon glyphicon-search"></span>
-              {% trans "New search" %}
-            </a></li>
-            <li><a href="{% url 'search_list' %}">
-              <span class="glyphicon glyphicon-floppy-saved"></span>
-              {% trans "Saved searches" %}
-            </a></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li><a href="{% url 'crm_this_month_actions' %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Monthly actions" %}
-            </a></li>
-            <li><a href="{% url 'crm_this_week_actions' %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Weekly actions" %}
-            </a></li>
-            <li><a href="{% url 'crm_today_actions' %}">
-              <span class="glyphicon glyphicon-calendar"></span>
-              {% trans "Daily actions" %}
-            </a></li>
-            <li><a href="{% url 'crm_actions_not_planned' %}">
-              <span class="glyphicon glyphicon-fire"></span>
-              {% trans "Not planned actions" %}
-            </a></li>
-          </ul>
-        </li>
-        {% for the_custom_menu in users_custom_menus %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
-              {{ the_custom_menu.label }} <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-                {% for custom_menu_item in the_custom_menu.get_children %}
-                <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
-                  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
-                  {{ custom_menu_item.label }}
-                </a></li>
-                {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-                {%if BALAFON_SITE_URL %}<li><a href="{{ BALAFON_SITE_URL }}">
-                  <span class="glyphicon glyphicon-home"></span>
-                  {% trans "Back to site" %}
-                </a></li>{% endif %}
-                <li><a href="{% url 'logout' %}">
-                  <span class="glyphicon glyphicon-off"></span>
-                  {% trans "Logout" %}
-                </a></li>
-                <li><a href="{% url 'password_change' %}">
-                  <span class="glyphicon glyphicon-cog"></span>
-                  {% trans "Password" %}
-                </a></li>
-                {%if user.is_staff %}
-                  <li><a href="{% url 'admin:index' %}">
-                  <span class="glyphicon glyphicon-cog"></span>
-                  {% trans "Admin" %}
-                  </a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url 'crm_new_contacts_import' %}">
-                  <span class="glyphicon glyphicon-import"></span>
-                  {% trans "Contacts import" %}
-                </a></li>{% endif %}
-                {%if user.is_staff %}<li><a href="{% url 'crm_unsubscribe_contacts_import' %}">
-                  <span class="glyphicon glyphicon-import"></span>
-                  {% trans "Unsubscribe emails" %}
-                </a></li>{% endif %}
-            </ul>
-        </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-        {% if is_allowed_homepage %}
-          <span
-            rel="{% url 'users_make_homepage' %}"
-            class="glyphicon glyphicon-log-in make-homepage"
-            data-toggle="tooltip" data-placement="bottom"
-            title="{% trans 'Make this homepage' %}"
-          ></span>
-        {% else %}
-          <span
-            rel=""
-            class="glyphicon glyphicon-log-in make-homepage disabled"
-            data-toggle="tooltip" data-placement="bottom"
-            title="{% trans 'This page can not be set as homepage' %}"
-          ></span>
-        {% endif %}
-        </li>
-        <li class="quick-search-form">
-            <form method="GET" action="{% url 'quick_search' %}">{{ quick_search_form.text }}</form>
-        </li>
-      </ul>
-    </div><!--/.nav-collapse -->
-  </div>
-</div>
+<div class="navbar navbar-expand-lg bg-black">
+	<div class="container">
+		<a class="navbar-brand" href="{% url 'balafon_homepage' %}" title="{% trans 'Board panel' %}">
+			<img src="{% static 'img/logo-balafon.png' %}" title="{% trans 'balafon' %}" style="height: 24px;">
+		</a>
+		<button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="navbar-collapse collapse">
+		  <ul class="nav navbar-nav">
+			<li class="dropdown">
+			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "View" %} <b class="caret"></b></a>
+			  <ul class="dropdown-menu">
+				<li>
+				  <a class="dropdown-link" href="{% url 'users_favorites_list' %}">
+					<span class="glyphicon glyphicon-star"></span>
+					{% trans "Favorites" %}
+				  </a>
+				</li>
+				<li>
+				  <a class="dropdown-link" href="{% url 'crm_view_entities_list' %}">
+					<span class="glyphicon glyphicon-user"></span>
+				  {% trans "Contacts" %}
+				  </a>
+				</li>
+				<li>
+				  <a class="dropdown-link" href="{% url 'crm_all_opportunities' %}">
+					<span class="glyphicon glyphicon-tag"></span>
+					{% trans "Opportunities" %}
+				  </a>
+				</li>
+				<li>
+				  <a class="dropdown-link" href="{% url 'crm_see_my_groups' %}">
+					<span class="glyphicon glyphicon-asterisk"></span>
+					{% trans "Groups" %}
+				  </a>
+				</li>
+				<li>
+				  <a class="dropdown-link" href="{% url 'emailing_newsletter_list' %}">
+					<span class="glyphicon glyphicon-open-file"></span>
+					{% trans "Mailings" %}
+				  </a>
+				</li>
+				{% if BALAFON_STORE_INSTALLED %}
+				<li>
+				  <a class="dropdown-link" href="{% url 'store_statistics_index' %}">
+					<span class="glyphicon glyphicon-equalizer"></span>
+					{% trans "Store statistics" %}
+				  </a>
+				</li>
+				{% endif %}
+			  </ul>
+			</li>
+			<li class="dropdown">
+			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Add" %} <b class="caret"></b></a>
+			  <ul class="dropdown-menu">
+			  {% if BALAFON_NO_ENTITY_TYPE %}
+				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_entity' 0 %}">
+					<span class="glyphicon glyphicon-tower"></span>
+					{% trans "Entity" %}
+				  </a></li>
+			  {% else %}
+			  {% for entity_type in BALAFON_ENTITY_TYPES %}
+				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_entity' entity_type.id %}">
+					<span class="glyphicon glyphicon-tower"></span>
+					{{ entity_type.name }}
+				  </a></li>
+			  {% endfor %}
+			  {% endif %}
+			  {% if BALAFON_ALLOW_SINGLE_CONTACT %}
+				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_add_single_contact' %}">
+					<span class="glyphicon glyphicon-user"></span>
+					{% trans "Single contact" %}
+				  </a></li>
+			  {% endif %}
+			  </ul>
+			</li>
+			<li class="dropdown">
+			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
+			  <ul class="dropdown-menu">
+				<li><a class="dropdown-link" href="{% url 'search' %}">
+				  <span class="glyphicon glyphicon-search"></span>
+				  {% trans "New search" %}
+				</a></li>
+				<li><a class="dropdown-link" href="{% url 'search_list' %}">
+				  <span class="glyphicon glyphicon-floppy-saved"></span>
+				  {% trans "Saved searches" %}
+				</a></li>
+			  </ul>
+			</li>
+			<li class="dropdown">
+			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
+			  <ul class="dropdown-menu">
+				<li><a class="dropdown-link" href="{% url 'crm_this_month_actions' %}">
+				  <span class="glyphicon glyphicon-calendar"></span>
+				  {% trans "Monthly actions" %}
+				</a></li>
+				<li><a class="dropdown-link" href="{% url 'crm_this_week_actions' %}">
+				  <span class="glyphicon glyphicon-calendar"></span>
+				  {% trans "Weekly actions" %}
+				</a></li>
+				<li><a class="dropdown-link" href="{% url 'crm_today_actions' %}">
+				  <span class="glyphicon glyphicon-calendar"></span>
+				  {% trans "Daily actions" %}
+				</a></li>
+				<li><a class="dropdown-link" href="{% url 'crm_actions_not_planned' %}">
+				  <span class="glyphicon glyphicon-fire"></span>
+				  {% trans "Not planned actions" %}
+				</a></li>
+			  </ul>
+			</li>
+			{% for the_custom_menu in users_custom_menus %}
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">
+				  {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+				  {{ the_custom_menu.label }} <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					{% for custom_menu_item in the_custom_menu.get_children %}
+					<li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
+					  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+					  {{ custom_menu_item.label }}
+					</a></li>
+					{% endfor %}
+				</ul>
+			</li>
+			{% endfor %}
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
+				<ul class="dropdown-menu">
+					{%if BALAFON_SITE_URL %}<li><a class="dropdown-link" href="{{ BALAFON_SITE_URL }}">
+					  <span class="glyphicon glyphicon-home"></span>
+					  {% trans "Back to site" %}
+					</a></li>{% endif %}
+					<li><a class="dropdown-link" href="{% url 'logout' %}">
+					  <span class="glyphicon glyphicon-off"></span>
+					  {% trans "Logout" %}
+					</a></li>
+					<li><a class="dropdown-link" href="{% url 'password_change' %}">
+					  <span class="glyphicon glyphicon-cog"></span>
+					  {% trans "Password" %}
+					</a></li>
+					{%if user.is_staff %}
+					  <li><a class="dropdown-link" href="{% url 'admin:index' %}">
+					  <span class="glyphicon glyphicon-cog"></span>
+					  {% trans "Admin" %}
+					  </a></li>{% endif %}
+					{%if user.is_staff %}<li><a class="dropdown-link" href="{% url 'crm_new_contacts_import' %}">
+					  <span class="glyphicon glyphicon-import"></span>
+					  {% trans "Contacts import" %}
+					</a></li>{% endif %}
+					{%if user.is_staff %}<li><a class="dropdown-link" href="{% url 'crm_unsubscribe_contacts_import' %}">
+					  <span class="glyphicon glyphicon-import"></span>
+					  {% trans "Unsubscribe emails" %}
+					</a></li>{% endif %}
+				</ul>
+			</li>
+		  </ul>
+		  <ul class="nav navbar-nav ml-auto">
+			<li>
+			{% if is_allowed_homepage %}
+			  <span
+				rel="{% url 'users_make_homepage' %}"
+				class="glyphicon glyphicon-log-in make-homepage"
+				data-toggle="tooltip" data-placement="bottom"
+				title="{% trans 'Make this homepage' %}"
+			  ></span>
+			{% else %}
+			  <span
+				rel=""
+				class="glyphicon glyphicon-log-in make-homepage disabled"
+				data-toggle="tooltip" data-placement="bottom"
+				title="{% trans 'This page can not be set as homepage' %}"
+			  ></span>
+			{% endif %}
+			</li>
+			<li class="quick-search-form">
+				<form method="GET" action="{% url 'quick_search' %}">{{ quick_search_form.text }}</form>
+			</li>
+		  </ul>
+		</div>
+	</div>
+</div><!--/.nav-collapse -->

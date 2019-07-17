@@ -116,28 +116,28 @@
 
 {% block section_buttons %}
 {% if results %}
-<li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button">
+<li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button dropdown-link">
   <span class="glyphicon glyphicon-send"></span> {% trans "Mail to" %}
 </a></li>
-<li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button">
+<li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button dropdown-link">
     <span class="glyphicon glyphicon-send"></span> {% trans "BCC Mail to" %}
 </a></li>
-<li><a href="{% url "search_emailing" %}" id="emailing-button">
+<li><a href="{% url "search_emailing" %}" id="emailing-button" class="dropdown-link">
   <span class="glyphicon glyphicon-open-file"></span> {% trans "Mailing" %}
 </a></li>
-<li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button">
+<li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button" class="dropdown-link">
   <span class="glyphicon glyphicon-th"></span> {% trans "Excel" %}
 </a></li>
-<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form">
+<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form dropdown-link">
   <span class="glyphicon glyphicon-duplicate"></span> {% trans "Create action" %}
 </a></li>
-<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form">
+<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form dropdown-link">
   <span class="glyphicon glyphicon-certificate"></span> {% trans "Add to groups" %}
 </a></li>
-<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form">
+<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form dropdown-link">
   <span class="glyphicon glyphicon-print"></span> {% trans "PDF" %}
 </a></li>
-{% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="action-button" class="colorbox-form">
+{% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="action-button" class="colorbox-form dropdown-link">
   <span class="glyphicon glyphicon-flash"></span> {% trans "Contacts Admin" %}
 </a></li>{% endif %}
 {% endif %}
