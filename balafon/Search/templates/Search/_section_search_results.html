@@ -2,7 +2,7 @@
 {% load i18n balafon_utils %}
 
 {% block section_title %}
-  <span class="glyphicon glyphicon-search"></span> {% trans "Search results" %} :
+  <i class="fas fa-search"></i> {% trans "Search results" %} :
   {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% else %}{{contacts_count}} {% trans "contact" %}{% endif %}
   
 {% endblock %}
@@ -109,7 +109,7 @@
 
 {% block section_menu_name %}
 {% if results %}
-  <span class="glyphicon glyphicon-tasks"></span> {% trans "Operations" %}
+  <i class="fas fa-tasks"></i> {% trans "Operations" %}
 {% endif %}
 {% endblock %}
 
@@ -117,28 +117,28 @@
 {% block section_buttons %}
 {% if results %}
 <li><a href="{% url "search_mailto_contacts" 0 %}" class="mailto-button dropdown-link">
-  <span class="glyphicon glyphicon-send"></span> {% trans "Mail to" %}
+  <i class="fas fa-paper-plane"></i> {% trans "Mail to" %}
 </a></li>
 <li><a href="{% url "search_mailto_contacts" 1 %}" class="mailto-button dropdown-link">
-    <span class="glyphicon glyphicon-send"></span> {% trans "BCC Mail to" %}
+    <i class="fas fa-paper-plane"></i> {% trans "BCC Mail to" %}
 </a></li>
 <li><a href="{% url "search_emailing" %}" id="emailing-button" class="dropdown-link">
-  <span class="glyphicon glyphicon-open-file"></span> {% trans "Mailing" %}
+  <i class="fas fa-file-upload"></i> {% trans "Mailing" %}
 </a></li>
 <li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button" class="dropdown-link">
-  <span class="glyphicon glyphicon-th"></span> {% trans "Excel" %}
+  <i class="fas fa-th"></i> {% trans "Excel" %}
 </a></li>
 <li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form dropdown-link">
-  <span class="glyphicon glyphicon-duplicate"></span> {% trans "Create action" %}
+  <i class="fas fa-copy"></i> {% trans "Create action" %}
 </a></li>
 <li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form dropdown-link">
-  <span class="glyphicon glyphicon-certificate"></span> {% trans "Add to groups" %}
+  <i class="fas fa-certificate"></i> {% trans "Add to groups" %}
 </a></li>
 <li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form dropdown-link">
-  <span class="glyphicon glyphicon-print"></span> {% trans "PDF" %}
+  <i class="fas fa-print"></i> {% trans "PDF" %}
 </a></li>
 {% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="action-button" class="colorbox-form dropdown-link">
-  <span class="glyphicon glyphicon-flash"></span> {% trans "Contacts Admin" %}
+  <i class="fas fa-flash"></i> {% trans "Contacts Admin" %}
 </a></li>{% endif %}
 {% endif %}
 {% endblock %}

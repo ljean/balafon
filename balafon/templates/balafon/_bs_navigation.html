@@ -16,38 +16,38 @@
 			  <ul class="dropdown-menu">
 				<li>
 				  <a class="dropdown-link" href="{% url 'users_favorites_list' %}">
-					<span class="glyphicon glyphicon-star"></span>
+					<i class="fas fa-star"></i>
 					{% trans "Favorites" %}
 				  </a>
 				</li>
 				<li>
 				  <a class="dropdown-link" href="{% url 'crm_view_entities_list' %}">
-					<span class="glyphicon glyphicon-user"></span>
+					<i class="fas fa-user"></i>
 				  {% trans "Contacts" %}
 				  </a>
 				</li>
 				<li>
 				  <a class="dropdown-link" href="{% url 'crm_all_opportunities' %}">
-					<span class="glyphicon glyphicon-tag"></span>
+					<i class="fas fa-tag"></i>
 					{% trans "Opportunities" %}
 				  </a>
 				</li>
 				<li>
 				  <a class="dropdown-link" href="{% url 'crm_see_my_groups' %}">
-					<span class="glyphicon glyphicon-asterisk"></span>
+					<i class="fas fa-asterisk"></i>
 					{% trans "Groups" %}
 				  </a>
 				</li>
 				<li>
 				  <a class="dropdown-link" href="{% url 'emailing_newsletter_list' %}">
-					<span class="glyphicon glyphicon-open-file"></span>
+					<i class="fas fa-file-upload"></i>
 					{% trans "Mailings" %}
 				  </a>
 				</li>
 				{% if BALAFON_STORE_INSTALLED %}
 				<li>
 				  <a class="dropdown-link" href="{% url 'store_statistics_index' %}">
-					<span class="glyphicon glyphicon-equalizer"></span>
+					<i class="fas fa-chart-bar"></i>
 					{% trans "Store statistics" %}
 				  </a>
 				</li>
@@ -59,20 +59,20 @@
 			  <ul class="dropdown-menu">
 			  {% if BALAFON_NO_ENTITY_TYPE %}
 				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_entity' 0 %}">
-					<span class="glyphicon glyphicon-tower"></span>
+					<i class="fas fa-chess-rook"></i>
 					{% trans "Entity" %}
 				  </a></li>
 			  {% else %}
 			  {% for entity_type in BALAFON_ENTITY_TYPES %}
 				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_create_entity' entity_type.id %}">
-					<span class="glyphicon glyphicon-tower"></span>
+					<i class="fas fa-chess-rook"></i>
 					{{ entity_type.name }}
 				  </a></li>
 			  {% endfor %}
 			  {% endif %}
 			  {% if BALAFON_ALLOW_SINGLE_CONTACT %}
 				  <li><a class="colorbox-form dropdown-link" href="{% url 'crm_add_single_contact' %}">
-					<span class="glyphicon glyphicon-user"></span>
+					<i class="fas fa-user"></i>
 					{% trans "Single contact" %}
 				  </a></li>
 			  {% endif %}
@@ -82,11 +82,11 @@
 			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Search" %} <b class="caret"></b></a>
 			  <ul class="dropdown-menu">
 				<li><a class="dropdown-link" href="{% url 'search' %}">
-				  <span class="glyphicon glyphicon-search"></span>
+				  <i class="fas fa-search"></i>
 				  {% trans "New search" %}
 				</a></li>
 				<li><a class="dropdown-link" href="{% url 'search_list' %}">
-				  <span class="glyphicon glyphicon-floppy-saved"></span>
+				  <i class="fas fa-save"></i>
 				  {% trans "Saved searches" %}
 				</a></li>
 			  </ul>
@@ -95,19 +95,19 @@
 			  <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
 			  <ul class="dropdown-menu">
 				<li><a class="dropdown-link" href="{% url 'crm_this_month_actions' %}">
-				  <span class="glyphicon glyphicon-calendar"></span>
+				  <i class="fas fa-calendar"></i>
 				  {% trans "Monthly actions" %}
 				</a></li>
 				<li><a class="dropdown-link" href="{% url 'crm_this_week_actions' %}">
-				  <span class="glyphicon glyphicon-calendar"></span>
+				  <i class="fas fa-calendar"></i>
 				  {% trans "Weekly actions" %}
 				</a></li>
 				<li><a class="dropdown-link" href="{% url 'crm_today_actions' %}">
-				  <span class="glyphicon glyphicon-calendar"></span>
+				  <i class="fas fa-calendar"></i>
 				  {% trans "Daily actions" %}
 				</a></li>
 				<li><a class="dropdown-link" href="{% url 'crm_actions_not_planned' %}">
-				  <span class="glyphicon glyphicon-fire"></span>
+				  <i class="fas fa-fire"></i>
 				  {% trans "Not planned actions" %}
 				</a></li>
 			  </ul>
@@ -115,13 +115,13 @@
 			{% for the_custom_menu in users_custom_menus %}
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">
-				  {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+				  {% if the_custom_menu.icon %}<i class="fas fa-{{ the_custom_menu.icon }}"></i>{% endif %}
 				  {{ the_custom_menu.label }} <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
 					{% for custom_menu_item in the_custom_menu.get_children %}
 					<li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
-					  <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+					  <i class="fas fa-{{custom_menu_item.icon}}"></i>
 					  {{ custom_menu_item.label }}
 					</a></li>
 					{% endfor %}
@@ -132,55 +132,50 @@
 				<a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Account" %} <b class="caret"></b></a>
 				<ul class="dropdown-menu">
 					{%if BALAFON_SITE_URL %}<li><a class="dropdown-link" href="{{ BALAFON_SITE_URL }}">
-					  <span class="glyphicon glyphicon-home"></span>
+					  <i class="fas fa-home"></i>
 					  {% trans "Back to site" %}
 					</a></li>{% endif %}
 					<li><a class="dropdown-link" href="{% url 'logout' %}">
-					  <span class="glyphicon glyphicon-off"></span>
+					  <i class="fas fa-power-off"></i>
 					  {% trans "Logout" %}
 					</a></li>
 					<li><a class="dropdown-link" href="{% url 'password_change' %}">
-					  <span class="glyphicon glyphicon-cog"></span>
+					  <i class="fas fa-cog"></i>
 					  {% trans "Password" %}
 					</a></li>
 					{%if user.is_staff %}
 					  <li><a class="dropdown-link" href="{% url 'admin:index' %}">
-					  <span class="glyphicon glyphicon-cog"></span>
+					  <i class="fas fa-cog"></i>
 					  {% trans "Admin" %}
 					  </a></li>{% endif %}
 					{%if user.is_staff %}<li><a class="dropdown-link" href="{% url 'crm_new_contacts_import' %}">
-					  <span class="glyphicon glyphicon-import"></span>
+					  <i class="fas fa-file-import"></i>
 					  {% trans "Contacts import" %}
 					</a></li>{% endif %}
 					{%if user.is_staff %}<li><a class="dropdown-link" href="{% url 'crm_unsubscribe_contacts_import' %}">
-					  <span class="glyphicon glyphicon-import"></span>
+					  <i class="fas fa-file-import"></i>
 					  {% trans "Unsubscribe emails" %}
 					</a></li>{% endif %}
 				</ul>
 			</li>
 		  </ul>
-		  <ul class="nav navbar-nav ml-auto">
-			<li>
+		<br/>
 			{% if is_allowed_homepage %}
-			  <span
+			  <i
 				rel="{% url 'users_make_homepage' %}"
-				class="glyphicon glyphicon-log-in make-homepage"
+				class="fas fa-sign-in-alt make-homepage"
 				data-toggle="tooltip" data-placement="bottom"
 				title="{% trans 'Make this homepage' %}"
-			  ></span>
+			  ></i>
 			{% else %}
-			  <span
+			  <i
 				rel=""
-				class="glyphicon glyphicon-log-in make-homepage disabled"
+				class="fas fa-sign-in-alt make-homepage disabled"
 				data-toggle="tooltip" data-placement="bottom"
 				title="{% trans 'This page can not be set as homepage' %}"
-			  ></span>
+			  ></i>
 			{% endif %}
-			</li>
-			<li class="quick-search-form">
 				<form method="GET" action="{% url 'quick_search' %}">{{ quick_search_form.text }}</form>
-			</li>
-		  </ul>
 		</div>
 	</div>
 </div><!--/.nav-collapse -->

@@ -6,7 +6,7 @@
 {% block section_title %}
 <a class="header-link" href="{% url 'crm_view_entity' entity.id %}">
   <div class="logo" style="display: inline-block; vertical-align: middle;">
-    <span class="glyphicon glyphicon-tower"></span>
+    <i class="fas fa-chess-rook"></i>
     <div class="logo-container">
       <img {{ entity.get_logo_center_style }} src="{{ entity.get_safe_logo }}"/>
     </div>
@@ -24,29 +24,29 @@
   <div class="col-lg-4">
     <table class="table">
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
-        {{ entity.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> ' }}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="fas fa-envelope"></i>
+        {{ entity.get_address_fields|join:'<br /><i class="fas fa-envelope" style="color:transparent"></i> ' }}
       </td></tr>
       {% if entity.has_billing_address %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
-        {{ entity.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> ' }}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="fas fa-euro"></i>
+        {{ entity.get_billing_address_fields|join:'<br /><i class="fas fa-envelope" style="color:transparent"></i> ' }}
       </td></tr>
       {% endif %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="fas fa-paper-plane"></i>
         <a href="mailto:{{ entity.email }}">{{ entity.email }}</a>
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="fas fa-phone-alt"></i>
         {{ entity.phone }}
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Web Site' %}" class="glyphicon glyphicon-link"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Web Site' %}" class="fas fa-link"></i>
         {% if entity.website %}<a href="{{ entity.website }}" target="_blank">{{ entity.website }}</a>{% endif %}
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Fax' %}" class="glyphicon glyphicon-print"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Fax' %}" class="fas fa-print"></i>
         {{ entity.fax }}
       </td></tr>
     </table>
@@ -88,7 +88,7 @@
 {% endblock %}
 
 
-{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
+{% block section_menu_name %}<i class="fas fa-cog"></i> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
   <li><a class="colorbox-form dropdown-link" href="{% url 'crm_edit_entity' entity.id %}">{% trans "Edit" %}</a></li>

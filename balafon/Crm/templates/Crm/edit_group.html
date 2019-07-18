@@ -72,16 +72,16 @@
 
     function addMemberToList(member) {
       var typeIcon = '<a href="'+ member.url +'" class="colorbox-form">'+
-        '<span class="glyphicon glyphicon-' +
+        '<i class="fas fa-' +
         ((member.type === 'entity')?'tower':'user') +
-        '"></span></a> ';
+        '"></i></a> ';
       var dataType = 'data-type="'+member.type+'" data-id="'+ member.id +'"';
 
       var html = '<span class="label label-member label-new-member">' +
         typeIcon +
         member.name +
-        ' <a class="remove-me" href '+dataType+'><span class="glyphicon glyphicon-remove"></span></a> ' +
-        '</span>&nbsp;';
+        ' <a class="remove-me" href '+dataType+'><i class="fas fa-times"></span></a> ' +
+        '</i>&nbsp;';
 
       $(".new-members-list").append(html);
     };
@@ -185,14 +185,14 @@
               {% for member in members %}
                 {% spaceless %}<span class="label label-member existing">
                   <a href="{{ member.url }}" class="colorbox-form">
-                    <span class="glyphicon glyphicon-{% if member.type == 'entity' %}tower{% else %}user{% endif %}"></span>
+                    <i class="fas fa-{% if member.type == 'entity' %}chess-rook{% else %}user{% endif %}"></i>
                   </a>
                   {{ member.name }}
                   <a class="remove-me" href data-type="{{ member.type }}" data-id="{{ member.id }}">
-                    <span class="glyphicon glyphicon-remove"></span>
+                    <i class="fas fa-times"></i>
                   </a>
                   <a class="add-me" href data-type="{{ member.type }}" data-id="{{ member.id }}" style="display: none;">
-                    <span class="glyphicon glyphicon-plus"></span>
+					  <i class="fas fa-plus"></i>
                   </a>
                 </span>{% endspaceless %}&nbsp;
               {% endfor %}
@@ -209,12 +209,12 @@
           </p>
 
           <a class="btn btn-sm btn-outline-secondary colorbox-form" href="{% url 'crm_select_contact_or_entity' %}">
-            <span class="glyphicon glyphicon-plus colorbox-form"></span> {% trans 'Add new member' %}
+            <i class="fas fa-plus colorbox-form"></i> {% trans 'Add new member' %}
           </a>
 
           {% if group %}
           <a class="btn btn-sm btn-outline-secondary" href="{% url 'search_group' group.id %}">
-            <span class="glyphicon glyphicon-search"></span> {% trans 'View members' %}
+            <i class="fas fa-search"></i> {% trans 'View members' %}
           </a>
           {% endif %}
         </td>

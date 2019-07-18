@@ -14,7 +14,7 @@
     <span class="contenteditable inline-block" rel="{% url "auto_save_data" "search" "name" search.id %}" contenteditable="true">
         {{search.name}}
     </span>
-    <a class="float-right" href="{% url "search" search.id %}"><span class="glyphicon glyphicon-search"></span></a>
+    <a class="float-right" href="{% url "search" search.id %}"><i class="fas fa-search"></i></a>
     </td>
   </tr>
 {% endfor %}

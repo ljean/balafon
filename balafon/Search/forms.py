@@ -468,15 +468,15 @@ class SearchForm(forms.Form):
         form = FieldChoiceForm()
         html_tpl = """{0}
             <a class="btn btn-xs btn-yellow add-field" href="">
-            <span class="glyphicon glyphicon-filter"></span> {1}</a>
+            <i class="fas fa-filter"></i> {1}</a>
             <a class="btn btn-xs btn-outline-secondary add-block" href="">
-            <span class="glyphicon glyphicon-th-list"></span> {2}</a>
+            <i class="fas fa-th-list"></i> {2}</a>
             <a class="btn btn-xs btn-outline-secondary duplicate-block" href="">
-            <span class="glyphicon glyphicon-share"></span> {5}</a>
+            <i class="fas fa-share-square"></i> {5}</a>
             <a class="btn btn-xs btn-danger clear-block" href="">
-            <span class="glyphicon glyphicon-remove"></span> {3}</a>
+            <i class="fas fa-times"></i> {3}</a>
             <a class="btn btn-xs btn-danger remove-block" href="">
-            <span class="glyphicon glyphicon-trash"></span> {4}</a>"""
+            <i class="fas fa-trash-alt"></i> {4}</a>"""
 
         return html_tpl.format(
             form.as_it_is(), _('Add filter'), _('Add block'), _('Clear'), _('Remove'), _('Duplicate')

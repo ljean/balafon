@@ -95,11 +95,11 @@
   <div class="row" style="margin-bottom: 20px;">
     <div class="col-lg-8">
       <a class="btn btn-md btn-outline-secondary" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-left"></span>
+          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-left"></i>
       </a>
       &nbsp;
       <a class="btn btn-md btn-outline-secondary" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-right"></span>
+          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-right"></i>
       </a>
       &nbsp;
       <h2 class="inline-block">
@@ -118,7 +118,7 @@
         </div>
         <div class="float-left" style="margin-left: 5px;">
           <a class="btn btn-outline-secondary datepicker-trigger" href="#">
-            <span class="glyphicon glyphicon-calendar"></span>
+            <i style="font-size: 1.5em; padding-top: 5px;" class="fas fa-calendar"></i>
           </a>
           <input type="date" id="showOnButton" class="datepicker float-right" style="width: 1px;" />
         </div>
@@ -165,14 +165,14 @@
       {% for the_custom_menu in planning_custom_menus %}
         <div class="dropdown btn-group float-right inline-block" style="vertical-align: top;">
           <a href="#" class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown">
-            {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+            {% if the_custom_menu.icon %}<i class="fas fa-{{ the_custom_menu.icon }}"></i>{% endif %}
             {{ the_custom_menu.label }}
             <b class="caret"></b>
           </a>
           <ul class="dropdown-menu">
               {% for custom_menu_item in the_custom_menu.get_children %}
               <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
-                <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+                <i class="fas fa-{{custom_menu_item.icon}}"></i>
                 {{ custom_menu_item.label }}
               </a></li>
               {% endfor %}

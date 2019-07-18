@@ -744,26 +744,26 @@
 
       <div ng-hide="app.isPdf" class="badges">
         <div class="badge badge-inactive" ng-show="app.isReadOnly && !app.isPublic">
-          <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
+          <i class="fas fa-eye"></i> {{ 'READ_ONLY' | translate }}
         </div>
 
         <div class="badge" ng-show="app.action.mail_to && !app.isPublic">
           <a href="{{app.action.mail_to}}">
-            <span class="glyphicon glyphicon-envelope"></span> {{ 'SEND_BY_MAIL' | translate}}
+            <i class="fas fa-envelope"></i> {{ 'SEND_BY_MAIL' | translate}}
           </a>
         </div>
 
         <div class="badge" ng-repeat="entity in app.action.entities" ng-show="!app.isPublic">
           <a href="{{ entity.get_view_url }}">
-            <span class="glyphicon glyphicon-tower"></span> {{ entity.name }}
+            <i class="fas fa-cog"></i> {{ entity.name }}
           </a>
         </div>
 
         <div class="badge" ng-repeat="contact in app.action.contacts" ng-show="!app.isPublic">
           <a href="{{ contact.get_view_url }}">
-            <span class="glyphicon glyphicon-user"></span> {{ contact.fullname }}
+            <i class="fas fa-user"></i> {{ contact.fullname }}
             <a ng-show="contact.email" href="mailto:{{contact.email}}">
-              <span class="glyphicon glyphicon-envelope"></span>
+              <i class="fas fa-envelope"></i>
             </a>
           </a>
         </div>
@@ -780,7 +780,7 @@
               {% endif %}
             {% endif %}
             {% verbatim %}
-            <span class="glyphicon glyphicon-download-alt"></span> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
+            <i class="fas fa-download"></i> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
         </div>
 
         {% endverbatim %}{% block extra_badges %}{% endblock %}{% verbatim %}
@@ -859,11 +859,11 @@
                       <div ng-show="allowEdit" class="float-right">
                         <div class="show-on-hover">
                           <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
-                            <span class="glyphicon glyphicon-plus"></span>
+                            <i class="fas fa-plus"></i>
                           </a>
 
                           <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
-                            <span class="glyphicon glyphicon-resize-vertical"></span>
+                            <i class="fas fa-arrows-alt-v"></i>
                           </a>
                         </div>
                       </div>
@@ -930,11 +930,11 @@
                 <div ng-show="allowEdit" class="float-right">
 
                   <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="saveEdit()">
-                    <span class="glyphicon glyphicon-ok"></span> {{ 'OK' | translate }}
+                    <i class="fas fa-check"></i> {{ 'OK' | translate }}
                   </a>
 
                   <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="cancelEdit()">
-                    <span class="glyphicon glyphicon-remove"></span> {{ 'CANCEL' | translate }}
+                    <i class="fas fa-times"></i> {{ 'CANCEL' | translate }}
                   </a>
                 </div>
               </div></div>
@@ -983,7 +983,7 @@
                   name="item"
                   required
                 />
-                <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+                <i ng-show="loading" class="fas fa-sync-alt"></i>
               </div>
               <div class="col-xl-6">
                 <div ng-show="selectedItem.name" class="selected-item-details">

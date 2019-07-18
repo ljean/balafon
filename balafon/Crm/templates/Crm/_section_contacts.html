@@ -20,7 +20,7 @@
             {% favorite_item object=c %}
             <a href="{% url "crm_view_contact" c.id %}">{{c.fullname}}</a>
             <a class="float-right btn btn-xs btn-outline-secondary colorbox-form" href="{% url "crm_edit_contact_on_entity" c.id %}">
-              <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+              <i class="fas fa-edit"></i> {% trans "Edit" %}
             </a>
             {%if not c.main_contact %}<span class="label label-default ut-secondary-contact">{% trans "secondary" %}</span>{% endif %}
             {%if has_left %}<span class="label label-warning ut-has-left">{% trans "has left" %}</span>{% endif %}
@@ -49,7 +49,7 @@
 </div>
 {% endblock %}
 
-{% block section_menu_name %}<span class="glyphicon glyphicon-user"></span> {% trans "Do" %}{% endblock %}
+{% block section_menu_name %}<i class="fas fa-user"></i> {% trans "Do" %}{% endblock %}
 
 {% block section_buttons %}
   {% if entity %}

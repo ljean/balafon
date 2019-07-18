@@ -2,7 +2,7 @@
 {% load i18n favorite_tags coop_utils %}
 
 {% block section_title %}
-    <span class="glyphicon glyphicon-open-file"></span>
+    <i class="fas fa-file-upload"></i>
 {% trans "Newsletters" %}
 {% endblock %}
   
@@ -12,8 +12,8 @@
     <div class="">
       <table class="table table-striped">
         <tr>
-          <th><span class="glyphicon glyphicon-file"></span> {% trans "Newsletter" %}</th>
-          <th><span class="glyphicon glyphicon-open-file"></span> {% trans "Sending" %}</th>
+          <th><i class="fas fa-file"></i> {% trans "Newsletter" %}</th>
+          <th><i class="fas fa-file-upload"></i> {% trans "Sending" %}</th>
         </tr>
       {% for newsletter in newsletters %}
         <tr>
@@ -21,7 +21,7 @@
             {% favorite_item object=newsletter %}
             {{newsletter.subject|dehtml }}
             <a class="btn btn-xs btn-outline-secondary" href="{{ newsletter.get_absolute_url }}">
-              <span class="glyphicon glyphicon-eye-open"></span> {% trans "View" %}
+              <i class="fas fa-eye"></i> {% trans "View" %}
             </a>
           </td>
           <td>
@@ -32,7 +32,7 @@
                         {% favorite_item object=e %}
                         {{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})
                         <a class="btn btn-xs btn-outline-secondary" href="{% url 'emailing_view' e.id %}">
-                          <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
+                          <i class="fas fa-cog"></i> {% trans "Settings" %}
                         </a>
                     </div>
                 </div>
@@ -52,14 +52,14 @@
 {% endblock %}
 
 {% block section_menu_name %}
-  <span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}
+  <i class="fas fa-plus"></i> {% trans "Add" %}
 {% endblock %}
 
 {% block section_buttons %}
   <li><a class="colorbox-form dropdown-link" href="{% url "emailing_new_newsletter" %}">
-    <span class="glyphicon glyphicon-file"></span> {% trans "New Newsletter" %}
+    <i class="fas fa-file"></i> {% trans "New Newsletter" %}
   </a></li>
   <li><a href="{% url "search" %}" class="dropdown-link">
-    <span class="glyphicon glyphicon-open-file"></span> {% trans "New Sending" %}
+    <i class="fas fa-file-upload"></i> {% trans "New Sending" %}
   </a></li>
 {% endblock %}

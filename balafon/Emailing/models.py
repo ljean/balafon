@@ -97,7 +97,7 @@ class Emailing(TimeStampedModel):
         action = ""
         if self.status == Emailing.STATUS_EDITING:
             action = '''
-                <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
+                <a class="colorbox-form action-button" href="{1}"><i class="fas fa-{2}"></i> {0}</a>
                 '''.format(
                     ugettext('Send'),
                     reverse("emailing_confirm_send_mail", args=[self.id]),
@@ -105,7 +105,7 @@ class Emailing(TimeStampedModel):
                 )
         if self.status == Emailing.STATUS_SCHEDULED:
             action = '''
-                <a class="colorbox-form action-button" href="{1}"><span class="glyphicon glyphicon-{2}"></span> {0}</a>
+                <a class="colorbox-form action-button" href="{1}"><i class="fas fa-{2}"></i> {0}</a>
                 '''.format(
                     ugettext('Cancel'),
                     reverse("emailing_cancel_send_mail", args=[self.id]),

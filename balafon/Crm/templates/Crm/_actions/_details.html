@@ -2,7 +2,7 @@
 {% spaceless %}
 <div class="action-subject" style="margin-top: 5px;">
   <a href="" class="show-note float-right {% if action.detail %}has-note{% endif %}">
-    <span class="glyphicon glyphicon-collapse-down" title="{% trans 'Show note' %}"></span>
+    <i class="far fa-caret-square-down" title="{% trans 'Show note' %}"></i>
   </a>
   <span class="contenteditable inline-block" rel="{% url 'auto_save_data' 'action' 'subject' action.id %}" style="font-weight: 500;" contenteditable="true">
     {{action.subject}}

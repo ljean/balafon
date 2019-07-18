@@ -2,7 +2,7 @@
 {% load i18n favorite_tags coop_utils %}
 
 {% block section_title %}
-  <h4 class="inline-block"><span class="glyphicon glyphicon-open-file"></span>
+  <h4 class="inline-block"><i class="fas fa-file-upload"></i>
  {% trans "Sending" %}: {{ emailing.newsletter.subject|dehtml }}</h4>
 {% endblock %}
   
@@ -36,16 +36,16 @@
 {% endblock %}
 
 {% block section_menu_name %}
-  <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
+  <i class="fas fa-cog"></i> {% trans "Settings" %}
 {% endblock %}
 
 {% block section_buttons %}
   <li><a class="colorbox-form dropdown-link" href="{% url 'emailing_update_emailing' emailing.id %}">
-    <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+    <i class="fas fa-edit"></i> {% trans "Edit" %}
   </a></li>
   <li>{{ emailing.next_action }}</li>
   <li><a class="colorbox-form dropdown-link" href="{% url 'emailing_delete' emailing.id %}">
-    <span class="glyphicon glyphicon-remove"></span> {% trans "Delete" %}
+    <i class="fas fa-remove"></i> {% trans "Delete" %}
   </a></li>
 {% endblock %}
 

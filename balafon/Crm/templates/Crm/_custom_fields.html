@@ -5,11 +5,11 @@
     <span class="custom-field-list-title">{% trans "Fields" %}</span>
     {% if contact %}
       <a class="btn btn-xs float-right colorbox-form" href="{% url "crm_edit_custom_fields" "contact" contact.id %}">
-        <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
+        <i class="fas fa-pencil-alt"></i> {% trans "Edit" %}
       </a>
     {% else %}
       <a class="btn btn-xs float-right colorbox-form" href="{% url "crm_edit_custom_fields" "entity" entity.id %}">
-        <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}
+        <i class="fas fa-pencil-alt"></i> {% trans "Edit" %}
       </a>
       {% endif %}    
   </div>

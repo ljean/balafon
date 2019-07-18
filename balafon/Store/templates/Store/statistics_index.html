@@ -232,8 +232,8 @@
             <h2 ng-show="mode==='families'"> {{ 'STATS_BY_FAMILY' | translate }} </h2>
             <h2 ng-show="mode==='tags'"> {{ 'STATS_BY_TAG' | translate }} </h2>
             <h2 ng-show="mode===''">
-              <span ng-show="currentItem.icon" class="glyphicon glyphicon-{{ currentItem.icon }}"></span>
-              <span ng-hide="currentItem.icon" class="glyphicon glyphicon-tag"></span>
+              <i ng-show="currentItem.icon" class="fas fa-{{ currentItem.icon }}"></i>
+              <i ng-show="currentItem.icon" class="fas fa-tag"></i>
               {{ currentItem.name }}
             </h2>
           </div>
@@ -279,8 +279,8 @@
         </tr>
         <tr ng-repeat="statistic in statistics | orderBy:'-total_amount' ">
           <td>
-            <span ng-show="statistic.icon" class="glyphicon glyphicon-{{ statistic.icon }}"></span>
-            <span ng-hide="statistic.icon" class="glyphicon glyphicon-tag"></span>
+            <i ng-show="statistic.icon" class="fas fa-{{ statistic.icon }}"></i>
+            <i ng-hide="statistic.icon" class="fas fa-tag"></i>
             <a href ng-show="mode && mode!=='total'" ng-click="loadItemStatistics(statistic)">{{ statistic.name }}</a>
             <span ng-show="!mode || mode==='total'">{{ statistic.name }}</span>
           </td>

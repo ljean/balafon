@@ -36,7 +36,7 @@
     <td><a href="mailto:{{same_as_contact.get_email}}">{{same_as_contact.get_email}}</a></td>
     <td>
       <a class="colorbox-form" href="{% url "crm_remove_same_as" contact.id same_as_contact.id %}">
-        <span class="glyphicon glyphicon-remove"></span>
+        <i class="fas fa-times"></i>
       </a>
     </td>
   </tr>
@@ -66,7 +66,7 @@
     <td>{{relationship.contact.get_phones|seq_to_br}}</td>
     <td><a href="mailto:{{relationship.contact.get_email}}">{{relationship.contact.get_email}}</a></td>
     <td><a class="colorbox-form" href="{% url "crm_delete_relationship" contact.id relationship.id %}">
-      <span class="glyphicon glyphicon-remove"></span>
+      <i class="fas fa-times"></i>
     </a></td>
   </tr>
   {% endwith %}
@@ -76,7 +76,7 @@
 </table>
 {% endblock %}
 
-{% block section_menu_name %}<span class="glyphicon glyphicon-pencil"></span> {% trans "Edit" %}{% endblock %}
+{% block section_menu_name %}<i class="fas fa-pencil-alt"></i> {% trans "Edit" %}{% endblock %}
 
 {% block section_buttons %}
   <li>

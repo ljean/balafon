@@ -15,7 +15,7 @@
     {% endif %}
     {% if total_count > actions.count %}
         <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
-          <span class="glyphicon glyphicon-warning-sign"></span>
+          <i class="fas fa-exclamation-triangle"></i>
           {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
           <a class="btn btn-outline-secondary btn-xs"
              href="{% if contact %}{% url 'crm_view_contact_actions' contact.id set_id %}{% else %}{% url 'crm_view_entity_actions' entity.id set_id %}{% endif %}"
@@ -29,7 +29,7 @@
   {% endfor %}
 {% endblock %}
 
-{% block section_menu_name %}<span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}{% endblock %}
+{% block section_menu_name %}<i class="fas fa-plus"></i> {% trans "Add" %}{% endblock %}
 
 {% block section_buttons %}
   {% if not has_default_Bonaction %}

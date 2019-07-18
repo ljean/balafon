@@ -1,20 +1,20 @@
 {% load i18n balafon_utils %}
 <li>
   <a class="colorbox-form dropdown-link" href="{% url 'crm_edit_action' action.id %}">
-    <span class="glyphicon glyphicon-cog" title="{% trans 'Edit' %}"></span> {% trans "Edit" %}
+    <i class="fas fa-cog" title="{% trans 'Edit' %}"></i> {% trans "Edit" %}
   </a>
 </li>
 
 {% if not action.type.hide_contacts_buttons %}
 <li>
   <a class="colorbox-form dropdown-link" href="{% url 'crm_add_contact_to_action' action.id %}">
-    <span class="glyphicon glyphicon-user"></span> {% trans "Add contact" %}
+    <i class="fas fa-user"></i> {% trans "Add contact" %}
   </a>
 </li>
 
 <li>
   <a class="colorbox-form dropdown-link" href="{% url 'crm_add_entity_to_action' action.id %}">
-    <span class="glyphicon glyphicon-tower"></span> {% trans "Add entity" %}
+    <i class="fas fa-chess-rook"></i> {% trans "Add entity" %}
   </a>
 </li>
 {% endif %}
@@ -22,7 +22,7 @@
 {% if not action.opportunity %}
 <li>
   <a href="{% url 'crm_add_action_to_opportunity' action.id %}" class="colorbox-form dropdown-link">
-    <span class="glyphicon glyphicon-tag"></span> {% trans "Opportunity" %}
+    <i class="fas fa-tag"></i> {% trans "Opportunity" %}
   </a>
 </li>
 {% endif %}
@@ -30,7 +30,7 @@
 {% if action.type.track_status %}
 <li>
   <a href="{% url 'crm_status_track' action.id %}" class="colorbox-form dropdown-link">
-    <span class="glyphicon glyphicon-road"></span> {% trans "Status track" %}
+    <i class="fas fa-road"></i> {% trans "Status track" %}
   </a>
 </li>
 {% endif %}
