@@ -2,18 +2,18 @@
 <div class="groups-box">
   <div class="groups-header">
     <span class="groups-title">{% trans "Groups" %}</span>
-    <a class="btn btn-xs pull-right colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">
-      <span class="glyphicon glyphicon-plus"></span> {% trans "Add to a group" %}
+    <a class="btn btn-xs float-right colorbox-form" href="{% url "crm_add_contact_to_group" contact.id %}">
+      <i class="fas fa-plus"></i> {% trans "Add to a group" %}
     </a>
   </div>
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-lg-12">
       <div class="data-groups">
         {% for g in contact.entity.group_set.all %}
           <span class="group-tag btn btn-xs btn-gray" title="{{g.description}}">
             {% spaceless %}
             <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
-            <span class="glyphicon glyphicon-remove disabled"></span>
+            <i class="fas fa-remove disabled"></i>
             {% endspaceless %}
           </span>
         {% endfor %}
@@ -26,7 +26,7 @@
             {% spaceless %}
             <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
               <a class="colorbox-form btn-close" href="{% url 'crm_remove_contact_from_group' g.id contact.id %}" title="{% trans 'Remove from group' %}">
-                <span class="glyphicon glyphicon-remove"></span>
+                <i class="fas fa-remove"></i>
               </a>
             {% endspaceless %}
           </span>
@@ -36,7 +36,7 @@
           {% if s.accept_subscription %}
           <span class="group-tag btn btn-xs btn-danger">
             {% spaceless %}
-            <span class="glyphicon glyphicon-send"></span> {{s.subscription_type.name}}
+            <i class="fas fa-paper-plane"></i> {{s.subscription_type.name}}
             {% endspaceless %}
           </span>
           {% endif %}

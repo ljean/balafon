@@ -93,41 +93,41 @@
 {% block document_content %}
 <div class="action-archive-filter">
   <div class="row" style="margin-bottom: 20px;">
-    <div class="col-md-8">
-      <a class="btn btn-md btn-default" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-left"></span>
+    <div class="col-lg-8">
+      <a class="btn btn-md btn-outline-secondary" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-left"></i>
       </a>
       &nbsp;
-      <a class="btn btn-md btn-default" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <span style="font-size: 0.9em" class="glyphicon glyphicon-chevron-right"></span>
+      <a class="btn btn-md btn-outline-secondary" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-right"></i>
       </a>
       &nbsp;
       <h2 class="inline-block">
           {% block this_title %}{% endblock %}
       </h2>
     </div>
-    <div class="col-md-4">
+    <div class="col-lg-4">
       {% if planning_type %}
-      <div class="pull-right" style="padding: 0; margin: 0">
-        <div style="display: inline-block;" class="pull-left">
+      <div class="float-right" style="padding: 0; margin: 0">
+        <div style="display: inline-block;" class="float-left">
           <select class="planningTypeSelector form-control" style="vertical-align: top;">
             <option value="day" {% if planning_type == "day" %}selected{%endif %}>{% trans "Day" %}</option>
             <option value="week" {% if planning_type == "week" %}selected{%endif %}>{% trans "Week" %}</option>
             <option value="month"{% if planning_type == "month" %}selected{%endif %}>{% trans "Month" %}</option>
           </select>
         </div>
-        <div class="pull-left" style="margin-left: 5px;">
-          <a class="btn btn-default datepicker-trigger" href="#">
-            <span class="glyphicon glyphicon-calendar"></span>
+        <div class="float-left" style="margin-left: 5px;">
+          <a class="btn btn-outline-secondary datepicker-trigger" href="#">
+            <i style="font-size: 1.5em; padding-top: 5px;" class="fas fa-calendar"></i>
           </a>
-          <input type="date" id="showOnButton" class="datepicker pull-right" style="width: 1px;" />
+          <input type="date" id="showOnButton" class="datepicker float-right" style="width: 1px;" />
         </div>
       </div>
       {% endif %}
     </div>
   </div>
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-lg-8">
       <select class="form-control action-filter chosen-select filter inline-block" multiple="" data-placeholder="{% trans 'Filter by' %}">
           {% if action_types %}
           <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
@@ -153,7 +153,7 @@
           </optgroup>
       </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
       <select class="form-control action-order">
         <option value="o1" {% if ordering == 'asc' %}selected="selected"{% endif %}>{% trans "Ascending" %}</option>
         <option value="o0" {% if ordering == 'desc' %}selected="selected"{% endif %}>{% trans "Descending" %}</option>
@@ -161,18 +161,18 @@
         <option value="o3" {% if ordering == 'entity' %}selected="selected"{% endif %}>{% trans "Entities" %}</option>
       </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-lg-2">
       {% for the_custom_menu in planning_custom_menus %}
-        <div class="dropdown btn-group pull-right inline-block" style="vertical-align: top;">
-          <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown">
-            {% if the_custom_menu.icon %}<span class="glyphicon glyphicon-{{ the_custom_menu.icon }}"></span>{% endif %}
+        <div class="dropdown btn-group float-right inline-block" style="vertical-align: top;">
+          <a href="#" class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown">
+            {% if the_custom_menu.icon %}<i class="fas fa-{{ the_custom_menu.icon }}"></i>{% endif %}
             {{ the_custom_menu.label }}
             <b class="caret"></b>
           </a>
           <ul class="dropdown-menu">
               {% for custom_menu_item in the_custom_menu.get_children %}
               <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
-                <span class="glyphicon glyphicon-{{custom_menu_item.icon}}"></span>
+                <i class="fas fa-{{custom_menu_item.icon}}"></i>
                 {{ custom_menu_item.label }}
               </a></li>
               {% endfor %}

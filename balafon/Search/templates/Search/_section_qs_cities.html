@@ -17,7 +17,7 @@
       {% if contacts_count == 1 %}{{contacts_count}} {% trans "contact" %}{% endif %}
       {% if contacts_count > 1 %}{{contacts_count}} {% trans "contacts" %}{% endif %}
       
-      <a href="{% url "search_cities" city.id %}"><span class="glyphicon glyphicon-search"></span></a>
+      <a href="{% url "search_cities" city.id %}"><i class="fas fa-search"></i></a>
       
     </td>
   </tr>

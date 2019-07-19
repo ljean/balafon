@@ -2,12 +2,12 @@
 <div class="groups-box">
   <div class="groups-header">
     <span class="groups-title">{% trans "Groups" %}</span>
-    <a class="btn btn-xs pull-right colorbox-form" href="{% url 'crm_add_entity_to_group' entity.id %}">
-      <span class="glyphicon glyphicon-plus"></span> {% trans "Add to a group" %}
+    <a class="btn btn-xs float-right colorbox-form" href="{% url 'crm_add_entity_to_group' entity.id %}">
+      <i class="fas fa-plus"></i> {% trans "Add to a group" %}
     </a>
   </div>
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-lg-12">
       <div class="data-groups">
         {% for g in groups.all %}
           <span
@@ -23,7 +23,7 @@
                 href="{% url 'crm_remove_entity_from_group' g.id entity.id %}"
                 title="{% trans 'Remove from group' %}"
               >
-                <span class="glyphicon glyphicon-remove"></span>
+                <i class="fas fa-times"></i>
               </a>
             {% endif %}
             {% endspaceless %}

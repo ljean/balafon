@@ -8,7 +8,6 @@
   <title>{% block head_subtitle %}{% endblock %}{% trans "balafon" %}</title>
   <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.png">
   <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400' rel='stylesheet' type='text/css'>
-
   {% block jquery_declaration %}
   {{jhouston}}
   <link type="text/css" href="{{ STATIC_URL }}css/base/jquery-ui-1.9.2.css" rel="Stylesheet" />	
@@ -19,6 +18,7 @@
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.colorbox-min.js"></script>
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.form.js"></script>
   <script type="text/javascript" src="{{ STATIC_URL }}js/colorbox.coop.js"></script>
+
   <script type="text/javascript">
     $(function () {
       $("a.colorbox-form").colorboxify();

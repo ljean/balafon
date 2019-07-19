@@ -89,7 +89,7 @@
 
   {% if action.done %}
   <div class="alert alert-warning">
-    <span class="glyphicon glyphicon-warning-sign"></span>
+    <i class="fas fa-exclamation-triangle"></i>
     {% trans "This action has be done on" %} {{action.done_date}}
   </div>
   {% endif %}
@@ -105,7 +105,7 @@
     {% if action %}
     <a class="btn btn-warning colorbox-form" href="{% url 'crm_delete_action' action.id %}">{% trans "Delete" %}</a>
     {% endif %}
-    <a class="btn btn-default cancel_button" href="">{% trans "Cancel" %}</a>
+    <a class="btn btn-outline-secondary cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}
 
 {% block doc_footer %}

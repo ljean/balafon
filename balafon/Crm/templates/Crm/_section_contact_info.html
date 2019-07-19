@@ -5,9 +5,9 @@
 
 {% block section_title %}
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-lg-5">
     <a class="header-link" href="{% url 'crm_view_contact' contact.id %}">
-      <span class="glyphicon glyphicon-user"></span>
+      <i class="fas fa-user"></i>
       <div class="logo-container">
         <img {{contact.get_photo_center_style}} src="{{contact.get_safe_photo}}"/>
       </div>
@@ -33,12 +33,12 @@
     <div class="section-subtitle">{{contact.title}}</div>
     </div>
   </div>
-  <div class="col-md-2 text-center" style="vertical-align: middle; margin-top: 10px;">
+  <div class="col-lg-2 text-center" style="vertical-align: middle; margin-top: 10px;">
     {% if not contact.entity.is_single_contact %}
-      <span class="glyphicon glyphicon-chevron-right"></span>
+      <i class="fas fa-chevron-right"></i>
     {% endif %}
   </div>
-  <div class="col-md-5">
+  <div class="col-lg-5">
     {% if not contact.entity.is_single_contact %}
     <div class="logo-container">
       <img {{contact.entity.get_logo_center_style}} class="contact-entity-logo" src="{{contact.entity.get_safe_logo}}">
@@ -55,41 +55,41 @@
 
 {% block section_data %}
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-lg-4">
     <table class="table">
       {% if contact.birth_date %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Birth date' %}" class="glyphicon glyphicon-calendar"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Birth date' %}" class="fas fa-calendar"></i>
         {{ contact.birth_date|date:"d/m/Y" }}
       </td></tr>
       {% endif %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="glyphicon glyphicon-envelope"></span>
-        {{contact.get_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Address' %}" class="fas fa-envelope"></i>
+        {{contact.get_address_fields|join:'<br /><i class="fas fa-envelope" style="color:transparent"></i> '}}
       </td></tr>
       {% if contact.has_billing_address %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="glyphicon glyphicon-euro"></span>
-        {{contact.get_billing_address_fields|join:'<br /><span class="glyphicon glyphicon-envelope" style="color:transparent"></span> '}}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="fas fa-euro-sign"></i>
+        {{contact.get_billing_address_fields|join:'<br /><i class="fas fa-envelope" style="color:transparent"></i> '}}
       </td></tr>
       {% endif %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="glyphicon glyphicon-send"></span> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Email' %}" class="fas fa-paper-plane"></i> <a href="mailto:{{contact.get_email}}">{{contact.get_email}}</a>
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="glyphicon glyphicon-earphone"></span> {{contact.get_phone}}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Phone' %}" class="fas fa-phone-alt"></i> {{contact.get_phone}}
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Mobile' %}" class="glyphicon glyphicon-phone"></span> {{contact.mobile}}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Mobile' %}" class="fas fa-mobile-alt"></i> {{contact.mobile}}
       </td></tr>
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Job' %}" class="glyphicon glyphicon-briefcase"></span> {{contact.job}}
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Job' %}" class="fas fa-briefcase"></i> {{contact.job}}
       </td></tr>
 
       {% with contact.get_roles as roles %}
       {% if roles %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Roles' %}" class="glyphicon glyphicon-film"></span>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Roles' %}" class="fas fa-film"></i>
         {{ roles|join:", " }}
       </td></tr>
       {% endif %}
@@ -97,14 +97,14 @@
 
       {% if contact.favorite_language %}
       <tr><td>
-        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Favorite language' %}" class="glyphicon glyphicon-globe"></span>
+        <span data-toggle="tooltip" data-placement="bottom" title="{% trans 'Favorite language' %}" class="fas fa-globe"></span>
         {{contact.get_favorite_language_display}}
       </td></tr>
       {% endif %}
     </table>
   </div>
   
-  <div class="col-md-6">
+  <div class="col-lg-6">
     
     <div class="note" style="margin-bottom: 5px;">
       
@@ -125,7 +125,7 @@
     
   </div>
   
-  <div class="col-md-2">
+  <div class="col-lg-2">
     <table class="table micro-table table-striped">
       {% if contact.has_left %}
       <tr><td colspan="2"><b>{% trans "This contact has left." %}</b></td></tr>
@@ -141,12 +141,12 @@
 </div>
 {% endblock %}
 
-{% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span> {% trans "Update" %}{% endblock %}
+{% block section_menu_name %}<i class="fas fa-cog"></i> {% trans "Update" %}{% endblock %}
 
 {% block section_buttons %}
-    <li><a class="colorbox-form" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
-    <li><a class="colorbox-form" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
-    <li><a class="colorbox-form" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_edit_contact' contact.id %}">{% trans "Edit" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_delete_contact' contact.id%}">{% trans "Delete" %}</a></li>
+    <li><a class="colorbox-form dropdown-link" href="{% url 'crm_change_contact_entity' contact.id%}">{% trans "Reassign" %}</a></li>
 {% endblock %}
 
 {% block section_favorite %}

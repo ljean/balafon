@@ -142,12 +142,12 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].text.strip(), menu2.label)
         self.assertEqual(li_tags[0].a['target'], '_blank')
         self.assertEqual(li_tags[0].a['href'], reverse('crm_delete_action', args=[action.id]))
-        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu2.icon)])
+        self.assertEqual(li_tags[0].a.i['class'], ['fas', 'fa-{0}'.format(menu2.icon)])
 
         self.assertEqual(li_tags[1].text.strip(), menu1.label)
         self.assertEqual(li_tags[1].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[1].a['href'], reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(li_tags[1].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+        self.assertEqual(li_tags[1].a.i['class'], ['fas', 'fa-{0}'.format(menu1.icon)])
 
     def test_action_menu_status(self):
         """test custom menus are displayed"""
@@ -190,7 +190,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
         self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+        self.assertEqual(li_tags[0].a.i['class'], ['fas', 'fa-{0}'.format(menu1.icon)])
 
     def test_action_menu_status_ony_empty(self):
         """test custom menus are displayed"""
@@ -231,7 +231,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
         self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+        self.assertEqual(li_tags[0].a.i['class'], ['fas', 'fa-{0}'.format(menu1.icon)])
 
     def test_action_menu_one_not_set(self):
         """test custom menus are displayed only for associated types"""
@@ -266,7 +266,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
         self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], reverse('crm_do_action', args=[action.id]))
-        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+        self.assertEqual(li_tags[0].a.i['class'], ['fas', 'fa-{0}'.format(menu1.icon)])
 
     def test_action_menu_no_type(self):
         """test action is displayed if no type defined"""
@@ -331,7 +331,7 @@ class ActionMenuTest(BaseTestCase):
         self.assertEqual(li_tags[0].text.strip(), menu1.label)
         self.assertEqual(li_tags[0].a['class'], ['colorbox-form'])
         self.assertEqual(li_tags[0].a['href'], '')
-        self.assertEqual(li_tags[0].a.span['class'], ['glyphicon', 'glyphicon-{0}'.format(menu1.icon)])
+        self.assertEqual(li_tags[0].a.i['class'], ['fas', 'fa-{0}'.format(menu1.icon)])
 
 
 class CloneActionTest(BaseTestCase):

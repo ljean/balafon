@@ -3,10 +3,10 @@
 <head lang="{{ LANGUAGE_CODE }}">
   <meta charset="UTF-8">
   <title></title>
-  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}bs4/css/bootstrap.css" />
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
-  <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}bs4/js/bootstrap.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/moment/moment.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-messages/angular-messages.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -744,26 +744,26 @@
 
       <div ng-hide="app.isPdf" class="badges">
         <div class="badge badge-inactive" ng-show="app.isReadOnly && !app.isPublic">
-          <span class="glyphicon glyphicon-eye-open"></span> {{ 'READ_ONLY' | translate }}
+          <i class="fas fa-eye"></i> {{ 'READ_ONLY' | translate }}
         </div>
 
         <div class="badge" ng-show="app.action.mail_to && !app.isPublic">
           <a href="{{app.action.mail_to}}">
-            <span class="glyphicon glyphicon-envelope"></span> {{ 'SEND_BY_MAIL' | translate}}
+            <i class="fas fa-envelope"></i> {{ 'SEND_BY_MAIL' | translate}}
           </a>
         </div>
 
         <div class="badge" ng-repeat="entity in app.action.entities" ng-show="!app.isPublic">
           <a href="{{ entity.get_view_url }}">
-            <span class="glyphicon glyphicon-tower"></span> {{ entity.name }}
+            <i class="fas fa-cog"></i> {{ entity.name }}
           </a>
         </div>
 
         <div class="badge" ng-repeat="contact in app.action.contacts" ng-show="!app.isPublic">
           <a href="{{ contact.get_view_url }}">
-            <span class="glyphicon glyphicon-user"></span> {{ contact.fullname }}
+            <i class="fas fa-user"></i> {{ contact.fullname }}
             <a ng-show="contact.email" href="mailto:{{contact.email}}">
-              <span class="glyphicon glyphicon-envelope"></span>
+              <i class="fas fa-envelope"></i>
             </a>
           </a>
         </div>
@@ -780,22 +780,22 @@
               {% endif %}
             {% endif %}
             {% verbatim %}
-            <span class="glyphicon glyphicon-download-alt"></span> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
+            <i class="fas fa-download"></i> {{ 'DOWNLOAD_AS_PDF' | translate }}</a>
         </div>
 
         {% endverbatim %}{% block extra_badges %}{% endblock %}{% verbatim %}
       </div>
 
       <div class="content">
-        <div class="row"><div class="col-md-12">
+        <div class="row"><div class="col-xl-12">
           <div class="header">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               {% endverbatim %}{% block header %}{% endblock %}{% verbatim %}
             </div></div>
           </div>
 
           <div class="doc-header">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               <div class="action-date">{{ app.action.planned_date|date }}</div>
               <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
               <div class="action-subject">{{ app.action.subject }}</div>
@@ -805,7 +805,7 @@
 
           <div class="contacts">
             <div ng-repeat="entity in app.action.entities" class="entity">
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div>
                   {{ entity.name }}
                 </div>
@@ -826,7 +826,7 @@
               </div></div>
             </div>
             <div ng-repeat="contact in app.action.contacts" class="contact">
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div>
                   {{ contact.fullname }}
                 </div>
@@ -850,20 +850,20 @@
 
           <div class="sale_items">
             <div>
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <form role="form" class="form" name="editForm">
                 <table class="table table-bordered">
                   <tr>
                     <th>
                       {{ 'LABEL' | translate }}
-                      <div ng-show="allowEdit" class="pull-right">
+                      <div ng-show="allowEdit" class="float-right">
                         <div class="show-on-hover">
-                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
-                            <span class="glyphicon glyphicon-plus"></span>
+                          <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
+                            <i class="fas fa-plus"></i>
                           </a>
 
-                          <a href ng-hide="editMode" class="btn btn-xs btn-default" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
-                            <span class="glyphicon glyphicon-resize-vertical"></span>
+                          <a href ng-hide="editMode" class="btn btn-xs btn-outline-secondary" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
+                            <i class="fas fa-arrows-alt-v"></i>
                           </a>
                         </div>
                       </div>
@@ -922,19 +922,19 @@
                 </form>
               </div></div>
 
-              <div class="row"><div class="col-md-12">
+              <div class="row"><div class="col-xl-12">
                 <div class="alert alert-danger" role="alert" ng-show="editMode && formErrors">
                   {{ formErrors }}
                 </div>
 
-                <div ng-show="allowEdit" class="pull-right">
+                <div ng-show="allowEdit" class="float-right">
 
-                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="saveEdit()">
-                    <span class="glyphicon glyphicon-ok"></span> {{ 'OK' | translate }}
+                  <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="saveEdit()">
+                    <i class="fas fa-check"></i> {{ 'OK' | translate }}
                   </a>
 
-                  <a href ng-show="editMode" class="btn btn-sm btn-default" ng-click="cancelEdit()">
-                    <span class="glyphicon glyphicon-remove"></span> {{ 'CANCEL' | translate }}
+                  <a href ng-show="editMode" class="btn btn-sm btn-outline-secondary" ng-click="cancelEdit()">
+                    <i class="fas fa-times"></i> {{ 'CANCEL' | translate }}
                   </a>
                 </div>
               </div></div>
@@ -948,7 +948,7 @@
           </div>
 
           <div class="doc-footer">
-            <div class="row"><div class="col-md-12">
+            <div class="row"><div class="col-xl-12">
               {% endverbatim %}{% block footer %}{{ references_text|safe }}{% endblock %}{% verbatim %}
             </div></div>
           </div>
@@ -970,7 +970,7 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-xl-6">
                 <input
                   class="form-control"
                   ng-model="selectedItem"
@@ -983,9 +983,9 @@
                   name="item"
                   required
                 />
-                <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+                <i ng-show="loading" class="fas fa-sync-alt"></i>
               </div>
-              <div class="col-md-6">
+              <div class="col-xl-6">
                 <div ng-show="selectedItem.name" class="selected-item-details">
                   <div>{{ selectedItem.category.name }}</div>
                   <div ng-if="selectedItem.accounting_code">{{ selectedItem.accounting_code }}</div>

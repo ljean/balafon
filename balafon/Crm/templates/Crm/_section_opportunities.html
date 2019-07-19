@@ -2,7 +2,7 @@
 {% load i18n favorite_tags %}
 
 {% block section_title %}
-  <span class="glyphicon glyphicon-tag"></span> {% trans "Opportunities" %}
+  <i class="fas fa-tag"></i> {% trans "Opportunities" %}
 {% endblock %}
   
 {% block section_data %}
@@ -33,8 +33,8 @@
     <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
     
     <td>
-      <a class="btn btn-xs btn-default pull-right" href="{% url "crm_view_opportunity" o.id %}">
-        <span class="glyphicon glyphicon-tag"></span>
+      <a class="btn btn-xs btn-outline-secondary float-right" href="{% url "crm_view_opportunity" o.id %}">
+        <i class="fas fa-tag"></i>
         {%  trans "View" %}
       </a>
     </td>
@@ -47,14 +47,13 @@
 
 
 {% block section_menu_name %}
-  <span class="glyphicon glyphicon-plus"></span> {% trans "Add" %}
+  <i class="fas fa-plus"></i> {% trans "Add" %}
 {% endblock %}
 
 {% block section_buttons %}
   {% if not entity and not contact %}
-  <li><a class="colorbox-form" href="{% url "crm_add_opportunity" %}">
-    <span class="glyphicon glyphicon-tag"></span>
+  <a class="colorbox-form dropdown-item dropdown-link" href="{% url "crm_add_opportunity" %}">
+    <i class="fas fa-tag"></i>
     {% trans "New opportunity" %}</a>
-  </li>
   {% endif %}
 {% endblock %}
