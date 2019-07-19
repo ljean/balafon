@@ -29,7 +29,7 @@
       </td></tr>
       {% if entity.has_billing_address %}
       <tr><td>
-        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="fas fa-euro"></i>
+        <i data-toggle="tooltip" data-placement="bottom" title="{% trans 'Billing address' %}" class="fas fa-euro-sign"></i>
         {{ entity.get_billing_address_fields|join:'<br /><i class="fas fa-envelope" style="color:transparent"></i> ' }}
       </td></tr>
       {% endif %}

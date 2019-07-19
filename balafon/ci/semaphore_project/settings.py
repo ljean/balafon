@@ -24,11 +24,11 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'test_db',
-        'USER': 'runner',
-        'PASSWORD': 'semaphoredb',
+        'NAME': 'graineopain',
+        'USER': 'postgres',
+        'PASSWORD': 'lynxlynx',
         'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PORT': '',
     }
 }
 
