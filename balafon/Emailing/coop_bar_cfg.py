@@ -6,13 +6,13 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from coop_bar.utils import make_link
+from coop_bar.utils import make_link, make_link_balafon
 
 
 def balafon_homepage(request, context):
     """back to balafon homepage"""
     if request and request.user.is_authenticated() and request.user.is_staff:
-        return make_link(
+        return make_link_balafon(
             reverse("balafon_homepage"),
             _('Balafon'),
             'img/balafon-icon.png',
@@ -26,7 +26,7 @@ def back_to_newsletters(request, context):
         return make_link(
             reverse("emailing_newsletter_list"),
             _('Back to newsletters'),
-            'fugue/table--arrow.png',
+            'table',
             classes=['icon', 'alert_on_click']
         )
 
