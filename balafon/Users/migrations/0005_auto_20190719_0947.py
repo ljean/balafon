@@ -9,97 +9,137 @@ def change_glyph_into_fontawesome(apps, schema_editor):
     """Assign the Internet AalysisCode to all existing sales"""
     custom_menu_class = apps.get_model("Users", "CustomMenu")
     custom_menu_item_class = apps.get_model("Users", "CustomMenuItem")
-
-    custom_menu_compta = custom_menu_class.objects.get(label="Compta")
-    custom_menu_compta_item = custom_menu_item_class.objects.get(parent=custom_menu_compta)
-
-    if custom_menu_compta_item.icon == "euro":
-        custom_menu_compta_item.icon = "euro-sign"
-        custom_menu_compta_item.save()
-
-    custom_menu_imprimer = custom_menu_class.objects.get(label="Imprimer")
-    custom_menu_imprimer_item = custom_menu_item_class.objects.filter(parent=custom_menu_imprimer)
-
-    for item in custom_menu_imprimer_item:
-        if item.icon == "euro":
-            item.icon = "euro-sign"
-            item.save()
-
-    custom_menu_epicerie = custom_menu_class.objects.get(label="Epicerie")
-    custom_menu_epicerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_epicerie)
-
-    for item in custom_menu_epicerie_item:
-        if item.icon == "euro":
-            item.icon = "euro-sign"
-            item.save()
-
-    custom_menu_boulangerie = custom_menu_class.objects.get(label="Boulangerie")
-    custom_menu_boulangerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_boulangerie)
-
-    for item in custom_menu_boulangerie_item:
-        if item.icon == "euro":
-            item.icon = "euro-sign"
-            item.save()
     
-        elif item.icon == "grain":
-            item.icon = "wheat"
-            item.save()
+    try:
+        custom_menu_compta = custom_menu_class.objects.get(label="Compta")
+        custom_menu_compta_item = custom_menu_item_class.objects.get(parent=custom_menu_compta)
 
-    custom_menu_fruits = custom_menu_class.objects.get(label="Fruits")
-    custom_menu_fruits_item = custom_menu_item_class.objects.filter(parent=custom_menu_fruits)
+        if custom_menu_compta_item.icon == "euro":
+            custom_menu_compta_item.icon = "euro-sign"
+            custom_menu_compta_item.save()
+            
+    except:
+        pass
+    
+    try:
+        custom_menu_imprimer = custom_menu_class.objects.get(label="Imprimer")
+        custom_menu_imprimer_item = custom_menu_item_class.objects.filter(parent=custom_menu_imprimer)
+    
+        for item in custom_menu_imprimer_item:
+            if item.icon == "euro":
+                item.icon = "euro-sign"
+                item.save()
+                
+    except:
+        pass
 
-    for item in custom_menu_fruits_item:
-        if item.icon == "apple":
-            item.icon = "apple-alt"
-            item.save()
+    try:
+        custom_menu_epicerie = custom_menu_class.objects.get(label="Epicerie")
+        custom_menu_epicerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_epicerie)
+    
+        for item in custom_menu_epicerie_item:
+            if item.icon == "euro":
+                item.icon = "euro-sign"
+                item.save()
+
+    except:
+        pass
+    
+    try:
+        custom_menu_boulangerie = custom_menu_class.objects.get(label="Boulangerie")
+        custom_menu_boulangerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_boulangerie)
+    
+        for item in custom_menu_boulangerie_item:
+            if item.icon == "euro":
+                item.icon = "euro-sign"
+                item.save()
+        
+            elif item.icon == "grain":
+                item.icon = "wheat"
+                item.save()
+
+    except:
+        pass
+    
+    try:
+        custom_menu_fruits = custom_menu_class.objects.get(label="Fruits")
+        custom_menu_fruits_item = custom_menu_item_class.objects.filter(parent=custom_menu_fruits)
+    
+        for item in custom_menu_fruits_item:
+            if item.icon == "apple":
+                item.icon = "apple-alt"
+                item.save()
+                
+    except:
+        pass
 
 def change_fontawesome_into_glyph(apps, schema_editor):
     """Assign the Internet AalysisCode to all existing sales"""
     custom_menu_class = apps.get_model("Users", "CustomMenu")
     custom_menu_item_class = apps.get_model("Users", "CustomMenuItem")
-
-    custom_menu_compta = custom_menu_class.objects.get(label="Compta")
-    custom_menu_compta_item = custom_menu_item_class.objects.get(parent=custom_menu_compta)
-
-    if custom_menu_compta_item.icon == "euro-sign":
-        custom_menu_compta_item.icon = "euro"
-        custom_menu_compta_item.save()
-
-    custom_menu_imprimer = custom_menu_class.objects.get(label="Imprimer")
-    custom_menu_imprimer_item = custom_menu_item_class.objects.filter(parent=custom_menu_imprimer)
     
-    for item in custom_menu_imprimer_item:
-        if item.icon == "euro-sign":
-            item.icon = "euro"
-            item.save()
-
-    custom_menu_epicerie = custom_menu_class.objects.get(label="Epicerie")
-    custom_menu_epicerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_epicerie)
+    try:
+        custom_menu_compta = custom_menu_class.objects.get(label="Compta")
+        custom_menu_compta_item = custom_menu_item_class.objects.get(parent=custom_menu_compta)
     
-    for item in custom_menu_epicerie_item:
-        if item.icon == "euro-sign":
-            item.icon = "euro"
-            item.save()
+        if custom_menu_compta_item.icon == "euro-sign":
+            custom_menu_compta_item.icon = "euro"
+            custom_menu_compta_item.save()
 
-    custom_menu_boulangerie = custom_menu_class.objects.get(label="Boulangerie")
-    custom_menu_boulangerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_boulangerie)
+    except:
+        pass
 
-    for item in custom_menu_boulangerie_item:
-        if item.icon == "euro-sign":
-            item.icon = "euro"
-            item.save()
+    try:
+        custom_menu_imprimer = custom_menu_class.objects.get(label="Imprimer")
+        custom_menu_imprimer_item = custom_menu_item_class.objects.filter(parent=custom_menu_imprimer)
+        
+        for item in custom_menu_imprimer_item:
+            if item.icon == "euro-sign":
+                item.icon = "euro"
+                item.save()
+
+    except:
+        pass
+
+    try:
+        custom_menu_epicerie = custom_menu_class.objects.get(label="Epicerie")
+        custom_menu_epicerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_epicerie)
+        
+        for item in custom_menu_epicerie_item:
+            if item.icon == "euro-sign":
+                item.icon = "euro"
+                item.save()
+
+    except:
+        pass
+
+    try:
+        custom_menu_boulangerie = custom_menu_class.objects.get(label="Boulangerie")
+        custom_menu_boulangerie_item = custom_menu_item_class.objects.filter(parent=custom_menu_boulangerie)
     
-        elif item.icon == "wheat":
-            item.icon = "grain"
-            item.save()
+        for item in custom_menu_boulangerie_item:
+            if item.icon == "euro-sign":
+                item.icon = "euro"
+                item.save()
+        
+            elif item.icon == "wheat":
+                item.icon = "grain"
+                item.save()
 
-    custom_menu_fruits = custom_menu_class.objects.get(label="Fruits")
-    custom_menu_fruits_item = custom_menu_item_class.objects.filter(parent=custom_menu_fruits)
-    
-    for item in custom_menu_fruits_item:
-        if item.icon == "apple-alt":
-            item.icon = "apple"
-            item.save()
+    except:
+        pass
+
+    try:
+        custom_menu_fruits = custom_menu_class.objects.get(label="Fruits")
+        custom_menu_fruits_item = custom_menu_item_class.objects.filter(parent=custom_menu_fruits)
+        
+        for item in custom_menu_fruits_item:
+            if item.icon == "apple-alt":
+                item.icon = "apple"
+                item.save()
+
+    except:
+        pass
 
 class Migration(migrations.Migration):
 
