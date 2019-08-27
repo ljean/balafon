@@ -17,6 +17,6 @@ $(document).bind('cbox_complete', function(){
 {% block title %}{% trans "Update emailing" %}{% endblock %}
 {% block form_url %}{% url "emailing_update_emailing" object.id %}{% endblock %}
 {% block popup_buttons %}
-<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<a href="javascript:$.colorbox.close()" class="btn btn-secondary btn-sm cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="update_emailing" value="{% trans "Update" %}">
 {% endblock %}

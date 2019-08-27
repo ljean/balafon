@@ -21,6 +21,6 @@
 {% block form_url %}{% url "crm_edit_custom_fields" model_name instance.id %}{% endblock %}
 
 {% block popup_buttons %}
-  <input class="btn btn-md btn-primary" type="submit" value="{% trans 'Save' %}" />
-  <a class="btn btn-md btn-outline-secondary cancel_button" href="">{% trans "Cancel" %}</a>
+  <input class="btn btn-md btn-primary btn-sm" type="submit" value="{% trans 'Save' %}" />
+  <a class="btn btn-md btn-secondary btn-sm cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}

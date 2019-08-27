@@ -7,11 +7,14 @@
 <div class="row">
   <div class="col-lg-12">
     {% if contacts %}
-    <table class="table table-responsive table-bordered">
+    <table class="table table-responsive table-bordered" style="display: table">
+	<thead>
       <tr>
         <th{% if not entity %} colspan=2{% endif %}>{% trans "Contact" %}</th>
         <th>{% trans "Job" %}</th><th>{% trans "Roles" %}</th><th>{% trans "Phone" %}</th><th>{% trans "Email" %}</th>
       </tr>
+	</thead>
+	<tbody>
       {% for c in contacts %}
       {% with c.has_left as has_left %}
       <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %} {% if c.main_contact %}main-contact{% endif %} {% if has_left %}has-left{% endif %}">
@@ -43,6 +46,7 @@
       </tr>
       {% endwith %}
       {% endfor %}
+	</tbody>
     </table>
     {% endif %}
   </div>

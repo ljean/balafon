@@ -3,6 +3,6 @@
 {% block title %}{% trans "New emailing" %}{% endblock %}
 {% block form_url %}{% url "search_emailing" %}{% endblock %}
 {% block popup_buttons %}
-<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<a href="javascript:$.colorbox.close()" class="btn btn-secondary btn-sm cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="create_emailing" value="{% trans "Create" %}">
 {% endblock %}
