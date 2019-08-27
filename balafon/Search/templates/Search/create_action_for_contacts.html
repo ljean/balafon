@@ -8,6 +8,6 @@
 {% block title %}{% blocktrans %}Create actions for {{nb_contacts}} contacts{% endblocktrans %}{% endblock %}
 {% block form_url %}{% url "search_create_action_for_contacts" %}{% endblock %}
 {% block popup_buttons %}
-<a href="javascript:$.colorbox.close()" class="cancel_button">{% trans "Cancel" %}</a>
+<a href="javascript:$.colorbox.close()" class="btn btn-secondary btn-sm cancel_button">{% trans "Cancel" %}</a>
 <input type="submit" name="create_actions" value="{% trans "Create" %}">
 {% endblock %}

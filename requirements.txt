@@ -6,7 +6,7 @@ beautifulsoup4
 django-wkhtmltopdf
 xlwt
 xlrd
-django-modeltranslation
+django-modeltranslation==0.13.3
 django-recaptcha2
 django-registration
 model_mommy

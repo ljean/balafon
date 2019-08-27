@@ -1,10 +1,10 @@
 {% load i18n balafon_utils %}
 {% if action.type %}
-  <div class="label label-default">
+  <div class="label label-default badge badge-font-size">
     {{ action.type }} {% if action.number %}{% trans "N°" %} {{action.number }} {% endif %}
   </div>&nbsp;
 {% else %}
-  {% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
+  {% if action.number %}<div class="label label-default badge badge-font-size">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
 {% endif %}
 {% if action.status %}
   <a
@@ -25,4 +25,4 @@
     {{action.status2}}
   </a>&nbsp;
 {% endif %}
-{% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}
+{% if action.amount %}<div class="label label-default badge badge-font-size">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}

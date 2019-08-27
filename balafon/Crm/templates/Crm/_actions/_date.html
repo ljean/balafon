@@ -1,5 +1,5 @@
 {% load i18n balafon_utils %}
-<div class="label label-date {{ action|get_action_date_label }}"
+<div class="label label-date {{ action|get_action_date_label }} badge badge-font-size"
      data-toggle="tooltip" data-placement="top"
      title="{% trans 'Creation date' %}: {{ action.created|date:'d/m/Y H:i' }}{% if action.created_by %} {% trans "by" %} {{ action.created_by }}{% endif %}">
   {% if action.planned_date %}
