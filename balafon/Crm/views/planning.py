@@ -13,6 +13,7 @@ from django.http import Http404, HttpResponse
 from django.views.generic import RedirectView
 from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.generic import ListView
 
 from balafon.Crm import models
@@ -52,13 +53,27 @@ class ActionArchiveView(object):
         """return actions displayed by this page. The date is managed by each Archive"""
         return models.Action.objects.all().order_by("planned_date", "priority")
 
+    def get_ordering(self):
+        return (
+            (1, _("Ascending"), ("planned_date", "id")),
+            (0, _("Descending"), ("-planned_date", "-id")),
+            (2, _("Contact"), ("contacts__lastname", "planned_date", "id")),
+            (3, _("Entity"), ("entities__name", "planned_date", "id")),
+        )
+
+    def order_queryset(self, queryset, ordering):
+
+        for value, label, lookup in self.get_ordering():
+            if value == ordering:
+                queryset = queryset.order_by(*lookup)
+        return queryset
+
     def get_queryset(self):
         """queryset ob objects"""
         values = self.request.GET.get("filter", None)
         queryset = self._get_queryset()
         if values and values != "null":
             values_dict = self._get_selection(values)
-
             selected_types = values_dict.get("t", [])
             if selected_types:
                 if 0 in selected_types:
@@ -85,18 +100,13 @@ class ActionArchiveView(object):
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
 
-            # Ordering
-            actions_ordering = values_dict.get("o", [1])
-            if actions_ordering == [0]:
-                queryset = queryset.order_by("-planned_date", "-id")
-            elif actions_ordering == [1]:
-                queryset = queryset.order_by("planned_date", "id")
-            elif actions_ordering == [2]:
-                # Order by contact
-                queryset = queryset.order_by("contacts__lastname", "planned_date", "id")
-            elif actions_ordering == [3]:
-                # Order by contact
-                queryset = queryset.order_by("entities__name", "planned_date", "id")
+            ordering = self.get_ordering()[0][0]
+            list_ordering = values_dict.get("o", [])
+            try:
+                ordering = list_ordering[0]
+            except IndexError:
+                pass
+            queryset = self.order_queryset(queryset, ordering)
 
         return queryset
 
@@ -117,7 +127,7 @@ class ActionArchiveView(object):
         action_status = []
         in_charge = get_in_charge_users()
         values = self.request.GET.get("filter", None)
-        ordering = "asc"
+        ordering = self.get_ordering()[0][0]
         if values and values != "null":
             context["filter"] = values
             values_dict = self._get_selection(values)
@@ -143,15 +153,11 @@ class ActionArchiveView(object):
                 if status.id in selected_status:
                     setattr(status, 'selected', True)
 
-            actions_ordering = values_dict.get("o", [1])
-            if actions_ordering == [0]:
-                ordering = "desc"
-            elif actions_ordering == [1]:
-                ordering = "asc"
-            elif actions_ordering == [2]:
-                ordering = "contact"
-            elif actions_ordering == [3]:
-                ordering = "entity"
+            list_ordering = values_dict.get("o", [])
+            try:
+                ordering = list_ordering[0]
+            except IndexError:
+                pass
 
         if HAS_CUSTOM_MENU:
             context['planning_custom_menus'] = [
@@ -162,7 +168,8 @@ class ActionArchiveView(object):
         context["in_charge"] = in_charge
         context["action_status"] = action_status
         context["planning_type"] = self.planning_type
-        context["ordering"] = ordering
+        context["order_value"] = "o{0}".format(ordering)
+        context["order_values"] = [("o{0}".format(index), label) for (index, label, lookup) in self.get_ordering()]
 
         return context
 
