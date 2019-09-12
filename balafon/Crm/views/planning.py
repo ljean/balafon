@@ -59,12 +59,12 @@ class ActionArchiveView(object):
         if ordering:
             return ordering
         else:
-        return (
-            (1, _("Ascending"), ("planned_date", "id")),
-            (0, _("Descending"), ("-planned_date", "-id")),
-            (2, _("Contact"), ("contacts__lastname", "planned_date", "id")),
-            (3, _("Entity"), ("entities__name", "planned_date", "id")),
-        )
+            return (
+                (1, _("Ascending"), ("planned_date", "id")),
+                (0, _("Descending"), ("-planned_date", "-id")),
+                (2, _("Contact"), ("contacts__lastname", "planned_date", "id")),
+                (3, _("Entity"), ("entities__name", "planned_date", "id")),
+            )
 
     def order_queryset(self, queryset, ordering):
 
