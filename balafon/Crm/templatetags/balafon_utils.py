@@ -160,3 +160,12 @@ def action_status_date(action, status):
     queryset = ActionStatusTrack.objects.filter(action=action, status=status).order_by('-datetime')
     if queryset.count():
         return queryset[0].datetime
+
+
+@register.filter
+def get_cf_value(contact_or_entity, custom_field_name):
+    """return date"""
+    try:
+        return getattr(contact_or_entity, 'custom_field_' + custom_field_name, "")
+    except:
+        return ""
