@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
@@ -556,6 +557,34 @@ class ActionArchiveTest(BaseTestCase):
 
         actions = [
             action4, action3, action5, action1, action2
+        ]
+
+        subjects = [action.subject for action in actions]
+        for subject in subjects:
+            self.assertContains(response, subject)
+        content = response.content.decode('utf-8')
+        pos = [content.find(subject) for subject in subjects]
+        self.assertEqual(pos, list(sorted(pos)))
+
+    @override_settings(BALAFON_PLANNING_ORDERING=[(5, 'Custom', (('subject', )))])
+    def test_action_type_ordering_custom(self):
+        """view actions of the month incharge filter"""
+        now = datetime(2016, 10, 10, 12, 0)
+
+        action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=now + timedelta(days=1))
+        action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=now + timedelta(days=2))
+        action3 = mommy.make(models.Action, subject="#ACT3#", planned_date=now - timedelta(days=1))
+        action4 = mommy.make(models.Action, subject="#ACT4#", planned_date=now - timedelta(days=3))
+        action5 = mommy.make(models.Action, subject="#ACT5#", planned_date=now)
+
+        url = reverse(
+            'crm_actions_of_month', args=[now.year, now.month]
+        ) + "?filter=o5"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        actions = [
+            action1, action2, action3, action4, action5
         ]
 
         subjects = [action.subject for action in actions]

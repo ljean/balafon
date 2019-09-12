@@ -18,6 +18,7 @@ from django.views.generic import ListView
 
 from balafon.Crm import models
 from balafon.Crm.utils import get_in_charge_users
+from balafon.settings import get_planning_ordering
 from balafon.permissions import can_access
 try:
     from balafon.Users.models import CustomMenu
@@ -54,6 +55,10 @@ class ActionArchiveView(object):
         return models.Action.objects.all().order_by("planned_date", "priority")
 
     def get_ordering(self):
+        ordering = get_planning_ordering()
+        if ordering:
+            return ordering
+        else:
         return (
             (1, _("Ascending"), ("planned_date", "id")),
             (0, _("Descending"), ("-planned_date", "-id")),

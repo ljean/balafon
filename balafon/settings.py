@@ -97,3 +97,9 @@ def is_profile_installed():
     """returns True of balafon Profile is installed"""
     installed_apps = getattr(settings, 'INSTALLED_APPS', [])
     return 'balafon.Profile' in installed_apps
+
+
+def get_planning_ordering():
+    """returns True of balafon Profile is installed"""
+    return getattr(settings, 'BALAFON_PLANNING_ORDERING', [])
+
