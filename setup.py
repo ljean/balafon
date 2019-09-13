@@ -27,7 +27,7 @@ setup(
         'django-extensions',
         'apidev-coop_cms >= 1.3.9, < 1.4',
         'apidev-coop_colorbox >= 1.4.1, < 1.5',
-        'apidev-coop_bar >= 1.3.2, < 1.4',
+        'apidev-coop_bar >= 1.4.1, < 1.5',
         'coop_html_editor >= 1.2.1, < 1.3',
         'beautifulsoup4',
         'django-wkhtmltopdf',
