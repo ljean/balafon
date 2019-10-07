@@ -648,7 +648,7 @@ def mailto_action(request, action_id):
     if action.uuid and hasattr(action, 'sale'):
         try:
             url = reverse('store_view_sales_document_public', args=[action.uuid])
-            prefix = "http{0}://".format('s' if request.is_secure else '')
+            prefix = "http{0}://".format('s' if request.is_secure() else '')
             doc_url = prefix + Site.objects.get_current().domain + url
         except ObjectDoesNotExist:
             pass
