@@ -1016,7 +1016,7 @@ class MailtoActionTest(TestCase):
         user.save()
         self.client.login(username=user.username, password='abc')
 
-    def test_mailto_to_action_body(self):
+    def test_mailto_to_action_body_https(self):
 
         action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
         mommy.make(models.StoreManagementActionType, action_type=action_type)
@@ -1040,7 +1040,35 @@ class MailtoActionTest(TestCase):
 
         url = reverse("crm_mailto_action", args=[action.id])
         self.assertEqual(action.mail_to, url)
-        response = self.client.get(url)
+        response = self.client.get(url, secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body={0}".format(expected_body))
+
+    def test_mailto_to_action_body_http(self):
+
+        action_type = mommy.make(ActionType, mail_to_subject='', generate_uuid=True, name='Doc')
+        mommy.make(models.StoreManagementActionType, action_type=action_type)
+
+        action = mommy.make(Action, type=action_type, subject='Test')
+
+        contact = mommy.make(Contact, email='toto@toto.fr', lastname='Doe', firstname='John')
+        action.contacts.add(contact)
+        action.save()
+
+        self.assertNotEqual(action.uuid, '')
+        url = reverse('store_view_sales_document_public', args=[action.uuid])
+
+        expected_body = "Here is a link to your document: http://example.com{0}".format(url).replace(' ', '%20')
+
+        mommy.make(
+            MailtoSettings,
+            body_template="Here is a link to your document: {{ doc_url }}",
+            action_type=action_type
+        )
+
+        url = reverse("crm_mailto_action", args=[action.id])
+        self.assertEqual(action.mail_to, url)
+        response = self.client.get(url, secure=False)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], "mailto:toto@toto.fr?subject=Test&body={0}".format(expected_body))
 
