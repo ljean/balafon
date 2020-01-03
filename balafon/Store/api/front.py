@@ -33,7 +33,7 @@ class CanAccessStorePermission(permissions.BasePermission):
         """check permission"""
 
         # Allow authenticated users
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return True
 
         # Allow anonymous user if settings
@@ -74,7 +74,7 @@ class StoreItemViewSet(viewsets.ModelViewSet):
         contact = None
         if is_profile_installed():
             try:
-                if self.request.user.is_authenticated():
+                if self.request.user.is_authenticated:
                     profile = ContactProfile.objects.get(user=self.request.user)
                     contact = profile.contact
             except ContactProfile.DoesNotExist:

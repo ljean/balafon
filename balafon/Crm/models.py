@@ -67,7 +67,7 @@ class LastModifiedModel(TimeStampedModel):
         current_user = None
         try:
             request = RequestManager().get_request()
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 # object can be modified by anonymous user : subscription page for example, view magic-link ...
                 current_user = request.user
         except (RequestNotFound, AttributeError):

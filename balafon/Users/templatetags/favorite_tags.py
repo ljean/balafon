@@ -16,7 +16,7 @@ register = template.Library()
 def favorite_item(context, object):
     content_type = ContentType.objects.get_for_model(object.__class__)
     user = context['request'].user
-    if user and user.is_authenticated():
+    if user and user.is_authenticated:
         is_in_favorite = Favorite.objects.filter(
             user=context['request'].user,
             content_type=content_type,

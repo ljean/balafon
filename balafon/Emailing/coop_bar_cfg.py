@@ -11,7 +11,7 @@ from coop_bar.utils import make_link
 
 def balafon_homepage(request, context):
     """back to balafon homepage"""
-    if request and request.user.is_authenticated() and request.user.is_staff:
+    if request and request.user.is_authenticated and request.user.is_staff:
         return make_link(
             reverse("balafon_homepage"),
             _('Balafon'),
@@ -22,7 +22,7 @@ def balafon_homepage(request, context):
 
 def back_to_newsletters(request, context):
     """back to balafon newsletters"""
-    if request and request.user.is_authenticated() and request.user.is_staff:
+    if request and request.user.is_authenticated and request.user.is_staff:
         return make_link(
             reverse("emailing_newsletter_list"),
             _('Back to newsletters'),

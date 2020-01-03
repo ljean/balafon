@@ -33,7 +33,7 @@ class SalesDocumentViewMixin(object):
 
     def dispatch(self, *args, **kwargs):
         if not self.is_public:
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 return HttpResponseRedirect(reverse('login'))
         return super(SalesDocumentViewMixin, self).dispatch(*args, **kwargs)
 
