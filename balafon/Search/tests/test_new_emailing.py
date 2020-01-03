@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from unittest import skipIf
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 
 from coop_cms.models import Newsletter

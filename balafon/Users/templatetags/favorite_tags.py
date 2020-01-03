@@ -2,9 +2,9 @@
 
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django import template
+from django.urls import reverse
 
 from balafon.Users.forms import UpdateFavoriteForm
 from balafon.Users.models import Favorite

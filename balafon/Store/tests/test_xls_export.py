@@ -8,7 +8,7 @@ from decimal import Decimal
 import xlrd
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from colorbox.utils import assert_popup_redirects
 from model_mommy import mommy

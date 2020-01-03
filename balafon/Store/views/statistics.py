@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from datetime import datetime, time
 from decimal import Decimal
 
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from balafon.generic import StaffPopupFormView, StaffTemplateView
 from balafon.Crm.models import Action

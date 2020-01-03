@@ -11,8 +11,8 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group, AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail, management
-from django.core.urlresolvers import reverse
 from django.template import Template, Context
+from django.urls import reverse
 from django.utils import timezone
 
 from coop_cms.moves import StringIO

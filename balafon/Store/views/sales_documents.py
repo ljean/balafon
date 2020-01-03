@@ -6,9 +6,9 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.text import slugify
 from django.views.generic import TemplateView
 

@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import logging
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from model_mommy import mommy
 from rest_framework import status
