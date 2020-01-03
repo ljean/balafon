@@ -11,8 +11,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.mail import get_connection, EmailMessage, EmailMultiAlternatives
-from django.core.urlresolvers import reverse
 from django.template.loader import get_template
+from django.urls import reverse
 from django.utils import translation
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language as django_get_language, ugettext as _

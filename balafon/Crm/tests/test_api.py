@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from model_mommy import mommy
 from rest_framework import status

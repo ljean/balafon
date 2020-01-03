@@ -4,12 +4,12 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import python_2_unicode_compatible
 
 from coop_cms.utils import RequestManager, RequestNotFound

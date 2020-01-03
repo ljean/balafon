@@ -12,12 +12,12 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
 from django.forms.utils import flatatt
 from django.template.loader import get_template
 from django.utils.encoding import smart_text
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
+from django.urls import reverse
 
 import floppyforms.__future__ as forms
 from coop_cms.bs_forms import Form as BsForm

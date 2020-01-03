@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import sys
 
 from django.core import management
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from coop_cms.tests import BeautifulSoup
 from coop_cms.moves import StringIO

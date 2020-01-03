@@ -9,11 +9,11 @@ import os.path
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import get_template
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View, TemplateView

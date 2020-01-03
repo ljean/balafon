@@ -5,13 +5,13 @@ from __future__ import unicode_literals
 
 import json
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.models import Site
 from django.db.models import Q, ObjectDoesNotExist
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import Template, Context
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from colorbox.decorators import popup_redirect, popup_reload, popup_close

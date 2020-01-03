@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from model_mommy import mommy
 from coop_cms.models import Newsletter

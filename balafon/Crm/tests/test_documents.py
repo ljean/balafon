@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from coop_cms.settings import is_perm_middleware_installed
 from model_mommy import mommy

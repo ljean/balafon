@@ -7,13 +7,13 @@ from datetime import datetime
 import os.path
 import re
 
-from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.messages import success, error
 from django.db.models import Max
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 

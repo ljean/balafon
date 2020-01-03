@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 from unittest import skipIf
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.core.files import File
+from django.urls import reverse
 
 from coop_cms.models import ArticleCategory, Document
 from model_mommy import mommy

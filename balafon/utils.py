@@ -11,8 +11,8 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, Http404
+from django.urls import resolve, Resolver404
 from django.utils.translation import ugettext as _
 
 from rest_framework.renderers import JSONRenderer

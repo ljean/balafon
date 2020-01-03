@@ -8,8 +8,8 @@ from datetime import date
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import activate
 
 from coop_cms.tests import BeautifulSoup

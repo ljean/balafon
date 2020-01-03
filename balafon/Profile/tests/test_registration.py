@@ -7,9 +7,9 @@ from unittest import skipIf
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from model_mommy import mommy
 from registration.models import RegistrationProfile

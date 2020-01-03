@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime
 
 from django import template
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 
 from balafon.Crm.models import ActionStatusTrack

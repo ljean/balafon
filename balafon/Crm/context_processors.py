@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.db.models import Q
 
 from balafon import VERSION

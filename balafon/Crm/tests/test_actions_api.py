@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from model_mommy import mommy
 from rest_framework import status

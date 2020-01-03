@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from datetime import date
 import os.path
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy

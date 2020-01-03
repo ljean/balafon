@@ -10,9 +10,9 @@ import unicodedata
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import signals
+from django.urls import reverse
 from django.utils.dateformat import DateFormat
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
