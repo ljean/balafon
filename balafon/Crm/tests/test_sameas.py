@@ -818,7 +818,7 @@ class FindSameAsTest(BaseTestCase):
         buf = StringIO()
         sysout = sys.stdout
         sys.stdout = buf
-        management.call_command('find_same_as', verbosity=0, interactive=False, stdout=buf)
+        management.call_command('find_same_as', verbosity=0, stdout=buf)
         buf.seek(0, 0)
         sys.stdout = sysout
         self.assertEqual(2, len(buf.readlines()))
@@ -832,7 +832,7 @@ class FindSameAsTest(BaseTestCase):
         buf = StringIO()
         sysout = sys.stdout
         sys.stdout = buf
-        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        management.call_command('find_same_as', "SameAs", verbosity=0, stdout=buf)
         buf.seek(0, 0)
         sys.stdout = sysout
         self.assertEqual(2, len(buf.readlines()))
@@ -856,7 +856,7 @@ class FindSameAsTest(BaseTestCase):
         buf = StringIO()
         sysout = sys.stdout
         sys.stdout = buf
-        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        management.call_command('find_same_as', "SameAs", verbosity=0, stdout=buf)
         buf.seek(0, 0)
         sys.stdout = sysout
         self.assertEqual(2, len(buf.readlines()))
@@ -879,7 +879,7 @@ class FindSameAsTest(BaseTestCase):
         buf = StringIO()
         sysout = sys.stdout
         sys.stdout = buf
-        management.call_command('find_same_as', "SameAs", verbosity=0, interactive=False, stdout=buf)
+        management.call_command('find_same_as', "SameAs", verbosity=0, stdout=buf)
         buf.seek(0, 0)
         sys.stdout = sysout
         self.assertEqual(2, len(buf.readlines()))
