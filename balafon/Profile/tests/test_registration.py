@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from model_mommy import mommy
-from registration.models import RegistrationProfile
 
 from balafon.unit_tests import TestCase
 from balafon.Crm import models
@@ -22,7 +21,7 @@ from balafon.Crm import models
 @override_settings(BALAFON_REGISTRATION_ENABLED=True)
 class RegisterTestCase(TestCase):
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register(self):
         site = Site.objects.get_current()
         subscription_type1 = mommy.make(models.SubscriptionType, site=site)
@@ -39,19 +38,16 @@ class RegisterTestCase(TestCase):
             'subscription_types': [subscription_type1.id, subscription_type2.id],
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
-
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
+        self.assertEqual(user.is_active, False)
         self.assertEqual(
-            rp.user.contactprofile.subscriptions_ids,
+            user.contactprofile.subscriptions_ids,
             "{0},{1}".format(subscription_type1.id, subscription_type2.id)
         )
-
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        activation_key = response.context["activation_key"]
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -81,10 +77,11 @@ class RegisterTestCase(TestCase):
             0,
             models.Subscription.objects.filter(contact=contact, subscription_type=subscription_type4).count()
         )
-
+        user = User.objects.get(id=user.id)
+        self.assertEqual(user.is_active, True)
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     @override_settings(BALAFON_REGISTRATION_ENABLED=False)
     def test_register_disable(self):
         site = Site.objects.get_current()
@@ -105,7 +102,7 @@ class RegisterTestCase(TestCase):
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 404)
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_no_subscription(self):
         site = Site.objects.get_current()
 
@@ -120,16 +117,12 @@ class RegisterTestCase(TestCase):
             'subscription_types': [],
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
-
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
-        self.assertEqual(rp.user.contactprofile.subscriptions_ids, "")
-
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        self.assertEqual(user.contactprofile.subscriptions_ids, "")
+        activation_key = response.context["activation_key"]
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -147,7 +140,7 @@ class RegisterTestCase(TestCase):
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_one_subscription(self):
         site = Site.objects.get_current()
 
@@ -163,16 +156,12 @@ class RegisterTestCase(TestCase):
             'subscription_types': [subscription_type1.id],
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
-
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
-        self.assertEqual(rp.user.contactprofile.subscriptions_ids, "{0}".format(subscription_type1.id))
-
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        self.assertEqual(user.contactprofile.subscriptions_ids, "{0}".format(subscription_type1.id))
+        activation_key = response.context["activation_key"]
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -195,7 +184,7 @@ class RegisterTestCase(TestCase):
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_activate_invalid_subscription(self):
         site = Site.objects.get_current()
 
@@ -211,19 +200,17 @@ class RegisterTestCase(TestCase):
             'subscription_types': [subscription_type1.id],
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
+        activation_key = response.context["activation_key"]
 
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
-        self.assertEqual(rp.user.contactprofile.subscriptions_ids, "{0}".format(subscription_type1.id))
+        self.assertEqual(user.contactprofile.subscriptions_ids, "{0}".format(subscription_type1.id))
 
-        rp.user.contactprofile.subscriptions_ids = "bla"
-        rp.user.contactprofile.save()
+        user.contactprofile.subscriptions_ids = "bla"
+        user.contactprofile.save()
 
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -246,7 +233,7 @@ class RegisterTestCase(TestCase):
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
-    @skipIf(not ("registration" in settings.INSTALLED_APPS), "registration not installed")
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_no_gender(self):
         url = reverse('registration_register')
         data = {
@@ -255,15 +242,12 @@ class RegisterTestCase(TestCase):
             'password2': 'PAss',
             'accept_termofuse': True,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
-
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
-        self.assertEqual(rp.user.contactprofile.subscriptions_ids, "")
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        self.assertEqual(user.contactprofile.subscriptions_ids, "")
+        activation_key = response.context["activation_key"]
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -276,23 +260,23 @@ class RegisterTestCase(TestCase):
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_with_very_long_email(self):
         url = reverse('registration_register')
         data = {
-            'email': ('a'*30)+'@toto.fr',
+            'email': ('a' * 30) + '@toto.fr',
             'password1': 'PAss',
             'password2': 'PAss',
             'accept_termofuse': True,
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
         user = User.objects.get(email=data['email'])
+        self.assertEqual(user.is_active, False)
+        activation_key = response.context["activation_key"]
 
-        self.assertEqual(RegistrationProfile.objects.count(), 1)
-        rp = RegistrationProfile.objects.all()[0]
-        self.assertEqual(rp.user, user)
-        activation_url = reverse('registration_activate', args=[rp.activation_key])
+        activation_url = reverse('registration_activate', args=[activation_key])
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [data['email']])
@@ -302,9 +286,12 @@ class RegisterTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         contact = models.Contact.objects.get(email=data['email'])
         self.assertEqual(contact.gender, data['gender'])
+        user = User.objects.get(id=user.id)
+        self.assertEqual(user.is_active, True)
 
         self.assertTrue(self.client.login(email=data['email'], password=data['password1']))
 
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_no_password(self):
         url = reverse('registration_register')
         data = {
@@ -314,10 +301,11 @@ class RegisterTestCase(TestCase):
             'accept_termofuse': True,
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
+        response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.filter(email=data['email']).count(), 0)
 
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_different_passwords(self):
         url = reverse('registration_register')
         data = {
@@ -327,10 +315,11 @@ class RegisterTestCase(TestCase):
             'accept_termofuse': True,
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
+        response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.filter(email=data['email']).count(), 0)
 
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_existing_email(self):
         user = mommy.make(models.User, email='toto@toto.fr')
         url = reverse('registration_register')
@@ -341,10 +330,11 @@ class RegisterTestCase(TestCase):
             'accept_termofuse': True,
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
+        response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.exclude(id=user.id).filter(email=data['email']).count(), 0)
 
+    @skipIf(not ("django_registration" in settings.INSTALLED_APPS), "django_registration not installed")
     def test_register_existing_email_different_cases(self):
         user = mommy.make(models.User, email='toto@toto.fr')
         url = reverse('registration_register')
@@ -355,6 +345,6 @@ class RegisterTestCase(TestCase):
             'accept_termofuse': True,
             'gender': 1,
         }
-        response = self.client.post(url, data=data, follow=True)
+        response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.exclude(id=user.id).filter(email=data['email']).count(), 0)

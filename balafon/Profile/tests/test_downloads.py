@@ -62,7 +62,7 @@ class DownloadTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         
         redirect_url = response.redirect_chain[-1][0]
-        login_url = reverse('auth_login')
+        login_url = reverse('login')
         self.assertTrue(redirect_url.find(login_url) >= 0)
         
     def test_download_private_not_in_group(self):

@@ -23,6 +23,7 @@ if getattr(settings, 'BALAFON_NOTIFY_SUBSCRIPTIONS', ''):
 
 localized_patterns = get_url_patterns()
 
+
 urlpatterns = [
     url(r'^crm/$', users_views.user_homepage, name="balafon_homepage"),
 ]
@@ -63,14 +64,11 @@ if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
     urlpatterns += localized_patterns(
         url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
     )
-
     if 'django_registration' in settings.INSTALLED_APPS and 'balafon.Profile' not in settings.INSTALLED_APPS:
         urlpatterns += localized_patterns(
             url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
         )
-
 else:
-
     urlpatterns += localized_patterns(
         url(
             r'^accounts/login/$',
@@ -95,7 +93,6 @@ else:
 urlpatterns += localized_patterns(
     url(r'^accounts/', include('django.contrib.auth.urls'))
 )
-
 
 
 if 'balafon.Profile' in settings.INSTALLED_APPS:

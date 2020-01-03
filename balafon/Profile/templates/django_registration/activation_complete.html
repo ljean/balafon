@@ -1,4 +1,4 @@
-{% extends "registration/base.html" %}{% load i18n %}
+{% extends "django_registration/base.html" %}{% load i18n %}
 {% block registration_content %}
 <h2>{% trans "Your account is now active!" %}</h2>
 <p>{% trans "Now, you can"%} <a href="{% url "login" %}">{% trans "login!" %}</a></p>

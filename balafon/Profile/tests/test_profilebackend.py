@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.core import mail
 
 from model_mommy import mommy
-from registration.models import RegistrationProfile
 
 from balafon.unit_tests import TestCase
 from balafon.Crm import models
@@ -42,7 +41,7 @@ class ProfileBackendTest(TestCase):
     
     def test_create_balafon_contact(self):
         user = self._create_user()
-        RegistrationProfile(user=user, activation_key=RegistrationProfile.ACTIVATED)
+        # RegistrationProfile(user=user, activation_key=RegistrationProfile.ACTIVATED)
         self._create_profile_and_check(user)
         
     def test_create_balafon_contact_no_profile(self):
