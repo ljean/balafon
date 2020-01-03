@@ -64,7 +64,7 @@ if 'coop_cms.apps.email_auth' in settings.INSTALLED_APPS:
         url(r'^accounts/', include('coop_cms.apps.email_auth.urls')),
     )
 
-    if 'registration' in settings.INSTALLED_APPS and 'balafon.Profile' not in settings.INSTALLED_APPS:
+    if 'django_registration' in settings.INSTALLED_APPS and 'balafon.Profile' not in settings.INSTALLED_APPS:
         urlpatterns += localized_patterns(
             url(r'^accounts/', include('coop_cms.apps.email_auth.registration_backend.urls')),
         )

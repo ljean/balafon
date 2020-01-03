@@ -230,7 +230,7 @@ INSTALLED_APPS = (
     'floppyforms',
     'sorl.thumbnail',
     'snowpenguin.django.recaptcha2',
-    'registration',
+    'django_registration',
 
     # externals
     'coop_html_editor',
