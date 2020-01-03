@@ -1784,7 +1784,7 @@ class ActionTest(BaseTestCase):
         data = {
             'subject': "tested", 'type': action_type.id, 'date': "2014-01-31", 'time': "11:34",
             'status': action_status.id, 'in_charge': team_member.id, 'detail': "ABCDEF",
-            'amount': None, 'number': 5
+            'number': 5
         }
 
         url = reverse('crm_edit_action', args=[action.id])
