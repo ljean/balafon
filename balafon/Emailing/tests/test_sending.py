@@ -81,7 +81,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -185,7 +185,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -299,7 +299,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -406,7 +406,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -506,7 +506,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -604,7 +604,7 @@ class SendEmailingTest(BaseTestCase):
             emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
@@ -1071,7 +1071,7 @@ class CustomTemplateTest(BaseTestCase):
         emailing.send_to.add(contact)
         emailing.save()
 
-        management.call_command('emailing_scheduler', verbosity=0, interactive=False)
+        management.call_command('emailing_scheduler', verbosity=0)
 
         emailing = Emailing.objects.get(id=emailing.id)
 
