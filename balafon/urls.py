@@ -72,19 +72,16 @@ else:
     urlpatterns += localized_patterns(
         url(
             r'^accounts/login/$',
-            django_auth_views.login,
-            {'authentication_form': BsAuthenticationForm},
+            django_auth_views.LoginView.as_view(authentication_form=BsAuthenticationForm),
             name='login'
         ),
         url(r'^accounts/password_change/$',
-            django_auth_views.password_change,
-            {'password_change_form': BsPasswordChangeForm},
+            django_auth_views.PasswordChangeView.as_view(form_class=BsPasswordChangeForm),
             name='password_change'
         ),
         url(
             r'^accounts/password_reset/$',
-            django_auth_views.password_reset,
-            {'password_reset_form': BsPasswordResetForm},
+            django_auth_views.PasswordResetView.as_view(form_class=BsPasswordResetForm),
             name='password_reset'
         ),
     )
