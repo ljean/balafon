@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import smart_text
 from django.utils.html import escape, mark_safe
 

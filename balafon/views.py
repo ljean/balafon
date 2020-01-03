@@ -5,10 +5,10 @@ from __future__ import unicode_literals
 import json
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 from balafon.Crm.models import Contact, Entity, Group, Action, Opportunity
 from balafon.Search.models import Search
