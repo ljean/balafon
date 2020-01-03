@@ -67,7 +67,7 @@ class NotifyDueActionsTestCase(BaseTestCase):
         buf = StringIO()
         sysout = sys.stdout
         sys.stdout = buf
-        management.call_command('notify_due_actions', verbosity=verbosity, interactive=False, stdout=buf)
+        management.call_command('notify_due_actions', verbosity=verbosity, stdout=buf)
         buf.seek(0, 0)
         sys.stdout = sysout
         return buf.readlines()
