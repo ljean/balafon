@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='contact',
             name='same_as',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.SameAs', null=True, verbose_name='same as'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.SameAs', null=True, verbose_name='same as', on_delete=models.CASCADE),
         ),
     ]

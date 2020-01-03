@@ -26,11 +26,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='sale',
             name='action',
-            field=models.OneToOneField(to='Crm.Action', verbose_name='action'),
+            field=models.OneToOneField(to='Crm.Action', verbose_name='action', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='sale',
             name='analysis_code',
-            field=models.ForeignKey(default=None, blank=True, to='Store.SaleAnalysisCode', null=True, verbose_name='analysis code'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.SaleAnalysisCode', null=True, verbose_name='analysis code', on_delete=models.CASCADE),
         ),
     ]

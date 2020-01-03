@@ -15,7 +15,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, ugettext
 
@@ -33,7 +33,7 @@ class StoreManagementActionType(models.Model):
     Define if an action type is linked to the store.
     If so it will be possible to link a Sale with an Action of this ActionType
     """
-    action_type = models.OneToOneField(ActionType)
+    action_type = models.OneToOneField(ActionType, on_delete=models.CASCADE)
     template_name = models.CharField(
         default='', blank=True, max_length=100, verbose_name=_('template name'),
         help_text=_('Set the name of a custom template for commercial document')
@@ -162,9 +162,11 @@ class StoreItemCategory(models.Model):
     icon = models.CharField(max_length=20, default="", blank=True)
     parent = models.ForeignKey(
         "StoreItemCategory", default=None, blank=True, null=True, verbose_name=_('parent category'),
-        related_name="subcategories_set"
+        related_name="subcategories_set", on_delete=models.CASCADE
     )
-    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'))
+    price_policy = models.ForeignKey(
+        PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'), on_delete=models.CASCADE
+    )
     default_image = models.ImageField(
         upload_to='storeitemcats', blank=True, default=None, null=True, verbose_name=_('image')
     )
@@ -378,9 +380,9 @@ class StoreItem(models.Model):
     """something than can be buy in this store"""
 
     name = models.CharField(verbose_name=_("name"), max_length=200)
-    category = models.ForeignKey(StoreItemCategory, verbose_name=_("category"))
+    category = models.ForeignKey(StoreItemCategory, verbose_name=_("category"), on_delete=models.CASCADE)
     tags = models.ManyToManyField(StoreItemTag, blank=True, verbose_name=_("tags"))
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"))
+    vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"), on_delete=models.CASCADE)
     pre_tax_price = models.DecimalField(
         verbose_name=_("pre-tax price"), max_digits=11, decimal_places=4
     )
@@ -393,17 +395,25 @@ class StoreItem(models.Model):
     purchase_price = models.DecimalField(
         verbose_name=_("purchase price"), max_digits=9, decimal_places=2, blank=True, default=None, null=True
     )
-    unit = models.ForeignKey(Unit, blank=True, default=None, null=True)
-    brand = models.ForeignKey(Brand, default=None, blank=True, null=True, verbose_name=_('brand'))
+    unit = models.ForeignKey(Unit, blank=True, default=None, null=True, on_delete=models.CASCADE)
+    brand = models.ForeignKey(
+        Brand, default=None, blank=True, null=True, verbose_name=_('brand'), on_delete=models.CASCADE
+    )
     reference = models.CharField(max_length=100, default='', blank=True, verbose_name=_('reference'))
     imported_by = models.ForeignKey(
-        'StoreItemImport', default=None, blank=True, null=True, verbose_name=_('imported by')
+        'StoreItemImport', default=None, blank=True, null=True, verbose_name=_('imported by'), on_delete=models.CASCADE
     )
-    price_policy = models.ForeignKey(PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'))
+    price_policy = models.ForeignKey(
+        PricePolicy, default=None, blank=True, null=True, verbose_name=_('price policy'), on_delete=models.CASCADE
+    )
     available = models.BooleanField(default=True, verbose_name=_('Available'))
     published = models.BooleanField(default=True, verbose_name=_('Published'))
-    supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
-    price_class = models.ForeignKey(PriceClass, default=None, null=True, blank=True, verbose_name=_("price class"))
+    supplier = models.ForeignKey(
+        Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True, on_delete=models.CASCADE
+    )
+    price_class = models.ForeignKey(
+        PriceClass, default=None, null=True, blank=True, verbose_name=_("price class"), on_delete=models.CASCADE
+    )
     certificates = models.ManyToManyField(Certificate, blank=True, verbose_name=_("certificate"))
     only_for_groups = models.ManyToManyField(
         Group, blank=True, verbose_name=_("only for groups"),
@@ -673,7 +683,9 @@ class StoreItemImport(models.Model):
         default='', verbose_name=_('default Brand'), blank=True, max_length=50,
         help_text=_('If defined, it will be used if no brand is given')
     )
-    supplier = models.ForeignKey(Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True)
+    supplier = models.ForeignKey(
+        Supplier, verbose_name=_('Supplier'), blank=True, default=None, null=True, on_delete=models.CASCADE
+    )
     make_available = models.BooleanField(default=False, verbose_name=_('articles will be available if price is set'))
 
     class Meta:
@@ -862,8 +874,8 @@ class StoreItemImport(models.Model):
 @python_2_unicode_compatible
 class StoreItemPropertyValue(models.Model):
     """The value of a property for a given item"""
-    item = models.ForeignKey(StoreItem, verbose_name=_('item'))
-    property = models.ForeignKey(StoreItemProperty, verbose_name=_('property'))
+    item = models.ForeignKey(StoreItem, verbose_name=_('item'), on_delete=models.CASCADE)
+    property = models.ForeignKey(StoreItemProperty, verbose_name=_('property'), on_delete=models.CASCADE)
     value = models.CharField(max_length=100, verbose_name=_('value'), blank=True, default='')
 
     class Meta:
@@ -892,7 +904,9 @@ class DeliveryPoint(models.Model):
 class SaleAnalysisCode(models.Model):
     """Where to get a sale"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    action_type = models.ForeignKey(ActionType, verbose_name=_('action type'), default=None, blank=True, null=True)
+    action_type = models.ForeignKey(
+        ActionType, verbose_name=_('action type'), default=None, blank=True, null=True, on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.name
@@ -906,12 +920,12 @@ class SaleAnalysisCode(models.Model):
 @python_2_unicode_compatible
 class Sale(models.Model):
     """A sale"""
-    action = models.OneToOneField(Action, verbose_name=_("action"))
+    action = models.OneToOneField(Action, verbose_name=_("action"), on_delete=models.CASCADE)
     delivery_point = models.ForeignKey(
-        DeliveryPoint, default=None, blank=True, null=True, verbose_name=_("delivery point")
+        DeliveryPoint, default=None, blank=True, null=True, verbose_name=_("delivery point"), on_delete=models.CASCADE
     )
     analysis_code = models.ForeignKey(
-        SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_("analysis code")
+        SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_("analysis code"), on_delete=models.CASCADE
     )
 
     def get_references_text(self):
@@ -1046,8 +1060,8 @@ class Sale(models.Model):
 
 @python_2_unicode_compatible
 class Favorite(models.Model):
-    user = models.ForeignKey(User, verbose_name=_('user'))
-    item = models.ForeignKey(StoreItem, verbose_name=_('store item'))
+    user = models.ForeignKey(User, verbose_name=_('user'), on_delete=models.CASCADE)
+    item = models.ForeignKey(StoreItem, verbose_name=_('store item'), on_delete=models.CASCADE)
 
     def __str__(self):
         return '{0} - {1}'.format(self.user, self.item)
@@ -1060,17 +1074,19 @@ class Favorite(models.Model):
 @python_2_unicode_compatible
 class SaleItem(models.Model):
     """details about the sold item"""
-    sale = models.ForeignKey(Sale)
-    item = models.ForeignKey(StoreItem, blank=True, default=None, null=True)
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
+    item = models.ForeignKey(StoreItem, blank=True, default=None, null=True, on_delete=models.CASCADE)
     quantity = models.DecimalField(verbose_name=_("quantity"), max_digits=9, decimal_places=2)
-    vat_rate = models.ForeignKey(VatRate, verbose_name=_("VAT rate"), blank=True, null=True, default=None)
+    vat_rate = models.ForeignKey(
+        VatRate, verbose_name=_("VAT rate"), blank=True, null=True, default=None, on_delete=models.CASCADE
+    )
     pre_tax_price = models.DecimalField(verbose_name=_("pre-tax price"), max_digits=11, decimal_places=4)
     text = models.TextField(verbose_name=_("Text"), max_length=3000, default='', blank=True)
     order_index = models.IntegerField(default=0)
     is_blank = models.BooleanField(
         default=False, verbose_name=_('is blank'), help_text=_('displayed as an empty line')
     )
-    discount = models.ForeignKey(Discount, blank=True, null=True, default=None)
+    discount = models.ForeignKey(Discount, blank=True, null=True, default=None, on_delete=models.CASCADE)
     no_quantity = models.BooleanField(
         default=False, verbose_name=_('no quantity'), help_text=_('quantity and unit price are not shown on bill')
     )

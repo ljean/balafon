@@ -16,16 +16,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='action',
             name='created_by',
-            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by'),
+            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='created_by',
-            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by'),
+            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='created_by',
-            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by'),
+            field=models.ForeignKey(related_name='+', default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='created by', on_delete=models.CASCADE),
         ),
     ]

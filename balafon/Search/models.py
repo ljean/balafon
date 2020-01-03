@@ -30,7 +30,7 @@ class Search(TimeStampedModel):
 @python_2_unicode_compatible
 class SearchGroup(models.Model):
     """blocks"""
-    search = models.ForeignKey(Search, verbose_name=_('search'))
+    search = models.ForeignKey(Search, verbose_name=_('search'), on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=100)
     
     def __str__(self):
@@ -44,7 +44,7 @@ class SearchGroup(models.Model):
 @python_2_unicode_compatible
 class SearchField(models.Model):
     """fields"""
-    search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'))
+    search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'), on_delete=models.CASCADE)
     field = models.CharField(_('field'), max_length=100)
     value = models.CharField(_('value'), max_length=200)
     is_list = models.BooleanField(default=False)

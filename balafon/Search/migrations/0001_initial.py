@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('search', models.ForeignKey(verbose_name='search', to='Search.Search')),
+                ('search', models.ForeignKey(verbose_name='search', to='Search.Search', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'search group',
@@ -53,6 +53,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='searchfield',
             name='search_group',
-            field=models.ForeignKey(verbose_name='search group', to='Search.SearchGroup'),
+            field=models.ForeignKey(verbose_name='search group', to='Search.SearchGroup', on_delete=models.CASCADE),
         ),
     ]

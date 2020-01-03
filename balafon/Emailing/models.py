@@ -46,8 +46,8 @@ class Emailing(TimeStampedModel):
         verbose_name = _('Emailing')
         verbose_name_plural = _('Emailings')
 
-    subscription_type = models.ForeignKey(SubscriptionType)
-    newsletter = models.ForeignKey(Newsletter) 
+    subscription_type = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
     send_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_to_be_received")
     sent_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_received")
     opened_emails = models.ManyToManyField(Contact, blank=True, related_name="emailing_opened")
@@ -142,7 +142,7 @@ class MagicLink(models.Model):
         verbose_name = _('Magic link')
         verbose_name_plural = _('Magic links')
 
-    emailing = models.ForeignKey(Emailing)
+    emailing = models.ForeignKey(Emailing, on_delete=models.CASCADE)
     url = models.URLField(max_length=500)
     visitors = models.ManyToManyField(Contact, blank=True)
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)

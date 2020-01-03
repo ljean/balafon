@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('content', models.TextField(default=b'', verbose_name='content', blank=True)),
                 ('template', models.CharField(max_length=200, verbose_name='template')),
-                ('action', models.OneToOneField(to='Crm.Action')),
+                ('action', models.OneToOneField(to='Crm.Action', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -107,9 +107,9 @@ class Migration(migrations.Migration):
                 ('not_assigned_when_cloned', models.BooleanField(default=False, verbose_name='Not assigned when cloned')),
                 ('generate_uuid', models.BooleanField(default=False, verbose_name='Generate UUID for action')),
                 ('allowed_status', models.ManyToManyField(default=None, help_text='Action of this type allow the given status', null=True, to='Crm.ActionStatus', blank=True)),
-                ('default_status', models.ForeignKey(related_name='type_default_status_set', default=None, blank=True, to='Crm.ActionStatus', help_text='Default status for actions of this type', null=True)),
+                ('default_status', models.ForeignKey(related_name='type_default_status_set', default=None, blank=True, to='Crm.ActionStatus', help_text='Default status for actions of this type', null=True, on_delete=models.CASCADE)),
                 ('next_action_types', models.ManyToManyField(to='Crm.ActionType', verbose_name='next action type', blank=True)),
-                ('set', models.ForeignKey(default=None, blank=True, to='Crm.ActionSet', null=True, verbose_name='action set')),
+                ('set', models.ForeignKey(default=None, blank=True, to='Crm.ActionSet', null=True, verbose_name='action set', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order_index', 'name'],
@@ -165,7 +165,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(default=b'', verbose_name='notes', blank=True)),
                 ('has_left', models.BooleanField(default=False, verbose_name='has left')),
                 ('favorite_language', models.CharField(default=b'', max_length=10, verbose_name='favorite language', blank=True, choices=[(b'', 'Par d\xe9faut'), (b'fr', 'Fran\xe7ais'), (b'en', 'English')])),
-                ('billing_city', models.ForeignKey(related_name='contact_billing_set', default=None, blank=True, to='Crm.City', null=True, verbose_name='city')),
+                ('billing_city', models.ForeignKey(related_name='contact_billing_set', default=None, blank=True, to='Crm.City', null=True, verbose_name='city', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('lastname', 'firstname'),
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('value', models.TextField(verbose_name='value')),
-                ('contact', models.ForeignKey(to='Crm.Contact')),
+                ('contact', models.ForeignKey(to='Crm.Contact', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'contact custom field value',
@@ -249,7 +249,7 @@ class Migration(migrations.Migration):
                 ('website', models.CharField(default=b'', max_length=200, verbose_name='web site', blank=True)),
                 ('notes', models.TextField(default=b'', verbose_name='notes', blank=True)),
                 ('is_single_contact', models.BooleanField(default=False, verbose_name='is single contact')),
-                ('billing_city', models.ForeignKey(related_name='entity_billing_set', default=None, blank=True, to='Crm.City', null=True, verbose_name='city')),
+                ('billing_city', models.ForeignKey(related_name='entity_billing_set', default=None, blank=True, to='Crm.City', null=True, verbose_name='city', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('name',),
@@ -262,8 +262,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('value', models.TextField(verbose_name='value')),
-                ('custom_field', models.ForeignKey(verbose_name='custom field', to='Crm.CustomField')),
-                ('entity', models.ForeignKey(to='Crm.Entity')),
+                ('custom_field', models.ForeignKey(verbose_name='custom field', to='Crm.CustomField', on_delete=models.CASCADE)),
+                ('entity', models.ForeignKey(to='Crm.Entity', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'entity custom field value',
@@ -330,7 +330,7 @@ class Migration(migrations.Migration):
                 ('start_date', models.DateField(default=None, null=True, verbose_name='starting date', blank=True)),
                 ('end_date', models.DateField(default=None, null=True, verbose_name='closing date', blank=True)),
                 ('display_on_board', models.BooleanField(default=True, db_index=True, verbose_name='display on board')),
-                ('entity', models.ForeignKey(default=None, blank=True, to='Crm.Entity', null=True)),
+                ('entity', models.ForeignKey(default=None, blank=True, to='Crm.Entity', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'opportunity',
@@ -366,8 +366,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
                 ('modified', django_extensions.db.fields.ModificationDateTimeField(auto_now=True, verbose_name='modified')),
-                ('contact1', models.ForeignKey(related_name='relationships1', verbose_name='contact 1', to='Crm.Contact')),
-                ('contact2', models.ForeignKey(related_name='relationships2', verbose_name='contact 2', to='Crm.Contact')),
+                ('contact1', models.ForeignKey(related_name='relationships1', verbose_name='contact 1', to='Crm.Contact', on_delete=models.CASCADE)),
+                ('contact2', models.ForeignKey(related_name='relationships2', verbose_name='contact 2', to='Crm.Contact', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'relationship',
@@ -390,7 +390,7 @@ class Migration(migrations.Migration):
             name='SameAs',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('main_contact', models.ForeignKey(default=None, blank=True, to='Crm.Contact', null=True)),
+                ('main_contact', models.ForeignKey(default=None, blank=True, to='Crm.Contact', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'same as',
@@ -416,7 +416,7 @@ class Migration(migrations.Migration):
                 ('accept_subscription', models.BooleanField(default=False, help_text='Keep this checked if you want to receive our newsletter.', verbose_name='accept subscription')),
                 ('subscription_date', models.DateTimeField(default=None, null=True, blank=True)),
                 ('unsubscription_date', models.DateTimeField(default=None, null=True, blank=True)),
-                ('contact', models.ForeignKey(to='Crm.Contact')),
+                ('contact', models.ForeignKey(to='Crm.Contact', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -424,7 +424,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('site', models.ForeignKey(blank=True, to='sites.Site', null=True)),
+                ('site', models.ForeignKey(blank=True, to='sites.Site', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Subscription type',
@@ -437,7 +437,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, verbose_name='name')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
-                ('user', models.OneToOneField(null=True, default=None, to=settings.AUTH_USER_MODEL, blank=True, verbose_name='user')),
+                ('user', models.OneToOneField(null=True, default=None, to=settings.AUTH_USER_MODEL, blank=True, verbose_name='user', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'team member',
@@ -450,7 +450,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=200, verbose_name='Name')),
                 ('code', models.CharField(default=b'', max_length=10, verbose_name='code', blank=True)),
-                ('parent', models.ForeignKey(default=None, blank=True, to='Crm.Zone', null=True)),
+                ('parent', models.ForeignKey(default=None, blank=True, to='Crm.Zone', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['name'],
@@ -473,62 +473,62 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='zone',
             name='type',
-            field=models.ForeignKey(to='Crm.ZoneType'),
+            field=models.ForeignKey(to='Crm.ZoneType', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='subscription',
             name='subscription_type',
-            field=models.ForeignKey(to='Crm.SubscriptionType'),
+            field=models.ForeignKey(to='Crm.SubscriptionType', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='relationship',
             name='relationship_type',
-            field=models.ForeignKey(verbose_name='relationship type', to='Crm.RelationshipType'),
+            field=models.ForeignKey(verbose_name='relationship type', to='Crm.RelationshipType', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='opportunity',
             name='status',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.OpportunityStatus', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.OpportunityStatus', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='opportunity',
             name='type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.OpportunityType', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.OpportunityType', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='billing_street_type',
-            field=models.ForeignKey(related_name='entity_billing_set', default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type'),
+            field=models.ForeignKey(related_name='entity_billing_set', default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='city',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='city'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='city', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='imported_by',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.ContactsImport', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.ContactsImport', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='last_modified_by',
-            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by'),
+            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='street_type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='entity',
             name='type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.EntityType', null=True, verbose_name='type'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.EntityType', null=True, verbose_name='type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contactsimport',
             name='entity_type',
-            field=models.ForeignKey(default=None, to='Crm.EntityType', blank=True, help_text='All created entities will get this type. Ignored if the entity already exist.', null=True, verbose_name='entity type'),
+            field=models.ForeignKey(default=None, to='Crm.EntityType', blank=True, help_text='All created entities will get this type. Ignored if the entity already exist.', null=True, verbose_name='entity type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contactsimport',
@@ -538,37 +538,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contactsimport',
             name='imported_by',
-            field=models.ForeignKey(verbose_name='imported by', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(verbose_name='imported by', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contactcustomfieldvalue',
             name='custom_field',
-            field=models.ForeignKey(verbose_name='custom field', to='Crm.CustomField'),
+            field=models.ForeignKey(verbose_name='custom field', to='Crm.CustomField', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='billing_street_type',
-            field=models.ForeignKey(related_name='contact_billing_set', default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type'),
+            field=models.ForeignKey(related_name='contact_billing_set', default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='city',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='city'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='city', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='entity',
-            field=models.ForeignKey(to='Crm.Entity'),
+            field=models.ForeignKey(to='Crm.Entity', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='imported_by',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.ContactsImport', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.ContactsImport', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='last_modified_by',
-            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by'),
+            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
@@ -583,12 +583,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contact',
             name='same_as',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.SameAs', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.SameAs', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='contact',
             name='street_type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.StreetType', null=True, verbose_name='street type', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='city',
@@ -598,12 +598,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='city',
             name='parent',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.Zone', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.Zone', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='actionmenu',
             name='action_type',
-            field=models.ForeignKey(verbose_name='Action type', to='Crm.ActionType'),
+            field=models.ForeignKey(verbose_name='Action type', to='Crm.ActionType', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='actionmenu',
@@ -623,31 +623,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='action',
             name='in_charge',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.TeamMember', null=True, verbose_name='in charge'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.TeamMember', null=True, verbose_name='in charge', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='action',
             name='last_modified_by',
-            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by'),
+            field=models.ForeignKey(default=None, blank=True, to=settings.AUTH_USER_MODEL, null=True, verbose_name='last modified by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='action',
             name='opportunity',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.Opportunity', null=True, verbose_name='opportunity'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.Opportunity', null=True, verbose_name='opportunity', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='action',
             name='parent',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.Action', null=True, verbose_name='parent'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.Action', null=True, verbose_name='parent', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='action',
             name='status',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionStatus', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionStatus', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='action',
             name='type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionType', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionType', null=True, on_delete=models.CASCADE),
         ),
     ]

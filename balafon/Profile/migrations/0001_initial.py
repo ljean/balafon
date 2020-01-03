@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('can_edit_groups', models.ManyToManyField(default=None, related_name='can_edit_perm', null=True, to='Crm.Group', blank=True)),
                 ('can_view_groups', models.ManyToManyField(default=None, related_name='can_view_perm', null=True, to='Crm.Group', blank=True)),
-                ('category', models.OneToOneField(to='coop_cms.ArticleCategory')),
+                ('category', models.OneToOneField(to='coop_cms.ArticleCategory', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -40,10 +40,10 @@ class Migration(migrations.Migration):
                 ('address3', models.CharField(default='', max_length=200, verbose_name='address 3', blank=True)),
                 ('cedex', models.CharField(default='', max_length=200, verbose_name='cedex', blank=True)),
                 ('subscriptions_ids', models.CharField(default=b'', max_length=100, blank=True)),
-                ('city', models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='City')),
-                ('contact', models.OneToOneField(null=True, default=None, blank=True, to='Crm.Contact')),
-                ('entity_type', models.ForeignKey(default=None, blank=True, to='Crm.EntityType', null=True, verbose_name='Entity type')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('city', models.ForeignKey(default=None, blank=True, to='Crm.City', null=True, verbose_name='City', on_delete=models.CASCADE)),
+                ('contact', models.OneToOneField(null=True, default=None, blank=True, to='Crm.Contact', on_delete=models.CASCADE)),
+                ('entity_type', models.ForeignKey(default=None, blank=True, to='Crm.EntityType', null=True, verbose_name='Entity type', on_delete=models.CASCADE)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

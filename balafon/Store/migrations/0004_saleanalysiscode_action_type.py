@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='saleanalysiscode',
             name='action_type',
-            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionType', null=True, verbose_name='action type'),
+            field=models.ForeignKey(default=None, blank=True, to='Crm.ActionType', null=True, verbose_name='action type', on_delete=models.CASCADE),
         ),
     ]

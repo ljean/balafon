@@ -21,7 +21,7 @@ from balafon.permissions import can_access
 class UserPreferences(models.Model):
     """user preferences"""
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     notify_due_actions = models.BooleanField(default=False, verbose_name=_("Notify due actions"))
     message_in_favorites = models.BooleanField(
         default=False,
@@ -40,8 +40,10 @@ class UserPreferences(models.Model):
 class Favorite(models.Model):
     """user favorite items"""
 
-    user = models.ForeignKey(User, verbose_name=_("user"), related_name="user_favorite_set")
-    content_type = models.ForeignKey(ContentType, verbose_name=_("content_type"), related_name="user_favorite_set")
+    user = models.ForeignKey(User, verbose_name=_("user"), related_name="user_favorite_set", on_delete=models.CASCADE)
+    content_type = models.ForeignKey(
+        ContentType, verbose_name=_("content_type"), related_name="user_favorite_set", on_delete=models.CASCADE
+    )
     object_id = models.PositiveIntegerField(verbose_name=_("object id"))
     content_object = GenericForeignKey('content_type', 'object_id')
     
@@ -58,7 +60,7 @@ class Favorite(models.Model):
 class UserHomepage(models.Model):
     """User homepage"""
 
-    user = models.OneToOneField(User, verbose_name=_("user"))
+    user = models.OneToOneField(User, verbose_name=_("user"), on_delete=models.CASCADE)
     url = models.URLField(verbose_name=_("URL"))
     
     class Meta:
@@ -114,7 +116,7 @@ class CustomMenu(models.Model):
 @python_2_unicode_compatible
 class CustomMenuItem(models.Model):
     """Menus items hat can be added to the Balafon menu"""
-    parent = models.ForeignKey(CustomMenu)
+    parent = models.ForeignKey(CustomMenu, on_delete=models.CASCADE)
     label = models.CharField(max_length=100, verbose_name=_("label"))
     icon = models.CharField(max_length=20, verbose_name=_("icon"), blank=True, default="")
     url = models.CharField(max_length=100, verbose_name=_("url"), default='', blank=True)
@@ -179,7 +181,7 @@ class CustomMenuItem(models.Model):
 class UserPermissions(models.Model):
     """user preferences"""
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     can_create_group = models.BooleanField(
         default=True, verbose_name=_('can create group'), help_text=_('If not checked, the user can not create group')
     )

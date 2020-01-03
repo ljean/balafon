@@ -28,15 +28,19 @@ class ContactProfile(models.Model):
         (Contact.GENDER_FEMALE, _('Mrs')),
     )
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    contact = models.OneToOneField(Contact, blank=True, default=None, null=True)
+    contact = models.OneToOneField(Contact, blank=True, default=None, null=True, on_delete=models.CASCADE)
 
     entity_name = models.CharField(_('Entity name'), max_length=200, blank=True, default="")
-    entity_type = models.ForeignKey(EntityType, verbose_name=_('Entity type'), blank=True, null=True, default=None)
+    entity_type = models.ForeignKey(
+        EntityType, verbose_name=_('Entity type'), blank=True, null=True, default=None, on_delete=models.CASCADE
+    )
 
     zip_code = models.CharField(_('Zip code'), max_length=20, blank=True, default='')
-    city = models.ForeignKey(City, verbose_name=_('City'), blank=True, default=None, null=True)
+    city = models.ForeignKey(
+        City, verbose_name=_('City'), blank=True, default=None, null=True, on_delete=models.CASCADE
+    )
     gender = models.IntegerField(_('Gender'), choices=GENDER_CHOICE, blank=True, default=0)
     lastname = models.CharField(_('last name'), max_length=200, blank=True, default='')
     firstname = models.CharField(_('first name'), max_length=200, blank=True, default='')
@@ -86,7 +90,7 @@ class CategoryPermission(models.Model):
         verbose_name = _('Category permission')
         verbose_name_plural = _('Category permissions')
 
-    category = models.OneToOneField(ArticleCategory)
+    category = models.OneToOneField(ArticleCategory, on_delete=models.CASCADE)
     can_view_groups = models.ManyToManyField(
         Group, blank=True, default=None, related_name="can_view_perm"
     )

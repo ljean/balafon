@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('bcc', models.BooleanField(default=False, verbose_name='carbon copy')),
                 ('subject', models.CharField(default=b'', help_text='Use action subject if empty', max_length=100, verbose_name='subject', blank=True)),
                 ('body_template', models.TextField(default=b'', verbose_name='body template', blank=True)),
-                ('action_type', models.OneToOneField(verbose_name='action type', to='Crm.ActionType')),
+                ('action_type', models.OneToOneField(verbose_name='action type', to='Crm.ActionType', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Mailto settings',

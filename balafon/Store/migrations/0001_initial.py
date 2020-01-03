@@ -105,8 +105,8 @@ class Migration(migrations.Migration):
             name='Sale',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('action', models.OneToOneField(to='Crm.Action')),
-                ('delivery_point', models.ForeignKey(default=None, blank=True, to='Store.DeliveryPoint', null=True, verbose_name='delivery point')),
+                ('action', models.OneToOneField(to='Crm.Action', on_delete=models.CASCADE)),
+                ('delivery_point', models.ForeignKey(default=None, blank=True, to='Store.DeliveryPoint', null=True, verbose_name='delivery point', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Sale',
@@ -122,7 +122,7 @@ class Migration(migrations.Migration):
                 ('text', models.TextField(default=b'', max_length=3000, verbose_name='Text', blank=True)),
                 ('order_index', models.IntegerField(default=0)),
                 ('is_blank', models.BooleanField(default=False, help_text='displayed as an empty line', verbose_name='is blank')),
-                ('discount', models.ForeignKey(default=None, blank=True, to='Store.Discount', null=True)),
+                ('discount', models.ForeignKey(default=None, blank=True, to='Store.Discount', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order_index'],
@@ -141,7 +141,7 @@ class Migration(migrations.Migration):
                 ('purchase_price', models.DecimalField(decimal_places=2, default=None, max_digits=9, blank=True, null=True, verbose_name='purchase price')),
                 ('reference', models.CharField(default=b'', max_length=100, verbose_name='reference', blank=True)),
                 ('available', models.BooleanField(default=True, verbose_name='Available')),
-                ('brand', models.ForeignKey(default=None, blank=True, to='Store.Brand', null=True, verbose_name='brand')),
+                ('brand', models.ForeignKey(default=None, blank=True, to='Store.Brand', null=True, verbose_name='brand', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['name'],
@@ -157,8 +157,8 @@ class Migration(migrations.Migration):
                 ('order_index', models.IntegerField(default=0, verbose_name='order_index')),
                 ('active', models.BooleanField(default=True, verbose_name='active')),
                 ('icon', models.CharField(default=b'', max_length=20, blank=True)),
-                ('parent', models.ForeignKey(related_name='subcategories_set', default=None, blank=True, to='Store.StoreItemCategory', null=True, verbose_name='parent category')),
-                ('price_policy', models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy')),
+                ('parent', models.ForeignKey(related_name='subcategories_set', default=None, blank=True, to='Store.StoreItemCategory', null=True, verbose_name='parent category', on_delete=models.CASCADE)),
+                ('price_policy', models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order_index', 'name'],
@@ -206,8 +206,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('value', models.CharField(default=b'', max_length=100, verbose_name='value', blank=True)),
-                ('item', models.ForeignKey(verbose_name='item', to='Store.StoreItem')),
-                ('property', models.ForeignKey(verbose_name='property', to='Store.StoreItemProperty')),
+                ('item', models.ForeignKey(verbose_name='item', to='Store.StoreItem', on_delete=models.CASCADE)),
+                ('property', models.ForeignKey(verbose_name='property', to='Store.StoreItemProperty', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Store item: property value',
@@ -236,7 +236,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('template_name', models.CharField(default=b'', help_text='Set the name of a custom template for commercial document', max_length=100, verbose_name='template name', blank=True)),
                 ('show_amount_as_pre_tax', models.BooleanField(default=True, help_text='The action amount will be update with pre-tax total if checked and with tax-included total if not', verbose_name='Show amount as pre-tax')),
-                ('action_type', models.OneToOneField(to='Crm.ActionType')),
+                ('action_type', models.OneToOneField(to='Crm.ActionType', on_delete=models.CASCADE)),
                 ('readonly_status', models.ManyToManyField(help_text='When action has one of these status, it is not possible to modify a commercial document', to='Crm.ActionStatus', verbose_name='readonly status', blank=True)),
             ],
             options={
@@ -282,7 +282,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='storeitemimport',
             name='supplier',
-            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitemimport',
@@ -292,7 +292,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='storeitem',
             name='category',
-            field=models.ForeignKey(verbose_name='category', to='Store.StoreItemCategory'),
+            field=models.ForeignKey(verbose_name='category', to='Store.StoreItemCategory', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
@@ -302,22 +302,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='storeitem',
             name='imported_by',
-            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItemImport', null=True, verbose_name='imported by'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItemImport', null=True, verbose_name='imported by', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
             name='price_class',
-            field=models.ForeignKey(default=None, blank=True, to='Store.PriceClass', null=True, verbose_name='price class'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.PriceClass', null=True, verbose_name='price class', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
             name='price_policy',
-            field=models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.PricePolicy', null=True, verbose_name='price policy', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
             name='supplier',
-            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.Supplier', null=True, verbose_name='Supplier', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
@@ -327,37 +327,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='storeitem',
             name='unit',
-            field=models.ForeignKey(default=None, blank=True, to='Store.Unit', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Store.Unit', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='storeitem',
             name='vat_rate',
-            field=models.ForeignKey(verbose_name='VAT rate', to='Store.VatRate'),
+            field=models.ForeignKey(verbose_name='VAT rate', to='Store.VatRate', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='saleitem',
             name='item',
-            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItem', null=True),
+            field=models.ForeignKey(default=None, blank=True, to='Store.StoreItem', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='saleitem',
             name='sale',
-            field=models.ForeignKey(to='Store.Sale'),
+            field=models.ForeignKey(to='Store.Sale', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='saleitem',
             name='vat_rate',
-            field=models.ForeignKey(default=None, blank=True, to='Store.VatRate', null=True, verbose_name='VAT rate'),
+            field=models.ForeignKey(default=None, blank=True, to='Store.VatRate', null=True, verbose_name='VAT rate', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='favorite',
             name='item',
-            field=models.ForeignKey(verbose_name='store item', to='Store.StoreItem'),
+            field=models.ForeignKey(verbose_name='store item', to='Store.StoreItem', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='favorite',
             name='user',
-            field=models.ForeignKey(verbose_name='user', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='discount',

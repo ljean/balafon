@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='action',
             name='status2',
-            field=models.ForeignKey(related_name='status2_set', default=None, blank=True, to='Crm.ActionStatus', null=True),
+            field=models.ForeignKey(related_name='status2_set', default=None, blank=True, to='Crm.ActionStatus', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='actiontype',
@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='actiontype',
             name='default_status2',
-            field=models.ForeignKey(related_name='type_default_status2_set', default=None, blank=True, to='Crm.ActionStatus', help_text='Default status for actions of this type', null=True),
+            field=models.ForeignKey(related_name='type_default_status2_set', default=None, blank=True, to='Crm.ActionStatus', help_text='Default status for actions of this type', null=True, on_delete=models.CASCADE),
         ),
     ]

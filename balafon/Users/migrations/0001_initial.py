@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('order_index', models.IntegerField(default=0)),
                 ('attributes', models.CharField(default=b'', max_length=100, verbose_name='attributes', blank=True)),
                 ('only_for_users', models.ManyToManyField(to=settings.AUTH_USER_MODEL, verbose_name='only for users', blank=True)),
-                ('parent', models.ForeignKey(to='Users.CustomMenu')),
+                ('parent', models.ForeignKey(to='Users.CustomMenu', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order_index', 'label'],
@@ -52,8 +52,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('object_id', models.PositiveIntegerField(verbose_name='object id')),
-                ('content_type', models.ForeignKey(related_name='user_favorite_set', verbose_name='content_type', to='contenttypes.ContentType')),
-                ('user', models.ForeignKey(related_name='user_favorite_set', verbose_name='user', to=settings.AUTH_USER_MODEL)),
+                ('content_type', models.ForeignKey(related_name='user_favorite_set', verbose_name='content_type', to='contenttypes.ContentType', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(related_name='user_favorite_set', verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Favorite',
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('url', models.URLField(verbose_name='URL')),
-                ('user', models.OneToOneField(verbose_name='user', to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(verbose_name='user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'User homepage',
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('notify_due_actions', models.BooleanField(default=False, verbose_name='Notify due actions')),
                 ('message_in_favorites', models.BooleanField(default=False, verbose_name='Create automatically a favorite for message posted from the public form')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'User preferences',

@@ -51,10 +51,12 @@ class LastModifiedModel(TimeStampedModel):
 
     created_by = models.ForeignKey(
         User, default=None, blank=True, null=True, verbose_name=_("created by"), related_name='+',
+        on_delete=models.CASCADE
+
     )
 
     last_modified_by = models.ForeignKey(
-        User, default=None, blank=True, null=True, verbose_name=_("last modified by")
+        User, default=None, blank=True, null=True, verbose_name=_("last modified by"), on_delete=models.CASCADE
     )
 
     class Meta:
@@ -124,7 +126,7 @@ class ZoneType(NamedElement):
 @python_2_unicode_compatible
 class BaseZone(NamedElement):
     """Base class for zones"""
-    parent = models.ForeignKey('Zone', blank=True, default=None, null=True)
+    parent = models.ForeignKey('Zone', blank=True, default=None, null=True, on_delete=models.CASCADE)
 
     def get_full_name(self):
         """full name"""
@@ -142,7 +144,7 @@ class BaseZone(NamedElement):
 @python_2_unicode_compatible
 class Zone(BaseZone):
     """A zone is a group of cities : departements, region, country..."""
-    type = models.ForeignKey(ZoneType)
+    type = models.ForeignKey(ZoneType, on_delete=models.CASCADE)
     code = models.CharField(_('code'), max_length=10, blank=True, default="")
     groups = models.ManyToManyField(
         "Zone", blank=True, verbose_name=_('parent groups'), related_name='children_groups_set'
@@ -228,11 +230,15 @@ class AddressModel(LastModifiedModel):
 
     zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default='')
     cedex = models.CharField(_('cedex'), max_length=200, blank=True, default='')
-    city = models.ForeignKey(City, verbose_name=_('city'), blank=True, default=None, null=True)
+    city = models.ForeignKey(
+        City, verbose_name=_('city'), blank=True, default=None, null=True, on_delete=models.CASCADE
+    )
 
     #These fields are just kept for editing the address field
     street_number = models.CharField(_('street number'), max_length=20, blank=True, default='')
-    street_type = models.ForeignKey(StreetType, default=None, blank=True, null=True, verbose_name=_('street type'))
+    street_type = models.ForeignKey(
+        StreetType, default=None, blank=True, null=True, verbose_name=_('street type'), on_delete=models.CASCADE
+    )
 
     billing_address = models.CharField(_('address'), max_length=200, blank=True, default='')
     billing_address2 = models.CharField(_('address 2'), max_length=200, blank=True, default='')
@@ -241,14 +247,15 @@ class AddressModel(LastModifiedModel):
     billing_zip_code = models.CharField(_('zip code'), max_length=20, blank=True, default='')
     billing_cedex = models.CharField(_('cedex'), max_length=200, blank=True, default='')
     billing_city = models.ForeignKey(
-        City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set'
+        City, verbose_name=_('city'), blank=True, default=None, null=True, related_name='%(class)s_billing_set',
+        on_delete=models.CASCADE
     )
 
     # These fields are just kept for editing the address field
     billing_street_number = models.CharField(_('street number'), max_length=20, blank=True, default='')
     billing_street_type = models.ForeignKey(
         StreetType, default=None, blank=True, null=True, verbose_name=_('street type'),
-        related_name='%(class)s_billing_set'
+        related_name='%(class)s_billing_set', on_delete=models.CASCADE
     )
 
     class Meta:
@@ -313,7 +320,9 @@ class Entity(AddressModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
     description = models.CharField(_('description'), max_length=200, blank=True, default="")
-    type = models.ForeignKey(EntityType, verbose_name=_('type'), blank=True, null=True, default=None)
+    type = models.ForeignKey(
+        EntityType, verbose_name=_('type'), blank=True, null=True, default=None, on_delete=models.CASCADE
+    )
     relationship_date = models.DateField(_('relationship date'), default=None, blank=True, null=True)
     
     logo = models.ImageField(_("logo"), blank=True, default="", upload_to=get_entity_logo_dir)
@@ -325,7 +334,7 @@ class Entity(AddressModel):
 
     notes = models.TextField(_('notes'), blank=True, default="")
     
-    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True, on_delete=models.CASCADE)
     
     is_single_contact = models.BooleanField(_("is single contact"), default=False)
     
@@ -576,9 +585,15 @@ class RelationshipType(models.Model):
 @python_2_unicode_compatible
 class Relationship(TimeStampedModel):
     """a relationship between two contacts"""
-    contact1 = models.ForeignKey("Contact", verbose_name=_("contact 1"), related_name="relationships1")
-    contact2 = models.ForeignKey("Contact", verbose_name=_("contact 2"), related_name="relationships2")
-    relationship_type = models.ForeignKey("RelationshipType", verbose_name=_("relationship type"))
+    contact1 = models.ForeignKey(
+        "Contact", verbose_name=_("contact 1"), related_name="relationships1", on_delete=models.CASCADE
+    )
+    contact2 = models.ForeignKey(
+        "Contact", verbose_name=_("contact 2"), related_name="relationships2", on_delete=models.CASCADE
+    )
+    relationship_type = models.ForeignKey(
+        "RelationshipType", verbose_name=_("relationship type"), on_delete=models.CASCADE
+    )
     
     def __str__(self):
         return _("{0} {1} of {2}").format(self.contact1, self.relationship_type, self.contact2)
@@ -603,7 +618,7 @@ class Contact(AddressModel):
         (GENDER_COUPLE, _('Mrs and Mr'))
     )
 
-    entity = models.ForeignKey(Entity)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     role = models.ManyToManyField(EntityRole, blank=True, default=None, verbose_name=_('Roles'))
     
     gender = models.IntegerField(_('gender'), choices=GENDER_CHOICE, blank=True, default=GENDER_NOT_SET)
@@ -636,14 +651,16 @@ class Contact(AddressModel):
     
     notes = models.TextField(_('notes'), blank=True, default="")
     
-    same_as = models.ForeignKey(SameAs, blank=True, null=True, default=None, verbose_name=_('same as'))
+    same_as = models.ForeignKey(
+        SameAs, blank=True, null=True, default=None, verbose_name=_('same as'), on_delete=models.CASCADE
+    )
     same_as_priority = models.IntegerField(default=0, verbose_name=_('same as priority'))
     
     relationships = models.ManyToManyField("Contact", blank=True, default=None, through=Relationship)
     
     has_left = models.BooleanField(_('has left'), default=False)
     
-    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True)
+    imported_by = models.ForeignKey("ContactsImport", default=None, blank=True, null=True, on_delete=models.CASCADE)
     
     favorites = GenericRelation(Favorite)
 
@@ -1047,7 +1064,7 @@ pre_delete.connect(on_update_same_as, sender=Contact)
 class SubscriptionType(models.Model):
     """Subscription type: a mailing list for example"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    site = models.ForeignKey(Site, blank=True, null=True)
+    site = models.ForeignKey(Site, blank=True, null=True, on_delete=models.CASCADE)
     order_index = models.IntegerField(default=0, verbose_name=_("order index"))
     allowed_on_sites = models.ManyToManyField(Site, blank=True, related_name='+')
 
@@ -1063,8 +1080,8 @@ class SubscriptionType(models.Model):
 @python_2_unicode_compatible
 class Subscription(models.Model):
     """contact is subscribing to a mailing list"""
-    subscription_type = models.ForeignKey(SubscriptionType)
-    contact = models.ForeignKey(Contact)
+    subscription_type = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     
     accept_subscription = models.BooleanField(
         _("accept subscription"), default=False,
@@ -1149,11 +1166,11 @@ class Opportunity(TimeStampedModel):
     )
     
     #TO BE REMOVED--
-    entity = models.ForeignKey(Entity, blank=True, null=True, default=None)
+    entity = models.ForeignKey(Entity, blank=True, null=True, default=None, on_delete=models.CASCADE)
     #---------------
     name = models.CharField(_('name'), max_length=200)
-    status = models.ForeignKey(OpportunityStatus, default=None, blank=True, null=True)
-    type = models.ForeignKey(OpportunityType, blank=True, null=True, default=None)
+    status = models.ForeignKey(OpportunityStatus, default=None, blank=True, null=True, on_delete=models.CASCADE)
+    type = models.ForeignKey(OpportunityType, blank=True, null=True, default=None, on_delete=models.CASCADE)
     detail = models.TextField(_('detail'), blank=True, default='')
     #TO BE REMOVED---
     probability = models.IntegerField(
@@ -1279,11 +1296,14 @@ class ActionType(NamedElement):
         default=False, verbose_name=_('Subscribe form'),
         help_text=_('This action type will be proposed on the public subscribe form')
     )
-    set = models.ForeignKey(ActionSet, blank=True, default=None, null=True, verbose_name=_("action set"))
+    set = models.ForeignKey(
+        ActionSet, blank=True, default=None, null=True, verbose_name=_("action set"), on_delete=models.CASCADE
+    )
     last_number = models.IntegerField(_('last number'), default=0)
     number_auto_generated = models.BooleanField(_('generate number automatically'), default=False)
     number_generator = models.ForeignKey(
-        ActionNumberGenerator, blank=True, default=None, null=True, verbose_name=_('number generator')
+        ActionNumberGenerator, blank=True, default=None, null=True, verbose_name=_('number generator'),
+        on_delete=models.CASCADE
     )
     default_template = models.CharField(
         _('document template'), max_length=200, blank=True, default="",
@@ -1295,7 +1315,7 @@ class ActionType(NamedElement):
     default_status = models.ForeignKey(
         ActionStatus, blank=True, default=None, null=True,
         help_text=_('Default status for actions of this type'),
-        related_name='type_default_status_set'
+        related_name='type_default_status_set', on_delete=models.CASCADE
     )
     allowed_status2 = models.ManyToManyField(
         ActionStatus, blank=True, default=None, help_text=_('Action of this type allow the given status'),
@@ -1304,7 +1324,7 @@ class ActionType(NamedElement):
     default_status2 = models.ForeignKey(
         ActionStatus, blank=True, default=None, null=True,
         help_text=_('Default status for actions of this type'),
-        related_name='type_default_status2_set'
+        related_name='type_default_status2_set', on_delete=models.CASCADE
     )
     is_editable = models.BooleanField(
         _('is editable'),
@@ -1394,7 +1414,9 @@ class ActionType(NamedElement):
 @python_2_unicode_compatible
 class TeamMember(models.Model):
     """A member of the team : can be in charge of actions"""
-    user = models.OneToOneField(User, default=None, blank=True, null=True, verbose_name=_("user"))
+    user = models.OneToOneField(
+        User, default=None, blank=True, null=True, verbose_name=_("user"), on_delete=models.CASCADE
+    )
     name = models.CharField(max_length=100, verbose_name=_("name"))
     active = models.BooleanField(default=True, verbose_name=(_("active")))
 
@@ -1410,7 +1432,7 @@ class TeamMember(models.Model):
 class ActionMenu(models.Model):
     """A menu to add to every action of this type"""
 
-    action_type = models.ForeignKey(ActionType, verbose_name=_('Action type'))
+    action_type = models.ForeignKey(ActionType, verbose_name=_('Action type'), on_delete=models.CASCADE)
     view_name = models.CharField(_('view_name'), max_length=200)
     icon = models.CharField(_('icon'), max_length=30, default="", blank=True)
     label = models.CharField(_('label'), max_length=200)
@@ -1471,13 +1493,17 @@ class Action(LastModifiedModel):
 
     subject = models.CharField(_('subject'), max_length=200, blank=True, default="")
     planned_date = models.DateTimeField(_('planned date'), default=None, blank=True, null=True, db_index=True)
-    type = models.ForeignKey(ActionType, blank=True, default=None, null=True)
+    type = models.ForeignKey(ActionType, blank=True, default=None, null=True, on_delete=models.CASCADE)
     detail = models.TextField(_('detail'), blank=True, default='')
     priority = models.IntegerField(_('priority'), default=PRIORITY_MEDIUM, choices=PRIORITY_CHOICES)
-    opportunity = models.ForeignKey(Opportunity, blank=True, default=None, null=True, verbose_name=_('opportunity'))
+    opportunity = models.ForeignKey(
+        Opportunity, blank=True, default=None, null=True, verbose_name=_('opportunity'), on_delete=models.CASCADE
+    )
     done = models.BooleanField(_('done'), default=False, db_index=True)
     done_date = models.DateTimeField(_('done date'), blank=True, null=True, default=None, db_index=True)
-    in_charge = models.ForeignKey(TeamMember, verbose_name=_('in charge'), blank=True, null=True, default=None)
+    in_charge = models.ForeignKey(
+        TeamMember, verbose_name=_('in charge'), blank=True, null=True, default=None, on_delete=models.CASCADE
+    )
     display_on_board = models.BooleanField(verbose_name=_('display on board'), default=True, db_index=True)
     archived = models.BooleanField(verbose_name=_('archived'), default=False, db_index=True)
     amount = models.DecimalField(
@@ -1486,15 +1512,21 @@ class Action(LastModifiedModel):
     number = models.IntegerField(
         _('number'), default=0, help_text=_('This number is auto-generated based on action type.')
     )
-    status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True)
-    status2 = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='status2_set')
+    status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, on_delete=models.CASCADE)
+    status2 = models.ForeignKey(
+        ActionStatus, blank=True, default=None, null=True, related_name='status2_set', on_delete=models.CASCADE
+    )
     contacts = models.ManyToManyField(Contact, blank=True, default=None, verbose_name=_('contacts'))
     entities = models.ManyToManyField(Entity, blank=True, default=None, verbose_name=_('entities'))
     favorites = GenericRelation(Favorite)
     end_datetime = models.DateTimeField(_('end date'), default=None, blank=True, null=True, db_index=True)
-    parent = models.ForeignKey("Action", blank=True, default=None, null=True, verbose_name=_("parent"))
+    parent = models.ForeignKey(
+        "Action", blank=True, default=None, null=True, verbose_name=_("parent"), on_delete=models.CASCADE
+    )
     uuid = models.CharField(max_length=100, blank=True, default='', db_index=True)
-    previous_status = models.ForeignKey(ActionStatus, blank=True, default=None, null=True, related_name='+')
+    previous_status = models.ForeignKey(
+        ActionStatus, blank=True, default=None, null=True, related_name='+', on_delete=models.CASCADE
+    )
     frozen = models.BooleanField(
         default=False, verbose_name=_('frozen'), help_text=_('Some data (date, sale, ...) can not be changed ')
     )
@@ -1668,7 +1700,7 @@ class Action(LastModifiedModel):
 class ActionDocument(models.Model):
     """A document"""
     content = models.TextField(_('content'), blank=True, default="")
-    action = models.OneToOneField(Action)
+    action = models.OneToOneField(Action, on_delete=models.CASCADE)
     template = models.CharField(_('template'), max_length=200)
     
     def get_edit_url(self):
@@ -1751,7 +1783,7 @@ class CustomField(models.Model):
 @python_2_unicode_compatible
 class CustomFieldValue(models.Model):
     """base class for custom field value"""
-    custom_field = models.ForeignKey(CustomField, verbose_name=_('custom field'))
+    custom_field = models.ForeignKey(CustomField, verbose_name=_('custom field'), on_delete=models.CASCADE)
     value = models.TextField(verbose_name=_('value'))
     
     class Meta:
@@ -1763,7 +1795,7 @@ class CustomFieldValue(models.Model):
 @python_2_unicode_compatible
 class EntityCustomFieldValue(CustomFieldValue):
     """a value for a custom field on an entity"""
-    entity = models.ForeignKey(Entity)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = _('entity custom field value')
@@ -1776,7 +1808,7 @@ class EntityCustomFieldValue(CustomFieldValue):
 @python_2_unicode_compatible
 class ContactCustomFieldValue(CustomFieldValue):
     """a value for a custom field of a contact"""
-    contact = models.ForeignKey(Contact)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
     
     class Meta:
         verbose_name = _('contact custom field value')
@@ -1814,12 +1846,13 @@ class ContactsImport(TimeStampedModel):
         max_length=100, verbose_name=_('name'), blank=True, default='',
         help_text=_('Optional name for searching contacts more easily. If not defined, use the name of the file.')
     )
-    imported_by = models.ForeignKey(User, verbose_name=_('imported by'))
+    imported_by = models.ForeignKey(User, verbose_name=_('imported by'), on_delete=models.CASCADE)
     encoding = models.CharField(max_length=50, default='utf-8', choices=ENCODINGS)
     separator = models.CharField(max_length=5, default=',', choices=SEPARATORS)
     entity_type = models.ForeignKey(
         EntityType, verbose_name=_('entity type'), blank=True, null=True, default=None,
-        help_text=_('All created entities will get this type. Ignored if the entity already exist.')
+        help_text=_('All created entities will get this type. Ignored if the entity already exist.'),
+        on_delete=models.CASCADE
     )
     groups = models.ManyToManyField(
         Group, verbose_name=_('groups'), blank=True, default=None,
@@ -1840,7 +1873,7 @@ class ContactsImport(TimeStampedModel):
 @python_2_unicode_compatible
 class MailtoSettings(models.Model):
     """make possible to send emails to actions contacts via mailto"""
-    action_type = models.OneToOneField(ActionType, verbose_name=_("action type"))
+    action_type = models.OneToOneField(ActionType, verbose_name=_("action type"), on_delete=models.CASCADE)
     bcc = models.BooleanField(default=False, verbose_name=_("carbon copy"))
     subject = models.CharField(
         verbose_name=_("subject"), default="", max_length=100, blank=True, help_text=_("Use action subject if empty")
@@ -1857,8 +1890,8 @@ class MailtoSettings(models.Model):
 
 @python_2_unicode_compatible
 class ActionStatusTrack(models.Model):
-    action = models.ForeignKey(Action)
-    status = models.ForeignKey(ActionStatus)
+    action = models.ForeignKey(Action, on_delete=models.CASCADE)
+    status = models.ForeignKey(ActionStatus, on_delete=models.CASCADE)
     datetime = models.DateTimeField()
 
     def __str__(self):

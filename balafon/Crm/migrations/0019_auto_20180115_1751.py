@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='action',
             name='previous_status',
-            field=models.ForeignKey(related_name='+', default=None, blank=True, to='Crm.ActionStatus', null=True),
+            field=models.ForeignKey(related_name='+', default=None, blank=True, to='Crm.ActionStatus', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='actiontype',
@@ -36,11 +36,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='actionstatustrack',
             name='action',
-            field=models.ForeignKey(to='Crm.Action'),
+            field=models.ForeignKey(to='Crm.Action', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='actionstatustrack',
             name='status',
-            field=models.ForeignKey(to='Crm.ActionStatus'),
+            field=models.ForeignKey(to='Crm.ActionStatus', on_delete=models.CASCADE),
         ),
     ]
