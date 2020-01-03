@@ -327,8 +327,14 @@ def on_bounce(event_type, email, description, permanent, contact_uuid, emailing_
         type=action_type,
     )
 
-    action.contacts = contacts
-    action.entities = entities
+    action.contacts.clear()
+    action.entities.clear()
+    contacts = list(contacts)
+    if contacts:
+        action.contacts.add(*contacts)
+    entities = list(entities)
+    if entities:
+        action.entities.add(*entities)
     action.save()
 
     # Unsubscribe emails for permanent errors
