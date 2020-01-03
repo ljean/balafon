@@ -12,11 +12,7 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from registration import get_version as get_registration_version
-try:
-    from registration.backends.default.views import RegistrationView, ActivationView
-except ImportError:
-    from registration.backends.model_activation.views import RegistrationView, ActivationView
+from django_registration.backends.activation.views import RegistrationView, ActivationView
 
 from balafon.Crm.models import Action, ActionType
 from balafon.Profile.forms import MessageForm
@@ -127,13 +123,7 @@ class AcceptNewsletterRegistrationView(RegistrationView):
         return super(AcceptNewsletterRegistrationView, self).dispatch(request, *args, **kwargs)
     
     def register(self, request_or_form, **kwargs):
-
-        if get_registration_version() >= '2.0.0':
-            data = request_or_form.cleaned_data
-        else:
-            data = kwargs
-            kwargs["username"] = kwargs["email"][:30]
-
+        data = request_or_form.cleaned_data
         user = super(AcceptNewsletterRegistrationView, self).register(request_or_form, **kwargs)
 
         user.first_name = data.get('firstname', "")

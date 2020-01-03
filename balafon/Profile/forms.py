@@ -8,7 +8,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
 import floppyforms.__future__ as forms
-from registration import get_version as get_registration_version
 
 from balafon.Crm.models import Contact, EntityType
 from balafon.Crm.forms import ModelFormWithCity
@@ -148,24 +147,14 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
 
     def save(self, commit=True):
-
-        if get_registration_version() >= "2.0.0":
-            # Django registration 2.0
-            # The registration form should return a user
-
-            email = self.cleaned_data["email"]
-            username = email[:30]
-
-            user = User.objects.create(
-                username=username, email=email, is_active=False
-            )
-            password = self.cleaned_data.get('password1', "")
-            user.set_password(password)
-
-            return user
-        else:
-            # Django registration 1.0
-            return super(UserRegistrationForm, self).save(commit)
+        email = self.cleaned_data["email"]
+        username = email[:30]
+        user = User.objects.create(
+            username=username, email=email, is_active=False
+        )
+        password = self.cleaned_data.get('password1', "")
+        user.set_password(password)
+        return user
 
 
 class MinimalUserRegistrationForm(UserRegistrationForm):
