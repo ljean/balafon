@@ -12,7 +12,6 @@ from django.db import models
 from django.db.models import signals
 from django.urls import reverse
 from django.utils.dateformat import DateFormat
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -24,7 +23,6 @@ from balafon.Crm.settings import get_language_choices
 from balafon.Users.models import UserPreferences, Favorite
 
 
-@python_2_unicode_compatible
 class Emailing(TimeStampedModel):
     """configuration on an emailing"""
     
@@ -132,7 +130,6 @@ class Emailing(TimeStampedModel):
         return super(Emailing, self).save(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class MagicLink(models.Model):
     """A tracking link"""
 

@@ -8,14 +8,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse, NoReverseMatch
-from django.utils.encoding import python_2_unicode_compatible
 
 from coop_cms.utils import RequestManager, RequestNotFound
 
 from balafon.permissions import can_access
 
 
-@python_2_unicode_compatible
 class UserPreferences(models.Model):
     """user preferences"""
 
@@ -34,7 +32,6 @@ class UserPreferences(models.Model):
         return self.user.username
 
 
-@python_2_unicode_compatible
 class Favorite(models.Model):
     """user favorite items"""
 
@@ -54,7 +51,6 @@ class Favorite(models.Model):
         return "{0} - {1}".format(self.user, self.content_object)
 
 
-@python_2_unicode_compatible
 class UserHomepage(models.Model):
     """User homepage"""
 
@@ -69,7 +65,6 @@ class UserHomepage(models.Model):
         return "{0} - {1}".format(self.user, self.url)
 
 
-@python_2_unicode_compatible
 class CustomMenu(models.Model):
     """Menus that can be added to the Balafon menu"""
     POSITION_MENU = 0
@@ -111,7 +106,6 @@ class CustomMenu(models.Model):
         return self.label
 
 
-@python_2_unicode_compatible
 class CustomMenuItem(models.Model):
     """Menus items hat can be added to the Balafon menu"""
     parent = models.ForeignKey(CustomMenu, on_delete=models.CASCADE)
@@ -175,7 +169,6 @@ class CustomMenuItem(models.Model):
         return url
 
 
-@python_2_unicode_compatible
 class UserPermissions(models.Model):
     """user preferences"""
 

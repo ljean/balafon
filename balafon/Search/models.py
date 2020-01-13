@@ -2,7 +2,6 @@
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
@@ -10,7 +9,6 @@ from django_extensions.db.models import TimeStampedModel
 from balafon.Users.models import Favorite
 
 
-@python_2_unicode_compatible
 class Search(TimeStampedModel):
     """A search"""
     name = models.CharField(_('name'), max_length=100)
@@ -25,7 +23,6 @@ class Search(TimeStampedModel):
         verbose_name_plural = _('searchs')
 
 
-@python_2_unicode_compatible
 class SearchGroup(models.Model):
     """blocks"""
     search = models.ForeignKey(Search, verbose_name=_('search'), on_delete=models.CASCADE)
@@ -39,7 +36,6 @@ class SearchGroup(models.Model):
         verbose_name_plural = _('search groups')
 
 
-@python_2_unicode_compatible
 class SearchField(models.Model):
     """fields"""
     search_group = models.ForeignKey(SearchGroup, verbose_name=_('search group'), on_delete=models.CASCADE)

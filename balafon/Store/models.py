@@ -14,7 +14,6 @@ from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse, NoReverseMatch
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _, ugettext
 
 from sorl.thumbnail import default as sorl_thumbnail
@@ -25,7 +24,6 @@ from balafon.Store.settings import get_thumbnail_crop, get_thumbnail_size, get_i
 from balafon.Store.utils import round_currency
 
 
-@python_2_unicode_compatible
 class StoreManagementActionType(models.Model):
     """
     Define if an action type is linked to the store.
@@ -82,7 +80,6 @@ class StoreManagementActionType(models.Model):
         return "{0}".format(self.action_type)
 
 
-@python_2_unicode_compatible
 class VatRate(models.Model):
     """Tax : A VAT rate"""
     rate = models.DecimalField(verbose_name=_("vat rate"), max_digits=4, decimal_places=2)
@@ -107,7 +104,6 @@ class VatRate(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Unit(models.Model):
     """a unit"""
     name = models.CharField(verbose_name=_("name"), max_length=200)
@@ -120,7 +116,6 @@ class Unit(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class PricePolicy(models.Model):
 
     APPLY_TO_ALL = 0
@@ -151,7 +146,6 @@ class PricePolicy(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class StoreItemCategory(models.Model):
     """something for organization of store items"""
     name = models.CharField(verbose_name=_("name"), max_length=200)
@@ -253,7 +247,6 @@ class StoreItemCategory(models.Model):
         return ret
 
 
-@python_2_unicode_compatible
 class StoreItemTag(models.Model):
     """something for finding store items more easily"""
     name = models.CharField(verbose_name=_("name"), max_length=200)
@@ -271,7 +264,6 @@ class StoreItemTag(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Discount(models.Model):
     """a discount on a store item price"""
     name = models.CharField(verbose_name=_('name'), max_length=100)
@@ -308,7 +300,6 @@ class Discount(models.Model):
         return None
 
 
-@python_2_unicode_compatible
 class Brand(models.Model):
     """A brand : cola-cola, peugeot or whatever"""
     name = models.CharField(max_length=100, verbose_name=_('name'))
@@ -326,7 +317,6 @@ class Brand(models.Model):
         return super(Brand, self).save(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class Supplier(models.Model):
     """supplier"""
     name = models.CharField(max_length=100)
@@ -339,7 +329,6 @@ class Supplier(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Certificate(models.Model):
     """certificate"""
     name = models.CharField(max_length=100)
@@ -358,7 +347,6 @@ class Certificate(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class PriceClass(models.Model):
     """price class"""
     name = models.CharField(max_length=100, verbose_name=_('Name'))
@@ -373,7 +361,6 @@ class PriceClass(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class StoreItem(models.Model):
     """something than can be buy in this store"""
 
@@ -623,7 +610,6 @@ class StoreItem(models.Model):
         return ""
 
 
-@python_2_unicode_compatible
 class StoreItemProperty(models.Model):
     """a property for a store item: DLC, Colisage..."""
     name = models.CharField(max_length=100, verbose_name=_('name'))
@@ -643,7 +629,6 @@ class StoreItemProperty(models.Model):
         return self.label or self.name
 
 
-@python_2_unicode_compatible
 class StoreItemImport(models.Model):
     """Makes possible to import store item"""
     data = models.FileField(
@@ -869,7 +854,6 @@ class StoreItemImport(models.Model):
         self.save()
 
 
-@python_2_unicode_compatible
 class StoreItemPropertyValue(models.Model):
     """The value of a property for a given item"""
     item = models.ForeignKey(StoreItem, verbose_name=_('item'), on_delete=models.CASCADE)
@@ -884,7 +868,6 @@ class StoreItemPropertyValue(models.Model):
         return '{0}'.format(self.property)
 
 
-@python_2_unicode_compatible
 class DeliveryPoint(models.Model):
     """Where to get a sale"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
@@ -898,7 +881,6 @@ class DeliveryPoint(models.Model):
         ordering = ('name',)
 
 
-@python_2_unicode_compatible
 class SaleAnalysisCode(models.Model):
     """Where to get a sale"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
@@ -915,7 +897,6 @@ class SaleAnalysisCode(models.Model):
         ordering = ('name',)
 
 
-@python_2_unicode_compatible
 class Sale(models.Model):
     """A sale"""
     action = models.OneToOneField(Action, verbose_name=_("action"), on_delete=models.CASCADE)
@@ -1056,7 +1037,6 @@ class Sale(models.Model):
         return ret
 
 
-@python_2_unicode_compatible
 class Favorite(models.Model):
     user = models.ForeignKey(User, verbose_name=_('user'), on_delete=models.CASCADE)
     item = models.ForeignKey(StoreItem, verbose_name=_('store item'), on_delete=models.CASCADE)
@@ -1069,7 +1049,6 @@ class Favorite(models.Model):
         verbose_name_plural = _("Favorites")
 
 
-@python_2_unicode_compatible
 class SaleItem(models.Model):
     """details about the sold item"""
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)

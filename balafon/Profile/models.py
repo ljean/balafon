@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import signals
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from coop_cms.models import ArticleCategory
@@ -12,7 +11,6 @@ from coop_cms.models import ArticleCategory
 from balafon.Crm.models import Contact, Group, City, EntityType
 
 
-@python_2_unicode_compatible
 class ContactProfile(models.Model):
     """Info creating a contact from registration"""
 
@@ -80,7 +78,6 @@ if "balafon.Profile" in settings.INSTALLED_APPS:
     signals.post_save.connect(create_profile, sender=User)
 
 
-@python_2_unicode_compatible
 class CategoryPermission(models.Model):
     """Permissions on category"""
 

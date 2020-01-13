@@ -17,7 +17,6 @@ from django.contrib.sites.models import Site
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
@@ -31,7 +30,6 @@ from balafon.utils import now_rounded, logger, validate_rgb
 from balafon.Users.models import Favorite
 
 
-@python_2_unicode_compatible
 class NamedElement(models.Model):
     """Base class for models with a name field"""
     name = models.CharField(_('Name'), max_length=200)
@@ -43,7 +41,6 @@ class NamedElement(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class LastModifiedModel(TimeStampedModel):
     """track the user who last modified an object"""
 
@@ -84,7 +81,6 @@ def _get_logo_dir(obj, filename):
     return '{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, "types", filename)
 
 
-@python_2_unicode_compatible
 class EntityType(NamedElement):
     """Type of entity: It might be removed in future"""
 
@@ -111,7 +107,6 @@ class EntityType(NamedElement):
         ordering = ['order']
 
 
-@python_2_unicode_compatible
 class ZoneType(NamedElement):
     """Type of zones (cities, coutries, ...)"""
     type = models.CharField(_('type'), max_length=200)
@@ -121,7 +116,6 @@ class ZoneType(NamedElement):
         verbose_name_plural = _('zone types')
 
 
-@python_2_unicode_compatible
 class BaseZone(NamedElement):
     """Base class for zones"""
     parent = models.ForeignKey('Zone', blank=True, default=None, null=True, on_delete=models.CASCADE)
@@ -139,7 +133,6 @@ class BaseZone(NamedElement):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Zone(BaseZone):
     """A zone is a group of cities : departements, region, country..."""
     type = models.ForeignKey(ZoneType, on_delete=models.CASCADE)
@@ -166,7 +159,6 @@ class Zone(BaseZone):
         ordering = ['name']
 
 
-@python_2_unicode_compatible
 class City(BaseZone):
     """city"""
     groups = models.ManyToManyField(
@@ -209,7 +201,6 @@ def get_entity_logo_dir(instance, filename):
     return '{0}/{1}/{2}'.format(settings.ENTITY_LOGO_DIR, instance.id, filename)
 
 
-@python_2_unicode_compatible
 class StreetType(NamedElement):
     """A selection for street type"""
 
@@ -313,7 +304,6 @@ class AddressModel(LastModifiedModel):
         return self.get_full_address()
 
 
-@python_2_unicode_compatible
 class Entity(AddressModel):
     """Entity correspond to a company, association, public administration ..."""
     name = models.CharField(_('name'), max_length=200, db_index=True)
@@ -514,7 +504,6 @@ class Entity(AddressModel):
         ordering = ('name',)
 
 
-@python_2_unicode_compatible
 class EntityRole(NamedElement):
     """what a contact is doing in an entity"""
     class Meta:
@@ -527,7 +516,6 @@ def get_contact_photo_dir(instance, filename):
     return '{0}/{1}/{2}'.format(settings.CONTACT_PHOTO_DIR, instance.id, filename)
 
 
-@python_2_unicode_compatible
 class SameAs(models.Model):
     """Link between two contacts for the same physical person"""
 
@@ -566,7 +554,6 @@ class SameAs(models.Model):
         verbose_name_plural = _('sames as')
 
 
-@python_2_unicode_compatible
 class RelationshipType(models.Model):
     """type of relationship: client-provider, partner ..."""
     name = models.CharField(max_length=100, blank=False, verbose_name=_("name"))
@@ -580,7 +567,6 @@ class RelationshipType(models.Model):
         verbose_name_plural = _('relationship types')
 
 
-@python_2_unicode_compatible
 class Relationship(TimeStampedModel):
     """a relationship between two contacts"""
     contact1 = models.ForeignKey(
@@ -601,7 +587,6 @@ class Relationship(TimeStampedModel):
         verbose_name_plural = _('relationships')
     
 
-@python_2_unicode_compatible
 class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
     GENDER_NOT_SET = 0
@@ -1058,7 +1043,6 @@ def on_update_same_as(sender, instance, **kwargs):
 pre_delete.connect(on_update_same_as, sender=Contact)
 
 
-@python_2_unicode_compatible
 class SubscriptionType(models.Model):
     """Subscription type: a mailing list for example"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
@@ -1075,7 +1059,6 @@ class SubscriptionType(models.Model):
         ordering = ('order_index', )
 
 
-@python_2_unicode_compatible
 class Subscription(models.Model):
     """contact is subscribing to a mailing list"""
     subscription_type = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE)
@@ -1093,7 +1076,6 @@ class Subscription(models.Model):
         return "{0} {1}".format(self.subscription_type, self.contact)
 
 
-@python_2_unicode_compatible
 class Group(TimeStampedModel):
     """Group of contacts or entities"""
     name = models.CharField(_('name'), max_length=200, unique=True, db_index=True)
@@ -1133,7 +1115,6 @@ class Group(TimeStampedModel):
         verbose_name_plural = _('groups')
 
 
-@python_2_unicode_compatible
 class OpportunityStatus(NamedElement):
     """status for an opportynity"""
     ordering = models.IntegerField(default=0)
@@ -1143,7 +1124,6 @@ class OpportunityStatus(NamedElement):
         verbose_name_plural = _('opportunity status')
 
 
-@python_2_unicode_compatible
 class OpportunityType(NamedElement):
     """type for an opprtunity"""
     class Meta:
@@ -1151,7 +1131,6 @@ class OpportunityType(NamedElement):
         verbose_name_plural = _('opportunity types')
 
 
-@python_2_unicode_compatible
 class Opportunity(TimeStampedModel):
     """An opportunity is kind of project. It makes possible to group different actions"""
     PROBABILITY_LOW = 1
@@ -1216,7 +1195,6 @@ class Opportunity(TimeStampedModel):
         verbose_name_plural = _('opportunities')
 
 
-@python_2_unicode_compatible
 class ActionSet(NamedElement):
     """group some actions types"""
     ordering = models.IntegerField(verbose_name=_('display ordering'), default=10)
@@ -1227,7 +1205,6 @@ class ActionSet(NamedElement):
         ordering = ['ordering']
 
 
-@python_2_unicode_compatible
 class ActionStatus(NamedElement):
     """status for an action"""
     ordering = models.IntegerField(verbose_name=_('display ordering'), default=10)
@@ -1267,7 +1244,6 @@ class ActionStatus(NamedElement):
         ordering = ['ordering']
 
 
-@python_2_unicode_compatible
 class ActionNumberGenerator(models.Model):
     class Meta:
         verbose_name = _('action number generator')
@@ -1287,7 +1263,6 @@ class ActionNumberGenerator(models.Model):
         return self.number
 
 
-@python_2_unicode_compatible
 class ActionType(NamedElement):
     """type of an action"""
     subscribe_form = models.BooleanField(
@@ -1409,7 +1384,6 @@ class ActionType(NamedElement):
         ordering = ['order_index', 'name']
 
 
-@python_2_unicode_compatible
 class TeamMember(models.Model):
     """A member of the team : can be in charge of actions"""
     user = models.OneToOneField(
@@ -1426,7 +1400,6 @@ class TeamMember(models.Model):
         verbose_name_plural = _('team members')
 
 
-@python_2_unicode_compatible
 class ActionMenu(models.Model):
     """A menu to add to every action of this type"""
 
@@ -1473,7 +1446,6 @@ class ActionMenu(models.Model):
         return self.label
 
 
-@python_2_unicode_compatible
 class Action(LastModifiedModel):
     """action : something to do"""
     PRIORITY_LOW = 1
@@ -1694,7 +1666,6 @@ class Action(LastModifiedModel):
         return reverse('crm_mailto_action', args=[self.id])
 
 
-@python_2_unicode_compatible
 class ActionDocument(models.Model):
     """A document"""
     content = models.TextField(_('content'), blank=True, default="")
@@ -1725,7 +1696,6 @@ class ActionDocument(models.Model):
         return "{0} - {1}".format(self.template, self.action)
 
 
-@python_2_unicode_compatible
 class CustomFieldChoice(models.Model):
     value = models.CharField(max_length=100, verbose_name=_('value'))
     label = models.CharField(max_length=100, verbose_name=_('label'))
@@ -1740,7 +1710,6 @@ class CustomFieldChoice(models.Model):
         ordering = ('order', 'label', )
 
 
-@python_2_unicode_compatible
 class CustomField(models.Model):
     """An additional field for a contact or an entity"""
 
@@ -1778,7 +1747,6 @@ class CustomField(models.Model):
         ordering = ('ordering', 'import_order', 'export_order')
 
 
-@python_2_unicode_compatible
 class CustomFieldValue(models.Model):
     """base class for custom field value"""
     custom_field = models.ForeignKey(CustomField, verbose_name=_('custom field'), on_delete=models.CASCADE)
@@ -1790,7 +1758,6 @@ class CustomFieldValue(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class EntityCustomFieldValue(CustomFieldValue):
     """a value for a custom field on an entity"""
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -1803,7 +1770,6 @@ class EntityCustomFieldValue(CustomFieldValue):
         return '{0} {1}'.format(self.entity, self.custom_field)
 
 
-@python_2_unicode_compatible
 class ContactCustomFieldValue(CustomFieldValue):
     """a value for a custom field of a contact"""
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
@@ -1821,7 +1787,6 @@ def _get_import_dir(contact_import, filename):
     return '{0}/{1}'.format(settings.CONTACTS_IMPORT_DIR, filename)
 
 
-@python_2_unicode_compatible
 class ContactsImport(TimeStampedModel):
     """import from csv"""
     
@@ -1868,7 +1833,6 @@ class ContactsImport(TimeStampedModel):
         verbose_name_plural = _('contact imports')
 
 
-@python_2_unicode_compatible
 class MailtoSettings(models.Model):
     """make possible to send emails to actions contacts via mailto"""
     action_type = models.OneToOneField(ActionType, verbose_name=_("action type"), on_delete=models.CASCADE)
@@ -1886,7 +1850,6 @@ class MailtoSettings(models.Model):
         verbose_name_plural = _('Mailto settings')
 
 
-@python_2_unicode_compatible
 class ActionStatusTrack(models.Model):
     action = models.ForeignKey(Action, on_delete=models.CASCADE)
     status = models.ForeignKey(ActionStatus, on_delete=models.CASCADE)
