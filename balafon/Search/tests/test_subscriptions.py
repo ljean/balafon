@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by subscription type"""
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 
 from model_mommy import mommy

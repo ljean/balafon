@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """a simple store"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime, date, time
 import xlrd
 import xlwt

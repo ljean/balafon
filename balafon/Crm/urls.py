@@ -2,8 +2,6 @@
 """urls"""
 # pylint: disable=C0330
 
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 
 from balafon.Crm.views import planning as planning_views, documents as document_views

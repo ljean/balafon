@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
-from __future__ import unicode_literals
-
 from datetime import date, datetime
 import xlwt
 

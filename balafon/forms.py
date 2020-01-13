@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Balafon : your django CRM"""
 
-from __future__ import unicode_literals
-
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, PasswordChangeForm
 
 import floppyforms.__future__ as forms

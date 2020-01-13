@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """documents"""
 
-from __future__ import unicode_literals
-
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.contrib.messages import api as user_message

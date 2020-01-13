@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
-from __future__ import unicode_literals
-
 from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 

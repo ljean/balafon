@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext, ugettext_lazy as _
 

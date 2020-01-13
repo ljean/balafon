@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """about actions : something you do with a contact or an entity"""
 
-from __future__ import unicode_literals
-
 import json
 
 from django.contrib.auth.decorators import user_passes_test

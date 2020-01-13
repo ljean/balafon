@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can save a search"""
 
-from __future__ import unicode_literals
-
 import json
 
 from django.urls import reverse

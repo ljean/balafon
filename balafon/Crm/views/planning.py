@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """display actions in different planning views"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime, date
 import json
 

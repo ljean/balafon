@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by entity"""
 
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse

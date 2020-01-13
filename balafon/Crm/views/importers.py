@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """import data from files"""
 
-from __future__ import unicode_literals, print_function
-
 from datetime import datetime
 import os.path
 import re

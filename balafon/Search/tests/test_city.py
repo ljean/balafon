@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search contact by zones"""
 
-from __future__ import unicode_literals
-
 from unittest import skipIf
 
 from django.urls import reverse

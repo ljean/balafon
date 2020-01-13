@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test mailto action on search results"""
 
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _

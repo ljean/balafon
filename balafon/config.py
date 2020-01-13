@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """configure the balafon search form"""
 
-from __future__ import unicode_literals
-
 import sys
 
 from django.utils.translation import ugettext as _

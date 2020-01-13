@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
-from __future__ import unicode_literals
-
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from importlib import import_module

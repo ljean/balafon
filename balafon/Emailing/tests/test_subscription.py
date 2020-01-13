@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test subscription"""
 
-from __future__ import unicode_literals
-
 import os
 from datetime import date
 

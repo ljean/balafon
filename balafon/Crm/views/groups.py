@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """about groups"""
 
-from __future__ import unicode_literals, print_function
-
 import json
 
 from django.contrib.auth.decorators import user_passes_test

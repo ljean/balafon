@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """admin"""
 
-from __future__ import unicode_literals
-
 from django import forms
 from django.db.models import CharField
 from django.contrib import admin

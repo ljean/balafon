@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """common utils"""
 
-from __future__ import unicode_literals
-
 from bs4 import BeautifulSoup
 from datetime import datetime
 import logging

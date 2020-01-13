@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """common place for all Emailing settings"""
 
-from __future__ import unicode_literals
-
 from importlib import import_module
 
 from django.conf import settings as project_settings

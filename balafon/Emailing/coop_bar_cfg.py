@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """coop_bar configuration: add links to balafon"""
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 

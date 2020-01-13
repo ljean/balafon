@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """templatetags library"""
 
-from __future__ import unicode_literals
-
 from datetime import date, datetime
 
 from django import template

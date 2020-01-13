@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """urls"""
 
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 
 from balafon.Users import views

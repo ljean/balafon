@@ -5,8 +5,6 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-branches
 
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """view and edit entities"""
 
-from __future__ import unicode_literals, print_function
-
 from datetime import date
 import json
 import re

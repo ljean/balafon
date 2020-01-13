@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test mandrill webhooks"""
 
-from __future__ import unicode_literals
-
 import datetime
 
 from model_mommy import mommy

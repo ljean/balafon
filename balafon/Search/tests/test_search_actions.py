@@ -2,8 +2,6 @@
 """test search actions"""
 #pylint: disable=too-many-locals
 
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
 
 from django.urls import reverse

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
 from django.urls import reverse
 from django.utils.encoding import smart_text

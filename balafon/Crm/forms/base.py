@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.forms.forms import BoundField
 from django.utils.translation import ugettext, ugettext_lazy as _

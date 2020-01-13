@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """forms"""
 
-from __future__ import unicode_literals
-
 from datetime import date, datetime, time
 from itertools import chain
 import importlib

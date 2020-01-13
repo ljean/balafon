@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """search views and actions"""
 
-from __future__ import unicode_literals
-
 import json
 import xlwt
 

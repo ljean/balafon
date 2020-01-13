@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Crm is the main module"""
 
-from __future__ import unicode_literals
-
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404

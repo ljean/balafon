@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.urls import reverse
 from django.test.utils import override_settings

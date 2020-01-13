@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we cans earch contacts y group"""
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 
 from model_mommy import mommy

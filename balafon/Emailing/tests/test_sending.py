@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test email sending"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 from unittest import skipIf
 

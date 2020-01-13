@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime, date, timedelta
 from unittest import skipIf
 import sys

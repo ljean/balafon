@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """test email tracking"""
 
-from __future__ import unicode_literals
-
-from datetime import datetime, date
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.sites.models import Site

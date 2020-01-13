@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """admin site"""
 
-from __future__ import unicode_literals
-
 from django.contrib import admin
 
 import floppyforms.__future__ as forms

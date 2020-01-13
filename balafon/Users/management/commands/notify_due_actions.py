@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """notify_due_actions command"""
 
-from __future__ import unicode_literals, print_function
-
 from datetime import date, timedelta
 
 from django.conf import settings

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from __future__ import unicode_literals
-
 from model_mommy import mommy
 
 from balafon.unit_tests import TestCase

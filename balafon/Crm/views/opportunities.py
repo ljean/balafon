@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """opportunities : certainly a bad name :-) this is a group of actions"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 import json
 

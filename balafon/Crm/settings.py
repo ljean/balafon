@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """common place for settings. Define defaults"""
 
-from __future__ import unicode_literals
-
 import sys
 
 from django.conf import settings as project_settings

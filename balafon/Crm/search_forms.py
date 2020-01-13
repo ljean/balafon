@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """forms than can be included as part of the main search form"""
 
-from __future__ import unicode_literals
-
 from datetime import date, timedelta
 
 from django.db.models import Q, Count

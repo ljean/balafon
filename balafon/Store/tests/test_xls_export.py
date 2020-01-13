@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from __future__ import unicode_literals
-
 from datetime import date, datetime
 from decimal import Decimal
 import xlrd

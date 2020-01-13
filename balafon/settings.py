@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """settings"""
 
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.views.generic import TemplateView
 from django.utils.translation import ugettext as _

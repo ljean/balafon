@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test search forms of the emailing module"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 
 from django.urls import reverse

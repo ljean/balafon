@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """project settings"""
 
-from __future__ import unicode_literals
-
 from django import VERSION as DJANGO_VERSION
 
 import os.path

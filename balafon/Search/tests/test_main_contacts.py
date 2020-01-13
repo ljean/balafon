@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test search behavior for main and has_left contacts"""
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 
 from model_mommy import mommy

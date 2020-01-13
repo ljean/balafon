@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """utilities"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 import re
 import sys

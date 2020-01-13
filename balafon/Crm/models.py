@@ -2,8 +2,6 @@
 """models"""
 # pylint: disable=model-no-explicit-unicode
 
-from __future__ import unicode_literals
-
 import uuid
 import unicodedata
 from six.moves.urllib.parse import urlparse

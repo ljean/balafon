@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 from decimal import Decimal
 

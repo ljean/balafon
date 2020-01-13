@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test subscription"""
 
-from __future__ import unicode_literals
-
 from datetime import date
 
 from django.conf import settings

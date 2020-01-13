@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """search forms : this forms are included in main search form"""
 
-from __future__ import unicode_literals
-
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _

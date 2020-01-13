@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from balafon.Users import models
 from balafon.Users.forms import UserPreferencesAdminForm, UserPermissionsAdminForm

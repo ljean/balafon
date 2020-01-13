@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test we can search by groups"""
 
-from __future__ import unicode_literals
-
 from django.urls import reverse
 
 from coop_cms.tests import BeautifulSoup

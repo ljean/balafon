@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """test relationship search"""
 
-from __future__ import unicode_literals
-
 from datetime import date, timedelta
 
 from django.urls import reverse

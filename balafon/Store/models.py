@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """models"""
 
-from __future__ import unicode_literals
-
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 import os.path
