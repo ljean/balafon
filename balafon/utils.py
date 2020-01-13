@@ -4,7 +4,7 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
 import logging
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from importlib import import_module
 
 from django.conf import settings

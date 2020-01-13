@@ -4,7 +4,7 @@
 
 import uuid
 import unicodedata
-from six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 from datetime import datetime
 
 from django.db import models
