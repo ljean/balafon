@@ -23,9 +23,9 @@ setup(
     zip_safe=False,
     install_requires=[
         'django >= 1.11.20, <2.0',
-        'djangorestframework',
+        'djangorestframework >= 3.10.3, <3.11.0',
         'django-extensions',
-        'apidev-coop_cms >= 1.3.9, < 1.4',
+        'apidev-coop_cms >= 1.3.14, < 1.4',
         'apidev-coop_colorbox >= 1.4.1, < 1.5',
         'apidev-coop_bar >= 1.4.1, < 1.5',
         'coop_html_editor >= 1.2.1, < 1.3',
