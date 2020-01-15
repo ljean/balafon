@@ -377,7 +377,14 @@ class MailtoSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(models.ActionStatusTrack)
 class ActionStatusTrackAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['action_number', 'status', 'datetime', ]
+    date_hierarchy = 'datetime'
+    list_filter = ['status']
+    raw_id_fields = ["action", ]
+    search_fields = ['action__number', ]
+
+    def action_number(self, instance):
+        return instance.action.number
 
 
 @admin.register(models.ActionNumberGenerator)

@@ -1502,7 +1502,10 @@ class Action(LastModifiedModel):
     )
 
     def __str__(self):
-        return '{0} - {1}'.format(self.planned_date, self.subject or self.type)
+        value = '{0} - {1}'.format(self.planned_date, self.subject or self.type)
+        if self.number:
+            value += ' - {0}'.format(self.number)
+        return value
 
     def show_duration(self):
         """Show duration on action line. If False show end_time"""
