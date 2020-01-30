@@ -23,11 +23,12 @@ from balafon.moves import urlopen
 from balafon.settings import get_captcha_field
 from balafon.Crm import settings as crm_settings
 from balafon.Crm.forms import ModelFormWithCity, BetterBsModelForm
-from balafon.Crm.models import Group, Contact, Entity, EntityType, Action, ActionType, SubscriptionType, Subscription
+from balafon.Crm.models import Group, Contact, Entity, EntityType, ActionType, SubscriptionType, Subscription
 from balafon.Crm.widgets import CityAutoComplete
 from balafon.Emailing import models
-from balafon.Emailing.utils import create_subscription_action, send_notification_email, get_language
-from balafon.Emailing import settings as emailing_settings
+from balafon.Emailing.utils import (
+    create_subscription_action, send_notification_email, get_language, subscribe_contact_to_newsletter
+)
 
 
 class UnregisterForm(BsForm):
@@ -217,42 +218,7 @@ class EmailSubscribeForm(BetterBsModelForm):
     def save(self, request=None):
         """save"""
         contact = super(EmailSubscribeForm, self).save(commit=False)
-        
-        if crm_settings.ALLOW_SINGLE_CONTACT:
-            contact.entity = Entity.objects.create(name=contact.email, type=None, is_single_contact=True)
-        else:
-            et_id = getattr(settings, 'BALAFON_INDIVIDUAL_ENTITY_ID', 1)
-            entity_type = EntityType.objects.get(id=et_id)
-            contact.entity = Entity.objects.create(name=contact.email, type=entity_type)
-        contact.save()
-        # delete unknown contacts for the current entity
-        contact.entity.contact_set.exclude(id=contact.id).delete()
-
-        queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
-
-        form_subscription_type = self.subscription_type
-        default_subscription_type = emailing_settings.get_default_subscription_type()
-        if not form_subscription_type and default_subscription_type:
-            form_subscription_type = default_subscription_type
-
-        if form_subscription_type:
-            queryset = queryset.filter(id=form_subscription_type)
-
-        subscriptions = []
-        for subscription_type in queryset:
-            subscription = Subscription.objects.get_or_create(contact=contact, subscription_type=subscription_type)[0]
-            subscription.accept_subscription = True
-            subscription.subscription_date = datetime.now()
-            subscription.save()
-            subscriptions.append(subscription_type.name)
-        
-        create_subscription_action(contact, subscriptions)
-        if subscriptions:
-            send_notification_email(request, contact, [], "")
-        else:
-            send_notification_email(request, contact, [], "Error: "+ugettext("No subscription_type defined"))
-                
-        return contact
+        return subscribe_contact_to_newsletter(contact, self.subscription_type)
 
 
 class SubscriptionTypeFormMixin(object):
@@ -331,7 +297,7 @@ class SubscriptionTypeFormMixin(object):
             if subscription_type in self.cleaned_data['subscription_types']:
                 subscription.accept_subscription = True
                 subscription.subscription_date = datetime.now()
-                #This is added to the notification email
+                # This is added to the notification email
                 subscriptions.append(subscription_type.name)
             else:
                 subscription.accept_subscription = False
@@ -508,57 +474,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     def save(self, request=None):
         """save"""
         contact = super(SubscribeForm, self).save(commit=False)
-        contact.entity = self.get_entity()
-        contact.city = self.cleaned_data['city']
-        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
-        contact.save()
-        # delete unknown contacts for the current entity
-        contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
-        
-        # force also the city on the entity
-        contact.entity.city = contact.city
-
-        groups = self.cleaned_data['groups']
-        for group in groups:
-            contact.entity.group_set.add(group)
-        contact.entity.save()
-        
-        subscriptions = self._save_subscription_types(contact)
-        
-        message = self.cleaned_data["message"]
-
-        if message:
-            action_type = ActionType.objects.get_or_create(name=ugettext("Message"))[0]
-            action = Action.objects.create(
-                subject=ugettext("Message from web site"),
-                type=action_type,
-                planned_date=datetime.now(),
-                detail=message,
-                display_on_board=True
-            )
-            action.contacts.add(contact)
-            action.save()
-        
-        if subscriptions:
-            create_subscription_action(contact, subscriptions)
-        
-        action_types = self.cleaned_data['action_types']
-        actions = []
-        for action_type in action_types:
-            action = Action.objects.create(
-                subject=ugettext("Contact"),
-                type=action_type,
-                planned_date=datetime.now(),
-                display_on_board=True
-            )
-            action.contacts.add(contact)
-            action.save()
-            actions.append(action)
-            
-        # send an email
-        send_notification_email(request, contact, actions, message)
-        
-        return contact
+        return register()
 
 
 class NewsletterSchedulingForm(forms.ModelForm):

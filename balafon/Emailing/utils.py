@@ -19,9 +19,13 @@ from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
 from coop_cms.utils import dehtml, make_links_absolute
 
+from balafon.Crm import settings as crm_settings
 from balafon.utils import logger
-from balafon.Crm.models import Action, ActionType, Contact, Entity, Subscription, SubscriptionType
+from balafon.Crm.models import (
+    Action, ActionType, Contact, Entity, Subscription, SubscriptionType, EntityType
+)
 from balafon.Emailing.models import Emailing, MagicLink
+from balafon.Emailing import settings as emailing_settings
 
 
 class EmailSendError(Exception):
@@ -400,3 +404,43 @@ def force_line_max_length(text, max_length_per_line=400, dont_cut_in_quotes=True
                 out_text += out_line + "\n"
 
     return out_text[:-1]  # Remove the last "\n"
+
+
+def subscribe_contact_to_newsletter(contact, subscription_type=None, request=None):
+    """save"""
+    if crm_settings.ALLOW_SINGLE_CONTACT:
+        contact.entity = Entity.objects.create(name=contact.email, type=None, is_single_contact=True)
+    else:
+        et_id = getattr(settings, 'BALAFON_INDIVIDUAL_ENTITY_ID', 1)
+        entity_type = EntityType.objects.get(id=et_id)
+        contact.entity = Entity.objects.create(name=contact.email, type=entity_type)
+    contact.save()
+    # delete unknown contacts for the current entity
+    contact.entity.contact_set.exclude(id=contact.id).delete()
+
+    queryset = SubscriptionType.objects.filter(site=Site.objects.get_current())
+    form_subscription_type = subscription_type
+    default_subscription_type = emailing_settings.get_default_subscription_type()
+    if not form_subscription_type and default_subscription_type:
+        form_subscription_type = default_subscription_type
+
+    if form_subscription_type:
+        queryset = queryset.filter(id=form_subscription_type)
+
+    subscriptions = []
+    for subscription_type in queryset:
+        subscription = Subscription.objects.get_or_create(
+            contact=contact, subscription_type=subscription_type
+        )[0]
+        subscription.accept_subscription = True
+        subscription.subscription_date = datetime.now()
+        subscription.save()
+        subscriptions.append(subscription_type.name)
+
+    create_subscription_action(contact, subscriptions)
+    if subscriptions:
+        send_notification_email(request, contact, [], "")
+    else:
+        send_notification_email(request, contact, [], "Error: " + _("No subscription_type defined"))
+
+    return contact
