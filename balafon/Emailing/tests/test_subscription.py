@@ -655,6 +655,35 @@ class SubscribeTest(TestCase):
         subscription2 = models.Subscription.objects.get(id=subscription2.id)
         self.assertEqual(subscription2.accept_subscription, True)
 
+    def test_verify_email_and_redirect_to(self):
+        """test email verification"""
+        self.client.logout()
+
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False)
+
+        subscription1 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=newsletter_subscription, accept_subscription=True
+        )
+        subscription2 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=third_party_subscription, accept_subscription=True
+        )
+
+        url = reverse('emailing_email_verification', args=[contact.uuid]) + '?redirect_to=https://test.fr/'
+        response = self.client.get(url)
+        self.assertRedirects(response, 'https://test.fr/', fetch_redirect_response=False)
+
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, True)
+
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, True)
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, True)
+
     def test_verify_email_no_newsletter(self):
         """test email verification ofr some who refuse subscriptions"""
         self.client.logout()

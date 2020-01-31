@@ -257,7 +257,7 @@ def send_notification_email(request, contact, actions, message):
                 )
 
 
-def send_verification_email(contact, subscription_types=None):
+def send_verification_email(contact, subscription_types=None, redirect_to=None):
     """send an email to subscriber for checking his email"""
 
     if contact.email:
@@ -267,9 +267,13 @@ def send_verification_email(contact, subscription_types=None):
         else:
             my_company = settings.BALAFON_MY_COMPANY
 
+        verification_url = reverse('emailing_email_verification', args=[contact.uuid])
+        if redirect_to:
+            verification_url += '?redirect_to=' + redirect_to
+
         data = {
             'contact': contact,
-            'verification_url': reverse('emailing_email_verification', args=[contact.uuid]),
+            'verification_url': verification_url,
             'site': Site.objects.get_current(),
             'my_company': mark_safe(my_company),
         }

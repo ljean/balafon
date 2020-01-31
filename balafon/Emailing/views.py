@@ -351,7 +351,9 @@ def email_verification(request, contact_uuid):
     contact = get_object_or_404(Contact, uuid=contact_uuid)
     subscription_type_names = [
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
-        ]
+    ]
+    redirect_to = request.GET.get('redirect_to', None)
+
     my_company = ', '.join(subscription_type_names)
     if not my_company:
         my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
@@ -359,14 +361,17 @@ def email_verification(request, contact_uuid):
     contact.email_verified = True
     contact.save()
 
-    return render(
-        request,
-        'Emailing/public/verification_done.html',
-        {
-            'contact': contact,
-            'my_company': my_company,
-        }
-    )
+    if redirect_to:
+        return HttpResponseRedirect(redirect_to)
+    else:
+        return render(
+            request,
+            'Emailing/public/verification_done.html',
+            {
+                'contact': contact,
+                'my_company': my_company,
+            }
+        )
 
 
 def email_tracking(request, emailing_id, contact_uuid):
