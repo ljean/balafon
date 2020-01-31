@@ -29,7 +29,7 @@ setup(
         'xlwt',
         'xlrd',
         'django-recaptcha2',
-        'django-registration>=3.0.1',
+        'django-registration==3.0.1',
         'model_mommy',
         'django-cors-headers',
     ],
