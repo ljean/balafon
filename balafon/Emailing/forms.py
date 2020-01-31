@@ -23,7 +23,9 @@ from balafon.moves import urlopen
 from balafon.settings import get_captcha_field
 from balafon.Crm import settings as crm_settings
 from balafon.Crm.forms import ModelFormWithCity, BetterBsModelForm
-from balafon.Crm.models import Group, Contact, Entity, EntityType, ActionType, SubscriptionType, Subscription
+from balafon.Crm.models import (
+    Group, Contact, Entity, EntityType, ActionType, SubscriptionType, Subscription, Action
+)
 from balafon.Crm.widgets import CityAutoComplete
 from balafon.Emailing import models
 from balafon.Emailing.utils import (
@@ -474,7 +476,57 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     def save(self, request=None):
         """save"""
         contact = super(SubscribeForm, self).save(commit=False)
-        return register()
+        contact.entity = self.get_entity()
+        contact.city = self.cleaned_data['city']
+        contact.favorite_language = self.cleaned_data.get('favorite_language', '')
+        contact.save()
+        # delete unknown contacts for the current entity
+        contact.entity.contact_set.filter(lastname='', firstname='').exclude(id=contact.id).delete()
+
+        # force also the city on the entity
+        contact.entity.city = contact.city
+
+        groups = self.cleaned_data['groups']
+        for group in groups:
+            contact.entity.group_set.add(group)
+        contact.entity.save()
+
+        subscriptions = self._save_subscription_types(contact)
+
+        message = self.cleaned_data["message"]
+
+        if message:
+            action_type = ActionType.objects.get_or_create(name=ugettext("Message"))[0]
+            action = Action.objects.create(
+                subject=ugettext("Message from web site"),
+                type=action_type,
+                planned_date=datetime.now(),
+                detail=message,
+                display_on_board=True
+            )
+            action.contacts.add(contact)
+            action.save()
+
+        if subscriptions:
+            create_subscription_action(contact, subscriptions)
+
+        action_types = self.cleaned_data['action_types']
+        actions = []
+        for action_type in action_types:
+            action = Action.objects.create(
+                subject=ugettext("Contact"),
+                type=action_type,
+                planned_date=datetime.now(),
+                display_on_board=True
+            )
+            action.contacts.add(contact)
+            action.save()
+            actions.append(action)
+
+        # send an email
+        send_notification_email(request, contact, actions, message)
+
+        return contact
 
 
 class NewsletterSchedulingForm(forms.ModelForm):
