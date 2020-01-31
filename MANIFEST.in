@@ -1,3 +1,4 @@
 recursive-include balafon *.html *.json *.js *.css *.png *.jpg *.gif *.po *.mo *.txt *.eot *.svg *.ttf *.woff
 recursive-include balafon *.
 include README.rst
+exclude balafon/ci/semaphore_project.local_settings.py
