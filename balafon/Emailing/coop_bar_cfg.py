@@ -13,7 +13,7 @@ def balafon_homepage(request, context):
         return make_link(
             reverse("balafon_homepage"),
             _('Balafon'),
-            'img/balafon-icon.png',
+            'address-book',
             classes=['icon', 'alert_on_click']
         )
 
@@ -24,7 +24,7 @@ def back_to_newsletters(request, context):
         return make_link(
             reverse("emailing_newsletter_list"),
             _('Back to newsletters'),
-            'fugue/table--arrow.png',
+            'arrow-left',
             classes=['icon', 'alert_on_click']
         )
 
