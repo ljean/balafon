@@ -2,8 +2,8 @@
 <div class="action-contacts">
 
   {% for c in action.contacts.all %}
-    <span class="label label-bigger label-primary label-action-who">
-      <span class="glyphicon glyphicon-user"></span>
+    <span class=" badge badge-primary label label-bigger label-primary label-action-who">
+      <i class="fas fa-user" style="padding-right: 5px"></i>
       <a style="max-width: 180px;" href="{% url 'crm_view_contact' c.id %}">{{ c.fullname }}</a>
       {% if not c.entity.is_single_contact %}
         &nbsp;
@@ -11,19 +11,19 @@
       {% endif %}
       {% if not action.type.hide_contacts_buttons %}
       &nbsp;<a href="{% url 'crm_remove_contact_from_action' action.id c.id %}" class="colorbox-form">
-          <span class="glyphicon glyphicon-remove"></span>
+          <i class="fas fa-times"></i>
       </a>
       {% endif %}
     </span>&nbsp;
   {% endfor %}
 
   {% for e in action.entities.all %}
-    <span class="label label-bigger label-primary label-action-who">
-      <span class="glyphicon glyphicon-tower"></span>
+    <span class="badge badge-primary label label-bigger label-primary label-action-who">
+      <i class="fas fa-chess-rook" style="padding-right: 5px"></i>
       <a style="max-width: 200px;" href="{% url 'crm_view_entity' e.id %}">{{ e }}</a>
       {% if not action.type.hide_contacts_buttons %}
       &nbsp;<a href="{% url 'crm_remove_entity_from_action' action.id e.id %}" class="colorbox-form">
-          <span class="glyphicon glyphicon-remove"></span>
+          <i class="fas fa-times"></i>
       </a>
       {% endif %}
     </span>&nbsp;

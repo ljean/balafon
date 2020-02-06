@@ -2,7 +2,7 @@
 {% load i18n favorite_tags balafon_utils %}
 
 {% block section_title %}
-  <span class="glyphicon glyphicon-user"></span>
+  <i class="fas fa-user"></i>
   {%if partial %}{% trans "Latest contacts" %}{% else %}{% trans "All contacts" %}{%endif%}
 {% endblock %}
   
@@ -11,15 +11,15 @@
   <tr>
     <th colspan="2">{% trans "Contacts" %}</th>
     <th class="extra-data">
-      <span class="glyphicon glyphicon-envelope"></span>
+      <i class="fas fa-envelope"></i>
       <span class="text">{% trans "City" %}</span>
     </th>
     <th class="extra-data">
-      <span class="glyphicon glyphicon-earphone"></span>
+      <i class="fas fa-phone-alt"></i>
       <span class="text">{% trans "Phone" %}</span>
     </th>
     <th class="extra-data">
-      <span class="glyphicon glyphicon-send"></span>
+      <i class="fas fa-paper-plane"></i>
       <span class="text">{% trans "Email" %}</span>
     </th>
   </tr>
@@ -29,7 +29,7 @@
       <tr class="{% if counter|divisibleby:2 %}even{% else %}odd{% endif %}"> 
         {% with e.single_contact as c %}
         <td colspan="2">
-          <span class="glyphicon glyphicon-user"></span>
+          <i class="fas fa-user"></i>
           <a href="{% url 'crm_view_contact' c.id %}">{{c.display_name }}</a>
         </td>
       
@@ -49,7 +49,7 @@
   
             <td>
               {% if forloop.counter0 == 0 %}
-                <span class="glyphicon glyphicon-tower"></span>
+                <i class="fas fa-chess-rook"></i>
                 <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
               {% else %}
                 &nbsp;
@@ -68,7 +68,7 @@
       {% else %}
         <tr class="{% if counter|divisibleby:2 %}even{% else %}odd{% endif %}">
           <td>
-            <span class="glyphicon glyphicon-tower"></span>
+            <i class="fas fa-chess-rook"></i>
             <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
           </td>
           <td></td>
@@ -88,6 +88,6 @@
 
 {% block section_buttons %}
   {% if partial %}
-  </li><a href="{% url "crm_view_entities_list" %}">{% trans "All" %}</a></li>
+  </li><a href="{% url "crm_view_entities_list" %}" class="dropdown-link">{% trans "All" %}</a></li>
   {% endif %}
 {% endblock %}

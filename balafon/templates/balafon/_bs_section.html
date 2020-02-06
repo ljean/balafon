@@ -1,28 +1,28 @@
 {% load i18n %}
 <div class="row section">
-  <div class="col-md-12 section-content">
+  <div class="col-xl-12 section-content">
     {% block column_section_data %}
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-xl-12">
         <div class="section-header {% block section_header_extra_class %}{% endblock %}"> 
           <div class="row">
-            <div class="col-md-11">
+            <div class="col-xl-11">
               <div class="section-title">{% block section_title %}{% endblock %}</div>
             </div>
-            <div class="col-md-1">
-              <div class="section-buttons pull-right">
+            <div class="col-xl-1">
+              <div class="section-buttons float-right">
                 <div class="section-favorite text-right">
                   {% block section_favorite %}{% endblock %}
                 </div>
                 {% if not preview %}
-                <div class="dropdown btn-group pull-right">
-                    <a class="btn btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-                      {% block section_menu_name %}<span class="glyphicon glyphicon-cog"></span>{% endblock %}
+                <div class="dropdown">
+                    <button class="btn btn-xs dropdown-toggle btn-outline-secondary" id="dropdown-action" data-toggle="dropdown" aria-haspopup="true"  href="#" aria-expanded="false" type="button">
+                      {% block section_menu_name %}<i class="fas fa-cog"></i>{% endblock %}
                       <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu text-right">
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdown-action">
                         {% block section_buttons %}{% endblock %}
-                    </ul>
+                    </div>
                 </div>
                 {% block section_buttons_extra %}{% endblock %}
                 {% endif %}
@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="row"><div class="col-md-12 section-data">
+    <div class="row"><div class="col-xl-12 section-data">
       {% block section_data %}
       {% endblock %}
     </div></div>

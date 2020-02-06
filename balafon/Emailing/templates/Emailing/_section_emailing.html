@@ -2,16 +2,16 @@
 {% load i18n favorite_tags coop_utils %}
 
 {% block section_title %}
-  <h4 class="inline-block"><span class="glyphicon glyphicon-open-file"></span>
+  <h4 class="inline-block"><i class="fas fa-file-upload"></i>
  {% trans "Sending" %}: {{ emailing.newsletter.subject|dehtml }}</h4>
 {% endblock %}
   
 {% block section_data %}
   <div class="row">
-      <div class="col-md-6"><h4>{{ emailing.get_info }}</h4></div>
-      <div class="col-md-6">
+      <div class="col-lg-6"><h4>{{ emailing.get_info }}</h4></div>
+      <div class="col-lg-6">
           <div class="row">
-              <div class="col-md-12">{% trans "Newsletter" %}:
+              <div class="col-lg-12">{% trans "Newsletter" %}:
                   <a href="{{emailing.newsletter.get_absolute_url }}">
                       {{ emailing.newsletter.subject|dehtml }}
                   </a>
@@ -19,16 +19,16 @@
               </div>
           </div>
           <div class="row">
-              <div class="col-md-12">{% trans "Subscription" %}: {{ emailing.subscription_type.name }}</div>
+              <div class="col-lg-12">{% trans "Subscription" %}: {{ emailing.subscription_type.name }}</div>
           </div>
           {% if emailing.lang %}
           <div class="row">
-              <div class="col-md-12">{% trans "Language" %}: {{ emailing.get_lang_display }}</div>
+              <div class="col-lg-12">{% trans "Language" %}: {{ emailing.get_lang_display }}</div>
           </div>
           {% endif %}
           {% if emailing.from_email %}
           <div class="row">
-              <div class="col-md-12">{% trans "Sender" %}: {{ emailing.from_email }}</div>
+              <div class="col-lg-12">{% trans "Sender" %}: {{ emailing.from_email }}</div>
           </div>
           {% endif %}
       </div>
@@ -36,16 +36,16 @@
 {% endblock %}
 
 {% block section_menu_name %}
-  <span class="glyphicon glyphicon-cog"></span> {% trans "Settings" %}
+  <i class="fas fa-cog"></i> {% trans "Settings" %}
 {% endblock %}
 
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url 'emailing_update_emailing' emailing.id %}">
-    <span class="glyphicon glyphicon-edit"></span> {% trans "Edit" %}
+  <li><a class="colorbox-form dropdown-link" href="{% url 'emailing_update_emailing' emailing.id %}">
+    <i class="fas fa-edit"></i> {% trans "Edit" %}
   </a></li>
   <li>{{ emailing.next_action }}</li>
-  <li><a class="colorbox-form" href="{% url 'emailing_delete' emailing.id %}">
-    <span class="glyphicon glyphicon-remove"></span> {% trans "Delete" %}
+  <li><a class="colorbox-form dropdown-link" href="{% url 'emailing_delete' emailing.id %}">
+    <i class="fas fa-remove"></i> {% trans "Delete" %}
   </a></li>
 {% endblock %}
 

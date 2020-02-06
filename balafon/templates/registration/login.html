@@ -1,6 +1,6 @@
 {% extends "registration/base.html" %}{% load i18n %}
 {% block registration_content %}
-<div class="row"><div class="col-md-6">
+<div class="row"><div class="col-xl-6">
     <H2>{% trans "Login" %}</H2>
     {% if form.errors %}
         <h3 class="warning">{% trans "Login has failed" %}</h3>
@@ -24,13 +24,13 @@
         {% include "balafon/_field_form.html" with field=form.password %}
 
         <div class="row" style="margin-top: 20px;">
-          <div class="col-md-9">
+          <div class="col-xl-9">
             <a class="" href="{% url 'password_reset' %}">
                 {% trans "Forgotten Password" %}
             </a>
           </div>
 
-          <div class="col-md-3">
+          <div class="col-xl-3">
             <input class="btn btn-primary" type="submit" value="{% trans 'Login' %}" />
           </div>
         </div>

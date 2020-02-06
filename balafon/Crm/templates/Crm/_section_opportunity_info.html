@@ -3,9 +3,9 @@
 
 {% block section_title %}
   <div class="row">
-  <div class="col-md-12">
+  <div class="col-lg-12">
     <div class="opportunity-title">
-      <span class="glyphicon glyphicon-tag"></span> <h2 class="inline-block">{{opportunity.name}}</h2>
+      <i class="fas fa-tag"></i> <h2 class="inline-block">{{opportunity.name}}</h2>
     </div>
   </div>
 </div>
@@ -13,7 +13,7 @@
 
 {% block section_data %}
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-lg-12">
     <div class="">
       <span class="contenteditable description inline-block" rel="{% url "auto_save_data" "opportunity" "detail" opportunity.id %}" contenteditable="true">
         {{opportunity.detail|linebreaksbr}}
@@ -25,8 +25,8 @@
 
 
 {% block section_buttons %}
-  <li><a class="colorbox-form" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
-  <li><a class="colorbox-form" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a></li>
+  <li><a class="colorbox-form dropdown-link" href="{% url "crm_edit_opportunity" opportunity.id %}">{% trans "Edit" %}</a></li>
+  <li><a class="colorbox-form dropdown-link" href="{% url "crm_delete_opportunity" opportunity.id %}">{% trans "Delete" %}</a></li>
 {% endblock %}
 
 {% block section_favorite %}

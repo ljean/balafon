@@ -225,41 +225,41 @@
     <div ng-controller="storeStatsCtrl" class="container-fluid">
 
       <div class="row" style="margin-bottom: 10px;">
-        <div class="col-md-5">
+        <div class="col-xl-5">
           <div class="title">
             <h2 ng-show="mode==='total'"> {{ 'STATS_TOTAL' | translate }} </h2>
             <h2 ng-show="mode==='categories'"> {{ 'STATS_BY_CATEGORY' | translate }} </h2>
             <h2 ng-show="mode==='families'"> {{ 'STATS_BY_FAMILY' | translate }} </h2>
             <h2 ng-show="mode==='tags'"> {{ 'STATS_BY_TAG' | translate }} </h2>
             <h2 ng-show="mode===''">
-              <span ng-show="currentItem.icon" class="glyphicon glyphicon-{{ currentItem.icon }}"></span>
-              <span ng-hide="currentItem.icon" class="glyphicon glyphicon-tag"></span>
+              <i ng-show="currentItem.icon" class="fas fa-{{ currentItem.icon }}"></i>
+              <i ng-show="currentItem.icon" class="fas fa-tag"></i>
               {{ currentItem.name }}
             </h2>
           </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-xl-2">
         <select ng-disabled="loading" class="form-control" ng-model="selectedYear" ng-options="year for year in years" ng-change="yearChanged()">
         </select>
         </div>
-        <div class="col-md-5">
-          <div class="btn-group pull-right" role="group" aria-label="...">
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-default': !isTotal()}"
+        <div class="col-xl-5">
+          <div class="btn-group float-right" role="group" aria-label="...">
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-outline-secondary': !isTotal()}"
               ng-click="loadTotalSalesStatistics()"
             >
               {{ 'TOTAL' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-default': !isFamilies()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-outline-secondary': !isFamilies()}"
               ng-click="loadFamiliesStatistics()"
             >
               {{ 'BY_FAMILY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-default': !isCategories()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-outline-secondary': !isCategories()}"
               ng-click="loadCategoriesStatistics()"
             >
               {{ 'BY_CATEGORY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-default': !isTags()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-outline-secondary': !isTags()}"
               ng-click="loadTagsStatistics()"
             >
               {{ 'BY_TAG' | translate }}
@@ -279,8 +279,8 @@
         </tr>
         <tr ng-repeat="statistic in statistics | orderBy:'-total_amount' ">
           <td>
-            <span ng-show="statistic.icon" class="glyphicon glyphicon-{{ statistic.icon }}"></span>
-            <span ng-hide="statistic.icon" class="glyphicon glyphicon-tag"></span>
+            <i ng-show="statistic.icon" class="fas fa-{{ statistic.icon }}"></i>
+            <i ng-hide="statistic.icon" class="fas fa-tag"></i>
             <a href ng-show="mode && mode!=='total'" ng-click="loadItemStatistics(statistic)">{{ statistic.name }}</a>
             <span ng-show="!mode || mode==='total'">{{ statistic.name }}</span>
           </td>

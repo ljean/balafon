@@ -25,7 +25,7 @@
   {% block doc_header %}
   {% endblock %}
   {% if form.errors %}
-  <div class="pull-right error-msg label label-danger">{% trans "The form is not valid." %}</div>
+  <div class="float-right error-msg label label-danger">{% trans "The form is not valid." %}</div>
   {% endif %}
   </div>
 
@@ -40,6 +40,6 @@
 {% endblock %}
 
 {% block popup_buttons %}
-<a href="" class="btn btn-default cancel_button">{% trans "Cancel" %}</a>
-<input class="btn btn-primary" type="submit" value="{% block form_ok %}{% trans "Ok" %}{% endblock %}" />
+<a href="" class="btn btn-secondary btn-sm cancel_button">{% trans "Cancel" %}</a>
+<input class="btn btn-primary btn-sm" type="submit" value="{% block form_ok %}{% trans "Ok" %}{% endblock %}" />
 {% endblock %}

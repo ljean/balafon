@@ -3,27 +3,29 @@
 {% for field in form %}
 <div class="form-group">
     <div class="field-form">
-    {% if field|is_checkbox %}
-        <div class="col-sm-8 col-sm-offset-2">
-            <div class="checkbox">
-            {{ field }} {{field.label}}
-            </div>
-            {{ field.errors }}
-            {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
-        </div>
-    {% else %}
-        {% if field.label %}<label class="control-label col-sm-2" for="{{ field.name }}">{{field.label}}</label>{% endif %}
-        <div class="col-sm-8">
-            {{ field }}
-            {% if field.errors %}<div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>{% endif %}
-            {% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
-        </div>
-    {% endif %}
-        <div class="col-sm-2">
-            <a href="" class="btn pull-right btn-xs btn-warning remove-field">
-                <span class="glyphicon glyphicon-minus"></span> {% trans "Remove" %}
-            </a>
-        </div>
-    </div>
+	<div class="row">
+		{% if field|is_checkbox %}
+			<div class="col-md-8 col-md-offset-2">
+				<div class="checkbox">
+				{{ field }} {{field.label}}
+				</div>
+				{{ field.errors }}
+				{% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
+			</div>
+		{% else %}
+			{% if field.label %}<label class="control-label col-md-2" for="{{ field.name }}">{{field.label}}</label>{% endif %}
+			<div class="col-md-8">
+				{{ field }}
+				{% if field.errors %}<div class="field-error"><div class="label label-danger">{{field.errors|join:", "}}</div></div>{% endif %}
+				{% if field.help_text %}<div class="help-block">{{ field.help_text }}</div>{% endif %}
+			</div>
+		{% endif %}
+			<div class="col-md-2">
+				<a href="" class="btn btn-xs btn-warning remove-field" style="color: white; margin-top: 8px">
+					<i class="fas fa-minus"></i> {% trans "Remove" %}
+				</a>
+			</div>
+		</div>
+	</div>
 </div>
 {% endfor %}

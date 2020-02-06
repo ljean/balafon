@@ -28,11 +28,22 @@ $(function() {
         return false;
     });
     
-    try {
-        $(".chosen-select").chosen({disable_search: false});//, width: "50%"});
-    } catch(e) {
+    $(".chosen-select").each(function (idx, elt) {
+        var attrs = {
+            disable_search: false,
+        };
+        var width = $(elt).attr('width');
+        console.log('> width', width);
+        if (width) {
+            attrs.width = width;
+        }
+        try {
+            $(elt).chosen(attrs);
+        } catch(e) {
+            console.error(e);
+        }
+    });
 
-    }
     
     $(".contenteditable").blur(function() {
         var t = (new Date()).getTime();
@@ -77,9 +88,9 @@ $(function() {
             data: form.serialize(),
             success: function(data) {
                 if (data.success) {
-                    var glyphicon = elt.find(".glyphicon");
-                    glyphicon.removeClass('glyphicon-star').removeClass('glyphicon-star-empty');
-                    glyphicon.addClass(data.status?'glyphicon-star':'glyphicon-star-empty');
+                    var icon = elt.find(".fa-star");
+                    icon.removeClass('fas').removeClass('far');
+                    icon.addClass(data.status?'fas':'far');
                 } else {
                     alert(data.message);
                 }

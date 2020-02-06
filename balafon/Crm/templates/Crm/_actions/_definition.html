@@ -1,15 +1,15 @@
 {% load i18n balafon_utils %}
 {% if action.type %}
-  <div class="label label-default">
+  <div class="label label-default badge badge-font-size">
     {{ action.type }} {% if action.number %}{% trans "N°" %} {{action.number }} {% endif %}
   </div>&nbsp;
 {% else %}
-  {% if action.number %}<div class="label label-default">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
+  {% if action.number %}<div class="label label-default badge badge-font-size">{% trans "Number"%}: {{action.number }}</div>&nbsp;{% endif %}
 {% endif %}
 {% if action.status %}
   <a
     href="{% url 'crm_update_action_status' action.id %}"
-    class="colorbox-form btn btn-xs btn-default btn-action-status"
+    class="colorbox-form btn btn-xs btn-outline-secondary btn-action-status"
     style="{{ action.status.style }}"
     {% if action.type.track_status %}title="{{ action|action_status_date:action.status|date:"d/m/Y H:i" }}" data-toggle="tooltip" date-placement="top" {% endif %}
   >
@@ -19,10 +19,10 @@
 {% if action.status2 %}
   <a
     href="{% url 'crm_update_action_status2' action.id %}"
-    class="colorbox-form btn btn-xs btn-default btn-action-status"
+    class="colorbox-form btn btn-xs btn-outline-secondary btn-action-status"
     style="{{ action.status2.style }}"
   >
     {{action.status2}}
   </a>&nbsp;
 {% endif %}
-{% if action.amount %}<div class="label label-default">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}
+{% if action.amount %}<div class="label label-default badge badge-font-size">{% trans "Amount"%}:{{action.amount }}</div>&nbsp;{% endif %}

@@ -235,7 +235,8 @@ class ZoneSearchForm(SearchFieldForm):
         return forms.SelectMultiple(attrs={
             'class': "chosen-select",
             'data-placeholder': self.label,
-            'style': "width: 100%", 
+            'style': "width: 100%",
+            'width': '100%',
         })
     
     def get_queryset(self, queryset):
@@ -690,7 +691,8 @@ class MultiGroupSearchForm(SearchFieldForm):
         return forms.SelectMultiple(attrs={
             'class': "chosen-select",
             'data-placeholder': _('Select Group names'),
-            'style': "width: 100%", 
+            'style': "width: 100%",
+            'width': "100%",
         })
 
 

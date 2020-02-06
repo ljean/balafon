@@ -89,7 +89,7 @@
 
   {% if action.done %}
   <div class="alert alert-warning">
-    <span class="glyphicon glyphicon-warning-sign"></span>
+    <i class="fas fa-exclamation-triangle"></i>
     {% trans "This action has be done on" %} {{action.done_date}}
   </div>
   {% endif %}
@@ -101,11 +101,11 @@
 
 
 {% block popup_buttons %}
-    <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}">
+    <input class="btn btn-primary btn-sm" type="submit" value="{% trans 'Save' %}">
     {% if action %}
-    <a class="btn btn-warning colorbox-form" href="{% url 'crm_delete_action' action.id %}">{% trans "Delete" %}</a>
+    <a class="btn btn-warning btn-sm colorbox-form" href="{% url 'crm_delete_action' action.id %}">{% trans "Delete" %}</a>
     {% endif %}
-    <a class="btn btn-default cancel_button" href="">{% trans "Cancel" %}</a>
+    <a class="btn btn-secondary btn-sm cancel_button" href="">{% trans "Cancel" %}</a>
 {% endblock %}
 
 {% block doc_footer %}

@@ -15,8 +15,8 @@
 </div>
 
 <form role="form" id="search_form" class="form-horizontal search-form" action="{% url 'search' %}" method="post">{% csrf_token %}
-  <a class="btn btn-primary pull-right search-btn" href="" id="search-button">
-    <span class="glyphicon glyphicon-search"></span>
+  <a class="btn btn-primary float-right search-btn btn-sm" href="" id="search-button">
+    <i class="fas fa-search"></i>
     {% trans "Search" %}
   </a>
   <div class="cur-form">
@@ -149,13 +149,13 @@
 {% endblock %}
 
 {% block section_menu_name %}
-  <span class="glyphicon glyphicon-floppy-saved"></span> {% trans "Save" %}
+  <i class="fas fa-save"></i> {% trans "Save" %}
 {% endblock %}
 
 {% block section_buttons %}
 <li>
-  <a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form">
-    <span class="glyphicon glyphicon-floppy-saved"></span> {% trans "Search" %}
+  <a href="{% url "search_save" search.id|default:0 %}" class="colorbox-form dropdown-link">
+    <i class="fas fa-save"></i> {% trans "Search" %}
   </a>
 </li>
 {% endblock %}
