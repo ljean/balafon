@@ -23,7 +23,7 @@ setup(
         'django >= 2.2.9, <3.0',
         'djangorestframework >= 3.10.3, <3.11.0',
         'django-extensions',
-        'apidev-coop_cms >= 1.5.2',
+        'apidev-coop_cms >= 1.5.5',
         'beautifulsoup4',
         'django-wkhtmltopdf',
         'xlwt',
