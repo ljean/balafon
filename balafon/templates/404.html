@@ -7,7 +7,9 @@
 
 {% block main %}
 <div class="login-header">
-    <a href="{% url 'balafon_homepage' %}"><img src="{{STATIC_URL}}img/logo-balafon.png"></a>
+    <a href="{% url 'balafon_homepage' %}">
+        <i class="fa fa-address-book"></i> Balafon
+    </a>
 </div>
 
 <h2>{% block document_title %}{% trans "Page not found" %}{% endblock %}</h2>
