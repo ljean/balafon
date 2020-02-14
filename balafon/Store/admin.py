@@ -260,7 +260,7 @@ class StoreItemAdmin(admin.ModelAdmin):
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.rel, self.admin_site)
+            kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.remote_field, self.admin_site)
         else:
             return super(StoreItemAdmin,self).formfield_for_dbfield(db_field, **kwargs)
         kwargs.pop('request')

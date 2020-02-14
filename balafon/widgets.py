@@ -20,12 +20,12 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
     def label_and_url_for_value(self, value):
         values = value
         str_values = []
-        key = self.rel.get_related_field().name
-        app_label = self.rel.to._meta.app_label
-        class_name = self.rel.to._meta.object_name.lower()
+        key = self.rel.field.name
+        app_label = self.rel.model._meta.app_label
+        class_name = self.rel.model._meta.model_name.lower()
         for elt in values:
             try:
-                obj = self.rel.to._default_manager.using(self.db).get(**{key: elt})
+                obj = self.rel.related_model.objects.using(self.db).get(**{key: elt})
                 url = reverse('admin:{0}_{1}_change'.format(app_label, class_name), args=[obj.id])
                 label = escape(smart_text(obj))
                 link = '<a href="{0}" {1}>{2}</a>'.format(
@@ -34,7 +34,7 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
                     label
                 )
                 str_values += [link]
-            except self.rel.to.DoesNotExist:
+            except self.rel.related_model.DoesNotExist:
                 str_values += ['???']
         return mark_safe('&nbsp;<strong>{0}</strong>'.format(',&nbsp;'.join(str_values))), ''
 
