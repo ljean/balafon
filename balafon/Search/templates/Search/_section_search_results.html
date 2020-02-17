@@ -128,17 +128,17 @@
 <li><a href="{% url "search_export_contacts_as_excel" %}" id="xl-button" class="dropdown-link">
   <i class="fas fa-th"></i> {% trans "Excel" %}
 </a></li>
-<li><a href="{% url "search_create_action_for_contacts" %}" class="action-button" class="colorbox-form dropdown-link">
+<li><a href="{% url "search_create_action_for_contacts" %}" class="dropdown-link" class="colorbox-form dropdown-link">
   <i class="fas fa-copy"></i> {% trans "Create action" %}
 </a></li>
-<li><a href="{% url "search_add_contacts_to_group" %}" class="action-button" class="colorbox-form dropdown-link">
+<li><a href="{% url "search_add_contacts_to_group" %}" class="dropdown-link" class="colorbox-form dropdown-link">
   <i class="fas fa-certificate"></i> {% trans "Add to groups" %}
 </a></li>
-<li><a href="{% url "search_export_to_pdf" %}" class="action-button" class="colorbox-form dropdown-link">
+<li><a href="{% url "search_export_to_pdf" %}" class="dropdown-link" class="colorbox-form dropdown-link">
   <i class="fas fa-print"></i> {% trans "PDF" %}
 </a></li>
-{% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="action-button" class="colorbox-form dropdown-link">
-  <i class="fas fa-flash"></i> {% trans "Contacts Admin" %}
+{% if user.is_superuser %}<li><a href="{% url "search_subscribe_contacts_admin" %}" class="dropdown-link" class="colorbox-form dropdown-link">
+  <i class="fas fa-users"></i> {% trans "Contacts Admin" %}
 </a></li>{% endif %}
 {% endif %}
 {% endblock %}
