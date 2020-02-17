@@ -25,9 +25,9 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
 
     class Media:
         css = {
-            'all': ('css/base/jquery-ui-1.9.2.css',),
+            'all': ('css/base/jquery-ui.css',),
         }
-        js = ('js/jquery-ui-1.9.2.js',)
+        js = ('js/jquery-ui.js',)
     
     class Meta:
         model = Contact

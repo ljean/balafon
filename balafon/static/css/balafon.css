@@ -804,4 +804,8 @@ a.dropdown-link:hover {
     padding-top: 140px;
   }
 }
+.ui-widget {
+  z-index: 10000;
+  display: block !important;
+}
 /*# sourceMappingURL=balafon.css.map */
