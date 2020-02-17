@@ -26,7 +26,7 @@
             {% spaceless %}
             <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
               <a class="colorbox-form btn-close" href="{% url 'crm_remove_contact_from_group' g.id contact.id %}" title="{% trans 'Remove from group' %}">
-                <i class="fas fa-remove"></i>
+                <i class="fa fa-times"></i>
               </a>
             {% endspaceless %}
           </span>
