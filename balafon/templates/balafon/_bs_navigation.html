@@ -161,22 +161,17 @@
             </ul>
         </li>
       </ul>
-      <a class="btn btn-sm btn-secondary make-homepage">
+        <a data-toggle="tooltip" data-placement="bottom"
+          rel="{% url 'users_make_homepage' %}"
         {% if is_allowed_homepage %}
-          <i
-            rel="{% url 'users_make_homepage' %}"
-            class="fas fa-home"
-            data-toggle="tooltip" data-placement="bottom"
-            title="{% trans 'Make this homepage' %}"
-          ></i>
+         class="btn btn-sm btn-secondary make-homepage"
+         title="{% trans 'Make this homepage' %}"
         {% else %}
-          <i
-            rel=""
-            class="fas fa-home disabled"
-            data-toggle="tooltip" data-placement="bottom"
-            title="{% trans 'This page can not be set as homepage' %}"
-          ></i>
+         class="btn btn-sm btn-secondary make-homepage disabled"
+         title="{% trans 'This page can not be set as homepage' %}"
         {% endif %}
+        >
+            <i class="fas fa-home"></i>
         </a>
       <form class="form-inline" method="GET" action="{% url 'quick_search' %}">
             {{ quick_search_form.text }}
