@@ -161,9 +161,9 @@ table.table.table-search-results td {
   color: #fff;
 }
 .label-group {
-  color: #000;
-  background: #eee;
-  border: solid thin #ccc;
+  color: #fff;
+  background: #0056b3;
+  border: solid thin #0056b3;
   margin-bottom: 3px;
   display: inline-block;
 }
