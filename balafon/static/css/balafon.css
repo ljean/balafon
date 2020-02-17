@@ -784,7 +784,6 @@ a.dropdown-link:hover {
 }
 .ui-widget {
   z-index: 10000;
-  display: block !important;
 }
 .btn-secondary {
   background: #eee;
