@@ -33,7 +33,7 @@
     <td>{{ o.get_start_date|date:'j F Y'|default:'&nbsp;'}} : {{ o.get_end_date|date:'j F Y'|default:'&nbsp;'}}</td>
     
     <td>
-      <a class="btn btn-xs btn-outline-secondary float-right" href="{% url "crm_view_opportunity" o.id %}">
+      <a class="btn btn-xs btn-secondary float-right" href="{% url "crm_view_opportunity" o.id %}">
         <i class="fas fa-tag"></i>
         {%  trans "View" %}
       </a>

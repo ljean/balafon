@@ -9,7 +9,7 @@
 {% if action.status %}
   <a
     href="{% url 'crm_update_action_status' action.id %}"
-    class="colorbox-form btn btn-xs btn-outline-secondary btn-action-status"
+    class="colorbox-form btn btn-xs btn-secondary btn-action-status"
     style="{{ action.status.style }}"
     {% if action.type.track_status %}title="{{ action|action_status_date:action.status|date:"d/m/Y H:i" }}" data-toggle="tooltip" date-placement="top" {% endif %}
   >
@@ -19,7 +19,7 @@
 {% if action.status2 %}
   <a
     href="{% url 'crm_update_action_status2' action.id %}"
-    class="colorbox-form btn btn-xs btn-outline-secondary btn-action-status"
+    class="colorbox-form btn btn-xs btn-secondary btn-action-status"
     style="{{ action.status2.style }}"
   >
     {{action.status2}}

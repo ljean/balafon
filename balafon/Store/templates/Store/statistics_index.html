@@ -244,22 +244,22 @@
         </div>
         <div class="col-xl-5">
           <div class="btn-group float-right" role="group" aria-label="...">
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-outline-secondary': !isTotal()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTotal(), 'btn-secondary': !isTotal()}"
               ng-click="loadTotalSalesStatistics()"
             >
               {{ 'TOTAL' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-outline-secondary': !isFamilies()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isFamilies(), 'btn-secondary': !isFamilies()}"
               ng-click="loadFamiliesStatistics()"
             >
               {{ 'BY_FAMILY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-outline-secondary': !isCategories()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isCategories(), 'btn-secondary': !isCategories()}"
               ng-click="loadCategoriesStatistics()"
             >
               {{ 'BY_CATEGORY' | translate }}
             </button>
-            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-outline-secondary': !isTags()}"
+            <button ng-disabled="loading" type="button" class="btn" ng-class="{'btn-primary': isTags(), 'btn-secondary': !isTags()}"
               ng-click="loadTagsStatistics()"
             >
               {{ 'BY_TAG' | translate }}

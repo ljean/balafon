@@ -94,12 +94,12 @@
 <div class="action-archive-filter">
   <div class="row" style="margin-bottom: 20px;">
     <div class="col-lg-8">
-      <a class="btn btn-md btn-outline-secondary" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-left"></i>
+      <a class="btn btn-secondary" href="{% block prev_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <i class="fas fa-chevron-left"></i>
       </a>
       &nbsp;
-      <a class="btn btn-md btn-outline-secondary" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
-          <i style="font-size: 1.5em; padding-top: 5px" class="fas fa-chevron-right"></i>
+      <a class="btn btn-secondary" href="{% block next_url %}{% endblock%}{% if filter %}?filter={{filter}}{% endif %}">
+          <i class="fas fa-chevron-right"></i>
       </a>
       &nbsp;
       <h2 class="inline-block">
@@ -117,8 +117,8 @@
           </select>
         </div>
         <div class="float-left" style="margin-left: 5px;">
-          <a class="btn btn-outline-secondary datepicker-trigger" href="#">
-            <i style="font-size: 1.5em; padding-top: 8px;" class="fas fa-calendar"></i>
+          <a class="btn btn-secondary datepicker-trigger" href="#">
+            <i class="fas fa-calendar"></i>
           </a>
           <input type="date" id="showOnButton" class="datepicker float-right" style="width: 1px;" />
         </div>
@@ -163,7 +163,7 @@
     <div class="col-lg-2">
       {% for the_custom_menu in planning_custom_menus %}
         <div class="dropdown btn-group float-right inline-block" style="vertical-align: top;">
-          <a href="#" class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown">
+          <a href="#" class="dropdown-toggle btn btn-secondary" data-toggle="dropdown">
             {% if the_custom_menu.icon %}<i class="fas fa-{{ the_custom_menu.icon }}"></i>{% endif %}
             {{ the_custom_menu.label }}
             <b class="caret"></b>

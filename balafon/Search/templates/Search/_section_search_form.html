@@ -89,9 +89,9 @@
       var field_type = $(this).val();
       var add_field_button = $(this).parent().find(".add-field");
       if (field_type) {
-        add_field_button.css("color", "#000");
+        add_field_button.removeClass('disabled')
       } else {
-        add_field_button.css("color", "#ccc");
+        add_field_button.addClass('disabled')
       }
       return false;
     });
