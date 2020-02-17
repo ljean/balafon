@@ -31,6 +31,20 @@
         <td colspan="2">
           <i class="fas fa-user"></i>
           <a href="{% url 'crm_view_contact' c.id %}">{{c.display_name }}</a>
+          {% for g in c.headline_groups %}
+            <span
+               class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+               style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+               title="{{g.description}}"
+             >
+             {% spaceless %}
+             <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+              <a class="colorbox-form btn-close" href="{% url 'crm_remove_contact_from_group' g.id c.id %}" title="{% trans 'Remove from group' %}">
+                <i class="fa fa-times"></i>
+              </a>
+             {% endspaceless %}
+              </span>
+          {% endfor  %}
         </td>
       
         <td class="extra-data">{{c.city.get_friendly_name|default:"&nbsp;"}}</td>
@@ -51,12 +65,42 @@
               {% if forloop.counter0 == 0 %}
                 <i class="fas fa-chess-rook"></i>
                 <a href="{% url "crm_view_entity" e.id %}">{{e.name}}</a>
+                {% for g in e.headline_groups %}
+                  <span
+                    class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+                    style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+                    title="{{g.description}}"
+                  >
+                  {% spaceless %}
+                    <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+                    <a class="colorbox-form btn-close" href="{% url 'crm_remove_entity_from_group' g.id e.id %}" title="{% trans 'Remove from group' %}">
+                      <i class="fa fa-times"></i>
+                    </a>
+                  {% endspaceless %}
+                  </span>
+                {% endfor  %}
               {% else %}
                 &nbsp;
               {% endif %}
             </td>
             
-            <td><a href="{% url "crm_view_contact" c.id %}">{{c.display_name}}</a></td>
+            <td>
+                <a href="{% url "crm_view_contact" c.id %}">{{c.display_name}}</a>
+                {% for g in c.headline_groups %}
+                  <span
+                    class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
+                    style="{% if g.fore_color %}color: {{ g.fore_color }}; {% endif %}{% if g.background_color %}background: {{ g.background_color }}; {% endif %}"
+                    title="{{g.description}}"
+                  >
+                  {% spaceless %}
+                    <a href="{% url 'search_group' g.id %}" class="group-name">{{g.name}}</a>&nbsp;
+                    <a class="colorbox-form btn-close" href="{% url 'crm_remove_contact_from_group' g.id c.id %}" title="{% trans 'Remove from group' %}">
+                      <i class="fa fa-times"></i>
+                    </a>
+                  {% endspaceless %}
+                  </span>
+                {% endfor  %}
+            </td>
             
             <td class="extra-data">{{c.get_city.get_friendly_name|default:"&nbsp;"}}</td>
             <td class="extra-data">{{c.get_phones|seq_to_br|default:"&nbsp;"}}</td>

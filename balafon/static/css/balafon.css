@@ -794,4 +794,8 @@ a.dropdown-link:hover {
 .btn-secondary:hover {
   background: #ddd;
 }
+.ui-helper-clearfix::before,
+.ui-helper-clearfix::after {
+  top: -1;
+}
 /*# sourceMappingURL=balafon.css.map */

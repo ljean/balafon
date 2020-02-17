@@ -420,6 +420,96 @@ class ViewContactsTest(BaseTestCase):
         self.assertNotContains(response, e3.name)
         self.assertNotContains(response, c3.lastname)
 
+    def test_view_contacts_group_single_contact(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+
+        e2 = mommy.make(models.Entity, is_single_contact=True)
+        c2 = e2.default_contact
+        c2.lastname = "#Contact{0}#".format(c2.id)
+        c2.save()
+
+        g1 = mommy.make(models.Group, on_contacts_list=True)
+        g1.contacts.add(c2)
+        g1.save()
+        g2 = mommy.make(models.Group, on_contacts_list=False)
+        g2.contacts.add(c2)
+        g2.save()
+        g3 = mommy.make(models.Group, on_contacts_list=True)
+
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        self.assertContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+
+    def test_view_contacts_group_contact(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+
+        e2 = mommy.make(models.Entity, is_single_contact=True)
+        c2 = e2.default_contact
+        c2.lastname = "#Contact{0}#".format(c2.id)
+        c2.save()
+
+        g1 = mommy.make(models.Group, on_contacts_list=True)
+        g1.contacts.add(c1)
+        g1.save()
+        g2 = mommy.make(models.Group, on_contacts_list=False)
+        g2.contacts.add(c1)
+        g2.save()
+        g3 = mommy.make(models.Group, on_contacts_list=True)
+
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        self.assertContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+
+    def test_view_contacts_group_entity(self):
+        e1 = mommy.make(models.Entity)
+        c1 = e1.default_contact
+        c1.lastname = "#Contact{0}#".format(c1.id)
+        c1.save()
+
+        e2 = mommy.make(models.Entity, is_single_contact=True)
+        c2 = e2.default_contact
+        c2.lastname = "#Contact{0}#".format(c2.id)
+        c2.save()
+
+        g1 = mommy.make(models.Group, on_contacts_list=True)
+        g1.entities.add(e1)
+        g1.save()
+        g2 = mommy.make(models.Group, on_contacts_list=False)
+        g2.entities.add(e1)
+        g2.save()
+        g3 = mommy.make(models.Group, on_contacts_list=True)
+
+        url = reverse('crm_view_entities_list')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        self.assertContains(response, g1.name)
+        self.assertNotContains(response, g2.name)
+        self.assertNotContains(response, g3.name)
+
 
 class ContactViewUrlTest(BaseTestCase):
     """Test the get_view_url method of contact"""

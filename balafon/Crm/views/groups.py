@@ -119,7 +119,8 @@ def remove_entity_from_group(request, group_id, entity_id):
         if form.is_valid():
             if form.cleaned_data["confirm"]:
                 group.entities.remove(entity)
-            return HttpResponseRedirect(reverse('crm_view_entity', args=[entity_id]))
+            redirect_url = request.META.get('HTTP_REFERER', '') or reverse('crm_view_entity', args=[entity_id])
+            return HttpResponseRedirect(redirect_url)
     else:
         form = forms.ConfirmForm()
     return render(
@@ -145,7 +146,8 @@ def remove_contact_from_group(request, group_id, contact_id):
             if form.is_valid():
                 if form.cleaned_data["confirm"]:
                     group.contacts.remove(contact)
-            return HttpResponseRedirect(reverse('crm_view_contact', args=[contact_id]))
+            redirect_url = request.META.get('HTTP_REFERER', '') or reverse('crm_view_contact', args=[contact_id])
+            return HttpResponseRedirect(redirect_url)
         else:
             form = forms.ConfirmForm()
         return render(

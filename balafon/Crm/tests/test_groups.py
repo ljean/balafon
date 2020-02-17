@@ -694,6 +694,7 @@ class EditGroupTestCase(BaseTestCase):
             'description': 'my group description',
             'fore_color': '',
             'background_color': '',
+            'on_contacts_list': False,
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
@@ -703,6 +704,7 @@ class EditGroupTestCase(BaseTestCase):
         self.assertEqual(group.description, data['description'])
         self.assertEqual(group.fore_color, data['fore_color'])
         self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
 
     def test_edit_group_fore_color(self):
         """it should modify the group"""
@@ -712,6 +714,7 @@ class EditGroupTestCase(BaseTestCase):
             'description': 'my group description',
             'fore_color': '#ccc',
             'background_color': '',
+            'on_contacts_list': False,
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
@@ -719,7 +722,7 @@ class EditGroupTestCase(BaseTestCase):
         self.assertEqual(group.name, data['name'])
         self.assertEqual(group.description, data['description'])
         self.assertEqual(group.fore_color, data['fore_color'])
-        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
 
     def test_edit_group_background_color(self):
         """it should modify the group"""
@@ -729,6 +732,7 @@ class EditGroupTestCase(BaseTestCase):
             'description': 'my group description',
             'fore_color': '',
             'background_color': '#123456',
+            'on_contacts_list': False,
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(302, response.status_code)
@@ -737,6 +741,7 @@ class EditGroupTestCase(BaseTestCase):
         self.assertEqual(group.description, data['description'])
         self.assertEqual(group.fore_color, data['fore_color'])
         self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
 
     def test_edit_group_invalid_color(self):
         """it should not modify the group"""
@@ -746,6 +751,7 @@ class EditGroupTestCase(BaseTestCase):
             'description': 'my group description',
             'fore_color': 'hello',
             'background_color': '#123456',
+            'on_contacts_list': False,
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(200, response.status_code)
@@ -760,6 +766,7 @@ class EditGroupTestCase(BaseTestCase):
         self.assertNotEqual(group.description, data['description'])
         self.assertNotEqual(group.fore_color, data['fore_color'])
         self.assertNotEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
 
     def test_edit_group_invalid_background_color(self):
         """it should not modify the group"""
@@ -769,6 +776,7 @@ class EditGroupTestCase(BaseTestCase):
             'description': 'my group description',
             'fore_color': '#123',
             'background_color': 'hello',
+            'on_contacts_list': False,
         }
         response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
         self.assertEqual(200, response.status_code)
@@ -783,6 +791,46 @@ class EditGroupTestCase(BaseTestCase):
         self.assertNotEqual(group.description, data['description'])
         self.assertNotEqual(group.fore_color, data['fore_color'])
         self.assertNotEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
+
+    def test_edit_group_on_contacts_list(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+            'on_contacts_list': True,
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 1)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, data['on_contacts_list'])
+
+    def test_edit_group_on_contacts_list_missing(self):
+        """it should modify the group"""
+        group = mommy.make(models.Group)
+        data = {
+            'name': 'my group name',
+            'description': 'my group description',
+            'fore_color': '',
+            'background_color': '',
+        }
+        response = self.client.post(reverse('crm_edit_group', args=[group.id]), data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Group.objects.count(), 1)
+        group = models.Group.objects.get(id=group.id)
+        self.assertEqual(group.name, data['name'])
+        self.assertEqual(group.description, data['description'])
+        self.assertEqual(group.fore_color, data['fore_color'])
+        self.assertEqual(group.background_color, data['background_color'])
+        self.assertEqual(group.on_contacts_list, False)
 
     def test_edit_group_add_members(self):
         """it should modify the group"""

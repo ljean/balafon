@@ -480,6 +480,9 @@ class Entity(AddressModel):
         group.entities.add(self)
         group.save()
 
+    def headline_groups(self):
+        return self.group_set.filter(on_contacts_list=True)
+
     def get_custom_fields(self):
         """additional fields"""
         return CustomField.objects.filter(model=CustomField.MODEL_ENTITY)
@@ -997,6 +1000,9 @@ class Contact(AddressModel):
         group.contacts.add(self)
         group.save()
 
+    def headline_groups(self):
+        return self.group_set.filter(on_contacts_list=True)
+
     def save(self, *args, **kwargs):
         """save"""
         try:
@@ -1094,7 +1100,7 @@ class Group(TimeStampedModel):
         blank=True, default='', max_length=7, validators=[validate_rgb], verbose_name=_('Background color'),
         help_text=_("Background color. Must be a rgb code. For example: #000000")
     )
-    
+    on_contacts_list = models.BooleanField(default=False, verbose_name=_('Displayed on contacts list'))
     favorites = GenericRelation(Favorite)
 
     def __str__(self):
