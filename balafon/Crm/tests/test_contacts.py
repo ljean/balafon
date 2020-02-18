@@ -420,6 +420,32 @@ class ViewContactsTest(BaseTestCase):
         self.assertNotContains(response, e3.name)
         self.assertNotContains(response, c3.lastname)
 
+    def test_view_contacts_filter_not_a_letter(self):
+        e1 = mommy.make(models.Entity, name="123")
+        c1 = e1.default_contact
+        c1.lastname = "A{0}A".format(c1.id)
+        c1.save()
+
+        e2 = mommy.make(models.Entity, is_single_contact=True, name="124")
+        c2 = e2.default_contact
+        c2.lastname = "125{0}A".format(c2.id)
+        c2.save()
+
+        e3 = mommy.make(models.Entity, name="Abc")
+        c3 = e3.default_contact
+        c3.lastname = "A{0}A".format(c3.id)
+        c3.save()
+
+        url = reverse('crm_view_entities_list')+"?filter=~"
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, e1.name)
+        self.assertContains(response, c1.lastname)
+        self.assertNotContains(response, e2.name)
+        self.assertContains(response, c2.lastname)
+        self.assertNotContains(response, e3.name)
+        self.assertNotContains(response, c3.lastname)
+
     def test_view_contacts_group_single_contact(self):
         e1 = mommy.make(models.Entity)
         c1 = e1.default_contact

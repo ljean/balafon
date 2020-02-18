@@ -113,7 +113,7 @@ def view_entities_list(request):
     elif letter_filter == "~":
         queryset = queryset.filter(name__regex=r'^\W|^\d')
 
-    queryset = queryset.extra(select={'lower_name':'lower(name)'}).order_by('lower_name')
+    queryset = queryset.extra(select={'lower_name': 'lower(name)'}).order_by('lower_name')
 
     page_obj = paginate(request, queryset, 50)
 

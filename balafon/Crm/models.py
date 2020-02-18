@@ -1019,6 +1019,7 @@ class Contact(AddressModel):
         
         if self.entity.is_single_contact:
             # force the entity name for ordering
+            self.entity.name = '{0}-{1}'.format(self.lastname, self.firstname)
             self.entity.save()
             
     class Meta:
