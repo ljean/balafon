@@ -103,7 +103,6 @@ def quick_search(request):
     )
 
 
-
 @user_passes_test(can_access)
 def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     message = ''
