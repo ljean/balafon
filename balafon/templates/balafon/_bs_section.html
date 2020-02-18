@@ -15,6 +15,7 @@
                   {% block section_favorite %}{% endblock %}
                 </div>
                 {% if not preview %}
+                {% block section_buttons_dropdown %}
                 <div class="dropdown">
                     <button class="btn btn-xs dropdown-toggle btn-secondary" id="dropdown-action" data-toggle="dropdown" aria-haspopup="true"  href="#" aria-expanded="false" type="button">
                       {% block section_menu_name %}<i class="fas fa-cog"></i>{% endblock %}
@@ -24,6 +25,7 @@
                         {% block section_buttons %}{% endblock %}
                     </div>
                 </div>
+                {% endblock %}
                 {% block section_buttons_extra %}{% endblock %}
                 {% endif %}
               </div>
