@@ -2,7 +2,7 @@ django >= 2.2.13, <3.0
 djangorestframework >= 3.10.3, <3.11.0
 django-extensions
 apidev_django-floppyforms >= 1.8.3
-apidev-coop_cms >= 1.5.5
+apidev-coop_cms >= 1.5.8
 django-wkhtmltopdf
 xlwt
 xlrd
