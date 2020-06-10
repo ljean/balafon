@@ -20,7 +20,7 @@ setup(
     license='CeCILL 2.1',
     zip_safe=False,
     install_requires=[
-        'django >= 2.2.14, <3.0',
+        'django >= 2.2.13, <3.0',
         'djangorestframework >= 3.10.3, <3.11.0',
         'django-extensions',
         'apidev-coop_cms >= 1.5.5',

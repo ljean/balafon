@@ -1,4 +1,4 @@
-django >= 2.2.14, <3.0
+django >= 2.2.13, <3.0
 djangorestframework >= 3.10.3, <3.11.0
 django-extensions
 apidev_django-floppyforms >= 1.8.3
