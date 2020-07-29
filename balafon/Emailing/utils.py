@@ -92,6 +92,7 @@ def patch_emailing_html(html_text, emailing, contact):
         reverse("emailing_unregister", args=[emailing.id, contact.uuid]),
         reverse("emailing_view_online", args=[emailing.id, contact.uuid]),
     ]
+    ignore_prefixes = ['mailto:', 'tel:']
 
     for lang_tuple in settings.LANGUAGES:
         ignore_links.append(
@@ -99,7 +100,13 @@ def patch_emailing_html(html_text, emailing, contact):
         )
 
     for link in links:
-        if (not link.lower().startswith('mailto:')) and (link[0] != "#") and link not in ignore_links:
+        ignore_link = False
+        for prefix in ignore_prefixes:
+            if link.lower().startswith(prefix):
+                ignore_link = True
+                break
+
+        if (not ignore_link) and (link[0] != "#") and link not in ignore_links:
             # mailto, internal links, 'unregister' and 'view online' are not magic
             if len(link) < 500:
 
