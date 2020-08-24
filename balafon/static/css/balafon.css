@@ -801,4 +801,8 @@ a.dropdown-link:hover {
   vertical-align: bottom;
   margin-left: 2px;
 }
+.navbar .quick-search input.form-control {
+  width: 150px;
+  font-size: 12px;
+}
 /*# sourceMappingURL=balafon.css.map */
