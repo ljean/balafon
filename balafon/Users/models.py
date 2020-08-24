@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """user customization"""
 
+import re
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -130,6 +132,20 @@ class CustomMenuItem(models.Model):
 
     def __str__(self):
         return "{0} > {1}".format(self.parent.label, self.label)
+
+    def get_attrs(self):
+        attrs = self.attributes
+        if 'class=' in attrs:
+            pattern = re.compile('class=\"(?P<css_class>.*)\"')
+        
+            def replacer(match):
+                value = match.group('css_class')
+                return 'class="{0} dropdown-link"'.format(value)
+
+            attrs = pattern.sub(replacer, attrs)
+        else:
+            attrs += ' class="dropdown-link"'
+        return attrs
 
     def get_url(self, *args, **kwargs):
         """return the url to display"""

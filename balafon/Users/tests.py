@@ -806,3 +806,16 @@ class CustomMenuTestCase(BaseTestCase):
         self.assertNotContains(response, menu.label)
         self.assertNotContains(response, menu_item.label)
 
+    def test_view_custom_menu_css_class(self):
+        """It should display custom menu"""
+        menu = mommy.make(CustomMenu, label="MON MENU", position=CustomMenu.POSITION_MENU)
+        menu_item = mommy.make(
+            CustomMenuItem, parent=menu, label="MON ELEMENT", url='/test', attributes='class="custom-class"'
+        )
+
+        response = self.client.get(reverse("balafon_homepage"), follow=True)
+        self.assertEqual(200, response.status_code)
+
+        self.assertContains(response, menu.label)
+        self.assertContains(response, menu_item.label)
+        self.assertContains(response, 'class="custom-class dropdown-link"')

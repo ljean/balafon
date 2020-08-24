@@ -122,7 +122,7 @@
             </a>
             <ul class="dropdown-menu">
                 {% for custom_menu_item in the_custom_menu.get_children %}
-                <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
+                <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.get_attrs|safe }} >
                   <i class="fas fa-{{custom_menu_item.icon}}"></i>
                   {{ custom_menu_item.label }}
                 </a></li>
