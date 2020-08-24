@@ -17,7 +17,7 @@
         <div class="action-overflow-warning {% if not set_title %}no-set-title{% endif %}">
           <i class="fas fa-exclamation-triangle"></i>
           {% trans "Only display the" %} {{actions.count}} {% trans "most recents" %}:
-          <a class="btn btn-outline-secondary btn-xs"
+          <a class="btn btn-white btn-xs"
              href="{% if contact %}{% url 'crm_view_contact_actions' contact.id set_id %}{% else %}{% url 'crm_view_entity_actions' entity.id set_id %}{% endif %}"
           >
             {% trans "View all" %}
