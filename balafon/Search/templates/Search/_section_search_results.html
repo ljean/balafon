@@ -58,8 +58,12 @@
 
       $("#emailing-button").click(function() {
         {% if contains_refuse_newsletter %}
+        var text = '{% trans "The search results contains contacts who are refusing the following newsletters:\n\n" %}'
+        {% for newsletter_name in contains_refuse_newsletter %}
+        text += '- {{ newsletter_name }}\n\n'
+        {% endfor %}
         var letsgo = confirm(
-          '{% trans "The search results contains contacts who are refusing the newsletter.\n\nContinue?" %}'
+          text + '{% trans "Continue?" %}'
         );
         if (!letsgo) {
           return false;

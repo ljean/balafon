@@ -180,7 +180,7 @@ class SearchForm(forms.Form):
         self._instance = instance
         self._save = save
         self.contacts_display = False
-        self.contains_refuse_newsletter = False
+        self.contains_refuse_newsletter = set()
         if instance:
             self.fields['name'].initial = instance.name
         if not data and instance:
@@ -332,7 +332,7 @@ class SearchForm(forms.Form):
         keys.sort()
         contacts = set([])
         global_post_processors = []
-        self.contains_refuse_newsletter = False
+        self.contains_refuse_newsletter = set()
         has_sort_forms = False
 
         for key in keys:
@@ -397,10 +397,10 @@ class SearchForm(forms.Form):
                 for subscription_type in queryset:
                     try:
                         if not contact.subscription_set.get(subscription_type=subscription_type).accept_subscription:
-                            self.contains_refuse_newsletter = True
+                            self.contains_refuse_newsletter.add(subscription_type.name)
                             break
                     except Subscription.DoesNotExist:
-                        self.contains_refuse_newsletter = True
+                        self.contains_refuse_newsletter.add(subscription_type.name)
                         break
                 
         return list(contacts)

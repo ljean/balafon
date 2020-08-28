@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-17 15:53+0100\n"
+"POT-Creation-Date: 2020-08-28 08:37+0200\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgstr "Balafon - Annuaire"
 msgid "Pdf"
 msgstr "Pdf"
 
-#: balafon/Crm/forms/actions.py:25 balafon/Crm/models.py:1471
+#: balafon/Crm/forms/actions.py:25 balafon/Crm/models.py:1472
 #: balafon/Search/forms.py:745
 msgid "planned date"
 msgstr "date prévue"
@@ -106,7 +106,7 @@ msgstr "date prévue"
 msgid "planned time"
 msgstr "heure prévue"
 
-#: balafon/Crm/forms/actions.py:28 balafon/Crm/models.py:1498
+#: balafon/Crm/forms/actions.py:28 balafon/Crm/models.py:1499
 msgid "end date"
 msgstr "date de fin"
 
@@ -152,7 +152,7 @@ msgid "Edit action"
 msgstr "Editer l'action"
 
 #: balafon/Crm/forms/actions.py:80
-#: balafon/Search/templates/Search/_section_search_results.html:132
+#: balafon/Search/templates/Search/_section_search_results.html:136
 msgid "Create action"
 msgstr "Ajout d'une action"
 
@@ -241,7 +241,7 @@ msgid "City"
 msgstr "Ville"
 
 #: balafon/Crm/forms/base.py:218 balafon/Crm/forms/base.py:228
-#: balafon/Crm/forms/base.py:244 balafon/Search/views.py:367
+#: balafon/Crm/forms/base.py:244 balafon/Search/views.py:366
 msgid "Country"
 msgstr "Pays"
 
@@ -339,7 +339,7 @@ msgstr "Le contact n'existe pas"
 
 #: balafon/Crm/forms/contacts.py:257 balafon/Crm/forms/contacts.py:262
 #: balafon/Crm/forms/contacts.py:344 balafon/Crm/forms/contacts.py:378
-#: balafon/Crm/forms/contacts.py:396 balafon/Crm/models.py:1730
+#: balafon/Crm/forms/contacts.py:396 balafon/Crm/models.py:1731
 #: balafon/Crm/templates/Crm/_section_contacts.html:13
 #: balafon/Crm/views/planning.py:63 balafon/Emailing/forms.py:517
 #: balafon/Emailing/templates/Emailing/subscribe_notification_email.txt:11
@@ -419,9 +419,9 @@ msgstr "Veuillez entrer un code valide"
 msgid "Logo"
 msgstr "Logo"
 
-#: balafon/Crm/forms/entities.py:102 balafon/Crm/models.py:1729
+#: balafon/Crm/forms/entities.py:102 balafon/Crm/models.py:1730
 #: balafon/Crm/templates/Crm/confirm_contacts_import.html:70
-#: balafon/Crm/views/planning.py:64 balafon/Search/views.py:368
+#: balafon/Crm/views/planning.py:64 balafon/Search/views.py:367
 #: balafon/config.py:47 balafon/templates/balafon/_bs_navigation.html:65
 #: balafon/templates/balafon/_navigation.html:27
 msgid "Entity"
@@ -529,7 +529,7 @@ msgstr "Féminin"
 msgid "gender"
 msgstr "civilité"
 
-#: balafon/Crm/models.py:93 balafon/Crm/models.py:1711
+#: balafon/Crm/models.py:93 balafon/Crm/models.py:1712
 msgid "order"
 msgstr "ordre"
 
@@ -537,8 +537,8 @@ msgstr "ordre"
 msgid "logo"
 msgstr "logo"
 
-#: balafon/Crm/models.py:96 balafon/Crm/models.py:1092
-#: balafon/Crm/models.py:1275
+#: balafon/Crm/models.py:96 balafon/Crm/models.py:1093
+#: balafon/Crm/models.py:1276
 msgid "Subscribe form"
 msgstr "Affiché sur le formulaire d'inscription"
 
@@ -546,7 +546,7 @@ msgstr "Affiché sur le formulaire d'inscription"
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: balafon/Crm/models.py:105 balafon/Crm/models.py:1825
+#: balafon/Crm/models.py:105 balafon/Crm/models.py:1826
 msgid "entity type"
 msgstr "type d'entité"
 
@@ -582,7 +582,7 @@ msgstr "zone"
 msgid "zones"
 msgstr "zones"
 
-#: balafon/Crm/models.py:165 balafon/Crm/models.py:1120
+#: balafon/Crm/models.py:165 balafon/Crm/models.py:1121
 msgid "group"
 msgstr "groupe"
 
@@ -629,10 +629,10 @@ msgid "street number"
 msgstr "numéro de rue"
 
 #: balafon/Crm/models.py:309 balafon/Crm/models.py:562
-#: balafon/Crm/models.py:1054 balafon/Crm/models.py:1087
-#: balafon/Crm/models.py:1154 balafon/Crm/models.py:1258
-#: balafon/Crm/models.py:1398 balafon/Crm/models.py:1733
-#: balafon/Crm/models.py:1818 balafon/Search/models.py:14
+#: balafon/Crm/models.py:1055 balafon/Crm/models.py:1088
+#: balafon/Crm/models.py:1155 balafon/Crm/models.py:1259
+#: balafon/Crm/models.py:1399 balafon/Crm/models.py:1734
+#: balafon/Crm/models.py:1819 balafon/Search/models.py:14
 #: balafon/Search/models.py:29 balafon/Store/models.py:109
 #: balafon/Store/models.py:136 balafon/Store/models.py:151
 #: balafon/Store/models.py:252 balafon/Store/models.py:269
@@ -642,7 +642,7 @@ msgstr "numéro de rue"
 msgid "name"
 msgstr "nom"
 
-#: balafon/Crm/models.py:310 balafon/Crm/models.py:1088
+#: balafon/Crm/models.py:310 balafon/Crm/models.py:1089
 #: balafon/Store/models.py:409
 msgid "description"
 msgstr "description"
@@ -681,7 +681,7 @@ msgstr "est un particulier"
 msgid "entity"
 msgstr "entité"
 
-#: balafon/Crm/models.py:506 balafon/Crm/models.py:1496
+#: balafon/Crm/models.py:506 balafon/Crm/models.py:1497
 #: balafon/Crm/templates/Crm/_section_my_groups.html:23
 #: balafon/Search/templates/Search/_section_qs_cities.html:13
 #: balafon/Search/templates/Search/_section_qs_groups.html:12
@@ -852,13 +852,13 @@ msgstr "Chère"
 msgid "Dears (couple)"
 msgstr "Chers"
 
-#: balafon/Crm/models.py:1025
+#: balafon/Crm/models.py:1026
 #: balafon/Search/templates/Search/_section_qs_cities.html:17
 #: balafon/Search/templates/Search/_section_search_results.html:6
 msgid "contact"
 msgstr "contact"
 
-#: balafon/Crm/models.py:1026 balafon/Crm/models.py:1495
+#: balafon/Crm/models.py:1027 balafon/Crm/models.py:1496
 #: balafon/Crm/templates/Crm/_section_my_groups.html:24
 #: balafon/Search/templates/Search/_section_qs_cities.html:18
 #: balafon/Search/templates/Search/_section_qs_groups.html:12
@@ -866,378 +866,378 @@ msgstr "contact"
 msgid "contacts"
 msgstr "contacts"
 
-#: balafon/Crm/models.py:1056
+#: balafon/Crm/models.py:1057
 msgid "order index"
 msgstr "ordre"
 
-#: balafon/Crm/models.py:1063
+#: balafon/Crm/models.py:1064
 msgid "Subscription type"
 msgstr "Type d'inscriptions"
 
-#: balafon/Crm/models.py:1064
+#: balafon/Crm/models.py:1065
 msgid "Subscription types"
 msgstr "Types d'inscriptions"
 
-#: balafon/Crm/models.py:1074
+#: balafon/Crm/models.py:1075
 msgid "accept subscription"
 msgstr "accepte les envois"
 
-#: balafon/Crm/models.py:1075
+#: balafon/Crm/models.py:1076
 msgid "Keep this checked if you want to receive our newsletter."
 msgstr "Garder ceci coché pour recevoir notre newsletter"
 
-#: balafon/Crm/models.py:1093
+#: balafon/Crm/models.py:1094
 msgid "This group will be proposed on the public subscribe form"
 msgstr "Ce groupe sera proposé sur le formulaire d'inscription public"
 
-#: balafon/Crm/models.py:1096 balafon/Crm/models.py:1223
+#: balafon/Crm/models.py:1097 balafon/Crm/models.py:1224
 msgid "Fore color"
 msgstr "Couleur de police"
 
-#: balafon/Crm/models.py:1097 balafon/Crm/models.py:1224
+#: balafon/Crm/models.py:1098 balafon/Crm/models.py:1225
 msgid "Fore color. Must be a rgb code. For example: #ffffff"
 msgstr "La couleur de police. Doit-être un code RGB par exemple #ffffff"
 
-#: balafon/Crm/models.py:1100 balafon/Crm/models.py:1227
+#: balafon/Crm/models.py:1101 balafon/Crm/models.py:1228
 msgid "Background color"
 msgstr "Couleur de fond"
 
-#: balafon/Crm/models.py:1101 balafon/Crm/models.py:1228
+#: balafon/Crm/models.py:1102 balafon/Crm/models.py:1229
 msgid "Background color. Must be a rgb code. For example: #000000"
 msgstr "Couleur de fond. Doit-être un code RGB par exemple #000000"
 
-#: balafon/Crm/models.py:1103
+#: balafon/Crm/models.py:1104
 msgid "Displayed on contacts list"
 msgstr "Affiché sur la liste des contacts"
 
-#: balafon/Crm/models.py:1121 balafon/Crm/models.py:1830
+#: balafon/Crm/models.py:1122 balafon/Crm/models.py:1831
 msgid "groups"
 msgstr "groupes"
 
-#: balafon/Crm/models.py:1129 balafon/Crm/models.py:1130
+#: balafon/Crm/models.py:1130 balafon/Crm/models.py:1131
 msgid "opportunity status"
 msgstr "Etats d'un dossier"
 
-#: balafon/Crm/models.py:1136
+#: balafon/Crm/models.py:1137
 msgid "opportunity type"
 msgstr "type de dossier"
 
-#: balafon/Crm/models.py:1137
+#: balafon/Crm/models.py:1138
 msgid "opportunity types"
 msgstr "types de dossier"
 
-#: balafon/Crm/models.py:1146
+#: balafon/Crm/models.py:1147
 msgid "low"
 msgstr "basse"
 
-#: balafon/Crm/models.py:1147
+#: balafon/Crm/models.py:1148
 msgid "medium"
 msgstr "moyenne"
 
-#: balafon/Crm/models.py:1148
+#: balafon/Crm/models.py:1149
 msgid "high"
 msgstr "haute"
 
-#: balafon/Crm/models.py:1157 balafon/Crm/models.py:1473
+#: balafon/Crm/models.py:1158 balafon/Crm/models.py:1474
 msgid "detail"
 msgstr "détail"
 
-#: balafon/Crm/models.py:1160
+#: balafon/Crm/models.py:1161
 msgid "probability"
 msgstr "probabilité"
 
-#: balafon/Crm/models.py:1162 balafon/Crm/models.py:1486
+#: balafon/Crm/models.py:1163 balafon/Crm/models.py:1487
 msgid "amount"
 msgstr "montant"
 
-#: balafon/Crm/models.py:1164
+#: balafon/Crm/models.py:1165
 msgid "closed"
 msgstr "fermé"
 
-#: balafon/Crm/models.py:1166
+#: balafon/Crm/models.py:1167
 msgid "starting date"
 msgstr "date de début"
 
-#: balafon/Crm/models.py:1167
+#: balafon/Crm/models.py:1168
 msgid "closing date"
 msgstr "date de fin"
 
-#: balafon/Crm/models.py:1170 balafon/Crm/models.py:1483
+#: balafon/Crm/models.py:1171 balafon/Crm/models.py:1484
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: balafon/Crm/models.py:1200 balafon/Crm/models.py:1476
+#: balafon/Crm/models.py:1201 balafon/Crm/models.py:1477
 msgid "opportunity"
 msgstr "dossier"
 
-#: balafon/Crm/models.py:1201
+#: balafon/Crm/models.py:1202
 msgid "opportunities"
 msgstr "dossiers"
 
-#: balafon/Crm/models.py:1206 balafon/Crm/models.py:1216
-#: balafon/Crm/models.py:1737
+#: balafon/Crm/models.py:1207 balafon/Crm/models.py:1217
+#: balafon/Crm/models.py:1738
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
-#: balafon/Crm/models.py:1209 balafon/Crm/models.py:1279
+#: balafon/Crm/models.py:1210 balafon/Crm/models.py:1280
 msgid "action set"
 msgstr "famille d'actions"
 
-#: balafon/Crm/models.py:1210
+#: balafon/Crm/models.py:1211
 msgid "action sets"
 msgstr "familles d'actions"
 
-#: balafon/Crm/models.py:1219
+#: balafon/Crm/models.py:1220
 msgid "is final"
 msgstr "final"
 
-#: balafon/Crm/models.py:1220
+#: balafon/Crm/models.py:1221
 msgid "The action will be marked done when it gets a final status"
 msgstr "L'action sera marquée comme faîte lorsqu'elle est dans un état final"
 
-#: balafon/Crm/models.py:1231
+#: balafon/Crm/models.py:1232
 msgid "Next status on send by email"
 msgstr "Status suivant après envoi par email"
 
-#: balafon/Crm/models.py:1232
+#: balafon/Crm/models.py:1233
 msgid "automatically change the status when sent by email"
 msgstr "Change le statut automatiquement après un envoi par email"
 
-#: balafon/Crm/models.py:1235
+#: balafon/Crm/models.py:1236
 msgid "allowed on frozen"
 msgstr "autorisé si figé"
 
-#: balafon/Crm/models.py:1235
+#: balafon/Crm/models.py:1236
 msgid "If False, not shown if action si frozen"
 msgstr "Si Faux, n'est pas affiché pour les actions figées"
 
-#: balafon/Crm/models.py:1248 balafon/Crm/models.py:1249
+#: balafon/Crm/models.py:1249 balafon/Crm/models.py:1250
 msgid "action status"
 msgstr "etat d'une action"
 
-#: balafon/Crm/models.py:1255
+#: balafon/Crm/models.py:1256
 msgid "action number generator"
 msgstr "générateur de numéro d'action"
 
-#: balafon/Crm/models.py:1256
+#: balafon/Crm/models.py:1257
 msgid "action number generators"
 msgstr "générateurs de numéro d'action"
 
-#: balafon/Crm/models.py:1260 balafon/Crm/models.py:1489
+#: balafon/Crm/models.py:1261 balafon/Crm/models.py:1490
 msgid "number"
 msgstr "numéro"
 
-#: balafon/Crm/models.py:1260
+#: balafon/Crm/models.py:1261
 msgid "This number is auto-generated."
 msgstr "Ce numéro est généré automatiquement"
 
-#: balafon/Crm/models.py:1276
+#: balafon/Crm/models.py:1277
 msgid "This action type will be proposed on the public subscribe form"
 msgstr "Ce type d'action sera proposé sur le formulaire d'inscription public"
 
-#: balafon/Crm/models.py:1281
+#: balafon/Crm/models.py:1282
 msgid "last number"
 msgstr "dernier numéro"
 
-#: balafon/Crm/models.py:1282
+#: balafon/Crm/models.py:1283
 msgid "generate number automatically"
 msgstr "génère automatiquement le numéro"
 
-#: balafon/Crm/models.py:1284
+#: balafon/Crm/models.py:1285
 msgid "number generator"
 msgstr "générateur de numéro"
 
-#: balafon/Crm/models.py:1288
+#: balafon/Crm/models.py:1289
 msgid "document template"
 msgstr "Modèle de document"
 
-#: balafon/Crm/models.py:1289
+#: balafon/Crm/models.py:1290
 msgid "Action of this type will have a document with the given template"
 msgstr "Les actions de ce type auront un document basé sur ce modèle"
 
-#: balafon/Crm/models.py:1292 balafon/Crm/models.py:1300
+#: balafon/Crm/models.py:1293 balafon/Crm/models.py:1301
 msgid "Action of this type allow the given status"
 msgstr "Les actions de ce type acceptent ces états"
 
-#: balafon/Crm/models.py:1296 balafon/Crm/models.py:1305
+#: balafon/Crm/models.py:1297 balafon/Crm/models.py:1306
 msgid "Default status for actions of this type"
 msgstr "Etat par défaut pour les actions de ce type"
 
-#: balafon/Crm/models.py:1309
+#: balafon/Crm/models.py:1310
 msgid "is editable"
 msgstr "est éditable"
 
-#: balafon/Crm/models.py:1311
+#: balafon/Crm/models.py:1312
 msgid ""
 "If default_template is set, define if the template has a editable content"
 msgstr "Si un modèle est défini, indique si celui-ci a un contenu éditable"
 
-#: balafon/Crm/models.py:1314
+#: balafon/Crm/models.py:1315
 msgid "action template"
 msgstr "template action"
 
-#: balafon/Crm/models.py:1315
+#: balafon/Crm/models.py:1316
 msgid "Action of this type will be displayed using the given template"
 msgstr "Les actions de ce type seront affichés avec ce template"
 
-#: balafon/Crm/models.py:1317
+#: balafon/Crm/models.py:1318
 msgid "Order"
 msgstr "Ordre"
 
-#: balafon/Crm/models.py:1318
+#: balafon/Crm/models.py:1319
 msgid "Is amount calculated"
 msgstr "Motant calculé"
 
-#: balafon/Crm/models.py:1319
+#: balafon/Crm/models.py:1320
 msgid "next action type"
 msgstr "Types d'action suivants"
 
-#: balafon/Crm/models.py:1320
+#: balafon/Crm/models.py:1321
 msgid "Not assigned when cloned"
 msgstr "Non affectée lorsque dupliquée"
 
-#: balafon/Crm/models.py:1321
+#: balafon/Crm/models.py:1322
 msgid "Generate UUID for action"
 msgstr "Générer un identifiant UUID pour les actions"
 
-#: balafon/Crm/models.py:1324
+#: balafon/Crm/models.py:1325
 msgid "hide contacts buttons"
 msgstr "cacher les boutons contacts/entités"
 
-#: balafon/Crm/models.py:1325
+#: balafon/Crm/models.py:1326
 msgid "The add and remove contact buttons will be hidden"
 msgstr ""
 "Les boutons d'ajout/suppression de contact/entité ne seront pas affichés"
 
-#: balafon/Crm/models.py:1328
+#: balafon/Crm/models.py:1329
 msgid "Subject of email"
 msgstr "Sujet pour l'email"
 
-#: balafon/Crm/models.py:1329
+#: balafon/Crm/models.py:1330
 msgid "This would be used as subject when sending the action by email"
 msgstr ""
 "Ceci sera utilisé comme sujet lorsque l'action est envoyée par email (si "
 "vide, on utilise le sujet de l'action)"
 
-#: balafon/Crm/models.py:1332
+#: balafon/Crm/models.py:1333
 msgid "Track status"
 msgstr "Historique état d'une action"
 
-#: balafon/Crm/models.py:1332
+#: balafon/Crm/models.py:1333
 msgid "If checked, all status changed is stored in DB"
 msgstr ""
 "Si coché, tous les madifications de statut sont stockés en base de données"
 
-#: balafon/Crm/models.py:1335 balafon/Store/models.py:86
+#: balafon/Crm/models.py:1336 balafon/Store/models.py:86
 msgid "is default"
 msgstr "par défaut"
 
-#: balafon/Crm/models.py:1336
+#: balafon/Crm/models.py:1337
 msgid ""
 "If checked, can be added from list. Action without types are not displayed"
 msgstr "Si coché, type par défaut des nouvelles actions"
 
-#: balafon/Crm/models.py:1339 balafon/Crm/models.py:1415
-#: balafon/Crm/models.py:1710 balafon/Crm/models.py:1734
-#: balafon/Store/models.py:616 balafon/Users/models.py:78
-#: balafon/Users/models.py:112
+#: balafon/Crm/models.py:1340 balafon/Crm/models.py:1416
+#: balafon/Crm/models.py:1711 balafon/Crm/models.py:1735
+#: balafon/Store/models.py:616 balafon/Users/models.py:80
+#: balafon/Users/models.py:114
 msgid "label"
 msgstr "libellé"
 
-#: balafon/Crm/models.py:1340
+#: balafon/Crm/models.py:1341
 msgid "If set, replace name on commercial document"
 msgstr "Si défini, remplace le nom sur le document commercial"
 
-#: balafon/Crm/models.py:1346
+#: balafon/Crm/models.py:1347
 msgid "Status defined"
 msgstr "Etats définis"
 
-#: balafon/Crm/models.py:1358
+#: balafon/Crm/models.py:1359
 msgid "Last number"
 msgstr "Dernier numéro"
 
-#: balafon/Crm/models.py:1369 balafon/Search/forms.py:480
+#: balafon/Crm/models.py:1370 balafon/Search/forms.py:480
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: balafon/Crm/models.py:1388 balafon/Crm/models.py:1847
+#: balafon/Crm/models.py:1389 balafon/Crm/models.py:1848
 #: balafon/Store/models.py:888
 msgid "action type"
 msgstr "type d'action"
 
-#: balafon/Crm/models.py:1389
+#: balafon/Crm/models.py:1390
 msgid "action types"
 msgstr "types d'action"
 
-#: balafon/Crm/models.py:1396 balafon/Store/models.py:1041
-#: balafon/Users/models.py:38 balafon/Users/models.py:57
+#: balafon/Crm/models.py:1397 balafon/Store/models.py:1041
+#: balafon/Users/models.py:40 balafon/Users/models.py:59
 msgid "user"
 msgstr "utilisateur"
 
-#: balafon/Crm/models.py:1399 balafon/Store/models.py:153
+#: balafon/Crm/models.py:1400 balafon/Store/models.py:153
 #: balafon/Store/models.py:254 balafon/Store/models.py:280
 msgid "active"
 msgstr "actif"
 
-#: balafon/Crm/models.py:1405
+#: balafon/Crm/models.py:1406
 msgid "team member"
 msgstr "membre de l'équipe"
 
-#: balafon/Crm/models.py:1406
+#: balafon/Crm/models.py:1407
 msgid "team members"
 msgstr "membres de l'équipe"
 
-#: balafon/Crm/models.py:1412 balafon/Crm/search_forms.py:935
+#: balafon/Crm/models.py:1413 balafon/Crm/search_forms.py:935
 msgid "Action type"
 msgstr "Type d'action"
 
-#: balafon/Crm/models.py:1413
+#: balafon/Crm/models.py:1414
 msgid "view_name"
 msgstr "nom de la vue"
 
-#: balafon/Crm/models.py:1414 balafon/Users/models.py:79
-#: balafon/Users/models.py:113
+#: balafon/Crm/models.py:1415 balafon/Users/models.py:81
+#: balafon/Users/models.py:115
 msgid "icon"
 msgstr "icone"
 
-#: balafon/Crm/models.py:1418
+#: balafon/Crm/models.py:1419
 msgid "Link args"
 msgstr "arguments du Lien"
 
-#: balafon/Crm/models.py:1421
+#: balafon/Crm/models.py:1422
 msgid "Example: class=\"colorbox-form\" for colorbos display"
 msgstr "Exemple: class=\"colorbox-form\" pour un affichage dans une colorbox"
 
-#: balafon/Crm/models.py:1423 balafon/Store/models.py:152
+#: balafon/Crm/models.py:1424 balafon/Store/models.py:152
 #: balafon/Store/models.py:253
 msgid "order_index"
 msgstr "ordre"
 
-#: balafon/Crm/models.py:1424 balafon/Crm/models.py:1437
+#: balafon/Crm/models.py:1425 balafon/Crm/models.py:1438
 msgid "Only for status"
 msgstr "Seulement à l'état"
 
-#: balafon/Crm/models.py:1427
+#: balafon/Crm/models.py:1428
 msgid "action menu"
 msgstr "menu d'actions"
 
-#: balafon/Crm/models.py:1428
+#: balafon/Crm/models.py:1429
 msgid "action menus"
 msgstr "menus d'actions"
 
-#: balafon/Crm/models.py:1461
+#: balafon/Crm/models.py:1462
 msgid "low priority"
 msgstr "priorité basse"
 
-#: balafon/Crm/models.py:1462
+#: balafon/Crm/models.py:1463
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: balafon/Crm/models.py:1463
+#: balafon/Crm/models.py:1464
 msgid "high priority"
 msgstr "priorité haute"
 
-#: balafon/Crm/models.py:1467
+#: balafon/Crm/models.py:1468
 #: balafon/Crm/templates/Crm/_section_actions.html:30
 #: balafon/Crm/templates/Crm/_section_actions.html:34
 #: balafon/Crm/templates/Crm/_section_actions.html:38
@@ -1245,156 +1245,156 @@ msgstr "priorité haute"
 msgid "action"
 msgstr "action"
 
-#: balafon/Crm/models.py:1468
+#: balafon/Crm/models.py:1469
 msgid "actions"
 msgstr "actions"
 
-#: balafon/Crm/models.py:1470 balafon/Crm/models.py:1850
+#: balafon/Crm/models.py:1471 balafon/Crm/models.py:1851
 msgid "subject"
 msgstr "sujet"
 
-#: balafon/Crm/models.py:1474
+#: balafon/Crm/models.py:1475
 msgid "priority"
 msgstr "priorité"
 
-#: balafon/Crm/models.py:1478
+#: balafon/Crm/models.py:1479
 msgid "done"
 msgstr "réalisé"
 
-#: balafon/Crm/models.py:1479
+#: balafon/Crm/models.py:1480
 msgid "done date"
 msgstr "date de réalisation"
 
-#: balafon/Crm/models.py:1481
+#: balafon/Crm/models.py:1482
 msgid "in charge"
 msgstr "en charge"
 
-#: balafon/Crm/models.py:1484
+#: balafon/Crm/models.py:1485
 msgid "archived"
 msgstr "archivé"
 
-#: balafon/Crm/models.py:1489
+#: balafon/Crm/models.py:1490
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: balafon/Crm/models.py:1500 balafon/Store/admin.py:37
+#: balafon/Crm/models.py:1501 balafon/Store/admin.py:37
 msgid "parent"
 msgstr "parent"
 
-#: balafon/Crm/models.py:1507
+#: balafon/Crm/models.py:1508
 msgid "frozen"
 msgstr "figée"
 
-#: balafon/Crm/models.py:1507
+#: balafon/Crm/models.py:1508
 msgid "Some data (date, sale, ...) can not be changed "
 msgstr "Certaines données (date, vente, ...) ne sont plus modifiables"
 
-#: balafon/Crm/models.py:1529
+#: balafon/Crm/models.py:1530
 #, python-brace-format
 msgid "{0} days {1}:{2:02}"
 msgstr "{0} jours {1}:{2:02}"
 
-#: balafon/Crm/models.py:1562
+#: balafon/Crm/models.py:1563
 #, python-brace-format
 msgid "{0} N° {1}"
 msgstr "{0} N° {1}"
 
-#: balafon/Crm/models.py:1680
+#: balafon/Crm/models.py:1681
 msgid "content"
 msgstr "contenu"
 
-#: balafon/Crm/models.py:1682 balafon/Search/forms.py:708
+#: balafon/Crm/models.py:1683 balafon/Search/forms.py:708
 msgid "template"
 msgstr "Modèle"
 
-#: balafon/Crm/models.py:1709 balafon/Crm/models.py:1762
+#: balafon/Crm/models.py:1710 balafon/Crm/models.py:1763
 #: balafon/Search/models.py:43 balafon/Store/models.py:861
 msgid "value"
 msgstr "valeur"
 
-#: balafon/Crm/models.py:1717
+#: balafon/Crm/models.py:1718
 msgid "custom field choice"
 msgstr "choix pour champ personnalisé"
 
-#: balafon/Crm/models.py:1718
+#: balafon/Crm/models.py:1719
 msgid "custom field choices"
 msgstr "choix pour champs personnalisé"
 
-#: balafon/Crm/models.py:1735
+#: balafon/Crm/models.py:1736
 msgid "model"
 msgstr "modèle"
 
-#: balafon/Crm/models.py:1736
+#: balafon/Crm/models.py:1737
 msgid "widget"
 msgstr "widget"
 
-#: balafon/Crm/models.py:1738
+#: balafon/Crm/models.py:1739
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: balafon/Crm/models.py:1739
+#: balafon/Crm/models.py:1740
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: balafon/Crm/models.py:1740
+#: balafon/Crm/models.py:1741
 msgid "is link"
 msgstr "est un lien"
 
-#: balafon/Crm/models.py:1744
+#: balafon/Crm/models.py:1745
 #, python-brace-format
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: balafon/Crm/models.py:1754 balafon/Crm/models.py:1761
+#: balafon/Crm/models.py:1755 balafon/Crm/models.py:1762
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: balafon/Crm/models.py:1755
+#: balafon/Crm/models.py:1756
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: balafon/Crm/models.py:1765
+#: balafon/Crm/models.py:1766
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: balafon/Crm/models.py:1766
+#: balafon/Crm/models.py:1767
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: balafon/Crm/models.py:1775
+#: balafon/Crm/models.py:1776
 msgid "entity custom field value"
 msgstr "cal"
 
-#: balafon/Crm/models.py:1776
+#: balafon/Crm/models.py:1777
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: balafon/Crm/models.py:1787
+#: balafon/Crm/models.py:1788
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: balafon/Crm/models.py:1788
+#: balafon/Crm/models.py:1789
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: balafon/Crm/models.py:1809
+#: balafon/Crm/models.py:1810
 #: balafon/Search/templates/Search/mailto_groups.html:110
 msgid "Coma"
 msgstr "Virgule"
 
-#: balafon/Crm/models.py:1810
+#: balafon/Crm/models.py:1811
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: balafon/Crm/models.py:1814
+#: balafon/Crm/models.py:1815
 msgid "import file"
 msgstr "fichier d'import"
 
-#: balafon/Crm/models.py:1815
+#: balafon/Crm/models.py:1816
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: balafon/Crm/models.py:1819
+#: balafon/Crm/models.py:1820
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -1402,53 +1402,53 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: balafon/Crm/models.py:1821 balafon/Store/models.py:389
+#: balafon/Crm/models.py:1822 balafon/Store/models.py:389
 msgid "imported by"
 msgstr "importé par"
 
-#: balafon/Crm/models.py:1826
+#: balafon/Crm/models.py:1827
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: balafon/Crm/models.py:1831
+#: balafon/Crm/models.py:1832
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: balafon/Crm/models.py:1834
+#: balafon/Crm/models.py:1835
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: balafon/Crm/models.py:1841
+#: balafon/Crm/models.py:1842
 msgid "contact import"
 msgstr "import de contacts"
 
-#: balafon/Crm/models.py:1842
+#: balafon/Crm/models.py:1843
 msgid "contact imports"
 msgstr "imports de contacts"
 
-#: balafon/Crm/models.py:1848
+#: balafon/Crm/models.py:1849
 msgid "carbon copy"
 msgstr "copie cachée"
 
-#: balafon/Crm/models.py:1850
+#: balafon/Crm/models.py:1851
 msgid "Use action subject if empty"
 msgstr "Utilise le sujet de l'action si vide"
 
-#: balafon/Crm/models.py:1852
+#: balafon/Crm/models.py:1853
 msgid "body template"
 msgstr "Corps (Template)"
 
-#: balafon/Crm/models.py:1858 balafon/Crm/models.py:1859
+#: balafon/Crm/models.py:1859 balafon/Crm/models.py:1860
 msgid "Mailto settings"
 msgstr "Mailto"
 
-#: balafon/Crm/models.py:1871
+#: balafon/Crm/models.py:1872
 msgid "Action state track"
 msgstr "Historique des états d'une action"
 
-#: balafon/Crm/models.py:1872
+#: balafon/Crm/models.py:1873
 msgid "Action state tracks"
 msgstr "Historiques des états d'une action"
 
@@ -2154,7 +2154,6 @@ msgstr "Description"
 
 #: balafon/Crm/templates/Crm/_section_my_groups.html:35
 #: balafon/Search/templates/Search/_section_search_form.html:20
-#: balafon/Search/templates/Search/_section_search_form.html:158
 #: balafon/Search/templates/Search/search.html:4
 #: balafon/templates/balafon/_bs_navigation.html:84
 #: balafon/templates/balafon/_navigation.html:38
@@ -2917,7 +2916,7 @@ msgstr "Groupe invalide"
 msgid "Invalid action type"
 msgstr "Type d'action invalide"
 
-#: balafon/Emailing/forms.py:501 balafon/Emailing/utils.py:237
+#: balafon/Emailing/forms.py:501 balafon/Emailing/utils.py:244
 #: balafon/Profile/views.py:83
 msgid "Message from web site"
 msgstr "Message depuis le site Internet"
@@ -2939,13 +2938,13 @@ msgid "Sending in progress"
 msgstr "Envoi en cours"
 
 #: balafon/Emailing/models.py:38
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:33
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:36
 msgid "Sent"
 msgstr "Envoyé"
 
 #: balafon/Emailing/models.py:42
 #: balafon/Emailing/templates/Emailing/view_emailing.html:4
-#: balafon/Emailing/utils.py:127 balafon/config.py:111
+#: balafon/Emailing/utils.py:134 balafon/config.py:111
 msgid "Emailing"
 msgstr "Emailing"
 
@@ -3040,7 +3039,7 @@ msgid "Sending"
 msgstr "Envois"
 
 #: balafon/Emailing/templates/Emailing/_section_emailing.html:22
-#: balafon/Emailing/utils.py:203
+#: balafon/Emailing/utils.py:210
 msgid "Subscription"
 msgstr "Inscriptions"
 
@@ -3082,31 +3081,31 @@ msgstr "Nouvel envoi"
 msgid "Statistics"
 msgstr "Statistiques"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:28
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:31
 msgid "To be send"
 msgstr "A envoyer"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:38
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:41
 msgid "Openings"
 msgstr "Ouvertures"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:43
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:46
 msgid "Unsubcribe"
 msgstr "Désinscriptions"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:48
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:51
 msgid "Soft Bounce"
 msgstr "Erreurs temporaires"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:53
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:56
 msgid "Hard Bounce"
 msgstr "Erreurs permanentes"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:58
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:61
 msgid "Spam"
 msgstr "Spams"
 
-#: balafon/Emailing/templates/Emailing/_section_visitors.html:63
+#: balafon/Emailing/templates/Emailing/_section_visitors.html:66
 msgid "Rejected"
 msgstr "Rejetés"
 
@@ -3317,24 +3316,24 @@ msgstr ""
 msgid "Update emailing"
 msgstr "Mise à jour d'un emailing"
 
-#: balafon/Emailing/utils.py:205
+#: balafon/Emailing/utils.py:212
 #, python-brace-format
 msgid "Subscribe to {0}"
 msgstr "S'inscrire à {0}"
 
-#: balafon/Emailing/utils.py:251 balafon/Profile/views.py:87
+#: balafon/Emailing/utils.py:258 balafon/Profile/views.py:87
 msgid "The message have been sent"
 msgstr "Votre message a bien été envoyé"
 
-#: balafon/Emailing/utils.py:256 balafon/Profile/views.py:89
+#: balafon/Emailing/utils.py:263 balafon/Profile/views.py:89
 msgid "The message couldn't be send."
 msgstr "Votre message n'a pas pu être envoyé"
 
-#: balafon/Emailing/utils.py:286
+#: balafon/Emailing/utils.py:293
 msgid "Verification of your email address"
 msgstr "Vérification de votre adresse e-mail"
 
-#: balafon/Emailing/utils.py:448
+#: balafon/Emailing/utils.py:455
 msgid "No subscription_type defined"
 msgstr "Aucun type d'inscription n'est défini"
 
@@ -3774,6 +3773,11 @@ msgstr ""
 "['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', "
 "'September', 'October', 'November', 'December']"
 
+#: balafon/Search/templates/Search/_section_search_form.html:158
+#: balafon/Search/templates/Search/search_name.html:4
+msgid "Save search"
+msgstr "Enregistrer la recherche"
+
 #: balafon/Search/templates/Search/_section_search_results.html:5
 msgid "Search results"
 msgstr "Résulats de la recherche"
@@ -3786,43 +3790,46 @@ msgstr ""
 "La recherche contient des entités vides : Ces entités peuvent avoir "
 "seulement des contacts secondaires ou anciens"
 
-#: balafon/Search/templates/Search/_section_search_results.html:62
+#: balafon/Search/templates/Search/_section_search_results.html:61
 msgid ""
-"The search results contains contacts who are refusing the newsletter.\\n"
-"\\nContinue?"
+"The search results contains contacts who are refusing the following "
+"newsletters:\\n\\n"
 msgstr ""
-"Le résultat de recherche contient des contacts qui refusent la newletter.\\n"
-"\\nContinuer?"
+"Le résultat de recherche contient des contacts qui refusent la(les) newletter(s) suivante(s):\\n\\n"
 
-#: balafon/Search/templates/Search/_section_search_results.html:112
+#: balafon/Search/templates/Search/_section_search_results.html:66
+msgid "Continue?"
+msgstr "Continuer?"
+
+#: balafon/Search/templates/Search/_section_search_results.html:116
 msgid "Operations"
 msgstr "Opérations"
 
-#: balafon/Search/templates/Search/_section_search_results.html:120
+#: balafon/Search/templates/Search/_section_search_results.html:124
 msgid "Mail to"
 msgstr "Mail à"
 
-#: balafon/Search/templates/Search/_section_search_results.html:123
+#: balafon/Search/templates/Search/_section_search_results.html:127
 msgid "BCC Mail to"
 msgstr "Mail à CCI"
 
-#: balafon/Search/templates/Search/_section_search_results.html:126
+#: balafon/Search/templates/Search/_section_search_results.html:130
 msgid "Mailing"
 msgstr "Mailing"
 
-#: balafon/Search/templates/Search/_section_search_results.html:129
+#: balafon/Search/templates/Search/_section_search_results.html:133
 msgid "Excel"
 msgstr "Excel"
 
-#: balafon/Search/templates/Search/_section_search_results.html:135
+#: balafon/Search/templates/Search/_section_search_results.html:139
 msgid "Add to groups"
 msgstr "Ajouter aux groupes"
 
-#: balafon/Search/templates/Search/_section_search_results.html:138
+#: balafon/Search/templates/Search/_section_search_results.html:142
 msgid "PDF"
 msgstr "PDF"
 
-#: balafon/Search/templates/Search/_section_search_results.html:141
+#: balafon/Search/templates/Search/_section_search_results.html:146
 msgid "Contacts Admin"
 msgstr "Administration des contacts"
 
@@ -3937,10 +3944,6 @@ msgstr "Contacts d'un dossier"
 msgid "Search for contacts"
 msgstr "Recherche de contacts"
 
-#: balafon/Search/templates/Search/search_name.html:4
-msgid "Save search"
-msgstr "Enregistrer la recherche"
-
 #: balafon/Search/templates/Search/subscribe_contacts_admin_form.html:3
 msgid "Subscribe Contacts Admin"
 msgstr "Administration - Inscription des contacts"
@@ -3952,53 +3955,53 @@ msgstr "Administration - Inscription des contacts"
 msgid "WARNING : NO ADDRESS DEFINED"
 msgstr "Attention : Pas d'adresse définie"
 
-#: balafon/Search/tests/test_mailto.py:42 balafon/Search/views.py:270
+#: balafon/Search/tests/test_mailto.py:42 balafon/Search/views.py:269
 msgid "Mailto: Error, no emails defined"
 msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 
-#: balafon/Search/views.py:146
+#: balafon/Search/views.py:145
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: balafon/Search/views.py:432
+#: balafon/Search/views.py:431
 #, python-brace-format
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crées"
 
-#: balafon/Search/views.py:457
+#: balafon/Search/views.py:456
 msgid "Create action for contacts"
 msgstr "Créer une action pour les contacts"
 
-#: balafon/Search/views.py:458 balafon/Search/views.py:516
-#: balafon/Search/views.py:599
+#: balafon/Search/views.py:457 balafon/Search/views.py:515
+#: balafon/Search/views.py:598
 msgid "The search results contains no contacts"
 msgstr "Le résultat de la recherche ne contient aucun contact"
 
-#: balafon/Search/views.py:481
+#: balafon/Search/views.py:480
 #, python-brace-format
 msgid "{0} contacts have been added to groups"
 msgstr "{0} contacts ont été ajoutés aux groupes"
 
-#: balafon/Search/views.py:490
+#: balafon/Search/views.py:489
 #, python-brace-format
 msgid "{0} entities have been added to groups"
 msgstr "{0} entités ont été ajoutés aux groupes"
 
-#: balafon/Search/views.py:515
+#: balafon/Search/views.py:514
 msgid "Add contacts to group"
 msgstr "Ajouter les contacts à un groupe"
 
-#: balafon/Search/views.py:566
+#: balafon/Search/views.py:565
 #, python-brace-format
 msgid "{0} contacts have subscribe to the newsletter"
 msgstr "{0} contacts ont été inscrits à la lettre d'information"
 
-#: balafon/Search/views.py:572
+#: balafon/Search/views.py:571
 #, python-brace-format
 msgid "{0} contacts have unsubscribe to the newsletter"
 msgstr "{0} contacts ont été désinscrits à la lettre d'information"
 
-#: balafon/Search/views.py:598
+#: balafon/Search/views.py:597
 msgid "Subscribe contacts admin"
 msgstr "Inscrire des contacts"
 
@@ -4590,11 +4593,11 @@ msgstr "Ventes"
 msgid "store item"
 msgstr "article"
 
-#: balafon/Store/models.py:1048 balafon/Users/models.py:46
+#: balafon/Store/models.py:1048 balafon/Users/models.py:48
 msgid "Favorite"
 msgstr "Favori"
 
-#: balafon/Store/models.py:1049 balafon/Users/models.py:47
+#: balafon/Store/models.py:1049 balafon/Users/models.py:49
 #: balafon/Users/templates/Users/favorites_list.html:4
 #: balafon/Users/templates/Users/favorites_list.html:9
 #: balafon/templates/balafon/_bs_navigation.html:22
@@ -4797,108 +4800,108 @@ msgstr "L'URL {0} n'est pas autorisé comme page d'accueil"
 msgid "Balafon: You have due actions"
 msgstr "Balafon: Vos actions à échéance"
 
-#: balafon/Users/models.py:21
+#: balafon/Users/models.py:23
 msgid "Notify due actions"
 msgstr "Notifier les actions à échéance"
 
-#: balafon/Users/models.py:24
+#: balafon/Users/models.py:26
 msgid "Create automatically a favorite for message posted from the public form"
 msgstr ""
 "Crée automatiquement un favori si un message est posté depuis le formulaire "
 "de contact"
 
-#: balafon/Users/models.py:28 balafon/Users/models.py:29
+#: balafon/Users/models.py:30 balafon/Users/models.py:31
 msgid "User preferences"
 msgstr "Préférences utilisateur"
 
-#: balafon/Users/models.py:40
+#: balafon/Users/models.py:42
 msgid "content_type"
 msgstr "type de contenu"
 
-#: balafon/Users/models.py:42
+#: balafon/Users/models.py:44
 msgid "object id"
 msgstr "id objet"
 
-#: balafon/Users/models.py:58
+#: balafon/Users/models.py:60
 msgid "URL"
 msgstr "URL"
 
-#: balafon/Users/models.py:61
+#: balafon/Users/models.py:63
 msgid "User homepage"
 msgstr "Page d'accueil utilisateur"
 
-#: balafon/Users/models.py:62
+#: balafon/Users/models.py:64
 msgid "User homepages"
 msgstr "Pages d'accueil utilisateur"
 
-#: balafon/Users/models.py:74
+#: balafon/Users/models.py:76
 msgid "Menu"
 msgstr "Menu"
 
-#: balafon/Users/models.py:75 balafon/templates/balafon/_bs_navigation.html:97
+#: balafon/Users/models.py:77 balafon/templates/balafon/_bs_navigation.html:97
 msgid "Planning"
 msgstr "Planning"
 
-#: balafon/Users/models.py:82
+#: balafon/Users/models.py:84
 msgid "position"
 msgstr "position"
 
-#: balafon/Users/models.py:83
+#: balafon/Users/models.py:85
 msgid "Where the menu will be set"
 msgstr "L'emplacement du menu"
 
-#: balafon/Users/models.py:87
+#: balafon/Users/models.py:89
 msgid "Custom menu"
 msgstr "Menu personnalisés"
 
-#: balafon/Users/models.py:88
+#: balafon/Users/models.py:90
 msgid "Custom menus"
 msgstr "Menus personnalisés"
 
-#: balafon/Users/models.py:114
+#: balafon/Users/models.py:116
 msgid "url"
 msgstr "url"
 
-#: balafon/Users/models.py:115
+#: balafon/Users/models.py:117
 msgid "reverse"
 msgstr "nom de la vue"
 
-#: balafon/Users/models.py:117
+#: balafon/Users/models.py:119
 msgid "reverse_kwargs"
 msgstr "arguments de la vue"
 
-#: balafon/Users/models.py:118
+#: balafon/Users/models.py:120
 msgid ""
 "kwargs to use for building the reverse. kw1:defaultval1,kw2,kw3:defaultval3 "
 msgstr ""
 "arguments (et éventuellement valeurs par défaut) par nom pour construire "
 "l'url via le reverse. Exemple year,month:1,day:1"
 
-#: balafon/Users/models.py:122
+#: balafon/Users/models.py:124
 msgid "only for users"
 msgstr "seulement pour les utilisateurs"
 
-#: balafon/Users/models.py:124
+#: balafon/Users/models.py:126
 msgid "attributes"
 msgstr "attributs"
 
-#: balafon/Users/models.py:127
+#: balafon/Users/models.py:129
 msgid "Custom menu item"
 msgstr "Élément de menu personnalisé"
 
-#: balafon/Users/models.py:128
+#: balafon/Users/models.py:130
 msgid "Custom menu items"
 msgstr "Éléments de menu personnalisé"
 
-#: balafon/Users/models.py:177
+#: balafon/Users/models.py:193
 msgid "can create group"
 msgstr "Peut créer un groupe"
 
-#: balafon/Users/models.py:177
+#: balafon/Users/models.py:193
 msgid "If not checked, the user can not create group"
 msgstr "Si non coché, l'utilisateur ne peut pas créer de groupe"
 
-#: balafon/Users/models.py:181 balafon/Users/models.py:182
+#: balafon/Users/models.py:197 balafon/Users/models.py:198
 msgid "User permissions"
 msgstr "Permissions utilisateur"
 
@@ -4926,12 +4929,12 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"    <p>Vous pouvez cliquer sur une étoile vide (<span class=\"far fa-star\">"
-"</span>) pour afficher l'élément correspondant sur la "
-"page des favoris.</p>\n"
-"    <p>Les favoris sont précédés d'une étoile pleine (<span class="
-"\"fas fa-star\"></span>). Cliquer sur celle-ci pour enlever "
-"l'élément des favoris.</p>\n"
+"    <p>Vous pouvez cliquer sur une étoile vide (<span class=\"far fa-star"
+"\"></span>) pour afficher l'élément correspondant sur la page des favoris.</"
+"p>\n"
+"    <p>Les favoris sont précédés d'une étoile pleine (<span class=\"fas fa-"
+"star\"></span>). Cliquer sur celle-ci pour enlever l'élément des favoris.</"
+"p>\n"
 "    <p>Les favoris sont propres à chaque utilisateur.</p>\n"
 "    "
 

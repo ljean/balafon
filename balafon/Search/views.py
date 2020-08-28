@@ -109,7 +109,7 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
     results = []
     search_obj = None
     field_choice_form = FieldChoiceForm()
-    contains_refuse_newsletter = False
+    contains_refuse_newsletter = []
     data = None
     contacts_count = 0
     has_empty_entities = False
@@ -135,11 +135,11 @@ def search(request, search_id=0, group_id=0, opportunity_id=0, city_id=0):
             
             if not contacts_display:
                 results, contacts_count, has_empty_entities = search_form.get_contacts_by_entity()
-                contains_refuse_newsletter = search_form.contains_refuse_newsletter
+                contains_refuse_newsletter = list(search_form.contains_refuse_newsletter)
             else:
                 results = search_form.get_contacts()
                 contacts_count, has_empty_entities = len(results), False
-                contains_refuse_newsletter = search_form.contains_refuse_newsletter
+                contains_refuse_newsletter = list(search_form.contains_refuse_newsletter)
             
             if not results:
                 message = _('Sorry, no results found')
