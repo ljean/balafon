@@ -204,6 +204,29 @@ class SingleContactTest(BaseTestCase):
         self.assertEqual(john_doe.city.name, data['city'])
         self.assertEqual(john_doe.city.parent, zone)
 
+    def test_add_single_contact_new_city_three_digits_code(self):
+        url = reverse('crm_add_single_contact')
+        zone = mommy.make(models.Zone, code="974")
+        data = {
+            'lastname': "Doe",
+            'firstname': 'John',
+            'zip_code': '97440',
+            'city': "Saint-Clotilde"
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        errors = BeautifulSoup(response.content).select('.field-error')
+        self.assertEqual(len(errors), 0)
+
+        self.assertEqual(models.Contact.objects.count(), 1)
+        john_doe = models.Contact.objects.all()[0]
+        self.assertEqual(john_doe.lastname, "Doe")
+        self.assertEqual(john_doe.firstname, "John")
+        self.assertEqual(john_doe.entity.is_single_contact, True)
+        self.assertEqual(john_doe.city.name, data['city'])
+        self.assertEqual(john_doe.city.parent, zone)
+
     def test_add_single_contact_unknown_code(self):
         url = reverse('crm_add_single_contact')
         data = {

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.forms.forms import BoundField
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -195,7 +196,9 @@ class _CityBasedForm(object):
                 else:
                     if len(zip_code) < 2:
                         raise ValidationError(ugettext('You must enter a valid zip code for selecting a new city'))
-                    dep = models.Zone.objects.get(code=zip_code[:2])
+                    dep = models.Zone.objects.get(
+                        Q(code=zip_code[:2]) | Q(code=zip_code[:3])
+                    )
                     city = models.City.objects.get_or_create(name=city, parent=dep)[0]
                 return city
             except ValidationError:
