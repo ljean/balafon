@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title></title>
   <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}bs4/css/bootstrap.css" />
+  <script src="{{ DOMAIN }}{{ STATIC_URL }}js/popper.min.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/jquery/dist/jquery.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular/angular.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}bs4/js/bootstrap.js"></script>
@@ -12,6 +13,7 @@
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-bootstrap/ui-bootstrap-tpls.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-i18n/angular-locale_{{ LANGUAGE_CODE }}-{{ LANGUAGE_CODE }}.js"></script>
   <script src="{{ DOMAIN }}{{ STATIC_URL }}modules/angular-translate/angular-translate.js"></script>
+  <link rel="stylesheet" href="{{ DOMAIN }}{{ STATIC_URL }}fontawesome/css/all.min.css" type="text/css" />
   <script>
     $(function () {
       $('[data-toggle="tooltip"]').tooltip();
@@ -858,11 +860,11 @@
                       {{ 'LABEL' | translate }}
                       <div ng-show="allowEdit" class="float-right">
                         <div class="show-on-hover">
-                          <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">
                             <i class="fas fa-plus"></i>
                           </a>
 
-                          <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
+                          <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="addBlank()" title="{{ 'BLANK' | translate }}" data-toggle="tooltip">
                             <i class="fas fa-arrows-alt-v"></i>
                           </a>
                         </div>
