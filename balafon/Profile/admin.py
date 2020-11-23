@@ -5,9 +5,13 @@ from django.contrib import admin
 from . import models
 
 
+class ContactProfileCustomFieldInline(admin.TabularInline):
+    model = models.ContactProfileCustomField
+
+
 @admin.register(models.ContactProfile)
 class ContactProfileAdmin(admin.ModelAdmin):
-    pass
+    inlines = [ContactProfileCustomFieldInline]
 
 
 @admin.register(models.CategoryPermission)

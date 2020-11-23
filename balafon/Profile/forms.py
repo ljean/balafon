@@ -11,7 +11,7 @@ from balafon.Crm.models import Contact, EntityType
 from balafon.Crm.forms import ModelFormWithCity
 from balafon.Crm.widgets import CityAutoComplete
 from balafon.Emailing.forms import SubscriptionTypeFormMixin
-from balafon.Profile.models import ContactProfile
+from balafon.Profile.models import ContactProfile, ContactProfileCustomField
 from balafon.settings import has_entity_on_registration_form, get_registration_accept_terms_of_use_link
 
 
@@ -143,6 +143,15 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         if password1 and (password1 != password2):
             raise forms.ValidationError(ugettext('Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
+
+    @staticmethod
+    def save_custom_field(user, name, value, entity_field):
+        ContactProfileCustomField.objects.create(
+            profile=user.contactprofile,
+            name=name,
+            value=value,
+            entity_field=entity_field
+        )
 
     def save(self, commit=True):
         email = self.cleaned_data["email"]

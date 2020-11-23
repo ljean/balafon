@@ -119,6 +119,14 @@ def create_profile_contact(user):
     )
     action.contacts.add(contact)
     action.save()
+
+    for custom_field in profile.custom_fields.all():
+        if custom_field.name:
+            if custom_field.entity_field:
+                if not contact.entity.is_single_contact:
+                    contact.entity.set_custom_field(custom_field.name, custom_field.value)
+            else:
+                contact.set_custom_field(custom_field.name, custom_field.value)
     
     if rename_entity:
         contact.entity.name = "{0.lastname} {0.firstname}".format(contact).strip().upper()

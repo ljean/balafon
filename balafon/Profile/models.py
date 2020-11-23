@@ -57,7 +57,14 @@ class ContactProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-    
+
+
+class ContactProfileCustomField(models.Model):
+    profile = models.ForeignKey(ContactProfile, on_delete=models.CASCADE, related_name='custom_fields')
+    name = models.CharField(_('name'), max_length=100)
+    value = models.CharField(_('value'), max_length=200, blank=True, default='')
+    entity_field = models.BooleanField(default=False)
+
  
 # signals
 def create_profile(sender, instance, signal, created, **kwargs):
