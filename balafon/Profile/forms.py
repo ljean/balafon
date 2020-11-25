@@ -137,7 +137,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         return entity
 
     def clean_gender(self):
-        gender = int(self.cleaned_data.get('gender', 0))
+        gender = int(self.cleaned_data.get('gender', None) or Contact.GENDER_NOT_SET)
         if self.fields['gender'].required and gender == Contact.GENDER_NOT_SET:
             raise ValidationError(_("This field is required"))
         return gender
