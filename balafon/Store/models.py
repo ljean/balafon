@@ -423,12 +423,11 @@ class StoreItem(models.Model):
         return Decimal("{0:.2f}".format(value, 2))
 
     def _to_vat_incl(self, value):
-        if value is None:
-            value = 0
+        value = self._to_decimal(value)
         if self.vat_rate:
             vat_value = self.vat_rate.rate
         else:
-            vat_value = 0
+            vat_value = Decimal(0)
         return self._to_decimal(value * (1 + vat_value / 100))
 
     def vat_incl_price(self):
