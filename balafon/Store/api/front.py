@@ -237,6 +237,7 @@ class CartView(APIView):
 
                 return Response({
                     'ok': True,
+                    'action': action.id,
                     'warnings': warnings,
                     'deliveryDate': action.planned_date,
                     'deliveryPlace': action.sale.delivery_point.name,

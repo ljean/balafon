@@ -94,6 +94,8 @@ class CartTest(BaseTestCase):
         self.assertEqual(action_queryset.count(), 1)
         action = action_queryset[0]
 
+        self.assertEqual(response.data['action'], action.id)
+
         self.assertEqual(list(action.contacts.all()), [contact])
         self.assertEqual(action.subject, '')
         self.assertEqual(action.detail, '')
