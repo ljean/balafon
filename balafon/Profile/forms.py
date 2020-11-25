@@ -41,6 +41,19 @@ class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         super(ProfileForm, self).__init__(*args, **kwargs)
         self._add_subscription_types_field(contact=self.instance)
 
+        if 'gender' in self.fields:
+            # do not display Mrs and Mr
+            choices = []
+            if not self.fields['gender'].required:
+                choices = [
+                    (Contact.GENDER_NOT_SET, ''),
+                ]
+            choices += [
+                (Contact.GENDER_MALE, ugettext('Mr')),
+                (Contact.GENDER_FEMALE, ugettext('Mrs')),
+            ]
+            self.fields['gender'].choices = choices
+
 
 class EmailField(forms.EmailField):
     """This field avoid duplicate emails"""
@@ -92,7 +105,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         if 'gender' in self.fields:
             # do not display Mrs and Mr
             self.fields['gender'].choices = [
-                (Contact.GENDER_NOT_SET, _('Gender')),
+                (Contact.GENDER_NOT_SET, ''),
                 (Contact.GENDER_MALE, ugettext('Mr')),
                 (Contact.GENDER_FEMALE, ugettext('Mrs')),
             ]
@@ -115,13 +128,19 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             )
         self._add_subscription_types_field()
 
-    def clean_entity(self, ):
+    def clean_entity(self):
         entity_type = self.cleaned_data.get('entity_type', None)
         entity = self.cleaned_data['entity']
         if entity_type:
             if not entity:
                 raise ValidationError(_("{0}: Please enter a name".format(entity_type)))
         return entity
+
+    def clean_gender(self):
+        gender = int(self.cleaned_data.get('gender', 0))
+        if self.fields['gender'].required and gender == Contact.GENDER_NOT_SET:
+            raise ValidationError(_("This field is required"))
+        return gender
         
     def clean_entity_type(self):
         try:
