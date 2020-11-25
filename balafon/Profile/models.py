@@ -58,6 +58,10 @@ class ContactProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def fullname(self):
+        return '{0} {1}'.format(self.firstname, self.lastname)
+
 
 class ContactProfileCustomField(models.Model):
     profile = models.ForeignKey(ContactProfile, on_delete=models.CASCADE, related_name='custom_fields')

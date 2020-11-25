@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
@@ -15,10 +15,10 @@ from django_registration.backends.activation.views import RegistrationView, Acti
 from balafon.Crm.models import Action, ActionType
 from balafon.Profile.forms import MessageForm
 from balafon.Profile.models import ContactProfile
-from balafon.Profile.settings import is_registration_enabled
+from balafon.Profile.settings import is_registration_enabled, is_html_activation_email
 from balafon.Profile.utils import create_profile_contact, notify_registration
 from balafon.settings import get_profile_form, get_registration_form
-from balafon.utils import now_rounded
+from balafon.utils import now_rounded, send_email
 
 
 @login_required 
@@ -119,7 +119,19 @@ class AcceptNewsletterRegistrationView(RegistrationView):
         if not is_registration_enabled():
             raise Http404
         return super(AcceptNewsletterRegistrationView, self).dispatch(request, *args, **kwargs)
-    
+
+    def create_inactive_user(self, form):
+        """
+        Create the inactive user account and send an email containing
+        activation instructions.
+
+        """
+        new_user = form.save(commit=False)
+        new_user.is_active = False
+        new_user.save()
+
+        return new_user
+
     def register(self, request_or_form, **kwargs):
         data = request_or_form.cleaned_data
         user = super(AcceptNewsletterRegistrationView, self).register(request_or_form, **kwargs)
@@ -156,7 +168,27 @@ class AcceptNewsletterRegistrationView(RegistrationView):
         user.contactprofile.subscriptions_ids = ",".join([str(s.id) for s in subscription_types])
         user.contactprofile.save()
 
+        self.send_activation_email(user)
+
         return user
+
+    def send_activation_email(self, user):
+        if not is_html_activation_email():
+            super(AcceptNewsletterRegistrationView, self).send_activation_email(user)
+        else:
+            activation_key = self.get_activation_key(user)
+            context = self.get_email_context(activation_key)
+            context['user'] = user
+            context['profile'] = user.contactprofile
+            subject = render_to_string(
+                template_name=self.email_subject_template,
+                context=context,
+                request=self.request
+            )
+            # Force subject to a single line to avoid header-injection issues.
+            # send an email
+            subject = ''.join(subject.splitlines())
+            send_email(subject, 'Profile/activation_email_body.html', context, [user.email])
 
 
 class AcceptNewsletterActivationView(ActivationView):

@@ -8,11 +8,16 @@ from urllib.parse import urlparse
 from importlib import import_module
 
 from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.mail import get_connection, EmailMultiAlternatives
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, Http404
+from django.template.loader import get_template
 from django.urls import resolve, Resolver404
 from django.utils.translation import ugettext as _
 
+from coop_cms.utils.requests import RequestManager
+from coop_cms.utils import dehtml
 from rest_framework.renderers import JSONRenderer
 
 from balafon.settings import get_allowed_homepages
@@ -103,3 +108,35 @@ def load_from_module(settings_key, default_value):
         obj = getattr(module, obj_name)
         return obj
     return None
+
+
+def send_email(subject, template_name, context, recipients, sender=None, cc_list=None):
+    """Send an HTML email"""
+    emails = []
+    connection = get_connection()
+    from_email = sender if sender else settings.DEFAULT_FROM_EMAIL
+    for address in recipients:
+        context['email_address'] = address
+        context['subject'] = subject
+        the_template = get_template(template_name)
+        html_text = the_template.render(context)
+        text = dehtml(html_text)
+        email = EmailMultiAlternatives(subject, text, from_email, [address], cc=cc_list if cc_list else [])
+        email.attach_alternative(html_text, "text/html")
+        emails.append(email)
+    return connection.send_messages(emails)
+
+
+def full_path_url(url):
+    request = RequestManager().get_request()
+    is_secured = not settings.DEBUG
+    if request:
+        is_secured = request.is_secure()
+    site = Site.objects.get_current(request)
+    if url is None:
+        url = ''
+    full_url = site.domain + url
+    if is_secured:
+        return 'https://' + full_url
+    else:
+        return 'http://' + full_url

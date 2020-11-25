@@ -8,7 +8,8 @@ from django.urls import reverse, NoReverseMatch
 from django.utils.safestring import mark_safe
 
 from balafon.Crm.models import ActionStatusTrack
-from balafon.utils import logger
+from balafon.utils import logger, full_path_url as utils_full_path_url
+
 
 register = template.Library()
 
@@ -167,3 +168,8 @@ def get_cf_value(contact_or_entity, custom_field_name):
         return getattr(contact_or_entity, 'custom_field_' + custom_field_name, "")
     except:
         return ""
+
+
+@register.filter
+def full_path_url(url):
+    return utils_full_path_url(url)
