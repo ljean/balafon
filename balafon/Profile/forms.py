@@ -111,7 +111,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             ]
 
         if 'entity_type' in self.fields:
-            self.fields['entity_type'].choices = [(0, ugettext('Individual'))]+[
+            self.fields['entity_type'].choices = [(0, ugettext('Individual'))] + [
                 (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
             ]
         if not has_entity_on_registration_form():
