@@ -39,7 +39,10 @@ class ActionArchiveView(object):
         try:
             values = {}
             for item in filter_value.split(","):
-                prefix, val = item[0], int(item[1:])
+                try:
+                    prefix, val = item[0], int(item[1:])
+                except IndexError:
+                    continue
                 if prefix in values:
                     values[prefix].append(val)
                 else:
