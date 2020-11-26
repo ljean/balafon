@@ -166,7 +166,13 @@ class CartSerializer(serializers.Serializer):
     items = CartItemSerializer(many=True)
     purchase_datetime = serializers.DateTimeField()
     delivery_point = serializers.IntegerField()
-    notes = serializers.CharField(max_length=3000, required=False)
+    notes = serializers.CharField(max_length=3000, required=False, allow_blank=True)
+    voucher_code = serializers.CharField(allow_blank=True, required=False)
+
+
+class VoucherSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    voucher_code = serializers.CharField(allow_blank=True, required=False)
 
 
 class FavoriteItemSerializer(serializers.Serializer):

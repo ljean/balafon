@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """unit testing"""
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import logging
 from unittest import skipIf
@@ -786,3 +786,309 @@ class CartTest(BaseTestCase):
 
         # Make sure the calback has been called
         self.assertEqual(GLOBAL_COUNTER, 1)
+
+
+@skipIf(not ("balafon.Profile" in settings.INSTALLED_APPS), "registration not installed")
+class VoucherTest(BaseTestCase):
+    """voucher calculated"""
+
+    def test_post_voucher(self):
+        """It should create a new sale and action"""
+
+        # Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+        vat_rate1 = mommy.make(models.VatRate, rate=20)
+        store_item1 = mommy.make(models.StoreItem, pre_tax_price=Decimal('120'), vat_rate=vat_rate1)
+        store_item2 = mommy.make(models.StoreItem, pre_tax_price=Decimal('100'), vat_rate=vat_rate1)
+
+        delivery_point = mommy.make(models.DeliveryPoint)
+
+        today = date.today()
+        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'voucher_code': voucher.code,
+        }
+        url = reverse('store_voucher')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['voucher_code'], voucher.code)
+        self.assertEqual(Decimal(response.data['discount']), Decimal('40.8'))
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'delivery_point': delivery_point.id,
+            'purchase_datetime': datetime(2015, 7, 23, 12, 0),
+            'voucher_code': voucher.code,
+        }
+
+        url = reverse('store_post_cart')
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
+        self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
+        self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
+
+        action_type = ActionType.objects.get(name=get_cart_type_name())
+
+        action_queryset = Action.objects.filter(type=action_type)
+        self.assertEqual(action_queryset.count(), 1)
+        action = action_queryset[0]
+
+        self.assertEqual(response.data['action'], action.id)
+
+        self.assertEqual(list(action.contacts.all()), [contact])
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, data['purchase_datetime'])
+
+        self.assertEqual(action.sale.analysis_code, models.SaleAnalysisCode.objects.get(name='Internet'))
+
+        self.assertEqual(action.sale.saleitem_set.count(), 3)
+        self.assertEqual(action.sale.saleitem_set.all()[0].item, store_item1)
+        self.assertEqual(action.sale.saleitem_set.all()[0].text, store_item1.name)
+        self.assertEqual(action.sale.saleitem_set.all()[0].unit_price(), store_item1.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[0].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[0].quantity, 2)
+
+        self.assertEqual(action.sale.saleitem_set.all()[1].item, store_item2)
+        self.assertEqual(action.sale.saleitem_set.all()[1].text, store_item2.name)
+        self.assertEqual(action.sale.saleitem_set.all()[1].unit_price(), store_item2.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[1].vat_rate, store_item2.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[1].quantity, 1)
+
+        voucher_text = _('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate))
+        self.assertEqual(action.sale.saleitem_set.all()[2].item, None)
+        self.assertEqual(action.sale.saleitem_set.all()[2].text, voucher_text)
+        self.assertEqual(action.sale.saleitem_set.all()[2].unit_price(), -Decimal(34))
+        self.assertEqual(action.sale.saleitem_set.all()[2].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[2].quantity, 1)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].to, [profile.contact.email])
+        self.assertEqual(mail.outbox[1].to, [settings.BALAFON_NOTIFICATION_EMAIL])
+
+        store_item1 = models.StoreItem.objects.get(id=store_item1.id)
+        self.assertEqual(store_item1.stock_count, None)
+
+        store_item2 = models.StoreItem.objects.get(id=store_item2.id)
+        self.assertEqual(store_item2.stock_count, None)
+
+        self.assertEqual(action.sale.vat_incl_total_price(), Decimal('367.2'))
+
+    def test_post_voucher_two_vat(self):
+        """It should create a new sale and action"""
+
+        # Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+        vat_rate1 = mommy.make(models.VatRate, rate=10)
+        vat_rate2 = mommy.make(models.VatRate, rate=20)
+        store_item1 = mommy.make(models.StoreItem, pre_tax_price=Decimal('120'), vat_rate=vat_rate1)
+        store_item2 = mommy.make(models.StoreItem, pre_tax_price=Decimal('100'), vat_rate=vat_rate2)
+
+        delivery_point = mommy.make(models.DeliveryPoint)
+
+        today = date.today()
+        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'voucher_code': voucher.code,
+        }
+        url = reverse('store_voucher')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['voucher_code'], voucher.code)
+        self.assertEqual(Decimal(response.data['discount']), Decimal('38.4'))
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'delivery_point': delivery_point.id,
+            'purchase_datetime': datetime(2015, 7, 23, 12, 0),
+            'voucher_code': voucher.code,
+        }
+
+        url = reverse('store_post_cart')
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
+        self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
+        self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
+
+        action_type = ActionType.objects.get(name=get_cart_type_name())
+
+        action_queryset = Action.objects.filter(type=action_type)
+        self.assertEqual(action_queryset.count(), 1)
+        action = action_queryset[0]
+
+        self.assertEqual(response.data['action'], action.id)
+
+        self.assertEqual(list(action.contacts.all()), [contact])
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, data['purchase_datetime'])
+
+        self.assertEqual(action.sale.analysis_code, models.SaleAnalysisCode.objects.get(name='Internet'))
+
+        self.assertEqual(action.sale.saleitem_set.count(), 4)
+        self.assertEqual(action.sale.saleitem_set.all()[0].item, store_item1)
+        self.assertEqual(action.sale.saleitem_set.all()[0].text, store_item1.name)
+        self.assertEqual(action.sale.saleitem_set.all()[0].unit_price(), store_item1.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[0].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[0].quantity, 2)
+
+        self.assertEqual(action.sale.saleitem_set.all()[1].item, store_item2)
+        self.assertEqual(action.sale.saleitem_set.all()[1].text, store_item2.name)
+        self.assertEqual(action.sale.saleitem_set.all()[1].unit_price(), store_item2.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[1].vat_rate, store_item2.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[1].quantity, 1)
+
+        voucher_text = _('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate))
+        self.assertEqual(action.sale.saleitem_set.all()[2].item, None)
+        self.assertEqual(action.sale.saleitem_set.all()[2].text, voucher_text)
+        self.assertEqual(action.sale.saleitem_set.all()[2].unit_price(), -Decimal(24))
+        self.assertEqual(action.sale.saleitem_set.all()[2].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[2].quantity, 1)
+
+        self.assertEqual(action.sale.saleitem_set.all()[3].item, None)
+        self.assertEqual(action.sale.saleitem_set.all()[3].text, voucher_text)
+        self.assertEqual(action.sale.saleitem_set.all()[3].unit_price(), -Decimal(10))
+        self.assertEqual(action.sale.saleitem_set.all()[3].vat_rate, store_item2.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[3].quantity, 1)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].to, [profile.contact.email])
+        self.assertEqual(mail.outbox[1].to, [settings.BALAFON_NOTIFICATION_EMAIL])
+
+        store_item1 = models.StoreItem.objects.get(id=store_item1.id)
+        self.assertEqual(store_item1.stock_count, None)
+
+        store_item2 = models.StoreItem.objects.get(id=store_item2.id)
+        self.assertEqual(store_item2.stock_count, None)
+
+        self.assertEqual(action.sale.vat_incl_total_price(), Decimal('345.6'))
+
+    def _do_test_post_voucher_no_voucher(self, code=''):
+        """It should create a new sale and action"""
+
+        # Create contact for the user
+        profile = create_profile_contact(self.user)
+        contact = profile.contact
+        vat_rate1 = mommy.make(models.VatRate, rate=20)
+        store_item1 = mommy.make(models.StoreItem, pre_tax_price=Decimal('120'), vat_rate=vat_rate1)
+        store_item2 = mommy.make(models.StoreItem, pre_tax_price=Decimal('100'), vat_rate=vat_rate1)
+
+        delivery_point = mommy.make(models.DeliveryPoint)
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'voucher_code': code,
+        }
+        url = reverse('store_voucher')
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['voucher_code'], code)
+        self.assertEqual(Decimal(response.data['discount']), Decimal('0'))
+
+        data = {
+            'items': [
+                {'id': store_item1.id, 'quantity': 2},
+                {'id': store_item2.id, 'quantity': 1},
+            ],
+            'delivery_point': delivery_point.id,
+            'purchase_datetime': datetime(2015, 7, 23, 12, 0),
+            'voucher_code': code,
+        }
+
+        url = reverse('store_post_cart')
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data['ok'], True)
+        self.assertEqual(len(response.data['warnings']), 0)
+        self.assertEqual(response.data['deliveryDate'], data['purchase_datetime'])
+        self.assertEqual(response.data['deliveryPlace'], delivery_point.name)
+
+        action_type = ActionType.objects.get(name=get_cart_type_name())
+
+        action_queryset = Action.objects.filter(type=action_type)
+        self.assertEqual(action_queryset.count(), 1)
+        action = action_queryset[0]
+
+        self.assertEqual(response.data['action'], action.id)
+
+        self.assertEqual(list(action.contacts.all()), [contact])
+        self.assertEqual(action.subject, '')
+        self.assertEqual(action.detail, '')
+        self.assertEqual(action.planned_date, data['purchase_datetime'])
+
+        self.assertEqual(action.sale.analysis_code, models.SaleAnalysisCode.objects.get(name='Internet'))
+
+        self.assertEqual(action.sale.saleitem_set.count(), 2)
+        self.assertEqual(action.sale.saleitem_set.all()[0].item, store_item1)
+        self.assertEqual(action.sale.saleitem_set.all()[0].text, store_item1.name)
+        self.assertEqual(action.sale.saleitem_set.all()[0].unit_price(), store_item1.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[0].vat_rate, store_item1.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[0].quantity, 2)
+
+        self.assertEqual(action.sale.saleitem_set.all()[1].item, store_item2)
+        self.assertEqual(action.sale.saleitem_set.all()[1].text, store_item2.name)
+        self.assertEqual(action.sale.saleitem_set.all()[1].unit_price(), store_item2.pre_tax_price)
+        self.assertEqual(action.sale.saleitem_set.all()[1].vat_rate, store_item2.vat_rate)
+        self.assertEqual(action.sale.saleitem_set.all()[1].quantity, 1)
+
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].to, [profile.contact.email])
+        self.assertEqual(mail.outbox[1].to, [settings.BALAFON_NOTIFICATION_EMAIL])
+
+        store_item1 = models.StoreItem.objects.get(id=store_item1.id)
+        self.assertEqual(store_item1.stock_count, None)
+
+        store_item2 = models.StoreItem.objects.get(id=store_item2.id)
+        self.assertEqual(store_item2.stock_count, None)
+
+        self.assertEqual(action.sale.vat_incl_total_price(), Decimal('408'))
+
+    def test_inactive_voucher(self):
+        today = date.today()
+        voucher = mommy.make(models.Voucher, active=False, code='abc', start_date=today, end_date=today, rate=10)
+        self._do_test_post_voucher_no_voucher('abc')
+
+    def test_no_voucher(self):
+        today = date.today()
+        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+        self._do_test_post_voucher_no_voucher('')
+
+    def test_before_after_voucher(self):
+        today = date.today()
+        dt1, dt2 = today - timedelta(days=5), today - timedelta(days=1)
+        dt3, dt4 = today + timedelta(days=1), today + timedelta(days=4)
+        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=dt1, end_date=dt2, rate=10)
+        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=dt3, end_date=dt4, rate=10)
+        self._do_test_post_voucher_no_voucher('abc')
+

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """models"""
 
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 import os.path
 from six import string_types
@@ -298,6 +298,36 @@ class Discount(models.Model):
         if sale_item.quantity >= self.quantity:
             return round_currency(sale_item.raw_total_price() * self.rate / Decimal(100))
         return None
+
+
+class Voucher(models.Model):
+    """Discount voucher"""
+    code = models.CharField(max_length=100, verbose_name=_('code'))
+    start_date = models.DateField(verbose_name=_('start date'))
+    end_date = models.DateField(verbose_name=_('end date'))
+    rate = models.DecimalField(
+        default=0, max_digits=4, decimal_places=2, verbose_name=_('rate')
+    )
+    active = models.BooleanField(default=False, verbose_name=_('active'))
+
+    class Meta:
+        verbose_name = _("Voucher")
+        verbose_name_plural = _("Vouchers")
+        ordering = ['-start_date', 'end_date']
+
+    def __str__(self):
+        return self.code
+
+    @classmethod
+    def get_active_voucher(cls, code):
+        today = date.today()
+        voucher = cls.objects.filter(
+            code=code,
+            active=True,
+            start_date__lte=today,
+            end_date__gte=today
+        ).first()
+        return voucher
 
 
 class Brand(models.Model):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+from datetime import date
 from decimal import Decimal
 
 from django.db.models import Q
@@ -16,7 +17,7 @@ from balafon.Crm.models import Action, ActionType
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
     Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint,
-    SaleAnalysisCode
+    SaleAnalysisCode, Voucher
 )
 from balafon.Store import settings
 from balafon.Store.api import serializers
@@ -127,6 +128,33 @@ class StoreItemTagViewSet(viewsets.ModelViewSet):
     permission_classes = get_public_api_permissions()
 
 
+class VoucherView(APIView):
+    """post a cart"""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        """receive a new cart"""
+        voucher_serializer = serializers.VoucherSerializer(data=request.data)
+        voucher_serializer.is_valid(raise_exception=True)
+        voucher_code = voucher_serializer.validated_data['voucher_code']
+        voucher = Voucher.get_active_voucher(voucher_code)
+        voucher_discount_vat_incl = 0
+        for item in voucher_serializer.validated_data['items']:
+            quantity = Decimal('{0}'.format(item['quantity']))
+            try:
+                store_item = StoreItem.objects.get(id=item['id'])
+            except StoreItem.DoesNotExist:
+                # ignore if not existing
+                continue
+
+            if voucher:
+                discount = store_item.vat_incl_price() * voucher.rate / 100
+                voucher_discount_vat_incl += quantity * discount
+
+        discount_data = {'voucher_code': voucher_code, 'discount': voucher_discount_vat_incl}
+        return Response(discount_data)
+
+
 class CartView(APIView):
     """post a cart"""
     permission_classes = (permissions.IsAuthenticated,)
@@ -136,6 +164,11 @@ class CartView(APIView):
 
         cart_serializer = serializers.CartSerializer(data=request.data)
         if cart_serializer.is_valid():
+
+            discounts = {}
+            vat_rates = {}
+            voucher_code = cart_serializer.validated_data.get('voucher_code', '')
+            voucher = Voucher.get_active_voucher(voucher_code)
 
             # Get Contact
             try:
@@ -183,6 +216,7 @@ class CartView(APIView):
             warnings = []
             is_empty = True
             # for each line add a sale item
+            counter = 0
             for index, item in enumerate(cart_serializer.validated_data['items']):
 
                 quantity = Decimal('{0}'.format(item['quantity']))
@@ -214,6 +248,29 @@ class CartView(APIView):
                         text=store_item.name,
                         order_index=index + 1
                     )
+                    counter = index
+
+                    # TODO calcule s'il y a une réduction Code Promo
+                    # Crée une ligne réduction pour ce code
+                    if voucher:
+                        discount = store_item.pre_tax_price * voucher.rate / 100
+                        vat_id = store_item.vat_rate.id if store_item.vat_rate else 0
+                        if vat_id not in discounts:
+                            vat_rates[vat_id] = store_item.vat_rate
+                            discounts[vat_id] = 0
+                        discounts[vat_id] += discount * quantity
+
+            for discount_vat, discount_value in discounts.items():
+                counter += 1
+                SaleItem.objects.create(
+                    sale=action.sale,
+                    quantity=1,
+                    item=None,
+                    vat_rate=vat_rates[discount_vat],
+                    pre_tax_price=-discount_value,
+                    text=_('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate)),
+                    order_index=counter
+                )
 
             # Done
             if is_empty:

@@ -8,7 +8,7 @@ from rest_framework import routers
 from balafon.Store.api.documents import SaleVatTotalsView
 from balafon.Store.api.front import (
     SaleItemViewSet, StoreItemViewSet, StoreItemCategoryViewSet, StoreItemTagViewSet, CartView, FavoriteView,
-    LastSalesView
+    LastSalesView, VoucherView
 )
 from balafon.Store.api.statistics import (
     SalesByCategoryView, SalesByFamilyView, SalesByTagView, SalesByItemOfCategoryView, SalesByItemOfFamilyView,
@@ -30,6 +30,12 @@ urlpatterns = [
         r'^api/cart/$',
         CartView.as_view(),
         name='store_post_cart'
+    ),
+
+    url(
+        r'^api/voucher/$',
+        VoucherView.as_view(),
+        name='store_voucher'
     ),
 
     url(

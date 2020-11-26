@@ -344,3 +344,9 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(models.SaleAnalysisCode)
 class SaleAnalysisCodeAdmin(admin.ModelAdmin):
     list_display = ('name', 'action_type')
+
+
+@admin.register(models.Voucher)
+class VoucherAdmin(admin.ModelAdmin):
+    list_display = ('code', 'start_date', 'end_date', 'active', 'rate')
+    date_hierarchy = 'start_date'
