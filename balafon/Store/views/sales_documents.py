@@ -138,7 +138,7 @@ class SalesDocumentViewMixin(object):
 
     def get_sale_items(self):
         """get the sales items"""
-        return SaleItem.objects.filter(sale__action=self.get_action())
+        return SaleItem.objects.filter(sale__action=self.get_action()).order_by('order_index')
 
 
 class SalesDocumentView(SalesDocumentViewMixin, TemplateView):
