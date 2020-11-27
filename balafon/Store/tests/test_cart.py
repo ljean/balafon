@@ -798,14 +798,16 @@ class VoucherTest(BaseTestCase):
         # Create contact for the user
         profile = create_profile_contact(self.user)
         contact = profile.contact
-        vat_rate1 = mommy.make(models.VatRate, rate=20)
+        vat_rate1 = mommy.make(models.VatRate, rate=Decimal(20))
         store_item1 = mommy.make(models.StoreItem, pre_tax_price=Decimal('120'), vat_rate=vat_rate1)
         store_item2 = mommy.make(models.StoreItem, pre_tax_price=Decimal('100'), vat_rate=vat_rate1)
 
         delivery_point = mommy.make(models.DeliveryPoint)
 
         today = date.today()
-        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+        voucher = mommy.make(
+            models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10)
+        )
 
         data = {
             'items': [
@@ -818,6 +820,7 @@ class VoucherTest(BaseTestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['voucher_code'], voucher.code)
+        self.assertEqual(response.data['label'], voucher.label)
         self.assertEqual(Decimal(response.data['discount']), Decimal('40.8'))
 
         data = {
@@ -868,7 +871,7 @@ class VoucherTest(BaseTestCase):
         self.assertEqual(action.sale.saleitem_set.all()[1].vat_rate, store_item2.vat_rate)
         self.assertEqual(action.sale.saleitem_set.all()[1].quantity, 1)
 
-        voucher_text = _('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate))
+        voucher_text = voucher.label
         self.assertEqual(action.sale.saleitem_set.all()[2].item, None)
         self.assertEqual(action.sale.saleitem_set.all()[2].text, voucher_text)
         self.assertEqual(action.sale.saleitem_set.all()[2].unit_price(), -Decimal(34))
@@ -901,7 +904,9 @@ class VoucherTest(BaseTestCase):
         delivery_point = mommy.make(models.DeliveryPoint)
 
         today = date.today()
-        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+        voucher = mommy.make(
+            models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10)
+        )
 
         data = {
             'items': [
@@ -915,6 +920,7 @@ class VoucherTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['voucher_code'], voucher.code)
         self.assertEqual(Decimal(response.data['discount']), Decimal('38.4'))
+        self.assertEqual(response.data['label'], voucher.label)
 
         data = {
             'items': [
@@ -964,7 +970,7 @@ class VoucherTest(BaseTestCase):
         self.assertEqual(action.sale.saleitem_set.all()[1].vat_rate, store_item2.vat_rate)
         self.assertEqual(action.sale.saleitem_set.all()[1].quantity, 1)
 
-        voucher_text = _('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate))
+        voucher_text = voucher.label
         self.assertEqual(action.sale.saleitem_set.all()[2].item, None)
         self.assertEqual(action.sale.saleitem_set.all()[2].text, voucher_text)
         self.assertEqual(action.sale.saleitem_set.all()[2].unit_price(), -Decimal(24))
@@ -1013,6 +1019,7 @@ class VoucherTest(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['voucher_code'], code)
         self.assertEqual(Decimal(response.data['discount']), Decimal('0'))
+        self.assertEqual(response.data['label'], '')
 
         data = {
             'items': [
@@ -1076,19 +1083,34 @@ class VoucherTest(BaseTestCase):
 
     def test_inactive_voucher(self):
         today = date.today()
-        voucher = mommy.make(models.Voucher, active=False, code='abc', start_date=today, end_date=today, rate=10)
+        mommy.make(models.Voucher, active=False, code='abc', start_date=today, end_date=today, rate=Decimal(10))
         self._do_test_post_voucher_no_voucher('abc')
 
     def test_no_voucher(self):
         today = date.today()
-        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=10)
+        mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10))
         self._do_test_post_voucher_no_voucher('')
+
+    def test_wrong_voucher_1(self):
+        today = date.today()
+        mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10))
+        self._do_test_post_voucher_no_voucher('abcd')
+
+    def test_wrong_voucher_2(self):
+        today = date.today()
+        mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10))
+        self._do_test_post_voucher_no_voucher('ab')
+
+    def test_wrong_voucher_3(self):
+        today = date.today()
+        mommy.make(models.Voucher, active=True, code='abc', start_date=today, end_date=today, rate=Decimal(10))
+        self._do_test_post_voucher_no_voucher('ABC')
 
     def test_before_after_voucher(self):
         today = date.today()
         dt1, dt2 = today - timedelta(days=5), today - timedelta(days=1)
         dt3, dt4 = today + timedelta(days=1), today + timedelta(days=4)
-        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=dt1, end_date=dt2, rate=10)
-        voucher = mommy.make(models.Voucher, active=True, code='abc', start_date=dt3, end_date=dt4, rate=10)
+        mommy.make(models.Voucher, active=True, code='abc', start_date=dt1, end_date=dt2, rate=Decimal(10))
+        mommy.make(models.Voucher, active=True, code='abc', start_date=dt3, end_date=dt4, rate=Decimal(10))
         self._do_test_post_voucher_no_voucher('abc')
 

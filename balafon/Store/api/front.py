@@ -151,7 +151,11 @@ class VoucherView(APIView):
                 discount = store_item.vat_incl_price() * voucher.rate / 100
                 voucher_discount_vat_incl += quantity * discount
 
-        discount_data = {'voucher_code': voucher_code, 'discount': voucher_discount_vat_incl}
+        discount_data = {
+            'voucher_code': voucher_code,
+            'label': voucher.label if voucher else '',
+            'discount': voucher_discount_vat_incl,
+        }
         return Response(discount_data)
 
 
@@ -250,7 +254,7 @@ class CartView(APIView):
                     )
                     counter = index
 
-                    # TODO calcule s'il y a une réduction Code Promo
+                    # calcule s'il y a une réduction Code Promo
                     # Crée une ligne réduction pour ce code
                     if voucher:
                         discount = store_item.pre_tax_price * voucher.rate / 100
@@ -268,7 +272,7 @@ class CartView(APIView):
                     item=None,
                     vat_rate=vat_rates[discount_vat],
                     pre_tax_price=-discount_value,
-                    text=_('Voucher {0} : Discount {0}%'.format(voucher.code, voucher.rate)),
+                    text=voucher.label,
                     order_index=counter
                 )
 
