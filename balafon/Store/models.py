@@ -331,7 +331,7 @@ class Voucher(models.Model):
 
     @property
     def label(self):
-        return ugettext('Voucher {0} : Discount {1}%'.format(self.code, self.rate.normalize()))
+        return ugettext('Voucher {0} : Discount {1}%').format(self.code, self.rate.normalize())
 
 
 class Brand(models.Model):
