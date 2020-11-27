@@ -939,7 +939,8 @@ class Sale(models.Model):
     analysis_code = models.ForeignKey(
         SaleAnalysisCode, default=None, blank=True, null=True, verbose_name=_("analysis code"), on_delete=models.CASCADE
     )
-    details = models.TextField(blank=True, default='')
+    delivery_details = models.TextField(blank=True, default='')  # This may be public (on sale document)
+    details = models.TextField(blank=True, default='')  # This should be private
 
     def get_references_text(self):
         """This text will be added at the bottom of the commercial document"""

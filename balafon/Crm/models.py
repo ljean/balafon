@@ -223,7 +223,7 @@ class AddressModel(LastModifiedModel):
         City, verbose_name=_('city'), blank=True, default=None, null=True, on_delete=models.CASCADE
     )
 
-    #These fields are just kept for editing the address field
+    # These fields are just kept for editing the address field
     street_number = models.CharField(_('street number'), max_length=20, blank=True, default='')
     street_type = models.ForeignKey(
         StreetType, default=None, blank=True, null=True, verbose_name=_('street type'), on_delete=models.CASCADE

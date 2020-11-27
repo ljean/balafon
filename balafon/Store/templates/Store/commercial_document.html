@@ -800,7 +800,9 @@
             <div class="row"><div class="col-xl-12">
               <div class="action-date">{{ app.action.planned_date|date }}</div>
               <div class="action-number" ng-show="app.action.get_action_number">{{ app.action.get_action_number }}</div>
-              <div class="action-subject">{{ app.action.subject }}</div>
+              <div class="action-subject">
+              {% endverbatim %}{% block subject %}{{ action.subject }}{% endblock %}{% verbatim %}
+              </div>
               {% endverbatim %}{% block extra_doc_header %}{% endblock %}{% verbatim %}
             </div></div>
           </div>
@@ -850,6 +852,10 @@
             </div>
           </div>
 
+          {% endverbatim %}
+          {% block contacts_about %}{% endblock %}
+          {% verbatim %}
+
           <div class="sale_items">
             <div>
               <div class="row"><div class="col-xl-12">
@@ -857,7 +863,7 @@
                 <table class="table table-bordered">
                   <tr>
                     <th>
-                      {{ 'LABEL' | translate }}
+                      {{ 'LABEL' | translate }}
                       <div ng-show="allowEdit" class="float-right">
                         <div class="show-on-hover">
                           <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="addItem()" title="{{ 'ADD' | translate }}" data-toggle="tooltip">

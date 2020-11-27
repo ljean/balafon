@@ -8,7 +8,8 @@ from balafon.Crm.forms.actions import (
     OpportunityForm, OpportunityStatusForm, UpdateActionStatusForm, UpdateActionStatus2Form
 )
 from balafon.Crm.forms.base import (
-    BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity, BsPopupModelForm, BsPopupForm
+    BetterBsForm, BetterBsModelForm, ModelFormWithCity, FormWithCity, BsPopupModelForm, BsPopupForm,
+    BillingModelFormWithCity
 )
 from balafon.Crm.forms.contacts import (
     ContactForm, SelectContactForm, SelectContactOrEntityForm, SameAsForm, SameAsPriorityForm, AddRelationshipForm,

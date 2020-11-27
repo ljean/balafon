@@ -8,14 +8,14 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 import floppyforms.__future__ as forms
 
 from balafon.Crm.models import Contact, EntityType
-from balafon.Crm.forms import ModelFormWithCity
+from balafon.Crm.forms import ModelFormWithCity, BillingModelFormWithCity
 from balafon.Crm.widgets import CityAutoComplete
 from balafon.Emailing.forms import SubscriptionTypeFormMixin
 from balafon.Profile.models import ContactProfile, ContactProfileCustomField
 from balafon.settings import has_entity_on_registration_form, get_registration_accept_terms_of_use_link
 
 
-class ProfileForm(ModelFormWithCity, SubscriptionTypeFormMixin):
+class ProfileForm(BillingModelFormWithCity, SubscriptionTypeFormMixin):
     """A form for updating user profile"""
     city = forms.CharField(
         required=False,
