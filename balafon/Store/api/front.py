@@ -274,7 +274,7 @@ class CartView(APIView):
                     pre_tax_price=-discount_value,
                     text=voucher.label,
                     order_index=counter,
-                    discount=True
+                    is_discount=True
                 )
 
             # Done
