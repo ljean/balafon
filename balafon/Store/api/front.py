@@ -273,7 +273,8 @@ class CartView(APIView):
                     vat_rate=vat_rates[discount_vat],
                     pre_tax_price=-discount_value,
                     text=voucher.label,
-                    order_index=counter
+                    order_index=counter,
+                    discount=True
                 )
 
             # Done
