@@ -60,3 +60,7 @@ def get_image_crop():
     returns size of image when displayed as thumbnail
     """
     return getattr(settings, 'BALAFON_STORE_IMAGE_CROP', None)
+
+
+def get_commercial_document_pdf_options():
+    return getattr(settings, 'BALAFON_COMMERCIAL_DOCUMENT_WKHTMLTOPDF_OPTIONS', None)

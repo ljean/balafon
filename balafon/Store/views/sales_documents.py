@@ -17,6 +17,7 @@ from balafon.utils import Utf8JSONRenderer
 from balafon.Crm.models import Action
 from balafon.Crm.serializers import ActionSerializer
 from balafon.Store.models import Discount, Sale, SaleItem, VatRate, StoreManagementActionType
+from balafon.Store.settings import get_commercial_document_pdf_options
 from balafon.Store.api.serializers import (
     DiscountSerializer, SaleItemSerializer, SaleSerializer, VatRateSerializer, VatTotalSerializer
 )
@@ -156,6 +157,34 @@ class SalesDocumentPdfView(SalesDocumentViewMixin, get_pdf_view_base_class()):
         'margin-left': 0,
         'margin-right': 0,
     }
+    
+    def __init__(self, *args, **kwargs):
+        options = get_commercial_document_pdf_options()
+        if options is not None:
+            self.cmd_options = options
+        super(SalesDocumentPdfView, self).__init__(*args, **kwargs)
+
+    def _get_template_for_document(self, footer):
+        """return customized template of exists"""
+        action = self.get_action()
+        try:
+            store_action_type = StoreManagementActionType.objects.get(action_type=action.type)
+            if store_action_type.template_name:
+                if footer:
+                    return store_action_type.footer_template_name or None
+                else:
+                    return store_action_type.header_template_name or None
+        except StoreManagementActionType.DoesNotExist:
+            pass
+        return None
+
+    @property
+    def header_template(self):
+        return self._get_template_for_document(False)
+
+    @property
+    def footer_template(self):
+        return self._get_template_for_document(True)
 
     def get_filename(self):
         action = self.get_action()

@@ -34,6 +34,14 @@ class StoreManagementActionType(models.Model):
         default='', blank=True, max_length=100, verbose_name=_('template name'),
         help_text=_('Set the name of a custom template for commercial document')
     )
+    header_template_name = models.CharField(
+        default='', blank=True, max_length=100, verbose_name=_('header template name'),
+        help_text=_('Set the name of a custom template for commercial document header')
+    )
+    footer_template_name = models.CharField(
+        default='', blank=True, max_length=100, verbose_name=_('footer template name'),
+        help_text=_('Set the name of a custom template for commercial document footer')
+    )
     show_amount_as_pre_tax = models.BooleanField(
         default=True,
         verbose_name=_('Show amount as pre-tax'),
