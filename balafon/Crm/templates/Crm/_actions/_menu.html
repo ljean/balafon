@@ -1,11 +1,11 @@
 {% load i18n balafon_utils %}
 <div class="dropdown btn-group float-right">
-  <a class="btn btn btn-xs btn-secondary dropdown-toggle" data-toggle="dropdown" href="#">
+  <a class="btn btn btn-xs btn-secondary dropdown-toggle" data-display="static" data-toggle="dropdown" href="#">
     <i class="fas fa-cog"></i>
     {% trans "Update" %}
     <span class="caret"></span>
   </a>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu dropdown-menu-right">
       {% block action_buttons %}
       {% include "Crm/_actions/_edit.html" %}
       {% endblock %}
