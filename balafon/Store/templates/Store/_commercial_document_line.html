@@ -19,23 +19,27 @@
   />
 </td>
 
-<td class="cell-label" ng-if="!item.is_blank" colspan="{{ item.is_discount?(columnsCount):1 }}">
+<td class="cell-label" ng-if="!item.is_blank">
   <div ng-show="allowEdit && !editedLines[$index]" class="float-right">
     <div class="show-on-hover">
-      <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="editOrder(item, $index)" title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
+      <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="editOrder(item, $index)"
+         title="{{ 'EDIT_ORDER' | translate }}" data-toggle="tooltip">
         <i class="fas fa-sort-alpha-down"></i>
       </a>
-      <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="editItem(item, $index)" title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
+      <a href ng-hide="editMode" class="btn btn-xs btn-secondary" ng-click="editItem(item, $index)"
+         title="{{ 'EDIT' | translate }}" data-toggle="tooltip">
         <i class="fas fa-pencil-alt"></i>
       </a>
-      <a href class="btn btn-xs btn-secondary" title="{{ 'DELETE' | translate }}" data-toggle="tooltip" ng-click="deleteItem(item, $index)">
+      <a href class="btn btn-xs btn-secondary" title="{{ 'DELETE' | translate }}" data-toggle="tooltip"
+         ng-click="deleteItem(item, $index)">
         <i class="fas fa-trash-alt"></i>
       </a>
     </div>
   </div>
   <div ng-show="allowEdit && editedLines[$index] && !changeOrder" class="float-right">
       <input type="hidden" name="item" ng-model="item.item" />
-      <a href class="btn btn-xs btn-secondary" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip" ng-click="lookFor(item)">
+      <a href class="btn btn-xs btn-secondary" title="{{ 'SEARCH' | translate }}" data-toggle="tooltip"
+         ng-click="lookFor(item)">
         <i class="fas fa-search"></i>
       </a>
   </div>
@@ -56,16 +60,19 @@
     name="text"
     ng-show="editedLines[$index] && !changeOrder">
   </textarea>
-  <div ng-show="allowEdit && editedLines[$index]">{{ 'NO_QUANTITY' | translate }} <input type="checkbox" ng-model="item.no_quantity"></div>
-  <div ng-show="allowEdit && editedLines[$index]">{{ 'DISCOUNT' | translate }} <input type="checkbox" ng-model="item.is_discount"></div>
-  <div ng-show="allowEdit && editedLines[$index]">{{ 'SHOW_PERCENTAGE' | translate }} <input type="checkbox" ng-model="item.showPercentage"></div>
+  <div class="checkboxes">
+    <div ng-show="allowEdit && editedLines[$index]">{{ 'NO_QUANTITY' | translate }} <input type="checkbox" ng-model="item.no_quantity"></div>
+    <div ng-show="allowEdit && editedLines[$index]">{{ 'DISCOUNT' | translate }} <input type="checkbox" ng-model="item.is_discount"></div>
+    <div ng-show="allowEdit && editedLines[$index]">{{ 'EXTRA' | translate }} <input type="checkbox" ng-model="item.is_extra"></div>
+    <div ng-show="allowEdit && editedLines[$index]">{{ 'SHOW_PERCENTAGE' | translate }} <input type="checkbox" ng-model="item.showPercentage"></div>
+  </div>
 </td>
 
-<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
+<td ng-if="!item.is_blank && (item.no_quantity || item.is_discount) ">&nbsp;</td>
 
-<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount">&nbsp;</td>
+<td ng-if="!item.is_blank && (item.no_quantity || item.is_discount) ">&nbsp;</td>
 
-<td ng-if="!item.is_blank && item.no_quantity && !item.is_discount && hasPercentage()">&nbsp;</td>
+<td ng-if="!item.is_blank && (item.no_quantity || item.is_discount) && hasPercentage()">&nbsp;</td>
 
 <td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
   <span ng-hide="editedLines[$index] && !changeOrder">
@@ -85,6 +92,8 @@
   </span>
 </td>
 
+
+
 <td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount && hasPercentage()">
   <span ng-hide="editedLines[$index] && !changeOrder">
     {{ item.percentage | number:2 }} %
@@ -100,7 +109,7 @@
   />
 </td>
 
-<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount">
+<td class="number" ng-if="!item.is_blank && !item.no_quantity && !item.is_discount ">
   <span ng-hide="editedLines[$index] && !changeOrder">{{ item.quantity | number }}</span>
   <input
     class="form-control"
@@ -135,4 +144,7 @@
 <td class="number" ng-if="item.is_discount">
   <span>{{ getItemPreTaxPrice(item) | number:2 }} €</span>
 </td>
+
+<td ng-if="item.is_discount">&nbsp;</td>
+<td ng-if="item.is_discount">&nbsp;</td>
 {% endverbatim %}

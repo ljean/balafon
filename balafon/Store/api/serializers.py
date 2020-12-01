@@ -138,7 +138,7 @@ class SaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'sale', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'is_blank',
-            'discount', 'unit_price', 'no_quantity', 'is_discount', 'percentage',
+            'discount', 'unit_price', 'no_quantity', 'is_discount', 'is_extra', 'percentage',
         )
 
 
@@ -152,7 +152,7 @@ class UpdateSaleItemSerializer(serializers.ModelSerializer):
         model = SaleItem
         fields = (
             'id', 'quantity', 'vat_rate', 'pre_tax_price', 'text', 'item', 'order_index', 'sale', 'is_blank',
-            'discount', 'no_quantity', 'is_discount', 'percentage',
+            'discount', 'no_quantity', 'is_discount', 'is_extra', 'percentage',
         )
 
 

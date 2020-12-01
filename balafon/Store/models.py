@@ -1105,6 +1105,9 @@ class SaleItem(models.Model):
     is_discount = models.BooleanField(
         default=False, verbose_name=_('is discount'), help_text=_('added after total on the bill')
     )
+    is_extra = models.BooleanField(
+        default=False, verbose_name=_('is extra'), help_text=_('added after total on the bill')
+    )
     percentage = models.DecimalField(
         verbose_name=_('percentage'), default=Decimal(100), max_digits=5, decimal_places=2,
         help_text=_('Only a percentage of the item price')

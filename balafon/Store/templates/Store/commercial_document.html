@@ -34,7 +34,7 @@
         UNIT_PRICE: 'Unit Price',
         PRE_TAX_TOTAL: 'Pre-tax total',
         PRE_TAX_PRICE: 'Pre-tax price',
-        PRE_TAX_TOTAL_BEFORE_DISCOUNT: 'Pre-tax total before discount',
+        PRE_TAX_SUB_TOTAL: 'Pre-tax sub-total',
         VAT_RATE: 'VAT rate',
         TAX_INCL_TOTAL: 'Tax Incl. total',
         TAX_INCL_PRICE: 'Tax Incl. price',
@@ -72,7 +72,7 @@
         QUANTITY: 'Quantité',
         UNIT_PRICE: 'Prix unitaire',
         PRE_TAX_TOTAL: 'Total HT',
-        PRE_TAX_TOTAL_BEFORE_DISCOUNT: 'Total HT avant Réduction',
+        PRE_TAX_SUB_TOTAL: 'Sous-Total HT',
         PRE_TAX_PRICE: 'Prix HT',
         VAT_RATE: 'TVA',
         TAX_INCL_TOTAL: 'Total TTC',
@@ -291,6 +291,7 @@
             is_blank: item.is_blank,
             no_quantity: item.no_quantity,
             is_discount: item.is_discount,
+            is_extra: item.is_extra,
             order_index: item.order_index
           };
           var url = '/store/api/' + $scope.app.action.id + '/sales-items/' + item.id + '/';
@@ -314,6 +315,7 @@
           item.quantity = respData.quantity;
           item.item = respData.item;
           item.is_discount = respData.is_discount;
+          item.is_extra = respData.is_extra;
           item.no_quantity = respData.no_quantity;
           item.percentage = respData.percentage;
           item.showPercentage = (respData.percentage !== 100);
@@ -348,6 +350,7 @@
             item: item.item,
             is_blank: item.is_blank,
             is_discount: item.is_discount,
+            is_extra: item.is_extra,
             no_quantity: item.no_quantity,
             order_index: item.order_index
           };
@@ -414,7 +417,7 @@
       $scope.getTotalPreTaxPriceNoDiscount = function() {
         var sum = 0;
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
-          if (!$scope.app.sale_items[i].is_blank && !$scope.app.sale_items[i].is_discount) {
+          if (!$scope.app.sale_items[i].is_blank && !$scope.app.sale_items[i].is_discount && !$scope.app.sale_items[i].is_extra) {
             sum += $scope.getItemPreTaxPrice($scope.app.sale_items[i]);
           }
         }
@@ -427,6 +430,15 @@
       $scope.hasDiscount = function () {
         for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
           if ($scope.app.sale_items[i].is_discount) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      $scope.hasExtra = function () {
+        for (var i= 0, l=$scope.app.sale_items.length; i<l; i++) {
+          if ($scope.app.sale_items[i].is_extra) {
             return true;
           }
         }
@@ -647,11 +659,19 @@
     }
 
     tr td.cell-label textarea {
-      width: 95%;
+      width: 92%;
     }
 
     tr td.cell-label > div {
       display: inline-block;
+    }
+
+    tr td.cell-label > .checkboxes > div {
+      display: inline-block;
+      padding: 2px 5px;
+      margin-top: 2px;
+      margin-right: 10px;
+      border: solid 1px #ccc;
     }
 
     input[type=number] {
@@ -796,6 +816,7 @@
             </div></div>
           </div>
 
+          {% endverbatim %}{% block doc_header %}{% verbatim %}
           <div class="doc-header">
             <div class="row"><div class="col-xl-12">
               <div class="action-date">{{ app.action.planned_date|date }}</div>
@@ -806,8 +827,12 @@
               {% endverbatim %}{% block extra_doc_header %}{% endblock %}{% verbatim %}
             </div></div>
           </div>
+          {% endverbatim %}{% endblock doc_header %}{% verbatim %}
+
+          {% endverbatim %}{% block contacts_before %}{% endblock %}{% verbatim %}
 
           <div class="contacts">
+            {% endverbatim %}{% block contacts_intro %}{% endblock %}{% verbatim %}
             <div ng-repeat="entity in app.action.entities" class="entity">
               <div class="row"><div class="col-xl-12">
                 <div>
@@ -876,53 +901,64 @@
                         </div>
                       </div>
                     </th>
-                    <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
-                    <th class="number" ng-if="hasPercentage()">{{ 'PERCENTAGE' | translate }}</th>
-                    <th class="number">{{ 'QUANTITY' | translate }}</th>
-                    <th class="number">{{ 'PRE_TAX_PRICE' | translate }}</th>
-                    <th class="number">{{ 'VAT_RATE' | translate }}</th>
-                    <th class="number">{{ 'TAX_INCL_PRICE' | translate }}</th>
+                    <th class="number">{{ 'UNIT_PRICE' | translate }}</th>
+                    <th class="number" ng-if="hasPercentage()">{{ 'PERCENTAGE' | translate }}</th>
+                    <th class="number">{{ 'QUANTITY' | translate }}</th>
+                    <th class="number">{{ 'PRE_TAX_PRICE' | translate }}</th>
+                    <th class="number">{{ 'VAT_RATE' | translate }}</th>
+                    <th class="number">{{ 'TAX_INCL_PRICE' | translate }}</th>
                   </tr>
 
-                  <tr class="tr-row" ng-repeat="item in app.sale_items" ng-if="!item.is_discount">
+                  <tr class="tr-row" ng-repeat="item in app.sale_items" ng-if="!item.is_discount && !item.is_extra">
                     {% endverbatim %}{% include "Store/_commercial_document_line.html" %}{% verbatim %}
                   </tr>
 
-                  <tr class="tr-row" ng-show="!editMode && app.vat_totals.length">
-                    <th colspan="{{ columnsCount + 1 }}">{{ 'TOTAL' | translate }}</th>
-                  </tr>
-
-                  <tr class="results tr-row" ng-if="hasDiscount()">
-                    <td colspan="{{ columnsCount }}">
-                      {{ 'PRE_TAX_TOTAL_BEFORE_DISCOUNT' | translate }}
+                  <tr class="results tr-row" ng-if="hasDiscount() || hasExtra()">
+                    <td colspan="{{ hasPercentage ? 2:1 }}">
+                      {{ 'PRE_TAX_SUB_TOTAL' | translate }}
                     </td>
+                    <td>&nbsp;</td>
                     <td class="number">{{ getTotalPreTaxPriceNoDiscount() | number:2 }} €</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
                   </tr>
 
                   <tr class="tr-row" ng-repeat="item in app.sale_items" ng-if="item.is_discount">
                     {% endverbatim %}{% include "Store/_commercial_document_line.html" %}{% verbatim %}
                   </tr>
 
+                  <tr class="tr-row" ng-repeat="item in app.sale_items" ng-if="item.is_extra">
+                    {% endverbatim %}{% include "Store/_commercial_document_line.html" %}{% verbatim %}
+                  </tr>
+
                   <tr class="results tr-row">
-                    <td colspan="{{ columnsCount }}">
-                      {{ 'PRE_TAX_TOTAL' | translate }}
+                    <td colspan="{{ columnsCount - 2 }}">
+                      {{ 'PRE_TAX_TOTAL' | translate }}
                     </td>
                     <td class="number">{{ getTotalPreTaxPrice() | number:2 }} €</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
                   </tr>
 
-                  <tr class="tr-row" ng-repeat="vat_total in app.vat_totals" ng-show="!editMode && vat_total.amount != 0">
-                    <td colspan="{{ columnsCount }}">{{ "VAT" | translate }} {{ vat_total.vat_rate.name }}</td>
+                  <tr class="results tr-row" ng-repeat="vat_total in app.vat_totals" ng-show="!editMode && vat_total.amount != 0">
+                    <td colspan="{{ columnsCount - 2 }}">{{ "VAT" | translate }} {{ vat_total.vat_rate.name }}</td>
+                    <td>&nbsp;</td>
                     <td class="number">{{ vat_total.amount| number:2 }} €</td>
+                    <td>&nbsp;</td>
                   </tr>
-                  <tr class="results tr-row" ng-show="!editMode && app.vat_totals.length">
-                    <td colspan="{{ columnsCount }}">{{ 'TOTAL' | translate }} {{ "VAT" | translate }}</td>
+                  <tr class="results tr-row" ng-show="!editMode && app.vat_totals.length > 1">
+                    <td colspan="{{ columnsCount - 2 }}">{{ 'TOTAL' | translate }} {{ "VAT" | translate }}</td>
+                    <td>&nbsp;</td>
                     <td class="number">{{ getVatTotalAmount() | number:2 }} €</td>
+                    <td>&nbsp;</td>
                   </tr>
 
                   <tr class="results tr-row">
-                    <td colspan="{{ columnsCount }}">
-                      {{ 'TAX_INCL_TOTAL' | translate }}
+                    <td colspan="{{ columnsCount - 2 }}">
+                      {{ 'TAX_INCL_TOTAL' | translate }}
                     </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
                     <td class="number">{{ getTotalTaxInclPrice() | number:2 }} €</td>
                   </tr>
 
@@ -938,11 +974,11 @@
                 <div ng-show="allowEdit" class="float-right">
 
                   <a href ng-show="editMode" class="btn btn-sm btn-secondary" ng-click="saveEdit()">
-                    <i class="fas fa-check"></i> {{ 'OK' | translate }}
+                    <i class="fas fa-check"></i> {{ 'OK' | translate }}
                   </a>
 
                   <a href ng-show="editMode" class="btn btn-sm btn-secondary" ng-click="cancelEdit()">
-                    <i class="fas fa-times"></i> {{ 'CANCEL' | translate }}
+                    <i class="fas fa-times"></i> {{ 'CANCEL' | translate }}
                   </a>
                 </div>
               </div></div>
