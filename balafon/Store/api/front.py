@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
-from datetime import date
 from decimal import Decimal
 
 from django.db.models import Q
@@ -21,8 +20,8 @@ from balafon.Store.models import (
 )
 from balafon.Store import settings
 from balafon.Store.api import serializers
-from balafon.Store.settings import get_cart_type_name, get_cart_processed_callback
-from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user, logger
+from balafon.Store.settings import get_cart_type_name, get_cart_processed_callback, get_notify_cart_callback
+from balafon.Store.utils import notify_cart_to_admin, confirm_cart_to_user
 
 
 class CanAccessStorePermission(permissions.BasePermission):
@@ -294,8 +293,12 @@ class CartView(APIView):
                 if on_cart_processed:
                     on_cart_processed(action)
 
-                confirm_cart_to_user(profile, action)
-                notify_cart_to_admin(profile, action)
+                notify_cart_callback = get_notify_cart_callback()
+                if notify_cart_callback is None:
+                    confirm_cart_to_user(profile, action)
+                    notify_cart_to_admin(profile, action)
+                else:
+                    notify_cart_callback(profile, action)
 
                 return Response({
                     'ok': True,

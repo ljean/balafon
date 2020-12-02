@@ -34,6 +34,15 @@ def get_cart_processed_callback():
     return load_from_module('BALAFON_CART_PROCESSED_CALLBACK', None)
 
 
+def get_notify_cart_callback():
+    """
+    returns a callback defined in BALAFON_NOTIFY_CART_CALLBACK
+    This function should take an action has argument
+    If not defined : notify to user and manager by email
+    """
+    return load_from_module('BALAFON_NOTIFY_CART_CALLBACK', None)
+
+
 def get_thumbnail_size():
     """
     returns size of image when displayed as thumbnail
