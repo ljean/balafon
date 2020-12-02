@@ -321,7 +321,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
     )
     groups = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
     action_types = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple(), label='', required=False)
-    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Message'), 'cols':'90'}))
+    message = forms.CharField(required=False, widget=forms.Textarea(attrs={'placeholder': _('Message'), 'cols': '90'}))
     captcha = get_captcha_field()
     favorite_language = forms.CharField(required=False, widget=forms.HiddenInput())
 
@@ -345,11 +345,12 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         self.fields['email'].required = True
 
         # Do not display (Mrs and M) gender on subscribe form
-        self.fields['gender'].choices = [
-            (models.Contact.GENDER_NOT_SET, _('')),
-            (models.Contact.GENDER_MALE, ugettext('Mr')),
-            (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
-        ]
+        if 'gender' in self.fields:
+            self.fields['gender'].choices = [
+                (models.Contact.GENDER_NOT_SET, _('')),
+                (models.Contact.GENDER_MALE, ugettext('Mr')),
+                (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
+            ]
 
         entity_types_choices = []
 
@@ -362,19 +363,22 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
         ])
 
-        self.fields['entity_type'].choices = entity_types_choices
+        if 'entity_type' in self.fields:
+            self.fields['entity_type'].choices = entity_types_choices
 
-        self.fields['groups'].choices = [
-            (group.id, group.name) for group in Group.objects.filter(subscribe_form=True)
-        ]
-        
-        self.fields['action_types'].choices = [
-            (action_type.id, action_type.name) for action_type in ActionType.objects.filter(subscribe_form=True)
-        ]
+        if 'groups' in self.fields:
+            self.fields['groups'].choices = [
+                (group.id, group.name) for group in Group.objects.filter(subscribe_form=True)
+            ]
+
+        if 'action_types':
+            self.fields['action_types'].choices = [
+                (action_type.id, action_type.name) for action_type in ActionType.objects.filter(subscribe_form=True)
+            ]
         
         self._add_subscription_types_field()
 
-        if crm_settings.has_language_choices():
+        if 'favorite_language' in self.fields and crm_settings.has_language_choices():
             self.fields['favorite_language'].initial = get_language()
     
     def clean_entity_type(self):
