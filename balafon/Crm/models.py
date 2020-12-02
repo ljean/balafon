@@ -1369,7 +1369,8 @@ class ActionType(NamedElement):
                     view_name='crm_clone_action',
                     label=ugettext('Duplicate'),
                     icon='duplicate',
-                    a_attrs='class="colorbox-form"'
+                    a_attrs='',
+                    css_class="colorbox-form",
                 )
             else:
                 ActionMenu.objects.filter(action_type=self, view_name='crm_clone_action').delete()
@@ -1419,7 +1420,14 @@ class ActionMenu(models.Model):
         verbose_name=_("Link args"),
         blank=True,
         default="",
-        help_text=_('Example: class="colorbox-form" for colorbos display')
+        help_text=_('Example: target="_blank"')
+    )
+    css_class = models.CharField(
+        max_length=50,
+        verbose_name=_("CSS class"),
+        blank=True,
+        default="",
+        help_text=_('Example: "colorbox-form" for colorbox display')
     )
     order_index = models.IntegerField(default=0, verbose_name=_("order_index"))
     only_for_status = models.ManyToManyField(ActionStatus, blank=True, verbose_name=_('Only for status'))
@@ -1438,7 +1446,7 @@ class ActionMenu(models.Model):
     only_for_status_str.short_description = _('Only for status')
 
     @classmethod
-    def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs=''):
+    def create_action_menu(cls, action_type, view_name, label=None, icon='', a_attrs='', css_class=''):
         queryset = ActionMenu.objects.filter(action_type=action_type, view_name=view_name)
         if not queryset.exists():
             return ActionMenu.objects.create(
@@ -1446,7 +1454,8 @@ class ActionMenu(models.Model):
                 action_type=action_type,
                 label=label or view_name,
                 icon=icon,
-                a_attrs=a_attrs
+                a_attrs=a_attrs,
+                css_class=css_class
             )
 
     def __str__(self):
