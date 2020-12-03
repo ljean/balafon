@@ -33,7 +33,7 @@ def edit_profile(request):
     if request.method == "POST":
         form = profile_form_class(request.POST, request.FILES, instance=profile.contact)
         if form.is_valid():
-            #save contact
+            # save contact
             form.save()
             messages.add_message(request, messages.SUCCESS, _("Your profile has been updated."))
             return HttpResponseRedirect(reverse('homepage'))
@@ -81,7 +81,7 @@ def post_message(request):
                 content = template_.render(data)
                 email = EmailMessage(
                     _("Message from web site"), content, from_email,
-                    [notification_email], headers = {'Reply-To': profile.contact.email})
+                    [notification_email], headers={'Reply-To': profile.contact.email})
                 try:
                     email.send()
                     messages.add_message(request, messages.SUCCESS, _("The message have been sent"))
