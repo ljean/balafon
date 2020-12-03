@@ -284,13 +284,16 @@ def send_verification_email(contact, subscription_types=None, redirect_to=None):
             'site': Site.objects.get_current(),
             'my_company': mark_safe(my_company),
         }
+        subject_template = get_template('Emailing/subscribe_verification_email_subject.txt')
+        subject = subject_template.render(data)
+
         the_template = get_template('Emailing/subscribe_verification_email.txt')
         content = the_template.render(data)
         
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         
         email = EmailMessage(
-            _('Verification of your email address'),
+            ' '.join(subject.splitlines()),
             content,
             from_email,
             [contact.email]
