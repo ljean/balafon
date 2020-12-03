@@ -44,7 +44,7 @@ def notify_cart_to_admin(profile, action):
             logger.exception("notify_cart_to_admin")
 
 
-def confirm_cart_to_user(profile, action):
+def confirm_cart_to_user(profile, action, custom_template=None):
     """send message by email"""
 
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
@@ -56,7 +56,11 @@ def confirm_cart_to_user(profile, action):
         'subject': subject,
     }
 
-    the_template = get_template('Store/cart_confirmation_email.html')
+    if custom_template:
+        template_name = custom_template
+    else:
+        template_name = 'Store/cart_confirmation_email.html'
+    the_template = get_template(template_name)
     html_text = the_template.render(data)
     text = dehtml(html_text)
 
