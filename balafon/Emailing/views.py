@@ -202,7 +202,7 @@ def view_link(request, link_uuid, contact_uuid):
         # create action
         link_action = ActionType.objects.get_or_create(name=_('Link'))[0]
         action = Action.objects.create(
-            subject=link.url, planned_date=now_rounded(),
+            subject=link.url[:200], planned_date=now_rounded(),
             type=link_action, detail='', done=True, display_on_board=False,
             done_date=now_rounded()
         )

@@ -1040,6 +1040,36 @@ class SendEmailingTest(BaseTestCase):
 
         self.assertContains(response, long_link)
 
+    def test_click_view_long_links(self):
+        entity = mommy.make(models.Entity, name="my corp")
+        contact = mommy.make(
+            models.Contact, entity=entity,
+            email='toto@toto.fr', lastname='Azerty', firstname='Albert'
+        )
+        link = "http://toto.fr/{0}".format("abcde" * 40)
+        newsletter_data = {
+            'subject': 'This is the subject',
+            'content': '<p>Visit <a href="{0}">long link</a></p>'.format(link),
+            'template': 'test/newsletter_no_link.html'
+        }
+        newsletter = mommy.make(Newsletter, **newsletter_data)
+        emailing = mommy.make(Emailing, newsletter=newsletter)
+        emailing.sent_to.add(contact)
+        emailing.save()
+
+        url = reverse('emailing_view_online', args=[emailing.id, contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(MagicLink.objects.count(), 1)
+
+        magic_link0 = MagicLink.objects.all()[0]
+        magic_link_url = reverse('emailing_view_link', args=[magic_link0.uuid, contact.uuid])
+        self.assertContains(response, magic_link_url)
+        self.assertEqual(magic_link0.url, link)
+        response = self.client.get(magic_link_url)
+        self.assertRedirects(response, link, fetch_redirect_response=False)
+
     def test_view_duplicate_links(self):
         entity = mommy.make(models.Entity, name="my corp")
         contact = mommy.make(
