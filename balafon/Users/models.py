@@ -124,6 +124,7 @@ class CustomMenuItem(models.Model):
         User, blank=True, verbose_name=_("only for users"), limit_choices_to={'is_staff': True}
     )
     attributes = models.CharField(max_length=100, verbose_name=_("attributes"), default="", blank=True)
+    query_string = models.CharField(max_length=100, verbose_name=_("query string"), default="", blank=True)
 
     class Meta:
         verbose_name = _('Custom menu item')
@@ -168,12 +169,16 @@ class CustomMenuItem(models.Model):
                         default_value = None
                     reverse_kwargs[keyword] = kwargs.get(keyword, default_value)
             try:
-                query_string = ''
-                request = RequestManager().get_request()
-                if request:
-                    query_string = request.META['QUERY_STRING'] or ''
+                if not self.query_string:
+                    query_string = ''
+                    request = RequestManager().get_request()
+                    if request:
+                        query_string = "?" + request.META['QUERY_STRING'] or ''
+                else:
+                    query_string = self.query_string
+                print('-->', query_string)
                 try:
-                    url = reverse(self.reverse, kwargs=reverse_kwargs) + "?" + query_string
+                    url = reverse(self.reverse, kwargs=reverse_kwargs) + query_string
                 except TypeError:
                     pass
             except NoReverseMatch as err:
