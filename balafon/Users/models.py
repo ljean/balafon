@@ -176,7 +176,6 @@ class CustomMenuItem(models.Model):
                         query_string = "?" + request.META['QUERY_STRING'] or ''
                 else:
                     query_string = self.query_string
-                print('-->', query_string)
                 try:
                     url = reverse(self.reverse, kwargs=reverse_kwargs) + query_string
                 except TypeError:
