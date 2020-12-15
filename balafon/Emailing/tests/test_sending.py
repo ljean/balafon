@@ -724,7 +724,6 @@ class SendEmailingTest(BaseTestCase):
             self.assertEqual(email.to, [contact.get_email_address()])
             self.assertEqual(email.from_email, emailing.from_email)
             self.assertEqual(email.subject, 'Balafon de retour sur scène en décembre !')
-            self.assertTrue(email.body.find(entity.name) >= 0)
             # print email.body
             self.assertEqual(
                 email.extra_headers['List-Unsubscribe'],
@@ -733,7 +732,6 @@ class SendEmailingTest(BaseTestCase):
             self.assertTrue(email.body.find(contact.fullname) >= 0)
             self.assertTrue(email.alternatives[0][1], "text/html")
             self.assertTrue(email.alternatives[0][0].find(contact.fullname) >= 0)
-            self.assertTrue(email.alternatives[0][0].find(entity.name) >= 0)
             self.assertTrue(email.alternatives[0][0].find(viewonline_url) >= 0)
             self.assertTrue(email.alternatives[0][0].find(unsubscribe_url) >= 0)
 
