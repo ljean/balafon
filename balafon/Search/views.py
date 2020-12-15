@@ -295,12 +295,14 @@ def create_emailing(request):
                 form = NewEmailingForm(request.POST)
                 if form.is_valid():
                     newsletter_id = form.cleaned_data['newsletter']
+                    subscription_type = form.cleaned_data['subscription_type']
                     if newsletter_id:
                         newsletter = Newsletter.objects.get(id=newsletter_id)
                     else:
-                        newsletter = Newsletter.objects.create(subject=form.cleaned_data['subject'])
-
-                    subscription_type = form.cleaned_data['subscription_type']
+                        newsletter = Newsletter.objects.create(
+                            subject=form.cleaned_data['subject'],
+                            site=subscription_type.site
+                        )
 
                     contacts = form.get_contacts()
 

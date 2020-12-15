@@ -4,8 +4,9 @@
 from unittest import skipIf
 
 from django.conf import settings
-from django.urls import reverse
+from django.contrib.sites.models import Site
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from coop_cms.models import Newsletter
 from coop_cms.tests import BeautifulSoup
@@ -215,7 +216,7 @@ class CreateEmailingTest(BaseTestCase):
         contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
         contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
 
-        subscription_type = mommy.make(models.SubscriptionType)
+        subscription_type = mommy.make(models.SubscriptionType, site=None)
 
         data = {
             'create_emailing': True,
@@ -244,6 +245,51 @@ class CreateEmailingTest(BaseTestCase):
 
         self.assertEqual(emailing.subscription_type, subscription_type)
         self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual(emailing.newsletter.subject, data["subject"])
+        self.assertEqual(emailing.newsletter.site, Site.objects.get_current())
+        self.assertEqual('', emailing.lang)
+        self.assertEqual(0, emailing.sent_to.count())
+        self.assertEqual(2, emailing.send_to.count())
+        self.assertTrue(contact1 in emailing.send_to.all())
+        self.assertTrue(contact2 in emailing.send_to.all())
+        self.assertFalse(contact3 in emailing.send_to.all())
+
+    def test_create_emailing_new_newsletter_alt_site(self):
+        """create emailing with new newsletter set"""
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False)
+        contact2 = mommy.make(models.Contact, lastname="EFGH", main_contact=True, has_left=False)
+        contact3 = mommy.make(models.Contact, lastname="IJKL", main_contact=True, has_left=False)
+        alt_site = mommy.make(Site)
+        subscription_type = mommy.make(models.SubscriptionType, site=alt_site)
+        data = {
+            'create_emailing': True,
+            'subject': "Test",
+            'subscription_type': subscription_type.id,
+            'newsletter': 0,
+            'contacts': ";".join([str(x) for x in [contact1.id, contact2.id]]),
+            'lang': '',
+            'from_email': '',
+        }
+
+        url = reverse('search_emailing')
+        response = self.client.post(url, data=data)
+        self.assertEqual(200, response.status_code)
+
+        self.assertEqual(Newsletter.objects.count(), 1)
+        newsletter = Newsletter.objects.all()[0]
+
+        self.assertContains(
+            response,
+            '<script>$.colorbox.close(); window.location="{0}";</script>'.format(newsletter.get_absolute_url())
+        )
+
+        self.assertEqual(Emailing.objects.count(), 1)
+        emailing = Emailing.objects.all()[0]
+
+        self.assertEqual(emailing.subscription_type, subscription_type)
+        self.assertEqual(emailing.newsletter, newsletter)
+        self.assertEqual(emailing.subscription_type.site, alt_site)
+        self.assertEqual(emailing.newsletter.site, alt_site)
         self.assertEqual(emailing.newsletter.subject, data["subject"])
         self.assertEqual('', emailing.lang)
         self.assertEqual(0, emailing.sent_to.count())

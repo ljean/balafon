@@ -102,13 +102,18 @@ def new_newsletter(request):
                 template = form.cleaned_data["template"]
                 content = form.cleaned_data["content"]
                 source_url = form.cleaned_data["source_url"]
+                site = form.cleaned_data["site"]
                 go_to_edit = False
                 if not content:
                     content = _("Enter the text of your newsletter here")
                     go_to_edit = True
 
                 newsletter = Newsletter.objects.create(
-                    subject=subject, template=template, content=content, source_url=source_url
+                    subject=subject,
+                    template=template,
+                    content=content,
+                    source_url=source_url,
+                    site=site
                 )
 
                 if go_to_edit:
