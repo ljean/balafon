@@ -64,7 +64,7 @@ def get_emailing_context(emailing, contact):
     newsletter.content = html_content
 
     context_dict = {
-        'title': dehtml(newsletter.subject).replace('\n', ''),
+        'title': dehtml(newsletter.subject).replace('\n\n', '\n').replace('\n', ' '),
         'newsletter': newsletter,
         'by_email': True,
         'MEDIA_URL': settings.MEDIA_URL,
