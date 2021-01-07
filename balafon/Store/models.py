@@ -339,7 +339,9 @@ class Voucher(models.Model):
 
     @property
     def label(self):
-        rate = str(self.rate).rstrip('0').rstrip('.')
+        rate = str(self.rate or 0)
+        if '.' in rate:
+            rate = rate.rstrip('0').rstrip('.')
         return ugettext('Voucher {0} : Discount {1}%').format(self.code, rate)
 
 
