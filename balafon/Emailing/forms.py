@@ -149,6 +149,7 @@ class NewNewsletterForm(BsForm):
     template = forms.ChoiceField(label=_("Template"), choices=get_newsletter_templates(None, None))
     source_url = forms.URLField(label=_('Source URL'), required=False)
     content = forms.CharField(label=_('Content'), required=False, widget=forms.HiddenInput())
+    site = forms.ModelChoiceField(queryset=Site.objects.all(), label=_('Site'))
     
     def __init__(self, *args, **kwargs):
         super(NewNewsletterForm, self).__init__(*args, **kwargs)

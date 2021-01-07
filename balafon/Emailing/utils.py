@@ -54,7 +54,6 @@ def get_emailing_context(emailing, contact):
     # clone the object: Avoid overwriting {tags} for ever
     newsletter = Newsletter()
     newsletter.__dict__ = dict(emailing.newsletter.__dict__)
-
     newsletter.subject = format_context(newsletter.subject, data)
 
     html_content = format_context(newsletter.content, data)
@@ -64,7 +63,7 @@ def get_emailing_context(emailing, contact):
     newsletter.content = html_content
 
     context_dict = {
-        'title': dehtml(newsletter.subject).replace('\n', ''),
+        'title': dehtml(newsletter.subject).replace('\n\n', '\n').replace('\n', ' '),
         'newsletter': newsletter,
         'by_email': True,
         'MEDIA_URL': settings.MEDIA_URL,

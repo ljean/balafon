@@ -29,8 +29,14 @@ class UserHomepageAdmin(admin.ModelAdmin):
     list_display = ["user", "url"]
 
 
-class CustomMenuItemInline(admin.TabularInline):
+class CustomMenuItemInline(admin.StackedInline):
     model = models.CustomMenuItem
+    fields = [
+        'label', 'icon', 'url', 'reverse', 'reverse_kwargs', 'attributes',
+        'query_string', 'order_index', 'only_for_users'
+    ]
+    raw_id_fields = ['only_for_users']
+    extra = 0
 
 
 @admin.register(models.CustomMenu)
