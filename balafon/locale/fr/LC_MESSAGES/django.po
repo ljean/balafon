@@ -3,12 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: Emailing/forms.py:349
+#: Emailing/forms.py:351
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-27 08:40+0100\n"
+"POT-Creation-Date: 2021-01-20 17:52+0100\n"
 "PO-Revision-Date: 2015-07-30 17:49+0100\n"
 "Last-Translator: Luc Jean <ljean@apidev.fr>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgstr "Balafon - Annuaire"
 msgid "Pdf"
 msgstr "Pdf"
 
-#: Crm/forms/actions.py:25 Crm/models.py:1472 Search/forms.py:745
+#: Crm/forms/actions.py:25 Crm/models.py:1481 Search/forms.py:745
 msgid "planned date"
 msgstr "date prévue"
 
@@ -105,7 +105,7 @@ msgstr "date prévue"
 msgid "planned time"
 msgstr "heure prévue"
 
-#: Crm/forms/actions.py:28 Crm/models.py:1499 Store/models.py:307
+#: Crm/forms/actions.py:28 Crm/models.py:1508 Store/models.py:315
 msgid "end date"
 msgstr "date de fin"
 
@@ -214,7 +214,7 @@ msgid "Invalid type"
 msgstr "Type invalide"
 
 #: Crm/forms/base.py:140 Crm/forms/base.py:219 Crm/forms/base.py:245
-#: Crm/search_forms.py:149 Emailing/forms.py:315 Profile/forms.py:23
+#: Crm/search_forms.py:149 Emailing/forms.py:316 Profile/forms.py:23
 #: Profile/forms.py:91
 msgid "Enter a city"
 msgstr "Entrez une ville"
@@ -226,7 +226,7 @@ msgstr ""
 
 #: Crm/forms/base.py:218 Crm/forms/base.py:233 Crm/forms/base.py:244
 #: Crm/search_forms.py:157 Crm/templates/Crm/_section_all_entities.html:15
-#: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:314
+#: Crm/templates/Crm/_section_entities.html:13 Emailing/forms.py:315
 #: Profile/forms.py:22 Profile/forms.py:90 Profile/models.py:38
 #: Search/templates/Search/_section_qs_cities.html:4
 #: Search/templates/Search/_section_qs_contacts.html:10
@@ -234,12 +234,12 @@ msgid "City"
 msgstr "Ville"
 
 #: Crm/forms/base.py:221 Crm/forms/base.py:231 Crm/forms/base.py:247
-#: Search/views.py:366
+#: Search/views.py:368
 msgid "Country"
 msgstr "Pays"
 
 #: Crm/forms/base.py:232 Crm/models.py:220 Crm/models.py:236
-#: Crm/search_forms.py:188 Emailing/forms.py:339
+#: Crm/search_forms.py:188 Emailing/forms.py:340
 msgid "zip code"
 msgstr "code postal"
 
@@ -270,7 +270,7 @@ msgstr "Sélectionnez les rôles de ce contact"
 #: Crm/forms/contacts.py:58 Crm/forms/contacts.py:277 Crm/forms/entities.py:32
 #: Crm/models.py:35 Crm/templates/Crm/_section_my_groups.html:10
 #: Crm/templates/Crm/_section_opportunities.html:12 Search/forms.py:829
-#: Store/models.py:386 Store/models.py:506 Store/views/xls_export.py:49
+#: Store/models.py:397 Store/models.py:517 Store/views/xls_export.py:49
 #: Store/views/xls_export.py:96 Store/views/xls_export.py:142
 msgid "Name"
 msgstr "Nom"
@@ -303,12 +303,12 @@ msgstr "Photo"
 msgid "Select the roles played by the contact in his entity"
 msgstr "Choisissez les rôles joués par le contact au sein de l'entité"
 
-#: Crm/forms/contacts.py:118 Crm/models.py:602 Emailing/forms.py:350
+#: Crm/forms/contacts.py:118 Crm/models.py:602 Emailing/forms.py:352
 #: Profile/forms.py:52 Profile/forms.py:109 Profile/models.py:23
 msgid "Mr"
 msgstr "M."
 
-#: Crm/forms/contacts.py:119 Crm/models.py:603 Emailing/forms.py:351
+#: Crm/forms/contacts.py:119 Crm/models.py:603 Emailing/forms.py:353
 #: Profile/forms.py:53 Profile/forms.py:110 Profile/models.py:24
 msgid "Mrs"
 msgstr "Mme"
@@ -327,9 +327,9 @@ msgstr "Le contact n'existe pas"
 
 #: Crm/forms/contacts.py:257 Crm/forms/contacts.py:262
 #: Crm/forms/contacts.py:344 Crm/forms/contacts.py:378
-#: Crm/forms/contacts.py:396 Crm/models.py:1731
+#: Crm/forms/contacts.py:396 Crm/models.py:1740
 #: Crm/templates/Crm/_section_contacts.html:13 Crm/views/planning.py:66
-#: Emailing/forms.py:517
+#: Emailing/forms.py:522
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:11
 msgid "Contact"
 msgstr "Contact"
@@ -406,9 +406,9 @@ msgstr "Veuillez entrer un code valide"
 msgid "Logo"
 msgstr "Logo"
 
-#: Crm/forms/entities.py:102 Crm/models.py:1730
+#: Crm/forms/entities.py:102 Crm/models.py:1739
 #: Crm/templates/Crm/confirm_contacts_import.html:70 Crm/views/planning.py:67
-#: Search/views.py:367 config.py:47 templates/balafon/_bs_navigation.html:65
+#: Search/views.py:369 config.py:47 templates/balafon/_bs_navigation.html:65
 #: templates/balafon/_navigation.html:27
 msgid "Entity"
 msgstr "Entité"
@@ -515,7 +515,7 @@ msgstr "Féminin"
 msgid "gender"
 msgstr "civilité"
 
-#: Crm/models.py:93 Crm/models.py:1712
+#: Crm/models.py:93 Crm/models.py:1721
 msgid "order"
 msgstr "ordre"
 
@@ -531,7 +531,7 @@ msgstr "Affiché sur le formulaire d'inscription"
 msgid "This type will be proposed on the public subscribe form"
 msgstr "Ce type sera proposé sur le formulaire d'inscription public"
 
-#: Crm/models.py:105 Crm/models.py:1826
+#: Crm/models.py:105 Crm/models.py:1835
 msgid "entity type"
 msgstr "type d'entité"
 
@@ -551,7 +551,7 @@ msgstr "type de zone"
 msgid "zone types"
 msgstr "types de zone"
 
-#: Crm/models.py:139 Store/models.py:305
+#: Crm/models.py:139 Store/models.py:313
 msgid "code"
 msgstr "code"
 
@@ -608,16 +608,16 @@ msgid "street number"
 msgstr "numéro de rue"
 
 #: Crm/models.py:309 Crm/models.py:562 Crm/models.py:1055 Crm/models.py:1088
-#: Crm/models.py:1155 Crm/models.py:1259 Crm/models.py:1399 Crm/models.py:1734
-#: Crm/models.py:1819 Profile/models.py:68 Search/models.py:14
-#: Search/models.py:29 Store/models.py:109 Store/models.py:136
-#: Store/models.py:151 Store/models.py:252 Store/models.py:269
-#: Store/models.py:339 Store/models.py:401 Store/models.py:648
-#: Store/models.py:906 Store/models.py:919
+#: Crm/models.py:1155 Crm/models.py:1259 Crm/models.py:1400 Crm/models.py:1743
+#: Crm/models.py:1828 Profile/models.py:68 Search/models.py:14
+#: Search/models.py:29 Store/models.py:117 Store/models.py:144
+#: Store/models.py:159 Store/models.py:260 Store/models.py:277
+#: Store/models.py:350 Store/models.py:412 Store/models.py:659
+#: Store/models.py:917 Store/models.py:930
 msgid "name"
 msgstr "nom"
 
-#: Crm/models.py:310 Crm/models.py:1089 Store/models.py:443
+#: Crm/models.py:310 Crm/models.py:1089 Store/models.py:454
 msgid "description"
 msgstr "description"
 
@@ -653,7 +653,7 @@ msgstr "est un particulier"
 msgid "entity"
 msgstr "entité"
 
-#: Crm/models.py:506 Crm/models.py:1497
+#: Crm/models.py:506 Crm/models.py:1506
 #: Crm/templates/Crm/_section_my_groups.html:23
 #: Search/templates/Search/_section_qs_cities.html:13
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -826,7 +826,7 @@ msgstr "Chers"
 msgid "contact"
 msgstr "contact"
 
-#: Crm/models.py:1027 Crm/models.py:1496
+#: Crm/models.py:1027 Crm/models.py:1505
 #: Crm/templates/Crm/_section_my_groups.html:24
 #: Search/templates/Search/_section_qs_cities.html:18
 #: Search/templates/Search/_section_qs_groups.html:12
@@ -878,7 +878,7 @@ msgstr "Couleur de fond. Doit-être un code RGB par exemple #000000"
 msgid "Displayed on contacts list"
 msgstr "Affiché sur la liste des contacts"
 
-#: Crm/models.py:1122 Crm/models.py:1831
+#: Crm/models.py:1122 Crm/models.py:1840
 msgid "groups"
 msgstr "groupes"
 
@@ -906,7 +906,7 @@ msgstr "moyenne"
 msgid "high"
 msgstr "haute"
 
-#: Crm/models.py:1158 Crm/models.py:1474
+#: Crm/models.py:1158 Crm/models.py:1483
 msgid "detail"
 msgstr "détail"
 
@@ -914,7 +914,7 @@ msgstr "détail"
 msgid "probability"
 msgstr "probabilité"
 
-#: Crm/models.py:1163 Crm/models.py:1487
+#: Crm/models.py:1163 Crm/models.py:1496
 msgid "amount"
 msgstr "montant"
 
@@ -930,11 +930,11 @@ msgstr "date de début"
 msgid "closing date"
 msgstr "date de fin"
 
-#: Crm/models.py:1171 Crm/models.py:1484
+#: Crm/models.py:1171 Crm/models.py:1493
 msgid "display on board"
 msgstr "affiché sur le tableau de bord"
 
-#: Crm/models.py:1201 Crm/models.py:1477
+#: Crm/models.py:1201 Crm/models.py:1486
 msgid "opportunity"
 msgstr "dossier"
 
@@ -942,7 +942,7 @@ msgstr "dossier"
 msgid "opportunities"
 msgstr "dossiers"
 
-#: Crm/models.py:1207 Crm/models.py:1217 Crm/models.py:1738
+#: Crm/models.py:1207 Crm/models.py:1217 Crm/models.py:1747
 msgid "display ordering"
 msgstr "ordre d'affichage"
 
@@ -990,7 +990,7 @@ msgstr "générateur de numéro d'action"
 msgid "action number generators"
 msgstr "générateurs de numéro d'action"
 
-#: Crm/models.py:1261 Crm/models.py:1490
+#: Crm/models.py:1261 Crm/models.py:1499
 msgid "number"
 msgstr "numéro"
 
@@ -1095,7 +1095,7 @@ msgid "If checked, all status changed is stored in DB"
 msgstr ""
 "Si coché, tous les madifications de statut sont stockés en base de données"
 
-#: Crm/models.py:1336 Store/models.py:86
+#: Crm/models.py:1336 Store/models.py:94
 msgid "is default"
 msgstr "par défaut"
 
@@ -1104,8 +1104,8 @@ msgid ""
 "If checked, can be added from list. Action without types are not displayed"
 msgstr "Si coché, type par défaut des nouvelles actions"
 
-#: Crm/models.py:1340 Crm/models.py:1416 Crm/models.py:1711 Crm/models.py:1735
-#: Store/models.py:649 Users/models.py:80 Users/models.py:114
+#: Crm/models.py:1340 Crm/models.py:1417 Crm/models.py:1720 Crm/models.py:1744
+#: Store/models.py:660 Users/models.py:80 Users/models.py:114
 msgid "label"
 msgstr "libellé"
 
@@ -1125,236 +1125,244 @@ msgstr "Dernier numéro"
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: Crm/models.py:1389 Crm/models.py:1848 Store/models.py:921
+#: Crm/models.py:1390 Crm/models.py:1857 Store/models.py:932
 msgid "action type"
 msgstr "type d'action"
 
-#: Crm/models.py:1390
+#: Crm/models.py:1391
 msgid "action types"
 msgstr "types d'action"
 
-#: Crm/models.py:1397 Store/models.py:1075 Users/models.py:40
+#: Crm/models.py:1398 Store/models.py:1087 Users/models.py:40
 #: Users/models.py:59
 msgid "user"
 msgstr "utilisateur"
 
-#: Crm/models.py:1400 Store/models.py:153 Store/models.py:254
-#: Store/models.py:280 Store/models.py:311
+#: Crm/models.py:1401 Store/models.py:161 Store/models.py:262
+#: Store/models.py:288 Store/models.py:319
 msgid "active"
 msgstr "actif"
 
-#: Crm/models.py:1406
+#: Crm/models.py:1407
 msgid "team member"
 msgstr "membre de l'équipe"
 
-#: Crm/models.py:1407
+#: Crm/models.py:1408
 msgid "team members"
 msgstr "membres de l'équipe"
 
-#: Crm/models.py:1413 Crm/search_forms.py:935
+#: Crm/models.py:1414 Crm/search_forms.py:935
 msgid "Action type"
 msgstr "Type d'action"
 
-#: Crm/models.py:1414
+#: Crm/models.py:1415
 msgid "view_name"
 msgstr "nom de la vue"
 
-#: Crm/models.py:1415 Users/models.py:81 Users/models.py:115
+#: Crm/models.py:1416 Users/models.py:81 Users/models.py:115
 msgid "icon"
 msgstr "icone"
 
-#: Crm/models.py:1419
+#: Crm/models.py:1420
 msgid "Link args"
 msgstr "arguments du Lien"
 
-#: Crm/models.py:1422
-msgid "Example: class=\"colorbox-form\" for colorbos display"
-msgstr "Exemple: class=\"colorbox-form\" pour un affichage dans une colorbox"
+#: Crm/models.py:1423
+msgid "Example: target=\"_blank\""
+msgstr ""
 
-#: Crm/models.py:1424 Store/models.py:152 Store/models.py:253
+#: Crm/models.py:1427
+msgid "CSS class"
+msgstr "Classe CSS"
+
+#: Crm/models.py:1430
+msgid "Example: \"colorbox-form\" for colorbox display"
+msgstr "Exemple: \"colorbox-form\" pour un affichage dans une colorbox"
+
+#: Crm/models.py:1432 Store/models.py:160 Store/models.py:261
 msgid "order_index"
 msgstr "ordre"
 
-#: Crm/models.py:1425 Crm/models.py:1438
+#: Crm/models.py:1433 Crm/models.py:1446
 msgid "Only for status"
 msgstr "Seulement à l'état"
 
-#: Crm/models.py:1428
+#: Crm/models.py:1436
 msgid "action menu"
 msgstr "menu d'actions"
 
-#: Crm/models.py:1429
+#: Crm/models.py:1437
 msgid "action menus"
 msgstr "menus d'actions"
 
-#: Crm/models.py:1462
+#: Crm/models.py:1471
 msgid "low priority"
 msgstr "priorité basse"
 
-#: Crm/models.py:1463
+#: Crm/models.py:1472
 msgid "medium priority"
 msgstr "priorité moyenne"
 
-#: Crm/models.py:1464
+#: Crm/models.py:1473
 msgid "high priority"
 msgstr "priorité haute"
 
-#: Crm/models.py:1468 Crm/templates/Crm/_section_actions.html:30
+#: Crm/models.py:1477 Crm/templates/Crm/_section_actions.html:30
 #: Crm/templates/Crm/_section_actions.html:34
 #: Crm/templates/Crm/_section_actions.html:38 Crm/views/actions.py:421
-#: Store/models.py:935
+#: Store/models.py:946
 msgid "action"
 msgstr "action"
 
-#: Crm/models.py:1469
+#: Crm/models.py:1478
 msgid "actions"
 msgstr "actions"
 
-#: Crm/models.py:1471 Crm/models.py:1851
+#: Crm/models.py:1480 Crm/models.py:1860
 msgid "subject"
 msgstr "sujet"
 
-#: Crm/models.py:1475
+#: Crm/models.py:1484
 msgid "priority"
 msgstr "priorité"
 
-#: Crm/models.py:1479
+#: Crm/models.py:1488
 msgid "done"
 msgstr "réalisé"
 
-#: Crm/models.py:1480
+#: Crm/models.py:1489
 msgid "done date"
 msgstr "date de réalisation"
 
-#: Crm/models.py:1482
+#: Crm/models.py:1491
 msgid "in charge"
 msgstr "en charge"
 
-#: Crm/models.py:1485
+#: Crm/models.py:1494
 msgid "archived"
 msgstr "archivé"
 
-#: Crm/models.py:1490
+#: Crm/models.py:1499
 msgid "This number is auto-generated based on action type."
 msgstr "Ce numéro est généré automatiquement à partir du type d'action"
 
-#: Crm/models.py:1501 Store/admin.py:37
+#: Crm/models.py:1510 Store/admin.py:37
 msgid "parent"
 msgstr "parent"
 
-#: Crm/models.py:1508
+#: Crm/models.py:1517
 msgid "frozen"
 msgstr "figée"
 
-#: Crm/models.py:1508
+#: Crm/models.py:1517
 msgid "Some data (date, sale, ...) can not be changed "
 msgstr "Certaines données (date, vente, ...) ne sont plus modifiables"
 
-#: Crm/models.py:1530
+#: Crm/models.py:1539
 #, python-brace-format
 msgid "{0} days {1}:{2:02}"
 msgstr "{0} jours {1}:{2:02}"
 
-#: Crm/models.py:1563
+#: Crm/models.py:1572
 #, python-brace-format
 msgid "{0} N° {1}"
 msgstr "{0} N° {1}"
 
-#: Crm/models.py:1681
+#: Crm/models.py:1690
 msgid "content"
 msgstr "contenu"
 
-#: Crm/models.py:1683 Search/forms.py:708
+#: Crm/models.py:1692 Search/forms.py:708
 msgid "template"
 msgstr "Modèle"
 
-#: Crm/models.py:1710 Crm/models.py:1763 Profile/models.py:69
-#: Search/models.py:43 Store/models.py:894
+#: Crm/models.py:1719 Crm/models.py:1772 Profile/models.py:69
+#: Search/models.py:43 Store/models.py:905
 msgid "value"
 msgstr "valeur"
 
-#: Crm/models.py:1718
+#: Crm/models.py:1727
 msgid "custom field choice"
 msgstr "choix pour champ personnalisé"
 
-#: Crm/models.py:1719
+#: Crm/models.py:1728
 msgid "custom field choices"
 msgstr "choix pour champs personnalisé"
 
-#: Crm/models.py:1736
+#: Crm/models.py:1745
 msgid "model"
 msgstr "modèle"
 
-#: Crm/models.py:1737
+#: Crm/models.py:1746
 msgid "widget"
 msgstr "widget"
 
-#: Crm/models.py:1739
+#: Crm/models.py:1748
 msgid "import ordering"
 msgstr "ordre d'import"
 
-#: Crm/models.py:1740
+#: Crm/models.py:1749
 msgid "export ordering"
 msgstr "ordre d'export"
 
-#: Crm/models.py:1741
+#: Crm/models.py:1750
 msgid "is link"
 msgstr "est un lien"
 
-#: Crm/models.py:1745
+#: Crm/models.py:1754
 #, python-brace-format
 msgid "{0}:{1}"
 msgstr "{0}:{1}"
 
-#: Crm/models.py:1755 Crm/models.py:1762
+#: Crm/models.py:1764 Crm/models.py:1771
 msgid "custom field"
 msgstr "champ personnalisé"
 
-#: Crm/models.py:1756
+#: Crm/models.py:1765
 msgid "custom fields"
 msgstr "champs personnalisés"
 
-#: Crm/models.py:1766
+#: Crm/models.py:1775
 msgid "custom field value"
 msgstr "valeur d'un champ personnalisé"
 
-#: Crm/models.py:1767
+#: Crm/models.py:1776
 msgid "custom field values"
 msgstr "valeurs des champs personnalisés"
 
-#: Crm/models.py:1776
+#: Crm/models.py:1785
 msgid "entity custom field value"
 msgstr "cal"
 
-#: Crm/models.py:1777
+#: Crm/models.py:1786
 msgid "entity custom field values"
 msgstr "valeur d'un champ personnalisé pour une entité"
 
-#: Crm/models.py:1788
+#: Crm/models.py:1797
 msgid "contact custom field value"
 msgstr "valeur d'un champ personnalisé pour un contact"
 
-#: Crm/models.py:1789
+#: Crm/models.py:1798
 msgid "contact custom field values"
 msgstr "valeurs des champs personnalisés pour un contact"
 
-#: Crm/models.py:1810 Search/templates/Search/mailto_groups.html:110
+#: Crm/models.py:1819 Search/templates/Search/mailto_groups.html:110
 msgid "Coma"
 msgstr "Virgule"
 
-#: Crm/models.py:1811
+#: Crm/models.py:1820
 msgid "Semi-colon"
 msgstr "Point-Virgule"
 
-#: Crm/models.py:1815
+#: Crm/models.py:1824
 msgid "import file"
 msgstr "fichier d'import"
 
-#: Crm/models.py:1816
+#: Crm/models.py:1825
 msgid "CSV file following the import contacts format."
 msgstr "Fichier CSV conforme au format d'import de contacts"
 
-#: Crm/models.py:1820
+#: Crm/models.py:1829
 msgid ""
 "Optional name for searching contacts more easily. If not defined, use the "
 "name of the file."
@@ -1362,53 +1370,53 @@ msgstr ""
 "Nom (optionnel) pour faciliter la recherche des contacts. Si non défini, le "
 "nom du fichier sera utilisé"
 
-#: Crm/models.py:1822 Store/models.py:423
+#: Crm/models.py:1831 Store/models.py:434
 msgid "imported by"
 msgstr "importé par"
 
-#: Crm/models.py:1827
+#: Crm/models.py:1836
 msgid ""
 "All created entities will get this type. Ignored if the entity already exist."
 msgstr ""
 "Toutes les entités seront créées avec ce type. Ignoré si l'entité existe déjà"
 
-#: Crm/models.py:1832
+#: Crm/models.py:1841
 msgid "The created entities will be added to the selected groups."
 msgstr "Les entités créées seront ajoutées aux groupes sélectionnés."
 
-#: Crm/models.py:1835
+#: Crm/models.py:1844
 msgid "generate entity name from email address"
 msgstr "Générer le nom de l'entité à partir de l'adresse email?"
 
-#: Crm/models.py:1842
+#: Crm/models.py:1851
 msgid "contact import"
 msgstr "import de contacts"
 
-#: Crm/models.py:1843
+#: Crm/models.py:1852
 msgid "contact imports"
 msgstr "imports de contacts"
 
-#: Crm/models.py:1849
+#: Crm/models.py:1858
 msgid "carbon copy"
 msgstr "copie cachée"
 
-#: Crm/models.py:1851
+#: Crm/models.py:1860
 msgid "Use action subject if empty"
 msgstr "Utilise le sujet de l'action si vide"
 
-#: Crm/models.py:1853
+#: Crm/models.py:1862
 msgid "body template"
 msgstr "Corps (Template)"
 
-#: Crm/models.py:1859 Crm/models.py:1860
+#: Crm/models.py:1868 Crm/models.py:1869
 msgid "Mailto settings"
 msgstr "Mailto"
 
-#: Crm/models.py:1872
+#: Crm/models.py:1881
 msgid "Action state track"
 msgstr "Historique des états d'une action"
 
-#: Crm/models.py:1873
+#: Crm/models.py:1882
 msgid "Action state tracks"
 msgstr "Historiques des états d'une action"
 
@@ -1634,8 +1642,8 @@ msgstr "Rôle du contact"
 #: Crm/templates/Crm/_section_contact_info.html:77
 #: Crm/templates/Crm/_section_contacts.html:14
 #: Crm/templates/Crm/_section_entity_info.html:37
-#: Crm/templates/Crm/confirm_contacts_import.html:75 Emailing/forms.py:205
-#: Emailing/forms.py:338 Emailing/forms.py:569 Profile/forms.py:71
+#: Crm/templates/Crm/confirm_contacts_import.html:75 Emailing/forms.py:206
+#: Emailing/forms.py:339 Emailing/forms.py:574 Profile/forms.py:71
 #: Search/templates/Search/_section_qs_contacts.html:10
 #: ci/semaphore_project/templates/registration/login.html:16
 msgid "Email"
@@ -1816,7 +1824,7 @@ msgstr "Contacts avec cet email dans le groupe"
 msgid "Default"
 msgstr "Par défaut"
 
-#: Crm/templates/Crm/_actions/_date.html:4 Store/models.py:1040
+#: Crm/templates/Crm/_actions/_date.html:4 Store/models.py:1052
 msgid "Creation date"
 msgstr "date de création"
 
@@ -1867,7 +1875,7 @@ msgstr "Créer le document"
 #: Crm/templates/Crm/_section_my_groups.html:32
 #: Crm/templates/Crm/_section_opportunity_info.html:28
 #: Crm/templates/Crm/_section_same_as.html:79
-#: Emailing/templates/Emailing/_section_emailing.html:44 Store/models.py:488
+#: Emailing/templates/Emailing/_section_emailing.html:44 Store/models.py:499
 msgid "Edit"
 msgstr "Editer"
 
@@ -1996,13 +2004,13 @@ msgstr "Contacts"
 #: Crm/templates/Crm/_section_all_entities.html:19
 #: Crm/templates/Crm/_section_contact_info.html:80
 #: Crm/templates/Crm/_section_contacts.html:14
-#: Crm/templates/Crm/_section_entity_info.html:41 Emailing/forms.py:337
+#: Crm/templates/Crm/_section_entity_info.html:41 Emailing/forms.py:338
 #: Search/templates/Search/_section_qs_contacts.html:10
 #: Search/templates/Search/_section_qs_phones.html:4
 msgid "Phone"
 msgstr "Téléphone"
 
-#: Crm/templates/Crm/_section_all_entities.html:135 Store/models.py:126
+#: Crm/templates/Crm/_section_all_entities.html:135 Store/models.py:134
 msgid "All"
 msgstr "Tous"
 
@@ -2089,7 +2097,7 @@ msgid "Number of members"
 msgstr "Nombre de membres"
 
 #: Crm/templates/Crm/_section_my_groups.html:11
-#: Crm/templates/Crm/_section_opportunities.html:13 Store/models.py:387
+#: Crm/templates/Crm/_section_opportunities.html:13 Store/models.py:398
 msgid "Description"
 msgstr "Description"
 
@@ -2332,13 +2340,13 @@ msgstr ""
 msgid "Gender"
 msgstr "civilité"
 
-#: Crm/templates/Crm/confirm_contacts_import.html:73 Emailing/forms.py:335
-#: Emailing/forms.py:567
+#: Crm/templates/Crm/confirm_contacts_import.html:73 Emailing/forms.py:336
+#: Emailing/forms.py:572
 msgid "Lastname"
 msgstr "Nom"
 
-#: Crm/templates/Crm/confirm_contacts_import.html:74 Emailing/forms.py:336
-#: Emailing/forms.py:568
+#: Crm/templates/Crm/confirm_contacts_import.html:74 Emailing/forms.py:337
+#: Emailing/forms.py:573
 msgid "Firstname"
 msgstr "Prénom"
 
@@ -2384,7 +2392,7 @@ msgid "Edit contact"
 msgstr "Editer le contact"
 
 #: Crm/templates/Crm/edit_contact.html:48
-#: Crm/templates/Crm/edit_contact.html:60
+#: Crm/templates/Crm/edit_contact.html:60 Profile/admin.py:24
 msgid "Create contact"
 msgstr "Ajout d'un contact"
 
@@ -2719,11 +2727,11 @@ msgstr ""
 "{0}: Voulez-vous changer l'ordre de priorité des contacts identiques pour "
 "cette personne? (1 est la priorité la plus haute)"
 
-#: Emailing/apps.py:12
+#: Emailing/apps.py:13
 msgid "Balafon Emailing"
 msgstr "Balafon: Newsletters"
 
-#: Emailing/coop_bar_cfg.py:15 Emailing/views.py:470
+#: Emailing/coop_bar_cfg.py:15 Emailing/views.py:475
 msgid "Balafon"
 msgstr "Balafon"
 
@@ -2788,71 +2796,75 @@ msgstr "URL Source"
 msgid "Content"
 msgstr "Contenu"
 
-#: Emailing/forms.py:190
+#: Emailing/forms.py:152
+msgid "Site"
+msgstr "Site"
+
+#: Emailing/forms.py:191
 msgid "The url is not allowed"
 msgstr "L'URL n'est pas autorisé"
 
-#: Emailing/forms.py:237
+#: Emailing/forms.py:238
 msgid "Check the boxes of the newsletters that you want to receive"
 msgstr "Cocher les lettres d'information que vous souhaitez recevoir"
 
-#: Emailing/forms.py:239
+#: Emailing/forms.py:240
 msgid "Check the box if you want to receive our newsletter"
 msgstr "Cocher la case pour recevoir notre lettre d'information"
 
-#: Emailing/forms.py:280
+#: Emailing/forms.py:281
 msgid "Invalid subscription type"
 msgstr "Type d'inscription invalide"
 
-#: Emailing/forms.py:284
+#: Emailing/forms.py:285
 msgid "You must check a least one subscription"
 msgstr "Vous devez cocher au moins une des inscriptions"
 
-#: Emailing/forms.py:286 Emailing/forms.py:547 Profile/forms.py:142
+#: Emailing/forms.py:287 Emailing/forms.py:552 Profile/forms.py:142
 #: Search/forms.py:838
 msgid "This field is required"
 msgstr "Ce champ est requis"
 
-#: Emailing/forms.py:320 Profile/forms.py:78
+#: Emailing/forms.py:321 Profile/forms.py:78
 msgid "Name of the entity"
 msgstr "Nom de l'entité"
 
-#: Emailing/forms.py:324 Emailing/forms.py:499 Emailing/models.py:161
+#: Emailing/forms.py:325 Emailing/forms.py:504 Emailing/models.py:161
 #: Emailing/templates/Emailing/subscribe_notification_email.txt:5
 #: Emailing/tests/test_actions.py:20 Emailing/tests/test_actions.py:31
 #: Profile/views.py:92
 msgid "Message"
 msgstr "Message"
 
-#: Emailing/forms.py:357 Profile/forms.py:114
+#: Emailing/forms.py:359 Profile/forms.py:114
 msgid "Individual"
 msgstr "Particulier"
 
-#: Emailing/forms.py:388 Profile/forms.py:149
+#: Emailing/forms.py:393 Profile/forms.py:149
 msgid "Invalid entity type"
 msgstr "Type d'entité invalide"
 
-#: Emailing/forms.py:413
+#: Emailing/forms.py:418
 msgid "Please enter a name"
 msgstr "Veuillez entrer un nom"
 
-#: Emailing/forms.py:457
+#: Emailing/forms.py:462
 msgid "Your message is too long"
 msgstr "Votre message est trop long"
 
-#: Emailing/forms.py:465
+#: Emailing/forms.py:470
 msgid "Invalid group"
 msgstr "Groupe invalide"
 
-#: Emailing/forms.py:473
+#: Emailing/forms.py:478
 msgid "Invalid action type"
 msgstr "Type d'action invalide"
 
-#: Emailing/forms.py:501 Emailing/utils.py:244 Profile/views.py:83
+#: Emailing/forms.py:506 Emailing/utils.py:243 Profile/views.py:83
 msgid "Message from web site"
 msgstr "Message depuis le site Internet"
 
-#: Emailing/forms.py:550
+#: Emailing/forms.py:555
 msgid "The scheduling date must be in future"
 msgstr "La date d'envoi doit être dans le futur"
 
@@ -2873,7 +2885,7 @@ msgid "Sent"
 msgstr "Envoyé"
 
 #: Emailing/models.py:42 Emailing/templates/Emailing/view_emailing.html:4
-#: Emailing/utils.py:134 config.py:111
+#: Emailing/utils.py:133 config.py:111
 msgid "Emailing"
 msgstr "Emailing"
 
@@ -2966,7 +2978,7 @@ msgstr "Destinataires d'un emailing"
 msgid "Sending"
 msgstr "Envois"
 
-#: Emailing/templates/Emailing/_section_emailing.html:22 Emailing/utils.py:210
+#: Emailing/templates/Emailing/_section_emailing.html:22 Emailing/utils.py:209
 msgid "Subscription"
 msgstr "Inscriptions"
 
@@ -3146,7 +3158,7 @@ msgstr ""
 "      "
 
 #: Emailing/templates/Emailing/public/unregister_confirm.html:4
-#: Emailing/views.py:241
+#: Emailing/views.py:246
 msgid "Unregister"
 msgstr "Se désinscrire"
 
@@ -3238,28 +3250,28 @@ msgstr ""
 "PS: Si vous n'êtes pas à l'origine de cette demande, merci d'ignorer cet "
 "email.\n"
 
+#: Emailing/templates/Emailing/subscribe_verification_email_subject.txt:1
+msgid "Verification of your email address"
+msgstr "Vérification de votre adresse e-mail"
+
 #: Emailing/templates/Emailing/update_emailing.html:17
 msgid "Update emailing"
 msgstr "Mise à jour d'un emailing"
 
-#: Emailing/utils.py:212
+#: Emailing/utils.py:211
 #, python-brace-format
 msgid "Subscribe to {0}"
 msgstr "S'inscrire à {0}"
 
-#: Emailing/utils.py:258 Profile/views.py:87
+#: Emailing/utils.py:257 Profile/views.py:87
 msgid "The message have been sent"
 msgstr "Votre message a bien été envoyé"
 
-#: Emailing/utils.py:263 Profile/views.py:89
+#: Emailing/utils.py:262 Profile/views.py:89
 msgid "The message couldn't be send."
 msgstr "Votre message n'a pas pu être envoyé"
 
-#: Emailing/utils.py:293
-msgid "Verification of your email address"
-msgstr "Vérification de votre adresse e-mail"
-
-#: Emailing/utils.py:455
+#: Emailing/utils.py:457
 msgid "No subscription_type defined"
 msgstr "Aucun type d'inscription n'est défini"
 
@@ -3268,52 +3280,60 @@ msgstr "Aucun type d'inscription n'est défini"
 msgid "Are you sure to delete '{0.newsletter.subject}' {1}?"
 msgstr "Etes-vous sur de supprimer '{0.newsletter.subject}' {1}?"
 
-#: Emailing/views.py:107
+#: Emailing/views.py:108
 msgid "Enter the text of your newsletter here"
 msgstr "Entrez le texte de votre newsletter ici"
 
-#: Emailing/views.py:143
+#: Emailing/views.py:148
 msgid "The sending has been scheduled"
 msgstr "L'envoi a été programmé"
 
-#: Emailing/views.py:145
+#: Emailing/views.py:150
 msgid "The sending can't be scheduled"
 msgstr "L'envoi ne paut pas être programmé"
 
-#: Emailing/views.py:155
+#: Emailing/views.py:160
 msgid "Is this newsletter ready to be sent?"
 msgstr "Est-ce que la newsletter est prête à être envoyée?"
 
-#: Emailing/views.py:176
+#: Emailing/views.py:181
 msgid "The sending has been cancelled"
 msgstr "L'envoi a été annulé"
 
-#: Emailing/views.py:178
+#: Emailing/views.py:183
 msgid "The sending can't be cancelled"
 msgstr "L'anvoi ne peut pas être annulé"
 
-#: Emailing/views.py:188
+#: Emailing/views.py:193
 msgid "Cancel the sending?"
 msgstr "Annuler l'envoi?"
 
-#: Emailing/views.py:203
+#: Emailing/views.py:208
 msgid "Link"
 msgstr "Lien"
 
-#: Emailing/views.py:243
+#: Emailing/views.py:248
 #, python-brace-format
 msgid "{0} has unregister"
 msgstr "{0} s'est désinscrit"
 
-#: Emailing/views.py:469
+#: Emailing/views.py:474
 msgid "An error occurred while verifying the email address of this contact."
 msgstr ""
 "Une erreur s'est produite au cours de la vérification de l'adresse email de "
 "ce contact."
 
-#: Emailing/views.py:472
+#: Emailing/views.py:477
 msgid "Need to verify the email address"
 msgstr "vérifier votre adresse email"
+
+#: Profile/admin.py:19
+msgid "{0}: Contact created"
+msgstr "{0}: Contact créé"
+
+#: Profile/admin.py:21
+msgid "{0}: Contact already existing"
+msgstr "{0}: Le contact existe déjà"
 
 #: Profile/apps.py:12
 msgid "Balafon Profile"
@@ -3892,44 +3912,44 @@ msgstr "Mailto : Erreur, aucun email n'a été sélectionné"
 msgid "Sorry, no results found"
 msgstr "Désolé, aucun résultat trouvé."
 
-#: Search/views.py:431
+#: Search/views.py:433
 #, python-brace-format
 msgid "{0} actions have been created"
 msgstr "{0} actions ont été crées"
 
-#: Search/views.py:456
+#: Search/views.py:458
 msgid "Create action for contacts"
 msgstr "Créer une action pour les contacts"
 
-#: Search/views.py:457 Search/views.py:515 Search/views.py:598
+#: Search/views.py:459 Search/views.py:517 Search/views.py:600
 msgid "The search results contains no contacts"
 msgstr "Le résultat de la recherche ne contient aucun contact"
 
-#: Search/views.py:480
+#: Search/views.py:482
 #, python-brace-format
 msgid "{0} contacts have been added to groups"
 msgstr "{0} contacts ont été ajoutés aux groupes"
 
-#: Search/views.py:489
+#: Search/views.py:491
 #, python-brace-format
 msgid "{0} entities have been added to groups"
 msgstr "{0} entités ont été ajoutés aux groupes"
 
-#: Search/views.py:514
+#: Search/views.py:516
 msgid "Add contacts to group"
 msgstr "Ajouter les contacts à un groupe"
 
-#: Search/views.py:565
+#: Search/views.py:567
 #, python-brace-format
 msgid "{0} contacts have subscribe to the newsletter"
 msgstr "{0} contacts ont été inscrits à la lettre d'information"
 
-#: Search/views.py:571
+#: Search/views.py:573
 #, python-brace-format
 msgid "{0} contacts have unsubscribe to the newsletter"
 msgstr "{0} contacts ont été désinscrits à la lettre d'information"
 
-#: Search/views.py:597
+#: Search/views.py:599
 msgid "Subscribe contacts admin"
 msgstr "Inscrire des contacts"
 
@@ -3973,8 +3993,8 @@ msgstr "Info"
 msgid "Price"
 msgstr "Prix"
 
-#: Store/admin.py:248 Store/models.py:359 Store/models.py:431
-#: Store/models.py:703 Store/views/xls_export.py:143
+#: Store/admin.py:248 Store/models.py:370 Store/models.py:442
+#: Store/models.py:714 Store/views/xls_export.py:143
 msgid "Supplier"
 msgstr "Fournisseur"
 
@@ -3993,21 +4013,21 @@ msgstr ""
 msgid "Error while importing the file {0}: {1}"
 msgstr "Erreur lors de l'import du fichier {0} : {1}"
 
-#: Store/api/front.py:182
+#: Store/api/front.py:181
 msgid "You don't have a valid profile"
 msgstr "Votre profil d'utilisateur n'est pas valide"
 
-#: Store/api/front.py:188
+#: Store/api/front.py:187
 msgid "Invalid delivery point"
 msgstr "Point de livraison invalide"
 
-#: Store/api/front.py:201 Store/templates/Store/cart_root_email.html:39
+#: Store/api/front.py:200 Store/templates/Store/cart_root_email.html:39
 #: Store/tests/test_cart.py:308 Store/tests/test_cart.py:366
 #: Store/tests/test_cart.py:424
 msgid "Notes"
 msgstr "Notes"
 
-#: Store/api/front.py:236
+#: Store/api/front.py:235
 #, python-brace-format
 msgid "{0} is currently not available. It has been removed from your cart"
 msgstr ""
@@ -4044,12 +4064,12 @@ msgstr "Une catégorie ne peut pas être son propre parent"
 msgid "A category can not be parent and children of another category"
 msgstr "Une catégorie ne peut pas être parent et enfant d'une autre catégorie"
 
-#: Store/forms.py:104 Store/models.py:928
+#: Store/forms.py:104 Store/models.py:939
 msgid "Analysis code"
 msgstr "Code analytique"
 
-#: Store/forms.py:106 Store/models.py:93 Store/models.py:404
-#: Store/models.py:1092
+#: Store/forms.py:106 Store/models.py:101 Store/models.py:415
+#: Store/models.py:1104
 msgid "VAT rate"
 msgstr "Taux de TVA"
 
@@ -4083,27 +4103,43 @@ msgstr "Nom du template"
 
 #: Store/models.py:35
 msgid "Set the name of a custom template for commercial document"
-msgstr "Nom du templaté personnalisé pour le document commercial"
+msgstr "Nom du template personnalisé pour le document commercial"
+
+#: Store/models.py:38
+msgid "header template name"
+msgstr "Nom de l'entête template"
 
 #: Store/models.py:39
+msgid "Set the name of a custom template for commercial document header"
+msgstr "Nom du template personnalisé pour l'entête document commercial"
+
+#: Store/models.py:42
+msgid "footer template name"
+msgstr "Nom du pied de page du template"
+
+#: Store/models.py:43
+msgid "Set the name of a custom template for commercial document footer"
+msgstr "Nom du template personnalisé pour le pied de page document commercial"
+
+#: Store/models.py:47
 msgid "Show amount as pre-tax"
 msgstr "Afficher les prix en HT"
 
-#: Store/models.py:41
+#: Store/models.py:49
 msgid ""
 "The action amount will be update with pre-tax total if checked and with tax-"
 "included total if not"
 msgstr "Le montant de l'action sera calculé en HT si coché et en TTC sinon"
 
-#: Store/models.py:45
+#: Store/models.py:53
 msgid "default readonly status"
 msgstr "Status en lecture-seule par défaut"
 
-#: Store/models.py:49
+#: Store/models.py:57
 msgid "readonly status"
 msgstr "Status en lecture-seule"
 
-#: Store/models.py:50
+#: Store/models.py:58
 msgid ""
 "When action has one of these status, it is not possible to modify a "
 "commercial document"
@@ -4111,39 +4147,39 @@ msgstr ""
 "Si l'action a un de ces status, il n'est pas possible de modifier le "
 "doucment commercial"
 
-#: Store/models.py:53
+#: Store/models.py:61
 msgid "references text"
 msgstr "mentions"
 
-#: Store/models.py:54
+#: Store/models.py:62
 msgid "this text will be added at the bottom of the commercial document"
 msgstr "ce text sera ajouté en bas de page du document commercial"
 
-#: Store/models.py:58
+#: Store/models.py:66
 msgid "Store management action type"
 msgstr "Type d'action géré par le Store"
 
-#: Store/models.py:59
+#: Store/models.py:67
 msgid "Store management action types"
 msgstr "Types d'action gérés par le Store"
 
-#: Store/models.py:85
+#: Store/models.py:93
 msgid "vat rate"
 msgstr "taux de TVA"
 
-#: Store/models.py:94
+#: Store/models.py:102
 msgid "VAT rates"
 msgstr "Taux de TVA"
 
-#: Store/models.py:112
+#: Store/models.py:120
 msgid "unit"
 msgstr "unité"
 
-#: Store/models.py:113
+#: Store/models.py:121
 msgid "units"
 msgstr "unités"
 
-#: Store/models.py:127
+#: Store/models.py:135
 #: Store/templates/admin/Store/storeitem/change_list.html:12
 #: Store/templates/admin/Store/storeitemcategory/change_form.html:12
 #: Store/templates/admin/Store/supplier/change_form.html:7
@@ -4151,274 +4187,274 @@ msgstr "unités"
 msgid "Articles"
 msgstr "Articles"
 
-#: Store/models.py:128
+#: Store/models.py:136
 msgid "Categories"
 msgstr "Categories"
 
-#: Store/models.py:132
+#: Store/models.py:140
 msgid "Inherit from category"
 msgstr "Défini par la catégorie"
 
-#: Store/models.py:133
+#: Store/models.py:141
 msgid "Multiply purchase price by ratio"
 msgstr "Multiplie le prix d'achat par un ratio"
 
-#: Store/models.py:137
+#: Store/models.py:145
 msgid "parameters"
 msgstr "paramètres"
 
-#: Store/models.py:138
+#: Store/models.py:146
 msgid "policy"
 msgstr "calcul de prix"
 
-#: Store/models.py:139
+#: Store/models.py:147
 msgid "apply to"
 msgstr "s'applique à"
 
-#: Store/models.py:142
+#: Store/models.py:150
 msgid "Price policy"
 msgstr "Calcul de prix"
 
-#: Store/models.py:143
+#: Store/models.py:151
 msgid "Price policies"
 msgstr "Calculs de prix"
 
-#: Store/models.py:156
+#: Store/models.py:164
 msgid "parent category"
 msgstr "Catégorie parent"
 
-#: Store/models.py:160 Store/models.py:426
+#: Store/models.py:168 Store/models.py:437
 msgid "price policy"
 msgstr "calcul de prix"
 
-#: Store/models.py:163 Store/models.py:442
+#: Store/models.py:171 Store/models.py:453
 msgid "image"
 msgstr "image"
 
-#: Store/models.py:165 Store/models.py:444
+#: Store/models.py:173 Store/models.py:455
 msgid "accounting code"
 msgstr "compte"
 
-#: Store/models.py:168
+#: Store/models.py:176
 msgid "Store item category"
 msgstr "Catégorie"
 
-#: Store/models.py:169
+#: Store/models.py:177
 msgid "Store item categories"
 msgstr "Catégories"
 
-#: Store/models.py:198
+#: Store/models.py:206
 msgid "Articles total count"
 msgstr "Nombre d'articles total"
 
-#: Store/models.py:203
+#: Store/models.py:211
 msgid "Articles count"
 msgstr "Nombre d'articles"
 
-#: Store/models.py:208
+#: Store/models.py:216
 msgid "Sub-categories count"
 msgstr "Nombre de sous-catégories"
 
-#: Store/models.py:256
+#: Store/models.py:264
 msgid "show always"
 msgstr "Toujours affiché"
 
-#: Store/models.py:259
+#: Store/models.py:267
 msgid "Store item tag"
 msgstr "Tag"
 
-#: Store/models.py:260
+#: Store/models.py:268
 msgid "Store item tags"
 msgstr "Tags"
 
-#: Store/models.py:270
+#: Store/models.py:278
 msgid "short name"
 msgstr "nom court"
 
-#: Store/models.py:271 Store/models.py:403 Store/models.py:675
+#: Store/models.py:279 Store/models.py:414 Store/models.py:686
 msgid "tags"
 msgstr "Tags"
 
-#: Store/models.py:273 Store/models.py:1090
+#: Store/models.py:281 Store/models.py:1102
 msgid "quantity"
 msgstr "quantité"
 
-#: Store/models.py:276 Store/models.py:309
+#: Store/models.py:284 Store/models.py:317
 msgid "rate"
 msgstr "taux"
 
-#: Store/models.py:281
+#: Store/models.py:289
 msgid "Only active discounts are taken into account on a new purchase"
 msgstr ""
 "Seules les réductions actives sont affichées pour une nouvelle commande"
 
-#: Store/models.py:285 Store/models.py:388
+#: Store/models.py:293 Store/models.py:399
 msgid "Discount"
 msgstr "Réduction"
 
-#: Store/models.py:286
+#: Store/models.py:294
 msgid "Discounts"
 msgstr "Réductions"
 
-#: Store/models.py:306
-#, fuzzy
-#| msgid "starting date"
+#: Store/models.py:314
 msgid "start date"
 msgstr "date de début"
 
-#: Store/models.py:314
+#: Store/models.py:322
 msgid "Voucher"
 msgstr "Code Promo"
 
-#: Store/models.py:315
+#: Store/models.py:323
 msgid "Vouchers"
 msgstr "Codes Promo"
 
-#: Store/models.py:334
+#: Store/models.py:345
+#, fuzzy, python-brace-format
+#| msgid "Voucher {0} : Discount {1}%"
 msgid "Voucher {0} : Discount {1}%"
 msgstr "Code Promo: Réduction {1}%"
 
-#: Store/models.py:342 Store/templates/Store/cart_root_email.html:51
+#: Store/models.py:353 Store/templates/Store/cart_root_email.html:51
 #: Store/views/xls_export.py:96 Store/views/xls_export.py:142
 msgid "Brand"
 msgstr "Marque"
 
-#: Store/models.py:343
+#: Store/models.py:354
 msgid "Brands"
 msgstr "Marques"
 
-#: Store/models.py:360
+#: Store/models.py:371
 msgid "Suppliers"
 msgstr "Fournisseurs"
 
-#: Store/models.py:377 Store/models.py:436
+#: Store/models.py:388 Store/models.py:447
 msgid "certificate"
 msgstr "certification"
 
-#: Store/models.py:378 Store/views/xls_export.py:97
+#: Store/models.py:389 Store/views/xls_export.py:97
 #: Store/views/xls_export.py:143
 msgid "certificates"
 msgstr "certifications"
 
-#: Store/models.py:391
+#: Store/models.py:402
 msgid "Price class"
 msgstr "Classe de prix"
 
-#: Store/models.py:392
+#: Store/models.py:403
 msgid "Price classes"
 msgstr "Classes de prix"
 
-#: Store/models.py:402
+#: Store/models.py:413
 msgid "category"
 msgstr "Catégorie"
 
-#: Store/models.py:406 Store/models.py:1094
+#: Store/models.py:417 Store/models.py:1106
 msgid "pre-tax price"
 msgstr "prix HT"
 
-#: Store/models.py:409
+#: Store/models.py:420
 msgid "stock count"
 msgstr "Stock"
 
-#: Store/models.py:412
+#: Store/models.py:423
 msgid "stock threshold"
 msgstr "seuil du stock"
 
-#: Store/models.py:415
+#: Store/models.py:426
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: Store/models.py:419
+#: Store/models.py:430
 msgid "brand"
 msgstr "marque"
 
-#: Store/models.py:421
+#: Store/models.py:432
 msgid "reference"
 msgstr "référence"
 
-#: Store/models.py:428 Store/views/xls_export.py:142
+#: Store/models.py:439 Store/views/xls_export.py:142
 msgid "Available"
 msgstr "Disponible"
 
-#: Store/models.py:429
+#: Store/models.py:440
 msgid "Published"
 msgstr "Publié"
 
-#: Store/models.py:434
+#: Store/models.py:445
 msgid "price class"
 msgstr "classe de prix"
 
-#: Store/models.py:438
+#: Store/models.py:449
 msgid "only for groups"
 msgstr "Seulement pour les groupes"
 
-#: Store/models.py:439
+#: Store/models.py:450
 msgid "If defined, only members of these groups will be able to see the item"
 msgstr ""
 "Si défini, seuls les membres de ces groupes peuvent voir l'article. Si vide, "
 "l'article est visible par tous"
 
-#: Store/models.py:441
+#: Store/models.py:452
 msgid "Origine"
 msgstr "Origine"
 
-#: Store/models.py:447
+#: Store/models.py:458
 msgid "Store item"
 msgstr "article"
 
-#: Store/models.py:448
+#: Store/models.py:459
 msgid "Store items"
 msgstr "articles"
 
-#: Store/models.py:470 Store/models.py:482 Store/views/xls_export.py:96
+#: Store/models.py:481 Store/models.py:493 Store/views/xls_export.py:96
 msgid "VAT inclusive price"
 msgstr "Prix TTC"
 
-#: Store/models.py:564 Store/views/xls_export.py:49
+#: Store/models.py:575 Store/views/xls_export.py:49
 msgid "Stock threshold"
 msgstr "Seuil du stock"
 
-#: Store/models.py:651
+#: Store/models.py:662
 msgid "in fullname"
 msgstr "utilisé dans le nom complet"
 
-#: Store/models.py:651
+#: Store/models.py:662
 msgid "is inserted in fullname if checked"
 msgstr "est inséré dans le nom complet si coché"
 
-#: Store/models.py:654
+#: Store/models.py:665
 msgid "is public"
 msgstr "est public"
 
-#: Store/models.py:654
+#: Store/models.py:665
 msgid "returned in public API"
 msgstr "retourné par l'API public"
 
-#: Store/models.py:658 Store/models.py:897
+#: Store/models.py:669 Store/models.py:908
 msgid "Store item: property value"
 msgstr "Valeur d'une propriété"
 
-#: Store/models.py:659
+#: Store/models.py:670
 msgid "Store item: properties"
 msgstr "Propriété"
 
-#: Store/models.py:669
+#: Store/models.py:680
 msgid "Import file"
 msgstr "fichier à importer"
 
-#: Store/models.py:670
+#: Store/models.py:681
 msgid "An Excel file (*.xls) with the data"
 msgstr "Un fichier Excel (*.xls) avec les données à importer"
 
-#: Store/models.py:676
+#: Store/models.py:687
 msgid "Tags that can be added to the items"
 msgstr "Les tags à affecter aux articles importés"
 
-#: Store/models.py:681
+#: Store/models.py:692
 msgid "fields"
 msgstr "champs"
 
-#: Store/models.py:682
+#: Store/models.py:693
 msgid ""
 "Fields to import in order: if the attribute doesn't exist, create a custom "
 "property"
@@ -4426,175 +4462,179 @@ msgstr ""
 "Les champs à importer : Si l'attribut n'existe pas une propriété "
 "personnalisée sera créée"
 
-#: Store/models.py:684
+#: Store/models.py:695
 msgid "last import"
 msgstr "dernier import"
 
-#: Store/models.py:685
+#: Store/models.py:696
 msgid "import error"
 msgstr "erreur d'import"
 
-#: Store/models.py:686
+#: Store/models.py:697
 msgid "is successful"
 msgstr "succès"
 
-#: Store/models.py:687
+#: Store/models.py:698
 msgid "ignore first line"
 msgstr "ignorer la 1ère ligne"
 
-#: Store/models.py:689
+#: Store/models.py:700
 msgid "margin_rate"
 msgstr "taux de marge"
 
-#: Store/models.py:692
+#: Store/models.py:703
 msgid "error message"
 msgstr "message d'erreur"
 
-#: Store/models.py:695
+#: Store/models.py:706
 msgid "category-lines mode"
 msgstr "Mode catégorie par ligne"
 
-#: Store/models.py:696
+#: Store/models.py:707
 msgid ""
 "If checked, the store item category are expected as merged-cells header lines"
 msgstr ""
 "Si coché, la catégorie de l'article sera lue depuis une ligne fusionnée "
 "précédente"
 
-#: Store/models.py:699
+#: Store/models.py:710
 msgid "default Brand"
 msgstr "marque par défaut"
 
-#: Store/models.py:700
+#: Store/models.py:711
 msgid "If defined, it will be used if no brand is given"
 msgstr ""
 "Si défini, sera utilisé comme marque par défaut si aucune marque n'est "
 "extraite"
 
-#: Store/models.py:705
+#: Store/models.py:716
 msgid "articles will be available if price is set"
 msgstr "Les articles seront disponibles si le prix est défini"
 
-#: Store/models.py:708
+#: Store/models.py:719
 msgid "Store item import"
 msgstr "Import d'articles"
 
-#: Store/models.py:709
+#: Store/models.py:720
 msgid "Store item imports"
 msgstr "Imports d'articles"
 
-#: Store/models.py:742 Store/tests/test_import_store.py:203
+#: Store/models.py:753 Store/tests/test_import_store.py:203
 #: Store/tests/test_import_store.py:233
 msgid "Uncategorized"
 msgstr "Divers"
 
-#: Store/models.py:892
+#: Store/models.py:903
 msgid "item"
 msgstr "article"
 
-#: Store/models.py:893
+#: Store/models.py:904
 msgid "property"
 msgstr "propriété"
 
-#: Store/models.py:898
+#: Store/models.py:909
 msgid "Store item: property values"
 msgstr "valeurs d'une proriété"
 
-#: Store/models.py:912 Store/templates/Store/cart_root_email.html:31
+#: Store/models.py:923 Store/templates/Store/cart_root_email.html:31
 msgid "Delivery point"
 msgstr "Point de livraison"
 
-#: Store/models.py:913
+#: Store/models.py:924
 msgid "Delivery points"
 msgstr "Points de livraison"
 
-#: Store/models.py:929
+#: Store/models.py:940
 msgid "Analysis codes"
 msgstr "Codes analytiques"
 
-#: Store/models.py:937
+#: Store/models.py:948
 msgid "delivery point"
 msgstr "point de livraison"
 
-#: Store/models.py:940
+#: Store/models.py:951
 msgid "analysis code"
 msgstr "code analytique"
 
-#: Store/models.py:1043
+#: Store/models.py:1055
 msgid "Sale"
 msgstr "Vente"
 
-#: Store/models.py:1044
+#: Store/models.py:1056
 msgid "Sales"
 msgstr "Ventes"
 
-#: Store/models.py:1076
+#: Store/models.py:1088
 msgid "store item"
 msgstr "article"
 
-#: Store/models.py:1082 Users/models.py:48
+#: Store/models.py:1094 Users/models.py:48
 msgid "Favorite"
 msgstr "Favori"
 
-#: Store/models.py:1083 Users/models.py:49
+#: Store/models.py:1095 Users/models.py:49
 #: Users/templates/Users/favorites_list.html:4
 #: Users/templates/Users/favorites_list.html:9
 #: templates/balafon/_bs_navigation.html:22
 msgid "Favorites"
 msgstr "Favoris"
 
-#: Store/models.py:1095
+#: Store/models.py:1107
 msgid "Text"
 msgstr "Texte"
 
-#: Store/models.py:1098
+#: Store/models.py:1110
 msgid "is blank"
 msgstr "est blanc"
 
-#: Store/models.py:1098
+#: Store/models.py:1110
 msgid "displayed as an empty line"
 msgstr "affiché comme une ligne vide"
 
-#: Store/models.py:1102
+#: Store/models.py:1114
 msgid "no quantity"
 msgstr "sans quantité"
 
-#: Store/models.py:1102
+#: Store/models.py:1114
 msgid "quantity and unit price are not shown on bill"
 msgstr ""
 "la quantité et le prix unitaire ne sont pas affichés sur le document "
 "comercial"
 
-#: Store/models.py:1105
+#: Store/models.py:1117
 msgid "is discount"
 msgstr "est une réduction"
 
-#: Store/models.py:1105
+#: Store/models.py:1117 Store/models.py:1120
 msgid "added after total on the bill"
 msgstr "ajouté après le total sur le document commercial"
 
-#: Store/models.py:1108
+#: Store/models.py:1120
+msgid "is extra"
+msgstr "est en plus"
+
+#: Store/models.py:1123
 msgid "percentage"
 msgstr "pourcentage"
 
-#: Store/models.py:1109
+#: Store/models.py:1124
 msgid "Only a percentage of the item price"
 msgstr "un pourcentage du prix de l'article"
 
-#: Store/models.py:1113
+#: Store/models.py:1128
 msgid "Sale item"
 msgstr "article vendu"
 
-#: Store/models.py:1114
+#: Store/models.py:1129
 msgid "Sales items"
 msgstr "articles vendus"
 
-#: Store/models.py:1119
+#: Store/models.py:1134
 #, python-brace-format
 msgid "{1} x {0}"
 msgstr "{1} x {0}"
 
-#: Store/models.py:1121
+#: Store/models.py:1136
 msgid "Sale item not set"
 msgstr "article vendu non défini"
 
@@ -4602,7 +4642,7 @@ msgstr "article vendu non défini"
 msgid "Cart"
 msgstr "Panier"
 
-#: Store/settings.py:22
+#: Store/settings.py:24
 msgid "Purchasing confirmation"
 msgstr "Confirmation de votre commande"
 
@@ -4824,23 +4864,27 @@ msgstr "seulement pour les utilisateurs"
 msgid "attributes"
 msgstr "attributs"
 
-#: Users/models.py:129
+#: Users/models.py:127
+msgid "query string"
+msgstr ""
+
+#: Users/models.py:130
 msgid "Custom menu item"
 msgstr "Élément de menu personnalisé"
 
-#: Users/models.py:130
+#: Users/models.py:131
 msgid "Custom menu items"
 msgstr "Éléments de menu personnalisé"
 
-#: Users/models.py:193
+#: Users/models.py:197
 msgid "can create group"
 msgstr "Peut créer un groupe"
 
-#: Users/models.py:193
+#: Users/models.py:197
 msgid "If not checked, the user can not create group"
 msgstr "Si non coché, l'utilisateur ne peut pas créer de groupe"
 
-#: Users/models.py:197 Users/models.py:198
+#: Users/models.py:201 Users/models.py:202
 msgid "User permissions"
 msgstr "Permissions utilisateur"
 
