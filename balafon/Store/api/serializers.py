@@ -168,6 +168,7 @@ class CartSerializer(serializers.Serializer):
     delivery_point = serializers.IntegerField()
     notes = serializers.CharField(max_length=3000, required=False, allow_blank=True)
     voucher_code = serializers.CharField(allow_blank=True, required=False)
+    payment_mode = serializers.IntegerField(required=False, allow_null=False)
 
 
 class VoucherSerializer(serializers.Serializer):

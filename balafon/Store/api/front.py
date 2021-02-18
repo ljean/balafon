@@ -16,7 +16,7 @@ from balafon.Crm.models import Action, ActionType
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
     Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint,
-    SaleAnalysisCode, Voucher
+    SaleAnalysisCode, Voucher, PaymentMode
 )
 from balafon.Store import settings
 from balafon.Store.api import serializers
@@ -186,6 +186,16 @@ class CartView(APIView):
             except DeliveryPoint.DoesNotExist:
                 return Response({'ok': False, 'message': _("Invalid delivery point")})
 
+            # Get Payment mode
+            payment_mode_id = cart_serializer.validated_data.get('payment_mode')
+            if payment_mode_id:
+                try:
+                    payment_mode = PaymentMode.objects.get(id=payment_mode_id)
+                except PaymentMode.DoesNotExist:
+                    return Response({'ok': False, 'message': _("Invalid payment mode")})
+            else:
+                payment_mode = None
+
             # Create a new Sale
             action_type_name = get_cart_type_name()
             action_type = ActionType.objects.get_or_create(name=action_type_name)[0]
@@ -214,6 +224,7 @@ class CartView(APIView):
             action.sale.analysis_code = SaleAnalysisCode.objects.get_or_create(name="Internet")[0]
 
             action.sale.delivery_point = delivery_point
+            action.sale.payment_mode = payment_mode
             action.sale.save()
 
             warnings = []

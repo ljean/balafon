@@ -88,6 +88,19 @@ class StoreManagementActionType(models.Model):
         return "{0}".format(self.action_type)
 
 
+class PaymentMode(models.Model):
+    name = models.CharField(max_length=100, verbose_name=_('name'))
+    code = models.CharField(max_length=100, verbose_name=_('code'))
+    is_active = models.BooleanField(default=True, verbose_name=_('is active'))
+
+    class Meta:
+        verbose_name = _("Payment mode")
+        verbose_name_plural = _("Payment modes")
+
+    def __str__(self):
+        return self.name
+
+
 class VatRate(models.Model):
     """Tax : A VAT rate"""
     rate = models.DecimalField(verbose_name=_("vat rate"), max_digits=4, decimal_places=2)
@@ -952,6 +965,9 @@ class Sale(models.Model):
     )
     delivery_details = models.TextField(blank=True, default='')  # This may be public (on sale document)
     details = models.TextField(blank=True, default='')  # This should be private
+    payment_mode = models.ForeignKey(
+        PaymentMode, blank=True, default=None, null=True, on_delete=models.CASCADE, verbose_name=_("payment mode"),
+    )
 
     def get_references_text(self):
         """This text will be added at the bottom of the commercial document"""
@@ -1303,3 +1319,4 @@ def freeze_readonly_action(sender, instance, created, **kwargs):
 
 
 post_save.connect(freeze_readonly_action, sender=Action)
+

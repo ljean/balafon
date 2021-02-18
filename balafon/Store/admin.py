@@ -350,3 +350,10 @@ class SaleAnalysisCodeAdmin(admin.ModelAdmin):
 class VoucherAdmin(admin.ModelAdmin):
     list_display = ('code', 'start_date', 'end_date', 'active', 'rate')
     date_hierarchy = 'start_date'
+
+
+@admin.register(models.PaymentMode)
+class PaymentModeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'code', 'is_active', )
+    list_filter = ('is_active', )
+    list_editable = ('is_active', )
