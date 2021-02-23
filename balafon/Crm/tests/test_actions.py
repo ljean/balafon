@@ -1493,6 +1493,38 @@ class ActionTest(BaseTestCase):
         self.assertEqual(int(options[2]['value']), status3.id)
         self.assertEqual(options[2]['selected'], "selected")
 
+    def test_view_add_action_in_charge(self):
+        """view create from contact"""
+        entity = mommy.make(models.Entity)
+        action_type = mommy.make(models.ActionType)
+        member1 = mommy.make(models.TeamMember, ordering=2, active=True)
+        member2 = mommy.make(models.TeamMember, ordering=1, active=True)
+        member3 = mommy.make(models.TeamMember, ordering=3, active=True)
+        member4 = mommy.make(models.TeamMember, ordering=4, active=False)
+
+        contact = entity.default_contact
+        url = reverse('crm_create_action_of_type', args=[0, contact.id, action_type.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(models.Action.objects.count(), 0)
+
+        soup = BeautifulSoup(response.content)
+
+        in_charge_fields = soup.select('select#id_in_charge')
+        self.assertEqual(1, len(in_charge_fields))
+        in_charge_field = in_charge_fields[0]
+        options = in_charge_field.select('option')
+        self.assertEqual(4, len(options))
+        self.assertEqual(options[0]['value'], "")
+        self.assertEqual(options[0].get('selected'), None)
+        self.assertEqual(int(options[1]['value']), member2.id)
+        self.assertEqual(options[1].get('selected'), None)
+        self.assertEqual(int(options[2]['value']), member1.id)
+        self.assertEqual(options[2].get('selected'), None)
+        self.assertEqual(int(options[3]['value']), member3.id)
+        self.assertEqual(options[3].get('selected'), None)
+
     def test_view_add_action_with_type2(self):
         """view create from contact"""
         entity = mommy.make(models.Entity)

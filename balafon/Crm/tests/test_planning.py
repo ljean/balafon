@@ -257,9 +257,9 @@ class ActionArchiveTest(BaseTestCase):
     def test_in_charge_filter(self):
         """view actions of the month in charge filter"""
 
-        user_joe = mommy.make(models.TeamMember, name="Joe")
-        user_jack = mommy.make(models.TeamMember, name="Jack")
-        user_will = mommy.make(models.TeamMember, name="Will")
+        user_joe = mommy.make(models.TeamMember, name="Joe", ordering=1)
+        user_jack = mommy.make(models.TeamMember, name="Jack", ordering=2)
+        user_will = mommy.make(models.TeamMember, name="Will", ordering=3)
 
         action1 = mommy.make(models.Action, subject="#ACT1#", planned_date=datetime.now(), in_charge=user_joe)
         action2 = mommy.make(models.Action, subject="#ACT2#", planned_date=datetime.now(), in_charge=user_joe)
