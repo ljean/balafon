@@ -92,10 +92,12 @@ class PaymentMode(models.Model):
     name = models.CharField(max_length=100, verbose_name=_('name'))
     code = models.CharField(max_length=100, verbose_name=_('code'))
     is_active = models.BooleanField(default=True, verbose_name=_('is active'))
+    ordering = models.IntegerField(default=0, verbose_name=_('ordering'))
 
     class Meta:
         verbose_name = _("Payment mode")
         verbose_name_plural = _("Payment modes")
+        ordering = ['ordering', 'id']
 
     def __str__(self):
         return self.name

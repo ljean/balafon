@@ -354,6 +354,6 @@ class VoucherAdmin(admin.ModelAdmin):
 
 @admin.register(models.PaymentMode)
 class PaymentModeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'code', 'is_active', )
+    list_display = ('name', 'code', 'is_active', 'ordering', )
     list_filter = ('is_active', )
-    list_editable = ('is_active', )
+    list_editable = ('is_active', 'ordering')
