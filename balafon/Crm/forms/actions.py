@@ -62,6 +62,8 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             action_type = instance.type
         self.action_type = action_type
 
+        self.fields['in_charge'].queryset = models.TeamMember.objects.filter(active=True)
+
         is_amount_calculated = False
         if action_type:
             is_amount_calculated = action_type.is_amount_calculated

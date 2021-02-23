@@ -360,8 +360,9 @@ class SubscriptionTypeAdmin(admin.ModelAdmin):
 @admin.register(models.TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['name', 'user', 'active']
+    list_display = ['user', 'name', 'active', 'ordering']
     list_filter = ['active']
+    list_editable = ['name', 'ordering']
 
 
 @admin.register(models.StreetType)

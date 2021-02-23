@@ -1399,6 +1399,7 @@ class TeamMember(models.Model):
     )
     name = models.CharField(max_length=100, verbose_name=_("name"))
     active = models.BooleanField(default=True, verbose_name=(_("active")))
+    ordering = models.IntegerField(default=0, verbose_name=_('ordering'))
 
     def __str__(self):
         return self.name
@@ -1406,6 +1407,7 @@ class TeamMember(models.Model):
     class Meta:
         verbose_name = _('team member')
         verbose_name_plural = _('team members')
+        ordering = ['ordering', 'name']
 
 
 class ActionMenu(models.Model):
