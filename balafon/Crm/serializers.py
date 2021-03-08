@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 """REST api powered by django-rest-framework"""
 
+import re
+
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.utils.translation import ugettext
 
 from rest_framework import serializers
 
-from balafon.Crm.models import Action, ActionType, ActionStatus, Contact, City, Entity, EntityType, TeamMember, Zone
+from balafon.Crm.models import (
+    Action, ActionType, ActionStatus, Contact, City, Entity, EntityType, TeamMember, Zone
+)
+from balafon.Crm.settings import get_default_country
 
 
 class TeamMemberSerializer(serializers.HyperlinkedModelSerializer):
@@ -67,6 +74,62 @@ class ContactSerializer(serializers.ModelSerializer):
             'get_billing_cedex', 'get_billing_zip_code', 'get_billing_country',
             'mobile', 'get_phone', 'email', 'notes', 'get_view_url', 'favorite_language',
         )
+
+
+class NewContactSerializer(serializers.ModelSerializer):
+    """Write a new contact"""
+    lastname = serializers.CharField(required=True)
+    firstname = serializers.CharField(required=True)
+    address = serializers.CharField(required=True)
+    zip_code = serializers.CharField(required=True)
+    city = serializers.CharField(required=True)
+    country = serializers.IntegerField(required=True)
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        model = Contact
+        fields = (
+            'lastname', 'firstname', 'email', 'address', 'address2', 'address3', 'cedex', 'zip_code',
+            'country', 'city'
+        )
+
+    def validate_country(self, country_id):
+        try:
+            return Zone.objects.get(id=country_id, parent__isnull=True)
+        except Zone.DoesNotExist:
+            raise serializers.ValidationError(ugettext('Invalid country'))
+
+    def validate_zip_code(self, zip_code):
+        return zip_code.strip()
+
+    def validate_city(self, city_name):
+        words = re.split(r'\W+', city_name)
+        city_name = '-'.join([word.capitalize() for word in words if word])
+        if not city_name:
+            raise serializers.ValidationError(ugettext('The city name is required'))
+        return city_name
+
+    def get_city(self, validated_data):
+        zip_code = validated_data['zip_code']
+        city_name = validated_data['city']
+        country = validated_data.pop('country')
+        default_country = get_default_country()
+        if country.name != default_country:
+            city = City.objects.get_or_create(name=city_name, parent=country)[0]
+        else:
+            if len(zip_code) < 2:
+                raise serializers.ValidationError(ugettext('You must enter a zip code'))
+            try:
+                dep = Zone.objects.get(Q(code=zip_code[:2]) | Q(code=zip_code[:3]))
+            except Zone.DoesNotExist:
+                raise serializers.ValidationError(ugettext('Invalid zip code'))
+            city = City.objects.get_or_create(name=city_name, parent=dep)[0]
+        return city
+
+    def validate(self, attrs):
+        validated_data = super(NewContactSerializer, self).validate(attrs)
+        validated_data['city'] = self.get_city(validated_data)
+        return validated_data
 
 
 class EntityTypeSerializer(serializers.ModelSerializer):

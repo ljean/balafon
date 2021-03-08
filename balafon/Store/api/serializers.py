@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
+from balafon.Crm.serializers import NewContactSerializer
 from balafon.Store.models import (
     Brand, Certificate, Discount, PriceClass, Sale, StoreItem, StoreItemCategory, StoreItemTag, SaleItem, Unit, VatRate
 )
@@ -169,6 +170,10 @@ class CartSerializer(serializers.Serializer):
     notes = serializers.CharField(max_length=3000, required=False, allow_blank=True)
     voucher_code = serializers.CharField(allow_blank=True, required=False)
     payment_mode = serializers.IntegerField(required=False, allow_null=False)
+
+
+class CartContactSerializer(CartSerializer):
+    contact = NewContactSerializer()
 
 
 class VoucherSerializer(serializers.Serializer):

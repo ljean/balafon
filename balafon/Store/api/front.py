@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.utils.translation import ugettext as _
 
 from rest_framework import viewsets, permissions
@@ -12,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from balafon.settings import is_profile_installed
-from balafon.Crm.models import Action, ActionType, Contact
+from balafon.Crm.models import Action, ActionType, Contact, Entity
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
     Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint,
@@ -161,6 +162,7 @@ class VoucherView(APIView):
 class CartView(APIView):
     """post a cart"""
     permission_classes = (permissions.IsAuthenticated,)
+    cart_serializer = None
 
     def get_buyer_contact(self):
         try:
@@ -169,11 +171,15 @@ class CartView(APIView):
         except ContactProfile.DoesNotExist:
             raise Contact.DoesNotExist(_("You don't have a valid profile"))
 
+    def get_serializer(self):
+        return serializers.CartSerializer(data=self.request.data)
+
     def post(self, request):
         """receive a new cart"""
 
-        cart_serializer = serializers.CartSerializer(data=request.data)
+        cart_serializer = self.get_serializer()
         if cart_serializer.is_valid():
+            self.cart_serializer = cart_serializer
 
             discounts = {}
             vat_rates = {}
@@ -330,6 +336,39 @@ class CartView(APIView):
                     'message': ', '.join(['{0}: {1}'.format(*err) for err in cart_serializer.errors.items()])
                 }
             )
+
+
+class CartNoProfileView(CartView):
+    """post a cart"""
+    permission_classes = (permissions.AllowAny,)
+
+    @staticmethod
+    def create_contact(lastname, firstname, email, address, zip_code, city, address2='', address3=''):
+        entity_name = lastname + '_' + firstname
+        entity = Entity(name=entity_name, is_single_contact=True, type=None)
+        entity.save()  # This creates a default contact
+        contact = entity.default_contact
+        contact.lastname = lastname
+        contact.firstname = firstname
+        contact.email = email
+        contact.email_verified = False
+        contact.address = address
+        contact.address2 = address2
+        contact.address3 = address3
+        contact.zip_code = zip_code
+        contact.city = city
+        contact.save()
+        return contact
+
+    def get_buyer_contact(self):
+        if not settings.allow_cart_no_profile():
+            raise Http404
+        contact_data = self.cart_serializer.validated_data.get('contact')
+        contact = self.create_contact(**contact_data)
+        return contact
+
+    def get_serializer(self):
+        return serializers.CartContactSerializer(data=self.request.data)
 
 
 class ProfileAPIView(APIView):

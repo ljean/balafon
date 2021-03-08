@@ -77,3 +77,7 @@ def get_image_crop():
 
 def get_commercial_document_pdf_options():
     return getattr(settings, 'BALAFON_COMMERCIAL_DOCUMENT_WKHTMLTOPDF_OPTIONS', None)
+
+
+def allow_cart_no_profile():
+    return getattr(settings, 'BALAFON_ALLOW_CART_NO_PROFILE', False)
