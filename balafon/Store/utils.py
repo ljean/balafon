@@ -14,14 +14,14 @@ from balafon.utils import logger
 from balafon.Store.settings import get_cart_confirmation_subject
 
 
-def notify_cart_to_admin(profile, action):
+def notify_cart_to_admin(contact, action):
     """send message by email"""
     notification_email = getattr(settings, 'BALAFON_NOTIFICATION_EMAIL', '')
     if notification_email:
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
         subject = _("New cart purchased on store")
         data = {
-            'profile': profile,
+            'contact': contact,
             'action': action,
             'subject': subject,
         }
@@ -34,7 +34,7 @@ def notify_cart_to_admin(profile, action):
             text,
             from_email,
             [notification_email],
-            headers={'Reply-To': profile.contact.email}
+            headers={'Reply-To': contact.email}
         )
         email.attach_alternative(html_text, "text/html")
 
@@ -44,14 +44,14 @@ def notify_cart_to_admin(profile, action):
             logger.exception("notify_cart_to_admin")
 
 
-def confirm_cart_to_user(profile, action, custom_template=None):
+def confirm_cart_to_user(contact, action, custom_template=None):
     """send message by email"""
 
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL')
-    subject = get_cart_confirmation_subject(profile, action)
+    subject = get_cart_confirmation_subject(contact, action)
 
     data = {
-        'profile': profile,
+        'contact': contact,
         'action': action,
         'subject': subject,
     }
@@ -68,7 +68,7 @@ def confirm_cart_to_user(profile, action, custom_template=None):
         subject,
         text,
         from_email,
-        [profile.contact.email],
+        [contact.email],
     )
     email.attach_alternative(html_text, "text/html")
 

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from balafon.settings import is_profile_installed
-from balafon.Crm.models import Action, ActionType
+from balafon.Crm.models import Action, ActionType, Contact
 from balafon.Profile.models import ContactProfile
 from balafon.Store.models import (
     Favorite, SaleItem, StoreItem, StoreItemCategory, StoreItemTag, StoreManagementActionType, DeliveryPoint,
@@ -162,6 +162,13 @@ class CartView(APIView):
     """post a cart"""
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_buyer_contact(self):
+        try:
+            profile = ContactProfile.objects.get(user=self.request.user)
+            return profile.contact
+        except ContactProfile.DoesNotExist:
+            raise Contact.DoesNotExist(_("You don't have a valid profile"))
+
     def post(self, request):
         """receive a new cart"""
 
@@ -173,12 +180,10 @@ class CartView(APIView):
             voucher_code = cart_serializer.validated_data.get('voucher_code', '')
             voucher = Voucher.get_active_voucher(voucher_code)
 
-            # Get Contact
             try:
-                profile = ContactProfile.objects.get(user=request.user)
-                contact = profile.contact
-            except ContactProfile.DoesNotExist:
-                return Response({'ok': False, 'message': _("You don't have a valid profile")})
+                contact = self.get_buyer_contact()
+            except Contact.DoesNotExist as exc:
+                return Response({'ok': False, 'message': exc})
 
             # Get Delivery point
             try:
@@ -306,10 +311,10 @@ class CartView(APIView):
 
                 notify_cart_callback = get_notify_cart_callback()
                 if notify_cart_callback is None:
-                    confirm_cart_to_user(profile, action)
-                    notify_cart_to_admin(profile, action)
+                    confirm_cart_to_user(contact, action)
+                    notify_cart_to_admin(contact, action)
                 else:
-                    notify_cart_callback(profile, action)
+                    notify_cart_callback(contact, action)
 
                 return Response({
                     'ok': True,
