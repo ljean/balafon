@@ -901,6 +901,20 @@ class ContactHasEmail(YesNoSearchFieldForm):
             return has_no_email
 
 
+class ContactVerifiedEmail(YesNoSearchFieldForm):
+    """by has email"""
+    name = 'contact_verified_email'
+    label = _('Email vérifié')
+
+    def get_lookup(self):
+        """lookup"""
+        verified_email = Q(email_verified=True)
+        if self.is_yes():
+            return verified_email
+        else:
+            return ~verified_email
+
+
 class ContactHasPersonalEmail(YesNoSearchFieldForm):
     """by has an email set on the contact (ignore if set on entity)"""
     name = 'contact_has_personal_email'

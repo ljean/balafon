@@ -71,6 +71,7 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
+            search_forms.ContactVerifiedEmail,
             search_forms.ContactHasEmail,
             search_forms.ContactHasPersonalEmail,
             search_forms.UnknownContact,
