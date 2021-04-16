@@ -375,17 +375,23 @@ class Entity(AddressModel):
     def get_safe_logo(self):
         """get entity logo or default one"""
         if self.logo:
-            width, height = self.logo.width, self.logo.height
-            image_format = "64" if width > height else "x64"
-            return sorl_thumbnail.backend.get_thumbnail(self.logo.file, image_format, crop='center').url
+            try:
+                width, height = self.logo.width, self.logo.height
+                image_format = "64" if width > height else "x64"
+                return sorl_thumbnail.backend.get_thumbnail(self.logo.file, image_format, crop='center').url
+            except FileNotFoundError:
+                pass
         else:
             return self.default_logo()
     
     def default_logo(self):
         """get default logo"""
         if self.type and self.type.logo:
-            file_ = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "64x64", crop='center')
-            return file_.url
+            try:
+                file_ = sorl_thumbnail.backend.get_thumbnail(self.type.logo.file, "64x64", crop='center')
+                return file_.url
+            except FileNotFoundError:
+                pass
         
         if self.is_single_contact:
             logo = "img/single-contact.png"
@@ -396,14 +402,17 @@ class Entity(AddressModel):
     
     def get_logo_center_style(self):
         """get logo style to apply to img html tag to get the logo centered"""
-        if self.logo:
-            width, height = self.logo.width, self.logo.height
-            if width > height:
-                width, height = 64, height * 64 / width
-                return mark_safe('style="margin: {0}px 0"'.format((64 - height) / 2))
-            else:
-                width, height = width * 64 / height, height
-                return mark_safe('style="margin-left: 0 {0}px"'.format((64 - width) / 2))
+        try:
+            if self.logo:
+                width, height = self.logo.width, self.logo.height
+                if width > height:
+                    width, height = 64, height * 64 / width
+                    return mark_safe('style="margin: {0}px 0"'.format((64 - height) / 2))
+                else:
+                    width, height = width * 64 / height, height
+                    return mark_safe('style="margin-left: 0 {0}px"'.format((64 - width) / 2))
+        except FileNotFoundError:
+            pass
                 
     def get_absolute_url(self):
         """url to the entity page"""
