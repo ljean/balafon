@@ -903,7 +903,7 @@ class ContactHasEmail(YesNoSearchFieldForm):
 
 class ContactVerifiedEmail(YesNoSearchFieldForm):
     """by has email"""
-    name = 'contact_verified_email'
+    name = 'verified_email'
     label = _('Email vérifié')
 
     def get_lookup(self):

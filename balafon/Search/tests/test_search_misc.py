@@ -515,3 +515,40 @@ class SameEmailTest(BaseTestCase):
 
         self.assertEqual(1, in_response_count)  # 2 contacts on 3 are found
         self.assertContains(response, contact4.lastname)
+
+
+class VerifiedEmailTest(BaseTestCase):
+
+    def test_search_email_verified(self):
+        """search by name"""
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False, email_verified=True)
+        contact2 = mommy.make(models.Contact, lastname="ABCE", main_contact=True, has_left=False, email_verified=True)
+        contact3 = mommy.make(models.Contact, lastname="ABCF", main_contact=True, has_left=False, email_verified=False)
+        contact4 = mommy.make(models.Contact, lastname="Toto", main_contact=True, has_left=False, email_verified=True)
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-contact_name-_-0": 'ABC', "gr0-_-verified_email-_-1": 1}
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertContains(response, contact1.lastname)
+        self.assertContains(response, contact2.lastname)
+        self.assertNotContains(response, contact3.lastname)
+        self.assertNotContains(response, contact4.lastname)
+
+    def test_search_email_not_verified(self):
+        """search by name"""
+        contact1 = mommy.make(models.Contact, lastname="ABCD", main_contact=True, has_left=False, email_verified=True)
+        contact2 = mommy.make(models.Contact, lastname="ABCE", main_contact=True, has_left=False, email_verified=True)
+        contact3 = mommy.make(models.Contact, lastname="ABCF", main_contact=True, has_left=False, email_verified=False)
+        contact4 = mommy.make(models.Contact, lastname="Toto", main_contact=True, has_left=False, email_verified=True)
+
+        response = self.client.post(
+            reverse('search'),
+            data={"gr0-_-contact_name-_-0": 'ABC', "gr0-_-verified_email-_-1": 0}
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertNotContains(response, contact1.lastname)
+        self.assertNotContains(response, contact2.lastname)
+        self.assertContains(response, contact3.lastname)
+        self.assertNotContains(response, contact4.lastname)
