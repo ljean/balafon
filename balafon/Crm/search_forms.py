@@ -1123,8 +1123,12 @@ class NoSameAsForm(YesNoSearchFieldForm):
                         # If the current contact has better priority (lower is better). Take this one
                         other_contact = same_as[contact.same_as.id]
                         if other_contact.same_as_priority > contact.same_as_priority:
-                            contact_index = filtered_contacts.index(other_contact)
-                            filtered_contacts[contact_index] = contact
+                            try:
+                                contact_index = filtered_contacts.index(other_contact)
+                                filtered_contacts[contact_index] = contact
+                            except ValueError:
+                                pass
+
                 else:
                     filtered_contacts.append(contact)
             return filtered_contacts
