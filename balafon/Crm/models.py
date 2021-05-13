@@ -30,6 +30,11 @@ from balafon.utils import now_rounded, logger, validate_rgb
 from balafon.Users.models import Favorite
 
 
+class ConfirmedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(confirmed=True)
+
+
 class NamedElement(models.Model):
     """Base class for models with a name field"""
     name = models.CharField(_('Name'), max_length=200)
@@ -327,6 +332,14 @@ class Entity(AddressModel):
     is_single_contact = models.BooleanField(_("is single contact"), default=False)
     
     favorites = GenericRelation(Favorite)
+
+    confirmed = models.BooleanField(
+        default=True, verbose_name=_('confirmed'), db_index=True,
+        help_text=_('For contact created from subscription form, we need to wait for confirmation by email link')
+    )
+
+    all_objects = models.Manager()  # The default manager.
+    objects = ConfirmedManager()
     
     def save(self, *args, **kwargs):
         """save"""
@@ -597,7 +610,7 @@ class Relationship(TimeStampedModel):
     class Meta:
         verbose_name = _('relationship')
         verbose_name_plural = _('relationships')
-    
+
 
 class Contact(AddressModel):
     """a contact : how to contact a physical person. A physical person may have several contacts"""
@@ -660,6 +673,14 @@ class Contact(AddressModel):
     favorites = GenericRelation(Favorite)
 
     favorite_language = models.CharField(_("favorite language"), max_length=10, default="", blank=True)
+
+    confirmed = models.BooleanField(
+        default=True, verbose_name=_('confirmed'), db_index=True,
+        help_text=_('For contact created from subscription form, we need to wait for confirmation by email link')
+    )
+
+    all_objects = models.Manager()  # The default manager.
+    objects = ConfirmedManager()
 
     def get_view_url(self):
         if self.entity.is_single_contact:
@@ -900,9 +921,12 @@ class Contact(AddressModel):
         fullname = "{0} {1}".format(self.lastname, self.firstname).strip()
         if not fullname:
             fullname = self.email
-        if self.entity.is_single_contact:
+        try:
+            if self.entity.is_single_contact:
+                return fullname
+            return "{0} ({1})".format(fullname, self.entity.name)
+        except Exception:
             return fullname
-        return "{0} ({1})".format(fullname, self.entity.name)
 
     def get_gender_text(self):
         if self.gender_title:

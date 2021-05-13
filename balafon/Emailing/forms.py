@@ -28,6 +28,7 @@ from balafon.Crm.models import (
 )
 from balafon.Crm.widgets import CityAutoComplete
 from balafon.Emailing import models
+from balafon.Emailing.settings import notify_subscription_on_confirmation
 from balafon.Emailing.utils import (
     create_subscription_action, send_notification_email, get_language, subscribe_contact_to_newsletter
 )
@@ -607,7 +608,8 @@ class MinimalSubscribeForm(BetterBsModelForm, SubscriptionTypeFormMixin):
         if subscriptions:
             create_subscription_action(contact, subscriptions)
 
-        # send an email
-        send_notification_email(request, contact, [], '')
+        if not notify_subscription_on_confirmation():
+            # send an email
+            send_notification_email(request, contact, [], '')
 
         return contact

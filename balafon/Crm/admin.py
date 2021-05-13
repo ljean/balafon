@@ -208,10 +208,14 @@ class SubscriptionInline(admin.TabularInline):
 @admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['lastname', 'firstname', 'entity', 'email']
+    list_display = ['id', 'lastname', 'firstname', 'entity', 'email', 'confirmed']
     search_fields = ['lastname', 'email']
-    raw_id_admin = ('entity',)
+    raw_id_fields = ['city', 'entity', 'same_as', 'billing_city', 'created_by', 'last_modified_by']
     inlines = (SubscriptionInline,)
+    list_filter = ['confirmed']
+
+    def get_queryset(self, request):
+        return models.Contact.all_objects.all()
 
     def get_form(self, *args, **kwargs):
         form_class = super(ContactAdmin, self).get_form(*args, **kwargs)
@@ -250,8 +254,13 @@ class CityAdmin(admin.ModelAdmin):
 @admin.register(models.Entity)
 class EntityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ('name', 'type')
+    list_display = ('id', 'name', 'type', 'confirmed')
     search_fields = ['name']
+    list_filter = ['confirmed']
+    raw_id_fields = ['city']
+
+    def get_queryset(self, request):
+        return models.Entity.all_objects.all()
 
 
 @admin.register(models.Opportunity)

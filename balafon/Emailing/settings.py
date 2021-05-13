@@ -16,6 +16,10 @@ def is_subscribe_enabled():
     return getattr(project_settings, 'BALAFON_SUBSCRIBE_ENABLED', True)
 
 
+def notify_subscription_on_confirmation():
+    return getattr(project_settings, 'BALAFON_NOTIFY_SUBSCRIPTION_ON_CONFIRMATION', False)
+
+
 def is_email_subscribe_enabled():
     """return true if email subscribe page is enabled : True by default for compatibility reason"""
     return getattr(project_settings, 'BALAFON_EMAIL_SUBSCRIBE_ENABLED', True)

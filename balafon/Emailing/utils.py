@@ -422,11 +422,13 @@ def force_line_max_length(text, max_length_per_line=400, dont_cut_in_quotes=True
 def subscribe_contact_to_newsletter(contact, subscription_type=None, request=None):
     """save"""
     if crm_settings.ALLOW_SINGLE_CONTACT:
-        contact.entity = Entity.objects.create(name=contact.email, type=None, is_single_contact=True)
+        contact.entity = Entity.objects.create(
+            name=contact.email, type=None, is_single_contact=True, confirmed=False
+        )
     else:
         et_id = getattr(settings, 'BALAFON_INDIVIDUAL_ENTITY_ID', 1)
         entity_type = EntityType.objects.get(id=et_id)
-        contact.entity = Entity.objects.create(name=contact.email, type=entity_type)
+        contact.entity = Entity.objects.create(name=contact.email, type=entity_type, confirmed=False)
     contact.save()
     # delete unknown contacts for the current entity
     contact.entity.contact_set.exclude(id=contact.id).delete()
@@ -442,6 +444,7 @@ def subscribe_contact_to_newsletter(contact, subscription_type=None, request=Non
 
     subscriptions = []
     for subscription_type in queryset:
+
         subscription = Subscription.objects.get_or_create(
             contact=contact, subscription_type=subscription_type
         )[0]
@@ -451,9 +454,10 @@ def subscribe_contact_to_newsletter(contact, subscription_type=None, request=Non
         subscriptions.append(subscription_type.name)
 
     create_subscription_action(contact, subscriptions)
-    if subscriptions:
-        send_notification_email(request, contact, [], "")
-    else:
-        send_notification_email(request, contact, [], "Error: " + _("No subscription_type defined"))
+    if not emailing_settings.notify_subscription_on_confirmation():
+        if subscriptions:
+            send_notification_email(request, contact, [], "")
+        else:
+            send_notification_email(request, contact, [], "Error: " + _("No subscription_type defined"))
 
     return contact

@@ -93,7 +93,7 @@ class SubscribeTest(TestCase):
         url = reverse("emailing_email_subscribe_subscription", args=[subscription_type1.id])
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 0)
         soup = BeautifulSoup(response.content)
         self.assertEqual(1, len(soup.select('form')))
         form = soup.select('form')[0]
@@ -118,9 +118,11 @@ class SubscribeTest(TestCase):
         
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
         
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
+        self.assertEqual(contact.confirmed, False)
         
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -148,7 +150,54 @@ class SubscribeTest(TestCase):
         for subscription_type in (subscription_type3, subscription_type4):
             queryset = models.Subscription.objects.filter(contact=contact, subscription_type=subscription_type)
             self.assertEqual(0, queryset.count())
-        
+
+    @override_settings(BALAFON_NOTIFY_SUBSCRIPTION_ON_CONFIRMATION=True, BALAFON_DEFAULT_SUBSCRIPTION_TYPE=None)
+    def test_email_subscribe_newsletter_no_notification(self):
+        """test email subscription when no type is configured"""
+        url = reverse("emailing_email_subscribe_newsletter")
+
+        site1 = Site.objects.get_current()
+        site2 = mommy.make(Site)
+
+        subscription_type1 = mommy.make(models.SubscriptionType, name="abc", site=site1)
+        subscription_type2 = mommy.make(models.SubscriptionType, name="def", site=site1)
+        subscription_type3 = mommy.make(models.SubscriptionType, name="ghi", site=site2)
+        subscription_type4 = mommy.make(models.SubscriptionType, name="jkl")
+
+        data = {
+            'email': 'pdupond@apidev.fr',
+        }
+
+        response = self.client.post(url, data=data, follow=False)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
+
+        contact = models.Contact.all_objects.all()[0]
+        self.assertEqual(contact.confirmed, False)
+
+        self.assertNotEqual(contact.uuid, '')
+        self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
+
+        self.assertEqual(contact.email, data['email'])
+
+        self.assertEqual(len(mail.outbox), 1)
+
+        verification_email = mail.outbox[0]
+        self.assertEqual(verification_email.to, [contact.email])
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        email_content = self.email_as_text(verification_email)
+        self.assertTrue(email_content.find(url) > 0)
+
+        for subscription_type in (subscription_type1, subscription_type2):
+            subscription = models.Subscription.objects.get(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(subscription.accept_subscription, True)
+            self.assertEqual(subscription.subscription_date.date(), date.today())
+
+        for subscription_type in (subscription_type3, subscription_type4):
+            queryset = models.Subscription.objects.filter(contact=contact, subscription_type=subscription_type)
+            self.assertEqual(0, queryset.count())
+
     @override_settings(BALAFON_DEFAULT_SUBSCRIPTION_TYPE=None)
     def test_email_subscribe_no_email(self):
         """test email subscription with empty email should fail"""
@@ -162,7 +211,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select("ul.errorlist")), 1)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 0)
         self.assertEqual(len(mail.outbox), 0)
 
     @override_settings(BALAFON_DEFAULT_SUBSCRIPTION_TYPE=None)
@@ -179,7 +228,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(200, response.status_code)
         soup = BeautifulSoup(response.content)
         self.assertEqual(len(soup.select("ul.errorlist")), 1)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 0)
         
         self.assertEqual(len(mail.outbox), 0)
 
@@ -205,9 +254,10 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
 
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -256,9 +306,10 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
 
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -308,9 +359,10 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
 
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -359,9 +411,10 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
 
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -400,11 +453,12 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 2)
-        self.assertEqual(models.Contact.objects.filter(email=existing_contact.email).count(), 2)
+        self.assertEqual(models.Contact.all_objects.count(), 2)
+        self.assertEqual(models.Contact.all_objects.filter(email=existing_contact.email).count(), 2)
 
-        new_contact = models.Contact.objects.filter(email=existing_contact.email).exclude(id=existing_contact.id)[0]
+        new_contact = models.Contact.all_objects.filter(email=existing_contact.email).exclude(id=existing_contact.id)[0]
         self.assertEqual(new_contact.email_verified, False)
+        self.assertEqual(new_contact.confirmed, False)
 
         self.assertEqual(new_contact.get_same_as().count(), 0)
         self.assertEqual(new_contact.get_same_email().count(), 1)
@@ -459,15 +513,16 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.filter(email=existing_contact1.email).count(), 3)
+        self.assertEqual(models.Contact.all_objects.filter(email=existing_contact1.email).count(), 3)
 
         existing_ids = [
             contact.id for contact in (existing_contact1, existing_contact2, existing_contact3, existing_contact4)
         ]
-        queryset = models.Contact.objects.filter(email=existing_contact1.email).exclude(id__in=existing_ids)
+        queryset = models.Contact.all_objects.filter(email=existing_contact1.email).exclude(id__in=existing_ids)
         self.assertEqual(queryset.count(), 1)
         new_contact = queryset[0]
         self.assertEqual(new_contact.email_verified, False)
+        self.assertEqual(new_contact.confirmed, False)
 
         queryset = models.Subscription.objects.filter(contact=new_contact, subscription_type=subscription_type1)
         self.assertEqual(1, queryset.count())
@@ -483,7 +538,7 @@ class SubscribeTest(TestCase):
         self.assertEqual(new_contact.favorite_language, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
 
-        #email verification
+        # email verification
         self.assertEqual(len(mail.outbox), 2)
 
         verification_email = mail.outbox[1]
@@ -505,7 +560,7 @@ class SubscribeTest(TestCase):
         url = reverse("emailing_email_subscribe_newsletter")
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 0)
 
     @override_settings(BALAFON_EMAIL_SUBSCRIBE_ENABLED=False)
     def test_subscribe_disabled(self):
@@ -517,7 +572,7 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(404, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 0)
+        self.assertEqual(models.Contact.all_objects.count(), 0)
 
         self.assertEqual(len(mail.outbox), 0)
 
@@ -546,9 +601,9 @@ class SubscribeTest(TestCase):
 
         response = self.client.post(url, data=data, follow=False)
         self.assertEqual(302, response.status_code)
-        self.assertEqual(models.Contact.objects.count(), 1)
+        self.assertEqual(models.Contact.all_objects.count(), 1)
 
-        contact = models.Contact.objects.all()[0]
+        contact = models.Contact.all_objects.all()[0]
 
         self.assertNotEqual(contact.uuid, '')
         self.assertTrue(response['Location'].find(reverse('emailing_subscribe_email_done')) >= 0)
@@ -586,3 +641,66 @@ class SubscribeTest(TestCase):
 
         new_subscription.disconnect(add_to_group_callback, sender=models.Subscription)
 
+    @override_settings(BALAFON_NOTIFY_SUBSCRIPTION_ON_CONFIRMATION=True)
+    def test_verify_email_notification(self):
+        """test email verification"""
+        self.client.logout()
+
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False, confirmed=False)
+
+        subscription1 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=newsletter_subscription, accept_subscription=True
+        )
+        subscription2 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=third_party_subscription, accept_subscription=True
+        )
+
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        contact = models.Contact.all_objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, True)
+        self.assertEqual(contact.confirmed, True)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(len(mail.outbox), 1)
+        notification_email = mail.outbox[0]
+        self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, True)
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, True)
+
+    @override_settings(BALAFON_NOTIFY_SUBSCRIPTION_ON_CONFIRMATION=False)
+    def test_verify_email(self):
+        """test email verification"""
+        self.client.logout()
+
+        site1 = Site.objects.get_current()
+
+        newsletter_subscription = mommy.make(models.SubscriptionType, name="newsletter", site=site1)
+        third_party_subscription = mommy.make(models.SubscriptionType, name="3rd_party", site=site1)
+        contact = mommy.make(models.Contact, email='toto@apidev.fr', email_verified=False, confirmed=False)
+
+        subscription1 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=newsletter_subscription, accept_subscription=True
+        )
+        subscription2 = mommy.make(
+            models.Subscription, contact=contact, subscription_type=third_party_subscription, accept_subscription=True
+        )
+
+        url = reverse('emailing_email_verification', args=[contact.uuid])
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code)
+        contact = models.Contact.all_objects.get(id=contact.id)
+        self.assertEqual(contact.email_verified, True)
+        self.assertEqual(contact.confirmed, True)
+        contact = models.Contact.objects.get(id=contact.id)
+        self.assertEqual(len(mail.outbox), 0)
+        subscription1 = models.Subscription.objects.get(id=subscription1.id)
+        self.assertEqual(subscription1.accept_subscription, True)
+        subscription2 = models.Subscription.objects.get(id=subscription2.id)
+        self.assertEqual(subscription2.accept_subscription, True)

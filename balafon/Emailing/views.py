@@ -29,9 +29,11 @@ from balafon.Crm.models import Contact, Action, ActionType, Subscription
 from balafon.Crm.signals import new_subscription
 from balafon.Emailing import models, forms
 from balafon.Emailing.settings import (
-    is_subscribe_enabled, is_email_subscribe_enabled, get_subscription_form
+    is_subscribe_enabled, is_email_subscribe_enabled, get_subscription_form, notify_subscription_on_confirmation
 )
-from balafon.Emailing.utils import get_emailing_context, send_verification_email, EmailSendError, patch_emailing_html
+from balafon.Emailing.utils import (
+    get_emailing_context, send_verification_email, EmailSendError, patch_emailing_html, send_notification_email
+)
 
 
 @user_passes_test(can_access)
@@ -353,7 +355,10 @@ def subscribe_error(request, contact_uuid):
 
 def email_verification(request, contact_uuid):
     """handle click on verification link in email verification email"""
-    contact = get_object_or_404(Contact, uuid=contact_uuid)
+    try:
+        contact = Contact.all_objects.get(uuid=contact_uuid)
+    except (Contact.DoesNotExist, Contact.MultipleObjectsReturned):
+        raise Http404
     subscription_type_names = [
         subscription.subscription_type.name for subscription in contact.subscription_set.all()
     ]
@@ -363,8 +368,16 @@ def email_verification(request, contact_uuid):
     if not my_company:
         my_company = getattr(settings, 'BALAFON_MY_COMPANY', '')
 
+    entity = contact.entity
+    entity.confirmed = True
+    entity.save()
+    contact.confirmed = True
     contact.email_verified = True
     contact.save()
+
+    if notify_subscription_on_confirmation():
+        # send an email
+        send_notification_email(request, contact, [], '')
 
     if redirect_to:
         return HttpResponseRedirect(redirect_to)
@@ -408,6 +421,10 @@ class SubscribeView(View):
 
     def is_enabled(self):
         return is_subscribe_enabled()
+
+    @staticmethod
+    def require_confirmation():
+        return False
 
     def dispatch(self, request, *args, **kwargs):
         """make possible to disable this view from settings"""
@@ -456,6 +473,12 @@ class SubscribeView(View):
         form = form_class(request.POST, request.FILES, **self.get_form_kwargs())
         if form.is_valid():
             contact = form.save(request)
+            if self.require_confirmation():
+                contact.confirmed = False
+                contact.save()
+                entity = contact.entity
+                entity.confirmed = False
+                entity.save()
             try:
                 subscription_queryset = contact.subscription_set.filter(accept_subscription=True)
 
@@ -493,6 +516,10 @@ class EmailSubscribeView(SubscribeView):
 
     def is_enabled(self):
         return is_email_subscribe_enabled()
+
+    @staticmethod
+    def require_confirmation():
+        return True
 
     def get_success_url(self, contact):
         """where to redirect when form is valid"""
