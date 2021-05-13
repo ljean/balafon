@@ -36,12 +36,8 @@ from balafon.Search.forms import (
 
 def filter_icontains_unaccent(queryset, field, text):
     if crm_settings.is_unaccent_filter_supported():
-        queryset = queryset.extra(
-            where=["UPPER(unaccent("+field+")) LIKE UPPER(unaccent(%s))"],
-            params=["%{0}%".format(text)]
-        )
-        return list(queryset)
-    return list(queryset.filter(**{field+"__icontains": text}))
+        field += '__unaccent'
+    return list(queryset.filter(**{field + "__icontains": text}))
 
 
 @csrf_exempt
