@@ -130,3 +130,19 @@ $(function() {
         return false;
     })
 })
+
+// Thank you http://stackoverflow.com/a/11677514/117092
+function getUrlVarsEx(url) {
+  // exctract query args keys and values
+  // return a list-object : list of keyworks. Each keyword is asscessible has a member variable of the list
+  var vars = [], hash;
+  if (url.indexOf('?') !== -1) {
+    var hashes = url.slice(url.indexOf('?') + 1).split('&');
+    for (var i = 0; i < hashes.length; i++) {
+      hash = hashes[i].split('=');
+      vars.push(hash[0]);
+      vars[hash[0]] = hash[1];
+    }
+  }
+  return vars;
+}

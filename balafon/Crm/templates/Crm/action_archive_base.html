@@ -8,7 +8,9 @@
 <script>
     $(function() {
 
-        var changeFilter = function(values, orderValue) {
+        $('.name-search').val(getUrlVarsEx(window.location.href).name);
+
+        var changeFilter = function(values, orderValue, name) {
           var filterValues = '';
           if (values) {
             filterValues = values;
@@ -20,21 +22,35 @@
             filterValues += orderValue;
           }
 
-          window.location = "{% block this_url %}{% endblock%}?filter=" + filterValues;
+          var url = "{% block this_url %}{% endblock%}?filter=" + filterValues;
+          if (name) {
+              url += "&name=" + name
+          }
+
+          window.location = url;
         };
 
-        $("select.filter").change(function() {
-            var values = $(this).val();
-            var orderValue = $("select.action-order").val();
-            changeFilter(values, orderValue);
-            return false;
-        });
-
-        $("select.action-order").change(function() {
+        function onFilter() {
             var values = $("select.filter").val();
             var orderValue = $("select.action-order").val();
-            changeFilter(values, orderValue);
+            changeFilter(values, orderValue, $('.name-search').val());
             return false;
+        }
+
+        $("select.filter").change(onFilter);
+
+        $("select.action-order").change(onFilter);
+
+        $(".name-search-btn").click(function(event) {
+            event.preventDefault();
+            event.stopPropagation()
+            return onFilter();
+        });
+
+        $(".name-search").keydown(function(event) {
+            if (event.keyCode === 13) {
+                return onFilter();
+            }
         });
         
         $(".action-archive-filter a.btn").each(function(idx, elt) {
@@ -127,7 +143,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-5">
       <select class="form-control action-filter chosen-select filter inline-block" multiple="" data-placeholder="{% trans 'Filter by' %}">
           {% if action_types %}
           <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action types' %}">
@@ -153,6 +169,17 @@
           </optgroup>
       </select>
     </div>
+    <div class="col-lg-3">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control name-search"
+                 placeholder="{%  trans 'Recherche par nom' %}" />
+          <div class="input-group-append">
+            <button class="btn btn-secondary name-search-btn" type="button" style="height: 38px;">
+                <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+    </div>
     <div class="col-lg-2">
       <select class="form-control action-order">
         {% for value, label in order_values %}
@@ -170,7 +197,7 @@
           </a>
           <ul class="dropdown-menu">
               {% for custom_menu_item in the_custom_menu.get_children %}
-              <li><a href="{{ custom_menu_item.get_url }}" {{ custom_menu_item.attributes|safe }} >
+              <li><a href="{{ custom_menu_item.get_url }}" class="dropdown-link" {{ custom_menu_item.attributes|safe }} >
                 <i class="fas fa-{{custom_menu_item.icon}}"></i>
                 {{ custom_menu_item.label }}
               </a></li>

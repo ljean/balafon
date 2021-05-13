@@ -78,6 +78,13 @@ class ActionArchiveView(object):
         """queryset ob objects"""
         values = self.request.GET.get("filter", None)
         queryset = self._get_queryset()
+
+        name = self.request.GET.get("name", None)
+        if name:
+            queryset = queryset.filter(
+                Q(entities__name__icontains=name) | Q(contacts__lastname__icontains=name)
+            )
+
         if values and values != "null":
             values_dict = self._get_selection(values)
             selected_types = values_dict.get("t", [])
