@@ -34,7 +34,7 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
                     label
                 )
                 str_values += [link]
-            except self.rel.related_model.DoesNotExist:
+            except (self.rel.related_model.DoesNotExist, self.rel.related_model.MultipleObjectsReturned):
                 str_values += ['???']
         return mark_safe('&nbsp;<strong>{0}</strong>'.format(',&nbsp;'.join(str_values))), ''
 
