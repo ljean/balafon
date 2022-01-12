@@ -5297,7 +5297,7 @@ msgstr "Le formulaire n'est pas valide"
 
 #: templates/basic_newsletter.html:40
 msgid "News"
-msgstr "Acrtualités"
+msgstr "Actualités"
 
 #: templates/basic_newsletter.html:58
 msgid "Read more"
