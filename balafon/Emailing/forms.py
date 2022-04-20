@@ -349,7 +349,7 @@ class SubscribeForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         # Do not display (Mrs and M) gender on subscribe form
         if 'gender' in self.fields:
             self.fields['gender'].choices = [
-                (models.Contact.GENDER_NOT_SET, _('')),
+                (models.Contact.GENDER_NOT_SET, ''),
                 (models.Contact.GENDER_MALE, ugettext('Mr')),
                 (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
             ]
