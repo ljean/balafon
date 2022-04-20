@@ -785,30 +785,59 @@ class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
     """by accept subscrition"""
     name = 'accept_subscription'
     label = _('Accept subscription to')
-    
+
     def __init__(self, *args, **kwargs):
-        super(ContactAcceptSubscriptionSearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         queryset = models.SubscriptionType.objects.all()
         field = forms.ModelChoiceField(queryset, label=self.label)
         self._add_field(field)
-        
-    def get_lookup(self):
-        """lookup"""
-        return {'subscription__subscription_type__id': self.value, 'subscription__accept_subscription': True}
+
+    def get_queryset(self, queryset):
+        refuse_queryset = queryset.filter(
+            subscription__subscription_type__id=self.value,
+            subscription__accept_subscription=False
+        )
+        queryset = queryset.filter(
+            subscription__subscription_type__id=self.value,
+            subscription__accept_subscription=True
+        )
+        return queryset.exclude(email__in=refuse_queryset.values('email'))
 
 
-class ContactRefuseSubscriptionSearchForm(ContactAcceptSubscriptionSearchForm):
-    """by refuse subscription"""
+class ContactRefuseSubscriptionSearchForm(SearchFieldForm):
+    """refuse subscrition"""
     name = 'refuse_subscription'
     label = _('Refuse subscription to')
-    
-    def get_lookup(self):
-        """lookup"""
-        return None
-        
-    def get_exclude_lookup(self):
-        """exclude lookup"""
-        return super(ContactRefuseSubscriptionSearchForm, self).get_lookup()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        queryset = models.SubscriptionType.objects.all()
+        field = forms.ModelChoiceField(queryset, label=self.label)
+        self._add_field(field)
+
+    def get_queryset(self, queryset):
+        refuse_queryset = queryset.filter(
+            subscription__subscription_type__id=self.value,
+            subscription__accept_subscription=False
+        )
+        return queryset.filter(email__in=refuse_queryset.values('email'))
+
+
+class ContactNoSubscriptionSearchForm(SearchFieldForm):
+    """by accept subscrition"""
+    name = 'no_subscription'
+    label = _('No subscription to')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        queryset = models.SubscriptionType.objects.all()
+        field = forms.ModelChoiceField(queryset, label=self.label)
+        self._add_field(field)
+
+    def get_queryset(self, queryset):
+        return queryset.exclude(
+            subscription__subscription_type__id=self.value,
+        )
 
 
 class SecondarySearchForm(SearchFieldForm):
@@ -826,7 +855,7 @@ class SecondarySearchForm(SearchFieldForm):
         """lookup"""
         value = int(self.value)
         if value == 1:
-            #the lookup 'main_contact' will be removed by the search form
+            # the lookup 'main_contact' will be removed by the search form
             return {}
         elif value == 0:
             return {'main_contact': False}
@@ -847,7 +876,7 @@ class ContactHasLeft(SearchFieldForm):
         """lookup"""
         value = int(self.value)
         if value == 1:
-            #the lookup 'has_left' will be removed by the search form
+            # the lookup 'has_left' will be removed by the search form
             return {}
         elif value == 0:
             return {'has_left': True}
@@ -995,7 +1024,10 @@ class RelationshipDateForm(TwoDatesForm):
     def get_lookup(self):
         """lookup"""
         start_datetime, end_datetime = self._get_datetimes()
-        return {'entity__relationship_date__gte': start_datetime, 'entity__relationship_date__lte': end_datetime}
+        return {
+            'entity__relationship_date__gte': start_datetime,
+            'entity__relationship_date__lte': end_datetime
+        }
 
 
 class ContactNameSearchForm(SearchFieldForm):

@@ -56,13 +56,21 @@ SEARCH_FORMS = [
             search_forms.EntityNotesForm,
         ],
     ), (
+        _('Newsletters'),
+        [
+            search_forms.ContactAcceptSubscriptionSearchForm,
+            search_forms.ContactRefuseSubscriptionSearchForm,
+            search_forms.ContactNoSubscriptionSearchForm,
+            search_forms.ContactVerifiedEmail,
+            search_forms.ContactHasEmail,
+            search_forms.ContactHasPersonalEmail,
+        ],
+    ), (
         _('Contacts'),
         [
             search_forms.ContactNameSearchForm,
             search_forms.ContactFirstnameSearchForm,
             search_forms.ContactRoleSearchForm,
-            search_forms.ContactAcceptSubscriptionSearchForm,
-            search_forms.ContactRefuseSubscriptionSearchForm,
             search_forms.SecondarySearchForm,
             search_forms.ContactAgeSearchForm,
             search_forms.ContactsRelationshipByType,
@@ -71,9 +79,6 @@ SEARCH_FORMS = [
             search_forms.ContactNotesSearchForm,
             search_forms.ContactHasLeft,
             search_forms.EmailSearchForm,
-            search_forms.ContactVerifiedEmail,
-            search_forms.ContactHasEmail,
-            search_forms.ContactHasPersonalEmail,
             search_forms.UnknownContact,
             search_forms.ContactLanguageSearchForm,
         ],
