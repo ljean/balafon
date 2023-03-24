@@ -281,7 +281,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = ['type', 'status', 'done', 'opportunity']
     readonly_fields = ['created', 'modified', 'created_by', 'last_modified_by']
     date_hierarchy = 'created'
-    raw_id_fields = ['contacts', 'entities',]
+    raw_id_fields = ['contacts', 'entities', 'parent']
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         if db_field.name in self.raw_id_fields:
