@@ -1063,8 +1063,12 @@ class Contact(AddressModel):
 
 def on_update_same_as(sender, instance, **kwargs):
     """update the SameAs contacts when a contact is deleted"""
-    if instance.same_as:
-        if instance.same_as.contact_set.exclude(id=instance.id).count() > 1:
+    try:
+        same_as = instance.same_as
+    except SameAs.DoesNotExist:
+        same_as = None
+    if same_as:
+        if same_as.contact_set.exclude(id=instance.id).count() > 1:
             # If still some other contacts : Rebuild the priority orders for others
             same_as_contacts = instance.same_as.contact_set.exclude(id=instance.id).order_by('same_as_priority')
             for index, contact in enumerate(same_as_contacts):
@@ -1072,7 +1076,6 @@ def on_update_same_as(sender, instance, **kwargs):
                 contact.save()
         else:
             # If the other contact is now alone: delete the same_as
-            same_as = instance.same_as
             for contact in same_as.contact_set.all():
                 contact.same_as = None
                 contact.same_as_priority = 0
