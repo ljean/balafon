@@ -30,7 +30,9 @@
         {% with e.single_contact as c %}
         <td colspan="2">
           <i class="fas fa-user"></i>
-          <a href="{% url 'crm_view_contact' c.id %}">{{c.display_name }}</a>
+          {% if c %}
+            <a href="{% url 'crm_view_contact' c.id %}">{{c.display_name }}</a>
+          {% endif %}
           {% for g in c.headline_groups %}
             <span
                class="group-tag btn btn-xs{% if not g.background_color %} btn-primary{% endif %}"
