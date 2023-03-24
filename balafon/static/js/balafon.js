@@ -33,7 +33,6 @@ $(function() {
             disable_search: false,
         };
         var width = $(elt).attr('width');
-        console.log('> width', width);
         if (width) {
             attrs.width = width;
         }
@@ -44,27 +43,44 @@ $(function() {
         }
     });
 
+    $(document).on('click', '.contenteditable-cancel', function () {
+        window.location.reload();
+    })
     
     $(".contenteditable").blur(function() {
         var t = (new Date()).getTime();
+        var url = $(this).attr('rel')+"?t="+t;
+        var html = $(this).html();
+        var elt1 = $('<a class="contenteditable-confirm">enregistrer</a>').insertAfter($(this));
+        var elt2 = $('<a class="contenteditable-cancel">annuler</a>').insertAfter($(this));
+
         var _that = $(this);
-        $.ajax({
-            type: "POST",
-            url: $(this).attr('rel')+"?t="+t,
-            data: {value: $(this).html()},
-            success: function(data) {
-                if (data.ok) {
-                    //var elt = _that.after('<span class="success glyphicon glyphicon-saved"></span>');
-                    var elt = $('<span class="label label-sm label-success"><span class="glyphicon glyphicon-saved"></span></span>').insertAfter(_that);
-                    setTimeout(function() {elt.remove();}, 1000);
-                } else {
-                    var elt = $('<span class="label label-sm label-danger"></span>').insertAfter(_that);
-                    //elt.attr("title", data.error);
-                    elt.html('<span class="glyphicon glyphicon-warning-sign"> '+data.error+'</span>');
-                }
-            },
-            dataType: 'json'
-        });
+
+        $(elt1).on(
+            'click',
+            function () {
+                $(elt2).hide();
+                $(this).hide();
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {value: html},
+                    success: function (data) {
+                        if (data.ok) {
+                            var icon = '<i class="fa fa-check-circle"></i>';
+                            var elt = $(icon).insertAfter(_that);
+                            setTimeout(function () {
+                                elt.remove();
+                            }, 1000);
+                        } else {
+                            var icon = '<span><i class="fa fa-check-circle"></i>' + data.error + '</span>';
+                            var elt = $(icon).insertAfter(_that);
+                            //elt.attr("title", data.error);
+                        }
+                    },
+                    dataType: 'json'
+                });
+            });
     });
     
     $(".show-note").click(function() {
