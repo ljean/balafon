@@ -283,14 +283,6 @@ class ActionAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     raw_id_fields = ['contacts', 'entities', 'parent']
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name in self.raw_id_fields:
-            kwargs['widget'] = VerboseManyToManyRawIdWidget(db_field.remote_field, self.admin_site)
-        else:
-            return super(ActionAdmin, self).formfield_for_dbfield(db_field, **kwargs)
-        kwargs.pop('request')
-        return db_field.formfield(**kwargs)
-
 
 @admin.register(models.CustomFieldChoice)
 class CustomFieldChoicedAdmin(admin.ModelAdmin):
