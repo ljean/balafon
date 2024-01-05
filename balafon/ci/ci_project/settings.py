@@ -23,7 +23,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'test_db',
-        'USER': 'runner',
+        'USER': 'piadeb',
         'PASSWORD': 'semaphoredb',
         'HOST': '127.0.0.1',
         'PORT': '5432',
@@ -210,8 +210,11 @@ REST_FRAMEWORK = {
     )
 }
 
-RECAPTCHA_PUBLIC_KEY = "dummy"
-RECAPTCHA_PRIVATE_KEY = "dummy"
+# RECAPTCHA_PUBLIC_KEY = ""
+# RECAPTCHA_PRIVATE_KEY = ""
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INSTALLED_APPS = (
     # contribs
@@ -227,7 +230,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'floppyforms',
     'sorl.thumbnail',
-    'snowpenguin.django.recaptcha2',
+    'django_recaptcha',
     'django_registration',
 
     # externals

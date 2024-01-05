@@ -6,7 +6,7 @@ from decimal import Decimal
 import os.path
 
 from django.core.files.base import ContentFile
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 from model_mommy import mommy
 
@@ -200,7 +200,7 @@ class ImportStoreTest(BaseTestCase):
             self.assertEqual(item.name, 'Item {0}'.format(index))
             self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
             self.assertEqual(item.reference, 'Reference {0}'.format(index))
-            self.assertEqual(item.category.name, ugettext('Uncategorized'))
+            self.assertEqual(item.category.name, gettext('Uncategorized'))
             self.assertEqual(item.purchase_price, None)
             self.assertEqual(item.pre_tax_price, Decimal('{0}.50'.format(index)))
             self.assertEqual(item.vat_rate.rate, Decimal('1{0}.00'.format(index)))
@@ -230,7 +230,7 @@ class ImportStoreTest(BaseTestCase):
             self.assertEqual(item.brand.name, 'Brand {0}'.format(index))
             self.assertEqual(item.reference, 'Reference {0}'.format(index))
             if index == 1:
-                self.assertEqual(item.category.name, ugettext('Uncategorized'))
+                self.assertEqual(item.category.name, gettext('Uncategorized'))
             else:
                 self.assertEqual(item.category.name, 'Category {0}'.format(index))
             self.assertEqual(item.purchase_price, None)

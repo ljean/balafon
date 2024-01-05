@@ -7,7 +7,7 @@ from django.core import management
 from django.urls import reverse
 
 from coop_cms.tests import BeautifulSoup
-from coop_cms.moves import StringIO
+from io import StringIO
 from model_mommy import mommy
 
 from balafon.unit_tests import response_as_json

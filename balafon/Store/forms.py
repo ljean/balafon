@@ -5,9 +5,9 @@ from datetime import date, timedelta
 from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.utils import RequestManager, RequestNotFound
 
@@ -70,9 +70,9 @@ class PricePolicyAdminForm(forms.ModelForm):
             try:
                 Decimal(parameters)
             except InvalidOperation:
-                text = ugettext('{0} is not a valid decimal'.format(parameters))
+                text = gettext('{0} is not a valid decimal'.format(parameters))
                 if ',' in parameters:
-                    text += ' ' + ugettext('Did you use coma rather than dot as decimal separator?')
+                    text += ' ' + gettext('Did you use coma rather than dot as decimal separator?')
                 raise forms.ValidationError(text)
         return parameters
 
@@ -87,12 +87,12 @@ class StoreItemCategoryAdminForm(forms.ModelForm):
     def clean_parent(self):
         parent = self.cleaned_data['parent']
         if self.instance and parent == self.instance:
-            raise forms.ValidationError(ugettext('A category can not be its own parent'))
+            raise forms.ValidationError(gettext('A category can not be its own parent'))
 
         if self.instance:
             if parent in self.instance.get_sub_categories():
                 raise forms.ValidationError(
-                    ugettext('A category can not be parent and children of another category')
+                    gettext('A category can not be parent and children of another category')
                 )
 
         return parent
@@ -127,7 +127,7 @@ class AddExtraSaleForm(BetterBsForm):
         try:
             return SaleAnalysisCode.objects.get(id=analysis_code_id, action_type__in=self.valid_action_types)
         except SaleAnalysisCode.DoesNotExist:
-            forms.ValidationError(ugettext('Invalid analysis code'))
+            forms.ValidationError(gettext('Invalid analysis code'))
 
     def clean_vat_rate(self):
         """validate the analysis code"""
@@ -135,7 +135,7 @@ class AddExtraSaleForm(BetterBsForm):
         try:
             return VatRate.objects.get(id=vat_rate_id)
         except VatRate.DoesNotExist:
-            forms.ValidationError(ugettext('Invalid analysis code'))
+            forms.ValidationError(gettext('Invalid analysis code'))
 
 
 class StockImportForm(BetterBsForm):

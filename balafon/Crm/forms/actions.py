@@ -7,9 +7,9 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.forms.base import InlineHtmlEditableModelForm
 
@@ -75,11 +75,11 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
             self.fields['type'].widget = forms.HiddenInput()
             self.fields['type'].initial = action_type
             if instance:
-                self.title = ugettext(u"Edition {0}").format(action_type.name)
+                self.title = gettext(u"Edition {0}").format(action_type.name)
             else:
-                self.title = ugettext(u"Creation {0}").format(action_type.name)
+                self.title = gettext(u"Creation {0}").format(action_type.name)
         else:
-            self.title = ugettext(u"Edit action") if instance else ugettext(u"Create action")
+            self.title = gettext(u"Edit action") if instance else gettext(u"Create action")
 
         is_auto_generated = (action_type and action_type.number_auto_generated) or \
                             (instance and instance.type and instance.type.number_auto_generated)
@@ -153,10 +153,10 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         if type_of:
             allowed_status = ([] if type_of.default_status else [None]) + list(type_of.allowed_status.all())
             if len(allowed_status) > 0 and status not in allowed_status:
-                raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+                raise ValidationError(gettext(u"This status can't not be used for this action type"))
         else:
             if status:
-                raise ValidationError(ugettext(u"Please select a type before defining the status"))
+                raise ValidationError(gettext(u"Please select a type before defining the status"))
         return status
 
     def clean_status2(self):
@@ -166,10 +166,10 @@ class ActionForm(FormWithFieldsetMixin, BetterBsModelForm):
         if type_of:
             allowed_status = ([] if type_of.default_status2 else [None]) + list(type_of.allowed_status2.all())
             if len(allowed_status) > 0 and status not in allowed_status:
-                raise ValidationError(ugettext(u"This status can't not be used for this action type"))
+                raise ValidationError(gettext(u"This status can't not be used for this action type"))
         else:
             if status:
-                raise ValidationError(ugettext(u"Please select a type before defining the status"))
+                raise ValidationError(gettext(u"Please select a type before defining the status"))
         return status
 
     def clean_planned_date(self):
@@ -317,7 +317,7 @@ class SelectOpportunityForm(forms.Form):
             opportunity_id = int(self.cleaned_data["opportunity"])
             return models.Opportunity.objects.get(id=opportunity_id)
         except (ValueError, models.Opportunity.DoesNotExist):
-            raise ValidationError(ugettext(u"The opportunity does'nt exist"))
+            raise ValidationError(gettext(u"The opportunity does'nt exist"))
 
 
 class CloneActionForm(forms.Form):
@@ -390,7 +390,7 @@ class UpdateActionStatusForm(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status else [None]) + list(action_type.allowed_status.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext("This status can't not be used for this action type"))
+            raise ValidationError(gettext("This status can't not be used for this action type"))
         return status
 
     def clean_status2(self):
@@ -399,7 +399,7 @@ class UpdateActionStatusForm(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext("This status can't not be used for this action type"))
+            raise ValidationError(gettext("This status can't not be used for this action type"))
         return status
 
 
@@ -429,7 +429,7 @@ class UpdateActionStatus2Form(BsPopupModelForm):
         action_type = self.instance.type
         allowed_status = ([] if action_type.default_status2 else [None]) + list(action_type.allowed_status2.all())
         if len(allowed_status) > 0 and status not in allowed_status:
-            raise ValidationError(ugettext("This status can't not be used for this action type"))
+            raise ValidationError(gettext("This status can't not be used for this action type"))
         return status
 
 

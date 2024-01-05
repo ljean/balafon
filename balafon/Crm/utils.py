@@ -7,7 +7,7 @@ import codecs
 from django.contrib.auth.models import User
 from django.db.models import Q
 
-from coop_cms.moves import StringIO
+from io import StringIO
 
 from balafon.Crm import models
 from balafon.Crm import settings as crm_settings

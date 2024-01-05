@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """urls"""
 
-from django.conf.urls import url, include
+from django.urls import re_path as url, include
 
 from rest_framework import routers
 
@@ -16,7 +16,7 @@ from balafon.Store.api.statistics import (
 )
 
 store_items_router = routers.DefaultRouter()
-store_items_router.register(r'store-items', StoreItemViewSet, base_name='store_store-items')
+store_items_router.register(r'store-items', StoreItemViewSet, basename='store_store-items')
 store_items_router.register(r'categories', StoreItemCategoryViewSet)
 store_items_router.register(r'tags', StoreItemTagViewSet)
 

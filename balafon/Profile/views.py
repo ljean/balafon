@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.loader import get_template, render_to_string
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from django_registration.backends.activation.views import RegistrationView, ActivationView
 
@@ -109,7 +109,16 @@ def post_message(request):
     )
 
 
-class AcceptNewsletterRegistrationView(RegistrationView):
+class BaseRegistrationView(RegistrationView):
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(**self.get_form_kwargs())
+
+
+
+class AcceptNewsletterRegistrationView(BaseRegistrationView):
     
     def get_form_class(self, request=None):
         return get_registration_form()

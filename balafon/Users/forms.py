@@ -3,10 +3,10 @@
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.utils import is_allowed_homepage
 from balafon.Users.models import UserPreferences, UserPermissions

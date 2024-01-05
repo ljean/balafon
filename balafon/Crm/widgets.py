@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 
 class CityAutoComplete(forms.HiddenInput):

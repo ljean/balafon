@@ -2,7 +2,7 @@
 """urls"""
 # pylint: disable=C0330
 
-from django.conf.urls import url
+from django.urls import re_path as url
 
 from balafon.Crm.views import planning as planning_views, documents as document_views
 from balafon.Crm.views import (

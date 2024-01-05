@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls import url
+from django.urls import re_path as url
 from django.contrib import admin
 
 from coop_cms.settings import get_url_patterns
@@ -8,7 +8,7 @@ from coop_cms.settings import get_url_patterns
 from balafon.urls import urlpatterns as balafon_urlpatterns
 
 
-admin.autodiscover()
+# admin.autodiscover()
 
 localized_patterns = get_url_patterns()
 

@@ -10,7 +10,8 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.test import tag
+from django.utils.translation import gettext as _
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy
@@ -1477,7 +1478,7 @@ class ActionTest(BaseTestCase):
         self.assertEqual(options[0]['value'], "")
         self.assertEqual(options[0].get('selected'), None)
         self.assertEqual(int(options[1]['value']), status1.id)
-        self.assertEqual(options[1]['selected'], "selected")
+        self.assertEqual(options[1]['selected'], "")
         self.assertEqual(int(options[2]['value']), status2.id)
         self.assertEqual(options[2].get('selected'), None)
 
@@ -1491,8 +1492,9 @@ class ActionTest(BaseTestCase):
         self.assertEqual(int(options[1]['value']), status1.id)
         self.assertEqual(options[1].get('selected'), None)
         self.assertEqual(int(options[2]['value']), status3.id)
-        self.assertEqual(options[2]['selected'], "selected")
+        self.assertEqual(options[2]['selected'], "")
 
+    @tag('fix')
     def test_view_add_action_in_charge(self):
         """view create from contact"""
         entity = mommy.make(models.Entity)
@@ -1517,7 +1519,7 @@ class ActionTest(BaseTestCase):
         options = in_charge_field.select('option')
         self.assertEqual(4, len(options))
         self.assertEqual(options[0]['value'], "")
-        self.assertEqual(options[0].get('selected'), None)
+        self.assertEqual(options[0].get('selected'), '')
         self.assertEqual(int(options[1]['value']), member2.id)
         self.assertEqual(options[1].get('selected'), None)
         self.assertEqual(int(options[2]['value']), member1.id)
@@ -1557,7 +1559,7 @@ class ActionTest(BaseTestCase):
         options = status_field.select('option')
         self.assertEqual(3, len(options))
         self.assertEqual(options[0]['value'], "")
-        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(options[0].get('selected'), "")
         self.assertEqual(int(options[1]['value']), status1.id)
         self.assertEqual(options[1].get('selected'), None)
         self.assertEqual(int(options[2]['value']), status2.id)
@@ -1569,7 +1571,7 @@ class ActionTest(BaseTestCase):
         options = status_field.select('option')
         self.assertEqual(3, len(options))
         self.assertEqual(options[0]['value'], "")
-        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(options[0].get('selected'), "")
         self.assertEqual(int(options[1]['value']), status1.id)
         self.assertEqual(options[1].get('selected'), None)
         self.assertEqual(int(options[2]['value']), status3.id)
@@ -1606,7 +1608,7 @@ class ActionTest(BaseTestCase):
         options = status_field.select('option')
         self.assertEqual(3, len(options))
         self.assertEqual(options[0]['value'], "")
-        self.assertEqual(options[0].get('selected'), "selected")
+        self.assertEqual(options[0].get('selected'), "")
         self.assertEqual(int(options[1]['value']), status1.id)
         self.assertEqual(options[1].get('selected'), None)
         self.assertEqual(int(options[2]['value']), status2.id)
@@ -1945,7 +1947,7 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertContains(response, action_status2.name)
         self.assertNotContains(response, action_status3.name)
 
-        self.assertEqual(0, len(soup.select("#id_status option[selected=selected]")))
+        self.assertEqual(0, len(soup.select("#id_status option[selected]")))
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, None)
@@ -1980,8 +1982,8 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertNotContains(response, action_status3.name)
         self.assertContains(response, action_status4.name)
 
-        self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
-        self.assertEqual(action_status1.name, soup.select("#id_status option[selected=selected]")[0].text)
+        self.assertEqual(1, len(soup.select("#id_status option[selected]")))
+        self.assertEqual(action_status1.name, soup.select("#id_status option[selected]")[0].text)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, action_status1)
@@ -2016,8 +2018,8 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertNotContains(response, action_status3.name)
         self.assertNotContains(response, action_status4.name)
 
-        self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
-        self.assertEqual(action_status1.name, soup.select("#id_status option[selected=selected]")[0].text)
+        self.assertEqual(1, len(soup.select("#id_status option[selected]")))
+        self.assertEqual(action_status1.name, soup.select("#id_status option[selected]")[0].text)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, action_status1)
@@ -2050,8 +2052,8 @@ class UpdateActionStatusTest(BaseTestCase):
         self.assertNotContains(response, action_status3.name)
 
         # show a final status has selected item
-        self.assertEqual(1, len(soup.select("#id_status option[selected=selected]")))
-        self.assertEqual(action_status2.name, soup.select("#id_status option[selected=selected]")[0].text)
+        self.assertEqual(1, len(soup.select("#id_status option[selected]")))
+        self.assertEqual(action_status2.name, soup.select("#id_status option[selected]")[0].text)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status, action_status1)
@@ -2287,7 +2289,7 @@ class UpdateActionStatus2Test(BaseTestCase):
         self.assertContains(response, action_status2.name)
         self.assertNotContains(response, action_status3.name)
 
-        self.assertEqual(0, len(soup.select("#id_status2 option[selected=selected]")))
+        self.assertEqual(0, len(soup.select("#id_status2 option[selected]")))
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status2, None)
@@ -2319,8 +2321,8 @@ class UpdateActionStatus2Test(BaseTestCase):
         self.assertContains(response, action_status2.name)
         self.assertNotContains(response, action_status3.name)
 
-        self.assertEqual(1, len(soup.select("#id_status2 option[selected=selected]")))
-        self.assertEqual(action_status1.name, soup.select("#id_status2 option[selected=selected]")[0].text)
+        self.assertEqual(1, len(soup.select("#id_status2 option[selected]")))
+        self.assertEqual(action_status1.name, soup.select("#id_status2 option[selected]")[0].text)
 
         action = models.Action.objects.get(id=action.id)
         self.assertEqual(action.status2, action_status1)

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from model_mommy import mommy
 from rest_framework import status

@@ -5,7 +5,7 @@ import re
 
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 from rest_framework import serializers
 
@@ -97,7 +97,7 @@ class NewContactSerializer(serializers.ModelSerializer):
         try:
             return Zone.objects.get(id=country_id, parent__isnull=True)
         except Zone.DoesNotExist:
-            raise serializers.ValidationError(ugettext('Invalid country'))
+            raise serializers.ValidationError(gettext('Invalid country'))
 
     def validate_zip_code(self, zip_code):
         return zip_code.strip()
@@ -106,7 +106,7 @@ class NewContactSerializer(serializers.ModelSerializer):
         words = re.split(r'\W+', city_name)
         city_name = '-'.join([word.capitalize() for word in words if word])
         if not city_name:
-            raise serializers.ValidationError(ugettext('The city name is required'))
+            raise serializers.ValidationError(gettext('The city name is required'))
         return city_name
 
     def get_city(self, validated_data):
@@ -118,11 +118,11 @@ class NewContactSerializer(serializers.ModelSerializer):
             city = City.objects.get_or_create(name=city_name, parent=country)[0]
         else:
             if len(zip_code) < 2:
-                raise serializers.ValidationError(ugettext('You must enter a zip code'))
+                raise serializers.ValidationError(gettext('You must enter a zip code'))
             try:
                 dep = Zone.objects.get(Q(code=zip_code[:2]) | Q(code=zip_code[:3]))
             except Zone.DoesNotExist:
-                raise serializers.ValidationError(ugettext('Invalid zip code'))
+                raise serializers.ValidationError(gettext('Invalid zip code'))
             city = City.objects.get_or_create(name=city_name, parent=dep)[0]
         return city
 

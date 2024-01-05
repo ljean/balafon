@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from balafon.permissions import can_access
 from balafon.utils import logger, is_allowed_homepage

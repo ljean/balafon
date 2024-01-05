@@ -3,9 +3,9 @@
 
 from django.contrib import admin
 from django.contrib.messages import success, error
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models

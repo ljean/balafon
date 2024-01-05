@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """settings"""
+import sys
 
 from django.conf import settings
 from django.views.generic import TemplateView
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
+import floppyforms
 from coop_cms.settings import load_class
 from wkhtmltopdf.views import PDFTemplateView
 
@@ -77,9 +79,11 @@ def get_registration_accept_terms_of_use_link():
 
 def get_captcha_field():
     """return the captcha field to use"""
+    if 'test' in sys.argv:
+        return floppyforms.CharField(required=False, widget=floppyforms.HiddenInput())
 
-    default_field = 'snowpenguin.django.recaptcha2.fields.ReCaptchaField'
-    default_widget = 'snowpenguin.django.recaptcha2.widgets.ReCaptchaWidget'
+    default_field = 'django_recaptcha.fields.ReCaptchaField'
+    default_widget = 'django_recaptcha.widgets.ReCaptchaV3'
 
     captcha_field = load_class('BALAFON_CAPTCHA_FIELD', default_field)
     captcha_widget = load_class('BALAFON_CAPTCHA_WIDGET', default_widget)

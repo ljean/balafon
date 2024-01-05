@@ -2,7 +2,7 @@
 """coop_bar configuration: add links to balafon"""
 
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from coop_bar.utils import make_link
 

@@ -2,6 +2,7 @@
 """unit testing"""
 
 from django.contrib.auth.models import User
+from django.test import tag
 from django.urls import reverse
 
 from coop_cms.settings import is_perm_middleware_installed
@@ -139,11 +140,12 @@ class ActionDocumentTestCase(BaseTestCase):
         """helper to check that anonymous user can not access"""
         if is_perm_middleware_installed():
             self.assertEqual(302, response.status_code)
-            auth_url = reverse("auth_login")
+            auth_url = reverse("login")
             self.assertRedirects(response, auth_url+'?next='+url)
         else:
             self.assertEqual(403, response.status_code)
 
+    @tag('fix')
     def test_anonymous_document_view(self):
         """view action document as anonymous user"""
 

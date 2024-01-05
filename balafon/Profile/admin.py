@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 from . import models
 from .utils import create_profile_contact
@@ -16,9 +16,9 @@ def finalize_user_profile(modeladmin, request, queryset):
     for profile in queryset:
         if profile.contact is None:
             create_profile_contact(profile.user)
-            messages.success(request, ugettext('{0}: Contact created').format(profile.user))
+            messages.success(request, gettext('{0}: Contact created').format(profile.user))
         else:
-            messages.warning(request, ugettext('{0}: Contact already existing').format(profile.user))
+            messages.warning(request, gettext('{0}: Contact already existing').format(profile.user))
 
 
 finalize_user_profile.short_description = _('Create contact')

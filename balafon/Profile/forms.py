@@ -3,9 +3,9 @@
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm.models import Contact, EntityType
 from balafon.Crm.forms import ModelFormWithCity, BillingModelFormWithCity
@@ -49,8 +49,8 @@ class ProfileForm(BillingModelFormWithCity, SubscriptionTypeFormMixin):
                     (Contact.GENDER_NOT_SET, ''),
                 ]
             choices += [
-                (Contact.GENDER_MALE, ugettext('Mr')),
-                (Contact.GENDER_FEMALE, ugettext('Mrs')),
+                (Contact.GENDER_MALE, gettext('Mr')),
+                (Contact.GENDER_FEMALE, gettext('Mrs')),
             ]
             self.fields['gender'].choices = choices
 
@@ -61,7 +61,7 @@ class EmailField(forms.EmailField):
         super(EmailField, self).clean(value)
         if User.objects.filter(email__iexact=value).count() > 0:
             raise forms.ValidationError(
-                ugettext("This email is already registered. Use the 'forgot password' link on the login page")
+                gettext("This email is already registered. Use the 'forgot password' link on the login page")
             )
         return value
 
@@ -106,12 +106,12 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
             # do not display Mrs and Mr
             self.fields['gender'].choices = [
                 (Contact.GENDER_NOT_SET, ''),
-                (Contact.GENDER_MALE, ugettext('Mr')),
-                (Contact.GENDER_FEMALE, ugettext('Mrs')),
+                (Contact.GENDER_MALE, gettext('Mr')),
+                (Contact.GENDER_FEMALE, gettext('Mrs')),
             ]
 
         if 'entity_type' in self.fields:
-            self.fields['entity_type'].choices = [(0, ugettext('Individual'))] + [
+            self.fields['entity_type'].choices = [(0, gettext('Individual'))] + [
                 (et.id, et.name) for et in EntityType.objects.filter(subscribe_form=True)
             ]
         if not has_entity_on_registration_form():
@@ -122,7 +122,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         termsofuse_url = get_registration_accept_terms_of_use_link()
         if 'accept_termofuse' in self.fields and termsofuse_url:
             self.fields['accept_termofuse'].label = mark_safe(
-                ugettext('Accept <a href="{0}">terms of use</a>').format(
+                gettext('Accept <a href="{0}">terms of use</a>').format(
                     termsofuse_url
                 )
             )
@@ -146,13 +146,13 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         try:
             entity_type_id = int(self.cleaned_data['entity_type'] or 0)
         except ValueError:
-            raise ValidationError(ugettext('Invalid entity type'))
+            raise ValidationError(gettext('Invalid entity type'))
        
         if entity_type_id:
             try:
                 return EntityType.objects.get(id=entity_type_id)
             except EntityType.DoesNotExist:
-                raise ValidationError(ugettext('Unknown entity type'))
+                raise ValidationError(gettext('Unknown entity type'))
         
         return None
 
@@ -160,7 +160,7 @@ class UserRegistrationForm(ModelFormWithCity, SubscriptionTypeFormMixin):
         password1 = self.cleaned_data.get('password1', "")
         password2 = self.cleaned_data.get('password2', "")
         if password1 and (password1 != password2):
-            raise forms.ValidationError(ugettext('Passwords are not the same'))
+            raise forms.ValidationError(gettext('Passwords are not the same'))
         return super(UserRegistrationForm, self).clean(*args, **kwargs)
 
     @staticmethod
@@ -211,5 +211,5 @@ class MessageForm(forms.Form):
     def clean_message(self):
         message = self.cleaned_data['message']
         if len(message) > 10000:
-            raise forms.ValidationError(ugettext('Message is too long'))
+            raise forms.ValidationError(gettext('Message is too long'))
         return message

@@ -2,9 +2,9 @@
 """Crm forms"""
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.bs_forms import ModelForm as BsModelForm, Form as BsForm
 from coop_cms.utils.requests import RequestManager
@@ -29,10 +29,10 @@ class AddEntityToGroupForm(BsForm):
         name = self.cleaned_data['group_name']
         request = RequestManager().get_request()
         if not can_create_group(request.user) and models.Group.objects.filter(name=name).count() == 0:
-            raise ValidationError(ugettext("You are not allowed to create new groups"))
+            raise ValidationError(gettext("You are not allowed to create new groups"))
 
         if models.Group.objects.filter(name=name, entities__id=self.entity.id).count() > 0:
-            raise ValidationError(ugettext("The entity already belong to group {0}").format(name))
+            raise ValidationError(gettext("The entity already belong to group {0}").format(name))
         return name
 
 
@@ -52,9 +52,9 @@ class AddContactToGroupForm(BsForm):
         name = self.cleaned_data['group_name']
         request = RequestManager().get_request()
         if not can_create_group(request.user) and models.Group.objects.filter(name=name).count() == 0:
-            raise ValidationError(ugettext("You are not allowed to create new groups"))
+            raise ValidationError(gettext("You are not allowed to create new groups"))
         if models.Group.objects.filter(name=name, contacts__id=self.contact.id).count() > 0:
-            raise ValidationError(ugettext("The contact already belong to group {0}").format(name))
+            raise ValidationError(gettext("The contact already belong to group {0}").format(name))
         return name
 
 
@@ -85,7 +85,7 @@ class EditGroupForm(BsModelForm):
         name = self.cleaned_data['name']
         if self.instance and not self.instance.id:
             if models.Group.objects.filter(name=name).exclude(id=self.instance.id).count() > 0:
-                raise ValidationError(ugettext("A group with this name already exists"))
+                raise ValidationError(gettext("A group with this name already exists"))
         return name
 
     def _clean_list(self, the_list):

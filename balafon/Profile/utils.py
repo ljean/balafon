@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import get_template
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from balafon.utils import logger, now_rounded
 from balafon.Crm import settings as crm_settings

@@ -4,7 +4,7 @@
 import sys
 
 from django.conf import settings as project_settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 ENTITY_LOGO_DIR = getattr(project_settings, 'ENTITY_LOGO_DIR', 'entities/logos')

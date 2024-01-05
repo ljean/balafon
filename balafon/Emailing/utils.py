@@ -13,7 +13,7 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import translation
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language as django_get_language, ugettext as _
+from django.utils.translation import get_language as django_get_language, gettext as _
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks

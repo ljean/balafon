@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm import models
 from balafon.Crm.forms.base import BetterBsForm

@@ -10,7 +10,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.template import Template, Context
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from colorbox.decorators import popup_redirect, popup_reload, popup_close
 from coop_cms.utils import paginate

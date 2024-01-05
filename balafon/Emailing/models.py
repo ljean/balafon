@@ -13,7 +13,7 @@ from django.db.models import signals
 from django.urls import reverse
 from django.utils.dateformat import DateFormat
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from coop_cms.models import Newsletter
 from django_extensions.db.models import TimeStampedModel
@@ -43,7 +43,7 @@ class Emailing(TimeStampedModel):
         verbose_name_plural = _('Emailings')
 
     subscription_type = models.ForeignKey(SubscriptionType, on_delete=models.CASCADE)
-    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(Newsletter, on_delete=models.CASCADE, related_name='emailing_set')
     send_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_to_be_received")
     sent_to = models.ManyToManyField(Contact, blank=True, related_name="emailing_received")
     opened_emails = models.ManyToManyField(Contact, blank=True, related_name="emailing_opened")
@@ -95,7 +95,7 @@ class Emailing(TimeStampedModel):
             action = '''
                 <a class="colorbox-form dropdown-link" href="{1}"><i class="fa fa-{2}"></i> {0}</a>
                 '''.format(
-                    ugettext('Send'),
+                    gettext('Send'),
                     reverse("emailing_confirm_send_mail", args=[self.id]),
                     'paper-plane'
                 )
@@ -103,7 +103,7 @@ class Emailing(TimeStampedModel):
             action = '''
                 <a class="colorbox-form dropdown-link" href="{1}"><i class="fas fa-{2}"></i> {0}</a>
                 '''.format(
-                    ugettext('Cancel'),
+                    gettext('Cancel'),
                     reverse("emailing_cancel_send_mail", args=[self.id]),
                     'chevron-left'
                 )
@@ -158,7 +158,7 @@ class MagicLink(models.Model):
 def force_message_in_favorites(sender, instance, signal, created, **kwargs):
     """force an action to be in user favorites"""
     action = instance
-    if created and action.type and action.type.name == ugettext("Message"):
+    if created and action.type and action.type.name == gettext("Message"):
         for user_pref in UserPreferences.objects.filter(message_in_favorites=True):
             content_type = ContentType.objects.get_for_model(action.__class__)
             Favorite.objects.get_or_create(

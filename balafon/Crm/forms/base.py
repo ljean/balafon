@@ -2,10 +2,10 @@
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.forms.forms import BoundField
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.forms.boundfield import BoundField
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.bs_forms import BootstrapableMixin
 
@@ -195,7 +195,7 @@ class _CityBasedForm(object):
                     city = models.City.objects.get_or_create(name=city, parent=country)[0]
                 else:
                     if len(zip_code) < 2:
-                        raise ValidationError(ugettext('You must enter a valid zip code for selecting a new city'))
+                        raise ValidationError(gettext('You must enter a valid zip code for selecting a new city'))
                     dep = models.Zone.objects.get(
                         Q(code=zip_code[:2]) | Q(code=zip_code[:3])
                     )

@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from coop_cms.tests import BeautifulSoup
 from model_mommy import mommy

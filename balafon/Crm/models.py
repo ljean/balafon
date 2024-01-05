@@ -18,8 +18,8 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.html import mark_safe
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 
 from coop_cms.utils import RequestManager, RequestNotFound, dehtml
 from django_extensions.db.models import TimeStampedModel
@@ -942,7 +942,7 @@ class Contact(AddressModel):
             if self.email:
                 return self.email.strip()
             else:
-                return "< {0} >".format(ugettext("Unknown")).strip()
+                return "< {0} >".format(gettext("Unknown")).strip()
         
         if self.gender and self.lastname:
             title = '{0} '.format(self.get_gender_text())
@@ -964,7 +964,7 @@ class Contact(AddressModel):
             if email:
                 return email
             else:
-                return "< {0} >".format(ugettext("Unknown")).strip()
+                return "< {0} >".format(gettext("Unknown")).strip()
 
         return "{0} {1}".format(lastname, firstname).strip()
 
@@ -1001,13 +1001,13 @@ class Contact(AddressModel):
     def gender_dear(self):
         """return male/female version of Dear"""
         if self.gender == Contact.GENDER_MALE:
-            return ugettext('Dear (male)')
+            return gettext('Dear (male)')
 
         elif self.gender == Contact.GENDER_FEMALE:
-            return ugettext('Dear (female)')
+            return gettext('Dear (female)')
 
         elif self.gender == Contact.GENDER_COUPLE:
-            return ugettext('Dears (couple)')
+            return gettext('Dears (couple)')
 
         return ''
 
@@ -1086,7 +1086,7 @@ pre_delete.connect(on_update_same_as, sender=Contact)
 class SubscriptionType(models.Model):
     """Subscription type: a mailing list for example"""
     name = models.CharField(max_length=100, verbose_name=_("name"))
-    site = models.ForeignKey(Site, blank=True, null=True, on_delete=models.CASCADE)
+    site = models.ForeignKey(Site, blank=True, null=True, on_delete=models.CASCADE, related_name='+')
     order_index = models.IntegerField(default=0, verbose_name=_("order index"))
     allowed_on_sites = models.ManyToManyField(Site, blank=True, related_name='+')
 
@@ -1400,7 +1400,7 @@ class ActionType(NamedElement):
                 ActionMenu.create_action_menu(
                     action_type=self,
                     view_name='crm_clone_action',
-                    label=ugettext('Duplicate'),
+                    label=gettext('Duplicate'),
                     icon='duplicate',
                     a_attrs='',
                     css_class="colorbox-form",

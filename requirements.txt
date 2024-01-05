@@ -1,8 +1,8 @@
-django >= 2.2.26, <3.0
-djangorestframework >= 3.10.3, <3.11.0
+django >= 4.2.8, <5.0
+djangorestframework >= 3.14.0
 django-extensions
-apidev_django-floppyforms >= 1.8.3
-apidev-coop_cms >= 1.5.12
+apidev_django-floppyforms >= 1.9.0
+apidev-coop_cms >= 1.6.4
 django-wkhtmltopdf
 xlwt
 xlrd
