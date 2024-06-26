@@ -796,7 +796,7 @@ class ContactAcceptSubscriptionSearchForm(SearchFieldForm):
         refuse_queryset = queryset.filter(
             subscription__subscription_type__id=self.value,
             subscription__accept_subscription=False
-        )
+        ).exclude(email='')
         queryset = queryset.filter(
             subscription__subscription_type__id=self.value,
             subscription__accept_subscription=True

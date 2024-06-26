@@ -358,6 +358,24 @@ class SubscriptionTypeAdmin(admin.ModelAdmin):
     list_editable = ['order_index']
 
 
+@admin.register(models.Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    """custom admin view"""
+    list_display = [
+        'subscription_type', 'contact', 'email', 'contact_email', 'accept_subscription', 'subscription_date',
+        'unsubscription_date'
+    ]
+    list_filter = ['subscription_type']
+    raw_id_fields = ['contact']
+    search_fields = ['contact__email', 'contact__entity__email']
+
+    def email(self, instance):
+        return instance.contact.email or instance.contact.entity.email
+
+    def contact_email(self, instance):
+        return instance.contact.entity.email
+
+
 @admin.register(models.TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     """custom admin view"""
