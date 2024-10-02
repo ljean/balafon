@@ -160,6 +160,13 @@
           {% endfor %}
           </optgroup>
           {% endif %}
+          {% if action_status2 %}
+          <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'Action status' %}2">
+          {% for status in action_status2 %}
+              <option value="x{{status.id}}" {% if status.selected %}selected="selected"{% endif %}>{{status.name}}</option>
+          {% endfor %}
+          </optgroup>
+          {% endif %}
           <optgroup label="&nbsp;&nbsp;&nbsp;{% trans 'In charge' %}">
           {% for team_member in in_charge %}
               <option value="u{{team_member.id}}" {% if team_member.selected %}selected="selected"{% endif %}>

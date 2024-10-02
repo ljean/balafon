@@ -109,6 +109,15 @@ class ActionArchiveView(object):
                 if selected_status:
                     queryset = queryset.filter(status__in=selected_status)
 
+            selected_status2 = values_dict.get("x", [])
+            if selected_status2:
+                # only some status2
+                action_types = models.ActionType.objects.filter(id__in=selected_types)
+                allowed_status2 = [status.id for status in self._get_allowed_status(action_types, selected_types, 2)]
+                selected_status2 = [status for status in selected_status2 if status in allowed_status2]
+                if selected_status2:
+                    queryset = queryset.filter(status2__in=selected_status2)
+
             selected_users = values_dict.get("u", [])
             if selected_users:
                 queryset = queryset.filter(in_charge__in=selected_users)
@@ -123,13 +132,14 @@ class ActionArchiveView(object):
 
         return queryset
 
-    def _get_allowed_status(self, action_types, selected_types):
+    def _get_allowed_status(self, action_types, selected_types, kind=1):
         """list of allowed status"""
         action_status = []
         for action_type in action_types:
             if action_type.id in selected_types:
                 setattr(action_type, 'selected', True)
-                action_status.extend(action_type.allowed_status.all())
+                queryset = action_type.allowed_status2.all() if kind == 2 else action_type.allowed_status.all()
+                action_status.extend(queryset)
         # unique action status sorted by name
         return sorted(set(action_status), key=lambda status: status.name)
 
@@ -138,6 +148,7 @@ class ActionArchiveView(object):
         context = super(ActionArchiveView, self).get_context_data(*args, **kwargs)
         action_types = models.ActionType.objects.all().order_by('order_index', 'name')
         action_status = []
+        action_status2 = []
         in_charge = get_in_charge_users()
         values = self.request.GET.get("filter", None)
         ordering = self.get_ordering()[0][0]
@@ -152,6 +163,7 @@ class ActionArchiveView(object):
 
             # list of unique action status sorted by name
             action_status = self._get_allowed_status(action_types, selected_types)
+            action_status2 = self._get_allowed_status(action_types, selected_types, 2)
 
             if 0 in selected_types:
                 context["no_type_selected"] = True
@@ -164,6 +176,11 @@ class ActionArchiveView(object):
             selected_status = values_dict.get("s", [])
             for status in action_status:
                 if status.id in selected_status:
+                    setattr(status, 'selected', True)
+
+            selected_status2 = values_dict.get("x", [])
+            for status in action_status2:
+                if status.id in selected_status2:
                     setattr(status, 'selected', True)
 
             list_ordering = values_dict.get("o", [])
@@ -180,6 +197,7 @@ class ActionArchiveView(object):
         context["action_types"] = action_types
         context["in_charge"] = in_charge
         context["action_status"] = action_status
+        context["action_status2"] = action_status2
         context["planning_type"] = self.planning_type
         context["order_value"] = "o{0}".format(ordering)
         context["order_values"] = [("o{0}".format(index), label) for (index, label, lookup) in self.get_ordering()]
