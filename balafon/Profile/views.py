@@ -81,7 +81,9 @@ def post_message(request):
                 content = template_.render(data)
                 email = EmailMessage(
                     _("Message from web site"), content, from_email,
-                    [notification_email], headers={'Reply-To': profile.contact.email})
+                    [notification_email]
+                    # headers={'Reply-To': profile.contact.email}
+                )
                 try:
                     email.send()
                     messages.add_message(request, messages.SUCCESS, _("The message have been sent"))
