@@ -14,7 +14,7 @@ from django.db.models.signals import pre_delete, post_save
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse, NoReverseMatch
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 from sorl.thumbnail import default as sorl_thumbnail
 
@@ -357,7 +357,7 @@ class Voucher(models.Model):
         rate = str(self.rate or 0)
         if '.' in rate:
             rate = rate.rstrip('0').rstrip('.')
-        return ugettext('Voucher {0} : Discount {1}%').format(self.code, rate)
+        return gettext('Voucher {0} : Discount {1}%').format(self.code, rate)
 
 
 class Brand(models.Model):
@@ -511,7 +511,7 @@ class StoreItem(models.Model):
     def get_admin_link(self):
         try:
             return '<a href="{0}" target="_extra_admin">{1}</a>'.format(
-                reverse("admin:Store_storeitem_change", args=[self.id]), ugettext('Edit')
+                reverse("admin:Store_storeitem_change", args=[self.id]), gettext('Edit')
             )
         except NoReverseMatch:
             return ''
@@ -765,7 +765,7 @@ class StoreItemImport(models.Model):
 
     def _to_category(self, raw_value):
         """convert string to category"""
-        raw_value = raw_value or ugettext('Uncategorized')
+        raw_value = raw_value or gettext('Uncategorized')
         return StoreItemCategory.objects.get_or_create(name=raw_value)[0]
 
     def _to_vat(self, raw_value):

@@ -477,7 +477,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='subscription',
             name='subscription_type',
-            field=models.ForeignKey(to='Crm.SubscriptionType', on_delete=models.CASCADE),
+            field=models.ForeignKey(to='Crm.SubscriptionType', on_delete=models.CASCADE, related_name='+'),
         ),
         migrations.AddField(
             model_name='relationship',

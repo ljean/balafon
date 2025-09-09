@@ -13,7 +13,7 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils import translation
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language as django_get_language, ugettext as _
+from django.utils.translation import get_language as django_get_language, gettext as _
 
 from coop_cms.models import Newsletter
 from coop_cms.settings import get_newsletter_context_callbacks
@@ -241,8 +241,7 @@ def send_notification_email(request, contact, actions, message):
         
         email = EmailMessage(
             _("Message from web site"), content, from_email,
-            [notification_email]
-            # , headers={'Reply-To': contact.email}
+            [notification_email], headers={'Reply-To': contact.email}
         )
 
         success = True

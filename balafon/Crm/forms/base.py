@@ -2,10 +2,10 @@
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.forms.forms import BoundField
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.forms.boundfield import BoundField
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.bs_forms import BootstrapableMixin
 
@@ -165,6 +165,9 @@ class _CityBasedForm(object):
         else:
             return get_default_country()
 
+    def is_public(self):
+        return False
+
     def _clean_city_field(self, field_prefix):
         """city validation"""
         city = self.cleaned_data[field_prefix + 'city']
@@ -190,16 +193,21 @@ class _CityBasedForm(object):
 
                 country = self._get_country(country_id)
                 default_country = get_default_country()
-
                 if country != default_country:
-                    city = models.City.objects.get_or_create(name=city, parent=country)[0]
+                    city, is_new = models.City.objects.get_or_create(name=city, parent=country)
                 else:
                     if len(zip_code) < 2:
-                        raise ValidationError(ugettext('You must enter a valid zip code for selecting a new city'))
-                    dep = models.Zone.objects.get(
-                        Q(code=zip_code[:2]) | Q(code=zip_code[:3])
-                    )
-                    city = models.City.objects.get_or_create(name=city, parent=dep)[0]
+                        raise ValidationError(gettext('You must enter a valid zip code for selecting a new city'))
+                    try:
+                        dep = models.Zone.objects.get(
+                            Q(code=zip_code[:2]) | Q(code=zip_code[:3])
+                        )
+                    except models.Zone.DoesNotExist:
+                        raise ValidationError(gettext('You must enter a valid zip code for selecting a new city'))
+                    city, is_new = models.City.objects.get_or_create(name=city, parent=dep)
+                if is_new and self.is_public():
+                    city.is_autocomplete = False
+                    city.save()
                 return city
             except ValidationError:
                 raise

@@ -5,6 +5,7 @@ from datetime import datetime
 from unittest import skipIf
 
 from django.conf import settings
+from django.test import tag
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -28,6 +29,7 @@ class EmailingManagementTestCase(BaseTestCase):
         else:
             return datetime.now()
 
+    @tag('fix')
     def test_view_newsletters_list(self):
         """list of newsletters"""
         entity = mommy.make(models.Entity, name="my corp")

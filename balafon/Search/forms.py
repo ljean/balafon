@@ -12,12 +12,12 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.forms.utils import flatatt
 from django.template.loader import get_template
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.utils.html import escape
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 from coop_cms.bs_forms import Form as BsForm
 
 from balafon.fields import HidableModelMultipleChoiceField
@@ -72,20 +72,20 @@ class GroupedSelect(forms.Select):
         final_attrs = self.build_attrs(attrs)
         final_attrs.update(dict(name=name))
         output = [u'<select {0}>'.format(flatatt(final_attrs))]
-        str_value = smart_text(value)
+        str_value = smart_str(value)
         for group_label, group in self.choices: 
             if group_label:
                 # should belong to an optgroup
-                group_label = smart_text(group_label)
+                group_label = smart_str(group_label)
                 output.append(u'<optgroup label="%s">' % escape(group_label)) 
             for key, value in group:
                 # build option html
-                option_value = smart_text(key)
+                option_value = smart_str(key)
                 output.append(
                     u'<option value="{0}"{1}>{2}</option>'.format(
                         escape(option_value),
                         (option_value == str_value) and u' selected="selected"' or '',
-                        escape(smart_text(value))
+                        escape(smart_str(value))
                     )
                 )
             if group_label:
@@ -115,7 +115,7 @@ class GroupedChoiceField(forms.ChoiceField):
         value = super(GroupedChoiceField, self).clean(value)
         if value in (None, ''):
             value = u''
-        value = smart_text(value)
+        value = smart_str(value)
         if value == u'':
             return value
         valid_values = []
@@ -293,7 +293,8 @@ class SearchForm(forms.Form):
     
     def save_search(self):
         """save search"""
-        self._instance.searchgroup_set.all().delete()
+        if self._instance.id:
+            self._instance.searchgroup_set.all().delete()
         self._instance.name = self.cleaned_data['name']
         self._instance.save()
         keys = self._forms.keys()

@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response

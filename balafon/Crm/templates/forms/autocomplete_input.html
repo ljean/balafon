@@ -16,45 +16,47 @@ $(function() {
         }
     });
 	{% endif %}
-    //when someting is an entered, get the autocomplete list
+  // when something is an entered, get the autocomplete list
 	$("input[name={{name}}_visible]").autocomplete({
 		source: function(request, add){
 			{% block extra_filter_value %}{% endblock %}
 			$.ajax({
-                url: "{% block get_list_url %}{% endblock %}?term="+request.term{% block extra_filter %}{% endblock %},
-                success : function(data) {
-                    var items = [];
-                    $.each(data, function(i, val){
-                        name_to_id[val.name] = val.id; //store in local dict
-                        items.push(val.name);
-                    });
-                    add(items);
-                }
-            });
-        },
+				url: "{% block get_list_url %}{% endblock %}?term="+request.term{% block extra_filter %}{% endblock %},
+				success : function(data) {
+					var items = [];
+					$.each(data, function(i, val){
+						name_to_id[val.name] = val.id; //store in local dict
+						items.push(val.name);
+					});
+					add(items);
+				}
+			});
+		},
 		//when the item is selected : get the value
-        select: function(event, ui) {
-            var id = name_to_id[ui.item.value]; //get id from local dict
-            if (!id) {
-                id = ui.item.value;
-            }
-            $("input[name={{name}}]").val(id);
-			      $("input[name={{name}}_visible]").attr('value', ui.item.value);
-        }
-    });
-    $("input[name={{name}}_visible]").change(function() {
+		select: function(event, ui) {
+      var id = name_to_id[ui.item.value]; //get id from local dict
+			if (!id) {
+					id = ui.item.value;
+			}
+			$("input[name={{name}}]").val(id);
+			$("input[name={{name}}_visible]").attr('value', ui.item.value);
+		},
+    appendTo: '#parent_{{name}}',
+	});
+
+  $("input[name={{name}}_visible]").change(function() {
 		var value = $(this).val();
-        $.ajax({
+		$.ajax({
 			url: "{% block get_id_url %}{% endblock %}?name="+value,
 			success: function(data){
-		        if (data.id) {
-                    $('input[name={{name}}]').val(data.id);
-                } else {
-                    $('input[name={{name}}]').val(value);
-                }
-            	$("input[name={{name}}_visible]").attr('value', value);
+				if (data.id) {
+						$('input[name={{name}}]').val(data.id);
+				} else {
+						$('input[name={{name}}]').val(value);
+				}
+				$("input[name={{name}}_visible]").attr('value', value);
 			}
 		});
-    });
+  });
 });
 </script>

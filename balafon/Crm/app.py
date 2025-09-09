@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+app configuration
+"""
+
+from django.utils.translation import gettext_lazy as _
+
+from django.apps import AppConfig
+
+
+class BalafonAppConfig(AppConfig):
+    name = 'balafon.Crm'
+    verbose_name = _(u"Balafon CRM")
+    default_auto_field = 'django.db.models.BigAutoField'

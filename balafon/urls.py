@@ -3,7 +3,7 @@
 import sys
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, re_path as url
 from django.contrib.auth import views as django_auth_views
 from django.contrib.staticfiles.views import serve as serve_static
 from django.views.static import serve as serve_media

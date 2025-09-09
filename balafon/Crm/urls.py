@@ -2,7 +2,7 @@
 """urls"""
 # pylint: disable=C0330
 
-from django.conf.urls import url
+from django.urls import re_path as url
 
 from balafon.Crm.views import planning as planning_views, documents as document_views
 from balafon.Crm.views import (
@@ -149,6 +149,7 @@ urlpatterns = [
     # cities
     url(r'^city-name/(?P<city>.*)/$', cities.get_city_name, name='crm_get_city_name'),
     url(r'^cities/list/$', cities.get_cities, name='crm_get_cities'),
+    url(r'^public-cities/list/$', cities.get_public_cities, name='crm_get_public_cities'),
     url(r'^city-id/$', cities.get_city_id, name='crm_get_city_id'),
 
     # bookmarks

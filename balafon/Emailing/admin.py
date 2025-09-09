@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm import settings as crm_settings
 from balafon.Emailing import models

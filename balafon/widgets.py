@@ -2,10 +2,10 @@
 
 from django.contrib.admin.widgets import ManyToManyRawIdWidget
 from django.urls import reverse
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.utils.html import escape, mark_safe
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 
 class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
@@ -27,7 +27,7 @@ class VerboseManyToManyRawIdWidget(ManyToManyRawIdWidget):
             try:
                 obj = self.rel.related_model.objects.using(self.db).get(**{key: elt})
                 url = reverse('admin:{0}_{1}_change'.format(app_label, class_name), args=[obj.id])
-                label = escape(smart_text(obj))
+                label = escape(smart_str(obj))
                 link = '<a href="{0}" {1}>{2}</a>'.format(
                     url,
                     'onclick="return showAddAnotherPopup(this);" target="_blank"',

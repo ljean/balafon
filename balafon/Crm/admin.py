@@ -3,9 +3,9 @@
 
 from django.contrib import admin
 from django.contrib.messages import success, error
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Crm import models
@@ -244,11 +244,12 @@ class GroupInline(admin.TabularInline):
 @admin.register(models.City)
 class CityAdmin(admin.ModelAdmin):
     """custom admin view"""
-    list_display = ['name', 'parent']
+    list_display = ['name', 'parent', 'is_autocomplete']
     search_fields = ['name']
     ordering = ['name']
-    list_filter = [HasParentFilter, 'parent', ]
+    list_filter = ['is_autocomplete', HasParentFilter, 'parent', ]
     raw_id_fields = ('groups',)
+    list_editable = ['is_autocomplete']
 
 
 @admin.register(models.Entity)

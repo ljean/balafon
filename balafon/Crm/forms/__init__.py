@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Crm forms"""
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm.forms.actions import (
     ActionForm, ActionDocumentForm, ActionDoneForm, ActionTypeForm, CloneActionForm, SelectOpportunityForm,

@@ -51,7 +51,7 @@ def get_city_id(request):
     return HttpResponse(json.dumps({'id': city_id}), 'application/json')
 
 
-def get_cities(request):
+def get_cities(request, public=False):
     """view"""
     #subscribe form : no login required
     term = request.GET.get('term')
@@ -69,10 +69,20 @@ def get_cities(request):
         cities_queryset = models.City.objects.filter(name__icontains=term)[:10]
     else:
         if country_id == 0 or country_id == default_country.id:
-            cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')[:10]
+            cities_queryset = models.City.objects.filter(name__icontains=term).exclude(parent__code='')
+
         else:
-            cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)[:10]
+            cities_queryset = models.City.objects.filter(name__icontains=term, parent__id=country_id)
+
+    if public:
+        cities_queryset = cities_queryset.filter(is_autocomplete=True)
+
+    cities_queryset = cities_queryset[:10]
 
     cities = [{'id': city.id, 'name': city.name} for city in cities_queryset]
 
     return HttpResponse(json.dumps(cities), 'application/json')
+
+
+def get_public_cities(request):
+    return get_cities(request, public=True)

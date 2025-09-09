@@ -5,9 +5,9 @@ from datetime import date, timedelta
 
 from django.db.models import Q, Count
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm import models
 from balafon.Crm.settings import get_language_choices

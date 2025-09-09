@@ -3,7 +3,7 @@
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, PasswordChangeForm
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.bs_forms import BootstrapableMixin
 

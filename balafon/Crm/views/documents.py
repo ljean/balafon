@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template import TemplateDoesNotExist
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from coop_cms.generic_views import EditableObjectView
 from wkhtmltopdf.views import PDFTemplateView

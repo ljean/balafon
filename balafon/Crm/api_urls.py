@@ -2,7 +2,7 @@
 """urls"""
 # pylint: disable=C0330
 
-from django.conf.urls import url, include
+from django.urls import re_path as url, include
 
 from rest_framework import routers
 

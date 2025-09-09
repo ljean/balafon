@@ -5,7 +5,7 @@ from django import forms
 from django.db.models import CharField
 from django.contrib import admin
 from django.contrib.messages import success, error
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 from balafon.widgets import VerboseManyToManyRawIdWidget
 from balafon.Store import models
@@ -123,9 +123,9 @@ class StockThresholdFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
-            (StockThresholdFilter.THRESHOLD_ALERT, ugettext("Threshold alert")),
-            (StockThresholdFilter.THRESHOLD_OK, ugettext("Threshold ok")),
-            (StockThresholdFilter.THRESHOLD_NONE, ugettext("Threshold missing")),
+            (StockThresholdFilter.THRESHOLD_ALERT, gettext("Threshold alert")),
+            (StockThresholdFilter.THRESHOLD_OK, gettext("Threshold ok")),
+            (StockThresholdFilter.THRESHOLD_NONE, gettext("Threshold missing")),
         ]
 
     def queryset(self, request, queryset):

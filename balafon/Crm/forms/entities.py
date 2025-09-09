@@ -2,9 +2,9 @@
 """Crm forms"""
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from balafon.Crm import models
 from balafon.Crm.forms.base import ModelFormWithAddress, FormWithFieldsetMixin
@@ -75,7 +75,7 @@ class EntityForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 instance.id = 1
         target_name = models.get_entity_logo_dir(instance, logo)
         if len(target_name) >= models.Entity._meta.get_field('logo').max_length:
-            raise ValidationError(ugettext("The file name is too long"))
+            raise ValidationError(gettext("The file name is too long"))
         return logo
 
 
@@ -112,7 +112,7 @@ class SelectEntityForm(forms.Form):
             entity_id = int(self.cleaned_data["entity"])
             return models.Entity.objects.get(id=entity_id)
         except (ValueError, models.Entity.DoesNotExist):
-            raise ValidationError(ugettext("The entity does'nt exist"))
+            raise ValidationError(gettext("The entity does'nt exist"))
 
 
 class ChangeContactEntityForm(forms.Form):
@@ -163,13 +163,13 @@ class ChangeContactEntityForm(forms.Form):
         try:
             option = int(self.cleaned_data["option"])
             if option == 0:
-                raise ValidationError(ugettext("Please select one of this options"))
+                raise ValidationError(gettext("Please select one of this options"))
             try:
                 self.meth_map[option]
             except KeyError:
-                raise ValidationError(ugettext("Invalid value"))
+                raise ValidationError(gettext("Invalid value"))
         except ValueError:
-            raise ValidationError(ugettext("Invalid data"))
+            raise ValidationError(gettext("Invalid data"))
         return option
 
     def clean_entity(self):
@@ -182,7 +182,7 @@ class ChangeContactEntityForm(forms.Form):
             try:
                 return models.Entity.objects.get(id=entity_id)
             except models.Entity.DoesNotExist:
-                raise ValidationError(ugettext("Please select an existing entity"))
+                raise ValidationError(gettext("Please select an existing entity"))
 
     def _add_to_existing_entity(self):
         """add to exsiting entity"""

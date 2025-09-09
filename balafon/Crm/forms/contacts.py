@@ -3,9 +3,9 @@
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 from coop_cms.bs_forms import ModelForm as BsModelForm
 
@@ -115,12 +115,12 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
         # define the allowed gender
         gender_choices = [
             (models.Contact.GENDER_NOT_SET, '-------'),
-            (models.Contact.GENDER_MALE, ugettext('Mr')),
-            (models.Contact.GENDER_FEMALE, ugettext('Mrs')),
+            (models.Contact.GENDER_MALE, gettext('Mr')),
+            (models.Contact.GENDER_FEMALE, gettext('Mrs')),
         ]
         if ALLOW_COUPLE_GENDER:
             gender_choices += [
-                (models.Contact.GENDER_COUPLE, ugettext('Mrs and Mr'))
+                (models.Contact.GENDER_COUPLE, gettext('Mrs and Mr'))
             ]
         self.fields['gender'].choices = gender_choices
 
@@ -190,7 +190,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 instance.id = 1
         target_name = models.get_contact_photo_dir(instance, photo)
         if len(target_name) >= models.Contact._meta.get_field('photo').max_length:
-            raise ValidationError(ugettext("The file name is too long"))
+            raise ValidationError(gettext("The file name is too long"))
         return photo
 
     def save_contact_subscriptions(self, contact):
@@ -220,7 +220,7 @@ class ContactForm(FormWithFieldsetMixin, ModelFormWithAddress):
                 contact = models.Contact.objects.get(id=contact_id)
                 return contact
             except models.Contact.DoesNotExist:
-                raise ValidationError(ugettext("Contact does'nt exist"))
+                raise ValidationError(gettext("Contact does'nt exist"))
 
     def save_same_as(self, this_contact):
         contact = self.cleaned_data['same_as_suggestions']
@@ -267,7 +267,7 @@ class SelectContactForm(forms.Form):
             contact_id = int(self.cleaned_data["contact"])
             return models.Contact.objects.get(id=contact_id)
         except (ValueError, models.Contact.DoesNotExist):
-            raise ValidationError(ugettext("The contact does'nt exist"))
+            raise ValidationError(gettext("The contact does'nt exist"))
 
 
 class SelectContactOrEntityForm(forms.Form):
@@ -286,13 +286,13 @@ class SelectContactOrEntityForm(forms.Form):
         }.get(object_type, None)
 
         if not object_class:
-            raise ValidationError(ugettext("Invalid type '{0}'").format(object_type))
+            raise ValidationError(gettext("Invalid type '{0}'").format(object_type))
 
         try:
             object_id = int(object_id)
             return object_class.objects.get(id=object_id)
         except (ValueError, object_class.DoesNotExist):
-            raise ValidationError(ugettext("Does'nt exist"))
+            raise ValidationError(gettext("Does'nt exist"))
 
 
 class SameAsPriorityForm(BetterBsForm):
@@ -311,7 +311,7 @@ class SameAsPriorityForm(BetterBsForm):
         max_value = self.contact.same_as.contact_set.count()
         if value < min_value or value > max_value:
             raise ValidationError(
-                ugettext('Invalid value : It should be between {0} and {1}').format(
+                gettext('Invalid value : It should be between {0} and {1}').format(
                     min_value, max_value
                 )
             )
@@ -366,10 +366,10 @@ class SameAsForm(forms.Form):
         contact_id = self.cleaned_data["contact"]
         try:
             if contact_id not in [same_as[0] for same_as in self._same_as]:
-                raise ValidationError(ugettext("Invalid contact"))
+                raise ValidationError(gettext("Invalid contact"))
             return models.Contact.objects.get(id=contact_id)
         except models.Contact.DoesNotExist:
-            raise ValidationError(ugettext("Contact does not exist"))
+            raise ValidationError(gettext("Contact does not exist"))
 
 
 class AddRelationshipForm(forms.Form):
@@ -405,9 +405,9 @@ class AddRelationshipForm(forms.Form):
                 relationship_type = -relationship_type
             return models.RelationshipType.objects.get(id=relationship_type)
         except ValueError:
-            raise ValidationError(ugettext("Invalid data"))
+            raise ValidationError(gettext("Invalid data"))
         except models.RelationshipType.DoesNotExist:
-            raise ValidationError(ugettext("Relationship type does not exist"))
+            raise ValidationError(gettext("Relationship type does not exist"))
 
     def clean_contact2(self):
         """clean the contacts in relation"""
@@ -415,9 +415,9 @@ class AddRelationshipForm(forms.Form):
             contact2 = int(self.cleaned_data["contact2"])
             return models.Contact.objects.get(id=contact2)
         except ValueError:
-            raise ValidationError(ugettext("Invalid data"))
+            raise ValidationError(gettext("Invalid data"))
         except models.Contact.DoesNotExist:
-            raise ValidationError(ugettext("Contact does not exist"))
+            raise ValidationError(gettext("Contact does not exist"))
 
     def save(self):
         """save"""
@@ -462,7 +462,7 @@ class ContactsImportForm(BsModelForm):
     def clean_separator(self):
         """validation"""
         if len(self.cleaned_data["separator"]) != 1:
-            raise ValidationError(ugettext('Invalid separator {0}').format(self.cleaned_data["separator"]))
+            raise ValidationError(gettext('Invalid separator {0}').format(self.cleaned_data["separator"]))
         return self.cleaned_data["separator"]
 
 
@@ -488,7 +488,7 @@ class ContactsImportConfirmForm(ContactsImportForm):
         code = self.cleaned_data['default_department']
         if code:
             if not models.Zone.objects.filter(code=self.cleaned_data['default_department']):
-                raise ValidationError(ugettext('Please enter a valid code'))
+                raise ValidationError(gettext('Please enter a valid code'))
             return self.cleaned_data['default_department']
         else:
             return None

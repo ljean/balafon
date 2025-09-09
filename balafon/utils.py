@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect, Http404
 from django.template.loader import get_template
 from django.urls import resolve, Resolver404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from coop_cms.utils.requests import RequestManager
 from coop_cms.utils import dehtml

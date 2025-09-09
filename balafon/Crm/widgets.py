@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import floppyforms.__future__ as forms
+import floppyforms as forms
 
 
 class CityAutoComplete(forms.HiddenInput):
     input_type = 'text'
     is_hidden = False
     template_name = 'forms/city_autocomplete.html'
+
+
+class PublicCityAutoComplete(CityAutoComplete):
+    template_name = 'forms/city_autocomplete_public.html'
 
 
 class CityNoCountryAutoComplete(forms.HiddenInput):

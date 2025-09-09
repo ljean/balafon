@@ -14,7 +14,6 @@
         {% favorite_item object=e %} {{e.newsletter.subject}}
       </td>
       <td>
-
         <a href="{% url "emailing_view" e.id %}">{{e.get_info}} ({{e.get_contacts|length}} {% trans "recipients" %})</a>
       </td>
     </tr>

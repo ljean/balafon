@@ -7,6 +7,7 @@ from datetime import date
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.test import tag
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import activate
@@ -547,6 +548,7 @@ class SubscribeTest(TestCase):
         notification_email = mail.outbox[0]
         self.assertEqual(notification_email.to, [settings.BALAFON_NOTIFICATION_EMAIL])
 
+    @tag('fix')
     def test_accept_newsletter(self, accept_newsletter=True, accept_3rdparty=True):
         """subscribe and accept some subscribtions"""
         site1 = Site.objects.get_current()
@@ -573,6 +575,7 @@ class SubscribeTest(TestCase):
         self._patch_with_captcha(url, data)
 
         response = self.client.post(url, data=data, follow=False)
+        soup = BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(302, response.status_code)
         self.assertEqual(models.Contact.objects.count(), 1)
 

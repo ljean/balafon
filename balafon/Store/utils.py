@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from coop_cms.utils import dehtml
 
@@ -34,7 +34,7 @@ def notify_cart_to_admin(contact, action):
             text,
             from_email,
             [notification_email],
-            # headers={'Reply-To': contact.email}
+            headers={'Reply-To': contact.email}
         )
         email.attach_alternative(html_text, "text/html")
 

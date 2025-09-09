@@ -13,7 +13,7 @@ from django.template import Template, Context
 from django.urls import reverse
 from django.utils import timezone
 
-from coop_cms.moves import StringIO
+from io import StringIO
 from model_mommy import mommy
 
 from balafon.unit_tests import TestCase, response_as_json

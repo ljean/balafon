@@ -3,7 +3,7 @@
 
 import sys
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_lazy as _
 
 from balafon.Crm import settings
 from balafon.Crm import search_forms
