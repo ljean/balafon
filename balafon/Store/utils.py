@@ -34,7 +34,7 @@ def notify_cart_to_admin(contact, action):
             text,
             from_email,
             [notification_email],
-            headers={'Reply-To': contact.email}
+            # headers={'Reply-To': contact.email}
         )
         email.attach_alternative(html_text, "text/html")
 

@@ -241,7 +241,8 @@ def send_notification_email(request, contact, actions, message):
         
         email = EmailMessage(
             _("Message from web site"), content, from_email,
-            [notification_email], headers={'Reply-To': contact.email}
+            [notification_email]
+            # , headers={'Reply-To': contact.email}
         )
 
         success = True

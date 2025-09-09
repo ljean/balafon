@@ -193,7 +193,9 @@ def notify_registration(profile):
         content = the_template.render(data)
         email = EmailMessage(
             _("New registration"), content, from_email,
-            [notification_email], headers={'Reply-To': profile.contact.email})
+            [notification_email],
+            # headers={'Reply-To': profile.contact.email}
+        )
         try:
             email.send()
         except Exception:
