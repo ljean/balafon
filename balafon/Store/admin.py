@@ -105,6 +105,18 @@ class SaleAdmin(admin.ModelAdmin):
     raw_id_fields = ['action', ]
 
 
+@admin.register(models.SaleItem)
+class SaleItemAdmin(admin.ModelAdmin):
+    list_display = (
+        'sale', 'text', 'item', 'quantity', 'pre_tax_price', 'percentage', 'discount', 'calculate_discount', 'vat_rate',
+        'order_index', 'is_blank', 'no_quantity', 'is_discount',
+    )
+    raw_id_fields = ['sale', 'item']
+    list_filter = ('item', )
+    date_hierarchy = 'sale__action__planned_date'
+    search_fields = ['text', ]
+
+
 @admin.register(models.StoreManagementActionType)
 class StoreManagementActionTypeAdmin(admin.ModelAdmin):
     """StoreManagementActionTypeAdmin"""
