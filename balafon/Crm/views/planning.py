@@ -84,6 +84,13 @@ class ActionArchiveView(object):
             queryset = queryset.filter(
                 Q(entities__name__icontains=name) | Q(contacts__lastname__icontains=name)
             )
+        number = self.request.GET.get("number", None)
+        if number is not None:
+            try:
+                number = int(number)
+                queryset = queryset.filter(number=number)
+            except ValueError:
+                pass
 
         if values and values != "null":
             values_dict = self._get_selection(values)

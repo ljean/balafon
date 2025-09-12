@@ -9,8 +9,9 @@
     $(function() {
 
         $('.name-search').val(getUrlVarsEx(window.location.href).name);
+        $('.number-search').val(getUrlVarsEx(window.location.href).number);
 
-        var changeFilter = function(values, orderValue, name) {
+        var changeFilter = function(values, orderValue, name, number) {
           var filterValues = '';
           if (values) {
             filterValues = values;
@@ -26,6 +27,9 @@
           if (name) {
               url += "&name=" + name
           }
+          if (number) {
+              url += "&number=" + number
+          }
 
           window.location = url;
         };
@@ -33,7 +37,7 @@
         function onFilter() {
             var values = $("select.filter").val();
             var orderValue = $("select.action-order").val();
-            changeFilter(values, orderValue, $('.name-search').val());
+            changeFilter(values, orderValue, $('.name-search').val(), $('.number-search').val());
             return false;
         }
 
@@ -41,18 +45,18 @@
 
         $("select.action-order").change(onFilter);
 
-        $(".name-search-btn").click(function(event) {
+        $(".name-search-btn,.number-search-btn").click(function(event) {
             event.preventDefault();
             event.stopPropagation()
             return onFilter();
         });
 
-        $(".name-search").keydown(function(event) {
+        $(".name-search,.number-search").keydown(function(event) {
             if (event.keyCode === 13) {
                 return onFilter();
             }
         });
-        
+
         $(".action-archive-filter a.btn").each(function(idx, elt) {
             var href = $(elt).attr("href");
             if (("" ===  href) || (href.charAt(0)==="?")) {
@@ -178,8 +182,15 @@
     </div>
     <div class="col-lg-3">
         <div class="input-group mb-3">
-          <input type="text" class="form-control name-search"
-                 placeholder="{%  trans 'Recherche par nom' %}" />
+          <input type="text" class="form-control name-search" placeholder="{%  trans 'Recherche par nom' %}" />
+          <div class="input-group-append">
+            <button class="btn btn-secondary name-search-btn" type="button" style="height: 38px;">
+                <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="number" class="form-control number-search" placeholder="{%  trans 'Recherche par n°' %}" />
           <div class="input-group-append">
             <button class="btn btn-secondary name-search-btn" type="button" style="height: 38px;">
                 <i class="fa fa-search"></i>
