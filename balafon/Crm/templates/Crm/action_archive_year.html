@@ -1,0 +1,13 @@
+{% extends "Crm/action_archive_base.html" %}
+{% load i18n %}
+
+{% block extra_title %}{{year|date:"Y"}}{% endblock %}
+
+{% block prev_url %}{% url "crm_actions_of_year" previous_year.year %}{% endblock %}
+
+{% block this_url %}{% url "crm_actions_of_year" year.year %}{% endblock %}
+
+{% block next_url %}{% url "crm_actions_of_year" next_year.year %}{% endblock %}
+
+{% block this_title %}{{year|date:"Y"}}{% endblock %}
+

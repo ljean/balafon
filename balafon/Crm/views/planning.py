@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.views.generic import RedirectView
-from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView
+from django.views.generic.dates import MonthArchiveView, WeekArchiveView, DayArchiveView, YearArchiveView
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse
@@ -137,6 +137,8 @@ class ActionArchiveView(object):
                 pass
             queryset = self.order_queryset(queryset, ordering)
 
+        print('####', queryset.count())
+
         return queryset
 
     def _get_allowed_status(self, action_types, selected_types, kind=1):
@@ -230,6 +232,17 @@ class ActionArchiveView(object):
         return super(ActionArchiveView, self).get(*args, **kwargs)
 
 
+
+class ActionYearArchiveView(ActionArchiveView, YearArchiveView):
+    """view"""
+    date_field = "planned_date"
+    year_format = '%Y'
+    allow_future = True
+    allow_empty = True
+    planning_type = 'year'
+    make_object_list = True
+
+
 class ActionMonthArchiveView(ActionArchiveView, MonthArchiveView):
     """view"""
     date_field = "planned_date"
@@ -300,6 +313,16 @@ class ThisMonthActionsView(RedirectView):
         return super(ThisMonthActionsView, self).get_redirect_url(*args, **kwargs)
 
 
+class ThisYearActionsView(RedirectView):
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        now = datetime.now()
+        self.url = reverse('crm_actions_of_year', args=[now.year])
+        return super(ThisYearActionsView, self).get_redirect_url(*args, **kwargs)
+
+
 @user_passes_test(can_access)
 def go_to_planning_date(request):
     """returns the url for displaying date"""
@@ -325,6 +348,9 @@ def go_to_planning_date(request):
 
     elif planning_type == 'day':
         url = reverse('crm_actions_of_day', args=[planning_date.year, planning_date.month, planning_date.day])
+
+    elif planning_type == 'year':
+        url = reverse('crm_actions_of_year', args=[planning_date.year])
 
     if url:
         if filters:

@@ -208,9 +208,15 @@ urlpatterns = [
     url('^contacts-import/unsubscribe/', importers.unsubscribe_contacts_import, name="crm_unsubscribe_contacts_import"),
 
     # planning
+    url(r'^actions-of-year/$', planning_views.ThisYearActionsView.as_view(), name="crm_this_year_actions"),
     url(r'^actions-of-month/$', planning_views.ThisMonthActionsView.as_view(), name="crm_this_month_actions"),
     url(r'^actions-of-week/$', planning_views.ThisWeekActionsView.as_view(), name="crm_this_week_actions"),
     url(r'^actions-of-day/$', planning_views.TodayActionsView.as_view(), name="crm_today_actions"),
+    url(
+        r'^actions-of-year/(?P<year>\d{4})/$',
+        planning_views.ActionYearArchiveView.as_view(),
+        name="crm_actions_of_year"
+    ),
     url(
         r'^actions-of-month/(?P<year>\d{4})/(?P<month>\d+)/$',
         planning_views.ActionMonthArchiveView.as_view(),

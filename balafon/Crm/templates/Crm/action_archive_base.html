@@ -51,10 +51,34 @@
             return onFilter();
         });
 
+        $(".number-clear-btn").click(function(event) {
+            event.preventDefault();
+            event.stopPropagation()
+            $('.number-search').val('')
+        });
+
+        $(".name-clear-btn").click(function(event) {
+            event.preventDefault();
+            event.stopPropagation()
+            $('.name-search').val('')
+        });
+        $(".search-clear").click(function(event) {
+            event.preventDefault();
+            event.stopPropagation()
+            $('.name-search').val('')
+            $('.number-search').val('')
+            return onFilter();
+        })
+
         $(".name-search,.number-search").keydown(function(event) {
             if (event.keyCode === 13) {
                 return onFilter();
             }
+        });
+
+        $(".name-search,.number-search").focus(function(event) {
+            $('.name-search').val('')
+            $('.number-search').val('')
         });
 
         $(".action-archive-filter a.btn").each(function(idx, elt) {
@@ -97,6 +121,7 @@
             {% if day %}dateToGo = '{{ day|date:"Y-m-d"}}';{% endif %}
             {% if month %}dateToGo = '{{ month|date:"Y-m-d"}}';{% endif %}
             {% if week %}dateToGo = '{{ week|date:"Y-m-d"}}';{% endif %}
+            {% if year %}dateToGo = '{{ year|date:"Y-m-d"}}';{% endif %}
             goToDate($(this).val(), dateToGo);
           }
           return false;
@@ -106,6 +131,18 @@
 <style>
   .datepicker { margin-left: -45px; z-index: 0; border: transparent; opacity: 0;}
   .datepicker-trigger { z-index: 100;}
+  .search-clear {
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: #eee;
+      color: #222;
+  }
+  .search-clear:hover {
+      background: #ddd;
+      border: 1px solid #222;
+      color: #fff;
+  }
 </style>
 {% include "balafon/_calendar.html" with dateFormat='yy-mm-dd' %}
 {% endblock %}
@@ -134,6 +171,7 @@
             <option value="day" {% if planning_type == "day" %}selected{%endif %}>{% trans "Day" %}</option>
             <option value="week" {% if planning_type == "week" %}selected{%endif %}>{% trans "Week" %}</option>
             <option value="month"{% if planning_type == "month" %}selected{%endif %}>{% trans "Month" %}</option>
+            <option value="year"{% if planning_type == "year" %}selected{%endif %}>{% trans "Année" %}</option>
           </select>
         </div>
         <div class="float-left" style="margin-left: 5px;">
@@ -181,9 +219,15 @@
       </select>
     </div>
     <div class="col-lg-3">
+        <div class="text-right" style="margin-top: -30px; margin-bottom: 5px;">
+            <a class="search-clear" href=""><i class="fa fa-eraser"></i></a>
+        </div>
         <div class="input-group mb-3">
           <input type="text" class="form-control name-search" placeholder="{%  trans 'Recherche par nom' %}" />
           <div class="input-group-append">
+{#            <button class="btn btn-secondary name-clear-btn" type="button" style="height: 38px;">#}
+{#                <i class="fa fa-eraser"></i>#}
+{#            </button>#}
             <button class="btn btn-secondary name-search-btn" type="button" style="height: 38px;">
                 <i class="fa fa-search"></i>
             </button>
@@ -192,7 +236,10 @@
         <div class="input-group mb-3">
           <input type="number" class="form-control number-search" placeholder="{%  trans 'Recherche par n°' %}" />
           <div class="input-group-append">
-            <button class="btn btn-secondary name-search-btn" type="button" style="height: 38px;">
+{#            <button class="btn btn-secondary number-clear-btn" type="button" style="height: 38px;">#}
+{#                <i class="fa fa-eraser"></i>#}
+{#            </button>#}
+            <button class="btn btn-secondary number-search-btn" type="button" style="height: 38px;">
                 <i class="fa fa-search"></i>
             </button>
           </div>

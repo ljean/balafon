@@ -96,7 +96,11 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle link-nav" data-toggle="dropdown">{% trans "Planning" %} <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-link" href="{% url 'crm_this_month_actions' %}">
+              <li><a class="dropdown-link" href="{% url 'crm_this_year_actions' %}">
+                <i class="fas fa-calendar"></i>
+                {% trans "Planning annuel" %}
+              </a></li>
+              <li><a class="dropdown-link" href="{% url 'crm_this_month_actions' %}">
               <i class="fas fa-calendar"></i>
               {% trans "Monthly actions" %}
             </a></li>
